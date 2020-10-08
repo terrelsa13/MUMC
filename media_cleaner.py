@@ -166,14 +166,15 @@ def generate_config():
     #config_file += "#0=Ok to delete favorite of media type once past not_played_age_* days ago#\n"
     #config_file += "#1=Do no delete favorite of media type#\n"
     #config_file += "#(1=default)#\n"
-    config_file += "ignore_favorites_movie=1\n"
-    config_file += "ignore_favorites_episode=1\n"
-    config_file += "ignore_favorites_video=1\n"
-    config_file += "ignore_favorites_trailer=1"
-    #config_file += "ignore_favorites_audio=1"
-    #config_file += "ignore_favorites_season_folder=1"
-    #config_file += "ignore_favorites_tvchannel=1"
-    #config_file += "ignore_favorites_program=1"
+    #config_file += "#Favoriting a series or season will treat all child episodes as if they are favorites#\n"
+    config_file += "keep_favorites_movie=1\n"
+    config_file += "keep_favorites_episode=1\n"
+    config_file += "keep_favorites_video=1\n"
+    config_file += "keep_favorites_trailer=1"
+    #config_file += "keep_favorites_audio=1"
+    #config_file += "keep_favorites_season_folder=1"
+    #config_file += "keep_favorites_tvchannel=1"
+    #config_file += "keep_favorites_program=1"
     #config_file += "\n#----------------------------------------------------------#"
 
     #Create config file next to the script even when cwd is not the same
@@ -204,6 +205,7 @@ def delete_item(itemID):
     url=url=cfg.server_url +'/Items/' + itemID + '?api_key='+ cfg.access_token
     req = request.Request(url,method='DELETE')
     if bool(cfg.DEBUG):
+        #DEBUG
         print(itemID)
         print(url)
         print(req)
@@ -240,7 +242,7 @@ def get_auth_key(server_url, username, password, password_sha1):
 
 
 def list_users(server_url, auth_key):
-    #Get all users - DEBUG
+    #Get all users 
     with request.urlopen(server_url +'/Users?api_key=' + auth_key) as response:
         if response.getcode() == 200:
             source = response.read()
@@ -318,6 +320,34 @@ def get_season_episode(season_number, episode_number):
     return(season_episode)
 
 
+def get_isfav_season_series(server_url, user_key, itemId, auth_key):
+    #Get if season or series is marked as favorite for this item
+    url=server_url + '/Users/' + user_key  + '/Items/' + itemId + '?api_key=' + auth_key
+
+    if bool(cfg.DEBUG):
+        #DEBUG
+        print(url)
+    with request.urlopen(url) as response:
+        if response.getcode() == 200:
+            source = response.read()
+            isfav_data = json.loads(source)
+            if bool(cfg.DEBUG):
+                #print debug data to file
+                cwd = os.getcwd()
+                script_dir = os.path.dirname(__file__)
+                os.chdir(script_dir)
+                f = open("media_cleaner.debug", "w")
+                f.write(retjprint(isfav_data))
+                f.close()
+                os.chdir(cwd)
+                #print debug data to buffer
+                #jprint(isfav_data)
+        else:
+            print('An error occurred while attempting to retrieve data from the API.')
+
+    return(isfav_data['UserData']['IsFavorite'])
+
+
 def get_items(server_url, user_key, auth_key):
     #Get list of all played items
     print('-----------------------------------------------------------')
@@ -332,6 +362,7 @@ def get_items(server_url, user_key, auth_key):
     url=server_url + '/Users/' + user_key  + '/Items?Recursive=true&IsPlayed=true&api_key=' + auth_key
 
     if bool(cfg.DEBUG):
+        #DEBUG
         print(url)
     with request.urlopen(url) as response:
         if response.getcode() == 200:
@@ -357,21 +388,24 @@ def get_items(server_url, user_key, auth_key):
     cut_off_date_video=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_video)
     cut_off_date_trailer=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_trailer)
     deleteItems=[]
+    isfav={'episode':{},'season':{},'series':{}}
 
     #Determine if media item is to be deleted or kept
     for item in data['Items']:
+
         if (item['Type'] == 'Movie'):
             if (
                (cfg.not_played_age_movie >= 0) and
                (item['UserData']['PlayCount'] >= 1) and
                (cut_off_date_movie > parse(item['UserData']['LastPlayedDate'])) and
-               (not bool(cfg.ignore_favorites_movie) or not item['UserData']['IsFavorite'])
+               (not bool(cfg.keep_favorites_movie) or not item['UserData']['IsFavorite'])
                ):
                 try:
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' - Favorite: ' + str(item['UserData']['IsFavorite'])  + ' - ' + 'MovieID: ' + item['Id']
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Delete Movie: \n' + str(item))
                 print(':*[DELETE] - ' + item_details)
                 deleteItems.append(item)
@@ -381,29 +415,62 @@ def get_items(server_url, user_key, auth_key):
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Keep Movie: \n' + str(item))
                 print(':[KEEPING] - ' + item_details)
         elif (item['Type'] == 'Episode'):
+            #Check if episode's favorite value already exists in dictionary
+            if not item['Id'] in isfav['episode']:
+                #Determine if this episode is marked as a favortie
+                isfav['episode'][item['Id']] = item['UserData']['IsFavorite']
+            #Check if season's favorite value already exists in dictionary
+            if not item['SeasonId'] in isfav['season']:
+                #Determine if the season is marked as a favorite
+                isfav['season'][item['SeasonId']] = get_isfav_season_series(server_url,user_key,item['SeasonId'],auth_key)
+            #Check if series' favorite value already exists in dictionary
+            if not item['SeriesId'] in isfav['series']:
+                #Determine if the series is marked as a favorite
+                isfav['series'][item['SeriesId']] = get_isfav_season_series(server_url,user_key,item['SeriesId'],auth_key)
+            if bool(cfg.DEBUG):
+                #DEBUG
+                print('Episode is favorite: ' + str(isfav['episode'][item['Id']]))
+                print(' Season is favorite: ' + str(isfav['season'][item['SeasonId']]))
+                print(' Series is favorite: ' + str(isfav['series'][item['SeriesId']]))
+
+            #Check if episode, season, or series is a favorite
+            if (
+               (isfav['episode'][item['Id']]) or
+               (isfav['season'][item['SeasonId']]) or
+               (isfav['series'][item['SeriesId']]) #or
+               ):
+                #Either the episode, season, or series is set as a favorite
+                itemIsFav=True
+            else:
+                #Neither the episode, season, or series is set as a favorite
+                itemIsFav=False
+
             if (
                (cfg.not_played_age_episode >= 0) and
                (item['UserData']['PlayCount'] >= 1) and
                (cut_off_date_episode > parse(item['UserData']['LastPlayedDate'])) and
-               (not bool(cfg.ignore_favorites_episode) or not item['UserData']['IsFavorite'])
+               (not bool(cfg.keep_favorites_episode) or (not itemIsFav))
                ):
                 try:
-                    item_details=item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' - Favorite: ' + str(item['UserData']['IsFavorite'])  + ' - ' + 'EpisodeID: ' + item['Id']
+                    item_details=item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' - Favorite: ' + str(itemIsFav)  + ' - ' + 'EpisodeID: ' + item['Id']
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Delete Episode: \n' + str(item))
                 print(':*[DELETE] - ' + item_details)
                 deleteItems.append(item)
             else:
                 try:
-                    item_details=item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' - Favorite: ' + str(item['UserData']['IsFavorite'])  + ' - ' + 'EpisodeID: ' + item['Id']
+                    item_details=item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' - Favorite: ' + str(itemIsFav)  + ' - ' + 'EpisodeID: ' + item['Id']
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Keep Episode: \n' + str(item))
                 print(':[KEEPING] - ' + item_details)
         elif (item['Type'] == 'Video'):
@@ -412,13 +479,14 @@ def get_items(server_url, user_key, auth_key):
                (cfg.not_played_age_video >= 0) and
                (item['UserData']['PlayCount'] >= 1) and
                (cut_off_date_video > parse(item['UserData']['LastPlayedDate'])) and
-               (not bool(cfg.ignore_favorites_video) or not item['UserData']['IsFavorite'])
+               (not bool(cfg.keep_favorites_video) or not item['UserData']['IsFavorite'])
                ):
                 try:
                     item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' -  Favorite: ' + str(item['UserData']['IsFavorite'])  + ' - ' + 'VideoID: ' + item['Id']
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Delete Video: \n' + str(item))
                 print(':*[DELETE] - ' + item_details)
                 deleteItems.append(item)
@@ -428,6 +496,7 @@ def get_items(server_url, user_key, auth_key):
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Keep Video: \n' + str(item))
                 print(':[KEEPING] - ' + item_details)
         elif (item['Type'] == 'Trailer'):
@@ -435,13 +504,14 @@ def get_items(server_url, user_key, auth_key):
                (cfg.not_played_age_trailer >= 0) and
                (item['UserData']['PlayCount'] >= 1) and
                (cut_off_date_trailer > parse(item['UserData']['LastPlayedDate'])) and
-               (not bool(cfg.ignore_favorites_trailer) or not item['UserData']['IsFavorite'])
+               (not bool(cfg.keep_favorites_trailer) or not item['UserData']['IsFavorite'])
                ):
                 try:
                     item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + get_days_since_watched(item['UserData']['LastPlayedDate']) + ' -  Favorite: ' + str(item['UserData']['IsFavorite'])  + ' - ' + 'TrailerID: ' + item['Id']
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Delete Trailer: \n' + str(item))
                 print(':*[DELETE] - ' + item_details)
                 deleteItems.append(item)
@@ -451,6 +521,7 @@ def get_items(server_url, user_key, auth_key):
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('\nError encountered - Keep Trailer: \n' + str(item))
                 print(':[KEEPING] - ' + item_details)
         else: #(item['Type'] == 'Unknown')
@@ -459,6 +530,7 @@ def get_items(server_url, user_key, auth_key):
             except (KeyError):
                 item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 if bool(cfg.DEBUG):
+                    #DEBUG
                     print('\nError encountered - Keep Unknown Media Type: \n' + str(item))
             print(':[KEEPING UNKNOWN MEDIA TYPE] - ' + item_details)
 
@@ -466,6 +538,7 @@ def get_items(server_url, user_key, auth_key):
         print('[NO WATCHED ITEMS]')
 
     print('-----------------------------------------------------------')
+    print('\n')
     return(deleteItems)
 
 
@@ -489,6 +562,7 @@ def list_delete_items(deleteItems):
                 except (KeyError):
                     item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
+                        #DEBUG
                         print('Error encountered - Delete Episode: \n\n' + str(item))
             elif item['Type'] == 'Video':
                 item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -519,10 +593,10 @@ try:
         not hasattr(cfg, 'admin_password_sha1') or
         not hasattr(cfg, 'access_token') or
         not hasattr(cfg, 'user_key') or
-        not hasattr(cfg, 'ignore_favorites_movie') or
-        not hasattr(cfg, 'ignore_favorites_episode') or
-        not hasattr(cfg, 'ignore_favorites_video') or
-        not hasattr(cfg, 'ignore_favorites_trailer') or
+        not hasattr(cfg, 'keep_favorites_movie') or
+        not hasattr(cfg, 'keep_favorites_episode') or
+        not hasattr(cfg, 'keep_favorites_video') or
+        not hasattr(cfg, 'keep_favorites_trailer') or
         not hasattr(cfg, 'remove_files') or
         not hasattr(cfg, 'not_played_age_movie') or
         not hasattr(cfg, 'not_played_age_episode') or
@@ -607,18 +681,18 @@ try:
             print('user_key=\'' + str(user_key) + '\'')
             setattr(cfg, 'user_key', user_key)
 
-        if not hasattr(cfg, 'ignore_favorites_movie'):
-            print('ignore_favorites_movie=1')
-            setattr(cfg, 'ignore_favorites_movie', 1)
-        if not hasattr(cfg, 'ignore_favorites_episode'):
-            print('ignore_favorites_episode=1')
-            setattr(cfg, 'ignore_favorites_episode', 1)
-        if not hasattr(cfg, 'ignore_favorites_video'):
-            print('ignore_favorites_video=1')
-            setattr(cfg, 'ignore_favorites_video', 1)
-        if not hasattr(cfg, 'ignore_favorites_trailer'):
-            print('ignore_favorites_trailer=1')
-            setattr(cfg, 'ignore_favorites_trailer', 1)
+        if not hasattr(cfg, 'keep_favorites_movie'):
+            print('keep_favorites_movie=1')
+            setattr(cfg, 'keep_favorites_movie', 1)
+        if not hasattr(cfg, 'keep_favorites_episode'):
+            print('keep_favorites_episode=1')
+            setattr(cfg, 'keep_favorites_episode', 1)
+        if not hasattr(cfg, 'keep_favorites_video'):
+            print('keep_favorites_video=1')
+            setattr(cfg, 'keep_favorites_video', 1)
+        if not hasattr(cfg, 'keep_favorites_trailer'):
+            print('keep_favorites_trailer=1')
+            setattr(cfg, 'keep_favorites_trailer', 1)
 
         if not hasattr(cfg, 'remove_files'):
             print('remove_files=0')
