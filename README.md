@@ -17,10 +17,10 @@ filename: media_cleaner_config.py
 * not_played_age_video=100 - How many days to keep a watched video before deleting; -1 do not delete media type
 * not_played_age_trailer=100 - How many days to keep a watched trailer before deleting; -1 do not delete media type
 * remove_files=0 - 0 for trial runs (media is not deleted);  1 to allow script to delete media
-* ignore_favorites_movie=1 - 1 Ignore movies that have been marked as favorite; 0 Delete movies marked as favorite
-* ignore_favorites_episode=1 - 1 Ignore episodes that have been marked as favorite; 0 Delete episodes marked as favorite
-* ignore_favorites_video=1 - 1 Ignore videos that have been marked as favorite; 0 Delete videos marked as favorite
-* ignore_favorites_trailer=1 - 1 Ignore trailers that have been marked as favorite; 0 Delete trailers marked as favorite
+* keep_favorites_movie=1 - 1 Keep movies that have been marked as favorite; 0 Delete movies marked as favorite
+* keep_favorites_episode=1 - 1 Keep episodes, seasons, and series that have been marked as favorite; 0 Delete episodes marked as favorite
+* keep_favorites_video=1 - 1 Keep videos that have been marked as favorite; 0 Delete videos marked as favorite
+* keep_favorites_trailer=1 - 1 Keep trailers that have been marked as favorite; 0 Delete trailers marked as favorite
 
 
 # Usage
