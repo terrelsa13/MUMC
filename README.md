@@ -28,8 +28,9 @@ not_played_age_audio=-1
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
 # Similar logic applies for other media types (episodes, trailers, etc...)
-#  0 : ok to delete favorite
-#  1 : do no delete favorite
+#  0 : ok to delete media items set as a favorite
+#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media items when all monitored users have set it as a favorite
+#  2 : when single user - not applicable; when multi-user - do not delete media_items when any monitored users have it set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
 keep_favorites_movie=1
