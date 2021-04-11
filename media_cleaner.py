@@ -123,6 +123,29 @@ def get_admin_password():
     return(password)
 
 
+#admin password?
+def get_cleaning_behavior():
+    defaultbehavior='whitelist'
+    valid_behavior=False
+    while (valid_behavior == False):
+        print('Choose how the script will decide which libraries to delete media items from.')
+        print('0 - Whitelisting media libraries; media items can be deleted from library unless library is whitelisted.')
+        print('1 - Blacklisting media libraries; media items cannot be deleted from library unless library is blacklisted (aka monitored).')
+        behavior=input('Choose how the script will behave. (press enter to default to whitelisting): ')
+        if (behavior == ''):
+            valid_behavior=True
+            return(defaultbehavior)
+        elif (behavior == '0'):
+            valid_behavior=True
+            return(defaultbehavior)
+        elif (behavior == '1'):
+            valid_behavior=True
+            return('blacklist')
+        else:
+            print('\nInvalid choice. Try again.\n')
+            return(defaultbrand)
+
+
 #use of hashed password removed
 #hash admin password
 #def get_admin_password_sha1(password):
@@ -152,11 +175,30 @@ def generate_config():
     print('-----------------------------------------------------------')
     password=get_admin_password()
     print('-----------------------------------------------------------')
-
     auth_key=get_auth_key(server_url, username, password)
-    user_keys=list_users(server_url, auth_key)
+
+    script_behavior=get_cleaning_behavior()
     print('-----------------------------------------------------------')
-    whitelist=list_library_folders(server_url, auth_key)
+
+    user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key, script_behavior)
+
+    userkeys_list=[]
+    userlibs_list=[]
+    userkeys_wllibs_list=[]
+    userwllibs_list=[]
+
+    for userkey, userlib in user_keys_and_libs.items():
+        userkeys_list.append(userkey)
+        userlibs_list.append(userlib)
+
+    for userkey, userwllib in user_keys_and_wllibs.items():
+        userkeys_wllibs_list.append(userkey)
+        userwllibs_list.append(userwllib)
+
+    user_keys=json.dumps(userkeys_list)
+    user_libs=json.dumps(userlibs_list)
+    user_wl_libs=json.dumps(userwllibs_list)
+
     print('-----------------------------------------------------------')
 
     not_played_age_movie="-1"
@@ -186,8 +228,8 @@ def generate_config():
     config_file += "# Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites\n"
     config_file += "# Similar logic applies for other media types (episodes, trailers, etc...)\n"
     config_file += "#  0 : ok to delete media items set as a favorite\n"
-    config_file += "#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media items when all monitored users have set it as a favorite\n"
-    config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media_items when any monitored users have it set as a favorite\n"
+    config_file += "#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite\n"
+    config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "keep_favorites_movie=1\n"
@@ -235,10 +277,13 @@ def generate_config():
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Whitelisting a library folder will treat all child media as if they are favorites\n"
-    config_file += "# ('' - default)\n"
+    config_file += "# Decide how whitelists behave\n"
+    config_file += "#  0 : reserved...\n"
+    config_file += "#  1 : when single user - not applicable; when multi-user - do not delete media item when all monitored users have the parent library whitelisted\n"
+    config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have the parent library whitelisted\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "whitelisted_library_folders='" + whitelist + "'\n"
+    config_file += "multiuser_whitelist_advanced=1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -252,19 +297,25 @@ def generate_config():
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Server branding chosen during setup; only used during setup\n"
+    config_file += "# Server branding; chosen during setup; only used during setup\n"
     config_file += "#  0 - 'emby'\n"
     config_file += "#  1 - 'jellyfin'\n"
-    config_file += "# Server URL created during setup\n"
-    config_file += "# Admin username chosen during setup\n"
-    config_file += "# Access token requested from server during setup\n"
-    config_file += "# User key of account to monitor played media chosen during setup\n"
+    config_file += "# Server URL; created during setup\n"
+    config_file += "# Admin username; chosen during setup\n"
+    config_file += "# Access token; requested from server during setup\n"
+    config_file += "# User key of account to monitor played media ;chosen during setup\n"
+    #config_file += "# Script is using whitelists or blacklists; chosen during setup\n"
+    config_file += "# User blacklisted libraries of corresponding user account to monitor for played media items; chosen during setup\n"
+    config_file += "# User whitelisted libraries of corresponding user account to exclude monitoring for played media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "server_brand='" + server_brand + "'\n"
     config_file += "server_url='" + server_url + "'\n"
     config_file += "admin_username='" + username + "'\n"
     config_file += "access_token='" + auth_key + "'\n"
     config_file += "user_keys='" + user_keys + "'\n"
+    #config_file += "script_behavior='" + script_behavior + "'\n"
+    config_file += "user_libs='" + user_libs + "'\n"
+    config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "DEBUG=0\n"
     #config_file += "#----------------------------------------------------------#"
 
@@ -348,7 +399,7 @@ def get_auth_key(server_url, username, password):
 #api call to get all user accounts
 #then choose account this script will use to delete played media
 #choosen account does NOT need to have "Allow Media Deletion From" enabled
-def list_users(server_url, auth_key):
+def get_users_and_paths(server_url, auth_key, script_behavior):
     #Get all users
     with request.urlopen(server_url + '/Users?api_key=' + auth_key) as response:
         if response.getcode() == 200:
@@ -361,9 +412,13 @@ def list_users(server_url, auth_key):
         else:
             print('An error occurred while attempting to retrieve data from the API.')
 
-    #define empty dictionary
+    #define empty userId dictionary
     userId_dict={}
-    #define empty set
+    #define empty monitored library dictionary
+    userId_lib_dict={}
+    #define empty whitelisted library dictionary
+    userId_wllib_dict={}
+    #define empty userId set
     userId_set=set()
 
     stop_loop=False
@@ -382,26 +437,38 @@ def list_users(server_url, auth_key):
                 i += 1
         else:
             single_user=True
+            userId_dict[i]=user['Id']
 
         print('')
 
         if ((i == 0) and (single_user == True)):
-            user_number=''
+            user_number='0'
         elif ((i >= 1) and (one_user_selected == False)):
-            print('Chosing multiple users is possible.')
-            print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
-            user_number=input('Enter number of user to track: ')
+            user_number=input('Enter number of user to monitor: ')
+            print('')
         else: #((i >= 1) and (one_user_selected == True)):
-            print('Chosing multiple users is possible.')
-            print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
-            print('Enter number of user to track.')
-            user_number=input('Leave blank when finished: ')
+            print('Monitoring multiple users is possible.')
+            #print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
+            print('When multiple users are selected; the user with the oldest last played time will determine if media is deleted.')
+            user_number=input('Enter number of user to monitor; leave blank when finished: ')
+            print('')
 
         try:
-            if ((user_number == '') and (single_user == True)):
+            if ((user_number == '0') and (single_user == True)):
                 stop_loop=True
                 one_user_selected=True
-                print('')
+
+                userId_set.add(userId_dict[user_number_int])
+
+                if (script_behavior == 'blacklist'):
+                    message='Enter number of library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
+                    userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message)
+                    userId_wllib_dict[userId_dict[user_number_int]]=''
+                else:
+                    userId_lib_dict[userId_dict[user_number_int]]=''
+                    message='Enter number of library folder to whitelist for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
+                    userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message)
+
             elif ((user_number == '') and not (len(userId_set) == 0)):
                 stop_loop=True
                 print('')
@@ -414,11 +481,20 @@ def list_users(server_url, auth_key):
                 if ((user_number_int >= 0) and (user_number_int < i)):
                     one_user_selected=True
                     userId_set.add(userId_dict[user_number_int])
+
+                    if (script_behavior == 'blacklist'):
+                        message='Enter number of library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
+                        userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
+                        userId_wllib_dict[userId_dict[user_number_int]]=''
+                    else:
+                        userId_lib_dict[userId_dict[user_number_int]]=''
+                        message='Enter number of library folder to whitelist for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
+                        userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, False)
+
                     if (len(userId_set) >= i):
                         stop_loop=True
                     else:
                         stop_loop=False
-                    print('')
                 else:
                     print('\nInvalid value. Try again.\n')
             else:
@@ -426,22 +502,12 @@ def list_users(server_url, auth_key):
         except:
             print('\nInvalid value. Try again.\n')
 
-
-    i=0
-    userIds=''
-    for userId in userId_set:
-        if (i == 0):
-            userIds = userId
-            i += 1
-        else:
-            userIds = userIds + ',' + userId
-
-    return(userIds)
+    return(userId_lib_dict, userId_wllib_dict)
 
 
 #api call to get library folders
 #then choose which folders to whitelist
-def list_library_folders(server_url, auth_key):
+def list_library_folders(server_url, auth_key, infotext, mandatory):
     #get all library paths
     with request.urlopen(server_url + '/Library/VirtualFolders?api_key=' + auth_key) as response:
         if response.getcode() == 200:
@@ -460,6 +526,7 @@ def list_library_folders(server_url, auth_key):
     libraryfolders_set=set()
 
     stop_loop=False
+    first_run=True
     while (stop_loop == False):
         i=0
         for path in data:
@@ -483,14 +550,21 @@ def list_library_folders(server_url, auth_key):
         print('')
 
         if (i >= 1):
-            print('Enter number of library folder to whitelist.')
-            print('Media in whitelisted library folders will NOT be deleted.')
-            path_number=input('Leave blank for none or when finished: ')
-        else:
-            path_number=''
+            #print('Enter number of library folder to whitelist.')
+            #print('Media in whitelisted library folders will NOT be deleted.')
+            print(infotext)
+            if ((mandatory) and (first_run)):
+                first_run=False
+                path_number=input('Must select at least one library to monitor: ')
+            elif (mandatory):
+                path_number=input('Leave blank when finished: ')
+            else:
+                path_number=input('Leave blank for none or when finished: ')
 
         try:
-            if (path_number == ''):
+            if ((path_number == '') and (len(libraryfolders_set) == 0) and (mandatory)):
+                print('\nMust select at least one library to monitor for this user. Try again.\n')
+            elif (path_number == ''):
                 stop_loop=True
                 print('')
             else:
@@ -519,17 +593,17 @@ def list_library_folders(server_url, auth_key):
         return('')
     else:
         i=0
-        whitelistpaths=''
+        libraryPaths=''
         for libfolders in libraryfolders_set:
             if (i == 0):
                 #libfolders = libfolders.replace('\"','\\\"')
-                whitelistpaths = libfolders.replace('\'','\\\'')
+                libraryPaths = libfolders.replace('\'','\\\'')
                 i += 1
             else:
                 #libfolders = libfolders.replace('\"','\\\"')
-                whitelistpaths = libfolders.replace('\'','\\\'') + ',' + whitelistpaths
+                libraryPaths = libfolders.replace('\'','\\\'') + ',' + libraryPaths
 
-        return(whitelistpaths)
+        return(libraryPaths)
 
 
 #Get count of days since last played
@@ -1047,7 +1121,7 @@ def get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key):
 def get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems):
     deleteIndexes=[]
 
-    #compare favoited items across users
+    #compare favorited items across users
     #remove from deleteItems list if configured to keep media item when any user has it set as a favorite
     for userId in userkey:
         for usersItemId in isfav_byUserId[userId]:
@@ -1059,21 +1133,21 @@ def get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems):
 
     #sort indexes needed to remove items from deletion that we want to keep
     deleteIndexes.sort()
-    #reverse the order so not worry about shifting indexes when removing items from deleteItems list
+    #reverse the order to not worry about shifting indexes when removing items from deleteItems list
     deleteIndexes.reverse()
 
     #remove favorited items we want to keep
-    for d in deleteIndexes:
-        deleteItems.pop(d)
+    for favItem in deleteIndexes:
+        deleteItems.pop(favItem)
 
     deleteIndexes=[]
 
     #find duplicates
-    for x in range(len(deleteItems)):
-        for y in range(len(deleteItems)):
-            if (x < y):
-               if (deleteItems[x]['Id'] == deleteItems[y]['Id']):
-                   deleteIndexes.append(y)
+    for item0 in range(len(deleteItems)):
+        for item1 in range(len(deleteItems)):
+            if (item0 < item1):
+               if (deleteItems[item0]['Id'] == deleteItems[item1]['Id']):
+                   deleteIndexes.append(item1)
 
     #sort indexes needed to remove items from deletion that we want to keep
     deleteIndexes.sort()
@@ -1081,33 +1155,49 @@ def get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems):
     deleteIndexes.reverse()
 
     #remove duplicates
-    for d in deleteIndexes:
-        deleteItems.pop(d)
+    for favItem in deleteIndexes:
+        deleteItems.pop(favItem)
 
     return(deleteItems)
 
 
-#determine if media item is in whitelisted folder
-def get_iswhitelisted(itemPath):
-    #read whitelist configuration variable
-    whitelist=cfg.whitelisted_library_folders
-    whitelistentries=whitelist.split(',')
+#Handle whitelists across multiple users
+def get_iswhitelist_MultiUser(userkey, isfav_byUserId, deleteItems):
+    return(get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems))
 
+
+#determine if media item is in library folder
+def get_isPathMatching(itemPath, comparePath):
+    #read and split paths to compare to
+    comparePathEntries=comparePath.split(',')
+
+    item_path_matches=False
     #determine if media item's path matches one of the whitelist folders
-    item_is_whitelisted=False
-    for path in whitelistentries:
+    for path in comparePathEntries:
         if not (path == ''):
             if (itemPath.startswith(path)):
-                item_is_whitelisted=True
+                item_path_matches=True
 
                 if bool(cfg.DEBUG):
                     #DEBUG
-                    print('whitelist folder comparison')
+                    print('media item folder/path comparison')
                     print(path + ' : ' + itemPath)
 
-                return(item_is_whitelisted)
+                return(item_path_matches)
 
-    return(item_is_whitelisted)
+    return(item_path_matches)
+
+#determine if item is whitelisted
+def get_isWhitelisted(itemPath, comparePath):
+    return(get_isPathMatching(itemPath, comparePath))
+
+
+#determine if item is blacklisted (aka monitored)
+def get_isBlacklisted(itemPath, comparePath):
+    if (comparePath == ''):
+        return(True)
+    else:
+        return(get_isPathMatching(itemPath, comparePath))
 
 
 #get played media items; track media items ready to be deleted
@@ -1138,15 +1228,27 @@ def get_items(server_url, user_keys, auth_key):
         print('* Set at least one media type to >=0 days. *')
         print('-----------------------------------------------------------')
 
+    #items to be deleted
     deleteItems=[]
+    #favorited items by userId
     isfav_byUserId={}
+    #whitelisted items by userId
+    iswhitelist_byUserId={}
 
-    #Spit user_key so each can be used
-    userkey=user_keys.split(',')
-    #Define empty dictionary to store media item favorite states by userId and itemId
-    usercount=len(userkey)
+    #load user_keys to json
+    user_key_json=json.loads(user_keys)
+    #load user_libs to json
+    user_lib_json=json.loads(cfg.user_libs)
+    #load_user_wl_libs to json
+    user_wllib_json=json.loads(cfg.user_wl_libs)
 
-    for user_key in userkey:
+    #get number of user_keys and user_libs
+    userkey_count=len(user_key_json)
+    userlib_count=len(user_lib_json)
+    userwllib_count=len(user_lib_json)
+
+    currentPosition=0
+    for user_key in user_key_json:
         url=server_url + '/Users/' + user_key  + '/?api_key=' + auth_key
 
         if bool(cfg.DEBUG):
@@ -1203,21 +1305,32 @@ def get_items(server_url, user_keys, auth_key):
 
         #define dictionary user_key to store media item favorite states by userId and itemId
         isfav_byUserId[user_key]={}
+        #define dictionary user_key to store media item whitelisted states by userId and itemId
+        iswhitelist_byUserId[user_key]={}
 
         #Determine if media item is to be deleted or kept
         for item in data['Items']:
+
+            #Get if media item path is monitored
+            item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
+            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+
             #find movie media items ready to delete
-            if ((item['Type'] == 'Movie') and not (cfg.not_played_age_movie == -1)):
+            if ((item['Type'] == 'Movie') and not (cfg.not_played_age_movie == -1) and (itemIsMonitored)):
 
                 #Get if movie is set as favorite
                 itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key)
+
+                #Get if media item path whitelisted
+                itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
                 #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                 if (cfg.keep_favorites_movie == 2):
                     isfav_byUserId[user_key][item['Id']] = itemisfav_MOVIE
 
-                #Get if media item is whitelisted
-                item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
-                itemIsWhiteListed=get_iswhitelisted(item_info['Path'])
+                #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                if (cfg.multiuser_whitelist_advanced == 2):
+                    iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                 if (
                    (cfg.not_played_age_movie >= 0) and
@@ -1245,17 +1358,21 @@ def get_items(server_url, user_keys, auth_key):
                             print('\nError encountered - Keep Movie: \n' + str(item))
                     print(':[KEEPING] - ' + item_details)
             #find tv-episode media items ready to delete
-            elif ((item['Type'] == 'Episode') and not (cfg.not_played_age_episode == -1)):
+            elif ((item['Type'] == 'Episode') and not (cfg.not_played_age_episode == -1) and (itemIsMonitored)):
 
                 #Get if episode, season, or series is set as favorite
                 itemisfav_TVessn=get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key)
+
+                #Get if media item path is whitelisted
+                itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
                 #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                 if (cfg.keep_favorites_episode == 2):
                     isfav_byUserId[user_key][item['Id']] = itemisfav_TVessn
 
-                #Get if media item is whitelisted
-                item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
-                itemIsWhiteListed=get_iswhitelisted(item_info['Path'])
+                #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                if (cfg.multiuser_whitelist_advanced == 2):
+                    iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                 if (
                    (cfg.not_played_age_episode >= 0) and
@@ -1283,15 +1400,18 @@ def get_items(server_url, user_keys, auth_key):
                             print('\nError encountered - Keep Episode: \n' + str(item))
                     print(':[KEEPING] - ' + item_details)
             #find video media items ready to delete
-            elif ((item['Type'] == 'Video') and not (cfg.not_played_age_video == -1)):
+            elif ((item['Type'] == 'Video') and not (cfg.not_played_age_video == -1) and (itemIsMonitored)):
 
                 #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                 if (cfg.keep_favorites_video == 2):
                     isfav_byUserId[user_key][item['Id']] = cfg.keep_favorites_video
 
-                #Get if media item is whitelisted
-                item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
-                itemIsWhiteListed=get_iswhitelisted(item_info['Path'])
+                #Get if media item path is whitelisted
+                itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
+                #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                if (cfg.multiuser_whitelist_advanced == 2):
+                    iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                 if (
                    (item['Type'] == 'Video') and
@@ -1320,15 +1440,18 @@ def get_items(server_url, user_keys, auth_key):
                             print('\nError encountered - Keep Video: \n' + str(item))
                     print(':[KEEPING] - ' + item_details)
             #find trailer media items ready to delete
-            elif ((item['Type'] == 'Trailer') and not (cfg.not_played_age_trailer == -1)):
+            elif ((item['Type'] == 'Trailer') and not (cfg.not_played_age_trailer == -1) and (itemIsMonitored)):
 
                 #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                 if (cfg.keep_favorites_trailer == 2):
                     isfav_byUserId[user_key][item['Id']] = cfg.keep_favorites_trailer
 
-                #Get if media item is whitelisted
-                item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
-                itemIsWhiteListed=get_iswhitelisted(item_info['Path'])
+                #Get if media item path is whitelisted
+                itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
+                #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                if (cfg.multiuser_whitelist_advanced == 2):
+                    iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                 if (
                    (cfg.not_played_age_trailer >= 0) and
@@ -1356,17 +1479,21 @@ def get_items(server_url, user_keys, auth_key):
                             print('\nError encountered - Keep Trailer: \n' + str(item))
                     print(':[KEEPING] - ' + item_details)
             #find audio media items ready to delete
-            elif ((item['Type'] == 'Audio') and not (cfg.not_played_age_audio == -1)):
+            elif ((item['Type'] == 'Audio') and not (cfg.not_played_age_audio == -1) and (itemIsMonitored)):
 
                 #Get if track, album, or artist is set as favorite
                 itemisfav_MUSICtaa=get_isfav_MUSICtaa(isfav_MUSICtaa, item, server_url, user_key, auth_key)
+
+                #Get if media item path is whitelisted
+                itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
                 #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                 if (cfg.keep_favorites_audio == 2):
                     isfav_byUserId[user_key][item['Id']] = itemisfav_MUSICtaa
 
-                #Get if media item is whitelisted
-                item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key)
-                itemIsWhiteListed=get_iswhitelisted(item_info['Path'])
+                #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                if (cfg.multiuser_whitelist_advanced == 2):
+                    iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                 if (
                    (cfg.not_played_age_audio >= 0) and
@@ -1409,9 +1536,15 @@ def get_items(server_url, user_keys, auth_key):
         if len(data['Items']) <= 0:
             print('[NO PLAYED ITEMS]')
 
-    #When multiple users and keep_favorite_???=2 Determine media items to keep and clean up deletion list
-    #When not multiple userss and keep_favorite_???=2 just clean up deletion list
-    deleteItems=get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems)
+        currentPosition+=1
+
+    #When multiple users and keep_favorite_xyz=2 Determine media items to keep and remove them from deletion list
+    #When not multiple userss and keep_favorite_xyz=2 will just clean up deletion list
+    deleteItems=get_isfav_MultiUser(user_key_json, isfav_byUserId, deleteItems)
+
+    #When multiple users and multiuser_whitelist_advanced=2 Determine media items to keep and remove them from deletion list
+    #When not multiple userss and multiuser_whitelist_advanced=2 will just clean up deletion list
+    deleteItems=get_iswhitelist_MultiUser(user_key_json, iswhitelist_byUserId, deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
@@ -1598,12 +1731,14 @@ def cfgCheck():
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
 
-    test=cfg.whitelisted_library_folders
+    test=cfg.multiuser_whitelist_advanced
     if (
-        not (type(test) is str)
+        not ((type(test) is int) and
+        (test >= 0) and
+        (test <= 2))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: whitelisted_library_folders must be a single string with commas separating multiple paths\n'
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_advanced must be an integer; valid range 0 thru 2\n'
 
     test=cfg.remove_files
     if (
@@ -1645,15 +1780,46 @@ def cfgCheck():
         error_found_in_media_cleaner_config_py+='TypeError: access_token must be a 32-character alphanumeric string\n'
 
     test=cfg.user_keys
-    test_split=test.split(',')
-    for test_irt in test_split:
+    test_list=json.loads(test)
+    test_user_keys_length=len(test_list)
+    for test_irt in test_list:
         if (
             not ((type(test_irt) is str) and
             (len(test_irt) == 32) and
             (str(test_irt).isalnum()))
            ):
             errorfound=True
-            error_found_in_media_cleaner_config_py+='TypeError: user_keys must be a single string with commas separating multiple user keys; each user key must be a 32-character alphanumeric string\n'
+            error_found_in_media_cleaner_config_py+='TypeError: user_keys must be a single list with commas separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
+
+    #test=cfg.script_behavior
+    #if (
+        #not ((type(test_irt) is str) and
+        #((test == 'whitelist') or (test == 'blacklist')))
+       #):
+            #errorfound=True
+            #error_found_in_media_cleaner_config_py+='TypeError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
+
+    test=cfg.user_libs
+    test_list=json.loads(test)
+    test_user_libs_length=len(test_list)
+    for test_irt in test_list:
+        if (
+            not ((type(test_irt) is str) and
+            (test_user_keys_length == test_user_libs_length))
+           ):
+            errorfound=True
+            error_found_in_media_cleaner_config_py+='TypeError: user_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
+
+    test=cfg.user_wl_libs
+    test_list=json.loads(test)
+    test_user_wllibs_length=len(test_list)
+    for test_irt in test_list:
+        if (
+            not ((type(test_irt) is str) and
+            (test_user_keys_length == test_user_wllibs_length))
+           ):
+            errorfound=True
+            error_found_in_media_cleaner_config_py+='TypeError: user_wl_libs must be a single list with commas separating multiple users\' whitelisted libraries; each user\'s whitelisted libraries must also be comma seperated within the string\n'
 
     test=cfg.DEBUG
     if (
@@ -1693,13 +1859,16 @@ try:
         not hasattr(cfg, 'keep_favorites_audio') or
         not hasattr(cfg, 'keep_favorites_advanced') or
         not hasattr(cfg, 'keep_favorites_advanced_any') or
+        not hasattr(cfg, 'multiuser_whitelist_advanced') or
         not hasattr(cfg, 'remove_files') or
-        not hasattr(cfg, 'whitelisted_library_folders') or
         not hasattr(cfg, 'server_brand') or
         not hasattr(cfg, 'server_url') or
         not hasattr(cfg, 'admin_username') or
         not hasattr(cfg, 'access_token') or
-        not hasattr(cfg, 'user_keys')
+        not hasattr(cfg, 'user_keys') or
+        #not hasattr(cfg, 'script_behavior') or
+        not hasattr(cfg, 'user_libs') or
+        not hasattr(cfg, 'user_wl_libs')
        ):
         if (
             not hasattr(cfg, 'server_brand') or
@@ -1707,7 +1876,9 @@ try:
             not hasattr(cfg, 'admin_username') or
             not hasattr(cfg, 'access_token') or
             not hasattr(cfg, 'user_keys') or
-            not hasattr(cfg, 'whitelisted_library_folders')
+            #not hasattr(cfg, 'script_behavior') or
+            not hasattr(cfg, 'user_libs') or
+            not hasattr(cfg, 'user_wl_libs')
            ):
 
             if hasattr(cfg, 'server_brand'):
@@ -1720,8 +1891,12 @@ try:
                 delattr(cfg, 'access_token')
             if hasattr(cfg, 'user_keys'):
                 delattr(cfg, 'user_keys')
-            if hasattr(cfg, 'whitelisted_library_folders'):
-                delattr(cfg, 'whitelisted_library_folders')
+            #if hasattr(cfg, 'script_behavior'):
+                #delattr(cfg, 'script_behavior')
+            if hasattr(cfg, 'user_libs'):
+                delattr(cfg, 'user_libs')
+            if hasattr(cfg, 'user_wl_libs'):
+                delattr(cfg, 'user_wl_libs')
 
             print('-----------------------------------------------------------')
             server_brand=get_brand()
@@ -1742,12 +1917,30 @@ try:
             print('-----------------------------------------------------------')
             password=get_admin_password()
             print('-----------------------------------------------------------')
-
             auth_key=get_auth_key(server_url, username, password)
-            user_keys=list_users(server_url, auth_key)
+
+            script_behavior=get_cleaning_behavior()
             print('-----------------------------------------------------------')
 
-            whitelist=list_library_folders(server_url, auth_key)
+            user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key)
+
+            userkeys_list=[]
+            userlibs_list=[]
+            userkeys_wllibs_list=[]
+            userwllibs_list=[]
+
+            for userkey, userlib in user_keys_and_libs.items():
+                userkeys_list.append(userkey)
+                userlibs_list.append(userlib)
+
+            for userkey, userwllib in user_keys_and_wllibs.items():
+                userkeys_wllibs_list.append(userkey)
+                userwllibs_list.append(userwllib)
+
+            user_keys=json.dumps(userkeys_list)
+            user_libs=json.dumps(userlibs_list)
+            user_wl_libs=json.dumps(userwllibs_list)
+
             print('-----------------------------------------------------------')
 
         #warn user the configuration file is not complete
@@ -1803,9 +1996,9 @@ try:
             print('keep_favorites_advanced_any=00000000')
             setattr(cfg, 'keep_favorites_advanced_any', '00000000')
 
-        if not hasattr(cfg, 'whitelisted_library_folders'):
-            print('whitelisted_library_folders=\'\'')
-            setattr(cfg, 'whitelisted_library_folders', '\'\'')
+        if not hasattr(cfg, 'multiuser_whitelist_advanced'):
+            print('multiuser_whitelist_advanced=0')
+            setattr(cfg, 'multiuser_whitelist_advanced', 0)
 
         if not hasattr(cfg, 'remove_files'):
             print('remove_files=0')
@@ -1826,6 +2019,15 @@ try:
         if not hasattr(cfg, 'user_keys'):
             print('user_keys=\'' + str(user_keys) + '\'')
             setattr(cfg, 'user_keys', user_keys)
+        #if not hasattr(cfg, 'script_behavior'):
+            #print('script_behavior=\'' + str(script_behavior) + '\'')
+            #setattr(cfg, 'script_behavior', script_behavior)
+        if not hasattr(cfg, 'user_libs'):
+            print('user_libs=\'' + str(user_libs) + '\'')
+            setattr(cfg, 'user_libs', user_libs)
+        if not hasattr(cfg, 'user_wl_libs'):
+            print('user_wl_libs=\'' + str(user_wl_libs) + '\'')
+            setattr(cfg, 'user_wl_libs', user_wl_libs)
 
         #print('DEBUG=' + str(cfg.DEBUG))
 
