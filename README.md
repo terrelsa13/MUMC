@@ -15,7 +15,7 @@ The first time you run the script it will attempt to create the config file by a
 #  -1 : to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
-not_played_age_movie=-1
+not_played_age_movie=0
 not_played_age_episode=-1
 not_played_age_video=-1
 not_played_age_trailer=-1
@@ -29,8 +29,8 @@ not_played_age_audio=-1
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
 # Similar logic applies for other media types (episodes, trailers, etc...)
 #  0 : ok to delete media items set as a favorite
-#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media items when all monitored users have set it as a favorite
-#  2 : when single user - not applicable; when multi-user - do not delete media_items when any monitored users have it set as a favorite
+#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
+#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
 keep_favorites_movie=1
@@ -77,13 +77,16 @@ keep_favorites_advanced='00000001'
 #----------------------------------------------------------#
 keep_favorites_advanced_any='00000000'
 ```
-#### Media in these library folders will be treated as if they are all marked as a favorite (i.e. media will not be deleted):
+#### When monitoring multiple users whitelisted libraries will be treated accordingly:
 ```python
 #----------------------------------------------------------#
-# Whitelisting a library folder will treat all child media as if they are favorites
-# ('' - default)
+# Decide how whitelists behave
+#  0 : reserved...
+#  1 : when single user - not applicable; when multi-user - do not delete media item when all monitored users have the parent library whitelisted
+#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have the parent library whitelisted
+# (0 : default)
 #----------------------------------------------------------#
-whitelisted_library_folders='/Path/To/Library/Folder0,/Path/To/Library/Folder1,/Path/To/Library/FolderX'
+multiuser_whitelist_advanced=1
 ```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
@@ -99,19 +102,23 @@ remove_files=0
 #------------DO NOT MODIFY BELOW---------------------------#
 
 #----------------------------------------------------------#
-# Server branding chosen during setup; only used during setup
+# Server branding; chosen during setup; only used during setup
 #  0 - 'emby'
 #  1 - 'jellyfin'
-# Server URL created during setup
-# Admin username chosen during setup
-# Access token requested from server during setup
-# User key of account to monitor played media chosen during setup
+# Server URL; created during setup
+# Admin username; chosen during setup
+# Access token; requested from server during setup
+# User key of account to monitor played media ;chosen during setup
+# User blacklisted libraries of corresponding user account to monitor for played media items; chosen during setup
+# User whitelisted libraries of corresponding user account to exclude monitoring for played media items; chosen during setup
 #----------------------------------------------------------#
 server_brand='xyz'
 server_url='http://localhost.abc:8096/basename'
 admin_username='Username'
 access_token='0123456789abcdef0123456789abcdef0'
-user_key='abcdef0123456789abcdef0123456789a'
+user_keys='["userkey0", "userkey1", "userkeyX"]'
+user_libs='["/Path/To/Library/Folder0", "/Path/To/Library/Folder0,/Path/To/Library/Folder1", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
+user_wl_libs='["/Path/To/Library/FolderX", "/Path/To/Library/Folder2,/Path/To/Library/Folder3", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
 DEBUG=0
 ```
 
