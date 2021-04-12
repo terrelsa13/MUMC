@@ -15,7 +15,7 @@ The first time you run the script it will attempt to create the config file by a
 #  -1 : to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
-not_played_age_movie=0
+not_played_age_movie=-1
 not_played_age_episode=-1
 not_played_age_video=-1
 not_played_age_trailer=-1
