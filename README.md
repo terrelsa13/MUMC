@@ -118,7 +118,7 @@ admin_username='Username'
 access_token='0123456789abcdef0123456789abcdef0'
 user_keys='["userkey0", "userkey1", "userkeyX"]'
 user_libs='["/Path/To/Library/Folder0", "/Path/To/Library/Folder0,/Path/To/Library/Folder1", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
-user_wl_libs='["/Path/To/Library/FolderX", "/Path/To/Library/Folder2,/Path/To/Library/Folder3", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
+user_wl_libs='["/Path/To/Library/Folder2", "/Path/To/Library/Folder2,/Path/To/Library/Folder3", "/Path/To/Library/Folder3,/Path/To/Library/FolderY"]'
 DEBUG=0
 ```
 
