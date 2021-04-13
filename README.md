@@ -1,6 +1,6 @@
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, and audio for the specified user; deleting any media past the specified played age cut off.
+This script will go through all played movies, tv episodes, videos, trailers, and audio for the specified user(s); deleting any media past the specified played age cut off.
 
 # Configuration
 ## media_cleaner_config.py
