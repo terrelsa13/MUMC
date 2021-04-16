@@ -97,6 +97,38 @@ multiuser_whitelist_advanced=0
 #----------------------------------------------------------#
 remove_files=0
 ```
+#### When enabled media items will be deleted based on DateCreated; played state will be ignored:
+```python
+#----------------------------------------------------------#
+# CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
+# Do NOT enable any max_age_xyz options unless you know what you are doing
+# Use at your own risk; You alone are responsible for your actions
+# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
+# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
+#   0-365000000 - number of days to wait before deleting "old" media
+#  -1 : to disable managing max age of specified media type
+# (-1 : default)
+#----------------------------------------------------------#
+max_age_movie=-1
+max_age_episode=-1
+max_age_video=-1
+max_age_trailer=-1
+max_age_audio=-1
+```
+#### When enabled favortied media items will not be deleted based on DateCreated:
+```python
+#----------------------------------------------------------#
+# Decide if max age media set as a favorite should be deleted
+#  0 : ok to delete max age media items set as a favorite
+#  1 : do not delete max age media items when set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+max_keep_favorites_movie=1
+max_keep_favorites_episode=1
+max_keep_favorites_video=1
+max_keep_favorites_trailer=1
+max_keep_favorites_audio=1
+```
 #### Created first time the script runs; Do **_NOT_** edit these:
 ```python
 #------------DO NOT MODIFY BELOW---------------------------#
@@ -111,6 +143,8 @@ remove_files=0
 # User key of account to monitor played media ;chosen during setup
 # User blacklisted libraries of corresponding user account to monitor for played media items; chosen during setup
 # User whitelisted libraries of corresponding user account to exclude monitoring for played media items; chosen during setup
+# API requests for media item metadata will be attempted this many times
+# API requests for media item metadata will return this many media items at a time
 #----------------------------------------------------------#
 server_brand='xyz'
 server_url='http://localhost.abc:8096/basename'
@@ -119,6 +153,8 @@ access_token='0123456789abcdef0123456789abcdef0'
 user_keys='["userkey0", "userkey1", "userkeyX"]'
 user_libs='["/Path/To/Library/Folder0", "/Path/To/Library/Folder0,/Path/To/Library/Folder1", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
 user_wl_libs='["/Path/To/Library/Folder2", "/Path/To/Library/Folder2,/Path/To/Library/Folder3", "/Path/To/Library/Folder3,/Path/To/Library/FolderY"]'
+api_request_attempts=6
+api_return_limit=100
 DEBUG=0
 ```
 
