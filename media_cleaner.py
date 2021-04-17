@@ -183,7 +183,6 @@ def requestURL(url, debugBool, debugMessage):
                     time.sleep(delay)
                     #delay value doubles each time the same API request is resent
                     delay+=delay
-                    print(str(err))
                     if (delay >= (2**retryAttempts)):
                         print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the API.')
                         return(err)
