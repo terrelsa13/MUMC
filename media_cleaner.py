@@ -1554,8 +1554,9 @@ def get_items(server_url, user_keys, auth_key):
                            ((cfg.not_played_age_movie >= 0) and
                            (item['UserData']['PlayCount'] >= 1) and
                            (cut_off_date_movie > parse(item['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and
-                           (not itemIsWhiteListed)) or
+                           (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
+                           (not itemIsWhiteListed))
+                           or
                            ((cfg.max_age_movie >= 0) and
                            (max_cut_off_date_movie <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_movie)) or (not itemisfav_MOVIE)) and
@@ -1665,7 +1666,8 @@ def get_items(server_url, user_keys, auth_key):
                            (item['UserData']['PlayCount'] >= 1) and
                            (cut_off_date_episode > parse(item['UserData']['LastPlayedDate'])) and
                            (not bool(cfg.keep_favorites_episode) or (not itemisfav_TVessn)) and
-                           (not itemIsWhiteListed)) or
+                           (not itemIsWhiteListed))
+                           or
                            ((cfg.max_age_episode >= 0) and
                            (max_cut_off_date_episode <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TVessn)) and
@@ -1776,7 +1778,8 @@ def get_items(server_url, user_keys, auth_key):
                            (item['UserData']['PlayCount'] >= 1) and
                            (cut_off_date_video > parse(item['UserData']['LastPlayedDate'])) and
                            (not bool(cfg.keep_favorites_video) or not item['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed)) or
+                           (not itemIsWhiteListed))
+                           or
                            ((cfg.max_age_video >= 0) and
                            (max_cut_off_date_video <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_video)) or (not not item['UserData']['IsFavorite'])) and
@@ -1883,7 +1886,8 @@ def get_items(server_url, user_keys, auth_key):
                            (item['UserData']['PlayCount'] >= 1) and
                            (cut_off_date_trailer > parse(item['UserData']['LastPlayedDate'])) and
                            (not bool(cfg.keep_favorites_trailer) or not item['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed)) or
+                           (not itemIsWhiteListed))
+                           or
                            ((cfg.max_age_trailer >= 0) and
                            (max_cut_off_date_trailer <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_trailer)) or (not not item['UserData']['IsFavorite'])) and
@@ -1997,7 +2001,8 @@ def get_items(server_url, user_keys, auth_key):
                            (item['UserData']['PlayCount'] >= 1) and
                            (cut_off_date_audio > parse(item['UserData']['LastPlayedDate'])) and
                            (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
-                           (not itemIsWhiteListed)) or
+                           (not itemIsWhiteListed))
+                           or
                            ((cfg.max_age_movie >= 0) and
                            (max_cut_off_date_movie <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
@@ -2124,336 +2129,336 @@ def cfgCheck():
     errorfound=False
     error_found_in_media_cleaner_config_py=''
     #need to find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
-    test=cfg.not_played_age_movie
-    test_not_played_age_movie=test
+    check=cfg.not_played_age_movie
+    check_not_played_age_movie=check
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: not_played_age_movie must be an integer; valid range -1 thru 365000000\n'
 
-    test=cfg.not_played_age_episode
-    test_not_played_age_episode=test
+    check=cfg.not_played_age_episode
+    check_not_played_age_episode=check
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: not_played_age_episode must be an integer; valid range -1 thru 365000000\n'
 
-    test=cfg.not_played_age_video
-    test_not_played_age_video=test
+    check=cfg.not_played_age_video
+    check_not_played_age_video=check
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: not_played_age_video must be an integer; valid range -1 thru 365000000\n'
 
-    test=cfg.not_played_age_trailer
-    test_not_played_age_trailer=test
+    check=cfg.not_played_age_trailer
+    check_not_played_age_trailer=check
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: not_played_age_trailer must be an integer; valid range -1 thru 365000000\n'
 
-    test=cfg.not_played_age_audio
-    test_not_played_age_audio=test
+    check=cfg.not_played_age_audio
+    check_not_played_age_audio=check
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: not_played_age_audio must be an integer; valid range -1 thru 365000000\n'
 
-    test=cfg.keep_favorites_movie
+    check=cfg.keep_favorites_movie
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.keep_favorites_episode
+    check=cfg.keep_favorites_episode
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.keep_favorites_video
+    check=cfg.keep_favorites_video
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_video must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.keep_favorites_trailer
+    check=cfg.keep_favorites_trailer
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_trailer must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.keep_favorites_audio
+    check=cfg.keep_favorites_audio
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.keep_favorites_advanced
+    check=cfg.keep_favorites_advanced
     if (
-        not ((type(test) is str) and
-        (int(test, 2) >= 0) and
-        (int(test, 2) <= 255) and
-        (len(test) >= 6) and
-        (len(test) <= 8))
+        not ((type(check) is str) and
+        (int(check, 2) >= 0) and
+        (int(check, 2) <= 255) and
+        (len(check) >= 6) and
+        (len(check) <= 8))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
 
-    test=cfg.keep_favorites_advanced_any
+    check=cfg.keep_favorites_advanced_any
     if (
-        not ((type(test) is str) and
-        (int(test, 2) >= 0) and
-        (int(test, 2) <= 255) and
-        (len(test) >= 6) and
-        (len(test) <= 8))
+        not ((type(check) is str) and
+        (int(check, 2) >= 0) and
+        (int(check, 2) <= 255) and
+        (len(check) >= 6) and
+        (len(check) <= 8))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
 
-    test=cfg.multiuser_whitelist_advanced
+    check=cfg.multiuser_whitelist_advanced
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 2))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 2))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_advanced must be an integer; valid range 0 thru 2\n'
 
-    test=cfg.remove_files
+    check=cfg.remove_files
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: remove_files must be an integer; valid values 0 and 1\n'
 
-    test=cfg.max_age_movie
+    check=cfg.max_age_movie
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000) and
-        (((test >= test_not_played_age_movie) and (test >= 0)) or
-        (test == -1)))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000) and
+        (((check >= check_not_played_age_movie) and (check >= 0)) or
+        (check == -1)))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
 
-    test=cfg.max_age_episode
+    check=cfg.max_age_episode
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000) and
-        (((test >= test_not_played_age_episode) and (test >= 0)) or
-        (test == -1)))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000) and
+        (((check >= check_not_played_age_episode) and (check >= 0)) or
+        (check == -1)))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
 
-    test=cfg.max_age_video
+    check=cfg.max_age_video
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000) and
-        (((test >= test_not_played_age_video) and (test >= 0)) or
-        (test == -1)))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000) and
+        (((check >= check_not_played_age_video) and (check >= 0)) or
+        (check == -1)))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
 
-    test=cfg.max_age_trailer
+    check=cfg.max_age_trailer
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000) and
-        (((test >= test_not_played_age_trailer) and (test >= 0)) or
-        (test == -1)))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000) and
+        (((check >= check_not_played_age_trailer) and (check >= 0)) or
+        (check == -1)))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
 
-    test=cfg.max_age_audio
+    check=cfg.max_age_audio
     if (
-        not ((type(test) is int) and
-        (test >= -1) and
-        (test <= 365000000) and
-        (((test >= test_not_played_age_audio) and (test >= 0)) or
-        (test == -1)))
+        not ((type(check) is int) and
+        (check >= -1) and
+        (check <= 365000000) and
+        (((check >= check_not_played_age_audio) and (check >= 0)) or
+        (check == -1)))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
 
-    test=cfg.max_keep_favorites_movie
+    check=cfg.max_keep_favorites_movie
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_movie must be an integer; valid range 0 thru 1\n'
 
-    test=cfg.max_keep_favorites_episode
+    check=cfg.max_keep_favorites_episode
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
 
-    test=cfg.max_keep_favorites_video
+    check=cfg.max_keep_favorites_video
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_video must be an integer; valid range 0 thru 1\n'
 
-    test=cfg.max_keep_favorites_trailer
+    check=cfg.max_keep_favorites_trailer
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_trailer must be an integer; valid range 0 thru 1\n'
 
-    test=cfg.max_keep_favorites_audio
+    check=cfg.max_keep_favorites_audio
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_audio must be an integer; valid range 0 thru 1\n'
 
-    test=cfg.server_brand
+    check=cfg.server_brand
     if (
-        not (type(test) is str)
+        not (type(check) is str)
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: server_brand must be a string\n'
 
-    test=cfg.server_url
+    check=cfg.server_url
     if (
-        not (type(test) is str)
+        not (type(check) is str)
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: server_url must be a string\n'
 
-    test=cfg.admin_username
+    check=cfg.admin_username
     if (
-        not (type(test) is str)
+        not (type(check) is str)
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: admin_username must be a string\n'
 
-    test=cfg.access_token
+    check=cfg.access_token
     if (
-        not ((type(test) is str) and
-        (len(test) == 32) and
-        (str(test).isalnum()))
+        not ((type(check) is str) and
+        (len(check) == 32) and
+        (str(check).isalnum()))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: access_token must be a 32-character alphanumeric string\n'
 
-    test=cfg.user_keys
-    test_list=json.loads(test)
-    test_user_keys_length=len(test_list)
-    for test_irt in test_list:
+    check=cfg.user_keys
+    check_list=json.loads(check)
+    check_user_keys_length=len(check_list)
+    for check_irt in check_list:
         if (
-            not ((type(test_irt) is str) and
-            (len(test_irt) == 32) and
-            (str(test_irt).isalnum()))
+            not ((type(check_irt) is str) and
+            (len(check_irt) == 32) and
+            (str(check_irt).isalnum()))
            ):
             errorfound=True
             error_found_in_media_cleaner_config_py+='TypeError: user_keys must be a single list with commas separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
 
-    #test=cfg.script_behavior
+    #check=cfg.script_behavior
     #if (
-        #not ((type(test_irt) is str) and
-        #((test == 'whitelist') or (test == 'blacklist')))
+        #not ((type(check_irt) is str) and
+        #((check == 'whitelist') or (check == 'blacklist')))
        #):
             #errorfound=True
             #error_found_in_media_cleaner_config_py+='TypeError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
 
-    test=cfg.user_libs
-    test_list=json.loads(test)
-    test_user_libs_length=len(test_list)
-    for test_irt in test_list:
+    check=cfg.user_libs
+    check_list=json.loads(check)
+    check_user_libs_length=len(check_list)
+    for check_irt in check_list:
         if (
-            not ((type(test_irt) is str) and
-            (test_user_keys_length == test_user_libs_length))
+            not ((type(check_irt) is str) and
+            (check_user_keys_length == check_user_libs_length))
            ):
             errorfound=True
             error_found_in_media_cleaner_config_py+='TypeError: user_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
 
-    test=cfg.user_wl_libs
-    test_list=json.loads(test)
-    test_user_wllibs_length=len(test_list)
-    for test_irt in test_list:
+    check=cfg.user_wl_libs
+    check_list=json.loads(check)
+    check_user_wllibs_length=len(check_list)
+    for check_irt in check_list:
         if (
-            not ((type(test_irt) is str) and
-            (test_user_keys_length == test_user_wllibs_length))
+            not ((type(check_irt) is str) and
+            (check_user_keys_length == check_user_wllibs_length))
            ):
             errorfound=True
             error_found_in_media_cleaner_config_py+=('TypeError: user_wl_libs must be a single list with commas separating multiple users\' whitelisted libraries; each user\'s whitelisted libraries must also be comma seperated within the string\n')
 
-    test=cfg.api_request_attempts
+    check=cfg.api_request_attempts
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 16))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 16))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: api_request_attempts must be an integer; valid range 0 thru 16\n'
 
-    test=cfg.api_return_limit
+    check=cfg.api_return_limit
     if (
-        not ((type(test) is int) and
-        (test >= 1) and
-        (test <= 10000))
+        not ((type(check) is int) and
+        (check >= 1) and
+        (check <= 10000))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: api_return_limit must be an integer; valid range 0 thru 10000\n'
 
-    test=cfg.DEBUG
+    check=cfg.DEBUG
     if (
-        not ((type(test) is int) and
-        (test >= 0) and
-        (test <= 1))
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
        ):
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: DEBUG must be an integer; valid values 0 and 1'
@@ -2468,9 +2473,10 @@ try:
     #try importing the media_cleaner_config.py file
     #if media_cleaner_config.py file does not exsit go to except and create one
     import media_cleaner_config as cfg
+
     #try setting DEBUG variable from media_cleaner_config.py file
     #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
-    test=cfg.DEBUG
+    check=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file is sort of configuration reset
 
     #depending on what is missing from media_cleaner_config.py file; try to only ask for certain input
@@ -2752,15 +2758,20 @@ except (AttributeError, ModuleNotFoundError):
     #this is either the first time the script is running or media_cleaner_config.py file was deleted
     #when this happens create a new media_cleaner_config.py file
     #another possible reason we are here...
-    #the above attempt to set test=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
+    #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
     generate_config()
-    #exit gracefully
+    
+    #exit gracefully after setup
     exit(0)
 
 #check config values are what we expect them to be
 cfgCheck()
+
+#now we can get media items that are ready to be deleted; 
 deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.access_token)
+
+#show and delete media items
 list_delete_items(deleteItems)
 
 ############# END OF SCRIPT #############
