@@ -769,7 +769,7 @@ def requestURL(url, debugBool, debugMessage):
     retryAttempts=cfg.api_request_attempts
 
     getdata=True
-    #try sending url request x10
+    #try sending url request specified number of times
         #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
         with request.urlopen(url) as response:
@@ -1447,6 +1447,8 @@ def get_items(server_url, user_keys, auth_key):
     cut_off_date_trailer=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_trailer)
     cut_off_date_audio=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_audio)
 
+    adv_settings=int(cfg.keep_favorites_advanced, 2)
+
     currentPosition=0
     for user_key in user_key_json:
         url=server_url + '/Users/' + user_key  + '/?api_key=' + auth_key
@@ -1474,8 +1476,6 @@ def get_items(server_url, user_keys, auth_key):
         isfav_byUserId[user_key]={}
         #define dictionary user_key to store media item whitelisted states by userId and itemId
         iswhitelist_byUserId[user_key]={}
-
-        adv_settings=int(cfg.keep_favorites_advanced, 2)
 
 ############# Movies #############
 
