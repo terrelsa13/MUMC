@@ -200,6 +200,7 @@ def generate_config():
         user_keys=json.dumps(userkeys_list)
         user_libs=json.dumps(userlibs_list)
         user_wl_libs=json.dumps(userwllibs_list)
+
     else:
         raise ValueError('Error! User key values do not match.')
 
@@ -273,13 +274,16 @@ def generate_config():
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide how whitelists behave\n"
-    config_file += "#  0 : reserved...\n"
-    config_file += "#  1 : when single user - not applicable; when multi-user - do not delete media item when all monitored users have the parent library whitelisted\n"
-    config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have the parent library whitelisted\n"
-    config_file += "# (0 : default)\n"
+    config_file += "# Decide how whitelists with multiple users behave\n"
+    config_file += "#  0 : do not delete media item when all monitored users have the parent library whitelisted\n"
+    config_file += "#  1 : do not delete media item when any monitored users have the parent library whitelisted\n"
+    config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "multiuser_whitelist_advanced=1\n"
+    config_file += "multiuser_whitelist_movie=1\n"
+    config_file += "multiuser_whitelist_episode=1\n"
+    config_file += "multiuser_whitelist_video=1\n"
+    config_file += "multiuser_whitelist_trailer=1\n"
+    config_file += "multiuser_whitelist_audio=1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -764,11 +768,11 @@ def requestURL(url, debugBool, debugMessage):
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
-    delay=1
+    delay = 1
     #number of times after the intial API request to retry if an exception occurs
-    retryAttempts=cfg.api_request_attempts
+    retryAttempts = cfg.api_request_attempts
 
-    getdata=True
+    getdata = True
     #try sending url request specified number of times
         #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
@@ -777,7 +781,7 @@ def requestURL(url, debugBool, debugMessage):
                 try:
                     source = response.read()
                     data = json.loads(source)
-                    getdata=False
+                    getdata = False
                     if bool(debugBool):
                         #DEBUG
                         print(debugMessage)
@@ -786,12 +790,12 @@ def requestURL(url, debugBool, debugMessage):
                 except Exception as err:
                     time.sleep(delay)
                     #delay value doubles each time the same API request is resent
-                    delay+=delay
+                    delay += delay
                     if (delay >= (2**retryAttempts)):
                         print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + debugMessage + '\" lookup.')
                         return(err)
             else:
-                getdata=False
+                getdata = False
                 print('An error occurred while attempting to retrieve data from the API.')
                 return(Error)
 
@@ -1546,7 +1550,7 @@ def get_items(server_url, user_keys, auth_key):
                             isfav_byUserId[user_key][item['Id']] = itemisfav_MOVIE
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_advanced == 2):
+                        if (cfg.multiuser_whitelist_movie == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                         if (
@@ -1656,7 +1660,7 @@ def get_items(server_url, user_keys, auth_key):
                             isfav_byUserId[user_key][item['Id']] = itemisfav_TVessn
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_advanced == 2):
+                        if (cfg.multiuser_whitelist_episode == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                         if (
@@ -1767,7 +1771,7 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_advanced == 2):
+                        if (cfg.multiuser_whitelist_video == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                         if (
@@ -1874,7 +1878,7 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_advanced == 2):
+                        if (cfg.multiuser_whitelist_trailer == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                         if (
@@ -1988,7 +1992,7 @@ def get_items(server_url, user_keys, auth_key):
                             isfav_byUserId[user_key][item['Id']] = itemisfav_AUDIOtaa
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_advanced == 2):
+                        if (cfg.multiuser_whitelist_audio == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
 
                         if (
@@ -2045,11 +2049,11 @@ def get_items(server_url, user_keys, auth_key):
         currentPosition+=1
 
     #When multiple users and keep_favorite_xyz=2 Determine media items to keep and remove them from deletion list
-    #When not multiple userss and keep_favorite_xyz=2 will just clean up deletion list
+    #When not multiple userss this will just clean up the deletion list
     deleteItems=get_isfav_MultiUser(user_key_json, isfav_byUserId, deleteItems)
 
-    #When multiple users and multiuser_whitelist_advanced=2 Determine media items to keep and remove them from deletion list
-    #When not multiple userss and multiuser_whitelist_advanced=2 will just clean up deletion list
+    #When multiple users and multiuser_whitelist_xyz=1 Determine media items to keep and remove them from deletion list
+    #When not multiple userss this will just clean up the deletion list
     deleteItems=get_iswhitelist_MultiUser(user_key_json, iswhitelist_byUserId, deleteItems)
 
     if bool(cfg.DEBUG):
@@ -2241,14 +2245,50 @@ def cfgCheck():
         errorfound=True
         error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
 
-    check=cfg.multiuser_whitelist_advanced
+    check=cfg.multiuser_whitelist_movie
     if (
         not ((type(check) is int) and
         (check >= 0) and
-        (check <= 2))
+        (check <= 1))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_advanced must be an integer; valid range 0 thru 2\n'
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
+
+    check=cfg.multiuser_whitelist_episode
+    if (
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
+       ):
+        errorfound=True
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
+
+    check=cfg.multiuser_whitelist_video
+    if (
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
+       ):
+        errorfound=True
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'        
+
+    check=cfg.multiuser_whitelist_trailer
+    if (
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
+       ):
+        errorfound=True
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_trailer must be an integer; valid range 0 thru 1\n'
+
+    check=cfg.multiuser_whitelist_audio
+    if (
+        not ((type(check) is int) and
+        (check >= 0) and
+        (check <= 1))
+       ):
+        errorfound=True
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
 
     check=cfg.remove_files
     if (
@@ -2491,7 +2531,11 @@ try:
         not hasattr(cfg, 'keep_favorites_advanced') or
         not hasattr(cfg, 'keep_favorites_advanced_any') or
 
-        not hasattr(cfg, 'multiuser_whitelist_advanced') or
+        not hasattr(cfg, 'multiuser_whitelist_movie') or
+        not hasattr(cfg, 'multiuser_whitelist_episode') or
+        not hasattr(cfg, 'multiuser_whitelist_video') or
+        not hasattr(cfg, 'multiuser_whitelist_trailer') or
+        not hasattr(cfg, 'multiuser_whitelist_audio') or
 
         not hasattr(cfg, 'remove_files') or
 
@@ -2666,9 +2710,25 @@ try:
             print('keep_favorites_advanced_any=00000000')
             setattr(cfg, 'keep_favorites_advanced_any', '00000000')
 
-        if not hasattr(cfg, 'multiuser_whitelist_advanced'):
-            print('multiuser_whitelist_advanced=0')
-            setattr(cfg, 'multiuser_whitelist_advanced', 0)
+        if not hasattr(cfg, 'multiuser_whitelist_movie'):
+            print('multiuser_whitelist_movie=1')
+            setattr(cfg, 'multiuser_whitelist_movie', 1)
+        
+        if not hasattr(cfg, 'multiuser_whitelist_episode'):
+            print('multiuser_whitelist_episode=1')
+            setattr(cfg, 'multiuser_whitelist_episode', 1)
+
+        if not hasattr(cfg, 'multiuser_whitelist_video'):
+            print('multiuser_whitelist_video=1')
+            setattr(cfg, 'multiuser_whitelist_video', 1)
+
+        if not hasattr(cfg, 'multiuser_whitelist_trailer'):
+            print('multiuser_whitelist_trailer=1')
+            setattr(cfg, 'multiuser_whitelist_trailer', 1)
+
+        if not hasattr(cfg, 'multiuser_whitelist_audio'):
+            print('multiuser_whitelist_audio=1')
+            setattr(cfg, 'multiuser_whitelist_audio', 1)
 
         if not hasattr(cfg, 'remove_files'):
             print('remove_files=0')
