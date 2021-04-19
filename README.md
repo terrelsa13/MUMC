@@ -80,13 +80,16 @@ keep_favorites_advanced_any='00000000'
 #### When monitoring multiple users whitelisted libraries will be treated accordingly:
 ```python
 #----------------------------------------------------------#
-# Decide how whitelists behave
-#  0 : reserved...
-#  1 : when single user - not applicable; when multi-user - do not delete media item when all monitored users have the parent library whitelisted
-#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have the parent library whitelisted
-# (0 : default)
+# Decide how whitelists with multiple users behave
+#  0 : when multi-user - do not delete media item when all monitored users have the parent library whitelisted
+#  1 : when multi-user - do not delete media item when any monitored users have the parent library whitelisted
+# (1 : default)
 #----------------------------------------------------------#
-multiuser_whitelist_advanced=0
+multiuser_whitelist_movie=1
+multiuser_whitelist_episode=1
+multiuser_whitelist_video=1
+multiuser_whitelist_trailer=1
+multiuser_whitelist_audio=1
 ```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
