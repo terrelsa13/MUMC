@@ -1469,6 +1469,8 @@ def get_items(server_url, user_keys, auth_key):
         print(data['Name'] + ' - ' + data['Id'])
         print('-----------------------------------------------------------')
 
+        media_found=False
+
         #define empty dictionary for favorited Movies
         isfav_MOVIE={'movie':{},'moviegenre':{}}
         #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
@@ -1504,7 +1506,7 @@ def get_items(server_url, user_keys, auth_key):
                 DiscoverItemsTotal = False
 
                 url=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=Movie&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
-                    '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&enableImages=False&api_key=' + auth_key)
+                    '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
 
                 if bool(cfg.DEBUG):
                     #DEBUG
@@ -1520,6 +1522,8 @@ def get_items(server_url, user_keys, auth_key):
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
+
+                    media_found=True
 
                     #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'movie_item')
@@ -1630,6 +1634,8 @@ def get_items(server_url, user_keys, auth_key):
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
+
+                    media_found=True
 
                     #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'episode_item')
@@ -1745,6 +1751,8 @@ def get_items(server_url, user_keys, auth_key):
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
 
+                    media_found=True
+
                     #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'video_item')
 
@@ -1851,6 +1859,8 @@ def get_items(server_url, user_keys, auth_key):
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
+
+                    media_found=True
 
                     #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'trailer_item')
@@ -1963,6 +1973,8 @@ def get_items(server_url, user_keys, auth_key):
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
 
+                    media_found=True
+
                     #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'audio_item')
 
@@ -2042,7 +2054,7 @@ def get_items(server_url, user_keys, auth_key):
                             print(':[KEEPING] - ' + item_details)
 
         if (not all_media_disabled):
-            if len(data['Items']) <= 0:
+            if not (media_found):
                 print('[NO PLAYED ITEMS]')
 
         print('-----------------------------------------------------------')
