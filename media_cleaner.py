@@ -1484,10 +1484,9 @@ def get_items(server_url, user_keys, auth_key):
             moviegenre_mask=int('00100000', 2)
 
             IsPlayedState='True'
-            FieldsState='Type,Name,Id,UserData,Studios,ParentId'
+            FieldsState='Type,Name,Id,UserData,Studios,ParentId,DateCreated'
             if (cfg.max_age_movie >= 0):
                 IsPlayedState=''
-                FieldsState=FieldsState + ',DateCreated'
             if (moviegenre_mask & adv_settings):
                 FieldsState=FieldsState + ',Genres'
 
@@ -1597,10 +1596,9 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
             IsPlayedState='True'
-            FieldsState='Type,Name,Id,UserData,SeriesStudio,ParentId'
+            FieldsState='Type,Name,Id,UserData,SeriesStudio,ParentId,DateCreated'
             if (cfg.max_age_episode >= 0):
                 IsPlayedState=''
-                FieldsState=FieldsState + ',DateCreated'
 
             StartIndex=0
             TotalItems=1
@@ -1712,10 +1710,9 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
 
             IsPlayedState='True'
-            FieldsState='Type,Name,Id,UserData,ParentId'
+            FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
             if (cfg.max_age_video >= 0):
                 IsPlayedState=''
-                FieldsState=FieldsState + ',DateCreated'
 
             StartIndex=0
             TotalItems=1
@@ -1820,10 +1817,9 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_trailer >= 0) or (cfg.max_age_trailer >= 0)):
 
             IsPlayedState='True'
-            FieldsState='Type,Name,Id,UserData,ParentId'
+            FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
             if (cfg.max_age_trailer >= 0):
                 IsPlayedState=''
-                FieldsState=FieldsState + ',DateCreated'
 
             StartIndex=0
             TotalItems=1
@@ -1931,10 +1927,9 @@ def get_items(server_url, user_keys, auth_key):
             albumgenre_mask=int('00001000', 2)
 
             IsPlayedState='True'
-            FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId'
+            FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
             if (cfg.max_age_audio >= 0):
                 IsPlayedState=''
-                FieldsState=FieldsState + ',DateCreated'
             if ((trackgenre_mask & adv_settings) or (albumgenre_mask & adv_settings)):
                 FieldsState=FieldsState + ',Genres'
 
@@ -2046,6 +2041,7 @@ def get_items(server_url, user_keys, auth_key):
             if len(data['Items']) <= 0:
                 print('[NO PLAYED ITEMS]')
 
+        print('-----------------------------------------------------------')
         currentPosition+=1
 
     #When multiple users and keep_favorite_xyz=2 Determine media items to keep and remove them from deletion list
@@ -2069,7 +2065,6 @@ def get_items(server_url, user_keys, auth_key):
         print(isfav_AUDIOtaa)
         print('')
 
-    print('-----------------------------------------------------------')
     print('\n')
     return(deleteItems)
 
