@@ -184,13 +184,13 @@ def generate_config():
     user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key, script_behavior)
 
     userkeys_list=[]
-    userlibs_list=[]
+    userbllibs_list=[]
     userkeys_wllibs_list=[]
     userwllibs_list=[]
 
-    for userkey, userlib in user_keys_and_libs.items():
+    for userkey, userbllib in user_keys_and_libs.items():
         userkeys_list.append(userkey)
-        userlibs_list.append(userlib)
+        userbllibs_list.append(userbllib)
 
     for userkey, userwllib in user_keys_and_wllibs.items():
         userkeys_wllibs_list.append(userkey)
@@ -198,9 +198,8 @@ def generate_config():
 
     if (userkeys_list == userkeys_wllibs_list):
         user_keys=json.dumps(userkeys_list)
-        user_libs=json.dumps(userlibs_list)
+        user_bl_libs=json.dumps(userbllibs_list)
         user_wl_libs=json.dumps(userwllibs_list)
-
     else:
         raise ValueError('Error! User key values do not match.')
 
@@ -361,7 +360,7 @@ def generate_config():
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "user_libs='" + user_libs + "'\n"
+    config_file += "user_bl_libs='" + user_bl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup\n"
@@ -1350,8 +1349,8 @@ def get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems):
 
 
 #Handle whitelists across multiple users
-def get_iswhitelist_MultiUser(userkey, isfav_byUserId, deleteItems):
-    return(get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems))
+def get_iswhitelist_MultiUser(userkey, iswhitelist_byUserId, deleteItems):
+    return(get_isfav_MultiUser(userkey, iswhitelist_byUserId, deleteItems))
 
 
 #determine if media item is in library folder
@@ -1434,15 +1433,15 @@ def get_items(server_url, user_keys, auth_key):
 
     #load user_keys to json
     user_key_json=json.loads(user_keys)
-    #load user_libs to json
-    user_lib_json=json.loads(cfg.user_libs)
+    #load user_bl_libs to json
+    user_bllib_json=json.loads(cfg.user_bl_libs)
     #load_user_wl_libs to json
     user_wllib_json=json.loads(cfg.user_wl_libs)
 
     #get number of user_keys and user_libs
     userkey_count=len(user_key_json)
-    userlib_count=len(user_lib_json)
-    userwllib_count=len(user_lib_json)
+    userbllib_count=len(user_bllib_json)
+    userwllib_count=len(user_wllib_json)
 
     #establish deletion date for played media items
     cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
@@ -1532,7 +1531,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                             itemIsMonitored=False
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find movie media items ready to delete
                     if ((item['Type'] == 'Movie') and (itemIsMonitored)):
@@ -1644,7 +1643,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                             itemIsMonitored=False
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find tv-episode media items ready to delete
                     if ((item['Type'] == 'Episode') and (itemIsMonitored)):
@@ -1760,7 +1759,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                             itemIsMonitored=False
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find video media items ready to delete
                     if ((item['Type'] == 'Video') and (itemIsMonitored)):
@@ -1869,7 +1868,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                             itemIsMonitored=False
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find trailer media items ready to delete
                     if ((item['Type'] == 'Trailer') and (itemIsMonitored)):
@@ -1982,7 +1981,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                             itemIsMonitored=False
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_lib_json[currentPosition])
+                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audio media items ready to delete
                     if ((item['Type'] == 'Audio') and (itemIsMonitored)):
@@ -2061,11 +2060,11 @@ def get_items(server_url, user_keys, auth_key):
         currentPosition+=1
 
     #When multiple users and keep_favorite_xyz=2 Determine media items to keep and remove them from deletion list
-    #When not multiple userss this will just clean up the deletion list
+    #When not multiple users this will just clean up the deletion list
     deleteItems=get_isfav_MultiUser(user_key_json, isfav_byUserId, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz=1 Determine media items to keep and remove them from deletion list
-    #When not multiple userss this will just clean up the deletion list
+    #When not multiple users this will just clean up the deletion list
     deleteItems=get_iswhitelist_MultiUser(user_key_json, iswhitelist_byUserId, deleteItems)
 
     if bool(cfg.DEBUG):
@@ -2461,16 +2460,16 @@ def cfgCheck():
             #errorfound=True
             #error_found_in_media_cleaner_config_py+='TypeError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
 
-    check=cfg.user_libs
+    check=cfg.user_bl_libs
     check_list=json.loads(check)
-    check_user_libs_length=len(check_list)
+    check_user_bllibs_length=len(check_list)
     for check_irt in check_list:
         if (
             not ((type(check_irt) is str) and
-            (check_user_keys_length == check_user_libs_length))
+            (check_user_keys_length == check_user_bllibs_length))
            ):
             errorfound=True
-            error_found_in_media_cleaner_config_py+='TypeError: user_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
+            error_found_in_media_cleaner_config_py+='TypeError: user_bl_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
 
     check=cfg.user_wl_libs
     check_list=json.loads(check)
@@ -2573,7 +2572,7 @@ try:
 
         #not hasattr(cfg, 'script_behavior') or
 
-        not hasattr(cfg, 'user_libs') or
+        not hasattr(cfg, 'user_bl_libs') or
         not hasattr(cfg, 'user_wl_libs') or
 
         not hasattr(cfg, 'api_request_attempts') or
@@ -2590,7 +2589,7 @@ try:
 
             #not hasattr(cfg, 'script_behavior') or
 
-            not hasattr(cfg, 'user_libs') or
+            not hasattr(cfg, 'user_bl_libs') or
             not hasattr(cfg, 'user_wl_libs') or
 
             not hasattr(cfg, 'api_request_attempts') or
@@ -2613,8 +2612,8 @@ try:
             #if hasattr(cfg, 'script_behavior'):
                 #delattr(cfg, 'script_behavior')
 
-            if hasattr(cfg, 'user_libs'):
-                delattr(cfg, 'user_libs')
+            if hasattr(cfg, 'user_bl_libs'):
+                delattr(cfg, 'user_bl_libs')
             if hasattr(cfg, 'user_wl_libs'):
                 delattr(cfg, 'user_wl_libs')
 
@@ -2650,20 +2649,20 @@ try:
             user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key)
 
             userkeys_list=[]
-            userlibs_list=[]
+            userbllibs_list=[]
             userkeys_wllibs_list=[]
             userwllibs_list=[]
 
             for userkey, userlib in user_keys_and_libs.items():
                 userkeys_list.append(userkey)
-                userlibs_list.append(userlib)
+                userbllibs_list.append(userbllib)
 
             for userkey, userwllib in user_keys_and_wllibs.items():
                 userkeys_wllibs_list.append(userkey)
                 userwllibs_list.append(userwllib)
 
             user_keys=json.dumps(userkeys_list)
-            user_libs=json.dumps(userlibs_list)
+            user_bl_libs=json.dumps(userbllibs_list)
             user_wl_libs=json.dumps(userwllibs_list)
 
             print('-----------------------------------------------------------')
@@ -2800,9 +2799,9 @@ try:
             #print('script_behavior=\'' + str(script_behavior) + '\'')
             #setattr(cfg, 'script_behavior', script_behavior)
 
-        if not hasattr(cfg, 'user_libs'):
-            print('user_libs=\'' + str(user_libs) + '\'')
-            setattr(cfg, 'user_libs', user_libs)
+        if not hasattr(cfg, 'user_bl_libs'):
+            print('user_bl_libs=\'' + str(user_bl_libs) + '\'')
+            setattr(cfg, 'user_bl_libs', user_bl_libs)
         if not hasattr(cfg, 'user_wl_libs'):
             print('user_wl_libs=\'' + str(user_wl_libs) + '\'')
             setattr(cfg, 'user_wl_libs', user_wl_libs)
