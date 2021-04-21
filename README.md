@@ -118,7 +118,7 @@ max_age_video=-1
 max_age_trailer=-1
 max_age_audio=-1
 ```
-#### When enabled favortied media items will not be deleted based on DateCreated:
+#### When enabled favorited media items will not be deleted using the corresponding max_age_xyz:
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
@@ -132,37 +132,75 @@ max_keep_favorites_video=1
 max_keep_favorites_trailer=1
 max_keep_favorites_audio=1
 ```
-#### Created first time the script runs; Do **_NOT_** edit these:
+
+#### Created first time the script runs; Do **_NOT_** edit or modify these:
 ```python
 #------------DO NOT MODIFY BELOW---------------------------#
 
 #----------------------------------------------------------#
-# Server branding; chosen during setup; only used during setup
+# Server branding; chosen during setup
 #  0 - 'emby'
 #  1 - 'jellyfin'
-# Server URL; created during setup
-# Admin username; chosen during setup
-# Access token; requested from server during setup
-# User key of account to monitor played media ;chosen during setup
-# User blacklisted libraries of corresponding user account to monitor for played media items; chosen during setup
-# User whitelisted libraries of corresponding user account to exclude monitoring for played media items; chosen during setup
-# API requests for media item metadata will be attempted this many times
-# API requests for media item metadata will return this many media items at a time
 #----------------------------------------------------------#
-server_brand='xyz'
+server_brand='emby'
+
+#----------------------------------------------------------#
+# Server URL; created during setup
+#----------------------------------------------------------#
 server_url='http://localhost.abc:8096/basename'
+
+#----------------------------------------------------------#
+# Admin username; chosen during setup
+#----------------------------------------------------------#
 admin_username='Username'
+
+#----------------------------------------------------------#
+# Access token; requested from server during setup
+#----------------------------------------------------------#
 access_token='0123456789abcdef0123456789abcdef0'
-user_keys='["userkey0", "userkey1", "userkeyX"]'
-user_libs='["/Path/To/Library/Folder0", "/Path/To/Library/Folder0,/Path/To/Library/Folder1", "/Path/To/Library/Folder1,/Path/To/Library/FolderX"]'
-user_wl_libs='["/Path/To/Library/Folder2", "/Path/To/Library/Folder2,/Path/To/Library/Folder3", "/Path/To/Library/Folder3,/Path/To/Library/FolderY"]'
+
+#----------------------------------------------------------#
+# User key(s) of account(s) to monitor media items; chosen during setup
+#----------------------------------------------------------#
+user_keys='["abcdef0123456789abcdef0123456789a", "bbcdef0123456789abcdef0123456789a", "etc...0123456789abcdef0123456789a"]'
+
+#----------------------------------------------------------#
+# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
+#----------------------------------------------------------#
+user_bl_libs='["/some/path/0,/some/path/1,/some/path/2", "/some/path/1,/some/path/2,/some/path/3", "/some/path/x,/some/path/etc..."]'
+
+#----------------------------------------------------------#
+# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup
+#----------------------------------------------------------#
+user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/path/6,/some/path/7", "/some/path/y,/some/path/etc..."]'
+
+#----------------------------------------------------------#
+# API request attempts; number of times to retry an API request
+#  delay between intial attempt and the first retry is 1 second
+#  the delay will double with each attempt after the first retry
+#  0-16 - number of retry attempts
+#  (6 : default)
+#----------------------------------------------------------#
 api_request_attempts=6
+
+#----------------------------------------------------------#
+# API return limit; Large libraries sometimes cannot return all of the media metadata items in a single API call
+#  This is especially true when using the max_age_xyz options; the max_age_xyz options require every item of the specified media type send its metadata
+#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value
+#  (100 : default)
+#----------------------------------------------------------#
 api_return_limit=100
+
+#----------------------------------------------------------#
+# 0 - Debug messages disaled
+# 1 - Debug messages enabled
+# (0 : default)
+#----------------------------------------------------------#
 DEBUG=0
 ```
 
 # Usage
-Make media_cleaner.py executable and run ./media_cleaner.py.  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
+Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py".  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
 
 # Requirements
 * python3
