@@ -222,6 +222,4 @@ Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py". 
 # Donation
 If you find this useful and you would like to support please the use option below.
 
-
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
-
