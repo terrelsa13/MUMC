@@ -176,19 +176,19 @@ def generate_config():
     print('-----------------------------------------------------------')
     password=get_admin_password()
     print('-----------------------------------------------------------')
-    auth_key=get_auth_key(server_url, username, password)
+    auth_key=get_auth_key(server_url, username, password, server_brand)
 
     script_behavior=get_cleaning_behavior()
     print('-----------------------------------------------------------')
 
-    user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key, script_behavior)
+    user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key, script_behavior)
 
     userkeys_list=[]
     userbllibs_list=[]
     userkeys_wllibs_list=[]
     userwllibs_list=[]
 
-    for userkey, userbllib in user_keys_and_libs.items():
+    for userkey, userbllib in user_keys_and_bllibs.items():
         userkeys_list.append(userkey)
         userbllibs_list.append(userbllib)
 
@@ -414,6 +414,7 @@ def generate_config():
     print('    Set \'not_played_age_trailer\' to zero or a positive number')
     print('    Set \'not_played_age_audio\' to zero or a positive number')
     print('-----------------------------------------------------------')
+    print('Config file is not setup to delete played media.')
     print('Config file is in dry run mode to prevent deleting media.')
     print('-----------------------------------------------------------')
     print('To delete media open media_cleaner_config.py in a text editor:')
@@ -442,7 +443,7 @@ def delete_item(itemID):
 
 
 #api call to get admin account authentication token
-def get_auth_key(server_url, username, password):
+def get_auth_key(server_url, username, password, server_brand):
     #login info
     values = {'Username' : username, 'Pw' : password}
     #DATA = urllib.parse.urlencode(values)
@@ -450,7 +451,12 @@ def get_auth_key(server_url, username, password):
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="'+ username  +'", Client="media_cleaner", Device="media_cleaner", DeviceId="media_cleaner", Version="0.4", Token=""', 'Content-Type' : 'application/json'}
+    #if (server_brand == 'emby'):
+        #brand='Emby'
+    #else:
+        #brand='Jellyfin'
+
+    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.0", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1348,9 +1354,56 @@ def get_isfav_MultiUser(userkey, isfav_byUserId, deleteItems):
     return(deleteItems)
 
 
-#Handle whitelists across multiple users
-def get_iswhitelist_MultiUser(userkey, iswhitelist_byUserId, deleteItems):
-    return(get_isfav_MultiUser(userkey, iswhitelist_byUserId, deleteItems))
+#Handle whitelists across multiple users by userId
+def get_iswhitelist_MultiUser_byId(userkeys, iswhitelist_byUserId, deleteItems):
+    return(get_isfav_MultiUser(userkeys, iswhitelist_byUserId, deleteItems))
+
+
+#Handle whitelists across multiple users by Path 
+def get_iswhitelist_MultiUser_byPath(userkeys, whitelists, deleteItems):
+    all_whitelists=set()
+    deleteIndexes=[]
+
+    #len_userkeys=len(userkeys)
+    len_deleteItems=len(deleteItems)
+
+    #build whitelist dictionary
+    for whitelist in whitelists:
+        #read and split paths to compare to
+        whitelist_split=whitelist.split(',')
+        #add whitelist paths to set
+        for wlist in whitelist_split:
+            all_whitelists.add(wlist)
+
+    #loop thru all whitelists and items to be deleted
+    #remove item if it matches a whitelisted path
+    for delIndex in range(len(deleteItems)):
+        for whitelist in all_whitelists:
+            delItemIsWhitelisted, delItemWhitelistedPath=get_isWhitelisted(deleteItems[delIndex]['Path'], whitelist)
+            if (delItemIsWhitelisted):
+                deleteIndexes.append(delIndex)
+
+    #convert to set then back to list to remove duplicates
+    deleteIndexes=list(set(deleteIndexes))
+
+    #sort indexes needed to remove items from deletion that we want to keep
+    deleteIndexes.sort()
+
+    #reverse the order to not worry about shifting indexes when removing items from deleteItems list
+    deleteIndexes.reverse()
+
+    #remove favorited items we want to keep
+    for wlItem in deleteIndexes:
+        try:
+           deleteItems.pop(wlItem)
+        except IndexError as err:
+           print(str(err))
+           print(wlItem)
+           print(deleteIndexes)
+           print2json(deleteItems)
+           exit(0)
+
+    return(deleteItems)
 
 
 #determine if media item is in library folder
@@ -1358,11 +1411,13 @@ def get_isPathMatching(itemPath, comparePath):
     #read and split paths to compare to
     comparePathEntries=comparePath.split(',')
 
+    matchingPath=''
     item_path_matches=False
     #determine if media item's path matches one of the whitelist folders
     for path in comparePathEntries:
         if not (path == ''):
             if (itemPath.startswith(path)):
+                matchingPath=path
                 item_path_matches=True
 
                 if bool(cfg.DEBUG):
@@ -1370,14 +1425,15 @@ def get_isPathMatching(itemPath, comparePath):
                     print('media item folder/path comparison')
                     print(path + ' : ' + itemPath)
 
-                return(item_path_matches)
+                return(item_path_matches, matchingPath)
 
-    return(item_path_matches)
+    return(item_path_matches, matchingPath)
 
 
 #determine if item is whitelisted
 def get_isWhitelisted(itemPath, comparePath):
-    return(get_isPathMatching(itemPath, comparePath))
+    pathResult, pathString=get_isPathMatching(itemPath, comparePath)
+    return(pathResult, pathString)
 
 
 #determine if item is blacklisted (aka monitored)
@@ -1385,8 +1441,8 @@ def get_isBlacklisted(itemPath, comparePath):
     if (comparePath == ''):
         return(True)
     else:
-        return(get_isPathMatching(itemPath, comparePath))
-
+        pathResult, pathString=get_isPathMatching(itemPath, comparePath)
+        return(pathResult)
 
 #get played media items; track media items ready to be deleted
 def get_items(server_url, user_keys, auth_key):
@@ -1430,16 +1486,22 @@ def get_items(server_url, user_keys, auth_key):
     isfav_byUserId={}
     #whitelisted items by userId
     iswhitelist_byUserId={}
+    #whitelisted paths per media type according to media types metadata
+    movie_whitelists=set()
+    episode_whitelists=set()
+    video_whitelists=set()
+    trailer_whitelists=set()
+    audio_whitelists=set()
 
     #load user_keys to json
-    user_key_json=json.loads(user_keys)
+    user_keys_json=json.loads(user_keys)
     #load user_bl_libs to json
     user_bllib_json=json.loads(cfg.user_bl_libs)
     #load_user_wl_libs to json
     user_wllib_json=json.loads(cfg.user_wl_libs)
 
     #get number of user_keys and user_libs
-    userkey_count=len(user_key_json)
+    userkey_count=len(user_keys_json)
     userbllib_count=len(user_bllib_json)
     userwllib_count=len(user_wllib_json)
 
@@ -1453,7 +1515,7 @@ def get_items(server_url, user_keys, auth_key):
     adv_settings=int(cfg.keep_favorites_advanced, 2)
 
     currentPosition=0
-    for user_key in user_key_json:
+    for user_key in user_keys_json:
         url=server_url + '/Users/' + user_key  + '/?api_key=' + auth_key
 
         if bool(cfg.DEBUG):
@@ -1546,7 +1608,7 @@ def get_items(server_url, user_keys, auth_key):
                         itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key)
 
                         #Get if media item path whitelisted
-                        itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                         if (cfg.keep_favorites_movie == 2):
@@ -1555,6 +1617,7 @@ def get_items(server_url, user_keys, auth_key):
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if (cfg.multiuser_whitelist_movie == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                            movie_whitelists.add(itemWhiteListedPath)
 
                         if (
                            ((cfg.not_played_age_movie >= 0) and
@@ -1582,7 +1645,7 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Delete Movie: \n' + str(item))
                             print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
+                            deleteItems.append(item_info)
                         else:
                             try:
                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
@@ -1658,7 +1721,7 @@ def get_items(server_url, user_keys, auth_key):
                         itemisfav_TVessn=get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key)
 
                         #Get if media item path is whitelisted
-                        itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                         if (cfg.keep_favorites_episode == 2):
@@ -1667,6 +1730,7 @@ def get_items(server_url, user_keys, auth_key):
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if (cfg.multiuser_whitelist_episode == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                            episode_whitelists.add(itemWhiteListedPath)
 
                         if (
                            ((cfg.not_played_age_episode >= 0) and
@@ -1696,7 +1760,7 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Delete Episode: \n' + str(item))
                             print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
+                            deleteItems.append(item_info)
                         else:
                             try:
                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
@@ -1775,11 +1839,12 @@ def get_items(server_url, user_keys, auth_key):
                             isfav_byUserId[user_key][item['Id']] = cfg.keep_favorites_video
 
                         #Get if media item path is whitelisted
-                        itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if (cfg.multiuser_whitelist_video == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                            video_whitelists.add(itemWhiteListedPath)
 
                         if (
                            ((cfg.not_played_age_video >= 0) and
@@ -1807,7 +1872,7 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Delete Video: \n' + str(item))
                             print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
+                            deleteItems.append(item_info)
                         else:
                             try:
                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
@@ -1884,11 +1949,12 @@ def get_items(server_url, user_keys, auth_key):
                             isfav_byUserId[user_key][item['Id']] = cfg.keep_favorites_trailer
 
                         #Get if media item path is whitelisted
-                        itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if (cfg.multiuser_whitelist_trailer == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                            trailer_whitelists.add(itemWhiteListedPath)
 
                         if (
                            ((cfg.not_played_age_trailer >= 0) and
@@ -1916,7 +1982,7 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Delete Trailer: \n' + str(item))
                             print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
+                            deleteItems.append(item_info)
                         else:
                             try:
                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
@@ -1996,7 +2062,7 @@ def get_items(server_url, user_keys, auth_key):
                         itemisfav_AUDIOtaa=get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key)
 
                         #Get if media item path is whitelisted
-                        itemIsWhiteListed=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                         if (cfg.keep_favorites_audio == 2):
@@ -2005,6 +2071,7 @@ def get_items(server_url, user_keys, auth_key):
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if (cfg.multiuser_whitelist_audio == 1):
                             iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                            audio_whitelists.add(itemWhiteListedPath)
 
                         if (
                            ((cfg.not_played_age_audio >= 0) and
@@ -2034,7 +2101,7 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Delete Audio: \n' + str(item))
                             print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
+                            deleteItems.append(item_info)
                         else:
                             try:
                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
@@ -2059,13 +2126,20 @@ def get_items(server_url, user_keys, auth_key):
         print('-----------------------------------------------------------')
         currentPosition+=1
 
-    #When multiple users and keep_favorite_xyz=2 Determine media items to keep and remove them from deletion list
+    #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
-    deleteItems=get_isfav_MultiUser(user_key_json, isfav_byUserId, deleteItems)
+    deleteItems=get_isfav_MultiUser(user_keys_json, isfav_byUserId, deleteItems)
 
-    #When multiple users and multiuser_whitelist_xyz=1 Determine media items to keep and remove them from deletion list
+    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
-    deleteItems=get_iswhitelist_MultiUser(user_key_json, iswhitelist_byUserId, deleteItems)
+    #deleteItems=get_iswhitelist_MultiUser_byId(user_keys_json, iswhitelist_byUserId, deleteItems)
+    
+    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
+    deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(movie_whitelists), deleteItems)
+    deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(episode_whitelists), deleteItems)
+    deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(video_whitelists), deleteItems)
+    deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(trailer_whitelists), deleteItems)
+    deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(audio_whitelists), deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
@@ -2641,19 +2715,19 @@ try:
             print('-----------------------------------------------------------')
             password=get_admin_password()
             print('-----------------------------------------------------------')
-            auth_key=get_auth_key(server_url, username, password)
+            auth_key=get_auth_key(server_url, username, password, server_brand)
 
             script_behavior=get_cleaning_behavior()
             print('-----------------------------------------------------------')
 
-            user_keys_and_libs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key)
+            user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key)
 
             userkeys_list=[]
             userbllibs_list=[]
             userkeys_wllibs_list=[]
             userwllibs_list=[]
 
-            for userkey, userlib in user_keys_and_libs.items():
+            for userkey, userlib in user_keys_and_bllibs.items():
                 userkeys_list.append(userkey)
                 userbllibs_list.append(userbllib)
 
