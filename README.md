@@ -1,6 +1,6 @@
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, and audio for the specified user; deleting any media past the specified played age cut off.
+This script will go through all played movies, tv episodes, videos, trailers, and audio for the specified user(s); deleting any media past the specified played age cut off.
 
 # Configuration
 ## media_cleaner_config.py
@@ -28,8 +28,9 @@ not_played_age_audio=-1
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
 # Similar logic applies for other media types (episodes, trailers, etc...)
-#  0 : ok to delete favorite
-#  1 : do no delete favorite
+#  0 : ok to delete media items set as a favorite
+#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
+#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
 keep_favorites_movie=1
@@ -76,13 +77,19 @@ keep_favorites_advanced='00000001'
 #----------------------------------------------------------#
 keep_favorites_advanced_any='00000000'
 ```
-#### Media in these library folders will be treated as if they are all marked as a favorite (i.e. media will not be deleted):
+#### When monitoring multiple users whitelisted libraries will be treated accordingly:
 ```python
 #----------------------------------------------------------#
-# Whitelisting a library folder will treat all child media as if they are favorites
-# ('' - default)
+# Decide how whitelists with multiple users behave
+#  0 : when multi-user - do not delete media item when all monitored users have the parent library whitelisted
+#  1 : when multi-user - do not delete media item when any monitored users have the parent library whitelisted
+# (1 : default)
 #----------------------------------------------------------#
-whitelisted_library_folders='/Path/To/Library/Folder0,/Path/To/Library/Folder1,/Path/To/Library/FolderX'
+multiuser_whitelist_movie=1
+multiuser_whitelist_episode=1
+multiuser_whitelist_video=1
+multiuser_whitelist_trailer=1
+multiuser_whitelist_audio=1
 ```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
@@ -93,29 +100,107 @@ whitelisted_library_folders='/Path/To/Library/Folder0,/Path/To/Library/Folder1,/
 #----------------------------------------------------------#
 remove_files=0
 ```
-#### Created first time the script runs; Do **_NOT_** edit these:
+#### When enabled media items will be deleted based on DateCreated; played state will be ignored:
+```python
+#----------------------------------------------------------#
+# CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
+# Do NOT enable any max_age_xyz options unless you know what you are doing
+# Use at your own risk; You alone are responsible for your actions
+# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
+# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
+#   0-365000000 - number of days to wait before deleting "old" media
+#  -1 : to disable managing max age of specified media type
+# (-1 : default)
+#----------------------------------------------------------#
+max_age_movie=-1
+max_age_episode=-1
+max_age_video=-1
+max_age_trailer=-1
+max_age_audio=-1
+```
+#### When enabled favorited media items will not be deleted using the corresponding max_age_xyz:
+```python
+#----------------------------------------------------------#
+# Decide if max age media set as a favorite should be deleted
+#  0 : ok to delete max age media items set as a favorite
+#  1 : do not delete max age media items when set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+max_keep_favorites_movie=1
+max_keep_favorites_episode=1
+max_keep_favorites_video=1
+max_keep_favorites_trailer=1
+max_keep_favorites_audio=1
+```
+
+#### Created first time the script runs; Do **_NOT_** edit or modify these:
 ```python
 #------------DO NOT MODIFY BELOW---------------------------#
 
 #----------------------------------------------------------#
-# Server branding chosen during setup; only used during setup
+# Server branding; chosen during setup
 #  0 - 'emby'
 #  1 - 'jellyfin'
-# Server URL created during setup
-# Admin username chosen during setup
-# Access token requested from server during setup
-# User key of account to monitor played media chosen during setup
 #----------------------------------------------------------#
-server_brand='xyz'
+server_brand='emby'
+
+#----------------------------------------------------------#
+# Server URL; created during setup
+#----------------------------------------------------------#
 server_url='http://localhost.abc:8096/basename'
+
+#----------------------------------------------------------#
+# Admin username; chosen during setup
+#----------------------------------------------------------#
 admin_username='Username'
+
+#----------------------------------------------------------#
+# Access token; requested from server during setup
+#----------------------------------------------------------#
 access_token='0123456789abcdef0123456789abcdef0'
-user_key='abcdef0123456789abcdef0123456789a'
+
+#----------------------------------------------------------#
+# User key(s) of account(s) to monitor media items; chosen during setup
+#----------------------------------------------------------#
+user_keys='["abcdef0123456789abcdef0123456789a", "bbcdef0123456789abcdef0123456789a", "etc...0123456789abcdef0123456789a"]'
+
+#----------------------------------------------------------#
+# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
+#----------------------------------------------------------#
+user_bl_libs='["/some/path/0,/some/path/1,/some/path/2", "/some/path/1,/some/path/2,/some/path/3", "/some/path/x,/some/path/etc..."]'
+
+#----------------------------------------------------------#
+# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup
+#----------------------------------------------------------#
+user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/path/6,/some/path/7", "/some/path/y,/some/path/etc..."]'
+
+#----------------------------------------------------------#
+# API request attempts; number of times to retry an API request
+#  delay between intial attempt and the first retry is 1 second
+#  the delay will double with each attempt after the first retry
+#  0-16 - number of retry attempts
+#  (6 : default)
+#----------------------------------------------------------#
+api_request_attempts=6
+
+#----------------------------------------------------------#
+# API return limit; Large libraries sometimes cannot return all of the media metadata items in a single API call
+#  This is especially true when using the max_age_xyz options; the max_age_xyz options require every item of the specified media type send its metadata
+#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value
+#  (100 : default)
+#----------------------------------------------------------#
+api_return_limit=100
+
+#----------------------------------------------------------#
+# 0 - Debug messages disaled
+# 1 - Debug messages enabled
+# (0 : default)
+#----------------------------------------------------------#
 DEBUG=0
 ```
 
 # Usage
-Make media_cleaner.py executable and run ./media_cleaner.py.  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
+Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py".  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
 
 # Requirements
 * python3
@@ -137,8 +222,4 @@ Make media_cleaner.py executable and run ./media_cleaner.py.  If no conifg file 
 # Donation
 If you find this useful and you would like to support please the use option below.
 
-##### @terrelsa13
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
-
-##### @clara-j
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=jason%2ep%2eclara%40gmail%2ecom&lc=CA&item_name=Jason%20Clara&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
