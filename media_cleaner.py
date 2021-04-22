@@ -427,7 +427,9 @@ def generate_config():
 #api call to delete items
 def delete_item(itemID):
     url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
+
     req = request.Request(url,method='DELETE')
+    
     if bool(cfg.DEBUG):
         #DEBUG
         print(itemID)
@@ -460,16 +462,8 @@ def get_auth_key(server_url, username, password, server_brand):
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
-    with request.urlopen(req) as response:
-        if response.getcode() == 200:
-            source = response.read()
-            data = json.loads(source)
-
-            #DEBUG
-            #print('get auth key data)
-            #print2json(data)
-        else:
-            print('An error occurred while attempting to retrieve data from the API.')
+    #api call
+    data=requestURL(req, False, 'get_auth_key', 3)
 
     return(data['AccessToken'])
 
@@ -479,16 +473,11 @@ def get_auth_key(server_url, username, password, server_brand):
 #choosen account does NOT need to have "Allow Media Deletion From" enabled
 def get_users_and_paths(server_url, auth_key, script_behavior):
     #Get all users
-    with request.urlopen(server_url + '/Users?api_key=' + auth_key) as response:
-        if response.getcode() == 200:
-            source = response.read()
-            data = json.loads(source)
 
-            #DEBUG
-            #print('list users')
-            #print2json(data)
-        else:
-            print('An error occurred while attempting to retrieve data from the API.')
+    req=(server_url + '/Users?api_key=' + auth_key)
+
+    #api call
+    data=requestURL(req, False, 'get_users', 3)
 
     #define empty userId dictionary
     userId_dict={}
@@ -587,16 +576,11 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
 #then choose which folders to whitelist
 def list_library_folders(server_url, auth_key, infotext, mandatory):
     #get all library paths
-    with request.urlopen(server_url + '/Library/VirtualFolders?api_key=' + auth_key) as response:
-        if response.getcode() == 200:
-            source = response.read()
-            data = json.loads(source)
 
-            #DEBUG
-            #print('list library folders')
-            #print2json(data)
-        else:
-            print('An error occurred while attempting to retrieve data from the API.')
+    req=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
+
+    #api call
+    data = requestURL(req, False, 'get_libraries', 3)
 
     #define empty dictionary
     libraryfolders_dict={}
@@ -769,13 +753,13 @@ def get_season_episode(season_number, episode_number):
 
 
 #send url request
-def requestURL(url, debugBool, debugMessage):
+def requestURL(url, debugBool, debugMessage, retries):
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
     delay = 1
     #number of times after the intial API request to retry if an exception occurs
-    retryAttempts = cfg.api_request_attempts
+    retryAttempts = int(retries)
 
     getdata = True
     #try sending url request specified number of times
@@ -816,7 +800,7 @@ def get_additional_item_info(server_url, user_key, itemId, auth_key, lookupTopic
         print('-----------------------------------------------------------')
         print(url)
 
-    itemInfo=requestURL(url, cfg.DEBUG, lookupTopic)
+    itemInfo=requestURL(url, cfg.DEBUG, lookupTopic, cfg.api_request_attempts)
 
     return(itemInfo)
 
@@ -834,7 +818,7 @@ def get_studio_item_info(server_url, user_key, studioName, auth_key):
         print('-----------------------------------------------------------')
         print(url)
 
-    itemInfo=requestURL(url, cfg.DEBUG, 'get_studio_item_info')
+    itemInfo=requestURL(url, cfg.DEBUG, 'get_studio_item_info', cfg.api_request_attempts)
 
     return(itemInfo)
 
@@ -1522,7 +1506,7 @@ def get_items(server_url, user_keys, auth_key):
             #DEBUG
             print(url)
 
-        data=requestURL(url, cfg.DEBUG, 'current_user')
+        data=requestURL(url, cfg.DEBUG, 'current_user', cfg.api_request_attempts)
 
         print('')
         print('-----------------------------------------------------------')
@@ -1573,7 +1557,7 @@ def get_items(server_url, user_keys, auth_key):
                     #DEBUG
                     print(url)
 
-                data=requestURL(url, cfg.DEBUG, 'movie_media_data')
+                data=requestURL(url, cfg.DEBUG, 'movie_media_data', cfg.api_request_attempts)
 
                 TotalItems = data['TotalRecordCount']
                 StartIndex = StartIndex + ItemsChunk
@@ -1686,7 +1670,7 @@ def get_items(server_url, user_keys, auth_key):
                     #DEBUG
                     print(url)
 
-                data=requestURL(url, cfg.DEBUG, 'episode_media_data')
+                data=requestURL(url, cfg.DEBUG, 'episode_media_data', cfg.api_request_attempts)
 
                 TotalItems = data['TotalRecordCount']
                 StartIndex = StartIndex + ItemsChunk
@@ -1803,7 +1787,7 @@ def get_items(server_url, user_keys, auth_key):
                     #DEBUG
                     print(url)
 
-                data=requestURL(url, cfg.DEBUG, 'video_media_data')
+                data=requestURL(url, cfg.DEBUG, 'video_media_data', cfg.api_request_attempts)
 
                 TotalItems = data['TotalRecordCount']
                 StartIndex = StartIndex + ItemsChunk
@@ -1913,7 +1897,7 @@ def get_items(server_url, user_keys, auth_key):
                     #DEBUG
                     print(url)
 
-                data=requestURL(url, cfg.DEBUG, 'trailer_media_data')
+                data=requestURL(url, cfg.DEBUG, 'trailer_media_data', cfg.api_request_attempts)
 
                 TotalItems = data['TotalRecordCount']
                 StartIndex = StartIndex + ItemsChunk
@@ -2028,7 +2012,7 @@ def get_items(server_url, user_keys, auth_key):
                     #DEBUG
                     print(url)
 
-                data=requestURL(url, cfg.DEBUG, 'audio_media_data')
+                data=requestURL(url, cfg.DEBUG, 'audio_media_data', cfg.api_request_attempts)
 
                 TotalItems = data['TotalRecordCount']
                 StartIndex = StartIndex + ItemsChunk
