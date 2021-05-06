@@ -1577,10 +1577,25 @@ def get_items(server_url, user_keys, auth_key):
 
                     #Get if media item path is monitored
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find movie media items ready to delete
                     if ((item_info['Type'] == 'Movie') and (itemIsMonitored)):
@@ -1695,10 +1710,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'episode_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find tv-episode media items ready to delete
                     if ((item_info['Type'] == 'Episode') and (itemIsMonitored)):
@@ -1813,10 +1843,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'video_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find video media items ready to delete
                     if ((item_info['Type'] == 'Video') and (itemIsMonitored)):
@@ -1924,10 +1969,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'trailer_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find trailer media items ready to delete
                     if ((item_info['Type'] == 'Trailer') and (itemIsMonitored)):
@@ -2039,10 +2099,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'audio_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audio media items ready to delete
                     if ((item_info['Type'] == 'Audio') and (itemIsMonitored)):
