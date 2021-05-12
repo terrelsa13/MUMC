@@ -522,13 +522,11 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
             user_number=input('Enter number of user to monitor; leave blank when finished: ')
             print('')
 
-        user_number_int=int(user_number)
-
         try:
             if ((user_number == '0') and (single_user == True)):
                 stop_loop=True
                 one_user_selected=True
-
+                user_number_int=int(user_number)
                 userId_set.add(userId_dict[user_number_int])
 
                 if (script_behavior == 'blacklist'):
