@@ -144,7 +144,7 @@ def get_cleaning_behavior():
             return('blacklist')
         else:
             print('\nInvalid choice. Try again.\n')
-            return(defaultbrand)
+            return(defaultbehavior)
 
 
 #use of hashed password removed
@@ -429,7 +429,7 @@ def delete_item(itemID):
     url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
 
     req = request.Request(url,method='DELETE')
-    
+
     if bool(cfg.DEBUG):
         #DEBUG
         print(itemID)
@@ -453,10 +453,11 @@ def get_auth_key(server_url, username, password, server_brand):
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
 
+    #assuming jellyfin will eventually change this 
     #if (server_brand == 'emby'):
-        #brand='Emby'
+        #xAuth = 'X-Emby-Authorization'
     #else:
-        #brand='Jellyfin'
+        #xAuth = 'X-Jellyfin-Authorization'
 
     headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.0", Token=""', 'Content-Type' : 'application/json'}
 
@@ -504,7 +505,8 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
                 i += 1
         else:
             single_user=True
-            userId_dict[i]=user['Id']
+            for user in data:
+                userId_dict[i]=user['Id']
 
         print('')
 
@@ -524,17 +526,17 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
             if ((user_number == '0') and (single_user == True)):
                 stop_loop=True
                 one_user_selected=True
-
+                user_number_int=int(user_number)
                 userId_set.add(userId_dict[user_number_int])
 
                 if (script_behavior == 'blacklist'):
                     message='Enter number of library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message)
+                    userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
                     userId_wllib_dict[userId_dict[user_number_int]]=''
                 else:
                     userId_lib_dict[userId_dict[user_number_int]]=''
                     message='Enter number of library folder to whitelist for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                    userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message)
+                    userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, False)
 
             elif ((user_number == '') and not (len(userId_set) == 0)):
                 stop_loop=True
@@ -658,12 +660,11 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
         libraryPaths=''
         for libfolders in libraryfolders_set:
             if (i == 0):
-                #libfolders = libfolders.replace('\"','\\\"')
-                libraryPaths = libfolders.replace('\'','\\\'')
+                libraryPaths = libfolders.replace('\\','/')
+                
                 i += 1
             else:
-                #libfolders = libfolders.replace('\"','\\\"')
-                libraryPaths = libfolders.replace('\'','\\\'') + ',' + libraryPaths
+                libraryPaths = libfolders.replace('\\','/') + "," + libraryPaths
 
         return(libraryPaths)
 
@@ -786,7 +787,7 @@ def requestURL(url, debugBool, debugMessage, retries):
             else:
                 getdata = False
                 print('An error occurred while attempting to retrieve data from the API.')
-                return(Error)
+                return('Attempt to get data at: ' + debugMessage + '. Server responded with code: ' + str(response.getcode()))
 
 
 #get additional item info needed to determine if parent of item is favorite
@@ -1344,7 +1345,7 @@ def get_iswhitelist_MultiUser_byId(userkeys, iswhitelist_byUserId, deleteItems):
     return(get_isfav_MultiUser(userkeys, iswhitelist_byUserId, deleteItems))
 
 
-#Handle whitelists across multiple users by Path 
+#Handle whitelists across multiple users by Path
 def get_iswhitelist_MultiUser_byPath(userkeys, whitelists, deleteItems):
     all_whitelists=set()
     deleteIndexes=[]
@@ -1394,6 +1395,10 @@ def get_iswhitelist_MultiUser_byPath(userkeys, whitelists, deleteItems):
 
 #determine if media item is in library folder
 def get_isPathMatching(itemPath, comparePath):
+
+    #for paths in Microsoft Windows, replace double forward slashes in item's path with a single back slash
+    itemPath = itemPath.replace('\\','/')
+
     #read and split paths to compare to
     comparePathEntries=comparePath.split(',')
 
@@ -1546,12 +1551,9 @@ def get_items(server_url, user_keys, auth_key):
 
             StartIndex=0
             TotalItems=1
-            DiscoverItemsTotal=True
             ItemsChunk=1
 
-            while ((StartIndex < (TotalItems - 1)) or (DiscoverItemsTotal == True)):
-
-                DiscoverItemsTotal = False
+            while (ItemsChunk > 0):
 
                 url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Movie&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
                     '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
@@ -1566,21 +1568,36 @@ def get_items(server_url, user_keys, auth_key):
                 StartIndex = StartIndex + ItemsChunk
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = (TotalItems - 1) - StartIndex
+                    ItemsChunk = TotalItems - StartIndex
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
 
                     media_found=True
 
+                    #Get if media item path is monitored
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'movie_item')
 
-                    #Get if media item path is monitored
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find movie media items ready to delete
                     if ((item_info['Type'] == 'Movie') and (itemIsMonitored)):
@@ -1660,12 +1677,9 @@ def get_items(server_url, user_keys, auth_key):
 
             StartIndex=0
             TotalItems=1
-            DiscoverItemsTotal=True
             ItemsChunk=1
 
-            while ((StartIndex < (TotalItems - 1)) or (DiscoverItemsTotal == True)):
-
-                DiscoverItemsTotal = False
+            while (ItemsChunk > 0):
 
                 if (cfg.server_brand == 'emby'):
                     url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Episode&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
@@ -1684,7 +1698,7 @@ def get_items(server_url, user_keys, auth_key):
                 StartIndex = StartIndex + ItemsChunk
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = (TotalItems - 1) - StartIndex
+                    ItemsChunk = TotalItems - StartIndex
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
@@ -1695,10 +1709,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'episode_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find tv-episode media items ready to delete
                     if ((item_info['Type'] == 'Episode') and (itemIsMonitored)):
@@ -1782,12 +1811,9 @@ def get_items(server_url, user_keys, auth_key):
 
             StartIndex=0
             TotalItems=1
-            DiscoverItemsTotal=True
             ItemsChunk=1
 
-            while ((StartIndex < (TotalItems - 1)) or (DiscoverItemsTotal == True)):
-
-                DiscoverItemsTotal = False
+            while (ItemsChunk > 0):
 
                 url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Video&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
                     '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
@@ -1802,7 +1828,7 @@ def get_items(server_url, user_keys, auth_key):
                 StartIndex = StartIndex + ItemsChunk
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = (TotalItems - 1) - StartIndex
+                    ItemsChunk = TotalItems - StartIndex
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
@@ -1813,10 +1839,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'video_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find video media items ready to delete
                     if ((item_info['Type'] == 'Video') and (itemIsMonitored)):
@@ -1893,12 +1934,9 @@ def get_items(server_url, user_keys, auth_key):
 
             StartIndex=0
             TotalItems=1
-            DiscoverItemsTotal=True
             ItemsChunk=1
 
-            while ((StartIndex < (TotalItems - 1)) or (DiscoverItemsTotal == True)):
-
-                DiscoverItemsTotal = False
+            while (ItemsChunk > 0):
 
                 url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Trailer&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
                     '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
@@ -1913,7 +1951,7 @@ def get_items(server_url, user_keys, auth_key):
                 StartIndex = StartIndex + ItemsChunk
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = (TotalItems - 1) - StartIndex
+                    ItemsChunk = TotalItems - StartIndex
 
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
@@ -1924,10 +1962,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'trailer_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find trailer media items ready to delete
                     if ((item_info['Type'] == 'Trailer') and (itemIsMonitored)):
@@ -2009,12 +2062,9 @@ def get_items(server_url, user_keys, auth_key):
 
             StartIndex=0
             TotalItems=1
-            DiscoverItemsTotal=True
             ItemsChunk=1
 
-            while ((StartIndex < (TotalItems - 1)) or (DiscoverItemsTotal == True)):
-
-                DiscoverItemsTotal = False
+            while (ItemsChunk > 0):
 
                 url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Audio&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
                     '&Recursive=true&SortBy=AlbumArtist,ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
@@ -2029,7 +2079,8 @@ def get_items(server_url, user_keys, auth_key):
                 StartIndex = StartIndex + ItemsChunk
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = (TotalItems - 1) - StartIndex
+                    ItemsChunk = TotalItems - StartIndex
+                    
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
 
@@ -2039,10 +2090,25 @@ def get_items(server_url, user_keys, auth_key):
                     item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'audio_item')
 
                     for mediasource in item_info['MediaSources']:
-                        if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                            itemIsMonitored=False
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
-                            itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audio media items ready to delete
                     if ((item_info['Type'] == 'Audio') and (itemIsMonitored)):
@@ -2128,7 +2194,7 @@ def get_items(server_url, user_keys, auth_key):
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
     #deleteItems=get_iswhitelist_MultiUser_byId(user_keys_json, iswhitelist_byUserId, deleteItems)
-    
+
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(movie_whitelists), deleteItems)
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(episode_whitelists), deleteItems)
@@ -2350,7 +2416,7 @@ def cfgCheck():
         (check <= 1))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'        
+        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'
 
     check=cfg.multiuser_whitelist_trailer
     if (
@@ -2793,7 +2859,7 @@ try:
         if not hasattr(cfg, 'multiuser_whitelist_movie'):
             print('multiuser_whitelist_movie=1')
             setattr(cfg, 'multiuser_whitelist_movie', 1)
-        
+
         if not hasattr(cfg, 'multiuser_whitelist_episode'):
             print('multiuser_whitelist_episode=1')
             setattr(cfg, 'multiuser_whitelist_episode', 1)
@@ -2896,14 +2962,14 @@ except (AttributeError, ModuleNotFoundError):
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
     generate_config()
-    
+
     #exit gracefully after setup
     exit(0)
 
 #check config values are what we expect them to be
 cfgCheck()
 
-#now we can get media items that are ready to be deleted; 
+#now we can get media items that are ready to be deleted;
 deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.access_token)
 
 #show and delete media items

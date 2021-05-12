@@ -142,7 +142,7 @@ max_keep_favorites_audio=1
 #  0 - 'emby'
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
-server_brand='emby'
+server_brand='abcd'
 
 #----------------------------------------------------------#
 # Server URL; created during setup
