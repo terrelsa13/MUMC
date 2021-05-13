@@ -205,7 +205,7 @@ Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py". 
 # Requirements
 * python3
 * python-dateutil
-* Emby/Jellyfin have permission to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+* Emby/Jellyfin have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # First Run
 * $ /path/to/python3.x /path/to/media_cleaner.py
