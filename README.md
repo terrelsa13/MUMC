@@ -27,7 +27,7 @@ not_played_age_audio=-1
 # Decide if media set as a favorite should be deleted
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
-# Similar logic applies for other media types (episodes, trailers, etc...)
+# Similar logic applies for other media types (movies, trailers, etc...)
 #  0 : ok to delete media items set as a favorite
 #  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
 #  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
@@ -81,8 +81,8 @@ keep_favorites_advanced_any='00000000'
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
-#  0 : when multi-user - do not delete media item when all monitored users have the parent library whitelisted
-#  1 : when multi-user - do not delete media item when any monitored users have the parent library whitelisted
+#  0 : when multi-user - do not delete media item when ALL monitored users have the parent library whitelisted
+#  1 : when multi-user - do not delete media item when ANY monitored users have the parent library whitelisted
 # (1 : default)
 #----------------------------------------------------------#
 multiuser_whitelist_movie=1
@@ -100,7 +100,7 @@ multiuser_whitelist_audio=1
 #----------------------------------------------------------#
 remove_files=0
 ```
-#### When enabled media items will be deleted based on DateCreated; played state will be ignored:
+#### When enabled, media items will be deleted based on DateCreated; played state will be ignored:
 ```python
 #----------------------------------------------------------#
 # CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
@@ -118,7 +118,7 @@ max_age_video=-1
 max_age_trailer=-1
 max_age_audio=-1
 ```
-#### When enabled favorited media items will not be deleted using the corresponding max_age_xyz:
+#### When enabled, favorited media items will not be deleted using the corresponding max_age_xyz:
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
@@ -176,7 +176,7 @@ user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/pat
 
 #----------------------------------------------------------#
 # API request attempts; number of times to retry an API request
-#  delay between intial attempt and the first retry is 1 second
+#  delay between initial attempt and the first retry is 1 second
 #  the delay will double with each attempt after the first retry
 #  0-16 - number of retry attempts
 #  (6 : default)
@@ -184,7 +184,7 @@ user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/pat
 api_request_attempts=6
 
 #----------------------------------------------------------#
-# API return limit; Large libraries sometimes cannot return all of the media metadata items in a single API call
+# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call
 #  This is especially true when using the max_age_xyz options; the max_age_xyz options require every item of the specified media type send its metadata
 #  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value
 #  (100 : default)
@@ -218,7 +218,7 @@ Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py". 
    - $ sudo pip3 install -U pip
    - $ sudo pip3 install python-dateutil
 * For other operating systems
-   - tbd or Google it
+   - Please consult Google
 
 # Donation
 If you find this useful and you would like to support please the use option below.
