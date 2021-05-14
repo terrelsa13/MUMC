@@ -162,7 +162,7 @@ access_token='0123456789abcdef0123456789abcdef'
 #----------------------------------------------------------#
 # User key(s) of account(s) to monitor media items; chosen during setup
 #----------------------------------------------------------#
-user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "etc...9876543210fedcba9876543210fedcba"]'
+user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
 
 #----------------------------------------------------------#
 # User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
