@@ -211,7 +211,7 @@ Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py". 
 * $ /path/to/python3.x /path/to/media_cleaner.py
 * You may get the below python error if the python-dateutil module is not installed
    - ModuleNotFoundError: No module named 'dateutil' python-dateutil
-* For Ubuntu/Linux Mint type systems you can install the python-dateutil module with the following commands:
+* For Debian/Ubuntu/Linux Mint type systems you can install the python-dateutil module with the following commands:
    - $ sudo apt-get update
    - $ sudo apt-get upgrade -y
    - $ sudo apt-get install python3-pip -y
