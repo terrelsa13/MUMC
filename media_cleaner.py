@@ -223,7 +223,7 @@ def generate_config():
     config_file += "# Decide if media set as a favorite should be deleted\n"
     config_file += "# Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites\n"
     config_file += "# Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites\n"
-    config_file += "# Similar logic applies for other media types (episodes, trailers, etc...)\n"
+    config_file += "# Similar logic applies for other media types (movies, trailers, etc...)\n"
     config_file += "#  0 : ok to delete media items set as a favorite\n"
     config_file += "#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite\n"
     config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite\n"
@@ -274,8 +274,8 @@ def generate_config():
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how whitelists with multiple users behave\n"
-    config_file += "#  0 : do not delete media item when all monitored users have the parent library whitelisted\n"
-    config_file += "#  1 : do not delete media item when any monitored users have the parent library whitelisted\n"
+    config_file += "#  0 : do not delete media item when ALL monitored users have the parent library whitelisted\n"
+    config_file += "#  1 : do not delete media item when ANY monitored users have the parent library whitelisted\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "multiuser_whitelist_movie=1\n"
@@ -369,7 +369,7 @@ def generate_config():
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API request attempts; number of times to retry an API request\n"
-    config_file += "#  delay between intial attempt and the first retry is 1 second\n"
+    config_file += "#  delay between initial attempt and the first retry is 1 second\n"
     config_file += "#  the delay will double with each attempt after the first retry\n"
     config_file += "#  0-16 - number of retry attempts\n"
     config_file += "#  (6 : default)\n"
@@ -377,7 +377,7 @@ def generate_config():
     config_file += "api_request_attempts=6\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# API return limit; Large libraries sometimes cannot return all of the media metadata items in a single API call\n"
+    config_file += "# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
     config_file += "#  This is especially true when using the max_age_xyz options; the max_age_xyz options require every item of the specified media type send its metadata\n"
     config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value\n"
     config_file += "#  (100 : default)\n"
@@ -385,7 +385,7 @@ def generate_config():
     config_file += "api_return_limit=100\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# 0 - Debug messages disaled\n"
+    config_file += "# 0 - Debug messages disabled\n"
     config_file += "# 1 - Debug messages enabled\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -453,13 +453,13 @@ def get_auth_key(server_url, username, password, server_brand):
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
 
-    #assuming jellyfin will eventually change this 
+    #assuming jellyfin will eventually change this
     #if (server_brand == 'emby'):
         #xAuth = 'X-Emby-Authorization'
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.1", Token=""', 'Content-Type' : 'application/json'}
+    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.2", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -661,7 +661,6 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
         for libfolders in libraryfolders_set:
             if (i == 0):
                 libraryPaths = libfolders.replace('\\','/')
-                
                 i += 1
             else:
                 libraryPaths = libfolders.replace('\\','/') + "," + libraryPaths
@@ -1471,11 +1470,11 @@ def get_items(server_url, user_keys, auth_key):
         print('-----------------------------------------------------------')
         all_media_disabled=True
 
-    #items to be deleted
+    #list of items to be deleted
     deleteItems=[]
-    #favorited items by userId
+    #dictionary of favorited items by userId
     isfav_byUserId={}
-    #whitelisted items by userId
+    #dictionary of whitelisted items by userId
     iswhitelist_byUserId={}
     #whitelisted paths per media type according to media types metadata
     movie_whitelists=set()
@@ -1611,7 +1610,7 @@ def get_items(server_url, user_keys, auth_key):
                         #Get if movie is set as favorite
                         itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item_info, server_url, user_key, auth_key)
 
-                        #Get if media item path whitelisted
+                        #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
@@ -2080,7 +2079,7 @@ def get_items(server_url, user_keys, auth_key):
                 ItemsChunk = cfg.api_return_limit
                 if ((StartIndex + ItemsChunk) >= (TotalItems)):
                     ItemsChunk = TotalItems - StartIndex
-                    
+
                 #Determine if media item is to be deleted or kept
                 for item in data['Items']:
 
