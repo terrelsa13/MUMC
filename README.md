@@ -192,7 +192,7 @@ api_request_attempts=6
 api_return_limit=100
 
 #----------------------------------------------------------#
-# 0 - Debug messages disaled
+# 0 - Debug messages disabled
 # 1 - Debug messages enabled
 # (0 : default)
 #----------------------------------------------------------#
