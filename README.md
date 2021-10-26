@@ -161,7 +161,7 @@ server_url='http://localhost.abc:8096/basename'
 #----------------------------------------------------------#
 # Admin username; chosen during setup
 #----------------------------------------------------------#
-admin_username='Username'
+admin_username='username'
 
 #----------------------------------------------------------#
 # Access token; requested from server during setup
