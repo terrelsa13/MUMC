@@ -151,7 +151,7 @@ max_keep_favorites_audiobook=1
 #  0 - 'emby'
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
-server_brand='servername'
+server_brand='serverbrand'
 
 #----------------------------------------------------------#
 # Server URL; created during setup
