@@ -129,10 +129,13 @@ def get_cleaning_behavior():
     defaultbehavior='whitelist'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Choose how the script will decide which libraries to delete media items from.')
-        print('0 - Whitelisting media libraries; media items can be deleted from library unless library is whitelisted.')
-        print('1 - Blacklisting media libraries; media items cannot be deleted from library unless library is blacklisted (aka monitored).')
-        behavior=input('Choose how the script will behave. (press enter to default to whitelisting): ')
+        #print('Choose how the script will decide which libraries to delete media items from.')
+        print('Decide how the script will treat libraries for the user(s) choosen in the next step.')
+        #print('0 - Whitelisting media libraries; media items can be deleted from library unless library is whitelisted.')
+        print('0 - Whitelist Media Libraries - Media items in the libraries you choose will NOT be allowed to be deleted.')
+        #print('1 - Blacklisting media libraries; media items cannot be deleted from library unless library is blacklisted (aka monitored).')
+        print('1 - Blacklist Media Libraries - Media items in the libraries you choose will be allowed to be deleted.')
+        behavior=input('Choose how the script will behave. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -217,6 +220,8 @@ def generate_config():
     config_file += "not_played_age_video=-1\n"
     config_file += "not_played_age_trailer=-1\n"
     config_file += "not_played_age_audio=-1\n"
+    if (server_brand == 'jellyfin'):
+        config_file += "not_played_age_audiobook=-1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -234,42 +239,48 @@ def generate_config():
     config_file += "keep_favorites_video=1\n"
     config_file += "keep_favorites_trailer=1\n"
     config_file += "keep_favorites_audio=1\n"
+    if (server_brand == 'jellyfin'):
+        config_file += "keep_favorites_audiobook=1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Advanced favorites configuration bitmask\n"
     config_file += "#     Requires 'keep_favorites_*=1'\n"
-    config_file += "#  xxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited\n"
-    config_file += "#  xxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited\n"
-    config_file += "#  xxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited\n"
-    config_file += "#  xxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited\n"
-    config_file += "#  xxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited\n"
-    config_file += "#  xxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited\n"
-    config_file += "#  xGxxxxxx - reserved...\n"
-    config_file += "#  Hxxxxxxx - reserved...\n"
+    config_file += "#  xxxxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited\n"
+    config_file += "#  xxxxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited\n"
+    config_file += "#  xxxxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited\n"
+    config_file += "#  xxxxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited\n"
+    config_file += "#  xxxxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited\n"
+    config_file += "#  xxxxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited\n"
+    config_file += "#  xxxGxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the track's 'artist(author)' metadata is favorited\n"
+    config_file += "#  xxHxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the tracks's 'album(book) artist(author)' metadata is favorited\n"
+    config_file += "#  xIxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the tracks's metadata is favorited\n"
+    config_file += "#  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited\n"
     config_file += "#  0 bit - disabled\n"
     config_file += "#  1 bit - enabled\n"
-    config_file += "# (00000001 - default)\n"
+    config_file += "# (0001000001 - default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "keep_favorites_advanced='00000001'\n"
+    config_file += "keep_favorites_advanced='0001000001'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Advanced favorites any configuration bitmask\n"
     config_file += "#     Requires matching bit in 'keep_favorites_advanced' bitmask is enabled\n"
-    config_file += "#  xxxxxxxa - xxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata\n"
-    config_file += "#  xxxxxxbx - xxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata\n"
-    config_file += "#  xxxxxcxx - xxxxxCxx must be enabled; will use ANY genres listed in the track's metadata\n"
-    config_file += "#  xxxxdxxx - xxxxDxxx must be enabled; will use ANY genres listed in the album's metadata\n"
-    config_file += "#  xxxexxxx - xxxExxxx must be enabled; will use ANY genres listed in the series' metadata\n"
-    config_file += "#  xxfxxxxx - xxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata\n"
-    config_file += "#  xgxxxxxx - reserved...\n"
-    config_file += "#  hxxxxxxx - reserved...\n"
+    config_file += "#  xxxxxxxxxa - xxxxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata\n"
+    config_file += "#  xxxxxxxxbx - xxxxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata\n"
+    config_file += "#  xxxxxxxcxx - xxxxxxxCxx must be enabled; will use ANY genres listed in the track's metadata\n"
+    config_file += "#  xxxxxxdxxx - xxxxxxDxxx must be enabled; will use ANY genres listed in the album's metadata\n"
+    config_file += "#  xxxxxexxxx - xxxxxExxxx must be enabled; will use ANY genres listed in the series' metadata\n"
+    config_file += "#  xxxxfxxxxx - xxxxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata\n"
+    config_file += "#  xxxgxxxxxx - xxxGxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'artist(author)' metadata\n"
+    config_file += "#  xxhxxxxxxx - xxHxxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'album(book) artist(autor)' metadata\n"
+    config_file += "#  xixxxxxxxx - xIxxxxxxxx must be enabled; will use ANY genres listed in the track's metadata\n"
+    config_file += "#  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata\n"
     config_file += "#  0 bit - disabled\n"
     config_file += "#  1 bit - enabled\n"
-    config_file += "# (00000000 - default)\n"
+    config_file += "# (0000000000 - default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "keep_favorites_advanced_any='00000000'\n"
+    config_file += "keep_favorites_advanced_any='0000000000'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -283,6 +294,8 @@ def generate_config():
     config_file += "multiuser_whitelist_video=1\n"
     config_file += "multiuser_whitelist_trailer=1\n"
     config_file += "multiuser_whitelist_audio=1\n"
+    if (server_brand == 'jellyfin'):
+        config_file += "multiuser_whitelist_audiobook=1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -308,6 +321,8 @@ def generate_config():
     config_file += "max_age_video=-1\n"
     config_file += "max_age_trailer=-1\n"
     config_file += "max_age_audio=-1\n"
+    if (server_brand == 'jellyfin'):
+        config_file += "max_age_audiobook=-1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -321,6 +336,8 @@ def generate_config():
     config_file += "max_keep_favorites_video=1\n"
     config_file += "max_keep_favorites_trailer=1\n"
     config_file += "max_keep_favorites_audio=1\n"
+    if (server_brand == 'jellyfin'):
+        config_file += "max_keep_favorites_audiobook=1\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -413,6 +430,8 @@ def generate_config():
     print('    Set \'not_played_age_video\' to zero or a positive number')
     print('    Set \'not_played_age_trailer\' to zero or a positive number')
     print('    Set \'not_played_age_audio\' to zero or a positive number')
+    if (server_brand == 'jellyfin'):
+        print('    Set \'not_played_age_audiobook\' to zero or a positive number')
     print('-----------------------------------------------------------')
     print('Config file is not setup to delete played media.')
     print('Config file is in dry run mode to prevent deleting media.')
@@ -440,6 +459,7 @@ def delete_item(itemID):
             request.urlopen(req)
         except Exception:
             print('generic exception: ' + traceback.format_exc())
+        return
     else:
         return
 
@@ -463,8 +483,11 @@ def get_auth_key(server_url, username, password, server_brand):
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
+    preConfigDebug = True
+    #preConfigDebug = False
+
     #api call
-    data=requestURL(req, False, 'get_auth_key', 3)
+    data=requestURL(req, preConfigDebug, 'get_auth_key', 3)
 
     return(data['AccessToken'])
 
@@ -477,8 +500,11 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
 
     req=(server_url + '/Users?api_key=' + auth_key)
 
+    preConfigDebug = True
+    #preConfigDebug = False
+
     #api call
-    data=requestURL(req, False, 'get_users', 3)
+    data=requestURL(req, preConfigDebug, 'get_users', 3)
 
     #define empty userId dictionary
     userId_dict={}
@@ -513,13 +539,13 @@ def get_users_and_paths(server_url, auth_key, script_behavior):
         if ((i == 0) and (single_user == True)):
             user_number='0'
         elif ((i >= 1) and (one_user_selected == False)):
-            user_number=input('Enter number of user to monitor: ')
+            user_number=input('Select one user at a time.\nEnter number of the user to monitor: ')
             print('')
         else: #((i >= 1) and (one_user_selected == True)):
             print('Monitoring multiple users is possible.')
             #print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
             print('When multiple users are selected; the user with the oldest last played time will determine if media is deleted.')
-            user_number=input('Enter number of user to monitor; leave blank when finished: ')
+            user_number=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
             print('')
 
         try:
@@ -581,8 +607,11 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
 
     req=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
 
+    preConfigDebug = True
+    #preConfigDebug = False
+
     #api call
-    data = requestURL(req, False, 'get_libraries', 3)
+    data = requestURL(req, preConfigDebug, 'get_media_libraries', 3)
 
     #define empty dictionary
     libraryfolders_dict={}
@@ -597,14 +626,14 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
             for subpath in range(len(path['LibraryOptions']['PathInfos'])):
                 if ('NetworkPath' in path['LibraryOptions']['PathInfos'][subpath]):
                     if not (path['LibraryOptions']['PathInfos'][subpath]['NetworkPath'] in libraryfolders_set):
-                        print(str(i) + ' - ' + path['LibraryOptions']['PathInfos'][subpath]['Path'] + ' - (' + path['LibraryOptions']['PathInfos'][subpath]['NetworkPath'] +')')
+                        print(str(i) + ' - ' + path['Name'] + ' - ' + path['LibraryOptions']['PathInfos'][subpath]['Path'] + ' - (' + path['LibraryOptions']['PathInfos'][subpath]['NetworkPath'] +')')
                         libraryfolders_dict[i]=path['LibraryOptions']['PathInfos'][subpath]['NetworkPath']
                     else:
                         #show blank entry
                         print(str(i) + ' - ')
                 else: #('Path' in path['LibraryOptions']['PathInfos'][subpath]):
                     if not(path['LibraryOptions']['PathInfos'][subpath]['Path'] in libraryfolders_set):
-                        print(str(i) + ' - ' + path['LibraryOptions']['PathInfos'][subpath]['Path'])
+                        print(str(i) + ' - ' + path['Name'] + ' - ' + path['LibraryOptions']['PathInfos'][subpath]['Path'])
                         libraryfolders_dict[i]=path['LibraryOptions']['PathInfos'][subpath]['Path']
                     else:
                         #show blank entry
@@ -619,11 +648,11 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
             print(infotext)
             if ((mandatory) and (first_run)):
                 first_run=False
-                path_number=input('Must select at least one library to monitor: ')
+                path_number=input('Select one folder at a time.\nMust select at least one library to monitor: ')
             elif (mandatory):
-                path_number=input('Leave blank when finished: ')
+                path_number=input('Select one folder at a time.\nLeave blank when finished: ')
             else:
-                path_number=input('Leave blank for none or when finished: ')
+                path_number=input('Select one folder at a time.\nLeave blank for none or when finished: ')
 
         try:
             if ((path_number == '') and (len(libraryfolders_set) == 0) and (mandatory)):
@@ -824,19 +853,41 @@ def get_studio_item_info(server_url, user_key, studioName, auth_key):
     return(itemInfo)
 
 
-#determine if track, album, or artist are set to favorite
-def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
-    #Set bitmasks
-    adv_settings=int(cfg.keep_favorites_advanced, 2)
-    adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
-    trackartist_mask=int('00000001', 2)
-    albumartist_mask=int('00000010', 2)
-    trackgenre_mask=int('00000100', 2)
-    albumgenre_mask=int('00001000', 2)
-    trackartist_any_mask=trackartist_mask
-    albumartist_any_mask=albumartist_mask
-    trackgenre_any_mask=trackgenre_mask
-    albumgenre_any_mask=albumgenre_mask
+#determine if track, album/book, or artist/author are set to favorite
+def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, itemType):
+
+    if (itemType == 'Audio'):
+        #Set bitmasks for audio
+        adv_settings=int(cfg.keep_favorites_advanced, 2)
+        adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
+        trackartist_mask=int('0000000001', 2)
+        albumartist_mask=int('0000000010', 2)
+        trackgenre_mask=int('0000000100', 2)
+        albumgenre_mask=int('0000001000', 2)
+        trackartist_any_mask=trackartist_mask
+        albumartist_any_mask=albumartist_mask
+        trackgenre_any_mask=trackgenre_mask
+        albumgenre_any_mask=albumgenre_mask
+        lookupTopicTrack='track'
+        lookupTopicAlbum='album'
+        lookupTopicArtist='artist'
+    elif (itemType == 'AudioBook'):
+        #Set bitmasks for audiobook
+        adv_settings=int(cfg.keep_favorites_advanced, 2)
+        adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
+        trackartist_mask=int('0001000000', 2) #track author
+        albumartist_mask=int('0010000000', 2) #book author
+        trackgenre_mask=int('0100000000', 2) #track genre
+        albumgenre_mask=int('1000000000', 2) #book genre
+        trackartist_any_mask=trackartist_mask #track author
+        albumartist_any_mask=albumartist_mask #book author
+        trackgenre_any_mask=trackgenre_mask #track genre
+        albumgenre_any_mask=albumgenre_mask #book genre
+        lookupTopicTrack='audiobook'
+        lookupTopicAlbum='book'
+        lookupTopicArtist='author'
+    else:
+        return('errorHandlingHere')
 
 ### Track #########################################################################################
 
@@ -846,51 +897,70 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
         isfav_AUDIOtaa['track'][item['Id']] = item['UserData']['IsFavorite']
 
     if (does_key_index_exist(item, 'GenreItems', 0)):
-        #Check if bitmask for favotires by track genre is enabled
+        #Check if bitmask for favorites by track genre is enabled
         if (adv_settings & trackgenre_mask):
             #Check if bitmask for any or first track genre is enabled
             if not (adv_settings_any & trackgenre_any_mask):
-                genre_track_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][0]['Id'], auth_key, 'track_genre')
-                #Check if track genre's favorite value already exists in dictionary
-                if not item['GenreItems'][0]['Id'] in isfav_AUDIOtaa['trackgenre']:
-                    #Store if first track genre is marked as favorite
-                    isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']] = genre_track_item_info['UserData']['IsFavorite']
+                #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
+                if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    genre_track_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][0]['Id'], auth_key, lookupTopicTrack + '_genre')
+                    #Check if track genre's favorite value already exists in dictionary
+                    if not item['GenreItems'][0]['Id'] in isfav_AUDIOtaa['trackgenre']:
+                        #Store if first track genre is marked as favorite
+                        isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']] = genre_track_item_info['UserData']['IsFavorite']
             else:
                 for trackgenre in range(len(item['GenreItems'])):
-                    genre_track_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][trackgenre]['Id'], auth_key, 'track_genre_any')
-                    #Check if track genre's favorite value already exists in dictionary
-                    if not item['GenreItems'][trackgenre]['Id'] in isfav_AUDIOtaa['trackgenre']:
-                        #Store if any track genre is marked as a favorite
-                        isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']] = genre_track_item_info['UserData']['IsFavorite']
+                    #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
+                    if not (item['GenreItems'][trackgenre]['Name'] == 'Audiobook'):
+                        genre_track_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][trackgenre]['Id'], auth_key, lookupTopicTrack + '_genre_any')
+                        #Check if track genre's favorite value already exists in dictionary
+                        if not item['GenreItems'][trackgenre]['Id'] in isfav_AUDIOtaa['trackgenre']:
+                            #Store if any track genre is marked as a favorite
+                            isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']] = genre_track_item_info['UserData']['IsFavorite']
 
 ### End Track #####################################################################################
 
-### Album #########################################################################################
+### Album(Parent) #########################################################################################
 
-    album_item_info = get_additional_item_info(server_url, user_key, item['AlbumId'], auth_key, 'album_info')
+    #Albums for music
+    if (does_key_exist(item, 'AlbumId')):
+        album_item_info = get_additional_item_info(server_url, user_key, item['AlbumId'], auth_key, lookupTopicAlbum + '_info')
 
-    #Check if album's favorite value already exists in dictionary
-    if not item['AlbumId'] in isfav_AUDIOtaa['album']:
-        #Store if the album is marked as a favorite
-        isfav_AUDIOtaa['album'][item['AlbumId']] = album_item_info['UserData']['IsFavorite']
+        #Check if album's favorite value already exists in dictionary
+        if not item['AlbumId'] in isfav_AUDIOtaa['album']:
+            #Store if the album is marked as a favorite
+            isfav_AUDIOtaa['album'][item['AlbumId']] = album_item_info['UserData']['IsFavorite']
+    #Audio for books
+    #ParentId could be the book or the author
+    elif (does_key_exist(item, 'ParentId')):
+        album_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, lookupTopicAlbum + '_info')
+
+        #Check if album's favorite value already exists in dictionary
+        if not item['ParentId'] in isfav_AUDIOtaa['album']:
+            #Store if the album is marked as a favorite
+            isfav_AUDIOtaa['album'][item['ParentId']] = album_item_info['UserData']['IsFavorite']
 
     if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
         #Check if bitmask for favotires by album genre is enabled
         if (adv_settings & albumgenre_mask):
             #Check if bitmask for any or first album genre is enabled
             if not (adv_settings_any & albumgenre_any_mask):
-                genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][0]['Id'], auth_key, 'ablum_genre')
-                #Check if album genre's favorite value already exists in dictionary
-                if not album_item_info['GenreItems'][0]['Id'] in isfav_AUDIOtaa['albumgenre']:
-                    #Store if first album genre is marked as favorite
-                    isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']] = genre_album_item_info['UserData']['IsFavorite']
+                #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
+                if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
+                    genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][0]['Id'], auth_key, lookupTopicAlbum + '_genre')
+                    #Check if album genre's favorite value already exists in dictionary
+                    if not album_item_info['GenreItems'][0]['Id'] in isfav_AUDIOtaa['albumgenre']:
+                        #Store if first album genre is marked as favorite
+                        isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']] = genre_album_item_info['UserData']['IsFavorite']
             else:
                 for albumgenre in range(len(album_item_info['GenreItems'])):
-                    genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][albumgenre]['Id'], auth_key, 'album_genre_any')
-                    #Check if album genre's favorite value already exists in dictionary
-                    if not album_item_info['GenreItems'][albumgenre]['Id'] in isfav_AUDIOtaa['albumgenre']:
-                        #Store if any album genre is marked as a favorite
-                        isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']] = genre_album_item_info['UserData']['IsFavorite']
+                    #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
+                    if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                        genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][albumgenre]['Id'], auth_key, lookupTopicAlbum + '_genre_any')
+                        #Check if album genre's favorite value already exists in dictionary
+                        if not album_item_info['GenreItems'][albumgenre]['Id'] in isfav_AUDIOtaa['albumgenre']:
+                            #Store if any album genre is marked as a favorite
+                            isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']] = genre_album_item_info['UserData']['IsFavorite']
 
 ### End Album #####################################################################################
 
@@ -901,14 +971,14 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
         if (adv_settings & trackartist_mask):
             #Check if bitmask for any or first track artist is enabled
             if not (adv_settings_any & trackartist_any_mask):
-                artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][0]['Id'], auth_key, 'artist_info')
+                artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][0]['Id'], auth_key, lookupTopicArtist + '_info')
                 #Check if artist's favorite value already exists in dictionary
                 if not item['ArtistItems'][0]['Id'] in isfav_AUDIOtaa['artist']:
                     #Store if first track artist is marked as favorite
                     isfav_AUDIOtaa['artist'][item['ArtistItems'][0]['Id']] = artist_item_info['UserData']['IsFavorite']
             else:
                 for artist in range(len(item['ArtistItems'])):
-                    artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][artist]['Id'], auth_key, 'artist_info_any')
+                    artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][artist]['Id'], auth_key, lookupTopicArtist + '_info_any')
                     #Check if artist's favorite value already exists in dictionary
                     if not item['ArtistItems'][artist]['Id'] in isfav_AUDIOtaa['artist']:
                         #Store if any track artist is marked as a favorite
@@ -919,14 +989,14 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
         if (adv_settings & albumartist_mask):
             #Check if bitmask for any or first album artist is enabled
             if not (adv_settings_any & albumartist_any_mask):
-                artist_item_info = get_additional_item_info(server_url, user_key, item['AlbumArtists'][0]['Id'], auth_key, 'album_info')
+                artist_item_info = get_additional_item_info(server_url, user_key, item['AlbumArtists'][0]['Id'], auth_key, lookupTopicAlbum + '_info')
                 #Check if artist's favorite value already exists in dictionary
                 if not item['AlbumArtists'][0]['Id'] in isfav_AUDIOtaa['artist']:
                     #Store if first album artist is marked as favorite
                     isfav_AUDIOtaa['artist'][item['AlbumArtists'][0]['Id']] = artist_item_info['UserData']['IsFavorite']
             else:
                 for albumartist in range(len(item['AlbumArtists'])):
-                    artist_item_info = get_additional_item_info(server_url, user_key, item['AlbumArtists'][albumartist]['Id'], auth_key, 'album_info_any')
+                    artist_item_info = get_additional_item_info(server_url, user_key, item['AlbumArtists'][albumartist]['Id'], auth_key, lookupTopicAlbum + '_info_any')
                     #Check if artist's favorite value already exists in dictionary
                     if not item['AlbumArtists'][albumartist]['Id'] in isfav_AUDIOtaa['artist']:
                         #Store if any album artist is marked as a favorite
@@ -937,60 +1007,85 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
     if bool(cfg.DEBUG):
         #DEBUG
         print('-----------------------------------------------------------')
-        print('     Track is favorite: ' + str(isfav_AUDIOtaa['track'][item['Id']]))
+        print('Track is favorite: ' + str(isfav_AUDIOtaa['track'][item['Id']]))
         if (does_key_exist(item, 'AlbumId')):
-            print('     Album is favorite: ' + str(isfav_AUDIOtaa['album'][item['AlbumId']]))
+            print(lookupTopicAlbum.title() + ' is favorite: ' + str(isfav_AUDIOtaa['album'][item['AlbumId']]))
 
         if (does_key_index_exist(item, 'ArtistItems', 0)):
             if (adv_settings & trackartist_mask):
                 if not (adv_settings_any & trackartist_any_mask):
-                    print(' TrkArtist is favorite: ' + str(isfav_AUDIOtaa['artist'][item['ArtistItems'][0]['Id']]))
+                    print(lookupTopicTrack.title() + lookupTopicArtist.title() + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['ArtistItems'][0]['Id']]))
                 else:
                     i=0
                     for artist in range(len(item['ArtistItems'])):
-                        print('TrkArtist' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['ArtistItems'][artist]['Id']]))
+                        print(lookupTopicTrack.title() + lookupTopicArtist.title() + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['ArtistItems'][artist]['Id']]))
                         i+=1
 
         if (does_key_index_exist(item, 'AlbumArtists', 0)):
             if (adv_settings & albumartist_mask):
                 if not (adv_settings_any & albumartist_any_mask):
-                    print(' AlbArtist is favorite: ' + str(isfav_AUDIOtaa['artist'][item['AlbumArtists'][0]['Id']]))
+                    print(lookupTopicAlbum.title() + lookupTopicArtist.title() + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['AlbumArtists'][0]['Id']]))
                 else:
                     i=0
                     for albumartist in range(len(item['AlbumArtists'])):
-                        print('AlbArtist' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['AlbumArtists'][albumartist]['Id']]))
+                        print(lookupTopicAlbum.title() + lookupTopicArtist.title() + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['artist'][item['AlbumArtists'][albumartist]['Id']]))
                         i+=1
 
         if (does_key_index_exist(item, 'GenreItems', 0)):
             if (adv_settings & trackgenre_mask):
                 if not (adv_settings_any & trackgenre_any_mask):
-                    print('  TrkGenre is favorite: ' + str(isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']]))
+                    if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        print(lookupTopicTrack.title() + 'Genre is favorite: ' + str(isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']]))
                 else:
                     i=0
                     for trackgenre in range(len(item['GenreItems'])):
-                        print(' TrkGenre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']]))
-                        i+=1
+                        if not (item['GenreItems'][trackgenre]['Name'] == 'Audiobook'):
+                            print(lookupTopicTrack.title() + 'Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']]))
+                            i+=1
 
-        if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
-            if (adv_settings & albumgenre_mask):
-                if not (adv_settings_any & albumgenre_any_mask):
-                    print('  AlbGenre is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for albumgenre in range(len(album_item_info['GenreItems'])):
-                        print(' AlbGenre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]))
-                        i+=1
+        #Check if album_item_info was created before trying to use it
+        try:
+            album_item_info
+        except NameError:
+            item_exists = False
+        else:
+            item_exists = True
 
+        if (item_exists):
+            if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
+                if (adv_settings & albumgenre_mask):
+                    if not (adv_settings_any & albumgenre_any_mask):
+                        if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                            print('  ' + lookupTopicAlbum.title() + 'Genre is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]))
+                    else:
+                        i=0
+                        for albumgenre in range(len(album_item_info['GenreItems'])):
+                            if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                                print(' ' + lookupTopicAlbum.title() + 'Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]))
+                                i+=1
 
     #Check if track or album was stored as a favorite
-    itemisfav_AUDIOtrackalbum=False
+    itemisfav_AUDIOtrack=False
+    if (does_key_exist(item, 'Id')):
+        if (
+           (isfav_AUDIOtaa['track'][item['Id']])
+           ):
+            #Track was stored as a favorite
+            itemisfav_AUDIOtrack=True
+
+    itemisfav_AUDIOalbum=False
     if (does_key_exist(item, 'AlbumId')):
         if (
-           (isfav_AUDIOtaa['track'][item['Id']]) or
            (isfav_AUDIOtaa['album'][item['AlbumId']])
            ):
-            #Either the track or album was stored as a favorite
-            itemisfav_AUDIOtrackalbum=True
+            #Album was stored as a favorite
+            itemisfav_AUDIOalbum=True
+    elif (does_key_exist(item, 'ParentId')):
+        if (
+           (isfav_AUDIOtaa['album'][item['ParentId']])
+           ):
+            #Album was stored as a favorite
+            itemisfav_AUDIOalbum=True
 
     #Check if track artist was stored as a favorite
     itemisfav_AUDIOartist=False
@@ -1018,52 +1113,85 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key):
                     if (isfav_AUDIOtaa['artist'][item['AlbumArtists'][albumartist]['Id']]):
                         itemisfav_AUDIOalubmartist=True
 
-    #Check if track genre was stored as a favorite
     itemisfav_AUDIOtrackgenre=False
+    #Check if track genre was stored as a favorite
     if (does_key_index_exist(item, 'GenreItems', 0)):
         if (adv_settings & trackgenre_mask):
             if not (adv_settings_any & trackgenre_any_mask):
-                if (isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']]):
-                    itemisfav_AUDIOtrackgenre=True
+                if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    if (isfav_AUDIOtaa['trackgenre'][item['GenreItems'][0]['Id']]):
+                        itemisfav_AUDIOtrackgenre=True
             else:
                 #Check if any track genre was stored as a favorite
                 for trackgenre in range(len(item['GenreItems'])):
-                    if (isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']]):
-                        itemisfav_AUDIOtrackgenre=True
+                    if not (item['GenreItems'][trackgenre]['Name'] == 'Audiobook'):
+                        if (isfav_AUDIOtaa['trackgenre'][item['GenreItems'][trackgenre]['Id']]):
+                            itemisfav_AUDIOtrackgenre=True
 
-    #Check if album genre was stored as a favorite
+    #Check if album_item_info was created before trying to use it
+    try:
+        album_item_info
+    except NameError:
+        item_exists = False
+    else:
+        item_exists = True
+
     itemisfav_AUDIOalbumgenre=False
-    if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
-        if (adv_settings & albumgenre_mask):
-            if not (adv_settings_any & albumgenre_any_mask):
-                if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]):
-                    itemisfav_AUDIOalbumgenre=True
-            else:
-                #Check if any album genre was stored as a favorite
-                for albumgenre in range(len(album_item_info['GenreItems'])):
-                    if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]):
-                        itemisfav_AUDIOalbumgenre=True
+    if (item_exists):
+        #Check if album genre was stored as a favorite
+        if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
+            if (adv_settings & albumgenre_mask):
+                if not (adv_settings_any & albumgenre_any_mask):
+                    if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]):
+                            itemisfav_AUDIOalbumgenre=True
+                else:
+                    #Check if any album genre was stored as a favorite
+                    for albumgenre in range(len(album_item_info['GenreItems'])):
+                        if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]):
+                                itemisfav_AUDIOalbumgenre=True
 
     #Check if track, album, or artist are a favorite
     itemisfav_AUDIOtaa=False
     if (
-       (itemisfav_AUDIOtrackalbum) or
+       (itemisfav_AUDIOtrack) or
+       (itemisfav_AUDIOalbum) or
        (itemisfav_AUDIOartist) or
        (itemisfav_AUDIOalbumartist) or
        (itemisfav_AUDIOtrackgenre) or
        (itemisfav_AUDIOalbumgenre)
        ):
-        #Either the track, album, artist(s), track genre(s), or album genre(s) are set as a favorite
+        #Either the track, album(book), artist(s)(author(s)), track genre(s), or album(book) genre(s) are set as a favorite
         itemisfav_AUDIOtaa=True
 
     return(itemisfav_AUDIOtaa)
 
+"""
+#determine if track, book, or author are set to favorite
+def get_isfav_AUDIOBOOKtba(isfav_AUDIOBOOKtba, item, server_url, user_key, auth_key, audioType):
+    #Set bitmasks
+    adv_settings=int(cfg.keep_favorites_advanced, 2)
+    adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
+    trackartist_mask=int('0001000000', 2)
+    albumartist_mask=int('0010000000', 2)
+    trackgenre_mask=int('0100000000', 2)
+    albumgenre_mask=int('1000000000', 2)
+    trackartist_any_mask=trackartist_mask
+    albumartist_any_mask=albumartist_mask
+    trackgenre_any_mask=trackgenre_mask
+    albumgenre_any_mask=albumgenre_mask
+
+    get_isfav_AUDIOtaa(isfav_AUDIOBOOKtba, item, server_url, user_key, auth_key, audioType)
+
+    return(itemisfav_AUDIOBOOKtba)
+"""
 
 #determine if episode, season, series, or network are set to favorite
 def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
     adv_settings=int(cfg.keep_favorites_advanced, 2)
     adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
-    seriesgenre_mask=int('00010000', 2)
+    seriesgenre_mask=int('0000010000', 2)
     seriesgenre_any_mask=seriesgenre_mask
 
 ### Episode #######################################################################################
@@ -1195,7 +1323,7 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
 def get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key):
     adv_settings=int(cfg.keep_favorites_advanced, 2)
     adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
-    moviegenre_mask=int('00100000', 2)
+    moviegenre_mask=int('0000100000', 2)
     moviegenre_any_mask=moviegenre_mask
 
 ### Movie #######################################################################################
@@ -1420,7 +1548,7 @@ def get_isPathMatching(itemPath, comparePath):
     return(item_path_matches, matchingPath)
 
 
-#determine if item is whitelisted
+#determine if item is whitelisted (aka not monitored)
 def get_isWhitelisted(itemPath, comparePath):
     pathResult, pathString=get_isPathMatching(itemPath, comparePath)
     return(pathResult, pathString)
@@ -1452,11 +1580,13 @@ def get_items(server_url, user_keys, auth_key):
        (cfg.not_played_age_video == -1) and
        (cfg.not_played_age_trailer == -1) and
        (cfg.not_played_age_audio == -1) and
+       ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook'))) and
        (cfg.max_age_movie == -1) and
        (cfg.max_age_episode == -1) and
        (cfg.max_age_video == -1) and
        (cfg.max_age_trailer == -1) and
-       (cfg.max_age_audio == -1)
+       (cfg.max_age_audio == -1) and
+       ((hasattr(cfg, 'max_age_audiobook') and (cfg.max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
        ):
         print('* ATTENTION!!!                             *')
         print('* No media types are being monitored.      *')
@@ -1465,6 +1595,8 @@ def get_items(server_url, user_keys, auth_key):
         print('* not_played_age_video=-1                  *')
         print('* not_played_age_trailer=-1                *')
         print('* not_played_age_audio=-1                  *')
+        if (cfg.server_brand == 'jellyfin'):
+            print('* not_played_age_audiobook=-1              *')
         print('* Open config file in text editor.         *')
         print('* Set at least one media type to >=0 days. *')
         print('-----------------------------------------------------------')
@@ -1482,6 +1614,8 @@ def get_items(server_url, user_keys, auth_key):
     video_whitelists=set()
     trailer_whitelists=set()
     audio_whitelists=set()
+    if (cfg.server_brand == 'jellyfin'):
+        audiobook_whitelists=set()
 
     #load user_keys to json
     user_keys_json=json.loads(user_keys)
@@ -1501,6 +1635,8 @@ def get_items(server_url, user_keys, auth_key):
     cut_off_date_video=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_video)
     cut_off_date_trailer=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_trailer)
     cut_off_date_audio=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_audio)
+    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'not_played_age_audiobook')):
+        cut_off_date_audiobook=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_audiobook)
 
     adv_settings=int(cfg.keep_favorites_advanced, 2)
 
@@ -1528,6 +1664,8 @@ def get_items(server_url, user_keys, auth_key):
         isfav_TVessn={'episode':{},'season':{},'series':{},'networkchannel':{},'seriesgenre':{}}
         #define empty dictionary for favorited Tracks, Albums, Artists
         isfav_AUDIOtaa={'track':{},'album':{},'artist':{},'trackgenre':{},'albumgenre':{}}
+        #define empty dictionary for favorited Tracks, Albums(Books), Artists(Authors)
+        isfav_AUDIOBOOKtba={'track':{},'album':{},'artist':{},'trackgenre':{},'albumgenre':{}}
 
         #define dictionary user_key to store media item favorite states by userId and itemId
         isfav_byUserId[user_key]={}
@@ -1538,7 +1676,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
-            moviegenre_mask=int('00100000', 2)
+            #moviegenre_mask=int('00100000', 2)
 
             IsPlayedState='True'
             #FieldsState='Type,Name,Id,UserData,Studios,ParentId,DateCreated,Path,MediaSource'
@@ -2048,8 +2186,8 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
-            trackgenre_mask=int('00000100', 2)
-            albumgenre_mask=int('00001000', 2)
+            #trackgenre_mask=int('00000100', 2)
+            #albumgenre_mask=int('00001000', 2)
 
             IsPlayedState='True'
             #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
@@ -2119,7 +2257,7 @@ def get_items(server_url, user_keys, auth_key):
                             max_cut_off_date_audio=date_time_now = datetime.utcnow() + timedelta(1)
 
                         #Get if track, album, or artist is set as favorite
-                        itemisfav_AUDIOtaa=get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key)
+                        itemisfav_AUDIOtaa=get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, item_info['Type'])
 
                         #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
@@ -2140,19 +2278,19 @@ def get_items(server_url, user_keys, auth_key):
                            (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
                            (not itemIsWhiteListed))
                            or
-                           ((cfg.max_age_movie >= 0) and
-                           (max_cut_off_date_movie <= datetime.utcnow()) and
+                           ((cfg.max_age_audio >= 0) and
+                           (max_cut_off_date_audio <= datetime.utcnow()) and
                            (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
                            ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIOtaa))) and
                            (not itemIsWhiteListed))
                            ):
                             try:
                                 if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
                                                   ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
                                                   ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
                                 else:
-                                    item_details=('  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
                                                   ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
                                                   ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
                             except (KeyError, IndexError):
@@ -2165,11 +2303,11 @@ def get_items(server_url, user_keys, auth_key):
                         else:
                             try:
                                 if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
                                                   ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
                                                   ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
                                 else:
-                                    item_details=('  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
                                                   ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
                                                   ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
                             except (KeyError, IndexError):
@@ -2178,6 +2316,145 @@ def get_items(server_url, user_keys, auth_key):
                                     #DEBUG
                                     print('\nError encountered - Keep Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
                             print(':[KEEPING] - ' + item_details)
+
+############# AudioBook#############
+
+        #audioBook meida type only applies to jellyfin
+        #Jellyfin sets audio books to a media type of audioBook
+        #Emby sets audio books to a media type of audio (see audio section)
+        if (
+           ((cfg.server_brand == 'jellyfin') and
+           hasattr(cfg, 'not_played_age_audiobook') and hasattr(cfg, 'max_age_audiobook')) and
+           ((cfg.not_played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
+           ):
+
+            IsPlayedState='True'
+            #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
+            FieldsState='Id,Path,Genres,ParentId'
+            if (cfg.max_age_audiobook >= 0):
+                IsPlayedState=''
+
+            StartIndex=0
+            TotalItems=1
+            ItemsChunk=1
+
+            while (ItemsChunk > 0):
+
+                url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=AudioBook&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
+                    '&Recursive=true&SortBy=AlbumArtist,Album,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
+
+                if bool(cfg.DEBUG):
+                    #DEBUG
+                    print(url)
+
+                data=requestURL(url, cfg.DEBUG, 'audiobook_media_data', cfg.api_request_attempts)
+
+                TotalItems = data['TotalRecordCount']
+                StartIndex = StartIndex + ItemsChunk
+                ItemsChunk = cfg.api_return_limit
+                if ((StartIndex + ItemsChunk) >= (TotalItems)):
+                    ItemsChunk = TotalItems - StartIndex
+
+                #Determine if media item is to be deleted or kept
+                for item in data['Items']:
+
+                    media_found=True
+
+                    #Get if media item path is monitored
+                    item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'audiobook_item')
+
+                    for mediasource in item_info['MediaSources']:
+
+                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Type')):
+                            if (mediasource['Type'] == 'Placeholder'):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        elif (does_key_exist(mediasource, 'Size')):
+                            if (mediasource['Size'] == 0):
+                                itemIsMonitored=False
+                            else:
+                                itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                        else:
+                            itemIsMonitored=False
+                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+
+                    #find audiobook media items ready to delete
+                    if ((item_info['Type'] == 'AudioBook') and (itemIsMonitored)):
+
+                        #establish max cutoff date for media item
+                        if (cfg.max_age_audiobook >= 0):
+                            max_cut_off_date_audiobook=datetime.strptime(item_info['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item_info['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audiobook)
+                        else:
+                            max_cut_off_date_audiobook=date_time_now = datetime.utcnow() + timedelta(1)
+
+                        #Get if track, album(book), or artist(author) is set as favorite
+                        itemisfav_AUDIOBOOKtba=get_isfav_AUDIOtaa(isfav_AUDIOBOOKtba, item, server_url, user_key, auth_key, item_info['Type'])
+
+                        #Get if media item path is whitelisted
+                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
+
+                        #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
+                        if (cfg.keep_favorites_audiobook == 2):
+                            isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOBOOKtba
+
+                        #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                        if (cfg.multiuser_whitelist_audiobook == 1):
+                            iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
+                            audiobook_whitelists.add(itemWhiteListedPath)
+
+                        if (
+                           ((cfg.not_played_age_audiobook >= 0) and
+                           (item_info['UserData']['PlayCount'] >= 1) and
+                           (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
+                           (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOKtba)) and
+                           (not itemIsWhiteListed))
+                           or
+                           ((cfg.max_age_audiobook >= 0) and
+                           (max_cut_off_date_audiobook <= datetime.utcnow()) and
+                           (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba)) and
+                           ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba))) and
+                           (not itemIsWhiteListed))
+                           ):
+                            try:
+                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                else:
+                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                            except (KeyError, IndexError):
+                                item_details=' ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                if bool(cfg.DEBUG):
+                                    #DEBUG
+                                    print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                            print(':*[DELETE] - ' + item_details)
+                            deleteItems.append(item)
+                        else:
+                            try:
+                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                else:
+                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                            except (KeyError, IndexError):
+                                item_details=' ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                if bool(cfg.DEBUG):
+                                    #DEBUG
+                                    print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                            print(':[KEEPING] - ' + item_details)
+
+############# End Media Types #############
 
         if (not all_media_disabled):
             if not (media_found):
@@ -2200,6 +2477,8 @@ def get_items(server_url, user_keys, auth_key):
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(video_whitelists), deleteItems)
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(trailer_whitelists), deleteItems)
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(audio_whitelists), deleteItems)
+    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+        deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(audiobook_whitelists), deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
@@ -2213,6 +2492,10 @@ def get_items(server_url, user_keys, auth_key):
         print('isfav_AUDIOtaa: ')
         print(isfav_AUDIOtaa)
         print('')
+        if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'keep_favorites_audiobook')):
+            print('isfav_AUDIOBOOKtba: ')
+            print(isfav_AUDIOBOOKtba)
+            print('')
 
     print('\n')
     return(deleteItems)
@@ -2250,6 +2533,8 @@ def list_delete_items(deleteItems):
             elif item['Type'] == 'Trailer':
                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Audio':
+                item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+            elif item['Type'] == 'AudioBook':
                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             else: # item['Type'] == 'Unknown':
                 pass
@@ -2372,23 +2657,23 @@ def cfgCheck():
     if (
         not ((type(check) is str) and
         (int(check, 2) >= 0) and
-        (int(check, 2) <= 255) and
-        (len(check) >= 6) and
-        (len(check) <= 8))
+        (int(check, 2) <= 1023) and
+        (len(check) >= 8) and
+        (len(check) <= 10))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
+        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
 
     check=cfg.keep_favorites_advanced_any
     if (
         not ((type(check) is str) and
         (int(check, 2) >= 0) and
-        (int(check, 2) <= 255) and
-        (len(check) >= 6) and
-        (len(check) <= 8))
+        (int(check, 2) <= 1023) and
+        (len(check) >= 8) and
+        (len(check) <= 10))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 8-digit binary string; valid range binary - 00000000 thru 11111111 (decimal - 0 thru 255)\n'
+        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
 
     check=cfg.multiuser_whitelist_movie
     if (
@@ -2546,10 +2831,12 @@ def cfgCheck():
 
     check=cfg.server_brand
     if (
-        not (type(check) is str)
+        not ((type(check) is str) and
+        ((check == 'emby') or
+        (check == 'jellyfin')))
        ):
         errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: server_brand must be a string\n'
+        error_found_in_media_cleaner_config_py+='TypeError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
 
     check=cfg.server_url
     if (
@@ -2787,7 +3074,7 @@ try:
             userkeys_wllibs_list=[]
             userwllibs_list=[]
 
-            for userkey, userlib in user_keys_and_bllibs.items():
+            for userkey, userbllib in user_keys_and_bllibs.items():
                 userkeys_list.append(userkey)
                 userbllibs_list.append(userbllib)
 
