@@ -151,39 +151,39 @@ max_keep_favorites_audiobook=1
 #  0 - 'emby'
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
-server_brand='jellyfin'
+server_brand='servername'
 
 #----------------------------------------------------------#
 # Server URL; created during setup
 #----------------------------------------------------------#
-server_url='http://watch.tv/jf'
+server_url='http://localhost.abc:8096/basename'
 
 #----------------------------------------------------------#
 # Admin username; chosen during setup
 #----------------------------------------------------------#
-admin_username='hieroglyph.admin'
+admin_username='Username'
 
 #----------------------------------------------------------#
 # Access token; requested from server during setup
 #----------------------------------------------------------#
-access_token='f8abcf8adb2a4593b2f740056f533205'
+access_token='0123456789abcdef0123456789abcdef'
 
 #----------------------------------------------------------#
 # User key(s) of account(s) to monitor media items; chosen during setup
 #----------------------------------------------------------#
-user_keys='["64fb67457ed944a0bfe01d4e957f38e2"]'
+user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
 
 #----------------------------------------------------------#
 
 #----------------------------------------------------------#
 # User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
 #----------------------------------------------------------#
-user_bl_libs='[""]'
+user_bl_libs='["/some/path/0,/some/path/1,/some/path/2", "/some/path/1,/some/path/2,/some/path/3", "/some/path/x,/some/path/etc..."]'
 
 #----------------------------------------------------------#
 # User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup
 #----------------------------------------------------------#
-user_wl_libs='["smb://hieroglyph/Pharaoh/xbmc/Movies,smb://hieroglyph/Pharaoh/xbmc/TV"]'
+user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/path/6,/some/path/7", "/some/path/y,/some/path/etc..."]'
 
 #----------------------------------------------------------#
 # API request attempts; number of times to retry an API request
