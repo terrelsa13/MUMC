@@ -184,7 +184,7 @@ def generate_config():
     script_behavior=get_cleaning_behavior()
     print('-----------------------------------------------------------')
 
-    user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key, script_behavior)
+    user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(server_url, auth_key, script_behavior)
 
     userkeys_list=[]
     userbllibs_list=[]
@@ -439,7 +439,7 @@ def generate_config():
     print('To delete media open media_cleaner_config.py in a text editor:')
     print('    Set \'remove_files=1\' in media_cleaner_config.py')
     print('-----------------------------------------------------------')
-    print('Edit the config file and try running again.')
+    print('Edit the media_cleaner_config.py file and try running again.')
     print('-----------------------------------------------------------')
 
 
@@ -483,8 +483,8 @@ def get_auth_key(server_url, username, password, server_brand):
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
-    preConfigDebug = True
-    #preConfigDebug = False
+    #preConfigDebug = True
+    preConfigDebug = False
 
     #api call
     data=requestURL(req, preConfigDebug, 'get_auth_key', 3)
@@ -495,13 +495,13 @@ def get_auth_key(server_url, username, password, server_brand):
 #api call to get all user accounts
 #then choose account this script will use to delete played media
 #choosen account does NOT need to have "Allow Media Deletion From" enabled
-def get_users_and_paths(server_url, auth_key, script_behavior):
+def get_users_and_libraries(server_url, auth_key, script_behavior):
     #Get all users
 
     req=(server_url + '/Users?api_key=' + auth_key)
 
-    preConfigDebug = True
-    #preConfigDebug = False
+    #preConfigDebug = True
+    preConfigDebug = False
 
     #api call
     data=requestURL(req, preConfigDebug, 'get_users', 3)
@@ -607,8 +607,8 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
 
     req=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
 
-    preConfigDebug = True
-    #preConfigDebug = False
+    #preConfigDebug = True
+    preConfigDebug = False
 
     #api call
     data = requestURL(req, preConfigDebug, 'get_media_libraries', 3)
@@ -855,7 +855,7 @@ def get_studio_item_info(server_url, user_key, studioName, auth_key):
 
 #determine if track, album/book, or artist/author are set to favorite
 def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, itemType):
-
+    
     if (itemType == 'Audio'):
         #Set bitmasks for audio
         adv_settings=int(cfg.keep_favorites_advanced, 2)
@@ -887,7 +887,7 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
         lookupTopicAlbum='book'
         lookupTopicArtist='author'
     else:
-        return('errorHandlingHere')
+        raise ValueError('ValueError: Unknown itemType passed into get_isfav_AUDIOtaa')
 
 ### Track #########################################################################################
 
@@ -940,27 +940,36 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
             #Store if the album is marked as a favorite
             isfav_AUDIOtaa['album'][item['ParentId']] = album_item_info['UserData']['IsFavorite']
 
-    if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
-        #Check if bitmask for favotires by album genre is enabled
-        if (adv_settings & albumgenre_mask):
-            #Check if bitmask for any or first album genre is enabled
-            if not (adv_settings_any & albumgenre_any_mask):
-                #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
-                if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
-                    genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][0]['Id'], auth_key, lookupTopicAlbum + '_genre')
-                    #Check if album genre's favorite value already exists in dictionary
-                    if not album_item_info['GenreItems'][0]['Id'] in isfav_AUDIOtaa['albumgenre']:
-                        #Store if first album genre is marked as favorite
-                        isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']] = genre_album_item_info['UserData']['IsFavorite']
-            else:
-                for albumgenre in range(len(album_item_info['GenreItems'])):
+    #Check if album_item_info was created before trying to use it
+    try:
+        album_item_info
+    except NameError:
+        item_exists = False
+    else:
+        item_exists = True
+
+    if(item_exists):
+        if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
+            #Check if bitmask for favotires by album genre is enabled
+            if (adv_settings & albumgenre_mask):
+                #Check if bitmask for any or first album genre is enabled
+                if not (adv_settings_any & albumgenre_any_mask):
                     #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
-                    if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
-                        genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][albumgenre]['Id'], auth_key, lookupTopicAlbum + '_genre_any')
+                    if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
+                        genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][0]['Id'], auth_key, lookupTopicAlbum + '_genre')
                         #Check if album genre's favorite value already exists in dictionary
-                        if not album_item_info['GenreItems'][albumgenre]['Id'] in isfav_AUDIOtaa['albumgenre']:
-                            #Store if any album genre is marked as a favorite
-                            isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']] = genre_album_item_info['UserData']['IsFavorite']
+                        if not album_item_info['GenreItems'][0]['Id'] in isfav_AUDIOtaa['albumgenre']:
+                            #Store if first album genre is marked as favorite
+                            isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']] = genre_album_item_info['UserData']['IsFavorite']
+                else:
+                    for albumgenre in range(len(album_item_info['GenreItems'])):
+                        #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
+                        if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            genre_album_item_info = get_additional_item_info(server_url, user_key, album_item_info['GenreItems'][albumgenre]['Id'], auth_key, lookupTopicAlbum + '_genre_any')
+                            #Check if album genre's favorite value already exists in dictionary
+                            if not album_item_info['GenreItems'][albumgenre]['Id'] in isfav_AUDIOtaa['albumgenre']:
+                                #Store if any album genre is marked as a favorite
+                                isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']] = genre_album_item_info['UserData']['IsFavorite']
 
 ### End Album #####################################################################################
 
@@ -1167,25 +1176,6 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
 
     return(itemisfav_AUDIOtaa)
 
-"""
-#determine if track, book, or author are set to favorite
-def get_isfav_AUDIOBOOKtba(isfav_AUDIOBOOKtba, item, server_url, user_key, auth_key, audioType):
-    #Set bitmasks
-    adv_settings=int(cfg.keep_favorites_advanced, 2)
-    adv_settings_any=int(cfg.keep_favorites_advanced_any, 2)
-    trackartist_mask=int('0001000000', 2)
-    albumartist_mask=int('0010000000', 2)
-    trackgenre_mask=int('0100000000', 2)
-    albumgenre_mask=int('1000000000', 2)
-    trackartist_any_mask=trackartist_mask
-    albumartist_any_mask=albumartist_mask
-    trackgenre_any_mask=trackgenre_mask
-    albumgenre_any_mask=albumgenre_mask
-
-    get_isfav_AUDIOtaa(isfav_AUDIOBOOKtba, item, server_url, user_key, auth_key, audioType)
-
-    return(itemisfav_AUDIOBOOKtba)
-"""
 
 #determine if episode, season, series, or network are set to favorite
 def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
@@ -1588,17 +1578,18 @@ def get_items(server_url, user_keys, auth_key):
        (cfg.max_age_audio == -1) and
        ((hasattr(cfg, 'max_age_audiobook') and (cfg.max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
        ):
-        print('* ATTENTION!!!                             *')
-        print('* No media types are being monitored.      *')
-        print('* not_played_age_movie=-1                  *')
-        print('* not_played_age_episode=-1                *')
-        print('* not_played_age_video=-1                  *')
-        print('* not_played_age_trailer=-1                *')
-        print('* not_played_age_audio=-1                  *')
+        print('* ATTENTION!!!                                            *')
+        print('* No media types are being monitored.                     *')
+        print('* Open the media_cleaner_config.py file in a text editor. *')
+        print('* Set at least one media type to >=0.                     *')
+        print('*                                                         *')
+        print('* not_played_age_movie=-1                                 *')
+        print('* not_played_age_episode=-1                               *')
+        print('* not_played_age_video=-1                                 *')
+        print('* not_played_age_trailer=-1                               *')
+        print('* not_played_age_audio=-1                                 *')
         if (cfg.server_brand == 'jellyfin'):
-            print('* not_played_age_audiobook=-1              *')
-        print('* Open config file in text editor.         *')
-        print('* Set at least one media type to >=0 days. *')
+            print('* not_played_age_audiobook=-1                             *')
         print('-----------------------------------------------------------')
         all_media_disabled=True
 
@@ -2557,382 +2548,520 @@ def cfgCheck():
 
     errorfound=False
     error_found_in_media_cleaner_config_py=''
-    #need to find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
-    check=cfg.not_played_age_movie
-    check_not_played_age_movie=check
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: not_played_age_movie must be an integer; valid range -1 thru 365000000\n'
+    #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
-    check=cfg.not_played_age_episode
-    check_not_played_age_episode=check
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: not_played_age_episode must be an integer; valid range -1 thru 365000000\n'
-
-    check=cfg.not_played_age_video
-    check_not_played_age_video=check
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: not_played_age_video must be an integer; valid range -1 thru 365000000\n'
-
-    check=cfg.not_played_age_trailer
-    check_not_played_age_trailer=check
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: not_played_age_trailer must be an integer; valid range -1 thru 365000000\n'
-
-    check=cfg.not_played_age_audio
-    check_not_played_age_audio=check
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: not_played_age_audio must be an integer; valid range -1 thru 365000000\n'
-
-    check=cfg.keep_favorites_movie
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 2))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
-
-    check=cfg.keep_favorites_episode
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 2))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
-
-    check=cfg.keep_favorites_video
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 2))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_video must be an integer; valid range 0 thru 2\n'
-
-    check=cfg.keep_favorites_trailer
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 2))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_trailer must be an integer; valid range 0 thru 2\n'
-
-    check=cfg.keep_favorites_audio
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 2))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
-
-    check=cfg.keep_favorites_advanced
-    if (
-        not ((type(check) is str) and
-        (int(check, 2) >= 0) and
-        (int(check, 2) <= 1023) and
-        (len(check) >= 8) and
-        (len(check) <= 10))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
-
-    check=cfg.keep_favorites_advanced_any
-    if (
-        not ((type(check) is str) and
-        (int(check, 2) >= 0) and
-        (int(check, 2) <= 1023) and
-        (len(check) >= 8) and
-        (len(check) <= 10))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: keep_favorites_advanced_any should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
-
-    check=cfg.multiuser_whitelist_movie
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.multiuser_whitelist_episode
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.multiuser_whitelist_video
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.multiuser_whitelist_trailer
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_trailer must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.multiuser_whitelist_audio
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.remove_files
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: remove_files must be an integer; valid values 0 and 1\n'
-
-    check=cfg.max_age_movie
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000) and
-        (((check >= check_not_played_age_movie) and (check >= 0)) or
-        (check == -1)))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
-
-    check=cfg.max_age_episode
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000) and
-        (((check >= check_not_played_age_episode) and (check >= 0)) or
-        (check == -1)))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
-
-    check=cfg.max_age_video
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000) and
-        (((check >= check_not_played_age_video) and (check >= 0)) or
-        (check == -1)))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
-
-    check=cfg.max_age_trailer
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000) and
-        (((check >= check_not_played_age_trailer) and (check >= 0)) or
-        (check == -1)))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
-
-    check=cfg.max_age_audio
-    if (
-        not ((type(check) is int) and
-        (check >= -1) and
-        (check <= 365000000) and
-        (((check >= check_not_played_age_audio) and (check >= 0)) or
-        (check == -1)))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
-
-    check=cfg.max_keep_favorites_movie
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_movie must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.max_keep_favorites_episode
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.max_keep_favorites_video
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_video must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.max_keep_favorites_trailer
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_trailer must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.max_keep_favorites_audio
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: max_keep_favorites_audio must be an integer; valid range 0 thru 1\n'
-
-    check=cfg.server_brand
-    if (
-        not ((type(check) is str) and
-        ((check == 'emby') or
-        (check == 'jellyfin')))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
-
-    check=cfg.server_url
-    if (
-        not (type(check) is str)
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: server_url must be a string\n'
-
-    check=cfg.admin_username
-    if (
-        not (type(check) is str)
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: admin_username must be a string\n'
-
-    check=cfg.access_token
-    if (
-        not ((type(check) is str) and
-        (len(check) == 32) and
-        (str(check).isalnum()))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: access_token must be a 32-character alphanumeric string\n'
-
-    check=cfg.user_keys
-    check_list=json.loads(check)
-    check_user_keys_length=len(check_list)
-    for check_irt in check_list:
+    if hasattr(cfg, 'not_played_age_movie'):
+        check=cfg.not_played_age_movie
+        check_not_played_age_movie=check
         if (
-            not ((type(check_irt) is str) and
-            (len(check_irt) == 32) and
-            (str(check_irt).isalnum()))
-           ):
-            errorfound=True
-            error_found_in_media_cleaner_config_py+='TypeError: user_keys must be a single list with commas separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_movie variable is missing from media_cleaner_config.py\n'
 
-    #check=cfg.script_behavior
-    #if (
-        #not ((type(check_irt) is str) and
-        #((check == 'whitelist') or (check == 'blacklist')))
-       #):
-            #errorfound=True
-            #error_found_in_media_cleaner_config_py+='TypeError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
-
-    check=cfg.user_bl_libs
-    check_list=json.loads(check)
-    check_user_bllibs_length=len(check_list)
-    for check_irt in check_list:
+    if hasattr(cfg, 'not_played_age_episode'):
+        check=cfg.not_played_age_episode
+        check_not_played_age_episode=check
         if (
-            not ((type(check_irt) is str) and
-            (check_user_keys_length == check_user_bllibs_length))
-           ):
-            errorfound=True
-            error_found_in_media_cleaner_config_py+='TypeError: user_bl_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_episode variable is missing from media_cleaner_config.py\n'
 
-    check=cfg.user_wl_libs
-    check_list=json.loads(check)
-    check_user_wllibs_length=len(check_list)
-    for check_irt in check_list:
+    if hasattr(cfg, 'not_played_age_video'):
+        check=cfg.not_played_age_video
+        check_not_played_age_video=check
         if (
-            not ((type(check_irt) is str) and
-            (check_user_keys_length == check_user_wllibs_length))
-           ):
-            errorfound=True
-            error_found_in_media_cleaner_config_py+=('TypeError: user_wl_libs must be a single list with commas separating multiple users\' whitelisted libraries; each user\'s whitelisted libraries must also be comma seperated within the string\n')
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_video variable is missing from media_cleaner_config.py\n'
 
-    check=cfg.api_request_attempts
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 16))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: api_request_attempts must be an integer; valid range 0 thru 16\n'
+    if hasattr(cfg, 'not_played_age_trailer'):
+        check=cfg.not_played_age_trailer
+        check_not_played_age_trailer=check
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_trailer must be an integer; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_trailer variable is missing from media_cleaner_config.py\n'
 
-    check=cfg.api_return_limit
-    if (
-        not ((type(check) is int) and
-        (check >= 1) and
-        (check <= 10000))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: api_return_limit must be an integer; valid range 0 thru 10000\n'
+    if hasattr(cfg, 'not_played_age_audio'):
+        check=cfg.not_played_age_audio
+        check_not_played_age_audio=check
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audio variable is missing from media_cleaner_config.py\n'
 
-    check=cfg.DEBUG
-    if (
-        not ((type(check) is int) and
-        (check >= 0) and
-        (check <= 1))
-       ):
-        errorfound=True
-        error_found_in_media_cleaner_config_py+='TypeError: DEBUG must be an integer; valid values 0 and 1'
+    if hasattr(cfg, 'not_played_age_audiobook'):
+        check=cfg.not_played_age_audiobook
+        check_not_played_age_audiobook=check
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 365000000\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audiobook variable is missing from media_cleaner_config.py\n'
 
-    if (errorfound):
-        error_found_in_media_cleaner_config_py=error_found_in_media_cleaner_config_py.replace('TypeError: ','',1)
-        raise TypeError(error_found_in_media_cleaner_config_py)
+    if hasattr(cfg, 'keep_favorites_movie'):
+        check=cfg.keep_favorites_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_episode'):
+        check=cfg.keep_favorites_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_video'):
+        check=cfg.keep_favorites_video
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_video must be an integer; valid range 0 thru 2\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_video variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_trailer'):
+        check=cfg.keep_favorites_trailer
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_trailer must be an integer; valid range 0 thru 2\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_trailer variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_audio'):
+        check=cfg.keep_favorites_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_audiobook'):
+        check=cfg.keep_favorites_audiobook
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 2))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_advanced'):
+        check=cfg.keep_favorites_advanced
+        if (
+            not ((type(check) is str) and
+            (int(check, 2) >= 0) and
+            (int(check, 2) <= 1023) and
+            (len(check) >= 6) and
+            (len(check) <= 10))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_favorites_advanced_any'):
+        check=cfg.keep_favorites_advanced_any
+        if (
+            not ((type(check) is str) and
+            (int(check, 2) >= 0) and
+            (int(check, 2) <= 1023) and
+            (len(check) >= 6) and
+            (len(check) <= 10))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_any should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_any variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_movie'):
+        check=cfg.multiuser_whitelist_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_episode'):
+        check=cfg.multiuser_whitelist_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_video'):
+        check=cfg.multiuser_whitelist_video
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_video variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_trailer'):
+        check=cfg.multiuser_whitelist_trailer
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_trailer must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_trailer variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_audio'):
+        check=cfg.multiuser_whitelist_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_audiobook'):
+        check=cfg.multiuser_whitelist_audiobook
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'remove_files'):
+        check=cfg.remove_files
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: remove_files must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The remove_files variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_movie'):
+        check=cfg.max_age_movie
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_movie) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_age_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_episode'):
+        check=cfg.max_age_episode
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_episode) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_age_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_video'):
+        check=cfg.max_age_video
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_video) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_age_video variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_trailer'):
+        check=cfg.max_age_trailer
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_trailer) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_age_trailer variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_audio'):
+        check=cfg.max_age_audio
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_audio) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_age_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_age_audiobook'):
+        check=cfg.max_age_audiobook
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 365000000) and
+            (((check >= check_not_played_age_audiobook) and (check >= 0)) or
+            (check == -1)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_keep_favorites_movie'):
+        check=cfg.max_keep_favorites_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'not_played_max_keep_favorites_episodege_audiobook'):
+        check=cfg.max_keep_favorites_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_keep_favorites_video'):
+        check=cfg.max_keep_favorites_video
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_video must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_video variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_keep_favorites_trailer'):
+        check=cfg.max_keep_favorites_trailer
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_trailer must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_trailer variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_keep_favorites_audio'):
+        check=cfg.max_keep_favorites_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audio must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'max_keep_favorites_audiobook'):
+        check=cfg.max_keep_favorites_audiobook
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audiobook must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (
+            not ((type(check) is str) and
+            ((check == 'emby') or
+            (check == 'jellyfin')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The server_brand variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_url'):
+        check=cfg.server_url
+        if (
+            not (type(check) is str)
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: server_url must be a string\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The server_url variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'admin_username'):
+        check=cfg.admin_username
+        if (
+            not (type(check) is str)
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: admin_username must be a string\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The admin_username variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'access_token'):
+        check=cfg.access_token
+        if (
+            not ((type(check) is str) and
+            (len(check) == 32) and
+            (str(check).isalnum()))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: access_token must be a 32-character alphanumeric string\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The access_token variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'user_keys'):
+        check=cfg.user_keys
+        check_list=json.loads(check)
+        check_user_keys_length=len(check_list)
+        for check_irt in check_list:
+            if (
+                not ((type(check_irt) is str) and
+                (len(check_irt) == 32) and
+                (str(check_irt).isalnum()))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: user_keys must be a single list with commas separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The user_keys variable is missing from media_cleaner_config.py\n'
+
+    #if hasattr(cfg, 'script_behavior'):
+        #check=cfg.script_behavior
+        #if (
+            #not ((type(check_irt) is str) and
+            #((check == 'whitelist') or (check == 'blacklist')))
+        #):
+                #errorfound=True
+                #error_found_in_media_cleaner_config_py+='ValueError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The script_behavior variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'user_bl_libs'):
+        check=cfg.user_bl_libs
+        check_list=json.loads(check)
+        check_user_bllibs_length=len(check_list)
+        for check_irt in check_list:
+            if (
+                not ((type(check_irt) is str) and
+                (check_user_keys_length == check_user_bllibs_length))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: user_bl_libs must be a single list with commas separating multiple users\' monitored libraries; each user\'s libraries must also be comma seperated within the string\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The user_bl_libs variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'user_wl_libs'):
+        check=cfg.user_wl_libs
+        check_list=json.loads(check)
+        check_user_wllibs_length=len(check_list)
+        for check_irt in check_list:
+            if (
+                not ((type(check_irt) is str) and
+                (check_user_keys_length == check_user_wllibs_length))
+            ):
+                error_found_in_media_cleaner_config_py+=('ValueError: user_wl_libs must be a single list with commas separating multiple users\' whitelisted libraries; each user\'s whitelisted libraries must also be comma seperated within the string\n')
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The user_wl_libs variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'api_request_attempts'):
+        check=cfg.api_request_attempts
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 16))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: api_request_attempts must be an integer; valid range 0 thru 16\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The api_request_attempts variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'api_return_limit'):
+        check=cfg.api_return_limit
+        if (
+            not ((type(check) is int) and
+            (check >= 1) and
+            (check <= 10000))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: api_return_limit must be an integer; valid range 0 thru 10000\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The api_return_limit variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'DEBUG'):
+        check=cfg.DEBUG
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: DEBUG must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The DEBUG variable is missing from media_cleaner_config.py\n'
+
+    #Bring all errors found to users attention
+    if (not error_found_in_media_cleaner_config_py == ''):
+        raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
 
 ############# START OF SCRIPT #############
 
@@ -2944,300 +3073,12 @@ try:
     #try setting DEBUG variable from media_cleaner_config.py file
     #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
     check=cfg.DEBUG
-    #removing DEBUG from media_cleaner_config.py file is sort of configuration reset
+    #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
+    
+    #print('DEBUG=' + str(cfg.DEBUG))
 
-    #depending on what is missing from media_cleaner_config.py file; try to only ask for certain input
-    if (
-        not hasattr(cfg, 'not_played_age_movie') or
-        not hasattr(cfg, 'not_played_age_episode') or
-        not hasattr(cfg, 'not_played_age_video') or
-        not hasattr(cfg, 'not_played_age_trailer') or
-        not hasattr(cfg, 'not_played_age_audio') or
-
-        not hasattr(cfg, 'keep_favorites_movie') or
-        not hasattr(cfg, 'keep_favorites_episode') or
-        not hasattr(cfg, 'keep_favorites_video') or
-        not hasattr(cfg, 'keep_favorites_trailer') or
-        not hasattr(cfg, 'keep_favorites_audio') or
-
-        not hasattr(cfg, 'keep_favorites_advanced') or
-        not hasattr(cfg, 'keep_favorites_advanced_any') or
-
-        not hasattr(cfg, 'multiuser_whitelist_movie') or
-        not hasattr(cfg, 'multiuser_whitelist_episode') or
-        not hasattr(cfg, 'multiuser_whitelist_video') or
-        not hasattr(cfg, 'multiuser_whitelist_trailer') or
-        not hasattr(cfg, 'multiuser_whitelist_audio') or
-
-        not hasattr(cfg, 'remove_files') or
-
-        not hasattr(cfg, 'max_age_movie') or
-        not hasattr(cfg, 'max_age_episode') or
-        not hasattr(cfg, 'max_age_video') or
-        not hasattr(cfg, 'max_age_trailer') or
-        not hasattr(cfg, 'max_age_audio') or
-
-        not hasattr(cfg, 'max_keep_favorites_movie') or
-        not hasattr(cfg, 'max_keep_favorites_episode') or
-        not hasattr(cfg, 'max_keep_favorites_video') or
-        not hasattr(cfg, 'max_keep_favorites_trailer') or
-        not hasattr(cfg, 'max_keep_favorites_audio') or
-
-        not hasattr(cfg, 'server_brand') or
-        not hasattr(cfg, 'server_url') or
-
-        not hasattr(cfg, 'admin_username') or
-        not hasattr(cfg, 'access_token') or
-
-        not hasattr(cfg, 'user_keys') or
-
-        #not hasattr(cfg, 'script_behavior') or
-
-        not hasattr(cfg, 'user_bl_libs') or
-        not hasattr(cfg, 'user_wl_libs') or
-
-        not hasattr(cfg, 'api_request_attempts') or
-        not hasattr(cfg, 'api_return_limit')
-       ):
-        if (
-            not hasattr(cfg, 'server_brand') or
-            not hasattr(cfg, 'server_url') or
-
-            not hasattr(cfg, 'admin_username') or
-            not hasattr(cfg, 'access_token') or
-
-            not hasattr(cfg, 'user_keys') or
-
-            #not hasattr(cfg, 'script_behavior') or
-
-            not hasattr(cfg, 'user_bl_libs') or
-            not hasattr(cfg, 'user_wl_libs') or
-
-            not hasattr(cfg, 'api_request_attempts') or
-            not hasattr(cfg, 'api_return_limit')
-           ):
-
-            if hasattr(cfg, 'server_brand'):
-                delattr(cfg, 'server_brand')
-            if hasattr(cfg, 'server_url'):
-                delattr(cfg, 'server_url')
-
-            if hasattr(cfg, 'admin_username'):
-                delattr(cfg, 'admin_username')
-            if hasattr(cfg, 'access_token'):
-                delattr(cfg, 'access_token')
-
-            if hasattr(cfg, 'user_keys'):
-                delattr(cfg, 'user_keys')
-
-            #if hasattr(cfg, 'script_behavior'):
-                #delattr(cfg, 'script_behavior')
-
-            if hasattr(cfg, 'user_bl_libs'):
-                delattr(cfg, 'user_bl_libs')
-            if hasattr(cfg, 'user_wl_libs'):
-                delattr(cfg, 'user_wl_libs')
-
-            if hasattr(cfg, 'api_request_attempts'):
-                delattr(cfg, 'api_request_attempts')
-            if hasattr(cfg, 'api_return_limit'):
-                delattr(cfg, 'api_return_limit')
-
-            print('-----------------------------------------------------------')
-            server_brand=get_brand()
-
-            print('-----------------------------------------------------------')
-            server=get_url()
-            print('-----------------------------------------------------------')
-            port=get_port()
-            print('-----------------------------------------------------------')
-            server_base=get_base(server_brand)
-            if (len(port)):
-                server_url=server + ':' + port + '/' + server_base
-            else:
-                server_url=server + '/' + server_base
-            print('-----------------------------------------------------------')
-
-            username=get_admin_username()
-            print('-----------------------------------------------------------')
-            password=get_admin_password()
-            print('-----------------------------------------------------------')
-            auth_key=get_auth_key(server_url, username, password, server_brand)
-
-            script_behavior=get_cleaning_behavior()
-            print('-----------------------------------------------------------')
-
-            user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_paths(server_url, auth_key)
-
-            userkeys_list=[]
-            userbllibs_list=[]
-            userkeys_wllibs_list=[]
-            userwllibs_list=[]
-
-            for userkey, userbllib in user_keys_and_bllibs.items():
-                userkeys_list.append(userkey)
-                userbllibs_list.append(userbllib)
-
-            for userkey, userwllib in user_keys_and_wllibs.items():
-                userkeys_wllibs_list.append(userkey)
-                userwllibs_list.append(userwllib)
-
-            user_keys=json.dumps(userkeys_list)
-            user_bl_libs=json.dumps(userbllibs_list)
-            user_wl_libs=json.dumps(userwllibs_list)
-
-            print('-----------------------------------------------------------')
-
-        #warn user the configuration file is not complete
-        #the missing varibles are not saved and the setup data will need to be manually entered the next time the script is run
-        #a new media_cleaner_config.py file will need to be completed or manually updated without duplicates
-        print('\n')
-        print('-----------------------------------------------------------')
-        print('ATTENTION!!!')
-        print('Old or incomplete config in use.')
-        print('1) Delete media_cleaner_config.py and run this again to create a new config.')
-        print('   Or')
-        print('2) Delete DEBUG from media_cleaner_config.py and run this again to create a new config.')
-        print('-----------------------------------------------------------')
-        print('Matching value(s) in media_cleaner_config.py ignored.')
-        print('Using the below config value(s) for this run:')
-        print('-----------------------------------------------------------')
-
-        if not hasattr(cfg, 'not_played_age_movie'):
-            print('not_played_age_movie=-1')
-            setattr(cfg, 'not_played_age_movie', -1)
-        if not hasattr(cfg, 'not_played_age_episode'):
-            print('not_played_age_episode=-1')
-            setattr(cfg, 'not_played_age_episode', -1)
-        if not hasattr(cfg, 'not_played_age_video'):
-            print('not_played_age_video=-1')
-            setattr(cfg, 'not_played_age_video', -1)
-        if not hasattr(cfg, 'not_played_age_trailer'):
-            print('not_played_age_trailer=-1')
-            setattr(cfg, 'not_played_age_trailer', -1)
-        if not hasattr(cfg, 'not_played_age_audio'):
-            print('not_played_age_audio=-1')
-            setattr(cfg, 'not_played_age_audio', -1)
-
-        if not hasattr(cfg, 'keep_favorites_movie'):
-            print('keep_favorites_movie=1')
-            setattr(cfg, 'keep_favorites_movie', 1)
-        if not hasattr(cfg, 'keep_favorites_episode'):
-            print('keep_favorites_episode=1')
-            setattr(cfg, 'keep_favorites_episode', 1)
-        if not hasattr(cfg, 'keep_favorites_video'):
-            print('keep_favorites_video=1')
-            setattr(cfg, 'keep_favorites_video', 1)
-        if not hasattr(cfg, 'keep_favorites_trailer'):
-            print('keep_favorites_trailer=1')
-            setattr(cfg, 'keep_favorites_trailer', 1)
-        if not hasattr(cfg, 'keep_favorites_audio'):
-            print('keep_favorites_audio=1')
-            setattr(cfg, 'keep_favorites_audio', 1)
-
-        if not hasattr(cfg, 'keep_favorites_advanced'):
-            print('keep_favorites_advanced=00000001')
-            setattr(cfg, 'keep_favorites_advanced', '00000001')
-        if not hasattr(cfg, 'keep_favorites_advanced_any'):
-            print('keep_favorites_advanced_any=00000000')
-            setattr(cfg, 'keep_favorites_advanced_any', '00000000')
-
-        if not hasattr(cfg, 'multiuser_whitelist_movie'):
-            print('multiuser_whitelist_movie=1')
-            setattr(cfg, 'multiuser_whitelist_movie', 1)
-
-        if not hasattr(cfg, 'multiuser_whitelist_episode'):
-            print('multiuser_whitelist_episode=1')
-            setattr(cfg, 'multiuser_whitelist_episode', 1)
-
-        if not hasattr(cfg, 'multiuser_whitelist_video'):
-            print('multiuser_whitelist_video=1')
-            setattr(cfg, 'multiuser_whitelist_video', 1)
-
-        if not hasattr(cfg, 'multiuser_whitelist_trailer'):
-            print('multiuser_whitelist_trailer=1')
-            setattr(cfg, 'multiuser_whitelist_trailer', 1)
-
-        if not hasattr(cfg, 'multiuser_whitelist_audio'):
-            print('multiuser_whitelist_audio=1')
-            setattr(cfg, 'multiuser_whitelist_audio', 1)
-
-        if not hasattr(cfg, 'remove_files'):
-            print('remove_files=0')
-            setattr(cfg, 'remove_files', 0)
-
-        if not hasattr(cfg, 'max_age_movie'):
-            print('max_age_movie=-1')
-            setattr(cfg, 'max_age_movie', -1)
-        if not hasattr(cfg, 'max_age_episode'):
-            print('max_age_episode=-1')
-            setattr(cfg, 'max_age_episode', -1)
-        if not hasattr(cfg, 'max_age_video'):
-            print('max_age_video=-1')
-            setattr(cfg, 'max_age_video', -1)
-        if not hasattr(cfg, 'max_age_trailer'):
-            print('max_age_trailer=-1')
-            setattr(cfg, 'max_age_trailer', -1)
-        if not hasattr(cfg, 'max_age_audio'):
-            print('max_age_audio=-1')
-            setattr(cfg, 'max_age_audio', -1)
-
-        if not hasattr(cfg, 'max_keep_favorites_movie'):
-            print('max_keep_favorites_movie=1')
-            setattr(cfg, 'max_keep_favorites_movie', 1)
-        if not hasattr(cfg, 'max_keep_favorites_episode'):
-            print('max_keep_favorites_episode=1')
-            setattr(cfg, 'max_keep_favorites_episode', 1)
-        if not hasattr(cfg, 'max_keep_favorites_video'):
-            print('max_keep_favorites_video=1')
-            setattr(cfg, 'max_keep_favorites_video', 1)
-        if not hasattr(cfg, 'max_keep_favorites_trailer'):
-            print('max_keep_favorites_trailer=1')
-            setattr(cfg, 'max_keep_favorites_trailer', 1)
-        if not hasattr(cfg, 'max_keep_favorites_audio'):
-            print('max_keep_favorites_audio=1')
-            setattr(cfg, 'max_keep_favorites_audio', 1)
-
-        if not hasattr(cfg, 'server_brand'):
-            print('server_brand=\'' + str(server_brand) + '\'')
-            setattr(cfg, 'server_brand', server_brand)
-        if not hasattr(cfg, 'server_url'):
-            print('server_url=\'' + str(server_url) + '\'')
-            setattr(cfg, 'server_url', server_url)
-
-        if not hasattr(cfg, 'admin_username'):
-            print('admin_username=\'' + str(username) + '\'')
-            setattr(cfg, 'admin_username', username)
-        if not hasattr(cfg, 'access_token'):
-            print('access_token=\'' + str(auth_key) + '\'')
-            setattr(cfg, 'access_token', auth_key)
-
-        if not hasattr(cfg, 'user_keys'):
-            print('user_keys=\'' + str(user_keys) + '\'')
-            setattr(cfg, 'user_keys', user_keys)
-
-        #if not hasattr(cfg, 'script_behavior'):
-            #print('script_behavior=\'' + str(script_behavior) + '\'')
-            #setattr(cfg, 'script_behavior', script_behavior)
-
-        if not hasattr(cfg, 'user_bl_libs'):
-            print('user_bl_libs=\'' + str(user_bl_libs) + '\'')
-            setattr(cfg, 'user_bl_libs', user_bl_libs)
-        if not hasattr(cfg, 'user_wl_libs'):
-            print('user_wl_libs=\'' + str(user_wl_libs) + '\'')
-            setattr(cfg, 'user_wl_libs', user_wl_libs)
-
-        if not hasattr(cfg, 'api_request_attempts'):
-            print('api_request_attempts=\'' + str(api_request_attempts) + '\'')
-            setattr(cfg, 'api_request_attempts', api_request_attempts)
-        if not hasattr(cfg, 'api_return_limit'):
-            print('api_return_limit=\'' + str(api_return_limit) + '\'')
-            setattr(cfg, 'api_return_limit', api_return_limit)
-
-        #print('DEBUG=' + str(cfg.DEBUG))
-
-        print('-----------------------------------------------------------')
-        print ('\n')
+    print('-----------------------------------------------------------')
+    print ('\n')
 
 #the except
 except (AttributeError, ModuleNotFoundError):
