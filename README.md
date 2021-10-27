@@ -104,7 +104,7 @@ remove_files=0
 ```python
 #----------------------------------------------------------#
 # Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
-# Does not allow updating libraries for existing users
+# Does not show existing users in the choice list; but existing users can be updated if you know their position
 #  FALSE - Operate as configured
 #  TRUE  - Allow adding new users to existing config; will NOT delete media items
 # (FALSE - default)
