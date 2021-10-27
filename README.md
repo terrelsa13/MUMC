@@ -100,6 +100,17 @@ multiuser_whitelist_audio=1
 #----------------------------------------------------------#
 remove_files=0
 ```
+#### Allows adding new users and their associated libraries to the existing config without deleting it; Set to 'FALSE' when ready for "production":
+```python
+#----------------------------------------------------------#
+# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
+# Does not allow updating libraries for existing users
+#  FALSE - Operate as configured
+#  TRUE  - Allow adding new users to existing config; will NOT delete media items
+# (FALSE - default)
+#----------------------------------------------------------#
+UPDATE_CONFIG='FALSE'
+```
 #### When enabled, media items will be deleted based on DateCreated; played state will be ignored:
 ```python
 #----------------------------------------------------------#
