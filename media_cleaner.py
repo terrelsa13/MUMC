@@ -393,7 +393,7 @@ def generate_config(updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters\n"
-    config_file += "# Does not allow updating libraries for existing users\n"
+    config_file += "# Does not show existing users in the choice list; but existing users can be updated if you know their position\n"
     config_file += "#  FALSE - Operate as configured\n"
     config_file += "#  TRUE  - Allow adding new users to existing config; will NOT delete media items\n"
     config_file += "# (FALSE - default)\n"
