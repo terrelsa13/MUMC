@@ -2666,7 +2666,7 @@ def list_delete_items(deleteItems):
     print('-----------------------------------------------------------')
     print('Summary Of Deleted Media:')
     if not bool(cfg.remove_files):
-        print('* Trial Run            ')
+        print('* Trial Run Mode       ')
         print('* remove_files=0       ')
         print('* No Media Deleted     ')
         print('* Items = ' + str(len(deleteItems)))
