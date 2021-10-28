@@ -20,6 +20,7 @@ not_played_age_episode=-1
 not_played_age_video=-1
 not_played_age_trailer=-1
 not_played_age_audio=-1
+not_played_age_audiobook=-1
 ```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
@@ -38,51 +39,56 @@ keep_favorites_episode=1
 keep_favorites_video=1
 keep_favorites_trailer=1
 keep_favorites_audio=1
+keep_favorites_audiobook=1
 ```
 #### Additional options for determining if a media item should be considered marked as a favorite based on specified metadata item:
 ```python
 #----------------------------------------------------------#
 # Advanced favorites configuration bitmask
 #     Requires 'keep_favorites_*=1'
-#  xxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited
-#  xxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited
-#  xxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited
-#  xxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited
-#  xxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited
-#  xxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited
-#  xGxxxxxx - reserved...
-#  Hxxxxxxx - reserved...
+#  xxxxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited
+#  xxxxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited
+#  xxxxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited
+#  xxxxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited
+#  xxxxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited
+#  xxxxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited
+#  xxxGxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the track's 'artist(author)' metadata is favorited
+#  xxHxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the tracks's 'album(book) artist(author)' metadata is favorited
+#  xIxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the tracks's metadata is favorited
+#  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited
 #  0 bit - disabled
 #  1 bit - enabled
-# (00000001 - default)
+# (0001000001 - default)
 #----------------------------------------------------------#
-keep_favorites_advanced='00000001'
+keep_favorites_advanced='0001000001'
 ```
 #### Dependent on the above "advanced options", determines if only the first metadata item should be considered or all metadata items should be considered:
 ```python
 #----------------------------------------------------------#
 # Advanced favorites any configuration bitmask
 #     Requires matching bit in 'keep_favorites_advanced' bitmask is enabled
-#  xxxxxxxa - xxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata
-#  xxxxxxbx - xxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata
-#  xxxxxcxx - xxxxxCxx must be enabled; will use ANY genres listed in the track's metadata
-#  xxxxdxxx - xxxxDxxx must be enabled; will use ANY genres listed in the album's metadata
-#  xxxexxxx - xxxExxxx must be enabled; will use ANY genres listed in the series' metadata
-#  xxfxxxxx - xxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata
-#  xgxxxxxx - reserved...
-#  hxxxxxxx - reserved...
+#  xxxxxxxxxa - xxxxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata
+#  xxxxxxxxbx - xxxxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata
+#  xxxxxxxcxx - xxxxxxxCxx must be enabled; will use ANY genres listed in the track's metadata
+#  xxxxxxdxxx - xxxxxxDxxx must be enabled; will use ANY genres listed in the album's metadata
+#  xxxxxexxxx - xxxxxExxxx must be enabled; will use ANY genres listed in the series' metadata
+#  xxxxfxxxxx - xxxxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata
+#  xxxgxxxxxx - xxxGxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'artist(author)' metadata
+#  xxhxxxxxxx - xxHxxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'album(book) artist(autor)' metadata
+#  xixxxxxxxx - xIxxxxxxxx must be enabled; will use ANY genres listed in the track's metadata
+#  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata
 #  0 bit - disabled
 #  1 bit - enabled
-# (00000000 - default)
+# (0000000000 - default)
 #----------------------------------------------------------#
-keep_favorites_advanced_any='00000000'
+keep_favorites_advanced_any='0000000000'
 ```
 #### When monitoring multiple users whitelisted libraries will be treated accordingly:
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
-#  0 : when multi-user - do not delete media item when ALL monitored users have the parent library whitelisted
-#  1 : when multi-user - do not delete media item when ANY monitored users have the parent library whitelisted
+#  0 : do not delete media item when ALL monitored users have the parent library whitelisted
+#  1 : do not delete media item when ANY monitored users have the parent library whitelisted
 # (1 : default)
 #----------------------------------------------------------#
 multiuser_whitelist_movie=1
@@ -90,6 +96,7 @@ multiuser_whitelist_episode=1
 multiuser_whitelist_video=1
 multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
+multiuser_whitelist_audiobook=1
 ```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
@@ -117,6 +124,7 @@ max_age_episode=-1
 max_age_video=-1
 max_age_trailer=-1
 max_age_audio=-1
+max_age_audiobook=-1
 ```
 #### When enabled, favorited media items will not be deleted using the corresponding max_age_xyz:
 ```python
@@ -131,6 +139,7 @@ max_keep_favorites_episode=1
 max_keep_favorites_video=1
 max_keep_favorites_trailer=1
 max_keep_favorites_audio=1
+max_keep_favorites_audiobook=1
 ```
 
 #### Created first time the script runs; Do **_NOT_** edit or modify these:
@@ -142,7 +151,7 @@ max_keep_favorites_audio=1
 #  0 - 'emby'
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
-server_brand='abcd'
+server_brand='serverbrand'
 
 #----------------------------------------------------------#
 # Server URL; created during setup
@@ -152,7 +161,7 @@ server_url='http://localhost.abc:8096/basename'
 #----------------------------------------------------------#
 # Admin username; chosen during setup
 #----------------------------------------------------------#
-admin_username='Username'
+admin_username='username'
 
 #----------------------------------------------------------#
 # Access token; requested from server during setup
@@ -163,6 +172,8 @@ access_token='0123456789abcdef0123456789abcdef'
 # User key(s) of account(s) to monitor media items; chosen during setup
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
+
+#----------------------------------------------------------#
 
 #----------------------------------------------------------#
 # User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
@@ -176,8 +187,8 @@ user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/pat
 
 #----------------------------------------------------------#
 # API request attempts; number of times to retry an API request
-#  Delay between initial attempt and the first retry is 1 second
-#  The delay will double with each try after the first retry
+#  delay between initial attempt and the first retry is 1 second
+#  the delay will double with each attempt after the first retry
 #  0-16 - number of retry attempts
 #  (6 : default)
 #----------------------------------------------------------#
