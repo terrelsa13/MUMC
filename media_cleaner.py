@@ -3275,7 +3275,7 @@ except (AttributeError, ModuleNotFoundError):
 #check config values are what we expect them to be
 cfgCheck()
 
-#
+#check if setup to updated the existing config file
 if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     #we are here because we want to add new users to the media_cleaner_config.py file
     generate_config(cfg.UPDATE_CONFIG)
