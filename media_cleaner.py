@@ -10,6 +10,8 @@ import os
 from dateutil.parser import parse
 from datetime import datetime,date,timedelta,timezone
 
+from media_cleaner_config import UPDATE_CONFIG
+
 # Hash password if not hashed
 #if cfg.admin_password_sha1 == '':
 #     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
@@ -129,11 +131,8 @@ def get_cleaning_behavior():
     defaultbehavior='whitelist'
     valid_behavior=False
     while (valid_behavior == False):
-        #print('Choose how the script will decide which libraries to delete media items from.')
         print('Decide how the script will treat libraries for the user(s) choosen in the next step.')
-        #print('0 - Whitelisting media libraries; media items can be deleted from library unless library is whitelisted.')
         print('0 - Whitelist Media Libraries - Media items in the libraries you choose will NOT be allowed to be deleted.')
-        #print('1 - Blacklisting media libraries; media items cannot be deleted from library unless library is blacklisted (aka monitored).')
         print('1 - Blacklist Media Libraries - Media items in the libraries you choose will be allowed to be deleted.')
         behavior=input('Choose how the script will behave. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
@@ -154,7 +153,6 @@ def get_not_played_age(mediaType):
     defaultage=-1
     valid_age=False
     while (valid_age == False):
-        #print('Delete ' + mediaType + ' media items once they have been played x days ago.')
         print('Choose the number of days to wait before deleting played ' + mediaType + ' media items')
         print('Valid values: 0-365000000 days')
         print('             -1 to disable deleting ' + mediaType + ' media items')
@@ -162,9 +160,6 @@ def get_not_played_age(mediaType):
         if (age == ''):
             valid_age=True
             return(defaultage)
-        #elif (age == ' '):
-            #valid_age=True
-            #return('')
         else:
             try:
                 age_float=float(age)
@@ -233,7 +228,10 @@ def generate_config(updateConfig):
             not_played_age_audiobook = get_not_played_age('audiobook')
     else:       
         print('-----------------------------------------------------------')
-        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
+        if (hasattr(cfg, 'script_behavior')):
+            user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
+        else:
+            raise NameError('Error! The script_behavior variable is missing from media_cleaner_config.py\nIt is needed to use the UPDATE_CONFIG functionality.')
 
     userkeys_list=[]
     userbllibs_list=[]
@@ -528,7 +526,7 @@ def generate_config(updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API request attempts; number of times to retry an API request\n"
     config_file += "#  delay between initial attempt and the first retry is 1 second\n"
-    config_file += "#  the delay will double with each attempt after the first retry\n"
+    config_file += "#  The delay will double with each attempt after the first retry\n"
     config_file += "#  0-16 - number of retry attempts\n"
     config_file += "#  (6 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -699,16 +697,11 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
             raise ValueError('\nValueError: Number of entries in user_key and number of entries in user_wl_libs does NOT match')
 
         i=0
+        #Pre-populate the existing userkeys and libraries so only new users are shown
         for rerun_userkey in user_keys_json:
             userId_set.add(rerun_userkey)
-            #for rerun_wllibs in user_wl_libs_json:
-            if (script_behavior == 'whitelist'):
-                userId_wllib_dict[rerun_userkey]=user_wl_libs_json[i]
-                userId_bllib_dict[rerun_userkey]=user_bl_libs_json[i]
-            #for rerun_bllibs in user_bl_libs_json:
-            elif (script_behavior == 'blacklist'):
-                userId_bllib_dict[rerun_userkey]=user_bl_libs_json[i]
-                userId_wllib_dict[rerun_userkey]=user_wl_libs_json[i]
+            userId_wllib_dict[rerun_userkey]=user_wl_libs_json[i]
+            userId_bllib_dict[rerun_userkey]=user_bl_libs_json[i]
             i += 1
 
         if ((len(user_keys_json)) == (len(data))):
@@ -746,7 +739,6 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
             print('')
         else: #((i >= 1) and (one_user_selected == True)):
             print('Monitoring multiple users is possible.')
-            #print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
             print('When multiple users are selected; the user with the oldest last played time will determine if media is deleted.')
             user_number=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
             print('')
@@ -846,8 +838,6 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
         print('')
 
         if (i >= 1):
-            #print('Enter number of library folder to whitelist.')
-            #print('Media in whitelisted library folders will NOT be deleted.')
             print(infotext)
             if ((mandatory) and (first_run)):
                 first_run=False
@@ -1819,9 +1809,9 @@ def get_items(server_url, user_keys, auth_key):
     user_wllib_json=json.loads(cfg.user_wl_libs)
 
     #get number of user_keys and user_libs
-    userkey_count=len(user_keys_json)
-    userbllib_count=len(user_bllib_json)
-    userwllib_count=len(user_wllib_json)
+    #userkey_count=len(user_keys_json)
+    #userbllib_count=len(user_bllib_json)
+    #userwllib_count=len(user_wllib_json)
 
     #establish deletion date for played media items
     cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
@@ -1870,15 +1860,10 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
-            #moviegenre_mask=int('00100000', 2)
-
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,ParentId,DateCreated,Path,MediaSource'
             FieldsState='Id,Path'
             if (cfg.max_age_movie >= 0):
                 IsPlayedState=''
-            #if (moviegenre_mask & adv_settings):
-                #FieldsState=FieldsState + ',Genres'
 
             StartIndex=0
             TotalItems=1
@@ -1928,7 +1913,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find movie media items ready to delete
                     if ((item_info['Type'] == 'Movie') and (itemIsMonitored)):
@@ -2001,7 +1985,6 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,SeriesStudio,ParentId,DateCreated'
             FieldsState='Id,Path,SeriesStudio'
             if (cfg.max_age_episode >= 0):
                 IsPlayedState=''
@@ -2058,7 +2041,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find tv-episode media items ready to delete
                     if ((item_info['Type'] == 'Episode') and (itemIsMonitored)):
@@ -2135,7 +2117,6 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
 
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
             FieldsState='Id,Path'
             if (cfg.max_age_video >= 0):
                 IsPlayedState=''
@@ -2188,7 +2169,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find video media items ready to delete
                     if ((item_info['Type'] == 'Video') and (itemIsMonitored)):
@@ -2258,7 +2238,6 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_trailer >= 0) or (cfg.max_age_trailer >= 0)):
 
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
             FieldsState='Id,Path'
             if (cfg.max_age_trailer >= 0):
                 IsPlayedState=''
@@ -2311,7 +2290,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find trailer media items ready to delete
                     if ((item_info['Type'] == 'Trailer') and (itemIsMonitored)):
@@ -2380,16 +2358,10 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
-            #trackgenre_mask=int('00000100', 2)
-            #albumgenre_mask=int('00001000', 2)
-
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
             FieldsState='Id,Path'
             if (cfg.max_age_audio >= 0):
                 IsPlayedState=''
-            #if ((trackgenre_mask & adv_settings) or (albumgenre_mask & adv_settings)):
-                #FieldsState=FieldsState + ',Genres'
 
             StartIndex=0
             TotalItems=1
@@ -2439,7 +2411,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audio media items ready to delete
                     if ((item_info['Type'] == 'Audio') and (itemIsMonitored)):
@@ -2523,7 +2494,6 @@ def get_items(server_url, user_keys, auth_key):
            ):
 
             IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
             FieldsState='Id,Path,Genres,ParentId'
             if (cfg.max_age_audiobook >= 0):
                 IsPlayedState=''
@@ -2576,7 +2546,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audiobook media items ready to delete
                     if ((item_info['Type'] == 'AudioBook') and (itemIsMonitored)):
@@ -2660,10 +2629,6 @@ def get_items(server_url, user_keys, auth_key):
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
     deleteItems=get_isfav_MultiUser(user_keys_json, isfav_byUserId, deleteItems)
-
-    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
-    #When not multiple users this will just clean up the deletion list
-    #deleteItems=get_iswhitelist_MultiUser_byId(user_keys_json, iswhitelist_byUserId, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(movie_whitelists), deleteItems)
@@ -3103,8 +3068,8 @@ def cfgCheck():
             (check <= 1))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_keep_favorites_video'):
         check=cfg.max_keep_favorites_video
@@ -3290,12 +3255,10 @@ try:
     check=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
     
-    #print('DEBUG=' + str(cfg.DEBUG))
-
     print('-----------------------------------------------------------')
     print ('\n')
 
-#the except
+#the exception
 except (AttributeError, ModuleNotFoundError):
     #we are here because the media_cleaner_config.py file does not exist
     #this is either the first time the script is running or media_cleaner_config.py file was deleted
@@ -3303,7 +3266,8 @@ except (AttributeError, ModuleNotFoundError):
     #another possible reason we are here...
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
-    generate_config('FALSE')
+    update_config = 'FALSE'
+    generate_config(update_config)
 
     #exit gracefully after setup
     exit(0)
@@ -3311,6 +3275,7 @@ except (AttributeError, ModuleNotFoundError):
 #check config values are what we expect them to be
 cfgCheck()
 
+#
 if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     #we are here because we want to add new users to the media_cleaner_config.py file
     generate_config(cfg.UPDATE_CONFIG)
