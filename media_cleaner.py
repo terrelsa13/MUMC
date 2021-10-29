@@ -10,8 +10,6 @@ import os
 from dateutil.parser import parse
 from datetime import datetime,date,timedelta,timezone
 
-from media_cleaner_config import UPDATE_CONFIG
-
 # Hash password if not hashed
 #if cfg.admin_password_sha1 == '':
 #     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
@@ -274,7 +272,7 @@ def generate_config(updateConfig):
         config_file += "not_played_age_trailer=" + str(getattr(cfg, 'not_played_age_trailer')) + "\n"
         config_file += "not_played_age_audio=" + str(getattr(cfg, 'not_played_age_audio')) + "\n"
         if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'not_played_age_audiobook'))):
-            config_file += "not_played_age_audiobook=" + getattr(cfg, 'not_played_age_audiobook') + "\n"
+            config_file += "not_played_age_audiobook=" + str(getattr(cfg, 'not_played_age_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -607,14 +605,16 @@ def delete_item(itemID):
         print(itemID)
         print(url)
         print(req)
-    if bool(cfg.remove_files):
+
+    #check if in dry-run mode; if remove_files=0 then immediately return with requesting the media item be deleted
+    if (not bool(cfg.remove_files)):
+        return
+    else:
         try:
             request.urlopen(req)
         except Exception:
             print('generic exception: ' + traceback.format_exc())
-        return
-    else:
-        return
+        return        
 
 
 #api call to get admin account authentication token
