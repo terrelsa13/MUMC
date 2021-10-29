@@ -228,10 +228,7 @@ def generate_config(updateConfig):
             not_played_age_audiobook = get_not_played_age('audiobook')
     else:       
         print('-----------------------------------------------------------')
-        if (hasattr(cfg, 'script_behavior')):
-            user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
-        else:
-            raise NameError('Error! The script_behavior variable is missing from media_cleaner_config.py\nIt is needed to use the UPDATE_CONFIG functionality.')
+        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
 
     userkeys_list=[]
     userbllibs_list=[]
@@ -3176,8 +3173,8 @@ def cfgCheck():
             ((check == 'whitelist') or (check == 'blacklist'))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The script_behavior variable is missing from media_cleaner_config.py\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The script_behavior variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'user_bl_libs'):
         check=cfg.user_bl_libs
@@ -3277,10 +3274,14 @@ cfgCheck()
 
 #check if setup to updated the existing config file
 if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
-    #we are here because we want to add new users to the media_cleaner_config.py file
-    generate_config(cfg.UPDATE_CONFIG)
+    #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
+    if (hasattr(cfg, 'script_behavior')):
+        #we are here because we want to add new users to the media_cleaner_config.py file
+        generate_config(cfg.UPDATE_CONFIG)
+    else:
+        raise NameError('Error! The script_behavior variable is missing from media_cleaner_config.py. It is needed to use the UPDATE_CONFIG functionality.')
     
-    #exit gracefully after setup
+    #exit gracefully after conifig update
     exit(0)
 
 #now we can get media items that are ready to be deleted;
