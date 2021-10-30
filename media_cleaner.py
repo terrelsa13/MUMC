@@ -152,7 +152,7 @@ def get_not_played_age(mediaType):
     valid_age=False
     while (valid_age == False):
         print('Choose the number of days to wait before deleting played ' + mediaType + ' media items')
-        print('Valid values: 0-365000000 days')
+        print('Valid values: 0-730500 days')
         print('             -1 to disable deleting ' + mediaType + ' media items')
         age=input('Enter number of days (default ' + str(defaultage) + '): ')
         if (age == ''):
@@ -163,7 +163,7 @@ def get_not_played_age(mediaType):
                 age_float=float(age)
                 if ((age_float % 1) == 0):
                     age_int=int(age_float)
-                    if ((int(age_int) >= -1) and (int(age_int) <= 365000000)):
+                    if ((int(age_int) >= -1) and (int(age_int) <= 730500)):
                         valid_age=True
                         return(age_int)
                     else:
@@ -253,7 +253,7 @@ def generate_config(updateConfig):
     config_file=''
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Delete media type once it has been played x days ago\n"
-    config_file += "#   0-365000000 - number of days to wait before deleting played media\n"
+    config_file += "#   0-730500 - number of days to wait before deleting played media\n"
     config_file += "#  -1 : to disable managing specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -403,7 +403,7 @@ def generate_config(updateConfig):
     config_file += "# Use at your own risk; You alone are responsible for your actions\n"
     config_file += "# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY\n"
     config_file += "# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz\n"
-    config_file += "#   0-365000000 - number of days to wait before deleting \"old\" media\n"
+    config_file += "#   0-730500 - number of days to wait before deleting \"old\" media\n"
     config_file += "#  -1 : to disable managing max age of specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -486,16 +486,10 @@ def generate_config(updateConfig):
         config_file += "access_token='" + getattr(cfg, 'access_token') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User key(s) of account(s) to monitor media items; chosen during setup\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "user_keys='" + user_keys + "'\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "user_keys='" + user_keys + "'\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Script is using whitelists or blacklists; chosen during setup\n"
-    config_file += "#  Only used when run with UPDATE_CONFIG=\'TRUE\'\n"
+    config_file += "# Script setup to use the whitelisting method or the blacklistling method; chosen during setup\n"
+    config_file += "#  Only used when run with UPDATE_CONFIG='TRUE'\n"
+    config_file += "# 'whitelist' - Script setup to store whitelisted libraries\n"
+    config_file += "# 'blacklist' - Script setup to store blacklisted libraries\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "script_behavior='" + script_behavior + "'\n"
@@ -503,20 +497,19 @@ def generate_config(updateConfig):
         config_file += "script_behavior='" + getattr(cfg, 'script_behavior') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup\n"
+    config_file += "# User key(s) of account(s) to monitor media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "user_bl_libs='" + user_bl_libs + "'\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "user_bl_libs='" + user_bl_libs + "'\n"
+    config_file += "user_keys='" + user_keys + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup\n"
+    config_file += "# User blacklisted libraries of corresponding user keys(s) to monitor media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "user_wl_libs='" + user_wl_libs + "'\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "user_wl_libs='" + user_wl_libs + "'\n"
+    config_file += "user_bl_libs='" + user_bl_libs + "'\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# User whitelisted libraries of corresponding user key(s) to exclude monitoring media items; chosen during setup\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API request attempts; number of times to retry an API request\n"
@@ -994,7 +987,7 @@ def requestURL(url, debugBool, debugMessage, retries):
                         #DEBUG
                         print(debugMessage)
                         print2json(data)
-                    return(data)
+                    #return(data)
                 except Exception as err:
                     time.sleep(delay)
                     #delay value doubles each time the same API request is resent
@@ -1006,13 +999,13 @@ def requestURL(url, debugBool, debugMessage, retries):
                 getdata = False
                 print('An error occurred while attempting to retrieve data from the API.')
                 return('Attempt to get data at: ' + debugMessage + '. Server responded with code: ' + str(response.getcode()))
+    return(data)
 
 
 #get additional item info needed to determine if parent of item is favorite
 #get additional item info needed to determine if media item is in whitelist
 def get_additional_item_info(server_url, user_key, itemId, auth_key, lookupTopic):
     #Get additonal item information
-    #url=server_url + '/Users/' + user_key  + '/Items/' + str(itemId) + '?fields=SeriesStudio,Studios,Genres,Path&enableImages=False&api_key=' + auth_key
     url=server_url + '/Users/' + user_key  + '/Items/' + str(itemId) + '?enableImages=False&api_key=' + auth_key
 
     if bool(cfg.DEBUG):
@@ -1254,12 +1247,14 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
             if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
                 if (adv_settings & albumgenre_mask):
                     if not (adv_settings_any & albumgenre_any_mask):
-                        if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        #if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
                             print('  ' + lookupTopicAlbum.title() + 'Genre is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]))
                     else:
                         i=0
                         for albumgenre in range(len(album_item_info['GenreItems'])):
-                            if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            #if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
                                 print(' ' + lookupTopicAlbum.title() + 'Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]))
                                 i+=1
 
@@ -1341,13 +1336,15 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
         if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
             if (adv_settings & albumgenre_mask):
                 if not (adv_settings_any & albumgenre_any_mask):
-                    if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    #if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
                         if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]):
                             itemisfav_AUDIOalbumgenre=True
                 else:
                     #Check if any album genre was stored as a favorite
                     for albumgenre in range(len(album_item_info['GenreItems'])):
-                        if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                        #if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                        if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
                             if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]):
                                 itemisfav_AUDIOalbumgenre=True
 
@@ -1425,11 +1422,23 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
 
 ### Network #######################################################################################
 
-    if (does_key_exist(item, 'SeriesStudio')):
+    #if (does_key_exist(item, 'SeriesStudio')):
         #Check if network's favorite value already exists in dictionary
-        if not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
+        #if not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
+            #Build url
+            #url=server_url + '/Studios/' + urllib.parse.quote(item['SeriesStudio']) + '?userId=' + user_key +  '&enableImages=False&api_key=' + auth_key
             #Store if the channel/network/studio is marked as a favorite
-            isfav_TVessn['networkchannel'][item['SeriesStudio']] = get_studio_item_info(server_url, user_key, item['SeriesStudio'], auth_key)['UserData']['IsFavorite']
+            #isfav_TVessn['networkchannel'][item['SeriesStudio']] = requestURL(url, cfg.DEBUG, 'get_studio_item_info', cfg.api_request_attempts)['UserData']['IsFavorite']
+
+    if (does_key_exist(item, 'SeriesStudio')):
+        #Build url
+        url=server_url + '/Studios/' + urllib.parse.quote(item['SeriesStudio']) + '?userId=' + user_key +  '&enableImages=False&api_key=' + auth_key
+        #Get studio's/network's item info
+        series_studio_item_info = requestURL(url, cfg.DEBUG, 'get_studio_item_info', cfg.api_request_attempts)
+        #Check if network's favorite value already exists in dictionary
+        if not series_studio_item_info['Id'] in isfav_TVessn['networkchannel']:
+            #Store if the channel/network/studio is marked as a favorite
+            isfav_TVessn['networkchannel'][series_studio_item_info['Id']] = series_studio_item_info['UserData']['IsFavorite']
 
 ### End Network ###################################################################################
 
@@ -1442,7 +1451,8 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
         if (does_key_exist(item, 'SeriesId')):
             print('   Series is favorite: ' + str(isfav_TVessn['series'][item['SeriesId']]))
         if (does_key_exist(item, 'SeriesStudio')):
-            print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][item['SeriesStudio']]))
+            #print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][item['SeriesStudio']]))
+            print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][series_studio_item_info['Id']]))
         if (does_key_index_exist(series_item_info, 'GenreItems', 0)):
             if (adv_settings & seriesgenre_mask):
                 if not (adv_settings_any & seriesgenre_any_mask):
@@ -1461,7 +1471,8 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
         seriesId_bool=isfav_TVessn['series'][item['SeriesId']]
     networkchannel_bool=False
     if (does_key_exist(item, 'SeriesStudio')):
-        networkchannel_bool=isfav_TVessn['networkchannel'][item['SeriesStudio']]
+        #networkchannel_bool=isfav_TVessn['networkchannel'][item['SeriesStudio']]
+        networkchannel_bool=isfav_TVessn['networkchannel'][series_studio_item_info['Id']]
 
     #Check if episode, season, or series are a favorite
     itemisfav_TVepiseasernet=False
@@ -1809,7 +1820,7 @@ def get_items(server_url, user_keys, auth_key):
     #userkey_count=len(user_keys_json)
     #userbllib_count=len(user_bllib_json)
     #userwllib_count=len(user_wllib_json)
-
+ 
     #establish deletion date for played media items
     cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
     cut_off_date_episode=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_episode)
@@ -2356,7 +2367,7 @@ def get_items(server_url, user_keys, auth_key):
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
             IsPlayedState='True'
-            FieldsState='Id,Path'
+            FieldsState='Id,Path,GenreItems'
             if (cfg.max_age_audio >= 0):
                 IsPlayedState=''
 
@@ -2721,9 +2732,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_movie variable is missing from media_cleaner_config.py\n'
 
@@ -2733,9 +2744,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_episode variable is missing from media_cleaner_config.py\n'
 
@@ -2745,9 +2756,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_video variable is missing from media_cleaner_config.py\n'
 
@@ -2757,9 +2768,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_trailer must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_trailer must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_trailer variable is missing from media_cleaner_config.py\n'
 
@@ -2769,9 +2780,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audio variable is missing from media_cleaner_config.py\n'
 
@@ -2781,9 +2792,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 730500\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audiobook variable is missing from media_cleaner_config.py\n'
 
@@ -2973,11 +2984,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_movie) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_movie variable is missing from media_cleaner_config.py\n'
 
@@ -2986,11 +2997,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_episode) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_episode variable is missing from media_cleaner_config.py\n'
 
@@ -2999,11 +3010,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_video) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_video variable is missing from media_cleaner_config.py\n'
 
@@ -3012,11 +3023,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_trailer) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_trailer variable is missing from media_cleaner_config.py\n'
 
@@ -3025,11 +3036,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_audio) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_audio variable is missing from media_cleaner_config.py\n'
 
@@ -3038,11 +3049,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_audiobook) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
 
@@ -3272,7 +3283,7 @@ except (AttributeError, ModuleNotFoundError):
 #check config values are what we expect them to be
 cfgCheck()
 
-#check if setup to updated the existing config file
+#check if user wants to update the existing config file
 if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
     if (hasattr(cfg, 'script_behavior')):
