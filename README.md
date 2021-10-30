@@ -11,7 +11,7 @@ The first time you run the script it will attempt to create the config file by a
 ```python
 #----------------------------------------------------------#
 # Delete media type once it has been played x days ago
-#   0-365000000 - number of days to wait before deleting played media
+#   0-730500 - number of days to wait before deleting played media
 #  -1 : to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
@@ -119,7 +119,7 @@ UPDATE_CONFIG='FALSE'
 # Use at your own risk; You alone are responsible for your actions
 # Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
 # Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
-#   0-365000000 - number of days to wait before deleting "old" media
+#   0-730500 - number of days to wait before deleting "old" media
 #  -1 : to disable managing max age of specified media type
 # (-1 : default)
 #----------------------------------------------------------#
