@@ -171,6 +171,14 @@ admin_username='Username'
 access_token='0123456789abcdef0123456789abcdef'
 
 #----------------------------------------------------------#
+# Script setup to use the whitelisting method or the blacklistling method; chosen during setup
+#  Only used when run with UPDATE_CONFIG='TRUE'
+# 'whitelist' - Script setup to store whitelisted libraries
+# 'blacklist' - Script setup to store blacklisted libraries
+#----------------------------------------------------------#
+script_behavior='abcd'
+
+#----------------------------------------------------------#
 # User key(s) of account(s) to monitor media items; chosen during setup
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
