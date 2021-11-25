@@ -176,7 +176,7 @@ access_token='0123456789abcdef0123456789abcdef'
 # 'whitelist' - Script setup to store whitelisted libraries
 # 'blacklist' - Script setup to store blacklisted libraries
 #----------------------------------------------------------#
-script_behavior='abcd'
+script_behavior='abclist'
 
 #----------------------------------------------------------#
 # User key(s) of account(s) to monitor media items; chosen during setup
