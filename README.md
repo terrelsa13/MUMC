@@ -219,27 +219,27 @@ DEBUG=0
 ```
 
 # Usage
-Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py".  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
+Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
 
 # Requirements
-* python3
+* python3.x
 * python-dateutil
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # First Run
-* $ /path/to/python3.x /path/to/media_cleaner.py
+* $```/path/to/python3.x /path/to/media_cleaner.py```
 * You may get the below python error if the python-dateutil module is not installed
    - ModuleNotFoundError: No module named 'dateutil' python-dateutil
 * For Debian/Ubuntu/Linux Mint type systems you can install the python-dateutil module with the following commands:
-   - $ sudo apt-get update
-   - $ sudo apt-get upgrade -y
-   - $ sudo apt-get install python3-pip -y
-   - $ sudo pip3 install -U pip
-   - $ sudo pip3 install python-dateutil
+   - $```sudo apt-get update```
+   - $```sudo apt-get upgrade -y```
+   - $```sudo apt-get install python3-pip -y```
+   - $```sudo pip3 install -U pip```
+   - $```sudo pip3 install python-dateutil```
 * For other operating systems
    - Please consult Google
 
 # Donation
-If you find this useful and you would like to support please the use option below.
+If you find this script useful and you would like to show your support, please consider the option below.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
