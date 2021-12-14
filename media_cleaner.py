@@ -599,7 +599,7 @@ def delete_item(itemID):
         print(url)
         print(req)
 
-    #check if in dry-run mode; if remove_files=0 then immediately return with requesting the media item be deleted
+    #check if in dry-run mode; if remove_files=0 then immediately return without requesting the media item be deleted
     if (not bool(cfg.remove_files)):
         return
     else:
@@ -3249,7 +3249,6 @@ def cfgCheck():
     #Bring all errors found to users attention
     if (not error_found_in_media_cleaner_config_py == ''):
         raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
-
 
 ############# START OF SCRIPT #############
 
