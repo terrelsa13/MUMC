@@ -258,7 +258,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
    - $```0 0 * * * /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py```
 * Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
    - $```23 1 * * 1 /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
-   
+
 
 # Donation
 If you find this script useful and you would like to show your support, please consider the option below.
