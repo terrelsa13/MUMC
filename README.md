@@ -238,7 +238,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # Blacklisting vs Whitelisting
-* https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271
+* [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
 
 # First Run
 * $```/path/to/python3.x /path/to/media_cleaner.py```
