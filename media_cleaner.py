@@ -543,8 +543,8 @@ def generate_config(updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
-    config_file += "#  This is especially true when using the max_age_xyz options; the max_age_xyz options require every item of the specified media type send its metadata\n"
-    config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value\n"
+    config_file += "#  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata\n"
+    config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value\n"
     config_file += "#  (100 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
