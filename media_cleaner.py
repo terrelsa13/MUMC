@@ -379,16 +379,16 @@ def generate_config(updateConfig):
     config_file += "#   When single user, script will complete faster, no downside\n"
     config_file += "#   When multiple users, script will complete faster BUT...\n"
     config_file += "#   The script will only be able to keep a media item when a user has set it as a favorite and has played it\n"
-    config_file += "#  1 : Request metadata for played and unplayed media items in monitored libraries\n"
+    config_file += "#  1 : Request metadata for played and not played media items in monitored libraries\n"
     config_file += "#   When single user, script will complete slower, slower is the downside\n"
     config_file += "#   When multiple users, script will complete slower BUT...\n"
     config_file += "#   The script is able to keep a media item when a user has set it as a favortie but has not played it\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
-        config_file += "request_unplayed=1\n"
+        config_file += "request_not_played=1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "request_unplayed=" + str(getattr(cfg, 'request_unplayed')) + "\n"
+        config_file += "request_not_played=" + str(getattr(cfg, 'request_not_played')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1889,7 +1889,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -2021,7 +2021,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -2158,7 +2158,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -2284,7 +2284,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_trailer >= 0) or (cfg.max_age_trailer >= 0)):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -2410,7 +2410,7 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -2550,7 +2550,7 @@ def get_items(server_url, user_keys, auth_key):
            ((cfg.not_played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
            ):
 
-            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
             else:
                 IsPlayedState=''
@@ -3010,16 +3010,16 @@ def cfgCheck():
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'request_unplayed'):
-        check=cfg.request_unplayed
+    if hasattr(cfg, 'request_not_played'):
+        check=cfg.request_not_played
         if (
             not (#(type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: request_unplayed must be an integer; valid values 0 and 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: request_not_played must be an integer; valid values 0 and 1\n'
     #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The request_unplayed variable is missing from media_cleaner_config.py\n'
+        #error_found_in_media_cleaner_config_py+='NameError: The request_not_played variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'remove_files'):
         check=cfg.remove_files
