@@ -98,7 +98,7 @@ multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
 multiuser_whitelist_audiobook=1
 ```
-#### Control if the script will request metadata only for played media items OR played and not played media items":
+#### Control if the script will request metadata only for played media items OR played and not played media items:
 ```python
 #----------------------------------------------------------#
 #  0 : Request metadata only for played media items in monitored libraries
