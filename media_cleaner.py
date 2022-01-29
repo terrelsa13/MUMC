@@ -228,21 +228,22 @@ def generate_config(updateConfig):
         print('-----------------------------------------------------------')
         user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
 
-    userkeys_list=[]
+    userkeys_bllibs_list=[]
     userbllibs_list=[]
     userkeys_wllibs_list=[]
     userwllibs_list=[]
 
     for userkey, userbllib in user_keys_and_bllibs.items():
-        userkeys_list.append(userkey)
+        userkeys_bllibs_list.append(userkey)
         userbllibs_list.append(userbllib)
 
     for userkey, userwllib in user_keys_and_wllibs.items():
         userkeys_wllibs_list.append(userkey)
         userwllibs_list.append(userwllib)
 
-    if (userkeys_list == userkeys_wllibs_list):
-        user_keys=json.dumps(userkeys_list)
+    if (userkeys_bllibs_list == userkeys_wllibs_list):
+        user_keys=json.dumps(userkeys_bllibs_list)
+        #user_keys=json.dumps(userkeys_wllibs_list)
         user_bl_libs=json.dumps(userbllibs_list)
         user_wl_libs=json.dumps(userwllibs_list)
     else:
@@ -374,9 +375,26 @@ def generate_config(updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  0 - Disable the ability to delete media (dry run mode)\n"
-    config_file += "#  1 - Enable the ability to delete media\n"
-    config_file += "# (0 - default)\n"
+    config_file += "#  0 : Request metadata only for played media items in monitored libraries\n"
+    config_file += "#   When single user, script will complete faster, no downside\n"
+    config_file += "#   When multiple users, script will complete faster BUT...\n"
+    config_file += "#   The script will only be able to keep a media item when a user has set it as a favorite and has played it\n"
+    config_file += "#  1 : Request metadata for played and unplayed media items in monitored libraries\n"
+    config_file += "#   When single user, script will complete slower, slower is the downside\n"
+    config_file += "#   When multiple users, script will complete slower BUT...\n"
+    config_file += "#   The script is able to keep a media item when a user has set it as a favortie but has not played it\n"
+    config_file += "# (1 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "request_unplayed=1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "request_unplayed=" + str(getattr(cfg, 'request_unplayed')) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "#  0 : Disable the ability to delete media (dry run mode)\n"
+    config_file += "#  1 : Enable the ability to delete media\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "remove_files=0\n"
@@ -589,6 +607,7 @@ def generate_config(updateConfig):
 
 #api call to delete items
 def delete_item(itemID):
+    #build API delete request for specified media item
     url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
 
     req = request.Request(url,method='DELETE')
@@ -599,7 +618,9 @@ def delete_item(itemID):
         print(url)
         print(req)
 
-    #check if in dry-run mode; if remove_files=0 then immediately return without requesting the media item be deleted
+    #check if in dry-run mode
+    #if remove_files=0; exit this function
+    #else remove_files=1; send request to Emby/Jellyfin to delete specified media item
     if (not bool(cfg.remove_files)):
         return
     else:
@@ -625,7 +646,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.2", Token=""', 'Content-Type' : 'application/json'}
+    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.2.0", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1868,7 +1889,10 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_movie >= 0):
                 IsPlayedState=''
@@ -1946,53 +1970,61 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             movie_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_movie >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_movie > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_movie >= 0) and
-                           (max_cut_off_date_movie <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_movie)) or (not itemisfav_MOVIE)) and
-                           ((not bool(cfg.max_keep_favorites_movie)) or (not itemisfav_MOVIE))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] -     ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] -     ' + item_details)
+                        #Check if media item has been played
+                            #If it has, try to print output
+                            #If it has not, we have already saved what we need above, no need to do anything else
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_movie >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_movie > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_movie >= 0) and
+                            (max_cut_off_date_movie <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_movie)) or (not itemisfav_MOVIE)) and
+                            ((not bool(cfg.max_keep_favorites_movie)) or (not itemisfav_MOVIE))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# Episodes #############
 
         if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path,SeriesStudio'
             if (cfg.max_age_episode >= 0):
                 IsPlayedState=''
@@ -2074,57 +2106,62 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             episode_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_episode >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_episode > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_episode) or (not itemisfav_TVessn)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_episode >= 0) and
-                           (max_cut_off_date_episode <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TVessn)) and
-                           ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_TVessn))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                 ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
-                                                 'EpisodeID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] -   ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                 ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
-                                                 'EpisodeID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] -   ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_episode >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_episode > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_episode) or (not itemisfav_TVessn)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_episode >= 0) and
+                            (max_cut_off_date_episode <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TVessn)) and
+                            ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_TVessn))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
+                                                    'EpisodeID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -   ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
+                                                    'EpisodeID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -   ' + item_details)
 
 ############# Videos #############
 
         if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_video >= 0):
                 IsPlayedState=''
@@ -2199,53 +2236,58 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             video_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_video >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_video > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_video) or not item_info['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_video >= 0) and
-                           (max_cut_off_date_video <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_video)) or (not not item_info['UserData']['IsFavorite'])) and
-                           ((not bool(cfg.max_keep_favorites_video)) or (not item_info['UserData']['IsFavorite']))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] -     ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] -     ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_video >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_video > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_video) or not item_info['UserData']['IsFavorite']) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_video >= 0) and
+                            (max_cut_off_date_video <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_video)) or (not not item_info['UserData']['IsFavorite'])) and
+                            ((not bool(cfg.max_keep_favorites_video)) or (not item_info['UserData']['IsFavorite']))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# Trailers #############
 
         if ((cfg.not_played_age_trailer >= 0) or (cfg.max_age_trailer >= 0)):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_trailer >= 0):
                 IsPlayedState=''
@@ -2320,53 +2362,58 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             trailer_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_trailer >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_trailer > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_trailer) or not item_info['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_trailer >= 0) and
-                           (max_cut_off_date_trailer <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_trailer)) or (not not item_info['UserData']['IsFavorite'])) and
-                           ((not bool(cfg.max_keep_favorites_trailer)) or (not item_info['UserData']['IsFavorite']))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] -   ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] -   ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_trailer >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_trailer > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_trailer) or not item_info['UserData']['IsFavorite']) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_trailer >= 0) and
+                            (max_cut_off_date_trailer <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_trailer)) or (not not item_info['UserData']['IsFavorite'])) and
+                            ((not bool(cfg.max_keep_favorites_trailer)) or (not item_info['UserData']['IsFavorite']))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -   ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -   ' + item_details)
 
 ############# Audio #############
 
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path,GenreItems'
             if (cfg.max_age_audio >= 0):
                 IsPlayedState=''
@@ -2444,51 +2491,53 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audio_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_audio >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_audio > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_audio >= 0) and
-                           (max_cut_off_date_audio <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
-                           ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIOtaa))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] -     ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] -     ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_audio >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_audio > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_audio >= 0) and
+                            (max_cut_off_date_audio <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
+                            ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIOtaa))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# AudioBook#############
 
@@ -2501,7 +2550,10 @@ def get_items(server_url, user_keys, auth_key):
            ((cfg.not_played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
            ):
 
-            IsPlayedState='True'
+            if ((hasattr(cfg, 'request_unplayed')) and (cfg.request_unplayed == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path,Genres,ParentId'
             if (cfg.max_age_audiobook >= 0):
                 IsPlayedState=''
@@ -2579,51 +2631,53 @@ def get_items(server_url, user_keys, auth_key):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audiobook_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_audiobook >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOKtba)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_audiobook >= 0) and
-                           (max_cut_off_date_audiobook <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba)) and
-                           ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+                            
+                            if (
+                            ((cfg.not_played_age_audiobook >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOKtba)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_audiobook >= 0) and
+                            (max_cut_off_date_audiobook <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba)) and
+                            ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] - ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] - ' + item_details)
 
 ############# End Media Types #############
 
@@ -2956,6 +3010,17 @@ def cfgCheck():
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
 
+    if hasattr(cfg, 'request_unplayed'):
+        check=cfg.request_unplayed
+        if (
+            not (#(type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: request_unplayed must be an integer; valid values 0 and 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The request_unplayed variable is missing from media_cleaner_config.py\n'
+
     if hasattr(cfg, 'remove_files'):
         check=cfg.remove_files
         if (
@@ -2967,15 +3032,15 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The remove_files variable is missing from media_cleaner_config.py\n'
 
-    #if hasattr(cfg, 'UPDATE_CONFIG'):
-        #check=cfg.UPDATE_CONFIG
-        #if (
-            #not ((type(check) is str) and
-            #((check == 'TRUE') or
-            #(check == 'FALSE')) and
-            #check.isupper())
-        #):
-            #error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be an all UPPERCASE string; valid values \'TRUE\' and \'FALSE\'\n'
+    if hasattr(cfg, 'UPDATE_CONFIG'):
+        check=cfg.UPDATE_CONFIG
+        if (
+            not (#(type(check) is str) and
+            (check.isupper()) and
+            ((check == 'TRUE') or
+            (check == 'FALSE')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be an all UPPERCASE string; valid values \'TRUE\' and \'FALSE\'\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
 
@@ -3249,6 +3314,7 @@ def cfgCheck():
     #Bring all errors found to users attention
     if (not error_found_in_media_cleaner_config_py == ''):
         raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
+
 
 ############# START OF SCRIPT #############
 
