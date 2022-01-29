@@ -98,6 +98,21 @@ multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
 multiuser_whitelist_audiobook=1
 ```
+#### Control if the script will request metadata only for played media items OR played and not played media items":
+```python
+#----------------------------------------------------------#
+#  0 : Request metadata only for played media items in monitored libraries
+#   When single user, script will complete faster, no downside
+#   When multiple users, script will complete faster BUT...
+#   The script will only be able to keep a media item when a user has set it as a favorite and has played it
+#  1 : Request metadata for played and not played media items in monitored libraries
+#   When single user, script will complete slower, slower is the downside
+#   When multiple users, script will complete slower BUT...
+#   The script is able to keep a media item when a user has set it as a favortie but has not played it
+# (1 : default)
+#----------------------------------------------------------#
+request_not_played=1
+```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
 #----------------------------------------------------------#
