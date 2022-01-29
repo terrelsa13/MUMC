@@ -1,6 +1,8 @@
+
+
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, and audio for the specified user(s); deleting any media past the specified played age cut off.
+This script will go through all played movies, tv episodes, videos, trailers, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media past the specified days since played cut off.
 
 # Configuration
 ## media_cleaner_config.py
@@ -11,8 +13,8 @@ The first time you run the script it will attempt to create the config file by a
 ```python
 #----------------------------------------------------------#
 # Delete media type once it has been played x days ago
-#   0-365000000 - number of days to wait before deleting played media
-#  -1 : to disable managing specified media type
+#   0-730500 - number of days to wait before deleting played media
+#  -1 - to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
 not_played_age_movie=-1
@@ -29,9 +31,9 @@ not_played_age_audiobook=-1
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
 # Similar logic applies for other media types (movies, trailers, etc...)
-#  0 : ok to delete media items set as a favorite
-#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
-#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
+#  0 - ok to delete media items set as a favorite
+#  1 - when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
+#  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
 keep_favorites_movie=1
@@ -58,7 +60,7 @@ keep_favorites_audiobook=1
 #  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited
 #  0 bit - disabled
 #  1 bit - enabled
-# (0001000001 - default)
+# (0001000001 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced='0001000001'
 ```
@@ -79,7 +81,7 @@ keep_favorites_advanced='0001000001'
 #  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata
 #  0 bit - disabled
 #  1 bit - enabled
-# (0000000000 - default)
+# (0000000000 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_any='0000000000'
 ```
@@ -87,8 +89,8 @@ keep_favorites_advanced_any='0000000000'
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
-#  0 : do not delete media item when ALL monitored users have the parent library whitelisted
-#  1 : do not delete media item when ANY monitored users have the parent library whitelisted
+#  0 - do not delete media item when ALL monitored users have the parent library whitelisted
+#  1 - do not delete media item when ANY monitored users have the parent library whitelisted
 # (1 : default)
 #----------------------------------------------------------#
 multiuser_whitelist_movie=1
@@ -98,14 +100,40 @@ multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
 multiuser_whitelist_audiobook=1
 ```
+#### Control if the script will request metadata only for played media items OR played and not played media items:
+```python
+#----------------------------------------------------------#
+#  0 - Request metadata only for played media items in monitored libraries
+#   When single user, script will complete faster, no downside
+#   When multiple users, script will complete faster BUT...
+#   The script will only be able to keep a media item when a user has set it as a favorite and has played it
+#  1 - Request metadata for played and not played media items in monitored libraries
+#   When single user, script will complete slower, slower is the downside
+#   When multiple users, script will complete slower BUT...
+#   The script is able to keep a media item when a user has set it as a favortie but has not played it
+# (1 : default)
+#----------------------------------------------------------#
+request_not_played=1
+```
 #### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
 ```python
 #----------------------------------------------------------#
 # 0 - Disable the ability to delete media (dry run mode)
 # 1 - Enable the ability to delete media
-# (0 - default)
+# (0 : default)
 #----------------------------------------------------------#
 remove_files=0
+```
+#### Allows adding new users and their associated libraries to the existing config without deleting it; Set to 'FALSE' when ready for "production":
+```python
+#----------------------------------------------------------#
+# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
+# Does not show existing users in the choice list; but existing users can be updated if you know their position
+#  FALSE - Operate as configured
+#  TRUE  - Allow adding new users to existing config; will NOT delete media items
+# (FALSE : default)
+#----------------------------------------------------------#
+UPDATE_CONFIG='FALSE'
 ```
 #### When enabled, media items will be deleted based on DateCreated; played state will be ignored:
 ```python
@@ -115,8 +143,8 @@ remove_files=0
 # Use at your own risk; You alone are responsible for your actions
 # Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
 # Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
-#   0-365000000 - number of days to wait before deleting "old" media
-#  -1 : to disable managing max age of specified media type
+#   0-730500 - number of days to wait before deleting "old" media
+#  -1 - to disable managing max age of specified media type
 # (-1 : default)
 #----------------------------------------------------------#
 max_age_movie=-1
@@ -130,8 +158,8 @@ max_age_audiobook=-1
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
-#  0 : ok to delete max age media items set as a favorite
-#  1 : do not delete max age media items when set as a favorite
+#  0 - ok to delete max age media items set as a favorite
+#  1 - do not delete max age media items when set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
 max_keep_favorites_movie=1
@@ -167,6 +195,14 @@ admin_username='username'
 # Access token; requested from server during setup
 #----------------------------------------------------------#
 access_token='0123456789abcdef0123456789abcdef'
+
+#----------------------------------------------------------#
+# Script setup to use the whitelisting method or the blacklistling method; chosen during setup
+#  Only used when run with UPDATE_CONFIG='TRUE'
+# 'whitelist' - Script setup to store whitelisted libraries
+# 'blacklist' - Script setup to store blacklisted libraries
+#----------------------------------------------------------#
+script_behavior='abclist'
 
 #----------------------------------------------------------#
 # User key(s) of account(s) to monitor media items; chosen during setup
@@ -211,10 +247,10 @@ DEBUG=0
 ```
 
 # Usage
-Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py".  If no conifg file is found it will prompt you to create one.  Once done you can run the script again to view files that will be deleted
+Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
 
 # Requirements
-* python3
+* python3.x
 * python-dateutil
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
@@ -235,13 +271,13 @@ Make media_cleaner.py executable and run "python3.x /path/to/media_cleaner.py". 
    - Please consult Google
 
 # Scheduled Run Using Crontab
-* Below cron entry runs script everyday at 00:00hrs (aka 12AM)
+* Below cron entry runs the script everyday at 00:00hrs (aka 12AM)
    - $```0 0 * * * /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py```
-* Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
+* Below cron entry runs the script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
    - $```23 1 * * 1 /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
 
 
 # Donation
-If you find this useful and you would like to support please the use option below.
+If you find this script useful and you would like to show your support, please consider the option below.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)

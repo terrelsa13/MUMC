@@ -129,11 +129,8 @@ def get_cleaning_behavior():
     defaultbehavior='whitelist'
     valid_behavior=False
     while (valid_behavior == False):
-        #print('Choose how the script will decide which libraries to delete media items from.')
         print('Decide how the script will treat libraries for the user(s) choosen in the next step.')
-        #print('0 - Whitelisting media libraries; media items can be deleted from library unless library is whitelisted.')
         print('0 - Whitelist Media Libraries - Media items in the libraries you choose will NOT be allowed to be deleted.')
-        #print('1 - Blacklisting media libraries; media items cannot be deleted from library unless library is blacklisted (aka monitored).')
         print('1 - Blacklist Media Libraries - Media items in the libraries you choose will be allowed to be deleted.')
         behavior=input('Choose how the script will behave. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
@@ -150,6 +147,33 @@ def get_cleaning_behavior():
             return(defaultbehavior)
 
 
+def get_not_played_age(mediaType):
+    defaultage=-1
+    valid_age=False
+    while (valid_age == False):
+        print('Choose the number of days to wait before deleting played ' + mediaType + ' media items')
+        print('Valid values: 0-730500 days')
+        print('             -1 to disable deleting ' + mediaType + ' media items')
+        age=input('Enter number of days (default ' + str(defaultage) + '): ')
+        if (age == ''):
+            valid_age=True
+            return(defaultage)
+        else:
+            try:
+                age_float=float(age)
+                if ((age_float % 1) == 0):
+                    age_int=int(age_float)
+                    if ((int(age_int) >= -1) and (int(age_int) <= 730500)):
+                        valid_age=True
+                        return(age_int)
+                    else:
+                        print('\nInvalid ' + mediaType + ' age. Try again.\n')
+                else:
+                    print('\nInvalid ' + mediaType + ' age. Try again.\n')
+            except:
+                print('\nInvalid ' + mediaType + ' age. Try again.\n')
+
+
 #use of hashed password removed
 #hash admin password
 #def get_admin_password_sha1(password):
@@ -159,48 +183,67 @@ def get_cleaning_behavior():
 
 
 #get user input needed to build the media_cleaner_config.py file
-def generate_config():
-    print('-----------------------------------------------------------')
-    server_brand=get_brand()
+def generate_config(updateConfig):
+    if (updateConfig == 'FALSE'):
+        print('-----------------------------------------------------------')
+        server_brand=get_brand()
 
-    print('-----------------------------------------------------------')
-    server=get_url()
-    print('-----------------------------------------------------------')
-    port=get_port()
-    print('-----------------------------------------------------------')
-    server_base=get_base(server_brand)
-    if (len(port)):
-        server_url=server + ':' + port + '/' + server_base
-    else:
-        server_url=server + '/' + server_base
-    print('-----------------------------------------------------------')
+        print('-----------------------------------------------------------')
+        server=get_url()
+        print('-----------------------------------------------------------')
+        port=get_port()
+        print('-----------------------------------------------------------')
+        server_base=get_base(server_brand)
+        if (len(port)):
+            server_url=server + ':' + port + '/' + server_base
+        else:
+            server_url=server + '/' + server_base
+        print('-----------------------------------------------------------')
 
-    username=get_admin_username()
-    print('-----------------------------------------------------------')
-    password=get_admin_password()
-    print('-----------------------------------------------------------')
-    auth_key=get_auth_key(server_url, username, password, server_brand)
+        username=get_admin_username()
+        print('-----------------------------------------------------------')
+        password=get_admin_password()
+        print('-----------------------------------------------------------')
+        auth_key=get_auth_key(server_url, username, password, server_brand)
 
-    script_behavior=get_cleaning_behavior()
-    print('-----------------------------------------------------------')
+        script_behavior=get_cleaning_behavior()
+        print('-----------------------------------------------------------')
 
-    user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(server_url, auth_key, script_behavior)
+        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
+        print('-----------------------------------------------------------')
 
-    userkeys_list=[]
+        not_played_age_movie = get_not_played_age('movie')
+        print('-----------------------------------------------------------')
+        not_played_age_episode = get_not_played_age('episode')
+        print('-----------------------------------------------------------')
+        not_played_age_video = get_not_played_age('video')
+        print('-----------------------------------------------------------')
+        not_played_age_trailer = get_not_played_age('trailer')
+        print('-----------------------------------------------------------')
+        not_played_age_audio = get_not_played_age('audio')
+        if (server_brand == 'jellyfin'):
+            print('-----------------------------------------------------------')
+            not_played_age_audiobook = get_not_played_age('audiobook')
+    else:       
+        print('-----------------------------------------------------------')
+        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
+
+    userkeys_bllibs_list=[]
     userbllibs_list=[]
     userkeys_wllibs_list=[]
     userwllibs_list=[]
 
     for userkey, userbllib in user_keys_and_bllibs.items():
-        userkeys_list.append(userkey)
+        userkeys_bllibs_list.append(userkey)
         userbllibs_list.append(userbllib)
 
     for userkey, userwllib in user_keys_and_wllibs.items():
         userkeys_wllibs_list.append(userkey)
         userwllibs_list.append(userwllib)
 
-    if (userkeys_list == userkeys_wllibs_list):
-        user_keys=json.dumps(userkeys_list)
+    if (userkeys_bllibs_list == userkeys_wllibs_list):
+        user_keys=json.dumps(userkeys_bllibs_list)
+        #user_keys=json.dumps(userkeys_wllibs_list)
         user_bl_libs=json.dumps(userbllibs_list)
         user_wl_libs=json.dumps(userwllibs_list)
     else:
@@ -211,17 +254,26 @@ def generate_config():
     config_file=''
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Delete media type once it has been played x days ago\n"
-    config_file += "#   0-365000000 - number of days to wait before deleting played media\n"
-    config_file += "#  -1 : to disable managing specified media type\n"
+    config_file += "#   0-730500 - number of days to wait before deleting played media\n"
+    config_file += "#  -1 - to disable managing specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "not_played_age_movie=-1\n"
-    config_file += "not_played_age_episode=-1\n"
-    config_file += "not_played_age_video=-1\n"
-    config_file += "not_played_age_trailer=-1\n"
-    config_file += "not_played_age_audio=-1\n"
-    if (server_brand == 'jellyfin'):
-        config_file += "not_played_age_audiobook=-1\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "not_played_age_movie=" + str(not_played_age_movie) + "\n"
+        config_file += "not_played_age_episode=" + str(not_played_age_episode) + "\n"
+        config_file += "not_played_age_video=" + str(not_played_age_video) + "\n"
+        config_file += "not_played_age_trailer=" + str(not_played_age_trailer) + "\n"
+        config_file += "not_played_age_audio=" + str(not_played_age_audio) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "not_played_age_audiobook=" + str(not_played_age_audiobook) + "\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "not_played_age_movie=" + str(getattr(cfg, 'not_played_age_movie')) + "\n"
+        config_file += "not_played_age_episode=" + str(getattr(cfg, 'not_played_age_episode')) + "\n"
+        config_file += "not_played_age_video=" + str(getattr(cfg, 'not_played_age_video')) + "\n"
+        config_file += "not_played_age_trailer=" + str(getattr(cfg, 'not_played_age_trailer')) + "\n"
+        config_file += "not_played_age_audio=" + str(getattr(cfg, 'not_played_age_audio')) + "\n"
+        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'not_played_age_audiobook'))):
+            config_file += "not_played_age_audiobook=" + str(getattr(cfg, 'not_played_age_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -229,18 +281,27 @@ def generate_config():
     config_file += "# Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites\n"
     config_file += "# Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites\n"
     config_file += "# Similar logic applies for other media types (movies, trailers, etc...)\n"
-    config_file += "#  0 : ok to delete media items set as a favorite\n"
-    config_file += "#  1 : when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite\n"
-    config_file += "#  2 : when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite\n"
+    config_file += "#  0 - ok to delete media items set as a favorite\n"
+    config_file += "#  1 - when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite\n"
+    config_file += "#  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "keep_favorites_movie=1\n"
-    config_file += "keep_favorites_episode=1\n"
-    config_file += "keep_favorites_video=1\n"
-    config_file += "keep_favorites_trailer=1\n"
-    config_file += "keep_favorites_audio=1\n"
-    if (server_brand == 'jellyfin'):
-        config_file += "keep_favorites_audiobook=1\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "keep_favorites_movie=1\n"
+        config_file += "keep_favorites_episode=1\n"
+        config_file += "keep_favorites_video=1\n"
+        config_file += "keep_favorites_trailer=1\n"
+        config_file += "keep_favorites_audio=1\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "keep_favorites_audiobook=1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_movie=" + str(getattr(cfg, 'keep_favorites_movie')) + "\n"
+        config_file += "keep_favorites_episode=" + str(getattr(cfg, 'keep_favorites_episode')) + "\n"
+        config_file += "keep_favorites_video=" + str(getattr(cfg, 'keep_favorites_video')) + "\n"
+        config_file += "keep_favorites_trailer=" + str(getattr(cfg, 'keep_favorites_trailer')) + "\n"
+        config_file += "keep_favorites_audio=" + str(getattr(cfg, 'keep_favorites_audio')) + "\n"
+        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'keep_favorites_audiobook'))):
+            config_file += "keep_favorites_audiobook=" + str(getattr(cfg, 'keep_favorites_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -258,9 +319,12 @@ def generate_config():
     config_file += "#  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited\n"
     config_file += "#  0 bit - disabled\n"
     config_file += "#  1 bit - enabled\n"
-    config_file += "# (0001000001 - default)\n"
+    config_file += "# (0001000001 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "keep_favorites_advanced='0001000001'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "keep_favorites_advanced='0001000001'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_advanced='" + getattr(cfg, 'keep_favorites_advanced') + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -278,32 +342,77 @@ def generate_config():
     config_file += "#  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata\n"
     config_file += "#  0 bit - disabled\n"
     config_file += "#  1 bit - enabled\n"
-    config_file += "# (0000000000 - default)\n"
+    config_file += "# (0000000000 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "keep_favorites_advanced_any='0000000000'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "keep_favorites_advanced_any='0000000000'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_advanced_any='" + getattr(cfg, 'keep_favorites_advanced_any') + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how whitelists with multiple users behave\n"
-    config_file += "#  0 : do not delete media item when ALL monitored users have the parent library whitelisted\n"
-    config_file += "#  1 : do not delete media item when ANY monitored users have the parent library whitelisted\n"
+    config_file += "#  0 - do not delete media item when ALL monitored users have the parent library whitelisted\n"
+    config_file += "#  1 - do not delete media item when ANY monitored users have the parent library whitelisted\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "multiuser_whitelist_movie=1\n"
-    config_file += "multiuser_whitelist_episode=1\n"
-    config_file += "multiuser_whitelist_video=1\n"
-    config_file += "multiuser_whitelist_trailer=1\n"
-    config_file += "multiuser_whitelist_audio=1\n"
-    if (server_brand == 'jellyfin'):
-        config_file += "multiuser_whitelist_audiobook=1\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "multiuser_whitelist_movie=1\n"
+        config_file += "multiuser_whitelist_episode=1\n"
+        config_file += "multiuser_whitelist_video=1\n"
+        config_file += "multiuser_whitelist_trailer=1\n"
+        config_file += "multiuser_whitelist_audio=1\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "multiuser_whitelist_audiobook=1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "multiuser_whitelist_movie=" + str(getattr(cfg, 'multiuser_whitelist_movie')) + "\n"
+        config_file += "multiuser_whitelist_episode=" + str(getattr(cfg, 'multiuser_whitelist_episode')) + "\n"
+        config_file += "multiuser_whitelist_video=" + str(getattr(cfg, 'multiuser_whitelist_video')) + "\n"
+        config_file += "multiuser_whitelist_trailer=" + str(getattr(cfg, 'multiuser_whitelist_trailer')) + "\n"
+        config_file += "multiuser_whitelist_audio=" + str(getattr(cfg, 'multiuser_whitelist_audio')) + "\n"
+        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'multiuser_whitelist_audiobook'))):
+            config_file += "multiuser_whitelist_audiobook=" + str(getattr(cfg, 'multiuser_whitelist_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# 0 - Disable the ability to delete media (dry run mode)\n"
-    config_file += "# 1 - Enable the ability to delete media\n"
-    config_file += "# (0 - default)\n"
+    config_file += "#  0 - Request metadata only for played media items in monitored libraries\n"
+    config_file += "#   When single user, script will complete faster, no downside\n"
+    config_file += "#   When multiple users, script will complete faster BUT...\n"
+    config_file += "#   The script will only be able to keep a media item when a user has set it as a favorite and has played it\n"
+    config_file += "#  1 - Request metadata for played and not played media items in monitored libraries\n"
+    config_file += "#   When single user, script will complete slower, slower is the downside\n"
+    config_file += "#   When multiple users, script will complete slower BUT...\n"
+    config_file += "#   The script is able to keep a media item when a user has set it as a favortie but has not played it\n"
+    config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "remove_files=0\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "request_not_played=1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "request_not_played=" + str(getattr(cfg, 'request_not_played')) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "#  0 - Disable the ability to delete media (dry run mode)\n"
+    config_file += "#  1 - Enable the ability to delete media\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "remove_files=0\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "remove_files=" + str(getattr(cfg, 'remove_files')) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters\n"
+    config_file += "# Does not show existing users in the choice list; but existing users can be updated if you know their position\n"
+    config_file += "#  FALSE - Operate as configured\n"
+    config_file += "#  TRUE  - Allow adding new users to existing config; will NOT delete media items\n"
+    config_file += "# (FALSE : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "UPDATE_CONFIG='FALSE'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "UPDATE_CONFIG='" + str(getattr(cfg, 'UPDATE_CONFIG')) + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -312,32 +421,50 @@ def generate_config():
     config_file += "# Use at your own risk; You alone are responsible for your actions\n"
     config_file += "# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY\n"
     config_file += "# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz\n"
-    config_file += "#   0-365000000 - number of days to wait before deleting \"old\" media\n"
-    config_file += "#  -1 : to disable managing max age of specified media type\n"
+    config_file += "#   0-730500 - number of days to wait before deleting \"old\" media\n"
+    config_file += "#  -1 - to disable managing max age of specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "max_age_movie=-1\n"
-    config_file += "max_age_episode=-1\n"
-    config_file += "max_age_video=-1\n"
-    config_file += "max_age_trailer=-1\n"
-    config_file += "max_age_audio=-1\n"
-    if (server_brand == 'jellyfin'):
-        config_file += "max_age_audiobook=-1\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "max_age_movie=-1\n"
+        config_file += "max_age_episode=-1\n"
+        config_file += "max_age_video=-1\n"
+        config_file += "max_age_trailer=-1\n"
+        config_file += "max_age_audio=-1\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "max_age_audiobook=-1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "max_age_movie=" + str(getattr(cfg, 'max_age_movie')) + "\n"
+        config_file += "max_age_episode=" + str(getattr(cfg, 'max_age_episode')) + "\n"
+        config_file += "max_age_video=" + str(getattr(cfg, 'max_age_video')) + "\n"
+        config_file += "max_age_trailer=" + str(getattr(cfg, 'max_age_trailer')) + "\n"
+        config_file += "max_age_audio=" + str(getattr(cfg, 'max_age_audio')) + "\n"
+        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
+            config_file += "max_age_audiobook=" + str(getattr(cfg, 'max_age_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide if max age media set as a favorite should be deleted\n"
-    config_file += "#  0 : ok to delete max age media items set as a favorite\n"
-    config_file += "#  1 : do not delete max age media items when set as a favorite\n"
+    config_file += "#  0 - ok to delete max age media items set as a favorite\n"
+    config_file += "#  1 - do not delete max age media items when set as a favorite\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "max_keep_favorites_movie=1\n"
-    config_file += "max_keep_favorites_episode=1\n"
-    config_file += "max_keep_favorites_video=1\n"
-    config_file += "max_keep_favorites_trailer=1\n"
-    config_file += "max_keep_favorites_audio=1\n"
-    if (server_brand == 'jellyfin'):
-        config_file += "max_keep_favorites_audiobook=1\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "max_keep_favorites_movie=1\n"
+        config_file += "max_keep_favorites_episode=1\n"
+        config_file += "max_keep_favorites_video=1\n"
+        config_file += "max_keep_favorites_trailer=1\n"
+        config_file += "max_keep_favorites_audio=1\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "max_keep_favorites_audiobook=1\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "max_keep_favorites_movie=" + str(getattr(cfg, 'max_keep_favorites_movie')) + "\n"
+        config_file += "max_keep_favorites_episode=" + str(getattr(cfg, 'max_keep_favorites_episode')) + "\n"
+        config_file += "max_keep_favorites_video=" + str(getattr(cfg, 'max_keep_favorites_video')) + "\n"
+        config_file += "max_keep_favorites_trailer=" + str(getattr(cfg, 'max_keep_favorites_trailer')) + "\n"
+        config_file += "max_keep_favorites_audio=" + str(getattr(cfg, 'max_keep_favorites_audio')) + "\n"
+        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
+            config_file += "max_keep_favorites_audiobook=" + str(getattr(cfg, 'max_keep_favorites_audiobook')) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -347,22 +474,45 @@ def generate_config():
     config_file += "#  0 - 'emby'\n"
     config_file += "#  1 - 'jellyfin'\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "server_brand='" + server_brand + "'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "server_brand='" + server_brand + "'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "server_brand='" + getattr(cfg, 'server_brand') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Server URL; created during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "server_url='" + server_url + "'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "server_url='" + server_url + "'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "server_url='" + getattr(cfg, 'server_url') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Admin username; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "admin_username='" + username + "'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "admin_username='" + username + "'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "admin_username='" + getattr(cfg, 'admin_username') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Access token; requested from server during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "access_token='" + auth_key + "'\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "access_token='" + auth_key + "'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "access_token='" + getattr(cfg, 'access_token') + "'\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Script setup to use the whitelisting method or the blacklistling method; chosen during setup\n"
+    config_file += "#  Only used when run with UPDATE_CONFIG='TRUE'\n"
+    config_file += "# 'whitelist' - Script setup to store whitelisted libraries\n"
+    config_file += "# 'blacklist' - Script setup to store blacklisted libraries\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "script_behavior='" + script_behavior + "'\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "script_behavior='" + getattr(cfg, 'script_behavior') + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User key(s) of account(s) to monitor media items; chosen during setup\n"
@@ -370,28 +520,26 @@ def generate_config():
     config_file += "user_keys='" + user_keys + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    #config_file += "# Script is using whitelists or blacklists; chosen during setup\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #config_file += "script_behavior='" + script_behavior + "'\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup\n"
+    config_file += "# User blacklisted libraries of corresponding user keys(s) to monitor media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_bl_libs='" + user_bl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup\n"
+    config_file += "# User whitelisted libraries of corresponding user key(s) to exclude monitoring media items; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API request attempts; number of times to retry an API request\n"
     config_file += "#  delay between initial attempt and the first retry is 1 second\n"
-    config_file += "#  the delay will double with each attempt after the first retry\n"
+    config_file += "#  The delay will double with each attempt after the first retry\n"
     config_file += "#  0-16 - number of retry attempts\n"
     config_file += "#  (6 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "api_request_attempts=6\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "api_request_attempts=6\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "api_request_attempts=" + str(getattr(cfg, 'api_request_attempts')) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
@@ -399,14 +547,20 @@ def generate_config():
     config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL items will be processed regardless of this value\n"
     config_file += "#  (100 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "api_return_limit=100\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "api_return_limit=100\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "api_return_limit=" + str(getattr(cfg, 'api_return_limit')) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# 0 - Debug messages disabled\n"
     config_file += "# 1 - Debug messages enabled\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "DEBUG=0\n"
+    if (updateConfig == 'FALSE'):
+        config_file += "DEBUG=0\n"
+    elif (updateConfig == 'TRUE'):
+        config_file += "DEBUG=" + str(getattr(cfg, 'DEBUG')) + "\n"    
 
     #Create config file next to the script even when cwd (Current Working Directory) is not the same
     cwd = os.getcwd()
@@ -421,30 +575,39 @@ def generate_config():
     f.close()
     os.chdir(cwd)
 
-    print('\n\n-----------------------------------------------------------')
-    print('Config file is not setup to find played media.')
-    print('-----------------------------------------------------------')
-    print('To find played media open media_cleaner_config.py in a text editor:')
-    print('    Set \'not_played_age_movie\' to zero or a positive number')
-    print('    Set \'not_played_age_episode\' to zero or a positive number')
-    print('    Set \'not_played_age_video\' to zero or a positive number')
-    print('    Set \'not_played_age_trailer\' to zero or a positive number')
-    print('    Set \'not_played_age_audio\' to zero or a positive number')
-    if (server_brand == 'jellyfin'):
-        print('    Set \'not_played_age_audiobook\' to zero or a positive number')
-    print('-----------------------------------------------------------')
-    print('Config file is not setup to delete played media.')
-    print('Config file is in dry run mode to prevent deleting media.')
-    print('-----------------------------------------------------------')
-    print('To delete media open media_cleaner_config.py in a text editor:')
-    print('    Set \'remove_files=1\' in media_cleaner_config.py')
-    print('-----------------------------------------------------------')
-    print('Edit the media_cleaner_config.py file and try running again.')
-    print('-----------------------------------------------------------')
+    if (updateConfig == 'FALSE'):
+        if ((cfg.not_played_age_movie == -1) and
+            (cfg.not_played_age_episode == -1) and
+            (cfg.not_played_age_video == -1) and
+            (cfg.not_played_age_trailer == -1) and
+            (cfg.not_played_age_audio == -1) and
+            ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook')))):
+                print('\n\n-----------------------------------------------------------')
+                print('Config file is not setup to find played media.')
+                print('-----------------------------------------------------------')
+                print('To find played media open media_cleaner_config.py in a text editor:')
+                print('    Set \'not_played_age_movie\' to zero or a positive number')
+                print('    Set \'not_played_age_episode\' to zero or a positive number')
+                print('    Set \'not_played_age_video\' to zero or a positive number')
+                print('    Set \'not_played_age_trailer\' to zero or a positive number')
+                print('    Set \'not_played_age_audio\' to zero or a positive number')
+                if (server_brand == 'jellyfin'):
+                    print('    Set \'not_played_age_audiobook\' to zero or a positive number')
+        if (cfg.remove_files == 0):
+            print('-----------------------------------------------------------')
+            print('Config file is not setup to delete played media.')
+            print('Config file is in dry run mode to prevent deleting media.')
+            print('-----------------------------------------------------------')
+            print('To delete media open media_cleaner_config.py in a text editor:')
+            print('    Set \'remove_files=1\' in media_cleaner_config.py')
+        print('-----------------------------------------------------------')
+        print('Edit the media_cleaner_config.py file and try running again.')
+        print('-----------------------------------------------------------')
 
 
 #api call to delete items
 def delete_item(itemID):
+    #build API delete request for specified media item
     url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
 
     req = request.Request(url,method='DELETE')
@@ -454,14 +617,18 @@ def delete_item(itemID):
         print(itemID)
         print(url)
         print(req)
-    if bool(cfg.remove_files):
+
+    #check if in dry-run mode
+    #if remove_files=0; exit this function
+    #else remove_files=1; send request to Emby/Jellyfin to delete specified media item
+    if (not bool(cfg.remove_files)):
+        return
+    else:
         try:
             request.urlopen(req)
         except Exception:
             print('generic exception: ' + traceback.format_exc())
-        return
-    else:
-        return
+        return        
 
 
 #api call to get admin account authentication token
@@ -479,7 +646,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.0.2", Token=""', 'Content-Type' : 'application/json'}
+    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.2.0", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -493,9 +660,9 @@ def get_auth_key(server_url, username, password, server_brand):
 
 
 #api call to get all user accounts
-#then choose account this script will use to delete played media
-#choosen account does NOT need to have "Allow Media Deletion From" enabled
-def get_users_and_libraries(server_url, auth_key, script_behavior):
+#then choose account(s) this script will use to delete played media
+#choosen account(s) do NOT need to have "Allow Media Deletion From" enabled
+def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig):
     #Get all users
 
     req=(server_url + '/Users?api_key=' + auth_key)
@@ -509,11 +676,51 @@ def get_users_and_libraries(server_url, auth_key, script_behavior):
     #define empty userId dictionary
     userId_dict={}
     #define empty monitored library dictionary
-    userId_lib_dict={}
+    userId_bllib_dict={}
     #define empty whitelisted library dictionary
     userId_wllib_dict={}
     #define empty userId set
     userId_set=set()
+
+    user_keys_json=''
+    user_wl_libs_json=''
+    user_bl_libs_json=''
+
+    #Check if not running for the first time
+    if (updateConfig == 'TRUE'):
+        #load user_keys to json
+        user_keys_json=json.loads(cfg.user_keys)
+        #load user_wl_libs to json
+        user_wl_libs_json=json.loads(cfg.user_wl_libs)
+        #load user_bl_libs to json
+        user_bl_libs_json=json.loads(cfg.user_bl_libs)
+
+        #get number of user_keys
+        userkey_count=len(user_keys_json)
+        #get number of user_keys
+        user_wllibs_count=len(user_wl_libs_json)
+        #get number of user_keys
+        user_bllibs_count=len(user_bl_libs_json)
+
+        if (userkey_count != user_wllibs_count):
+            raise ValueError('\nValueError: Number of entries in user_key and number of entries in user_bl_libs does NOT match')
+        elif(userkey_count != user_bllibs_count):
+            raise ValueError('\nValueError: Number of entries in user_key and number of entries in user_wl_libs does NOT match')
+
+        i=0
+        #Pre-populate the existing userkeys and libraries so only new users are shown
+        for rerun_userkey in user_keys_json:
+            userId_set.add(rerun_userkey)
+            userId_wllib_dict[rerun_userkey]=user_wl_libs_json[i]
+            userId_bllib_dict[rerun_userkey]=user_bl_libs_json[i]
+            i += 1
+
+        if ((len(user_keys_json)) == (len(data))):
+            print('-----------------------------------------------------------')
+            print('No new user(s) found.')
+            print('-----------------------------------------------------------')
+            print('Verify new user(s) added to the Emby/Jellyfin server.')
+            return(userId_bllib_dict, userId_wllib_dict)
 
     stop_loop=False
     single_user=False
@@ -543,7 +750,6 @@ def get_users_and_libraries(server_url, auth_key, script_behavior):
             print('')
         else: #((i >= 1) and (one_user_selected == True)):
             print('Monitoring multiple users is possible.')
-            #print('When multiple users are selected; the user with the longest played since time will determine if media is deleted.')
             print('When multiple users are selected; the user with the oldest last played time will determine if media is deleted.')
             user_number=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
             print('')
@@ -557,10 +763,10 @@ def get_users_and_libraries(server_url, auth_key, script_behavior):
 
                 if (script_behavior == 'blacklist'):
                     message='Enter number of library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
+                    userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
                     userId_wllib_dict[userId_dict[user_number_int]]=''
                 else:
-                    userId_lib_dict[userId_dict[user_number_int]]=''
+                    userId_bllib_dict[userId_dict[user_number_int]]=''
                     message='Enter number of library folder to whitelist for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
                     userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, False)
 
@@ -579,10 +785,10 @@ def get_users_and_libraries(server_url, auth_key, script_behavior):
 
                     if (script_behavior == 'blacklist'):
                         message='Enter number of library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                        userId_lib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
+                        userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, True)
                         userId_wllib_dict[userId_dict[user_number_int]]=''
                     else:
-                        userId_lib_dict[userId_dict[user_number_int]]=''
+                        userId_bllib_dict[userId_dict[user_number_int]]=''
                         message='Enter number of library folder to whitelist for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
                         userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url, auth_key, message, False)
 
@@ -597,7 +803,7 @@ def get_users_and_libraries(server_url, auth_key, script_behavior):
         except:
             print('\nInvalid value. Try again.\n')
 
-    return(userId_lib_dict, userId_wllib_dict)
+    return(userId_bllib_dict, userId_wllib_dict)
 
 
 #api call to get library folders
@@ -643,8 +849,6 @@ def list_library_folders(server_url, auth_key, infotext, mandatory):
         print('')
 
         if (i >= 1):
-            #print('Enter number of library folder to whitelist.')
-            #print('Media in whitelisted library folders will NOT be deleted.')
             print(infotext)
             if ((mandatory) and (first_run)):
                 first_run=False
@@ -804,7 +1008,7 @@ def requestURL(url, debugBool, debugMessage, retries):
                         #DEBUG
                         print(debugMessage)
                         print2json(data)
-                    return(data)
+                    #return(data)
                 except Exception as err:
                     time.sleep(delay)
                     #delay value doubles each time the same API request is resent
@@ -816,13 +1020,13 @@ def requestURL(url, debugBool, debugMessage, retries):
                 getdata = False
                 print('An error occurred while attempting to retrieve data from the API.')
                 return('Attempt to get data at: ' + debugMessage + '. Server responded with code: ' + str(response.getcode()))
+    return(data)
 
 
 #get additional item info needed to determine if parent of item is favorite
 #get additional item info needed to determine if media item is in whitelist
 def get_additional_item_info(server_url, user_key, itemId, auth_key, lookupTopic):
     #Get additonal item information
-    #url=server_url + '/Users/' + user_key  + '/Items/' + str(itemId) + '?fields=SeriesStudio,Studios,Genres,Path&enableImages=False&api_key=' + auth_key
     url=server_url + '/Users/' + user_key  + '/Items/' + str(itemId) + '?enableImages=False&api_key=' + auth_key
 
     if bool(cfg.DEBUG):
@@ -1064,12 +1268,14 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
             if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
                 if (adv_settings & albumgenre_mask):
                     if not (adv_settings_any & albumgenre_any_mask):
-                        if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        #if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                        if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
                             print('  ' + lookupTopicAlbum.title() + 'Genre is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]))
                     else:
                         i=0
                         for albumgenre in range(len(album_item_info['GenreItems'])):
-                            if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            #if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                            if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
                                 print(' ' + lookupTopicAlbum.title() + 'Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]))
                                 i+=1
 
@@ -1151,13 +1357,15 @@ def get_isfav_AUDIOtaa(isfav_AUDIOtaa, item, server_url, user_key, auth_key, ite
         if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
             if (adv_settings & albumgenre_mask):
                 if not (adv_settings_any & albumgenre_any_mask):
-                    if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    #if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
+                    if not (album_item_info['GenreItems'][0]['Name'] == 'Audiobook'):
                         if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][0]['Id']]):
                             itemisfav_AUDIOalbumgenre=True
                 else:
                     #Check if any album genre was stored as a favorite
                     for albumgenre in range(len(album_item_info['GenreItems'])):
-                        if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                        #if not (item['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
+                        if not (album_item_info['GenreItems'][albumgenre]['Name'] == 'Audiobook'):
                             if (isfav_AUDIOtaa['albumgenre'][album_item_info['GenreItems'][albumgenre]['Id']]):
                                 itemisfav_AUDIOalbumgenre=True
 
@@ -1235,11 +1443,23 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
 
 ### Network #######################################################################################
 
-    if (does_key_exist(item, 'SeriesStudio')):
+    #if (does_key_exist(item, 'SeriesStudio')):
         #Check if network's favorite value already exists in dictionary
-        if not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
+        #if not item['SeriesStudio'] in isfav_TVessn['networkchannel']:
+            #Build url
+            #url=server_url + '/Studios/' + urllib.parse.quote(item['SeriesStudio']) + '?userId=' + user_key +  '&enableImages=False&api_key=' + auth_key
             #Store if the channel/network/studio is marked as a favorite
-            isfav_TVessn['networkchannel'][item['SeriesStudio']] = get_studio_item_info(server_url, user_key, item['SeriesStudio'], auth_key)['UserData']['IsFavorite']
+            #isfav_TVessn['networkchannel'][item['SeriesStudio']] = requestURL(url, cfg.DEBUG, 'get_studio_item_info', cfg.api_request_attempts)['UserData']['IsFavorite']
+
+    if (does_key_exist(item, 'SeriesStudio')):
+        #Build url
+        url=server_url + '/Studios/' + urllib.parse.quote(item['SeriesStudio']) + '?userId=' + user_key +  '&enableImages=False&api_key=' + auth_key
+        #Get studio's/network's item info
+        series_studio_item_info = requestURL(url, cfg.DEBUG, 'get_studio_item_info', cfg.api_request_attempts)
+        #Check if network's favorite value already exists in dictionary
+        if not series_studio_item_info['Id'] in isfav_TVessn['networkchannel']:
+            #Store if the channel/network/studio is marked as a favorite
+            isfav_TVessn['networkchannel'][series_studio_item_info['Id']] = series_studio_item_info['UserData']['IsFavorite']
 
 ### End Network ###################################################################################
 
@@ -1252,7 +1472,8 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
         if (does_key_exist(item, 'SeriesId')):
             print('   Series is favorite: ' + str(isfav_TVessn['series'][item['SeriesId']]))
         if (does_key_exist(item, 'SeriesStudio')):
-            print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][item['SeriesStudio']]))
+            #print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][item['SeriesStudio']]))
+            print('  Network is favorite: ' + str(isfav_TVessn['networkchannel'][series_studio_item_info['Id']]))
         if (does_key_index_exist(series_item_info, 'GenreItems', 0)):
             if (adv_settings & seriesgenre_mask):
                 if not (adv_settings_any & seriesgenre_any_mask):
@@ -1271,7 +1492,8 @@ def get_isfav_TVessn(isfav_TVessn, item, server_url, user_key, auth_key):
         seriesId_bool=isfav_TVessn['series'][item['SeriesId']]
     networkchannel_bool=False
     if (does_key_exist(item, 'SeriesStudio')):
-        networkchannel_bool=isfav_TVessn['networkchannel'][item['SeriesStudio']]
+        #networkchannel_bool=isfav_TVessn['networkchannel'][item['SeriesStudio']]
+        networkchannel_bool=isfav_TVessn['networkchannel'][series_studio_item_info['Id']]
 
     #Check if episode, season, or series are a favorite
     itemisfav_TVepiseasernet=False
@@ -1616,10 +1838,10 @@ def get_items(server_url, user_keys, auth_key):
     user_wllib_json=json.loads(cfg.user_wl_libs)
 
     #get number of user_keys and user_libs
-    userkey_count=len(user_keys_json)
-    userbllib_count=len(user_bllib_json)
-    userwllib_count=len(user_wllib_json)
-
+    #userkey_count=len(user_keys_json)
+    #userbllib_count=len(user_bllib_json)
+    #userwllib_count=len(user_wllib_json)
+ 
     #establish deletion date for played media items
     cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
     cut_off_date_episode=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_episode)
@@ -1667,15 +1889,13 @@ def get_items(server_url, user_keys, auth_key):
 
         if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
-            #moviegenre_mask=int('00100000', 2)
-
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,ParentId,DateCreated,Path,MediaSource'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_movie >= 0):
                 IsPlayedState=''
-            #if (moviegenre_mask & adv_settings):
-                #FieldsState=FieldsState + ',Genres'
 
             StartIndex=0
             TotalItems=1
@@ -1725,7 +1945,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find movie media items ready to delete
                     if ((item_info['Type'] == 'Movie') and (itemIsMonitored)):
@@ -1743,62 +1962,69 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_movie == 2):
+                        if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_MOVIE
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_movie == 1):
+                        if ((cfg.multiuser_whitelist_movie == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             movie_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_movie >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_movie > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_movie >= 0) and
-                           (max_cut_off_date_movie <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_movie)) or (not itemisfav_MOVIE)) and
-                           ((not bool(cfg.max_keep_favorites_movie)) or (not itemisfav_MOVIE))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        #Check if media item has been played
+                            #If it has, try to print output
+                            #If it has not, we have already saved what we need above, no need to do anything else
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_movie >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_movie > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_movie >= 0) and
+                            (max_cut_off_date_movie <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_movie)) or (not itemisfav_MOVIE)) and
+                            ((not bool(cfg.max_keep_favorites_movie)) or (not itemisfav_MOVIE))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Studios'][0]['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'MovieID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Movie: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# Episodes #############
 
         if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,SeriesStudio,ParentId,DateCreated'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path,SeriesStudio'
             if (cfg.max_age_episode >= 0):
                 IsPlayedState=''
@@ -1855,7 +2081,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find tv-episode media items ready to delete
                     if ((item_info['Type'] == 'Episode') and (itemIsMonitored)):
@@ -1873,66 +2098,70 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_episode == 2):
+                        if ((cfg.keep_favorites_episode == 2) and (itemisfav_TVessn)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_TVessn
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_episode == 1):
+                        if ((cfg.multiuser_whitelist_episode == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             episode_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_episode >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_episode > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_episode) or (not itemisfav_TVessn)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_episode >= 0) and
-                           (max_cut_off_date_episode <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TVessn)) and
-                           ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_TVessn))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                 ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
-                                                 'EpisodeID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
-                                else:
-                                    item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
-                                                 ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
-                                                 'EpisodeID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_episode >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_episode > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_episode) or (not itemisfav_TVessn)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_episode >= 0) and
+                            (max_cut_off_date_episode <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TVessn)) and
+                            ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_TVessn))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
+                                                    'EpisodeID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -   ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'EpisodeID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['SeriesName'] + ' - ' + get_season_episode(item_info['ParentIndexNumber'], item_info['IndexNumber']) + ' - ' + item_info['Name'] + ' - ' + item['SeriesStudio'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_TVessn) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' +
+                                                    'EpisodeID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Episode: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -   ' + item_details)
 
 ############# Videos #############
 
         if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
 
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_video >= 0):
                 IsPlayedState=''
@@ -1985,7 +2214,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find video media items ready to delete
                     if ((item_info['Type'] == 'Video') and (itemIsMonitored)):
@@ -1997,65 +2225,69 @@ def get_items(server_url, user_keys, auth_key):
                             max_cut_off_date_video=date_time_now = datetime.utcnow() + timedelta(1)
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_video == 2):
+                        if ((cfg.keep_favorites_video == 2) and (keep_favorites_video)):
                             isfav_byUserId[user_key][item_info['Id']] = cfg.keep_favorites_video
 
                         #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_video == 1):
+                        if ((cfg.multiuser_whitelist_video == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             video_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_video >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_video > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_video) or not item_info['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_video >= 0) and
-                           (max_cut_off_date_video <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_video)) or (not not item_info['UserData']['IsFavorite'])) and
-                           ((not bool(cfg.max_keep_favorites_video)) or (not item_info['UserData']['IsFavorite']))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_video >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_video > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_video) or not item_info['UserData']['IsFavorite']) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_video >= 0) and
+                            (max_cut_off_date_video <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_video)) or (not not item_info['UserData']['IsFavorite'])) and
+                            ((not bool(cfg.max_keep_favorites_video)) or (not item_info['UserData']['IsFavorite']))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# Trailers #############
 
         if ((cfg.not_played_age_trailer >= 0) or (cfg.max_age_trailer >= 0)):
 
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,ParentId,DateCreated'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path'
             if (cfg.max_age_trailer >= 0):
                 IsPlayedState=''
@@ -2108,7 +2340,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find trailer media items ready to delete
                     if ((item_info['Type'] == 'Trailer') and (itemIsMonitored)):
@@ -2120,73 +2351,72 @@ def get_items(server_url, user_keys, auth_key):
                             max_cut_off_date_trailer=date_time_now = datetime.utcnow() + timedelta(1)
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_trailer == 2):
+                        if ((cfg.keep_favorites_trailer == 2) and (keep_favorites_trailer)):
                             isfav_byUserId[user_key][item_info['Id']] = cfg.keep_favorites_trailer
 
                         #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_trailer == 1):
+                        if ((cfg.multiuser_whitelist_trailer == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             trailer_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_trailer >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_trailer > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_trailer) or not item_info['UserData']['IsFavorite']) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_trailer >= 0) and
-                           (max_cut_off_date_trailer <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_trailer)) or (not not item_info['UserData']['IsFavorite'])) and
-                           ((not bool(cfg.max_keep_favorites_trailer)) or (not item_info['UserData']['IsFavorite']))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                                else:
-                                    item_details=(' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                                else:
-                                    item_details=(' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                  ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=' ' + item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_trailer >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_trailer > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_trailer) or not item_info['UserData']['IsFavorite']) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_trailer >= 0) and
+                            (max_cut_off_date_trailer <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_trailer)) or (not not item_info['UserData']['IsFavorite'])) and
+                            ((not bool(cfg.max_keep_favorites_trailer)) or (not item_info['UserData']['IsFavorite']))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -   ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
+                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrailerID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Trailer: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -   ' + item_details)
 
 ############# Audio #############
 
         if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
-            #trackgenre_mask=int('00000100', 2)
-            #albumgenre_mask=int('00001000', 2)
-
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
-            FieldsState='Id,Path'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
+            FieldsState='Id,Path,GenreItems'
             if (cfg.max_age_audio >= 0):
                 IsPlayedState=''
-            #if ((trackgenre_mask & adv_settings) or (albumgenre_mask & adv_settings)):
-                #FieldsState=FieldsState + ',Genres'
 
             StartIndex=0
             TotalItems=1
@@ -2236,7 +2466,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audio media items ready to delete
                     if ((item_info['Type'] == 'Audio') and (itemIsMonitored)):
@@ -2254,59 +2483,61 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_audio == 2):
+                        if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIOtaa)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOtaa
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_audio == 1):
+                        if ((cfg.multiuser_whitelist_audio == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audio_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_audio >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_audio > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_audio >= 0) and
-                           (max_cut_off_date_audio <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
-                           ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIOtaa))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=('  ' + item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details='  ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+
+                            if (
+                            ((cfg.not_played_age_audio >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_audio > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIOtaa)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_audio >= 0) and
+                            (max_cut_off_date_audio <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIOtaa)) and
+                            ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIOtaa))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] -     ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Album: ' + item_info['Album'] + ' - Artist: ' + item_info['Artists'][0] + ' - Record Label: ' + item_info['Studios'][0]['Name'] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOtaa) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep Audio: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] -     ' + item_details)
 
 ############# AudioBook#############
 
@@ -2319,8 +2550,10 @@ def get_items(server_url, user_keys, auth_key):
            ((cfg.not_played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
            ):
 
-            IsPlayedState='True'
-            #FieldsState='Type,Name,Id,UserData,Studios,Artists,Album,ParentId,DateCreated'
+            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
+                IsPlayedState='True'
+            else:
+                IsPlayedState=''
             FieldsState='Id,Path,Genres,ParentId'
             if (cfg.max_age_audiobook >= 0):
                 IsPlayedState=''
@@ -2373,7 +2606,6 @@ def get_items(server_url, user_keys, auth_key):
                                 itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
-                            #itemIsMonitored=get_isBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
 
                     #find audiobook media items ready to delete
                     if ((item_info['Type'] == 'AudioBook') and (itemIsMonitored)):
@@ -2391,59 +2623,61 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_audiobook == 2):
+                        if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOKtba)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOBOOKtba
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_audiobook == 1):
+                        if ((cfg.multiuser_whitelist_audiobook == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audiobook_whitelists.add(itemWhiteListedPath)
 
-                        if (
-                           ((cfg.not_played_age_audiobook >= 0) and
-                           (item_info['UserData']['PlayCount'] >= 1) and
-                           (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
-                           (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOKtba)) and
-                           (not itemIsWhiteListed))
-                           or
-                           ((cfg.max_age_audiobook >= 0) and
-                           (max_cut_off_date_audiobook <= datetime.utcnow()) and
-                           (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba)) and
-                           ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba))) and
-                           (not itemIsWhiteListed))
-                           ):
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=' ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':*[DELETE] - ' + item_details)
-                            deleteItems.append(item)
-                        else:
-                            try:
-                                if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                else:
-                                    item_details=(' ' + item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                  ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
-                                                  ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                            except (KeyError, IndexError):
-                                item_details=' ' + item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                if bool(cfg.DEBUG):
-                                    #DEBUG
-                                    print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                            print(':[KEEPING] - ' + item_details)
+                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
+                            
+                            if (
+                            ((cfg.not_played_age_audiobook >= 0) and
+                            (item_info['UserData']['PlayCount'] >= 1) and
+                            (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
+                            (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOKtba)) and
+                            (not itemIsWhiteListed))
+                            or
+                            ((cfg.max_age_audiobook >= 0) and
+                            (max_cut_off_date_audiobook <= datetime.utcnow()) and
+                            (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba)) and
+                            ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOKtba))) and
+                            (not itemIsWhiteListed))
+                            ):
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':*[DELETE] - ' + item_details)
+                                deleteItems.append(item)
+                            else:
+                                try:
+                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    else:
+                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
+                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOKtba) +
+                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                except (KeyError, IndexError):
+                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
+                                    if bool(cfg.DEBUG):
+                                        #DEBUG
+                                        print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
+                                print(':[KEEPING] - ' + item_details)
 
 ############# End Media Types #############
 
@@ -2457,10 +2691,6 @@ def get_items(server_url, user_keys, auth_key):
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
     deleteItems=get_isfav_MultiUser(user_keys_json, isfav_byUserId, deleteItems)
-
-    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
-    #When not multiple users this will just clean up the deletion list
-    #deleteItems=get_iswhitelist_MultiUser_byId(user_keys_json, iswhitelist_byUserId, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_MultiUser_byPath(user_keys_json, list(movie_whitelists), deleteItems)
@@ -2498,7 +2728,7 @@ def list_delete_items(deleteItems):
     print('-----------------------------------------------------------')
     print('Summary Of Deleted Media:')
     if not bool(cfg.remove_files):
-        print('* Trial Run            ')
+        print('* Trial Run Mode       ')
         print('* remove_files=0       ')
         print('* No Media Deleted     ')
         print('* Items = ' + str(len(deleteItems)))
@@ -2510,28 +2740,28 @@ def list_delete_items(deleteItems):
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
-                item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Episode':
                 try:
-                    item_details=item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
+                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
-                    item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if bool(cfg.DEBUG):
                         #DEBUG
                         print('Error encountered - Delete Episode: \n\n' + str(item))
             elif item['Type'] == 'Video':
-                item_details='  ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Trailer':
-                item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Audio':
-                item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'AudioBook':
-                item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             else: # item['Type'] == 'Unknown':
                 pass
             #Delete media item
             delete_item(item['Id'])
-            print('[DELETED] ' + item_details)
+            print(item_details)
     else:
         print('[NO ITEMS TO DELETE]')
 
@@ -2556,9 +2786,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_movie variable is missing from media_cleaner_config.py\n'
 
@@ -2568,9 +2798,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_episode variable is missing from media_cleaner_config.py\n'
 
@@ -2580,9 +2810,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_video variable is missing from media_cleaner_config.py\n'
 
@@ -2592,9 +2822,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_trailer must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_trailer must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_trailer variable is missing from media_cleaner_config.py\n'
 
@@ -2604,9 +2834,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audio variable is missing from media_cleaner_config.py\n'
 
@@ -2616,9 +2846,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000))
+            (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 730500\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audiobook variable is missing from media_cleaner_config.py\n'
 
@@ -2699,7 +2929,7 @@ def cfgCheck():
         ):
             error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced binary string is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_any'):
         check=cfg.keep_favorites_advanced_any
@@ -2712,7 +2942,7 @@ def cfgCheck():
         ):
             error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_any should be an 6 to 10-digit binary string; valid range binary - 0000000000 thru 1111111111 (decimal - 0 thru 255)\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_any variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_any binary string is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'multiuser_whitelist_movie'):
         check=cfg.multiuser_whitelist_movie
@@ -2780,6 +3010,17 @@ def cfgCheck():
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
 
+    if hasattr(cfg, 'request_not_played'):
+        check=cfg.request_not_played
+        if (
+            not (#(type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: request_not_played must be an integer; valid values 0 and 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The request_not_played variable is missing from media_cleaner_config.py\n'
+
     if hasattr(cfg, 'remove_files'):
         check=cfg.remove_files
         if (
@@ -2791,16 +3032,28 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The remove_files variable is missing from media_cleaner_config.py\n'
 
+    if hasattr(cfg, 'UPDATE_CONFIG'):
+        check=cfg.UPDATE_CONFIG
+        if (
+            not (#(type(check) is str) and
+            (check.isupper()) and
+            ((check == 'TRUE') or
+            (check == 'FALSE')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be an all UPPERCASE string; valid values \'TRUE\' and \'FALSE\'\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
+
     if hasattr(cfg, 'max_age_movie'):
         check=cfg.max_age_movie
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_movie) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_movie variable is missing from media_cleaner_config.py\n'
 
@@ -2809,11 +3062,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_episode) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_episode variable is missing from media_cleaner_config.py\n'
 
@@ -2822,11 +3075,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_video) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_video variable is missing from media_cleaner_config.py\n'
 
@@ -2835,11 +3088,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_trailer) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_trailer must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_trailer variable is missing from media_cleaner_config.py\n'
 
@@ -2848,11 +3101,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_audio) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_audio variable is missing from media_cleaner_config.py\n'
 
@@ -2861,11 +3114,11 @@ def cfgCheck():
         if (
             not ((type(check) is int) and
             (check >= -1) and
-            (check <= 365000000) and
+            (check <= 730500) and
             (((check >= check_not_played_age_audiobook) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 365000000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
 
@@ -2880,7 +3133,7 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_movie variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'not_played_max_keep_favorites_episodege_audiobook'):
+    if hasattr(cfg, 'max_keep_favorites_episode'):
         check=cfg.max_keep_favorites_episode
         if (
             not ((type(check) is int) and
@@ -2888,8 +3141,8 @@ def cfgCheck():
             (check <= 1))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_keep_favorites_video'):
         check=cfg.max_keep_favorites_video
@@ -2989,14 +3242,13 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The user_keys variable is missing from media_cleaner_config.py\n'
 
-    #if hasattr(cfg, 'script_behavior'):
-        #check=cfg.script_behavior
-        #if (
-            #not ((type(check_irt) is str) and
-            #((check == 'whitelist') or (check == 'blacklist')))
-        #):
-                #errorfound=True
-                #error_found_in_media_cleaner_config_py+='ValueError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
+    if hasattr(cfg, 'script_behavior'):
+        check=cfg.script_behavior
+        if (
+            not (type(check) is str) and
+            ((check == 'whitelist') or (check == 'blacklist'))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: script_behavior must be a string; valid values \'whitelist\' or \'blacklist\'\n'
     #else:
         #error_found_in_media_cleaner_config_py+='NameError: The script_behavior variable is missing from media_cleaner_config.py\n'
 
@@ -3063,6 +3315,7 @@ def cfgCheck():
     if (not error_found_in_media_cleaner_config_py == ''):
         raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
 
+
 ############# START OF SCRIPT #############
 
 try:
@@ -3075,12 +3328,10 @@ try:
     check=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
     
-    #print('DEBUG=' + str(cfg.DEBUG))
-
     print('-----------------------------------------------------------')
     print ('\n')
 
-#the except
+#the exception
 except (AttributeError, ModuleNotFoundError):
     #we are here because the media_cleaner_config.py file does not exist
     #this is either the first time the script is running or media_cleaner_config.py file was deleted
@@ -3088,13 +3339,26 @@ except (AttributeError, ModuleNotFoundError):
     #another possible reason we are here...
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
-    generate_config()
+    update_config = 'FALSE'
+    generate_config(update_config)
 
     #exit gracefully after setup
     exit(0)
 
 #check config values are what we expect them to be
 cfgCheck()
+
+#check if user wants to update the existing config file
+if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
+    #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
+    if (hasattr(cfg, 'script_behavior')):
+        #we are here because we want to add new users to the media_cleaner_config.py file
+        generate_config(cfg.UPDATE_CONFIG)
+    else:
+        raise NameError('Error! The script_behavior variable is missing from media_cleaner_config.py. It is needed to use the UPDATE_CONFIG functionality.')
+    
+    #exit gracefully after conifig update
+    exit(0)
 
 #now we can get media items that are ready to be deleted;
 deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.access_token)
