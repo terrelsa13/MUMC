@@ -1962,11 +1962,11 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_movie == 2):
+                        if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_MOVIE
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_movie == 1):
+                        if ((cfg.multiuser_whitelist_movie == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             movie_whitelists.add(itemWhiteListedPath)
 
@@ -2098,11 +2098,11 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_episode == 2):
+                        if ((cfg.keep_favorites_episode == 2) and (itemisfav_TVessn)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_TVessn
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_episode == 1):
+                        if ((cfg.multiuser_whitelist_episode == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             episode_whitelists.add(itemWhiteListedPath)
 
@@ -2225,14 +2225,14 @@ def get_items(server_url, user_keys, auth_key):
                             max_cut_off_date_video=date_time_now = datetime.utcnow() + timedelta(1)
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_video == 2):
+                        if ((cfg.keep_favorites_video == 2) and (keep_favorites_video)):
                             isfav_byUserId[user_key][item_info['Id']] = cfg.keep_favorites_video
 
                         #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_video == 1):
+                        if ((cfg.multiuser_whitelist_video == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             video_whitelists.add(itemWhiteListedPath)
 
@@ -2351,14 +2351,14 @@ def get_items(server_url, user_keys, auth_key):
                             max_cut_off_date_trailer=date_time_now = datetime.utcnow() + timedelta(1)
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_trailer == 2):
+                        if ((cfg.keep_favorites_trailer == 2) and (keep_favorites_trailer)):
                             isfav_byUserId[user_key][item_info['Id']] = cfg.keep_favorites_trailer
 
                         #Get if media item path is whitelisted
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_trailer == 1):
+                        if ((cfg.multiuser_whitelist_trailer == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             trailer_whitelists.add(itemWhiteListedPath)
 
@@ -2483,11 +2483,11 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_audio == 2):
+                        if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIOtaa)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOtaa
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_audio == 1):
+                        if ((cfg.multiuser_whitelist_audio == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audio_whitelists.add(itemWhiteListedPath)
 
@@ -2623,11 +2623,11 @@ def get_items(server_url, user_keys, auth_key):
                         itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if (cfg.keep_favorites_audiobook == 2):
+                        if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOKtba)):
                             isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOBOOKtba
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if (cfg.multiuser_whitelist_audiobook == 1):
+                        if ((cfg.multiuser_whitelist_audiobook == 1) and (itemIsWhiteListed)):
                             iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
                             audiobook_whitelists.add(itemWhiteListedPath)
 
