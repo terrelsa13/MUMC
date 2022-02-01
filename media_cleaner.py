@@ -576,33 +576,55 @@ def generate_config(updateConfig):
     os.chdir(cwd)
 
     if (updateConfig == 'FALSE'):
-        if ((cfg.not_played_age_movie == -1) and
-            (cfg.not_played_age_episode == -1) and
-            (cfg.not_played_age_video == -1) and
-            (cfg.not_played_age_trailer == -1) and
-            (cfg.not_played_age_audio == -1) and
-            ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook')))):
-                print('\n\n-----------------------------------------------------------')
-                print('Config file is not setup to find played media.')
+        try:
+            #try importing the media_cleaner_config.py file
+            #if media_cleaner_config.py file does not exsit go to except and create one
+            import media_cleaner_config as cfg
+
+            #try setting DEBUG variable from media_cleaner_config.py file
+            #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
+            check=cfg.DEBUG
+            #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
+            
+            if ((cfg.not_played_age_movie == -1) and
+                (cfg.not_played_age_episode == -1) and
+                (cfg.not_played_age_video == -1) and
+                (cfg.not_played_age_trailer == -1) and
+                (cfg.not_played_age_audio == -1) and
+                ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook')))):
+                    print('\n\n-----------------------------------------------------------')
+                    print('Config file is not setup to find played media.')
+                    print('-----------------------------------------------------------')
+                    print('To find played media open media_cleaner_config.py in a text editor:')
+                    print('    Set \'not_played_age_movie\' to zero or a positive number')
+                    print('    Set \'not_played_age_episode\' to zero or a positive number')
+                    print('    Set \'not_played_age_video\' to zero or a positive number')
+                    print('    Set \'not_played_age_trailer\' to zero or a positive number')
+                    print('    Set \'not_played_age_audio\' to zero or a positive number')
+                    if (server_brand == 'jellyfin'):
+                        print('    Set \'not_played_age_audiobook\' to zero or a positive number')
+            if (cfg.remove_files == 0):
                 print('-----------------------------------------------------------')
-                print('To find played media open media_cleaner_config.py in a text editor:')
-                print('    Set \'not_played_age_movie\' to zero or a positive number')
-                print('    Set \'not_played_age_episode\' to zero or a positive number')
-                print('    Set \'not_played_age_video\' to zero or a positive number')
-                print('    Set \'not_played_age_trailer\' to zero or a positive number')
-                print('    Set \'not_played_age_audio\' to zero or a positive number')
-                if (server_brand == 'jellyfin'):
-                    print('    Set \'not_played_age_audiobook\' to zero or a positive number')
-        if (cfg.remove_files == 0):
+                print('Config file is not setup to delete played media.')
+                print('Config file is in dry run mode to prevent deleting media.')
+                print('-----------------------------------------------------------')
+                print('To delete media open media_cleaner_config.py in a text editor:')
+                print('    Set \'remove_files=1\' in media_cleaner_config.py')
             print('-----------------------------------------------------------')
-            print('Config file is not setup to delete played media.')
-            print('Config file is in dry run mode to prevent deleting media.')
+            print('Edit the media_cleaner_config.py file and try running again.')
             print('-----------------------------------------------------------')
-            print('To delete media open media_cleaner_config.py in a text editor:')
-            print('    Set \'remove_files=1\' in media_cleaner_config.py')
-        print('-----------------------------------------------------------')
-        print('Edit the media_cleaner_config.py file and try running again.')
-        print('-----------------------------------------------------------')
+
+        #the exception
+        except (AttributeError, ModuleNotFoundError):
+            #something went wrong
+            #media_cleaner_config.py should have been created by now
+            #we are here because the media_cleaner_config.py file does not exist
+            #this is either the first time the script is running or media_cleaner_config.py file was deleted
+
+            raise RuntimeError('\nConfigError: Cannot find or open media_cleaner_config.py')
+
+            #exit gracefully
+            exit(0)
 
 
 #api call to delete items
