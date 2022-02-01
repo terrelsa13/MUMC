@@ -183,7 +183,7 @@ def get_not_played_age(mediaType):
 
 
 #get user input needed to build the media_cleaner_config.py file
-def generate_config(updateConfig):
+def generate_config(cfg,updateConfig):
     if (updateConfig == 'FALSE'):
         print('-----------------------------------------------------------')
         server_brand=get_brand()
@@ -226,7 +226,8 @@ def generate_config(updateConfig):
             not_played_age_audiobook = get_not_played_age('audiobook')
     else:       
         print('-----------------------------------------------------------')
-        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
+        #user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(getattr(cfg, 'server_url'), getattr(cfg, 'access_token'), getattr(cfg, 'script_behavior'), updateConfig)
+        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(cfg.server_url, cfg.access_token, cfg.script_behavior, updateConfig)
 
     userkeys_bllibs_list=[]
     userbllibs_list=[]
@@ -267,13 +268,14 @@ def generate_config(updateConfig):
         if (server_brand == 'jellyfin'):
             config_file += "not_played_age_audiobook=" + str(not_played_age_audiobook) + "\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "not_played_age_movie=" + str(getattr(cfg, 'not_played_age_movie')) + "\n"
-        config_file += "not_played_age_episode=" + str(getattr(cfg, 'not_played_age_episode')) + "\n"
-        config_file += "not_played_age_video=" + str(getattr(cfg, 'not_played_age_video')) + "\n"
-        config_file += "not_played_age_trailer=" + str(getattr(cfg, 'not_played_age_trailer')) + "\n"
-        config_file += "not_played_age_audio=" + str(getattr(cfg, 'not_played_age_audio')) + "\n"
-        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'not_played_age_audiobook'))):
-            config_file += "not_played_age_audiobook=" + str(getattr(cfg, 'not_played_age_audiobook')) + "\n"
+        #config_file += "not_played_age_movie=" + str(getattr(cfg, 'not_played_age_movie')) + "\n"
+        config_file += "not_played_age_movie=" + str(cfg.not_played_age_movie) + "\n"
+        config_file += "not_played_age_episode=" + str(cfg.not_played_age_episode) + "\n"
+        config_file += "not_played_age_video=" + str(cfg.not_played_age_video) + "\n"
+        config_file += "not_played_age_trailer=" + str(cfg.not_played_age_trailer) + "\n"
+        config_file += "not_played_age_audio=" + str(cfg.not_played_age_audio) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'not_played_age_audiobook'))):
+            config_file += "not_played_age_audiobook=" + str(cfg.not_played_age_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -295,13 +297,13 @@ def generate_config(updateConfig):
         if (server_brand == 'jellyfin'):
             config_file += "keep_favorites_audiobook=1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_movie=" + str(getattr(cfg, 'keep_favorites_movie')) + "\n"
-        config_file += "keep_favorites_episode=" + str(getattr(cfg, 'keep_favorites_episode')) + "\n"
-        config_file += "keep_favorites_video=" + str(getattr(cfg, 'keep_favorites_video')) + "\n"
-        config_file += "keep_favorites_trailer=" + str(getattr(cfg, 'keep_favorites_trailer')) + "\n"
-        config_file += "keep_favorites_audio=" + str(getattr(cfg, 'keep_favorites_audio')) + "\n"
-        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'keep_favorites_audiobook'))):
-            config_file += "keep_favorites_audiobook=" + str(getattr(cfg, 'keep_favorites_audiobook')) + "\n"
+        config_file += "keep_favorites_movie=" + str(cfg.keep_favorites_movie) + "\n"
+        config_file += "keep_favorites_episode=" + str(cfg.keep_favorites_episode) + "\n"
+        config_file += "keep_favorites_video=" + str(cfg.keep_favorites_video) + "\n"
+        config_file += "keep_favorites_trailer=" + str(cfg.keep_favorites_trailer) + "\n"
+        config_file += "keep_favorites_audio=" + str(cfg.keep_favorites_audio) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'keep_favorites_audiobook'))):
+            config_file += "keep_favorites_audiobook=" + str(cfg.keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -324,7 +326,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced='0001000001'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced='" + getattr(cfg, 'keep_favorites_advanced') + "'\n"
+        config_file += "keep_favorites_advanced='" + cfg.keep_favorites_advanced + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -347,7 +349,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_any='0000000000'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_any='" + getattr(cfg, 'keep_favorites_advanced_any') + "'\n"
+        config_file += "keep_favorites_advanced_any='" + cfg.keep_favorites_advanced_any + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -365,13 +367,13 @@ def generate_config(updateConfig):
         if (server_brand == 'jellyfin'):
             config_file += "multiuser_whitelist_audiobook=1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "multiuser_whitelist_movie=" + str(getattr(cfg, 'multiuser_whitelist_movie')) + "\n"
-        config_file += "multiuser_whitelist_episode=" + str(getattr(cfg, 'multiuser_whitelist_episode')) + "\n"
-        config_file += "multiuser_whitelist_video=" + str(getattr(cfg, 'multiuser_whitelist_video')) + "\n"
-        config_file += "multiuser_whitelist_trailer=" + str(getattr(cfg, 'multiuser_whitelist_trailer')) + "\n"
-        config_file += "multiuser_whitelist_audio=" + str(getattr(cfg, 'multiuser_whitelist_audio')) + "\n"
-        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'multiuser_whitelist_audiobook'))):
-            config_file += "multiuser_whitelist_audiobook=" + str(getattr(cfg, 'multiuser_whitelist_audiobook')) + "\n"
+        config_file += "multiuser_whitelist_movie=" + str(cfg.multiuser_whitelist_movie) + "\n"
+        config_file += "multiuser_whitelist_episode=" + str(cfg.multiuser_whitelist_episode) + "\n"
+        config_file += "multiuser_whitelist_video=" + str(cfg.multiuser_whitelist_video) + "\n"
+        config_file += "multiuser_whitelist_trailer=" + str(cfg.multiuser_whitelist_trailer) + "\n"
+        config_file += "multiuser_whitelist_audio=" + str(cfg.multiuser_whitelist_audio) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'multiuser_whitelist_audiobook'))):
+            config_file += "multiuser_whitelist_audiobook=" + str(cfg.multiuser_whitelist_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -388,7 +390,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "request_not_played=1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "request_not_played=" + str(getattr(cfg, 'request_not_played')) + "\n"
+        config_file += "request_not_played=" + str(cfg.request_not_played) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -399,7 +401,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "remove_files=0\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "remove_files=" + str(getattr(cfg, 'remove_files')) + "\n"
+        config_file += "remove_files=" + str(cfg.remove_files) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -412,7 +414,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "UPDATE_CONFIG='FALSE'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "UPDATE_CONFIG='" + str(getattr(cfg, 'UPDATE_CONFIG')) + "'\n"
+        config_file += "UPDATE_CONFIG='" + str(cfg.UPDATE_CONFIG) + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -434,13 +436,13 @@ def generate_config(updateConfig):
         if (server_brand == 'jellyfin'):
             config_file += "max_age_audiobook=-1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "max_age_movie=" + str(getattr(cfg, 'max_age_movie')) + "\n"
-        config_file += "max_age_episode=" + str(getattr(cfg, 'max_age_episode')) + "\n"
-        config_file += "max_age_video=" + str(getattr(cfg, 'max_age_video')) + "\n"
-        config_file += "max_age_trailer=" + str(getattr(cfg, 'max_age_trailer')) + "\n"
-        config_file += "max_age_audio=" + str(getattr(cfg, 'max_age_audio')) + "\n"
-        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
-            config_file += "max_age_audiobook=" + str(getattr(cfg, 'max_age_audiobook')) + "\n"
+        config_file += "max_age_movie=" + str(cfg.max_age_movie) + "\n"
+        config_file += "max_age_episode=" + str(cfg.max_age_episode) + "\n"
+        config_file += "max_age_video=" + str(cfg.max_age_video) + "\n"
+        config_file += "max_age_trailer=" + str(cfg.max_age_trailer) + "\n"
+        config_file += "max_age_audio=" + str(cfg.max_age_audio) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
+            config_file += "max_age_audiobook=" + str(cfg.max_age_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -458,13 +460,13 @@ def generate_config(updateConfig):
         if (server_brand == 'jellyfin'):
             config_file += "max_keep_favorites_audiobook=1\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "max_keep_favorites_movie=" + str(getattr(cfg, 'max_keep_favorites_movie')) + "\n"
-        config_file += "max_keep_favorites_episode=" + str(getattr(cfg, 'max_keep_favorites_episode')) + "\n"
-        config_file += "max_keep_favorites_video=" + str(getattr(cfg, 'max_keep_favorites_video')) + "\n"
-        config_file += "max_keep_favorites_trailer=" + str(getattr(cfg, 'max_keep_favorites_trailer')) + "\n"
-        config_file += "max_keep_favorites_audio=" + str(getattr(cfg, 'max_keep_favorites_audio')) + "\n"
-        if ((getattr(cfg, 'server_brand') == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
-            config_file += "max_keep_favorites_audiobook=" + str(getattr(cfg, 'max_keep_favorites_audiobook')) + "\n"
+        config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
+        config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
+        config_file += "max_keep_favorites_video=" + str(cfg.max_keep_favorites_video) + "\n"
+        config_file += "max_keep_favorites_trailer=" + str(cfg.max_keep_favorites_trailer) + "\n"
+        config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
+            config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -477,7 +479,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "server_brand='" + server_brand + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "server_brand='" + getattr(cfg, 'server_brand') + "'\n"
+        config_file += "server_brand='" + cfg.server_brand + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Server URL; created during setup\n"
@@ -485,7 +487,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "server_url='" + server_url + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "server_url='" + getattr(cfg, 'server_url') + "'\n"
+        config_file += "server_url='" + cfg.server_url + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Admin username; chosen during setup\n"
@@ -493,7 +495,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "admin_username='" + username + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "admin_username='" + getattr(cfg, 'admin_username') + "'\n"
+        config_file += "admin_username='" + cfg.admin_username + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Access token; requested from server during setup\n"
@@ -501,7 +503,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "access_token='" + auth_key + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "access_token='" + getattr(cfg, 'access_token') + "'\n"
+        config_file += "access_token='" + cfg.access_token + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Script setup to use the whitelisting method or the blacklistling method; chosen during setup\n"
@@ -512,7 +514,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "script_behavior='" + script_behavior + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "script_behavior='" + getattr(cfg, 'script_behavior') + "'\n"
+        config_file += "script_behavior='" + cfg.script_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User key(s) of account(s) to monitor media items; chosen during setup\n"
@@ -539,7 +541,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "api_request_attempts=6\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "api_request_attempts=" + str(getattr(cfg, 'api_request_attempts')) + "\n"
+        config_file += "api_request_attempts=" + str(cfg.api_request_attempts) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
@@ -550,7 +552,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "api_return_limit=100\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "api_return_limit=" + str(getattr(cfg, 'api_return_limit')) + "\n"
+        config_file += "api_return_limit=" + str(cfg.api_return_limit) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# 0 - Debug messages disabled\n"
@@ -560,7 +562,7 @@ def generate_config(updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "DEBUG=0\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "DEBUG=" + str(getattr(cfg, 'DEBUG')) + "\n"    
+        config_file += "DEBUG=" + str(cfg.DEBUG) + "\n"    
 
     #Create config file next to the script even when cwd (Current Working Directory) is not the same
     cwd = os.getcwd()
@@ -580,11 +582,6 @@ def generate_config(updateConfig):
             #try importing the media_cleaner_config.py file
             #if media_cleaner_config.py file does not exsit go to except and create one
             import media_cleaner_config as cfg
-
-            #try setting DEBUG variable from media_cleaner_config.py file
-            #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
-            check=cfg.DEBUG
-            #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
             
             if ((cfg.not_played_age_movie == -1) and
                 (cfg.not_played_age_episode == -1) and
@@ -668,7 +665,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.2.1", Token=""', 'Content-Type' : 'application/json'}
+    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="1.2.2", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -3362,7 +3359,7 @@ except (AttributeError, ModuleNotFoundError):
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
     update_config = 'FALSE'
-    generate_config(update_config)
+    generate_config(None,update_config)
 
     #exit gracefully after setup
     exit(0)
@@ -3375,7 +3372,7 @@ if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
     if (hasattr(cfg, 'script_behavior')):
         #we are here because we want to add new users to the media_cleaner_config.py file
-        generate_config(cfg.UPDATE_CONFIG)
+        generate_config(cfg,cfg.UPDATE_CONFIG)
     else:
         raise NameError('Error! The script_behavior variable is missing from media_cleaner_config.py. It is needed to use the UPDATE_CONFIG functionality.')
     
