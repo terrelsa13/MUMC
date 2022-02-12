@@ -250,7 +250,7 @@ DEBUG=0
 Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
 
 # Requirements
-* Linux or Windows machine
+* Linux or Windows
 * Mac (probably works but do not have a Mac to confirm)
 * python3.x
 * python-dateutil
