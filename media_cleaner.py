@@ -52,7 +52,7 @@ def get_url():
     if (url == ''):
         return(defaulturl)
     else:
-        if (url.find('://',3,7) >= 0):
+        if (url.find('://',3,8) >= 0):
             return(url)
         else:
            #print('No http:// or https:// entered.')
