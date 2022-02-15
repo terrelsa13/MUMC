@@ -225,6 +225,14 @@ user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/pat
 # API request attempts; number of times to retry an API request
 #  delay between initial attempt and the first retry is 1 second
 #  the delay will double with each attempt after the first retry
+#  Delay between the orginal request and retry 1 is (2^0) 1 second
+#  Delay between retry 1 and retry 2 is (2^1) 2 seconds
+#  Delay between retry 2 and retry 3 is (2^2) 4 seconds
+#  Delay between retry 3 and retry 4 is (2^3) 8 seconds
+#  Delay between retry 4 and retry 5 is (2^4) 16 seconds
+#  Delay between retry 5 and retry 6 is (2^5) 32 seconds
+#  ...
+#  Delay between retry 15 and retry 16 is (2^15) 32768 seconds
 #  0-16 - number of retry attempts
 #  (6 : default)
 #----------------------------------------------------------#
