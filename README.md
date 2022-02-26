@@ -2,7 +2,7 @@
 
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media past the specified days since played cut off.
+This script will go through all played movies, tv episodes, videos, trailers, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
 
 # Configuration
 ## media_cleaner_config.py
