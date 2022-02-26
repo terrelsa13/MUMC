@@ -12,7 +12,7 @@ The first time you run the script it will attempt to create the config file by a
 #### Media will be deleted once it has been played the configured number of days ago:
 ```python
 #----------------------------------------------------------#
-# Delete media type once it has been played x days ago
+# Delete media type once it has been played # days ago
 #   0-730500 - number of days to wait before deleting played media
 #  -1 - to disable managing specified media type
 # (-1 : default)
