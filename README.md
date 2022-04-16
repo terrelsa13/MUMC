@@ -2,13 +2,15 @@
 
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
+This script will go through all played movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
 
 # Configuration
 ## media_cleaner_config.py
 The first time you run the script it will attempt to create the config file by asking a handful of questions.
-
+## media_cleaner_config_defaults.py
+Customize your default values before running for the script the first time.
 ## Configuration Contents
+
 #### Media will be deleted once it has been played the configured number of days ago:
 ```python
 #----------------------------------------------------------#
@@ -19,8 +21,6 @@ The first time you run the script it will attempt to create the config file by a
 #----------------------------------------------------------#
 not_played_age_movie=-1
 not_played_age_episode=-1
-not_played_age_video=-1
-not_played_age_trailer=-1
 not_played_age_audio=-1
 not_played_age_audiobook=-1
 ```
@@ -30,7 +30,7 @@ not_played_age_audiobook=-1
 # Decide if media set as a favorite should be deleted
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
-# Similar logic applies for other media types (movies, trailers, etc...)
+# Similar logic applies for other media types (movies, audio books, etc...)
 #  0 - ok to delete media items set as a favorite
 #  1 - when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
 #  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
@@ -38,54 +38,10 @@ not_played_age_audiobook=-1
 #----------------------------------------------------------#
 keep_favorites_movie=1
 keep_favorites_episode=1
-keep_favorites_video=1
-keep_favorites_trailer=1
 keep_favorites_audio=1
 keep_favorites_audiobook=1
 ```
 #### Additional options for determining if a media item should be considered marked as a favorite based on specified metadata item:
-```python
-#----------------------------------------------------------#
-# Advanced favorites configuration bitmask
-#     Requires 'keep_favorites_*=1'
-#  xxxxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited
-#  xxxxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited
-#  xxxxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited
-#  xxxxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited
-#  xxxxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited
-#  xxxxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited
-#  xxxGxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the track's 'artist(author)' metadata is favorited
-#  xxHxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the tracks's 'album(book) artist(author)' metadata is favorited
-#  xIxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the tracks's metadata is favorited
-#  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited
-#  0 bit - disabled
-#  1 bit - enabled
-# (0001000001 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced='0001000001'
-```
-#### Dependent on the above "advanced options", determines if only the first metadata item should be considered or all metadata items should be considered:
-```python
-#----------------------------------------------------------#
-# Advanced favorites any configuration bitmask
-#     Requires matching bit in 'keep_favorites_advanced' bitmask is enabled
-#  xxxxxxxxxa - xxxxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata
-#  xxxxxxxxbx - xxxxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata
-#  xxxxxxxcxx - xxxxxxxCxx must be enabled; will use ANY genres listed in the track's metadata
-#  xxxxxxdxxx - xxxxxxDxxx must be enabled; will use ANY genres listed in the album's metadata
-#  xxxxxexxxx - xxxxxExxxx must be enabled; will use ANY genres listed in the series' metadata
-#  xxxxfxxxxx - xxxxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata
-#  xxxgxxxxxx - xxxGxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'artist(author)' metadata
-#  xxhxxxxxxx - xxHxxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'album(book) artist(autor)' metadata
-#  xixxxxxxxx - xIxxxxxxxx must be enabled; will use ANY genres listed in the track's metadata
-#  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata
-#  0 bit - disabled
-#  1 bit - enabled
-# (0000000000 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_any='0000000000'
-```
-#### When monitoring multiple users whitelisted libraries will be treated accordingly:
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
@@ -96,35 +52,205 @@ keep_favorites_advanced_any='0000000000'
 multiuser_whitelist_movie=1
 multiuser_whitelist_episode=1
 multiuser_whitelist_video=1
-multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
-multiuser_whitelist_audiobook=1
 ```
-#### Control if the script will request metadata only for played media items OR played and not played media items:
+#### Blacktag a watched media item to be deleted:
 ```python
 #----------------------------------------------------------#
-#  0 - Request metadata only for played media items in monitored libraries
-#   When single user, script will complete faster, no downside
-#   When multiple users, script will complete faster BUT...
-#   The script will only be able to keep a media item when a user has set it as a favorite and has played it
-#  1 - Request metadata for played and not played media items in monitored libraries
-#   When single user, script will complete slower, slower is the downside
-#   When multiple users, script will complete slower BUT...
-#   The script is able to keep a media item when a user has set it as a favortie but has not played it
-# (1 : default)
+# User entered blacktag name; chosen during setup
+#  Use comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
 #----------------------------------------------------------#
-request_not_played=1
+blacktag='tagname,tag name,tag-name'
 ```
-#### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
+#### Whitetag a watched media item to be kept:
 ```python
 #----------------------------------------------------------#
-# 0 - Disable the ability to delete media (dry run mode)
-# 1 - Enable the ability to delete media
+# User entered whitetag name; chosen during setup
+#  Use comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
+#----------------------------------------------------------#
+whitetag='tagname,tag name,tag-name'
+```
+#### Deleting media items is disabled by default:
+```python
+#----------------------------------------------------------#
+#  0 - Disable the ability to delete media (dry run mode)
+#  1 - Enable the ability to delete media
 # (0 : default)
 #----------------------------------------------------------#
 remove_files=0
 ```
-#### Allows adding new users and their associated libraries to the existing config without deleting it; Set to 'FALSE' when ready for "production":
+### When monitoring multiple users whitelisted libraries will be treated accordingly:
+#### Keep movie if genre favorited:
+```python
+#----------------------------------------------------------#
+# Advanced movie genre configurations
+#     Requires 'keep_favorites_movie=1'
+#----------------------------------------------------------#
+#  Keep movie based on the movie's genre
+#  0 - ok to delete movie when its genres are set as a favorite
+#  1 - keep movie if FIRST genre listed in the movie's metadata is set as a favorite
+#  2 - keep movie if ANY genre listed in the movie's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_movie_genre=0
+```
+#### Keep movie if library's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep movie based on the movie library's genre
+#  0 - ok to delete movie when its movie-library genres are set as a favorite
+#  1 - keep movie if FIRST genre listed in the movie-library's metadata is set as a favorite
+#  2 - keep movie if ANY genre listed in the movie-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_movie_library_genre=0
+```
+#### Keep episode if genre favorited:
+```python
+#----------------------------------------------------------#
+# Advanced episode genre configurations
+#     Requires 'keep_favorites_episode=1'
+#----------------------------------------------------------#
+#  Keep episode based on the episode's genre
+#  0 - ok to delete episode when its genres are set as a favorite
+#  1 - keep episode if FIRST genre listed in the episode's metadata is set as a favorite
+#  2 - keep episode if ANY genre listed in the episode's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_episode_genre=0
+```
+#### Keep episode if season's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep episode based on the season's genre
+#  0 - ok to delete episode when its season genres are set as a favorite
+#  1 - keep episode if FIRST genre listed in the season's metadata is set as a favorite
+#  2 - keep episode if ANY genre listed in the season's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_season_genre=0
+```
+#### Keep episode if series' genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep episode based on the series' genre
+#  0 - ok to delete episode when its series genres are set as a favorite
+#  1 - keep episode if FIRST genre listed in the series' metadata is set as a favorite
+#  2 - keep episode if ANY genre listed in the series' metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_series_genre=0
+```
+#### Keep episode if library's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep episode based on the tv-library's genre
+#  0 - ok to delete episode when its tv-library genres are set as a favorite
+#  1 - keep episode if FIRST genre listed in the tv-library's metadata is set as a favorite
+#  2 - keep episode if ANY genre listed in the tv-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_tv_library_genre=0
+```
+#### Keep episode if studio network favorited:
+```python
+#----------------------------------------------------------#
+#  Keep episode based on the studio-network
+#  0 - ok to delete episode when its series' studio-networks are set as a favorite
+#  1 - keep episode if FIRST studio-network listed in the series' metadata is set as a favorite
+#  2 - keep episode if ANY studio-network listed in the series' metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_tv_studio_network=0
+```
+#### Keep episode if studio network's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep episode based on the studio-network's genre
+#  0 - ok to delete episode when its studio-network genres are set as a favorite
+#  1 - keep episode if FIRST genre listed in the studio-network's metadata is set as a favorite
+#  2 - keep episode if ANY genre listed in the studio-network's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_tv_studio_network_genre=0
+```
+#### Keep track if genre favorited:
+```python
+#----------------------------------------------------------#
+# Advanced track genre configurations
+#     Requires 'keep_favorites_audio=1'
+#----------------------------------------------------------#
+#  Keep track based on the track's genre
+#  0 - ok to delete track when its genres are set as a favorite
+#  1 - keep track if FIRST genre listed in the track's metadata is set as a favorite
+#  2 - keep track if ANY genre listed in the track's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_track_genre=0
+```
+#### Keep track if album's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep track based on the album's genre
+#  0 - ok to delete track when its album's genres are set as a favorite
+#  1 - keep track if FIRST genre listed in the album's metadata is set as a favorite
+#  2 - keep track if ANY genre listed in the album's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_album_genre=0
+```
+#### Keep track if library's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep track based on the music-library's genre
+#  0 - ok to delete track when its music-library genres are set as a favorite
+#  1 - keep track if FIRST genre listed in the music-library's metadata is set as a favorite
+#  2 - keep track if ANY genre listed in the music-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_music_library_genre=0
+```
+#### Keep track if artist favorited:
+```python
+#----------------------------------------------------------#
+# Advanced track artist configurations
+#     Requires 'keep_favorites_audio=1'
+#----------------------------------------------------------#
+#  Keep track based on the track's artist
+#  0 - ok to delete track when its artists are set as a favorite
+#  1 - keep track if FIRST artist listed in the track's metadata is set as a favorite
+#  2 - keep track if ANY artist listed in the track's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_track_artist=0
+```
+#### Keep track if album artist favorited:
+```python
+#----------------------------------------------------------#
+#  Keep track based on the album's artist
+#  0 - ok to delete track when its album's artists are set as a favorite
+#  1 - keep track if FIRST artist listed in the album's metadata is set as a favorite
+#  2 - keep track if ANY artist listed in the album's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_album_artist=1
+```
+#### Keep track if library artist favorited:
+```python
+#----------------------------------------------------------#
+#  Keep track based on the music-library's artist
+#  0 - ok to delete track when its music-library artists are set as a favorite
+#  1 - keep track if FIRST artist listed in the music-library's metadata is set as a favorite
+#  2 - keep track if ANY artist listed in the music-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_music_library_artist=0
+```
+#### Edit user to library assocations using current config
 ```python
 #----------------------------------------------------------#
 # Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
@@ -135,7 +261,7 @@ remove_files=0
 #----------------------------------------------------------#
 UPDATE_CONFIG='FALSE'
 ```
-#### When enabled, media items will be deleted based on DateCreated; played state will be ignored:
+#### !!!CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
 #----------------------------------------------------------#
 # CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
@@ -150,11 +276,9 @@ UPDATE_CONFIG='FALSE'
 max_age_movie=-1
 max_age_episode=-1
 max_age_video=-1
-max_age_trailer=-1
 max_age_audio=-1
-max_age_audiobook=-1
 ```
-#### When enabled, favorited media items will not be deleted using the corresponding max_age_xyz:
+#### CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   CAUTION!!!
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
@@ -165,12 +289,11 @@ max_age_audiobook=-1
 max_keep_favorites_movie=1
 max_keep_favorites_episode=1
 max_keep_favorites_video=1
-max_keep_favorites_trailer=1
 max_keep_favorites_audio=1
-max_keep_favorites_audiobook=1
 ```
 
-#### Created first time the script runs; Do **_NOT_** edit or modify these:
+### Created first time the script runs; Do **_NOT_** edit or modify these:
+#### Needed for differences between Emby and Jellyfin?
 ```python
 #------------DO NOT MODIFY BELOW---------------------------#
 
@@ -180,51 +303,68 @@ max_keep_favorites_audiobook=1
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
 server_brand='serverbrand'
-
+```
+#### Full URL of media server
+```python
 #----------------------------------------------------------#
 # Server URL; created during setup
 #----------------------------------------------------------#
 server_url='http://localhost.abc:8096/basename'
-
+```
+#### Media server's admin username
+```python
 #----------------------------------------------------------#
-# Admin username; chosen during setup
+# Admin username; entered during setup
 #----------------------------------------------------------#
 admin_username='username'
-
+```
+#### Server authentication key
+```python
 #----------------------------------------------------------#
-# Access token; requested from server during setup
+# Authentication Key; requested from server during setup
+#  Also know as an Access Token
 #----------------------------------------------------------#
-access_token='0123456789abcdef0123456789abcdef'
-
+auth_key='0123456789abcdef0123456789abcdef'
+```
+#### How were libraries selected during setup?
+```python
 #----------------------------------------------------------#
-# Script setup to use the whitelisting method or the blacklistling method; chosen during setup
-#  Only used when run with UPDATE_CONFIG='TRUE'
-# 'whitelist' - Script setup to store whitelisted libraries
-# 'blacklist' - Script setup to store blacklisted libraries
+# Decide how the script will use the libraries chosen for each user.
+#  0 - blacklist - Media items in the libraries you choose will be allowed to be deleted.
+#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted.
+# (blacklist : default)
 #----------------------------------------------------------#
 script_behavior='abclist'
-
+```
+#### UserId for each monitored user
+```python
 #----------------------------------------------------------#
-# User key(s) of account(s) to monitor media items; chosen during setup
+# User key(s) of monitored account(s); chosen during setup
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
-
-#----------------------------------------------------------#
-
-#----------------------------------------------------------#
-# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
-#----------------------------------------------------------#
-user_bl_libs='["/some/path/0,/some/path/1,/some/path/2", "/some/path/1,/some/path/2,/some/path/3", "/some/path/x,/some/path/etc..."]'
-
-#----------------------------------------------------------#
-# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup
-#----------------------------------------------------------#
-user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/path/6,/some/path/7", "/some/path/y,/some/path/etc..."]'
-
+```
+#### Blacklisted library information
+```python
+#----------------------------------------------------------#"
+# Blacklisted libraries with corresponding user keys(s)"
+# These libraries are actively monitored for media items to delete; chosen during setup"
+#----------------------------------------------------------#"
+user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00112233445566778899aabbccddeeff", "collectiontype": "abc", "networkpath": "smb://some/netpath/0", "path": "/some/path/0"}, "#": {"libid": "aabbccddeeff00112233445566778899", "collectiontype": "def", "networkpath": "smb://some/netpath/1", "path": "/some/path/1"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+```
+#### Whitelisted library information
+```python
+#----------------------------------------------------------#"
+# Whitelisted libraries with corresponding user keys(s)"
+# These libraries are NOT actively monitored for media items to delete; chosen during setup"
+#----------------------------------------------------------#"
+user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+```
+#### Number of times to send an API query before giving up
+```python
 #----------------------------------------------------------#
 # API request attempts; number of times to retry an API request
 #  delay between initial attempt and the first retry is 1 second
-#  the delay will double with each attempt after the first retry
+#  The delay will double with each attempt after the first retry
 #  Delay between the orginal request and retry 1 is (2^0) 1 second
 #  Delay between retry 1 and retry 2 is (2^1) 2 seconds
 #  Delay between retry 2 and retry 3 is (2^2) 4 seconds
@@ -234,18 +374,22 @@ user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/pat
 #  ...
 #  Delay between retry 15 and retry 16 is (2^15) 32768 seconds
 #  0-16 - number of retry attempts
-#  (6 : default)
+#  (4 : default)
 #----------------------------------------------------------#
-api_request_attempts=6
-
+api_request_attempts=4
+```
+#### Throttle how aggressively the script sends queries
+```python
 #----------------------------------------------------------#
 # API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call
 #  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata
 #  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
 #  (100 : default)
-#----------------------------------------------------------#
+#----------------------------------------------------------##
 api_return_limit=100
-
+```
+#### DEBUG
+```python
 #----------------------------------------------------------#
 # 0 - Debug messages disabled
 # 1 - Debug messages enabled
@@ -266,6 +410,9 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
+
+# Blacktagging vs Whitetagging
+* [Explaination and examples. (WIP)]()
 
 # First Run
 * $```/path/to/python3.x /path/to/media_cleaner.py```
