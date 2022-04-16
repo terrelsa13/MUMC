@@ -53,6 +53,7 @@ multiuser_whitelist_movie=1
 multiuser_whitelist_episode=1
 multiuser_whitelist_video=1
 multiuser_whitelist_audio=1
+multiuser_whitelist_audiobook=1
 ```
 #### Blacktag a watched media item to be deleted:
 ```python
@@ -249,6 +250,78 @@ keep_favorites_advanced_album_artist=1
 # (1 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_music_library_artist=0
+```
+#### Keep audio book track if genre favorited:
+```python
+#----------------------------------------------------------#
+# Advanced audio book track genre configurations
+#     Requires 'keep_favorites_audiobook=1'
+#----------------------------------------------------------#
+#  Keep audio book track based on the track's genre
+#  0 - ok to delete audio book track when its genres are set as a favorite
+#  1 - keep audio book track if FIRST genre listed in the track's metadata is set as a favorite
+#  2 - keep audio book track if ANY genre listed in the track's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_track_genre=0
+```
+#### Keep audio book track if book's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep audio book track based on the audio book's genre
+#  0 - ok to delete audio book track when its audio book's genres are set as a favorite
+#  1 - keep audio book track if FIRST genre listed in the audio book's metadata is set as a favorite
+#  2 - keep audio book track if ANY genre listed in the audio book's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_genre=0
+```
+#### Keep audio book track if library's genre favorited:
+```python
+#----------------------------------------------------------#
+#  Keep audio book track based on the audio book-library's genre
+#  0 - ok to delete audio book track when its audio book-library genres are set as a favorite
+#  1 - keep audio book track if FIRST genre listed in the audio book-library's metadata is set as a favorite
+#  2 - keep audio book track if ANY genre listed in the audio book-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_library_genre=0
+```
+#### Keep audio book track if track's author favorited:
+```python
+#----------------------------------------------------------#
+# Advanced audio book track author configurations
+#     Requires 'keep_favorites_audiobook=1'
+#----------------------------------------------------------#
+#  Keep audio book track based on the track's author
+#  0 - ok to delete audio book track when its authors are set as a favorite
+#  1 - keep audio book track if FIRST author listed in the track's metadata is set as a favorite
+#  2 - keep audio book track if ANY author listed in the track's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_track_author=0
+```
+#### Keep audio book track if book's author favorited:
+```python
+#----------------------------------------------------------#
+#  Keep audio book track based on the audio book author
+#  0 - ok to delete audio book track when its audio book's authors are set as a favorite
+#  1 - keep audio book track if FIRST author listed in the audio book's metadata is set as a favorite
+#  2 - keep audio book track if ANY author listed in the audio book's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_author=1
+```
+#### Keep audio book track if library's author favorited:
+```python
+#----------------------------------------------------------#
+#  Keep audio book track based on the audio book-library's author
+#  0 - ok to delete audio book track when its audio book-library authors are set as a favorite
+#  1 - keep audio book track if FIRST author listed in the audio book-library's metadata is set as a favorite
+#  2 - keep audio book track if ANY author listed in the audio book-library's metadata is set as a favorite
+# (1 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_library_author=0
 ```
 #### Edit user to library assocations using current config
 ```python
