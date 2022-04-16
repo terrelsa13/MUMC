@@ -412,7 +412,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
 
 # Blacktagging vs Whitetagging
-* [Explaination and examples. (WIP)]()
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
 
 # First Run
 * $```/path/to/python3.x /path/to/media_cleaner.py```
