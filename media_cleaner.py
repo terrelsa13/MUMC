@@ -1374,33 +1374,39 @@ def does_key_index_exist(item, keyvalue, indexvalue):
 
 #Get count of days since last played
 def get_days_since_played(date_last_played):
-    #Get current time
-    date_time_now = datetime.utcnow()
 
-    #Keep the year, month, day, hour, minute, and seconds
-      #split date_last_played after seconds
-    try:
-        split_date_micro_tz = date_last_played.split(".")
-        date_time_last_played = datetime.strptime(date_last_played, '%Y-%m-%dT%H:%M:%S.' + split_date_micro_tz[1])
-    except (ValueError):
-        date_time_last_played = 'unknown date time format'
+    if not (date_last_played == 'Unknown'):
 
-    if bool(cfg.DEBUG):
-        #DEBUG
-        print(date_time_last_played)
+        #Get current time
+        date_time_now = datetime.utcnow()
 
-    if not (date_time_last_played == 'unknown date time format'):
-        date_time_delta = date_time_now - date_time_last_played
-        s_date_time_delta = str(date_time_delta)
-        days_since_played = s_date_time_delta.split(' day')[0]
-        if ':' in days_since_played:
-            days_since_played = 'Played <1 day ago'
-        elif days_since_played == '1':
-            days_since_played = 'Played ' + days_since_played + ' day ago'
+        #Keep the year, month, day, hour, minute, and seconds
+        #split date_last_played after seconds
+        try:
+            split_date_micro_tz = date_last_played.split(".")
+            date_time_last_played = datetime.strptime(date_last_played, '%Y-%m-%dT%H:%M:%S.' + split_date_micro_tz[1])
+        except (ValueError):
+            date_time_last_played = 'unknown date time format'
+
+        if bool(cfg.DEBUG):
+            #DEBUG
+            print(date_time_last_played)
+
+        if not (date_time_last_played == 'unknown date time format'):
+            date_time_delta = date_time_now - date_time_last_played
+            s_date_time_delta = str(date_time_delta)
+            days_since_played = s_date_time_delta.split(' day')[0]
+            if ':' in days_since_played:
+                days_since_played = 'Played <1 day ago'
+            elif days_since_played == '1':
+                days_since_played = 'Played ' + days_since_played + ' day ago'
+            else:
+                days_since_played = 'Played ' + days_since_played + ' days ago'
         else:
-            days_since_played = 'Played ' + days_since_played + ' days ago'
+            days_since_played='0'
     else:
-        days_since_played='0'
+        days_since_played=date_last_played
+
     return(days_since_played)
 
 
@@ -2637,6 +2643,374 @@ def user_lib_builder(lib_json):
     return(built_libid,built_collectiontype,built_networkpath,built_path)
 
 
+def get_isMovieTagged(usertags,itemtaglist,item,user_key,tagtype):
+    itemIsTagged=False
+    itemIsTagged_Item=False
+    itemIsTagged_Library=False
+
+    if (cfg.server_brand == 'emby'):
+        #Check if media item is tagged
+        if ((not (usertags == '')) and (does_key_exist(item,'TagItems'))):
+            #Check if media item is tagged
+            taglist=set()
+            for tagpos in range(len(item['TagItems'])):
+                taglist.add(item['TagItems'][tagpos])
+            itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save media item's tags state
+            if (itemIsTagged_Item):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][item['Id']] = itemIsTagged_Item
+
+        if (does_key_exist(item,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['TagItems'])):
+                taglist.add(library_item_info['TagItems'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif not (LibraryID == ''):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['TagItems'])):
+                taglist.add(library_item_info['TagItems'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+    else:
+        #Jellyfin tags
+        #Check if media item is tagged
+        if ((not (usertags == '')) and (does_key_exist(item,'Tags'))):
+            #Check if media item is tagged
+            taglist=set()
+            for tagpos in range(len(item['Tags'])):
+                taglist.add(item['Tags'][tagpos])
+            itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save media item's usertags state
+            if (itemIsTagged_Item):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][item['Id']] = itemIsTagged_Item
+
+        if (does_key_exist(item,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['Tags'])):
+                taglist.add(library_item_info['Tags'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif not (LibraryID == ''):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['Tags'])):
+                taglist.add(library_item_info['Tags'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+
+    #Set common tagged variable
+    if (itemIsTagged_Item or itemIsTagged_Library):
+        itemIsTagged=True
+
+    #parenthesis intentionally omitted to return itemtaglist as a set
+    return itemtaglist,itemIsTagged
+
+def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
+    itemIsTagged=False
+    itemIsTagged_Item=False
+    itemIsTagged_Season=False
+    itemIsTagged_Series=False
+    itemIsTagged_Library=False
+
+    if (cfg.server_brand == 'emby'):
+        #Check if media item is tagged
+        if ((not (usertags == '')) and (does_key_exist(item,'TagItems'))):
+            #Check if media item is tagged
+            taglist=set()
+            for tagpos in range(len(item['TagItems'])):
+                taglist.add(item['TagItems'][tagpos])
+            itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save media item's tags state
+            if (itemIsTagged_Item):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][item['Id']] = itemIsTagged_Item
+
+        if (does_key_exist(item,'SeasonId')):
+            #Check if season is tagged
+            season_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeasonId'], cfg.auth_key, 'episode_season_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(season_item_info['TagItems'])):
+                taglist.add(season_item_info['TagItems'][tagpos])
+            itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save season's usertags state
+            if (itemIsTagged_Season):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][season_item_info['Id']] = itemIsTagged_Season
+        elif (does_key_exist(item,'ParentId')):
+            #Check if season is tagged
+            season_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'episode_season_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(season_item_info['TagItems'])):
+                taglist.add(season_item_info['TagItems'][tagpos])
+            itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save season's usertags state
+            if (itemIsTagged_Season):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][season_item_info['Id']] = itemIsTagged_Season
+
+        if (does_key_exist(item,'SeasonId')):
+            #Check if series' is tagged
+            series_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeriesId'], cfg.auth_key, 'season_series_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(series_item_info['TagItems'])):
+                taglist.add(series_item_info['TagItems'][tagpos])
+            itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save series' usertags state
+            if (itemIsTagged_Series):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][series_item_info['Id']] = itemIsTagged_Series
+        elif (does_key_exist(season_item_info,'ParentId')):
+            #Check if parent is tagged
+            series_item_info = get_additional_item_info(cfg.server_url, user_key, season_item_info['ParentId'], cfg.auth_key, 'season_series_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(series_item_info['TagItems'])):
+                taglist.add(series_item_info['TagItems'][tagpos])
+            itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save parent's usertags state
+            if (itemIsTagged_Series):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][series_item_info['Id']] = itemIsTagged_Series
+
+        if (does_key_exist(item,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['TagItems'])):
+                taglist.add(library_item_info['TagItems'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif (does_key_exist(series_item_info,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, series_item_info['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['TagItems'])):
+                taglist.add(library_item_info['TagItems'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif not (LibraryID == ''):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['TagItems'])):
+                taglist.add(library_item_info['TagItems'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+    else:
+        #Jellyfin tags
+        #Check if media item is tagged
+        if ((not (usertags == '')) and (does_key_exist(item,'Tags'))):
+            #Check if media item is tagged
+            taglist=set()
+            for tagpos in range(len(item['Tags'])):
+                taglist.add(item['Tags'][tagpos])
+            itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save media item's usertags state
+            if (itemIsTagged_Item):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][item['Id']] = itemIsTagged_Item
+                    
+        if (does_key_exist(item,'SeasonId')):
+            #Check if season is tagged
+            season_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeasonId'], cfg.auth_key, 'episode_season_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(season_item_info['Tags'])):
+                taglist.add(season_item_info['Tags'][tagpos])
+            itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save season's usertags state
+            if (itemIsTagged_Season):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][season_item_info['Id']] = itemIsTagged_Season
+        elif (does_key_exist(item,'ParentId')):
+            #Check if season is tagged
+            season_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'episode_season_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(season_item_info['Tags'])):
+                taglist.add(season_item_info['Tags'][tagpos])
+            itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save season's usertags state
+            if (itemIsTagged_Season):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][season_item_info['Id']] = itemIsTagged_Season
+
+        if (does_key_exist(item,'SeasonId')):
+            #Check if series' is tagged
+            series_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeriesId'], cfg.auth_key, 'season_series_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(series_item_info['Tags'])):
+                taglist.add(series_item_info['Tags'][tagpos])
+            itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save series' usertags state
+            if (itemIsTagged_Series):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][series_item_info['Id']] = itemIsTagged_Series
+        elif (does_key_exist(season_item_info,'ParentId')):
+            #Check if parent is tagged
+            series_item_info = get_additional_item_info(cfg.server_url, user_key, season_item_info['ParentId'], cfg.auth_key, 'season_series_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(series_item_info['Tags'])):
+                taglist.add(series_item_info['Tags'][tagpos])
+            itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save parent's usertags state
+            if (itemIsTagged_Series):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][series_item_info['Id']] = itemIsTagged_Series
+
+        if (does_key_exist(item,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['Tags'])):
+                taglist.add(library_item_info['Tags'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif (does_key_exist(series_item_info,'ParentId')):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, series_item_info['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['Tags'])):
+                taglist.add(library_item_info['Tags'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+        elif not (LibraryID == ''):
+            #Check if library is tagged (Emby does not allow tagging libraries)
+            library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
+            taglist=set()
+            for tagpos in range(len(library_item_info['Tags'])):
+                taglist.add(library_item_info['Tags'][tagpos])
+            itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
+            #Save library's usertags state
+            if (itemIsTagged_Library):
+                itemtaglist.append(item['Id'])
+                if bool(cfg.DEBUG):
+                    istag_byUserId[user_key][library_item_info['Id']] = itemIsTagged_Library
+
+    #Set common tagged variable
+    if (itemIsTagged_Item or itemIsTagged_Season or itemIsTagged_Series or itemIsTagged_Library):
+        itemIsTagged=True
+
+    #parenthesis intentionally omitted to return itemtaglist as a set
+    return itemtaglist,itemIsTagged
+
+
+#check and populate unknown movie output data
+def get_movieOutput(item):
+
+    if not (does_key_exist(item,'Type')):
+        item['Type']='Movie'
+    if not (does_key_exist(item,'Name')):
+        item['Name']='Unknown'
+    if not (does_key_exist(item,'Studios')):
+        item['Studios']=[0]
+        item['Studios'][0]={'Name':'Unknown'}
+    if not (does_key_exist(item['Studios'],0)):
+        item['Studios']=[0]
+        item['Studios'][0]={'Name':'Unknown'}
+    if not (does_key_exist(item['Studios'][0],'Name')):
+        item['Studios'][0]={'Name':'Unknown'}
+    #if not (does_key_exist(item,'SeriesStudio')):
+        #item['SeriesStudio']='Unknown'
+        #tbd
+    if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+    else:
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='Unknown'
+    if not (does_key_exist(item,'DateCreated')):
+        item['DateCreated']='1970-01-01T00:00:00.00Z'
+    if not (does_key_exist(item,'Id')):
+        item['item']='Unknown'
+
+    return item
+
+
+#check and populate unknown episode output data
+def get_episodeOutput(item):
+
+    if not (does_key_exist(item,'Type')):
+        item['Type']='Episode'
+    if not (does_key_exist(item,'SeriesName')):
+        item['SeriesName']='Unknown'
+    if not (does_key_exist(item,'ParentIndexNumber')):
+        item['ParentIndexNumber']=999
+    if not (does_key_exist(item,'IndexNumber')):
+        item['IndexNumber']=999
+    if not (does_key_exist(item,'Name')):
+        item['Name']='Unknown'
+    if not (does_key_exist(item,'SeriesStudio')):
+        item['SeriesStudio']='Unknown'
+    if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+    else:
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='Unknown'
+    if not (does_key_exist(item,'DateCreated')):
+        item['DateCreated']='1970-01-01T00:00:00.00Z'
+    if not (does_key_exist(item,'Id')):
+        item['item']='Unknown'
+
+    return item
+
+
 #get played media items; track media items ready to be deleted
 def get_items(server_url, user_keys, auth_key):
     #Get list of all played items
@@ -2693,8 +3067,8 @@ def get_items(server_url, user_keys, auth_key):
     audio_blacklists=set()
     if (cfg.server_brand == 'jellyfin'):
         audiobook_blacklists=set()
-    blacktaglists=set()
-    whitetaglists=set()
+    blacktaglists=[]
+    whitetaglists=[]
     if bool(cfg.DEBUG):
         #dictionary of whitelisted items by userId
         iswhitelist_byUserId={}
@@ -2721,9 +3095,9 @@ def get_items(server_url, user_keys, auth_key):
     #userwllib_count=len(user_wllib_json)
 
     #Get blacktags
-    blacktag=cfg.blacktag
+    blacktags=cfg.blacktag
     #Get whitetags
-    whitetag=cfg.whitetag
+    whitetags=cfg.whitetag
 
     #establish deletion date for played media items
     cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
@@ -2835,7 +3209,7 @@ def get_items(server_url, user_keys, auth_key):
                 EnableImages_Tagged='False'
                 CollapseBoxSetItems='False'
                 #Encode blacktags so they are url acceptable
-                BlackTags_Tagged=urllib.parse.quote(blacktag.replace(',','|'))
+                BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
                 QueryItemsRemaining=True
 
@@ -2983,114 +3357,13 @@ def get_items(server_url, user_keys, auth_key):
                                     if (LibraryID == ''):
                                         displayIsWhiteListed=True
 
-                                    itemIsWhiteTagged=False
-                                    itemIsWhiteTagged_Item=False
-                                    itemIsWhiteTagged_Library=False
-
-                                    if (cfg.server_brand == 'emby'):
-                                        #Check if media item is whitetagged
-                                        if ((not (whitetag == '')) and (does_key_exist(item,'TagItems'))):
-                                            #Check if media item is whitetagged
-                                            taglist=set()
-                                            for tagpos in range(len(item['TagItems'])):
-                                                taglist.add(item['TagItems'][tagpos]['Name'])
-                                            itemIsWhiteTagged_Item, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                            #Save media item's whitetag state
-                                            if (itemIsWhiteTagged_Item):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][item['Id']] = itemIsWhiteTagged_Item
-
-                                            #Check if library is whitetagged (Emby does not allow tagging libraries)
-                                            #library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_whitetag')
-                                            #taglist=set()
-                                            #for tagpos in range(len(library_item_info['TagItems'])):
-                                                #taglist.add(item['TagItems'][tagpos]['Name'])
-                                            #itemIsWhiteTagged_Library, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                            #Save library's whitetag state
-                                            #if (itemIsWhiteTagged_Library):
-                                                #whitetaglists.add(item['Id'])
-                                                #if bool(cfg.DEBUG):
-                                                    #iswhitetag_byUserId[user_key][library_item_info['Id']] = itemIsWhiteTagged_Library
-                                    else:
-                                        #Check if media item is whitetagged
-                                        if ((not (whitetag == '')) and (does_key_exist(item,'Tags'))):
-                                            #Check if media item is whitetagged
-                                            itemIsWhiteTagged_Item, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, item['Tags'])))
-                                            #Save media item's whitetag state
-                                            if (itemIsWhiteTagged_Item):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][item['Id']] = itemIsWhiteTagged_Item
-
-                                            #Check if library is whitetagged
-                                            library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_whitetag')
-                                            itemIsWhiteTagged_Library, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, library_item_info['Tags'])))
-                                            #Save library's whitetag state
-                                            if (itemIsWhiteTagged_Library):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][library_item_info['Id']] = itemIsWhiteTagged_Library
-
-                                    #Set common whitetagged variable
-                                    if (itemIsWhiteTagged_Item or itemIsWhiteTagged_Library):
-                                        itemIsWhiteTagged=True
+                                    whitetaglists,itemIsWhiteTagged=get_isMovieTagged(whitetags,whitetaglists,item,user_key,'whitetag')
 
                                     itemIsBlackTagged=False
                                     #Skip blacktagging if already whitetagged
-                                    if not (itemIsWhiteTagged):
-                                        itemIsBlackTagged_Item=False
-                                        itemIsBlackTagged_Library=False
-                                        if (cfg.server_brand == 'emby'):
-                                            #Check if media item is blacktagged
-                                            if ((not (blacktag == '')) and (does_key_exist(item,'TagItems'))):
-                                                #Check if media item is blacktagged
-                                                taglist=set()
-                                                for tagpos in range(len(item['TagItems'])):
-                                                    taglist.add(item['TagItems'][tagpos]['Name'])
-                                                itemIsBlackTagged_Item, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                                #Save media item's blacktag state
-                                                if (itemIsBlackTagged_Item):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][item['Id']] = itemIsBlackTagged_Item
+                                    #if not (itemIsWhiteTagged):
+                                        #blacktaglists,itemIsBlackTagged=get_isEpisodeTagged(blacktags,blacktaglists,item,user_key,'blacktag')
 
-                                                #Check if library is blacktagged (Emby does not allow tagging libraries)
-                                                #library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_blacktag')
-                                                #taglist=set()
-                                                #for tagpos in range(len(library_item_info['TagItems'])):
-                                                    #taglist.add(item['TagItems'][tagpos]['Name'])
-                                                #itemIsBlackTagged_Library, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                                #Save library's blacktag state
-                                                #if (itemIsBlackTagged_Library):
-                                                    #blacktaglists.add(item['Id'])
-                                                    #if bool(cfg.DEBUG):
-                                                        #isblacktag_byUserId[user_key][library_item_info['Id']] = itemIsBlackTagged_Library
-                                        else:
-                                            #Check if media item is blacktagged
-                                            if ((not (blacktag == '')) and (does_key_exist(item,'Tags'))):
-                                                #Check if media item is blacktagged
-                                                itemIsBlackTagged_Item, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, item['Tags'])))
-                                                #Save media item's blacktag state
-                                                if (itemIsBlackTagged_Item):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][item['Id']] = itemIsBlackTagged_Item
-
-                                                #Check if library is blacktagged
-                                                library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_blacktag')
-                                                itemIsBlackTagged_Library, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, library_item_info['Tags'])))
-                                                #Save library's blacktag state
-                                                if (itemIsBlackTagged_Library):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][library_item_info['Id']] = itemIsBlackTagged_Library
-
-                                        #Set common blacktagged variable
-                                        if (itemIsBlackTagged_Item or itemIsBlackTagged_Library):
-                                            itemIsBlackTagged=True
-
-                                    #if ((does_key_exist(item['UserData'], 'Played')) and (item['UserData']['Played'] == True)):
                                     if (does_key_exist(item['UserData'], 'Played')):
 
                                         if (
@@ -3107,14 +3380,16 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
-                                                if (does_key_exist(item['UserData'], 'LastPlayedDate')):
-                                                    item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                else:
-                                                    item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                ' - ' + item['Type'] + 'ID: ' + item['Id'])
+
+                                                item=get_movieOutput(item)
+
+                                                item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                #else:
+                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
+                                                                #' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                #' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3125,14 +3400,16 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
-                                                if (does_key_exist(item['UserData'], 'LastPlayedDate')):
-                                                    item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                else:
-                                                    item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                ' - ' + item['Type'] + 'ID: ' + item['Id'])
+
+                                                item=get_movieOutput(item)
+
+                                                item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                #else:
+                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
+                                                                #' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                #' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3164,7 +3441,7 @@ def get_items(server_url, user_keys, auth_key):
                     EnableUserData='True'
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
-                    if (cfg.max_age_movie >= 0):
+                    if (cfg.max_age_episode >= 0):
                         IsPlayedState_Blacklist=''
                     else:
                         IsPlayedState_Blacklist='True'
@@ -3176,7 +3453,7 @@ def get_items(server_url, user_keys, auth_key):
                 APIDebugMsg_Favorited='episode_Favorited_media_data'
 
                 #Build query for Favorited media items
-                IncludeItemTypes_Favorited='Series,Season,Episode'
+                IncludeItemTypes_Favorited='Episode'
                 FieldsState_Favorited='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio'
                 SortBy_Favorited='SeriesName,ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Favorited='Ascending'
@@ -3192,7 +3469,7 @@ def get_items(server_url, user_keys, auth_key):
                 APIDebugMsg_Tagged='episode_favortied_media_data'
 
                 #Build query for tagged media items
-                IncludeItemTypes_Tagged='Series,Season,Episode'
+                IncludeItemTypes_Tagged='Episode'
                 FieldsState_Tagged='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
                 SortBy_Tagged='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Tagged='Ascending'
@@ -3200,7 +3477,7 @@ def get_items(server_url, user_keys, auth_key):
                 Recursive_Tagged='True'
                 EnableImages_Tagged='False'
                 #Encode blacktags so they are url acceptable
-                BlackTags_Tagged=urllib.parse.quote(blacktag.replace(',','|'))
+                BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
                 QueryItemsRemaining=True
 
@@ -3311,14 +3588,14 @@ def get_items(server_url, user_keys, auth_key):
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
                                     #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                    if (cfg.multiuser_whitelist_movie == 1):
+                                    if (cfg.multiuser_whitelist_episode == 1):
                                         #Get if media item is whitelisted
                                         for wllib_pos in range(len(user_wllib_keys_json)):
                                             if not (wllib_pos == currentPosition):
                                                 itemIsWhiteListed, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
                                                 #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                                 if (itemIsWhiteListed):
-                                                    movie_whitelists.add(item['Id'])
+                                                    episode_whitelists.add(item['Id'])
                                                     if bool(cfg.DEBUG):
                                                         iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
                                             else:
@@ -3345,209 +3622,12 @@ def get_items(server_url, user_keys, auth_key):
                                     if (LibraryID == ''):
                                         displayIsWhiteListed=True
 
-                                    itemIsWhiteTagged=False
-                                    itemIsWhiteTagged_Item=False
-                                    itemIsWhiteTagged_Season=False
-                                    itemIsWhiteTagged_Series=False
-                                    itemIsWhiteTagged_Library=False
-
-                                    if (cfg.server_brand == 'emby'):
-                                        #Check if media item is whitetagged
-                                        if ((not (whitetag == '')) and (does_key_exist(item,'TagItems'))):
-                                            #Check if media item is whitetagged
-                                            taglist=set()
-                                            for tagpos in range(len(item['TagItems'])):
-                                                taglist.add(item['TagItems'][tagpos]['Name'])
-                                            itemIsWhiteTagged_Item, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                            #Save media item's whitetag state
-                                            if (itemIsWhiteTagged_Item):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][item['Id']] = itemIsWhiteTagged_Item
-
-                                        if not ((item['Type'] == 'Series') or (item['Type'] == 'Season')):
-                                            #Check if season is whitetagged
-                                            season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'movie_season_whitetag')
-                                            taglist=set()
-                                            for tagpos in range(len(season_item_info['TagItems'])):
-                                                taglist.add(season_item_info['TagItems'][tagpos]['Name'])
-                                            itemIsWhiteTagged_Season, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                            #Save season's whitetag state
-                                            if (itemIsWhiteTagged_Season):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][season_item_info['Id']] = itemIsWhiteTagged_Season
-
-                                        if not (item['Type'] == 'Series'):
-                                            #Check if series' is whitetagged
-                                            series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'movie_series_whitetag')
-                                            taglist=set()
-                                            for tagpos in range(len(series_item_info['TagItems'])):
-                                                taglist.add(series_item_info['TagItems'][tagpos]['Name'])
-                                            itemIsWhiteTagged_Series, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                            #Save series' whitetag state
-                                            if (itemIsWhiteTagged_Series):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][series_item_info['Id']] = itemIsWhiteTagged_Series
-
-                                        #Check if library is whitetagged (Emby does not allow tagging libraries)
-                                        #library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_whitetag')
-                                        #taglist=set()
-                                        #for tagpos in range(len(library_item_info['TagItems'])):
-                                            #taglist.add(library_item_info['TagItems'][tagpos]['Name'])
-                                        #itemIsWhiteTagged_Library, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, taglist)))
-                                        #Save library's whitetag state
-                                        #if (itemIsWhiteTagged_Library):
-                                            #whitetaglists.add(item['Id'])
-                                            #if bool(cfg.DEBUG):
-                                                #iswhitetag_byUserId[user_key][library_item_info['Id']] = itemIsWhiteTagged_Library
-                                    else:
-                                        #Check if media item is whitetagged
-                                        if ((not (whitetag == '')) and (does_key_exist(item,'Tags'))):
-                                            #Check if media item is whitetagged
-                                            itemIsWhiteTagged_Item, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, item['Tags'])))
-                                            #Save media item's whitetag state
-                                            if (itemIsWhiteTagged_Item):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][item['Id']] = itemIsWhiteTagged_Item
-
-                                        if not ((item['Type'] == 'Series') or (item['Type'] == 'Season')):
-                                            #Check if season is whitetagged
-                                            season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'movie_season_whitetag')
-                                            itemIsWhiteTagged_Season, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, season_item_info['Tags'])))
-                                            #Save season's whitetag state
-                                            if (itemIsWhiteTagged_Season):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][season_item_info['Id']] = itemIsWhiteTagged_Season
-
-                                        if not (item['Type'] == 'Series'):
-                                            #Check if series' is whitetagged
-                                            series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'movie_series_whitetag')
-                                            itemIsWhiteTagged_Series, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, series_item_info['Tags'])))
-                                            #Save series' whitetag state
-                                            if (itemIsWhiteTagged_Series):
-                                                whitetaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    iswhitetag_byUserId[user_key][series_item_info['Id']] = itemIsWhiteTagged_Series
-
-                                        #Check if library is whitetagged
-                                        library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_whitetag')
-                                        itemIsWhiteTagged_Library, itemWhiteTaggedValue=get_isItemMatching(whitetag, ','.join(map(str, library_item_info['Tags'])))
-                                        #Save library's whitetag state
-                                        if (itemIsWhiteTagged_Library):
-                                            whitetaglists.add(item['Id'])
-                                            if bool(cfg.DEBUG):
-                                                iswhitetag_byUserId[user_key][library_item_info['Id']] = itemIsWhiteTagged_Library
-
-                                    #Set common whitetagged variable
-                                    if (itemIsWhiteTagged_Item or itemIsWhiteTagged_Season or itemIsWhiteTagged_Series or itemIsWhiteTagged_Library):
-                                        itemIsWhiteTagged=True
+                                    whitetaglists,itemIsWhiteTagged=get_isEpisodeTagged(whitetags,whitetaglists,item,user_key,'whitetag')
 
                                     itemIsBlackTagged=False
                                     #Skip blacktagging if already whitetagged
-                                    if not (itemIsWhiteTagged):
-                                        itemIsBlackTagged_Item=False
-                                        itemIsBlackTagged_Season=False
-                                        itemIsBlackTagged_Series=False
-                                        itemIsBlackTagged_Library=False
-
-                                        if (cfg.server_brand == 'emby'):
-                                            #Check if media item is blacktagged
-                                            if ((not (blacktag == '')) and (does_key_exist(item,'TagItems'))):
-                                                #Check if media item is blacktagged
-                                                taglist=set()
-                                                for tagpos in range(len(item['TagItems'])):
-                                                    taglist.add(item['TagItems'][tagpos]['Name'])
-                                                itemIsBlackTagged_Item, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                                #Save media item's blacktag state
-                                                if (itemIsBlackTagged_Item):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][item['Id']] = itemIsBlackTagged_Item
-
-                                            if not ((item['Type'] == 'Series') or (item['Type'] == 'Season')):
-                                                #Check if season is blacktagged
-                                                season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'movie_season_blacktag')
-                                                taglist=set()
-                                                for tagpos in range(len(season_item_info['TagItems'])):
-                                                    taglist.add(season_item_info['TagItems'][tagpos]['Name'])
-                                                itemIsBlackTagged_Season, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                                #Save season's blacktag state
-                                                if (itemIsBlackTagged_Season):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][season_item_info['Id']] = itemIsBlackTagged_Season
-
-                                            if not (item['Type'] == 'Series'):
-                                                #Check if series' is blacktagged
-                                                series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'movie_series_blacktag')
-                                                taglist=set()
-                                                for tagpos in range(len(series_item_info['TagItems'])):
-                                                    taglist.add(series_item_info['TagItems'][tagpos]['Name'])
-                                                itemIsBlackTagged_Series, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                                #Save series' blacktag state
-                                                if (itemIsBlackTagged_Series):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][series_item_info['Id']] = itemIsBlackTagged_Series
-
-                                            #Check if library is blacktagged (Emby does not allow tagging libraries)
-                                            #library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_blacktag')
-                                            #taglist=set()
-                                            #for tagpos in range(len(library_item_info['TagItems'])):
-                                                #taglist.add(library_item_info['TagItems'][tagpos]['Name'])
-                                            #itemIsBlackTagged_Library, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, taglist)))
-                                            #Save library's blacktag state
-                                            #if (itemIsBlackTagged_Library):
-                                                #blacktaglists.add(item['Id'])
-                                                #if bool(cfg.DEBUG):
-                                                    #isblacktag_byUserId[user_key][library_item_info['Id']] = itemIsBlackTagged_Library
-                                        else:
-                                            #Check if media item is blacktagged
-                                            if ((not (blacktag == '')) and (does_key_exist(item,'Tags'))):
-                                                #Check if media item is blacktagged
-                                                itemIsBlackTagged_Item, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, item['Tags'])))
-                                                #Save media item's blacktag state
-                                                if (itemIsBlackTagged_Item):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][item['Id']] = itemIsBlackTagged_Item
-
-                                            if not ((item['Type'] == 'Series') or (item['Type'] == 'Season')):
-                                                #Check if season is blacktagged
-                                                season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'movie_season_blacktag')
-                                                itemIsBlackTagged_Season, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, season_item_info['Tags'])))
-                                                #Save season's blacktag state
-                                                if (itemIsBlackTagged_Season):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][season_item_info['Id']] = itemIsBlackTagged_Season
-
-                                            if not (item['Type'] == 'Series'):
-                                                #Check if series' is blacktagged
-                                                series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'movie_series_blacktag')
-                                                itemIsBlackTagged_Series, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, series_item_info['Tags'])))
-                                                #Save series' blacktag state
-                                                if (itemIsBlackTagged_Series):
-                                                    blacktaglists.add(item['Id'])
-                                                    if bool(cfg.DEBUG):
-                                                        isblacktag_byUserId[user_key][series_item_info['Id']] = itemIsBlackTagged_Series
-
-                                            #Check if library is blacktagged
-                                            library_item_info = get_additional_item_info(server_url, user_key, LibraryID, auth_key, 'movie_library_blacktag')
-                                            itemIsBlackTagged_Library, itemBlackTaggedValue=get_isItemMatching(blacktag, ','.join(map(str, library_item_info['Tags'])))
-                                            #Save library's blacktag state
-                                            if (itemIsBlackTagged_Library):
-                                                blacktaglists.add(item['Id'])
-                                                if bool(cfg.DEBUG):
-                                                    isblacktag_byUserId[user_key][library_item_info['Id']] = itemIsBlackTagged_Library
-
-                                        #Set common blacktagged variable
-                                        if (itemIsBlackTagged_Item or itemIsBlackTagged_Season or itemIsBlackTagged_Series or itemIsBlackTagged_Library):
-                                            itemIsBlackTagged=True
+                                    #if not (itemIsWhiteTagged):
+                                        #blacktaglists,itemIsBlackTagged=get_isEpisodeTagged(blacktags,blacktaglists,item,user_key,'blacktag')
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -3565,16 +3645,12 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
-                                                if ((item['Type'] == 'Episode') and (does_key_exist(item['UserData'], 'LastPlayedDate')) and (does_key_exist(item,'SeriesStudio'))):
-                                                    item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
-                                                                ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                elif (item['Type'] == 'Episode'):
-                                                    item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
-                                                                ' - ' + item['Name'] + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                item=get_episodeOutput(item)
+
+                                                item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
+                                                            ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Season'):
                                                     #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
                                                                   #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
@@ -3592,23 +3668,19 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
-                                                if (does_key_exist(item['UserData'], 'LastPlayedDate')):
-                                                    item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
-                                                                ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                elif (item['Type'] == 'Episode'):
-                                                    item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
-                                                                ' - ' + item['Name'] + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                item=get_episodeOutput(item)
+                                                
+                                                item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
+                                                            ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Season'):
                                                     #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
-                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                  #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                                    #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                                    #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Series'):
                                                     #item_details=(item['Type'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                  #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                                    #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3890,132 +3962,6 @@ def get_items(server_url, user_keys, auth_key):
                                         print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
                                 print(':[KEEPING] - ' + item_details)
 
-############# Videos #############
-
-        if ((cfg.not_played_age_video >= 0) or (cfg.max_age_video >= 0)):
-
-            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
-                IsPlayedState='True'
-            else:
-                IsPlayedState=''
-            FieldsState='Id,Path'
-            if (cfg.max_age_video >= 0):
-                IsPlayedState=''
-
-            StartIndex=0
-            TotalItems=1
-            ItemsChunk=1
-
-            while (ItemsChunk > 0):
-
-                url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=Video&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
-                    '&Recursive=true&SortBy=ParentIndexNumber,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
-
-                if bool(cfg.DEBUG):
-                    #DEBUG
-                    print(url)
-
-                data=requestURL(url, cfg.DEBUG, 'video_media_data', cfg.api_request_attempts)
-
-                TotalItems = data['TotalRecordCount']
-                StartIndex = StartIndex + ItemsChunk
-                ItemsChunk = cfg.api_return_limit
-                if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = TotalItems - StartIndex
-
-                #Determine if media item is to be deleted or kept
-                for item in data['Items']:
-
-                    media_found=True
-
-                    #Get if media item path is monitored
-                    item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'video_item')
-
-                    for mediasource in item_info['MediaSources']:
-
-                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
-                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
-                                itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
-                        elif (does_key_exist(mediasource, 'Type')):
-                            if (mediasource['Type'] == 'Placeholder'):
-                                itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
-                        elif (does_key_exist(mediasource, 'Size')):
-                            if (mediasource['Size'] == 0):
-                                itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
-                        else:
-                            itemIsMonitored=False
-
-                    #find video media items ready to delete
-                    if ((item_info['Type'] == 'Video') and (itemIsMonitored)):
-
-                        #establish max cutoff date for media item
-                        if (cfg.max_age_video >= 0):
-                            max_cut_off_date_video=datetime.strptime(item_info['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item_info['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_video)
-                        else:
-                            max_cut_off_date_video=date_time_now = datetime.utcnow() + timedelta(1)
-
-                        #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if ((cfg.keep_favorites_video == 2) and (keep_favorites_video)):
-                            isfav_byUserId[user_key][item_info['Id']] = cfg.keep_favorites_video
-
-                        #Get if media item path is whitelisted
-                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
-
-                        #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if ((cfg.multiuser_whitelist_video == 1) and (itemIsWhiteListed)):
-                            iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
-                            video_whitelists.add(itemWhiteListedPath)
-
-                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
-
-                            if (
-                            ((cfg.not_played_age_video >= 0) and
-                            (item_info['UserData']['PlayCount'] >= 1) and
-                            (cut_off_date_video > parse(item_info['UserData']['LastPlayedDate'])) and
-                            (not bool(cfg.keep_favorites_video) or not item_info['UserData']['IsFavorite']) and
-                            (not itemIsWhiteListed))
-                            or
-                            ((cfg.max_age_video >= 0) and
-                            (max_cut_off_date_video <= datetime.utcnow()) and
-                            (((not bool(cfg.keep_favorites_video)) or (not not item_info['UserData']['IsFavorite'])) and
-                            ((not bool(cfg.max_keep_favorites_video)) or (not item_info['UserData']['IsFavorite']))) and
-                            (not itemIsWhiteListed))
-                            ):
-                                try:
-                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                    else:
-                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                except (KeyError, IndexError):
-                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                    if bool(cfg.DEBUG):
-                                        #DEBUG
-                                        print('\nError encountered - Delete Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                                print(':*[DELETE] -     ' + item_details)
-                                deleteItems.append(item)
-                            else:
-                                try:
-                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                    else:
-                                        item_details=(item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + get_days_since_created(item_info['DateCreated']) +
-                                                    ' -  Favorite: ' + str(item_info['UserData']['IsFavorite']) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'VideoID: ' + item_info['Id'])
-                                except (KeyError, IndexError):
-                                    item_details=item_info['Type'] + ' - ' + item_info['Name'] + ' - ' + item_info['Id']
-                                    if bool(cfg.DEBUG):
-                                        #DEBUG
-                                        print('\nError encountered - Keep Video: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                                print(':[KEEPING] -     ' + item_details)
-
 ############# End Media Types #############
 
         if (not all_media_disabled):
@@ -4032,13 +3978,12 @@ def get_items(server_url, user_keys, auth_key):
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(movie_whitelists), deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(episode_whitelists), deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(video_whitelists), deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(audio_whitelists), deleteItems)
     if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
         deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(audiobook_whitelists), deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(whitetaglists), deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, whitetaglists, deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
