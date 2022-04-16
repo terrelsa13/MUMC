@@ -120,8 +120,8 @@ def get_admin_username():
 
 #admin password?
 def get_admin_password():
-    #print('Plain text password used to grab access token; hashed password stored in config file.')
-    print('Plain text password used to grab access token; password not stored in config file.')
+    #print('Plain text password used to grab authentication key; hashed password stored in config file.')
+    print('Plain text password used to grab authentication key; password not stored in config file.')
     password=input('Enter admin password: ')
     return(password)
 
@@ -265,7 +265,7 @@ def generate_config(cfg,updateConfig):
         print('-----------------------------------------------------------')
         script_behavior=get_setup_behavior(cfg.script_behavior)
         print('-----------------------------------------------------------')
-        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(cfg.server_url, cfg.access_token, script_behavior, updateConfig)
+        user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(cfg.server_url, cfg.auth_key, script_behavior, updateConfig)
 
     userkeys_bllibs_list=[]
     userbllibs_list=[]
@@ -758,7 +758,7 @@ def generate_config(cfg,updateConfig):
         config_file += "server_url='" + cfg.server_url + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Admin username; chosen during setup\n"
+    config_file += "# Admin username; entered during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "admin_username='" + username + "'\n"
@@ -766,12 +766,13 @@ def generate_config(cfg,updateConfig):
         config_file += "admin_username='" + cfg.admin_username + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Access token; requested from server during setup\n"
+    config_file += "# Authentication Key; requested from server during setup\n"
+    config_file += "#  Also know as an Access Token\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
-        config_file += "access_token='" + auth_key + "'\n"
+        config_file += "auth_key='" + auth_key + "'\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "access_token='" + cfg.access_token + "'\n"
+        config_file += "auth_key='" + cfg.auth_key + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how the script will use the libraries chosen for each user.\n"
@@ -785,17 +786,19 @@ def generate_config(cfg,updateConfig):
         config_file += "script_behavior='" + cfg.script_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User key(s) of account(s) to monitor media items; chosen during setup\n"
+    config_file += "# User key(s) of monitored account(s); chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_keys='" + user_keys + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User blacklisted libraries of corresponding user keys(s) to monitor media items; chosen during setup\n"
+    config_file += "# Blacklisted libraries with corresponding user keys(s)\n"
+    config_file += "# These libraries are monitored for media items to delete; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_bl_libs='" + user_bl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User whitelisted libraries of corresponding user key(s) to exclude monitoring media items; chosen during setup\n"
+    config_file += "# Whitelisted libraries with corresponding user keys(s)\n"
+    config_file += "# These libraries are NOT actively monitored for media items to delete; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "\n"
@@ -812,7 +815,7 @@ def generate_config(cfg,updateConfig):
     config_file += "#  ...\n"
     config_file += "#  Delay between retry 15 and retry 16 is (2^15) 32768 seconds\n"
     config_file += "#  0-16 - number of retry attempts\n"
-    config_file += "#  (6 : default)\n"
+    config_file += "#  (4 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "api_request_attempts=4\n"
@@ -901,8 +904,8 @@ def generate_config(cfg,updateConfig):
 #api call to delete items
 def delete_item(itemID):
     #build API delete request for specified media item
-    #url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
-    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.access_token
+    #url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
+    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
 
     req = request.Request(url,method='DELETE')
 
@@ -2967,18 +2970,18 @@ def get_items(server_url, user_keys, auth_key):
 
                                     #Determine what to show based on whitelist outputs
                                     if ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == False)):
-                                        showIsWhiteListed=False
+                                        displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == True)):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
                                     elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == False)):
-                                        showIsWhiteListed=False
+                                        displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == True)):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
 
-                                    #Overrid for when LibraryID == ''
+                                    #Override for when LibraryID == ''
                                     #This means all libraries are whitelisted for this user
                                     if (LibraryID == ''):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
 
                                     itemIsWhiteTagged=False
                                     itemIsWhiteTagged_Item=False
@@ -3106,11 +3109,11 @@ def get_items(server_url, user_keys, auth_key):
                                             try:
                                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
                                                     item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                 ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 else:
                                                     item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
                                                                 ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -3124,11 +3127,11 @@ def get_items(server_url, user_keys, auth_key):
                                             try:
                                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
                                                     item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                 ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 else:
                                                     item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
                                                                 ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -3209,14 +3212,15 @@ def get_items(server_url, user_keys, auth_key):
                         '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
                         '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
                         '&EnableImages=' + EnableImages_Blacklist + '&EnableUserData=' + EnableUserData + '&api_key=' + auth_key)
+
+                        #Send the API query for for watched media items in blacklists
+                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist=api_return_limiter(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
+
                     else:
                         #When no libraries are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0}
                         QueryLimit_Blacklist=0
-
-                    #Send the API query for for watched media items in blacklists
-                    data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist=api_return_limiter(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
 
                     #Built query for Favorited media items
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
@@ -3328,18 +3332,18 @@ def get_items(server_url, user_keys, auth_key):
                                                 itemIsWhiteListedTaggedNotWatched, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
 
                                     if ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == False)):
-                                        showIsWhiteListed=False
+                                        displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == True)):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
                                     elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == False)):
-                                        showIsWhiteListed=False
+                                        displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == True)):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
 
-                                    #Overrid for when LibraryID == ''
+                                    #Override for when LibraryID == ''
                                     #This means all libraries are whitelisted for this user
                                     if (LibraryID == ''):
-                                        showIsWhiteListed=True
+                                        displayIsWhiteListed=True
 
                                     itemIsWhiteTagged=False
                                     itemIsWhiteTagged_Item=False
@@ -3564,20 +3568,20 @@ def get_items(server_url, user_keys, auth_key):
                                                 if ((item['Type'] == 'Episode') and (does_key_exist(item['UserData'], 'LastPlayedDate')) and (does_key_exist(item,'SeriesStudio'))):
                                                     item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                                 ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                 ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 elif (item['Type'] == 'Episode'):
                                                     item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                                 ' - ' + item['Name'] + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                ' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
                                                                 ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Season'):
                                                     #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
-                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                   #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Series'):
                                                     #item_details=(item['Type'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                  #' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                                  #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3591,20 +3595,20 @@ def get_items(server_url, user_keys, auth_key):
                                                 if (does_key_exist(item['UserData'], 'LastPlayedDate')):
                                                     item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                                 ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                 ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 elif (item['Type'] == 'Episode'):
                                                     item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                                 ' - ' + item['Name'] + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                ' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                                ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
                                                                 ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Season'):
                                                     #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
-                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(showIsWhiteListed) +
+                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                                   #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                                 #elif (item['Type'] == 'Series'):
                                                     #item_details=(item['Type'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                  #' - Whitelisted: ' + str(showIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                                  #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -4832,16 +4836,16 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The admin_username variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'access_token'):
-        check=cfg.access_token
+    if hasattr(cfg, 'auth_key'):
+        check=cfg.auth_key
         if (
             not ((type(check) is str) and
             (len(check) == 32) and
             (str(check).isalnum()))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: access_token must be a 32-character alphanumeric string\n'
+            error_found_in_media_cleaner_config_py+='ValueError: auth_key must be a 32-character alphanumeric string\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The access_token variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The auth_key variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'user_keys'):
         check=cfg.user_keys
@@ -4971,7 +4975,7 @@ if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     exit(0)
 
 #now we can get media items that are ready to be deleted;
-deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.access_token)
+deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.auth_key)
 
 #show and delete media items
 list_delete_items(deleteItems)
