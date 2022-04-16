@@ -41,7 +41,7 @@ keep_favorites_episode=1
 keep_favorites_audio=1
 keep_favorites_audiobook=1
 ```
-#### Additional options for determining if a media item should be considered marked as a favorite based on specified metadata item:
+#### Option for determining if a media item should be deleted or kept based on other users whitelisted libraries:
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
@@ -51,11 +51,10 @@ keep_favorites_audiobook=1
 #----------------------------------------------------------#
 multiuser_whitelist_movie=1
 multiuser_whitelist_episode=1
-multiuser_whitelist_video=1
 multiuser_whitelist_audio=1
 multiuser_whitelist_audiobook=1
 ```
-#### Blacktag a watched media item to be deleted:
+#### Blacktag a media item to be deleted after it is watched:
 ```python
 #----------------------------------------------------------#
 # User entered blacktag name; chosen during setup
@@ -63,17 +62,17 @@ multiuser_whitelist_audiobook=1
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
-blacktag='tagname,tag name,tag-name'
+blacktag='bt_tagname,bt_tag name,bt_tag-name'
 ```
-#### Whitetag a watched media item to be kept:
+#### Whitetag a media item to be kept after it is watched:
 ```python
-#----------------------------------------------------------#
+#----------------------------t------------------------------#
 # User entered whitetag name; chosen during setup
 #  Use comma ',' to seperate multiple tag names
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
-whitetag='tagname,tag name,tag-name'
+whitetag='wt_tagname,wt_tag name,wt_tag-name'
 ```
 #### Deleting media items is disabled by default:
 ```python
@@ -84,252 +83,85 @@ whitetag='tagname,tag name,tag-name'
 #----------------------------------------------------------#
 remove_files=0
 ```
-### When monitoring multiple users whitelisted libraries will be treated accordingly:
 #### Keep movie if genre favorited:
 ```python
 #----------------------------------------------------------#
 # Advanced movie genre configurations
 #     Requires 'keep_favorites_movie=1'
 #----------------------------------------------------------#
-#  Keep movie based on the movie's genre
-#  0 - ok to delete movie when its genres are set as a favorite
-#  1 - keep movie if FIRST genre listed in the movie's metadata is set as a favorite
-#  2 - keep movie if ANY genre listed in the movie's metadata is set as a favorite
-# (1 : default)
+#  Keep movie based on the genres
+#  0 - ok to delete movie when genres are set as a favorite
+#  1 - keep movie if FIRST genre listed is set as a favorite
+#  2 - keep movie if ANY genre listed is set as a favorite
+# (0 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_movie_genre=0
-```
-#### Keep movie if library's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep movie based on the movie library's genre
-#  0 - ok to delete movie when its movie-library genres are set as a favorite
-#  1 - keep movie if FIRST genre listed in the movie-library's metadata is set as a favorite
-#  2 - keep movie if ANY genre listed in the movie-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_movie_library_genre=0
 ```
-#### Keep episode if genre favorited:
+#### Keep episode if genre or studio-network favorited:
 ```python
 #----------------------------------------------------------#
-# Advanced episode genre configurations
+# Advanced episode genre/studio-network configurations
 #     Requires 'keep_favorites_episode=1'
 #----------------------------------------------------------#
-#  Keep episode based on the episode's genre
-#  0 - ok to delete episode when its genres are set as a favorite
-#  1 - keep episode if FIRST genre listed in the episode's metadata is set as a favorite
-#  2 - keep episode if ANY genre listed in the episode's metadata is set as a favorite
-# (1 : default)
+#  Keep episode based on the genre(s) or studio-network(s)
+#  0 - ok to delete episode when its genres or studio-networks are set as a favorite
+#  1 - keep episode if FIRST genre or studio-network is set as a favorite
+#  2 - keep episode if ANY genres or studio-networks are set as a favorite
+# (0 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_episode_genre=0
-```
-#### Keep episode if season's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep episode based on the season's genre
-#  0 - ok to delete episode when its season genres are set as a favorite
-#  1 - keep episode if FIRST genre listed in the season's metadata is set as a favorite
-#  2 - keep episode if ANY genre listed in the season's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_season_genre=0
-```
-#### Keep episode if series' genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep episode based on the series' genre
-#  0 - ok to delete episode when its series genres are set as a favorite
-#  1 - keep episode if FIRST genre listed in the series' metadata is set as a favorite
-#  2 - keep episode if ANY genre listed in the series' metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_series_genre=0
-```
-#### Keep episode if library's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep episode based on the tv-library's genre
-#  0 - ok to delete episode when its tv-library genres are set as a favorite
-#  1 - keep episode if FIRST genre listed in the tv-library's metadata is set as a favorite
-#  2 - keep episode if ANY genre listed in the tv-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_tv_library_genre=0
-```
-#### Keep episode if studio network favorited:
-```python
-#----------------------------------------------------------#
-#  Keep episode based on the studio-network
-#  0 - ok to delete episode when its series' studio-networks are set as a favorite
-#  1 - keep episode if FIRST studio-network listed in the series' metadata is set as a favorite
-#  2 - keep episode if ANY studio-network listed in the series' metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_tv_studio_network=0
-```
-#### Keep episode if studio network's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep episode based on the studio-network's genre
-#  0 - ok to delete episode when its studio-network genres are set as a favorite
-#  1 - keep episode if FIRST genre listed in the studio-network's metadata is set as a favorite
-#  2 - keep episode if ANY genre listed in the studio-network's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_tv_studio_network_genre=0
 ```
-#### Keep track if genre favorited:
+#### Keep track if genre or artist favorited:
 ```python
 #----------------------------------------------------------#
-# Advanced track genre configurations
+# Advanced track genre/artist configurations
 #     Requires 'keep_favorites_audio=1'
 #----------------------------------------------------------#
-#  Keep track based on the track's genre
-#  0 - ok to delete track when its genres are set as a favorite
-#  1 - keep track if FIRST genre listed in the track's metadata is set as a favorite
-#  2 - keep track if ANY genre listed in the track's metadata is set as a favorite
-# (1 : default)
+#  Keep track based on the genre(s) or artist(s)
+#  0 - ok to delete track when its genres or artists are set as a favorite
+#  1 - keep track if FIRST genre or artist is set as a favorite
+#  2 - keep track if ANY genres or artists are set as a favorite
+# (0 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_track_genre=0
-```
-#### Keep track if album's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep track based on the album's genre
-#  0 - ok to delete track when its album's genres are set as a favorite
-#  1 - keep track if FIRST genre listed in the album's metadata is set as a favorite
-#  2 - keep track if ANY genre listed in the album's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_album_genre=0
-```
-#### Keep track if library's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep track based on the music-library's genre
-#  0 - ok to delete track when its music-library genres are set as a favorite
-#  1 - keep track if FIRST genre listed in the music-library's metadata is set as a favorite
-#  2 - keep track if ANY genre listed in the music-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_music_library_genre=0
-```
-#### Keep track if artist favorited:
-```python
-#----------------------------------------------------------#
-# Advanced track artist configurations
-#     Requires 'keep_favorites_audio=1'
-#----------------------------------------------------------#
-#  Keep track based on the track's artist
-#  0 - ok to delete track when its artists are set as a favorite
-#  1 - keep track if FIRST artist listed in the track's metadata is set as a favorite
-#  2 - keep track if ANY artist listed in the track's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_track_artist=0
-```
-#### Keep track if album artist favorited:
-```python
-#----------------------------------------------------------#
-#  Keep track based on the album's artist
-#  0 - ok to delete track when its album's artists are set as a favorite
-#  1 - keep track if FIRST artist listed in the album's metadata is set as a favorite
-#  2 - keep track if ANY artist listed in the album's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_album_artist=1
-```
-#### Keep track if library artist favorited:
-```python
-#----------------------------------------------------------#
-#  Keep track based on the music-library's artist
-#  0 - ok to delete track when its music-library artists are set as a favorite
-#  1 - keep track if FIRST artist listed in the music-library's metadata is set as a favorite
-#  2 - keep track if ANY artist listed in the music-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
+keep_favorites_advanced_album_artist=0
 keep_favorites_advanced_music_library_artist=0
 ```
-#### Keep audio book track if genre favorited:
+#### Keep audio book track if genre or author favorited:
 ```python
 #----------------------------------------------------------#
-# Advanced audio book track genre configurations
+# Advanced audio book track genre/author configurations
 #     Requires 'keep_favorites_audiobook=1'
 #----------------------------------------------------------#
-#  Keep audio book track based on the track's genre
-#  0 - ok to delete audio book track when its genres are set as a favorite
-#  1 - keep audio book track if FIRST genre listed in the track's metadata is set as a favorite
-#  2 - keep audio book track if ANY genre listed in the track's metadata is set as a favorite
-# (1 : default)
+#  Keep audio book track based on the genres or authors
+#  0 - ok to delete audio book track when its genres or authors are set as a favorite
+#  1 - keep audio book track if FIRST genre or author is set as a favorite
+#  2 - keep audio book track if ANY genres or authors are set as a favorite
+# (0 : default)
 #----------------------------------------------------------#
 keep_favorites_advanced_audio_book_track_genre=0
-```
-#### Keep audio book track if book's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep audio book track based on the audio book's genre
-#  0 - ok to delete audio book track when its audio book's genres are set as a favorite
-#  1 - keep audio book track if FIRST genre listed in the audio book's metadata is set as a favorite
-#  2 - keep audio book track if ANY genre listed in the audio book's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_audio_book_genre=0
-```
-#### Keep audio book track if library's genre favorited:
-```python
-#----------------------------------------------------------#
-#  Keep audio book track based on the audio book-library's genre
-#  0 - ok to delete audio book track when its audio book-library genres are set as a favorite
-#  1 - keep audio book track if FIRST genre listed in the audio book-library's metadata is set as a favorite
-#  2 - keep audio book track if ANY genre listed in the audio book-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_audio_book_library_genre=0
-```
-#### Keep audio book track if track's author favorited:
-```python
-#----------------------------------------------------------#
-# Advanced audio book track author configurations
-#     Requires 'keep_favorites_audiobook=1'
-#----------------------------------------------------------#
-#  Keep audio book track based on the track's author
-#  0 - ok to delete audio book track when its authors are set as a favorite
-#  1 - keep audio book track if FIRST author listed in the track's metadata is set as a favorite
-#  2 - keep audio book track if ANY author listed in the track's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
 keep_favorites_advanced_audio_book_track_author=0
-```
-#### Keep audio book track if book's author favorited:
-```python
-#----------------------------------------------------------#
-#  Keep audio book track based on the audio book author
-#  0 - ok to delete audio book track when its audio book's authors are set as a favorite
-#  1 - keep audio book track if FIRST author listed in the audio book's metadata is set as a favorite
-#  2 - keep audio book track if ANY author listed in the audio book's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_audio_book_author=1
-```
-#### Keep audio book track if library's author favorited:
-```python
-#----------------------------------------------------------#
-#  Keep audio book track based on the audio book-library's author
-#  0 - ok to delete audio book track when its audio book-library authors are set as a favorite
-#  1 - keep audio book track if FIRST author listed in the audio book-library's metadata is set as a favorite
-#  2 - keep audio book track if ANY author listed in the audio book-library's metadata is set as a favorite
-# (1 : default)
-#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_author=0
 keep_favorites_advanced_audio_book_library_author=0
 ```
 #### Edit user to library assocations using current config
 ```python
 #----------------------------------------------------------#
-# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
-# Does not show existing users in the choice list; but existing users can be updated if you know their position
-#  FALSE - Operate as configured
-#  TRUE  - Allow adding new users to existing config; will NOT delete media items
+# Set to 'TRUE' to add new users or edit existing users
+# Must be string with UPPERCASE letters
+#  FALSE - Operate normally
+#  TRUE  - Enable configuration editor mode; will NOT delete media items
 # (FALSE : default)
 #----------------------------------------------------------#
 UPDATE_CONFIG='FALSE'
@@ -341,15 +173,15 @@ UPDATE_CONFIG='FALSE'
 # Do NOT enable any max_age_xyz options unless you know what you are doing
 # Use at your own risk; You alone are responsible for your actions
 # Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
-# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
+# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding played_age_xyz
 #   0-730500 - number of days to wait before deleting "old" media
 #  -1 - to disable managing max age of specified media type
 # (-1 : default)
 #----------------------------------------------------------#
 max_age_movie=-1
 max_age_episode=-1
-max_age_video=-1
 max_age_audio=-1
+max_age_audiobook=-1
 ```
 #### CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   CAUTION!!!
 ```python
@@ -361,8 +193,8 @@ max_age_audio=-1
 #----------------------------------------------------------#
 max_keep_favorites_movie=1
 max_keep_favorites_episode=1
-max_keep_favorites_video=1
 max_keep_favorites_audio=1
+max_keep_favorites_audiobook=1
 ```
 
 ### Created first time the script runs; Do **_NOT_** edit or modify these:
