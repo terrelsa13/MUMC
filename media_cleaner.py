@@ -178,13 +178,14 @@ def get_tag_name(tagbehavior):
 
 
 #Get not played ages for media types?
-def get_not_played_age(mediaType):
-    defaultage=get_default_config_values('not_played_age_' + mediaType)
+def get_played_age(mediaType):
+    defaultage=get_default_config_values('played_age_' + mediaType)
     valid_age=False
     while (valid_age == False):
         print('Choose the number of days to wait before deleting played ' + mediaType + ' media items')
         print('Valid values: 0-730500 days')
         print('             -1 to disable deleting ' + mediaType + ' media items')
+        print('Press Enter to use default value')
         age=input('Enter number of days (default ' + str(defaultage) + '): ')
         if (age == ''):
             valid_age=True
@@ -251,16 +252,14 @@ def generate_config(cfg,updateConfig):
         print('-----------------------------------------------------------')
 
 
-        not_played_age_movie = get_not_played_age('movie')
+        played_age_movie = get_played_age('movie')
         print('-----------------------------------------------------------')
-        not_played_age_episode = get_not_played_age('episode')
+        played_age_episode = get_played_age('episode')
         print('-----------------------------------------------------------')
-        not_played_age_video = get_not_played_age('video')
-        print('-----------------------------------------------------------')
-        not_played_age_audio = get_not_played_age('audio')
+        played_age_audio = get_played_age('audio')
         if (server_brand == 'jellyfin'):
             print('-----------------------------------------------------------')
-            not_played_age_audiobook = get_not_played_age('audiobook')
+            played_age_audiobook = get_played_age('audiobook')
     else:
         print('-----------------------------------------------------------')
         script_behavior=get_setup_behavior(cfg.script_behavior)
@@ -298,19 +297,17 @@ def generate_config(cfg,updateConfig):
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
-        config_file += "not_played_age_movie=" + str(not_played_age_movie) + "\n"
-        config_file += "not_played_age_episode=" + str(not_played_age_episode) + "\n"
-        config_file += "not_played_age_video=" + str(not_played_age_video) + "\n"
-        config_file += "not_played_age_audio=" + str(not_played_age_audio) + "\n"
+        config_file += "played_age_movie=" + str(played_age_movie) + "\n"
+        config_file += "played_age_episode=" + str(played_age_episode) + "\n"
+        config_file += "played_age_audio=" + str(played_age_audio) + "\n"
         if (server_brand == 'jellyfin'):
-            config_file += "not_played_age_audiobook=" + str(not_played_age_audiobook) + "\n"
+            config_file += "played_age_audiobook=" + str(played_age_audiobook) + "\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "not_played_age_movie=" + str(cfg.not_played_age_movie) + "\n"
-        config_file += "not_played_age_episode=" + str(cfg.not_played_age_episode) + "\n"
-        config_file += "not_played_age_video=" + str(cfg.not_played_age_video) + "\n"
-        config_file += "not_played_age_audio=" + str(cfg.not_played_age_audio) + "\n"
+        config_file += "played_age_movie=" + str(cfg.played_age_movie) + "\n"
+        config_file += "played_age_episode=" + str(cfg.played_age_episode) + "\n"
+        config_file += "played_age_audio=" + str(cfg.played_age_audio) + "\n"
         if (cfg.server_brand == 'jellyfin'):
-            config_file += "not_played_age_audiobook=" + str(cfg.not_played_age_audiobook) + "\n"
+            config_file += "played_age_audiobook=" + str(cfg.played_age_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -326,14 +323,12 @@ def generate_config(cfg,updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_movie=" + str(get_default_config_values('keep_favorites_movie')) + "\n"
         config_file += "keep_favorites_episode=" + str(get_default_config_values('keep_favorites_episode')) + "\n"
-        config_file += "keep_favorites_video=" + str(get_default_config_values('keep_favorites_video')) + "\n"
         config_file += "keep_favorites_audio=" + str(get_default_config_values('keep_favorites_audio')) + "\n"
         if (server_brand == 'jellyfin'):
             config_file += "keep_favorites_audiobook=" + str(get_default_config_values('keep_favorites_audiobook')) + "\n"
     elif (updateConfig == 'TRUE'):
         config_file += "keep_favorites_movie=" + str(cfg.keep_favorites_movie) + "\n"
         config_file += "keep_favorites_episode=" + str(cfg.keep_favorites_episode) + "\n"
-        config_file += "keep_favorites_video=" + str(cfg.keep_favorites_video) + "\n"
         config_file += "keep_favorites_audio=" + str(cfg.keep_favorites_audio) + "\n"
         if (cfg.server_brand == 'jellyfin'):
             config_file += "keep_favorites_audiobook=" + str(cfg.keep_favorites_audiobook) + "\n"
@@ -348,14 +343,12 @@ def generate_config(cfg,updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "multiuser_whitelist_movie=" + str(get_default_config_values('multiuser_whitelist_movie')) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(get_default_config_values('multiuser_whitelist_episode')) + "\n"
-        config_file += "multiuser_whitelist_video=" + str(get_default_config_values('multiuser_whitelist_video')) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(get_default_config_values('multiuser_whitelist_audio')) + "\n"
         if (server_brand == 'jellyfin'):
             config_file += "multiuser_whitelist_audiobook=" + str(get_default_config_values('multiuser_whitelist_audiobook')) + "\n"
     elif (updateConfig == 'TRUE'):
         config_file += "multiuser_whitelist_movie=" + str(cfg.multiuser_whitelist_movie) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(cfg.multiuser_whitelist_episode) + "\n"
-        config_file += "multiuser_whitelist_video=" + str(cfg.multiuser_whitelist_video) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(cfg.multiuser_whitelist_audio) + "\n"
         if (cfg.server_brand == 'jellyfin'):
             config_file += "multiuser_whitelist_audiobook=" + str(cfg.multiuser_whitelist_audiobook) + "\n"
@@ -400,287 +393,105 @@ def generate_config(cfg,updateConfig):
     config_file += "# Advanced movie genre configurations\n"
     config_file += "#     Requires 'keep_favorites_movie=1'\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep movie based on the movie's genre\n"
-    config_file += "#  0 - ok to delete movie when its genres are set as a favorite\n"
-    config_file += "#  1 - keep movie if FIRST genre listed in the movie's metadata is set as a favorite\n"
-    config_file += "#  2 - keep movie if ANY genre listed in the movie's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
+    config_file += "#  Keep movie based on the genres\n"
+    config_file += "#  0 - ok to delete movie when genres are set as a favorite\n"
+    config_file += "#  1 - keep movie if FIRST genre listed is set as a favorite\n"
+    config_file += "#  2 - keep movie if ANY genre listed is set as a favorite\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_movie_genre=" + str(get_default_config_values('keep_favorites_advanced_movie_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_movie_genre=" + str(cfg.keep_favorites_advanced_movie_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep movie based on the movie library's genre\n"
-    config_file += "#  0 - ok to delete movie when its movie-library genres are set as a favorite\n"
-    config_file += "#  1 - keep movie if FIRST genre listed in the movie-library's metadata is set as a favorite\n"
-    config_file += "#  2 - keep movie if ANY genre listed in the movie-library's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_movie_library_genre=" + str(get_default_config_values('keep_favorites_advanced_movie_library_genre')) + "\n"
     elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_advanced_movie_genre=" + str(cfg.keep_favorites_advanced_movie_genre) + "\n"
         config_file += "keep_favorites_advanced_movie_library_genre=" + str(cfg.keep_favorites_advanced_movie_library_genre) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Advanced episode genre configurations\n"
+    config_file += "# Advanced episode genre/studio-network configurations\n"
     config_file += "#     Requires 'keep_favorites_episode=1'\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the episode's genre\n"
-    config_file += "#  0 - ok to delete episode when its genres are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST genre listed in the episode's metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY genre listed in the episode's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
+    config_file += "#  Keep episode based on the genre(s) or studio-network(s)\n"
+    config_file += "#  0 - ok to delete episode when its genres or studio-networks are set as a favorite\n"
+    config_file += "#  1 - keep episode if FIRST genre or studio-network is set as a favorite\n"
+    config_file += "#  2 - keep episode if ANY genres or studio-networks are set as a favorite\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_episode_genre=" + str(get_default_config_values('keep_favorites_advanced_episode_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_episode_genre=" + str(cfg.keep_favorites_advanced_episode_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the season's genre\n"
-    config_file += "#  0 - ok to delete episode when its season genres are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST genre listed in the season's metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY genre listed in the season's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_season_genre=" + str(get_default_config_values('keep_favorites_advanced_season_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_season_genre=" + str(cfg.keep_favorites_advanced_season_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the series' genre\n"
-    config_file += "#  0 - ok to delete episode when its series genres are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST genre listed in the series' metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY genre listed in the series' metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_series_genre=" + str(get_default_config_values('keep_favorites_advanced_series_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_series_genre=" + str(cfg.keep_favorites_advanced_series_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the tv-library's genre\n"
-    config_file += "#  0 - ok to delete episode when its tv-library genres are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST genre listed in the tv-library's metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY genre listed in the tv-library's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_tv_library_genre=" + str(get_default_config_values('keep_favorites_advanced_tv_library_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_tv_library_genre=" + str(cfg.keep_favorites_advanced_tv_library_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the studio-network\n"
-    config_file += "#  0 - ok to delete episode when its series' studio-networks are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST studio-network listed in the series' metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY studio-network listed in the series' metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_tv_studio_network=" + str(get_default_config_values('keep_favorites_advanced_tv_studio_network')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_tv_studio_network=" + str(cfg.keep_favorites_advanced_tv_studio_network) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep episode based on the studio-network's genre\n"
-    config_file += "#  0 - ok to delete episode when its studio-network genres are set as a favorite\n"
-    config_file += "#  1 - keep episode if FIRST genre listed in the studio-network's metadata is set as a favorite\n"
-    config_file += "#  2 - keep episode if ANY genre listed in the studio-network's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_tv_studio_network_genre=" + str(get_default_config_values('keep_favorites_advanced_tv_studio_network_genre')) + "\n"
     elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_advanced_episode_genre=" + str(cfg.keep_favorites_advanced_episode_genre) + "\n"
+        config_file += "keep_favorites_advanced_season_genre=" + str(cfg.keep_favorites_advanced_season_genre) + "\n"
+        config_file += "keep_favorites_advanced_series_genre=" + str(cfg.keep_favorites_advanced_series_genre) + "\n"
+        config_file += "keep_favorites_advanced_tv_library_genre=" + str(cfg.keep_favorites_advanced_tv_library_genre) + "\n"
+        config_file += "keep_favorites_advanced_tv_studio_network=" + str(cfg.keep_favorites_advanced_tv_studio_network) + "\n"
         config_file += "keep_favorites_advanced_tv_studio_network_genre=" + str(cfg.keep_favorites_advanced_tv_studio_network_genre) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Advanced track genre configurations\n"
+    config_file += "# Advanced track genre/artist configurations\n"
     config_file += "#     Requires 'keep_favorites_audio=1'\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the track's genre\n"
-    config_file += "#  0 - ok to delete track when its genres are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST genre listed in the track's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY genre listed in the track's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
+    config_file += "#  Keep track based on the genre(s) or artist(s)\n"
+    config_file += "#  0 - ok to delete track when its genres or artists are set as a favorite\n"
+    config_file += "#  1 - keep track if FIRST genre or artist is set as a favorite\n"
+    config_file += "#  2 - keep track if ANY genres or artists are set as a favorite\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_track_genre=" + str(get_default_config_values('keep_favorites_advanced_track_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_track_genre=" + str(cfg.keep_favorites_advanced_track_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the album's genre\n"
-    config_file += "#  0 - ok to delete track when its album's genres are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST genre listed in the album's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY genre listed in the album's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_album_genre=" + str(get_default_config_values('keep_favorites_advanced_album_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_album_genre=" + str(cfg.keep_favorites_advanced_album_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the music-library's genre\n"
-    config_file += "#  0 - ok to delete track when its music-library genres are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST genre listed in the music-library's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY genre listed in the music-library's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_music_library_genre=" + str(get_default_config_values('keep_favorites_advanced_music_library_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_music_library_genre=" + str(cfg.keep_favorites_advanced_music_library_genre) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Advanced track artist configurations\n"
-    config_file += "#     Requires 'keep_favorites_audio=1'\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the track's artist\n"
-    config_file += "#  0 - ok to delete track when its artists are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST artist listed in the track's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY artist listed in the track's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_track_artist=" + str(get_default_config_values('keep_favorites_advanced_track_artist')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_track_artist=" + str(cfg.keep_favorites_advanced_track_artist) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the album's artist\n"
-    config_file += "#  0 - ok to delete track when its album's artists are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST artist listed in the album's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY artist listed in the album's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_album_artist=" + str(get_default_config_values('keep_favorites_advanced_album_artist')) + "\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "keep_favorites_advanced_album_artist=" + str(cfg.keep_favorites_advanced_album_artist) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  Keep track based on the music-library's artist\n"
-    config_file += "#  0 - ok to delete track when its music-library artists are set as a favorite\n"
-    config_file += "#  1 - keep track if FIRST artist listed in the music-library's metadata is set as a favorite\n"
-    config_file += "#  2 - keep track if ANY artist listed in the music-library's metadata is set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
         config_file += "keep_favorites_advanced_music_library_artist=" + str(get_default_config_values('keep_favorites_advanced_music_library_artist')) + "\n"
     elif (updateConfig == 'TRUE'):
+        config_file += "keep_favorites_advanced_track_genre=" + str(cfg.keep_favorites_advanced_track_genre) + "\n"
+        config_file += "keep_favorites_advanced_album_genre=" + str(cfg.keep_favorites_advanced_album_genre) + "\n"
+        config_file += "keep_favorites_advanced_music_library_genre=" + str(cfg.keep_favorites_advanced_music_library_genre) + "\n"
+        config_file += "keep_favorites_advanced_track_artist=" + str(cfg.keep_favorites_advanced_track_artist) + "\n"
+        config_file += "keep_favorites_advanced_album_artist=" + str(cfg.keep_favorites_advanced_album_artist) + "\n"
         config_file += "keep_favorites_advanced_music_library_artist=" + str(cfg.keep_favorites_advanced_music_library_artist) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     if (((updateConfig == 'FALSE') and (server_brand == 'jellyfin')) or
          (updateConfig == 'TRUE') and (hasattr(cfg, 'server_brand') and (cfg.server_brand == 'jellyfin'))):
         config_file += "\n"
         config_file += "#----------------------------------------------------------#\n"
-        config_file += "# Advanced audio book track genre configurations\n"
+        config_file += "# Advanced audio book track genre/author configurations\n"
         config_file += "#     Requires 'keep_favorites_audiobook=1'\n"
         config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the track's genre\n"
-        config_file += "#  0 - ok to delete audio book track when its genres are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST genre listed in the track's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY genre listed in the track's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
+        config_file += "#  Keep audio book track based on the genres or authors\n"
+        config_file += "#  0 - ok to delete audio book track when its genres or authors are set as a favorite\n"
+        config_file += "#  1 - keep audio book track if FIRST genre or author is set as a favorite\n"
+        config_file += "#  2 - keep audio book track if ANY genres or authors are set as a favorite\n"
+        config_file += "# (0 : default)\n"
         config_file += "#----------------------------------------------------------#\n"
         if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_track_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_track_genre')) + "\n"
-        elif (updateConfig == 'TRUE'):
-            config_file += "keep_favorites_advanced_audio_book_track_genre=" + str(cfg.keep_favorites_advanced_audio_book_track_genre) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
-        config_file += "\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the audio book's genre\n"
-        config_file += "#  0 - ok to delete audio book track when its audio book's genres are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST genre listed in the audio book's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY genre listed in the audio book's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
-        config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_genre')) + "\n"
-        elif (updateConfig == 'TRUE'):
-            config_file += "keep_favorites_advanced_audio_book_genre=" + str(cfg.keep_favorites_advanced_audio_book_genre) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
-        config_file += "\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the audio book-library's genre\n"
-        config_file += "#  0 - ok to delete audio book track when its audio book-library genres are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST genre listed in the audio book-library's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY genre listed in the audio book-library's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
-        config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_library_genre')) + "\n"
-        elif (updateConfig == 'TRUE'):
-            config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(cfg.keep_favorites_advanced_audio_book_library_genre) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
-        config_file += "\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "# Advanced audio book track author configurations\n"
-        config_file += "#     Requires 'keep_favorites_audiobook=1'\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the track's author\n"
-        config_file += "#  0 - ok to delete audio book track when its authors are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST author listed in the track's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY author listed in the track's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
-        config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_track_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_track_author')) + "\n"
-        elif (updateConfig == 'TRUE'):
-            config_file += "keep_favorites_advanced_audio_book_track_author=" + str(cfg.keep_favorites_advanced_audio_book_track_author) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
-        config_file += "\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the audio book author\n"
-        config_file += "#  0 - ok to delete audio book track when its audio book's authors are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST author listed in the audio book's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY author listed in the audio book's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
-        config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_author')) + "\n"
-        elif (updateConfig == 'TRUE'):
-            config_file += "keep_favorites_advanced_audio_book_author=" + str(cfg.keep_favorites_advanced_audio_book_author) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
-        config_file += "\n"
-        config_file += "#----------------------------------------------------------#\n"
-        config_file += "#  Keep audio book track based on the audio book-library's author\n"
-        config_file += "#  0 - ok to delete audio book track when its audio book-library authors are set as a favorite\n"
-        config_file += "#  1 - keep audio book track if FIRST author listed in the audio book-library's metadata is set as a favorite\n"
-        config_file += "#  2 - keep audio book track if ANY author listed in the audio book-library's metadata is set as a favorite\n"
-        config_file += "# (1 : default)\n"
-        config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
             config_file += "keep_favorites_advanced_audio_book_library_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_library_author')) + "\n"
         elif (updateConfig == 'TRUE'):
+            config_file += "keep_favorites_advanced_audio_book_track_genre=" + str(cfg.keep_favorites_advanced_audio_book_track_genre) + "\n"
+            config_file += "keep_favorites_advanced_audio_book_genre=" + str(cfg.keep_favorites_advanced_audio_book_genre) + "\n"
+            config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(cfg.keep_favorites_advanced_audio_book_library_genre) + "\n"
+            config_file += "keep_favorites_advanced_audio_book_track_author=" + str(cfg.keep_favorites_advanced_audio_book_track_author) + "\n"
+            config_file += "keep_favorites_advanced_audio_book_author=" + str(cfg.keep_favorites_advanced_audio_book_author) + "\n"
             config_file += "keep_favorites_advanced_audio_book_library_author=" + str(cfg.keep_favorites_advanced_audio_book_library_author) + "\n"
         #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters\n"
-    config_file += "# Does not show existing users in the choice list; but existing users can be updated if you know their position\n"
-    config_file += "#  FALSE - Operate as configured\n"
-    config_file += "#  TRUE  - Allow adding new users to existing config; will NOT delete media items\n"
+    config_file += "# Set to 'TRUE' to add new users or edit existing users\n"
+    config_file += "# Must be string with UPPERCASE letters\n"
+    config_file += "#  FALSE - Operate normally\n"
+    config_file += "#  TRUE  - Enable configuration editor mode; will NOT delete media items\n"
     config_file += "# (FALSE : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
@@ -694,7 +505,7 @@ def generate_config(cfg,updateConfig):
     config_file += "# Do NOT enable any max_age_xyz options unless you know what you are doing\n"
     config_file += "# Use at your own risk; You alone are responsible for your actions\n"
     config_file += "# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY\n"
-    config_file += "# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz\n"
+    config_file += "# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding played_age_xyz\n"
     config_file += "#   0-730500 - number of days to wait before deleting \"old\" media\n"
     config_file += "#  -1 - to disable managing max age of specified media type\n"
     config_file += "# (-1 : default)\n"
@@ -702,14 +513,12 @@ def generate_config(cfg,updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "max_age_movie=-1\n"
         config_file += "max_age_episode=-1\n"
-        config_file += "max_age_video=-1\n"
         config_file += "max_age_audio=-1\n"
         if (server_brand == 'jellyfin'):
             config_file += "max_age_audiobook=-1\n"
     elif (updateConfig == 'TRUE'):
         config_file += "max_age_movie=" + str(cfg.max_age_movie) + "\n"
         config_file += "max_age_episode=" + str(cfg.max_age_episode) + "\n"
-        config_file += "max_age_video=" + str(cfg.max_age_video) + "\n"
         config_file += "max_age_audio=" + str(cfg.max_age_audio) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
             config_file += "max_age_audiobook=" + str(cfg.max_age_audiobook) + "\n"
@@ -724,14 +533,12 @@ def generate_config(cfg,updateConfig):
     if (updateConfig == 'FALSE'):
         config_file += "max_keep_favorites_movie=1\n"
         config_file += "max_keep_favorites_episode=1\n"
-        config_file += "max_keep_favorites_video=1\n"
         config_file += "max_keep_favorites_audio=1\n"
         if (server_brand == 'jellyfin'):
             config_file += "max_keep_favorites_audiobook=1\n"
     elif (updateConfig == 'TRUE'):
         config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
         config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
-        config_file += "max_keep_favorites_video=" + str(cfg.max_keep_favorites_video) + "\n"
         config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
             config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
@@ -862,21 +669,19 @@ def generate_config(cfg,updateConfig):
             #if media_cleaner_config.py file does not exsit go to except and create one
             import media_cleaner_config as cfg
 
-            if ((cfg.not_played_age_movie == -1) and
-                (cfg.not_played_age_episode == -1) and
-                (cfg.not_played_age_video == -1) and
-                (cfg.not_played_age_audio == -1) and
-                ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook')))):
+            if ((cfg.played_age_movie == -1) and
+                (cfg.played_age_episode == -1) and
+                (cfg.played_age_audio == -1) and
+                ((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook')))):
                     print('\n\n-----------------------------------------------------------')
                     print('Config file is not setup to find played media.')
                     print('-----------------------------------------------------------')
                     print('To find played media open media_cleaner_config.py in a text editor:')
-                    print('    Set \'not_played_age_movie\' to zero or a positive number')
-                    print('    Set \'not_played_age_episode\' to zero or a positive number')
-                    print('    Set \'not_played_age_video\' to zero or a positive number')
-                    print('    Set \'not_played_age_audio\' to zero or a positive number')
+                    print('    Set \'played_age_movie\' to zero or a positive number')
+                    print('    Set \'played_age_episode\' to zero or a positive number')
+                    print('    Set \'played_age_audio\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
-                        print('    Set \'not_played_age_audiobook\' to zero or a positive number')
+                        print('    Set \'played_age_audiobook\' to zero or a positive number')
             if (cfg.remove_files == 0):
                 print('-----------------------------------------------------------')
                 print('Config file is not setup to delete played media.')
@@ -3024,14 +2829,12 @@ def get_items(server_url, user_keys, auth_key):
     all_media_disabled=False
 
     if (
-       (cfg.not_played_age_movie == -1) and
-       (cfg.not_played_age_episode == -1) and
-       (cfg.not_played_age_video == -1) and
-       (cfg.not_played_age_audio == -1) and
-       ((hasattr(cfg, 'not_played_age_audiobook') and (cfg.not_played_age_audiobook == -1)) or (not hasattr(cfg, 'not_played_age_audiobook'))) and
+       (cfg.played_age_movie == -1) and
+       (cfg.played_age_episode == -1) and
+       (cfg.played_age_audio == -1) and
+       ((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook'))) and
        (cfg.max_age_movie == -1) and
        (cfg.max_age_episode == -1) and
-       (cfg.max_age_video == -1) and
        (cfg.max_age_audio == -1) and
        ((hasattr(cfg, 'max_age_audiobook') and (cfg.max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
        ):
@@ -3040,12 +2843,11 @@ def get_items(server_url, user_keys, auth_key):
         print('* Open the media_cleaner_config.py file in a text editor. *')
         print('* Set at least one media type to >=0.                     *')
         print('*                                                         *')
-        print('* not_played_age_movie=-1                                 *')
-        print('* not_played_age_episode=-1                               *')
-        print('* not_played_age_video=-1                                 *')
-        print('* not_played_age_audio=-1                                 *')
+        print('* played_age_movie=-1                                 *')
+        print('* played_age_episode=-1                               *')
+        print('* played_age_audio=-1                                 *')
         if (cfg.server_brand == 'jellyfin'):
-            print('* not_played_age_audiobook=-1                             *')
+            print('* played_age_audiobook=-1                             *')
         print('-----------------------------------------------------------')
         all_media_disabled=True
 
@@ -3056,14 +2858,12 @@ def get_items(server_url, user_keys, auth_key):
     #whitelisted Id per media type according to media types metadata
     movie_whitelists=set()
     episode_whitelists=set()
-    video_whitelists=set()
     audio_whitelists=set()
     if (cfg.server_brand == 'jellyfin'):
         audiobook_whitelists=set()
     #blacklisted Ids per media type according to media types metadata
     movie_blacklists=set()
     episode_blacklists=set()
-    video_blacklists=set()
     audio_blacklists=set()
     if (cfg.server_brand == 'jellyfin'):
         audiobook_blacklists=set()
@@ -3100,12 +2900,11 @@ def get_items(server_url, user_keys, auth_key):
     whitetags=cfg.whitetag
 
     #establish deletion date for played media items
-    cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_movie)
-    cut_off_date_episode=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_episode)
-    cut_off_date_video=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_video)
-    cut_off_date_audio=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_audio)
-    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'not_played_age_audiobook')):
-        cut_off_date_audiobook=datetime.now(timezone.utc) - timedelta(cfg.not_played_age_audiobook)
+    cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.played_age_movie)
+    cut_off_date_episode=datetime.now(timezone.utc) - timedelta(cfg.played_age_episode)
+    cut_off_date_audio=datetime.now(timezone.utc) - timedelta(cfg.played_age_audio)
+    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'played_age_audiobook')):
+        cut_off_date_audiobook=datetime.now(timezone.utc) - timedelta(cfg.played_age_audiobook)
 
     for user_key in user_keys_json:
         #define dictionary user_key to store media item favorite states by userId and itemId
@@ -3149,7 +2948,7 @@ def get_items(server_url, user_keys, auth_key):
 
 ############# Movies #############
 
-        if ((cfg.not_played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
+        if ((cfg.played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
 
             user_processed_itemsId_list=set()
 
@@ -3367,7 +3166,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if (does_key_exist(item['UserData'], 'Played')):
 
                                         if (
-                                        ((cfg.not_played_age_movie >= 0) and
+                                        ((cfg.played_age_movie >= 0) and
                                         (item['UserData']['PlayCount'] >= 1) and
                                         (cut_off_date_movie > parse(item['UserData']['LastPlayedDate'])) and
                                         (not bool(cfg.keep_favorites_movie) or (not itemisfav_MOVIE)) and 
@@ -3420,7 +3219,7 @@ def get_items(server_url, user_keys, auth_key):
 
 ############# Episodes #############
 
-        if ((cfg.not_played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
+        if ((cfg.played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
             user_processed_itemsId_list=set()
 
@@ -3632,7 +3431,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if (does_key_exist(item['UserData'], 'Played')):
 
                                         if (
-                                        ((cfg.not_played_age_episode >= 0) and
+                                        ((cfg.played_age_episode >= 0) and
                                         (item['UserData']['PlayCount'] >= 1) and
                                         (cut_off_date_episode > parse(item['UserData']['LastPlayedDate'])) and
                                         (not bool(cfg.keep_favorites_episode) or (not itemisfav_TV)) and
@@ -3691,7 +3490,7 @@ def get_items(server_url, user_keys, auth_key):
 
 ############# Audio #############
 
-        if ((cfg.not_played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
+        if ((cfg.played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
 
             if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
                 IsPlayedState='True'
@@ -3777,7 +3576,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
 
                             if (
-                            ((cfg.not_played_age_audio >= 0) and
+                            ((cfg.played_age_audio >= 0) and
                             (item_info['UserData']['PlayCount'] >= 1) and
                             (cut_off_date_audio > parse(item_info['UserData']['LastPlayedDate'])) and
                             (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIO)) and
@@ -3829,8 +3628,8 @@ def get_items(server_url, user_keys, auth_key):
         #Emby sets audio books to a media type of audio (see audio section)
         if (
            ((cfg.server_brand == 'jellyfin') and
-           hasattr(cfg, 'not_played_age_audiobook') and hasattr(cfg, 'max_age_audiobook')) and
-           ((cfg.not_played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
+           hasattr(cfg, 'played_age_audiobook') and hasattr(cfg, 'max_age_audiobook')) and
+           ((cfg.played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
            ):
 
             if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
@@ -3917,7 +3716,7 @@ def get_items(server_url, user_keys, auth_key):
                         if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
 
                             if (
-                            ((cfg.not_played_age_audiobook >= 0) and
+                            ((cfg.played_age_audiobook >= 0) and
                             (item_info['UserData']['PlayCount'] >= 1) and
                             (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
                             (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOK)) and
@@ -4177,68 +3976,56 @@ def cfgCheck():
     error_found_in_media_cleaner_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
-    if hasattr(cfg, 'not_played_age_movie'):
-        check=cfg.not_played_age_movie
-        check_not_played_age_movie=check
+    if hasattr(cfg, 'played_age_movie'):
+        check=cfg.played_age_movie
+        check_played_age_movie=check
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_movie must be an integer; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: played_age_movie must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The played_age_movie variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'not_played_age_episode'):
-        check=cfg.not_played_age_episode
-        check_not_played_age_episode=check
+    if hasattr(cfg, 'played_age_episode'):
+        check=cfg.played_age_episode
+        check_played_age_episode=check
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_episode must be an integer; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: played_age_episode must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The played_age_episode variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'not_played_age_video'):
-        check=cfg.not_played_age_video
-        check_not_played_age_video=check
+    if hasattr(cfg, 'played_age_audio'):
+        check=cfg.played_age_audio
+        check_played_age_audio=check
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_video must be an integer; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: played_age_audio must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_video variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'not_played_age_audio'):
-        check=cfg.not_played_age_audio
-        check_not_played_age_audio=check
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audio must be an integer; valid range -1 thru 730500\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The played_age_audio variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (check == 'jellyfin'):
-            if hasattr(cfg, 'not_played_age_audiobook'):
-                check=cfg.not_played_age_audiobook
-                check_not_played_age_audiobook=check
+            if hasattr(cfg, 'played_age_audiobook'):
+                check=cfg.played_age_audiobook
+                check_played_age_audiobook=check
                 if (
                     not ((type(check) is int) and
                     (check >= -1) and
                     (check <= 730500))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: not_played_age_audiobook must be an integer; valid range -1 thru 730500\n'
+                    error_found_in_media_cleaner_config_py+='ValueError: played_age_audiobook must be an integer; valid range -1 thru 730500\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The not_played_age_audiobook variable is missing from media_cleaner_config.py\n'
+                error_found_in_media_cleaner_config_py+='NameError: The played_age_audiobook variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_movie'):
         check=cfg.keep_favorites_movie
@@ -4261,17 +4048,6 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'keep_favorites_video'):
-        check=cfg.keep_favorites_video
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_video must be an integer; valid range 0 thru 2\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_video variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_audio'):
         check=cfg.keep_favorites_audio
@@ -4547,17 +4323,6 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'multiuser_whitelist_video'):
-        check=cfg.multiuser_whitelist_video
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_video must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_video variable is missing from media_cleaner_config.py\n'
-
     if hasattr(cfg, 'multiuser_whitelist_audio'):
         check=cfg.multiuser_whitelist_audio
         if (
@@ -4632,10 +4397,10 @@ def cfgCheck():
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500) and
-            (((check >= check_not_played_age_movie) and (check >= 0)) or
+            (((check >= check_played_age_movie) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_movie variable is missing from media_cleaner_config.py\n'
 
@@ -4645,25 +4410,12 @@ def cfgCheck():
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500) and
-            (((check >= check_not_played_age_episode) and (check >= 0)) or
+            (((check >= check_played_age_episode) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_age_video'):
-        check=cfg.max_age_video
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500) and
-            (((check >= check_not_played_age_video) and (check >= 0)) or
-            (check == -1)))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_video must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_age_video variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_age_audio'):
         check=cfg.max_age_audio
@@ -4671,10 +4423,10 @@ def cfgCheck():
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500) and
-            (((check >= check_not_played_age_audio) and (check >= 0)) or
+            (((check >= check_played_age_audio) and (check >= 0)) or
             (check == -1)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_age_audio variable is missing from media_cleaner_config.py\n'
 
@@ -4687,10 +4439,10 @@ def cfgCheck():
                     not ((type(check) is int) and
                     (check >= -1) and
                     (check <= 730500) and
-                    (((check >= check_not_played_age_audiobook) and (check >= 0)) or
+                    (((check >= check_played_age_audiobook) and (check >= 0)) or
                     (check == -1)))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding not_played_age_xyz; valid range -1 thru 730500\n'
+                    error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
 
@@ -4715,17 +4467,6 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_keep_favorites_video'):
-        check=cfg.max_keep_favorites_video
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_video must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_video variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_keep_favorites_audio'):
         check=cfg.max_keep_favorites_audio
