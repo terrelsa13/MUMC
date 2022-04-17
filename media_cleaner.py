@@ -563,14 +563,14 @@ def generate_config(cfg,updateConfig):
         config_file += "server_url='" + server_url + "'\n"
     elif (updateConfig == 'TRUE'):
         config_file += "server_url='" + cfg.server_url + "'\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Admin username; entered during setup\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "admin_username='" + username + "'\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "admin_username='" + cfg.admin_username + "'\n"
+    #config_file += "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "# Admin username; entered during setup\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #if (updateConfig == 'FALSE'):
+        #config_file += "admin_username='" + username + "'\n"
+    #elif (updateConfig == 'TRUE'):
+        #config_file += "admin_username='" + cfg.admin_username + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Authentication Key; requested from server during setup\n"
@@ -2258,13 +2258,6 @@ def get_isItemMatching(item_one, item_two):
                         return(items_match, single_item_one)
     return(items_match, matching_item)
 
-
-#determine if item path is blacklisted (aka monitored)
-def get_isPathBlacklisted(itemPath, comparePath, itemTitle):
-    pathResult, pathString=get_isItemMatching(itemPath, comparePath)
-    return(pathResult)
-
-
 #Determine if item can be monitored
 def get_isItemMonitored(mediasource):
     if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
@@ -2459,7 +2452,7 @@ def get_isMovieTagged(usertags,itemtaglist,item,user_key,tagtype):
             #Check if media item is tagged
             taglist=set()
             for tagpos in range(len(item['TagItems'])):
-                taglist.add(item['TagItems'][tagpos])
+                taglist.add(item['TagItems'][tagpos]['Name'])
             itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save media item's tags state
             if (itemIsTagged_Item):
@@ -2472,7 +2465,7 @@ def get_isMovieTagged(usertags,itemtaglist,item,user_key,tagtype):
             library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
             taglist=set()
             for tagpos in range(len(library_item_info['TagItems'])):
-                taglist.add(library_item_info['TagItems'][tagpos])
+                taglist.add(library_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save library's usertags state
             if (itemIsTagged_Library):
@@ -2484,7 +2477,7 @@ def get_isMovieTagged(usertags,itemtaglist,item,user_key,tagtype):
             library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
             taglist=set()
             for tagpos in range(len(library_item_info['TagItems'])):
-                taglist.add(library_item_info['TagItems'][tagpos])
+                taglist.add(library_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save library's usertags state
             if (itemIsTagged_Library):
@@ -2551,7 +2544,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             #Check if media item is tagged
             taglist=set()
             for tagpos in range(len(item['TagItems'])):
-                taglist.add(item['TagItems'][tagpos])
+                taglist.add(item['TagItems'][tagpos]['Name'])
             itemIsTagged_Item, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save media item's tags state
             if (itemIsTagged_Item):
@@ -2564,7 +2557,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             season_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeasonId'], cfg.auth_key, 'episode_season_' + tagtype)
             taglist=set()
             for tagpos in range(len(season_item_info['TagItems'])):
-                taglist.add(season_item_info['TagItems'][tagpos])
+                taglist.add(season_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save season's usertags state
             if (itemIsTagged_Season):
@@ -2576,7 +2569,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             season_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'episode_season_' + tagtype)
             taglist=set()
             for tagpos in range(len(season_item_info['TagItems'])):
-                taglist.add(season_item_info['TagItems'][tagpos])
+                taglist.add(season_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Season, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save season's usertags state
             if (itemIsTagged_Season):
@@ -2589,7 +2582,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             series_item_info = get_additional_item_info(cfg.server_url, user_key, item['SeriesId'], cfg.auth_key, 'season_series_' + tagtype)
             taglist=set()
             for tagpos in range(len(series_item_info['TagItems'])):
-                taglist.add(series_item_info['TagItems'][tagpos])
+                taglist.add(series_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save series' usertags state
             if (itemIsTagged_Series):
@@ -2601,7 +2594,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             series_item_info = get_additional_item_info(cfg.server_url, user_key, season_item_info['ParentId'], cfg.auth_key, 'season_series_' + tagtype)
             taglist=set()
             for tagpos in range(len(series_item_info['TagItems'])):
-                taglist.add(series_item_info['TagItems'][tagpos])
+                taglist.add(series_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Series, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save parent's usertags state
             if (itemIsTagged_Series):
@@ -2614,7 +2607,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             library_item_info = get_additional_item_info(cfg.server_url, user_key, item['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
             taglist=set()
             for tagpos in range(len(library_item_info['TagItems'])):
-                taglist.add(library_item_info['TagItems'][tagpos])
+                taglist.add(library_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save library's usertags state
             if (itemIsTagged_Library):
@@ -2626,7 +2619,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             library_item_info = get_additional_item_info(cfg.server_url, user_key, series_item_info['ParentId'], cfg.auth_key, 'movie_library_' + tagtype)
             taglist=set()
             for tagpos in range(len(library_item_info['TagItems'])):
-                taglist.add(library_item_info['TagItems'][tagpos])
+                taglist.add(library_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save library's usertags state
             if (itemIsTagged_Library):
@@ -2638,7 +2631,7 @@ def get_isEpisodeTagged(usertags,itemtaglist,item,user_key,tagtype):
             library_item_info = get_additional_item_info(cfg.server_url, user_key, LibraryID, cfg.auth_key, 'movie_library_' + tagtype)
             taglist=set()
             for tagpos in range(len(library_item_info['TagItems'])):
-                taglist.add(library_item_info['TagItems'][tagpos])
+                taglist.add(library_item_info['TagItems'][tagpos]['Name'])
             itemIsTagged_Library, itemTaggedValue=get_isItemMatching(usertags, ','.join(map(str, taglist)))
             #Save library's usertags state
             if (itemIsTagged_Library):
@@ -3535,17 +3528,17 @@ def get_items(server_url, user_keys, auth_key):
                             if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         elif (does_key_exist(mediasource, 'Type')):
                             if (mediasource['Type'] == 'Placeholder'):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         elif (does_key_exist(mediasource, 'Size')):
                             if (mediasource['Size'] == 0):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
 
@@ -3675,17 +3668,17 @@ def get_items(server_url, user_keys, auth_key):
                             if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         elif (does_key_exist(mediasource, 'Type')):
                             if (mediasource['Type'] == 'Placeholder'):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         elif (does_key_exist(mediasource, 'Size')):
                             if (mediasource['Size'] == 0):
                                 itemIsMonitored=False
                             else:
-                                itemIsMonitored=get_isPathBlacklisted(item_info['Path'], user_bllib_json[currentPosition])
+                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
                         else:
                             itemIsMonitored=False
 
@@ -4513,14 +4506,14 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The server_url variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'admin_username'):
-        check=cfg.admin_username
-        if (
-            not (type(check) is str)
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: admin_username must be a string\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The admin_username variable is missing from media_cleaner_config.py\n'
+    #if hasattr(cfg, 'admin_username'):
+        #check=cfg.admin_username
+        #if (
+            #not (type(check) is str)
+        #):
+            #error_found_in_media_cleaner_config_py+='ValueError: admin_username must be a string\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The admin_username variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
