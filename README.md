@@ -216,13 +216,6 @@ server_brand='serverbrand'
 #----------------------------------------------------------#
 server_url='http://localhost.abc:8096/basename'
 ```
-#### Media server's admin username
-```python
-#----------------------------------------------------------#
-# Admin username; entered during setup
-#----------------------------------------------------------#
-admin_username='username'
-```
 #### Server authentication key
 ```python
 #----------------------------------------------------------#
