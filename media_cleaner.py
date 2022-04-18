@@ -1736,7 +1736,7 @@ def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
     return(deleteItems)
 
 
-#Handle whitelists across multiple users by IDs
+#Handle whitelists across multiple users by ID
 def get_iswhitelist_ByMultiUser(userkeys, whitelists, deleteItems):
     all_whitelists=set()
     deleteIndexes=[]
@@ -1782,6 +1782,11 @@ def get_iswhitelist_ByMultiUser(userkeys, whitelists, deleteItems):
            exit(0)
 
     return(deleteItems)
+
+
+#Handle whitetags across multiple users by ID
+def get_iswhitetagged_ByMultiUser(userkeys, whitetags, deleteItems):
+    return get_iswhitelist_ByMultiUser(userkeys, whitetags, deleteItems)
 
 
 #Determine if there is a matching item
@@ -2251,7 +2256,11 @@ def get_items(server_url, user_keys, auth_key):
     #list of items to be deleted
     deleteItems=[]
     #dictionary of favorited items by userId
-    isfav_byUserId={}
+    isfav_byUserId_Movie={}
+    isfav_byUserId_Episode={}
+    isfav_byUserId_Audio={}
+    if (cfg.server_brand == 'jellyfin'):
+        isfav_byUserId_AudioBook={}
     #whitelisted Id per media type according to media types metadata
     movie_whitelists=set()
     episode_whitelists=set()
@@ -2310,7 +2319,11 @@ def get_items(server_url, user_keys, auth_key):
 
     for user_key in user_keys_json:
         #define dictionary user_key to store media item favorite states by userId and itemId
-        isfav_byUserId[user_key]={}
+        isfav_byUserId_Movie[user_key]={}
+        isfav_byUserId_Episode[user_key]={}
+        isfav_byUserId_Audio[user_key]={}
+        if (cfg.server_brand == 'jellyfin'):
+            isfav_byUserId_AudioBook[user_key]={}
 
     currentPosition=0
 
@@ -2532,7 +2545,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
-                                        isfav_byUserId[user_key][item['Id']] = itemisfav_MOVIE
+                                        isfav_byUserId_Movie[user_key][item['Id']] = itemisfav_MOVIE
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -2812,7 +2825,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_episode == 2) and (itemisfav_EPISODE)):
-                                        isfav_byUserId[user_key][item['Id']] = itemisfav_EPISODE
+                                        isfav_byUserId_Episode[user_key][item['Id']] = itemisfav_EPISODE
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -3094,7 +3107,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIO)):
-                                        isfav_byUserId[user_key][item['Id']] = itemisfav_AUDIO
+                                        isfav_byUserId_Audio[user_key][item['Id']] = itemisfav_AUDIO
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -3270,7 +3283,7 @@ def get_items(server_url, user_keys, auth_key):
 
                         #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                         if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK)):
-                            isfav_byUserId[user_key][item_info['Id']] = itemisfav_AUDIOBOOK
+                            isfav_byUserId_AudioBook[user_key][item_info['Id']] = itemisfav_AUDIOBOOK
 
                         #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                         if ((cfg.multiuser_whitelist_audiobook == 1) and (itemIsWhiteListed)):
@@ -3336,7 +3349,11 @@ def get_items(server_url, user_keys, auth_key):
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
-    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId, deleteItems)
+    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
+    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
+    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
+    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+        deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(movie_whitelists), deleteItems)
@@ -3346,11 +3363,11 @@ def get_items(server_url, user_keys, auth_key):
         deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(audiobook_whitelists), deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, movie_whitetaglists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, episode_whitetaglists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, audio_whitetaglists, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(user_keys_json, movie_whitetaglists, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(user_keys_json, episode_whitetaglists, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(user_keys_json, audio_whitetaglists, deleteItems)
     if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
-        deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, audiobook_whitetaglists, deleteItems)
+        deleteItems=get_iswhitetagged_ByMultiUser(user_keys_json, audiobook_whitetaglists, deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
