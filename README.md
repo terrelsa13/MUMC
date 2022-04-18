@@ -19,10 +19,10 @@ Customize your default values before running for the script the first time.
 #  -1 - to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
-not_played_age_movie=-1
-not_played_age_episode=-1
-not_played_age_audio=-1
-not_played_age_audiobook=-1
+played_age_movie=-1
+played_age_episode=-1
+played_age_audio=-1
+played_age_audiobook=-1
 ```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
@@ -66,7 +66,7 @@ blacktag='bt_tagname,bt_tag name,bt_tag-name'
 ```
 #### Whitetag a media item to be kept after it is watched:
 ```python
-#----------------------------t------------------------------#
+#----------------------------------------------------------#
 # User entered whitetag name; chosen during setup
 #  Use comma ',' to seperate multiple tag names
 #   Ex: tagname,tag name,tag-name
@@ -282,9 +282,9 @@ api_request_attempts=4
 # API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call
 #  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata
 #  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
-#  (100 : default)
+#  (50 : default)
 #----------------------------------------------------------##
-api_return_limit=100
+api_return_limit=50
 ```
 #### DEBUG
 ```python
