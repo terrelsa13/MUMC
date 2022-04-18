@@ -261,7 +261,7 @@ def generate_config(cfg,updateConfig):
         if (server_brand == 'jellyfin'):
             print('-----------------------------------------------------------')
             played_age_audiobook = get_played_age('audiobook')
-    else:
+    else: #Prepare to run the config editor
         print('-----------------------------------------------------------')
         script_behavior=get_setup_behavior(cfg.script_behavior)
         print('-----------------------------------------------------------')
@@ -564,14 +564,6 @@ def generate_config(cfg,updateConfig):
         config_file += "server_url='" + server_url + "'\n"
     elif (updateConfig == 'TRUE'):
         config_file += "server_url='" + cfg.server_url + "'\n"
-    #config_file += "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #config_file += "# Admin username; entered during setup\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #if (updateConfig == 'FALSE'):
-        #config_file += "admin_username='" + username + "'\n"
-    #elif (updateConfig == 'TRUE'):
-        #config_file += "admin_username='" + cfg.admin_username + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Authentication Key; requested from server during setup\n"
@@ -614,14 +606,14 @@ def generate_config(cfg,updateConfig):
     config_file += "# API request attempts; number of times to retry an API request\n"
     config_file += "#  delay between initial attempt and the first retry is 1 second\n"
     config_file += "#  The delay will double with each attempt after the first retry\n"
-    config_file += "#  Delay between the orginal request and retry 1 is (2^0) 1 second\n"
-    config_file += "#  Delay between retry 1 and retry 2 is (2^1) 2 seconds\n"
-    config_file += "#  Delay between retry 2 and retry 3 is (2^2) 4 seconds\n"
-    config_file += "#  Delay between retry 3 and retry 4 is (2^3) 8 seconds\n"
-    config_file += "#  Delay between retry 4 and retry 5 is (2^4) 16 seconds\n"
-    config_file += "#  Delay between retry 5 and retry 6 is (2^5) 32 seconds\n"
+    config_file += "#  Delay between the orginal request and retry #1 is (2^0) 1 second\n"
+    config_file += "#  Delay between retry #1 and retry #2 is (2^1) 2 seconds\n"
+    config_file += "#  Delay between retry #2 and retry #3 is (2^2) 4 seconds\n"
+    config_file += "#  Delay between retry #3 and retry #4 is (2^3) 8 seconds\n"
+    config_file += "#  Delay between retry #4 and retry #5 is (2^4) 16 seconds\n"
+    config_file += "#  Delay between retry #5 and retry #6 is (2^5) 32 seconds\n"
     config_file += "#  ...\n"
-    config_file += "#  Delay between retry 15 and retry 16 is (2^15) 32768 seconds\n"
+    config_file += "#  Delay between retry #15 and retry #16 is (2^15) 32768 seconds\n"
     config_file += "#  0-16 - number of retry attempts\n"
     config_file += "#  (4 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -743,13 +735,14 @@ def get_auth_key(server_url, username, password, server_brand):
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
 
-    #assuming jellyfin will eventually change this
+    xAuth = 'X-Emby-Authorization'
+    #assuming jellyfin will eventually change to this
     #if (server_brand == 'emby'):
         #xAuth = 'X-Emby-Authorization'
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {'X-Emby-Authorization' : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.0 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.0 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -762,9 +755,9 @@ def get_auth_key(server_url, username, password, server_brand):
     return(data['AccessToken'])
 
 
-#api call to get all user accounts
-#then choose account(s) this script will use to delete played media
-#choosen account(s) do NOT need to have "Allow Media Deletion From" enabled
+#API call to get all user accounts
+#Choose account(s) this script will use to delete played media
+#Choosen account(s) do NOT need to have "Allow Media Deletion From" enabled in the UI
 def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig):
     #Get all users
     req=(server_url + '/Users?api_key=' + auth_key)
@@ -810,7 +803,7 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
             raise ValueError('\nValueError: Number of entries in user_key and number of entries in user_wl_libs does NOT match')
 
         i=0
-        #Pre-populate the existing userkeys and libraries so only new users are shown
+        #Pre-populate the existing userkeys and libraries so only new users are shown will all displayed user info
         for rerun_userkey in user_keys_json:
             userId_set.add(rerun_userkey)
             if (rerun_userkey == user_wl_libs_json[i]['userid']):
@@ -823,6 +816,8 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
                 raise ValueError('\nValueError: Order of user_keys and user_wl libs are not in the same order.')
             i += 1
 
+        #Uncomment if the config editor should only allow adding new users
+        #This means the script will not allow editing exisitng users until a new user is added
         #if ((len(user_keys_json)) == (len(data))):
             #print('-----------------------------------------------------------')
             #print('No new user(s) found.')
@@ -916,7 +911,9 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
 def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, user_number, mandatory):
     #get all library paths
 
+    #Request for libraries (i.e. movies, tvshows, audio, etc...)
     req_folders=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
+    #Request for channels (i.e. livetv, trailers, etc...)
     #req_channels=(server_url + '/Channels?api_key=' + auth_key)
 
     #preConfigDebug = True
@@ -1864,7 +1861,6 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                 if not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio')):
                     #include all item types; filter applied in firt API calls for each media type in get_items()
                     IncludeItemTypes=''
-                    IsFavorite='True'
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
                     SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                     SortOrder='Ascending'
@@ -1883,9 +1879,8 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                         if not (data['Id'] == ''):
                             #Built query for watched items in s
                             apiQuery=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                            '&IsFavorite=' + IsFavorite + '&StartIndex=' + str(StartIndex) + '&Limit=' + str(QueryLimit) + '&IsPlayed=' + IsPlayedState +
-                            '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
-                            '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
+                            '&StartIndex=' + str(StartIndex) + '&Limit=' + str(QueryLimit) + '&IsPlayed=' + IsPlayedState + '&Fields=' + FieldsState +
+                            '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
                         else:
                             #When no libraries are ed; simulate an empty query being returned
                             #this will prevent trying to compare to an empty  string '' to the whitelist libraries later on
@@ -1907,13 +1902,13 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                                 #Check if media item has any favs
                                 if not (does_key_exist(child_item,'UserData')):
                                     #if it does not; add fav to metadata
-                                    child_item['UserData']={'IsFavorite':'True'}
+                                    child_item['UserData']={'IsFavorite':True}
                                 elif not (does_key_exist(child_item['UserData'],'IsFavorite')):
                                     #if it does not; add fav to metadata
-                                    child_item['UserData']['IsFavorite']='True'
+                                    child_item['UserData']['IsFavorite']=True
                                 #if child_item is not already a fav; update this temp metadata so it is a fav
                                 if not (child_item['UserData']['IsFavorite']):
-                                    child_item['UserData']['IsFavorite']='True'
+                                    child_item['UserData']['IsFavorite']=True
 
                                 #assign fav to metad
                                 child_list.append(child_item)
@@ -2029,6 +2024,8 @@ def api_return_limiter(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
 
     return(data,StartIndex,TotalItems,QueryLimit)
 
+
+#Unpack library data structure from config
 def user_lib_builder(lib_json):
     built_userid=[]
     built_libid=[]
@@ -2243,9 +2240,9 @@ def get_items(server_url, user_keys, auth_key):
         print('* Open the media_cleaner_config.py file in a text editor. *')
         print('* Set at least one media type to >=0.                     *')
         print('*                                                         *')
-        print('* played_age_movie=-1                                 *')
-        print('* played_age_episode=-1                               *')
-        print('* played_age_audio=-1                                 *')
+        print('* played_age_movie=-1                                     *')
+        print('* played_age_episode=-1                                   *')
+        print('* played_age_audio=-1                                     *')
         if (cfg.server_brand == 'jellyfin'):
             print('* played_age_audiobook=-1                             *')
         print('-----------------------------------------------------------')
@@ -2261,21 +2258,31 @@ def get_items(server_url, user_keys, auth_key):
     audio_whitelists=set()
     if (cfg.server_brand == 'jellyfin'):
         audiobook_whitelists=set()
-    #blacklisted Ids per media type according to media types metadata
-    movie_blacklists=set()
-    episode_blacklists=set()
-    audio_blacklists=set()
+
+    #blacktagged items per media type according to media types metadata
+    movie_blacktaglists=[]
+    episode_blacktaglists=[]
+    audio_blacktaglists=[]
     if (cfg.server_brand == 'jellyfin'):
-        audiobook_blacklists=set()
-    blacktaglists=[]
-    whitetaglists=[]
+        audiobook_blacktaglists=[]
+
+    #whitetagged items per media type according to media types metadata
+    movie_whitetaglists=[]
+    episode_whitetaglists=[]
+    audio_whitetaglists=[]
+    if (cfg.server_brand == 'jellyfin'):
+        audiobook_whitetaglists=[]
+
     if bool(cfg.DEBUG):
         #dictionary of whitelisted items by userId
-        iswhitelist_byUserId={}
+        #iswhitelist_byUserId={}
+        iswhitelist_byUserId[user_key]={}
         #dictionary of blacktagged items by userId
-        isblacktag_byUserId={}
+        #isblacktag_byUserId={}
+        isblacktag_byUserId[user_key]={}
         #dictionary of whitetagged items by userId
-        iswhitetag_byUserId={}
+        #iswhitetag_byUserId={}
+        iswhitetag_byUserId[user_key]={}
 
     #load user_keys to json
     user_keys_json=json.loads(user_keys)
@@ -2284,15 +2291,10 @@ def get_items(server_url, user_keys, auth_key):
     #load_user_wl_libs to json
     user_wllib_json=json.loads(cfg.user_wl_libs)
 
-    #Build the data structures from the blacklist data stored in the configuration file
+    #Build the library data from the data structures stored in the configuration file
     user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(json.loads(cfg.user_bl_libs))
-    #Build the data structures from the whitelist data stored in the configuration file
+    #Build the library data from the data structures stored in the configuration file
     user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(json.loads(cfg.user_wl_libs))
-
-    #get number of user_keys and user_libs
-    #userkey_count=len(user_keys_json)
-    #userbllib_count=len(user_bllib_json)
-    #userwllib_count=len(user_wllib_json)
 
     #Get blacktags
     blacktags=cfg.blacktag
@@ -2332,19 +2334,11 @@ def get_items(server_url, user_keys, auth_key):
         #define empty dictionary for favorited Movies
         isfav_MOVIE={'movie':{},'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
         #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
-        isfav_TV={'episode':{},'season':{},'series':{},'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
+        isfav_EPISODE={'episode':{},'season':{},'series':{},'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
         #define empty dictionary for favorited Tracks, Albums, Artists
         isfav_AUDIO={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'audiolibrarygenre':{},'trackartist':{},'albumartist':{},'audiolibraryartist':{},'composergenre':{}}
         #define empty dictionary for favorited Tracks, Albums(Books), Artists(Authors)
         isfav_AUDIOBOOK={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'artistgenre':{},'composergenre':{},'audiolibrarygenre':{}}
-
-        if bool(cfg.DEBUG):
-            #define dictionary user_key to store media item whitelisted states by userId and itemId
-            iswhitelist_byUserId[user_key]={}
-            #define dictionary user_key to store media item blacktagged states by userId and itemId
-            isblacktag_byUserId[user_key]={}
-            #define dictionary user_key to store media item whitetagged states by userId and itemId
-            iswhitetag_byUserId[user_key]={}
 
 ############# Movies #############
 
@@ -2495,7 +2489,8 @@ def get_items(server_url, user_keys, auth_key):
                     data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    data_list=[data_Blacklist,data_Favorited,data_Favorited_Children,data_Blacktagged,data_Blacktagged_Children,data_Whitetagged,data_Whitetagged_Children]
+                    #Order here is important
+                    data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
@@ -2577,12 +2572,12 @@ def get_items(server_url, user_keys, auth_key):
                                     if (LibraryID == ''):
                                         displayIsWhiteListed=True
 
-                                    whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,whitetaglists,item,user_key,'whitetag')
+                                    movie_whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,movie_whitetaglists,item,user_key,'whitetag')
 
                                     itemIsBlackTagged=False
                                     #Skip blacktagging if already whitetagged
-                                    #if not (itemIsWhiteTagged):
-                                        #blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,blacktaglists,item,user_key,'blacktag')
+                                    if not (itemIsWhiteTagged):
+                                        movie_blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,movie_blacktaglists,item,user_key,'blacktag')
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -2663,7 +2658,7 @@ def get_items(server_url, user_keys, auth_key):
                 APIDebugMsg_Favorited='episode_Favorited_media_data'
 
                 #Build query for Favorited media items
-                IncludeItemTypes_Favorited='Episode'
+                IncludeItemTypes_Favorited='Episode,Season,Series,CollectionFolder'
                 FieldsState_Favorited='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
                 SortBy_Favorited='SeriesName,ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Favorited='Ascending'
@@ -2774,7 +2769,8 @@ def get_items(server_url, user_keys, auth_key):
                     data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    data_list=[data_Blacklist,data_Favorited,data_Favorited_Children,data_Blacktagged,data_Blacktagged_Children,data_Whitetagged,data_Whitetagged_Children]
+                    #Order here is important
+                    data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
@@ -2812,11 +2808,11 @@ def get_items(server_url, user_keys, auth_key):
                                         max_cut_off_date_episode=date_time_now=datetime.utcnow() + timedelta(1)
 
                                     #Get if media item is set as favorite
-                                    itemisfav_TV=item['UserData']['IsFavorite']
+                                    itemisfav_EPISODE=item['UserData']['IsFavorite']
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((cfg.keep_favorites_episode == 2) and (itemisfav_TV)):
-                                        isfav_byUserId[user_key][item['Id']] = itemisfav_TV
+                                    if ((cfg.keep_favorites_episode == 2) and (itemisfav_EPISODE)):
+                                        isfav_byUserId[user_key][item['Id']] = itemisfav_EPISODE
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -2841,6 +2837,7 @@ def get_items(server_url, user_keys, auth_key):
                                                 #media item could be seen due to matching tag and not watched state
                                                 itemIsWhiteListedTaggedNotWatched, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
 
+                                    #Determine what to show based on whitelist outputs
                                     if ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == False)):
                                         displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == True)):
@@ -2855,12 +2852,12 @@ def get_items(server_url, user_keys, auth_key):
                                     if (LibraryID == ''):
                                         displayIsWhiteListed=True
 
-                                    whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,whitetaglists,item,user_key,'whitetag')
+                                    episode_whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,episode_whitetaglists,item,user_key,'whitetag')
 
                                     itemIsBlackTagged=False
                                     #Skip blacktagging if already whitetagged
-                                    #if not (itemIsWhiteTagged):
-                                        #blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,blacktaglists,item,user_key,'blacktag')
+                                    if not (itemIsWhiteTagged):
+                                        episode_blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,episode_blacktaglists,item,user_key,'blacktag')
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -2868,13 +2865,13 @@ def get_items(server_url, user_keys, auth_key):
                                         ((cfg.played_age_episode >= 0) and
                                         (item['UserData']['PlayCount'] >= 1) and
                                         (cut_off_date_episode > parse(item['UserData']['LastPlayedDate'])) and
-                                        (not bool(cfg.keep_favorites_episode) or (not itemisfav_TV)) and
+                                        (not bool(cfg.keep_favorites_episode) or (not itemisfav_EPISODE)) and
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         or
                                         ((cfg.max_age_episode >= 0) and
                                         (max_cut_off_date_episode <= datetime.utcnow()) and
-                                        (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_TV)) and
-                                        ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_TV))) and
+                                        (((not bool(cfg.keep_favorites_episode)) or (not itemisfav_EPISODE)) and
+                                        ((not bool(cfg.max_keep_favorites_episode)) or (not itemisfav_EPISODE))) and
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
@@ -2882,7 +2879,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                             ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -2898,7 +2895,7 @@ def get_items(server_url, user_keys, auth_key):
                                                 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                             ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
+                                                            ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -2943,7 +2940,7 @@ def get_items(server_url, user_keys, auth_key):
                 APIDebugMsg_Favorited='audio_Favorited_media_data'
 
                 #Build query for Favorited media items
-                IncludeItemTypes_Favorited='Audio'
+                IncludeItemTypes_Favorited='Audio,MusicAlbum,Playlist,CollectionFolder'
                 FieldsState_Favorited='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
                 SortBy_Favorited='AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Favorited='Ascending'
@@ -3054,7 +3051,8 @@ def get_items(server_url, user_keys, auth_key):
                     data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    data_list=[data_Blacklist,data_Favorited,data_Favorited_Children,data_Blacktagged,data_Blacktagged_Children,data_Whitetagged,data_Whitetagged_Children]
+                    #Order here is important
+                    data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
@@ -3121,6 +3119,7 @@ def get_items(server_url, user_keys, auth_key):
                                                 #media item could be seen due to matching tag and not watched state
                                                 itemIsWhiteListedTaggedNotWatched, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
 
+                                    #Determine what to show based on whitelist outputs
                                     if ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == False)):
                                         displayIsWhiteListed=False
                                     elif ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == True)):
@@ -3135,15 +3134,14 @@ def get_items(server_url, user_keys, auth_key):
                                     if (LibraryID == ''):
                                         displayIsWhiteListed=True
 
-                                    whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,whitetaglists,item,user_key,'whitetag')
+                                    audio_whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,audio_whitetaglists,item,user_key,'whitetag')
 
                                     itemIsBlackTagged=False
                                     #Skip blacktagging if already whitetagged
-                                    #if not (itemIsWhiteTagged):
-                                        #blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,blacktaglists,item,user_key,'blacktag')
+                                    if not (itemIsWhiteTagged):
+                                        audio_blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,audio_blacktaglists,item,user_key,'blacktag')
 
                                     if (does_key_exist(item['UserData'], 'Played')):
-                                    #if ((does_key_exist(item['UserData'], 'Played')) and (item['UserData']['Played'] == True)):
 
                                         if (
                                         ((cfg.played_age_audio >= 0) and
@@ -3348,7 +3346,11 @@ def get_items(server_url, user_keys, auth_key):
         deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, list(audiobook_whitelists), deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, whitetaglists, deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, movie_whitetaglists, deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, episode_whitetaglists, deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, audio_whitetaglists, deleteItems)
+    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+        deleteItems=get_iswhitelist_ByMultiUser(user_keys_json, audiobook_whitetaglists, deleteItems)
 
     if bool(cfg.DEBUG):
         print('-----------------------------------------------------------')
@@ -3356,8 +3358,8 @@ def get_items(server_url, user_keys, auth_key):
         print('isfav_MOVIE: ')
         print(isfav_MOVIE)
         print('')
-        print('isfav_TV: ')
-        print(isfav_TV)
+        print('isfav_EPISODE: ')
+        print(isfav_EPISODE)
         print('')
         print('isfav_AUDIO: ')
         print(isfav_AUDIO)
