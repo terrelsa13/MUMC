@@ -1671,449 +1671,6 @@ def get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key, itemType)
 
 
 #determine if episode, season, series, or network are set to favorite
-def get_isfav_TV(isfav_TV, item, server_url, user_key, auth_key):
-    keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
-    keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
-    keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
-    keep_favorites_advanced_tv_library_genre=cfg.keep_favorites_advanced_tv_library_genre
-    keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
-    keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
-
-### Episode #######################################################################################
-
-    if (does_key_exist(item, 'Id')):
-        #Check if episode's favorite value already exists in dictionary
-        if not item['Id'] in isfav_TV['episode']:
-            if (does_key_index_exist(item,'UserData','IsFavorite')):
-                #Store if this episode is marked as a favorite
-                isfav_TV['episode'][item['Id']] = item['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (item['UserData']['IsFavorite']):
-                #Store if the episode is marked as a favorite
-                isfav_TV['episode'][item['Id']] = item['UserData']['IsFavorite']
-
-        isfav_TV['episodegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_TV['episodegenre'],keep_favorites_advanced_episode_genre,'episode_genre')
-
-### End Episode ###################################################################################
-
-### Season ########################################################################################
-
-    if (does_key_exist(item, 'SeasonId')):
-        season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'season_info')
-        #Check if season's favorite value already exists in dictionary
-        if not season_item_info['Id'] in isfav_TV['season']:
-            if (does_key_index_exist(season_item_info,'UserData','IsFavorite')):
-                #Store if the season folder is marked as a favorite
-                isfav_TV['season'][season_item_info['Id']] = season_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (season_item_info['UserData']['IsFavorite']):
-                #Store if the season is marked as a favorite
-                isfav_TV['season'][season_item_info['Id']] = season_item_info['UserData']['IsFavorite']
-
-        isfav_TV['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_TV['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
-
-    elif (does_key_exist(item, 'ParentId')):
-        season_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'season_info')
-        #Check if season's favorite value already exists in dictionary
-        if not season_item_info['Id'] in isfav_TV['season']:
-            if (does_key_index_exist(season_item_info,'UserData','IsFavorite')):
-                #Store if the season folder is marked as a favorite
-                isfav_TV['season'][season_item_info['Id']] = season_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (season_item_info['UserData']['IsFavorite']):
-                #Store if the season is marked as a favorite
-                isfav_TV['season'][season_item_info['Id']] = season_item_info['UserData']['IsFavorite']
-
-        isfav_TV['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_TV['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
-
-### End Season ####################################################################################
-
-### Series ########################################################################################
-
-    if (does_key_exist(item, 'SeriesId')):
-        series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'series_info')
-        #Check if series' favorite value already exists in dictionary
-        if not series_item_info['Id'] in isfav_TV['series']:
-            if (does_key_index_exist(series_item_info,'UserData','IsFavorite')):
-                #Store if the series is marked as a favorite
-                isfav_TV['series'][series_item_info['Id']] = series_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #but if the value is True save it anyway
-            if (series_item_info['UserData']['IsFavorite']):
-                #Store if the series is marked as a favorite
-                isfav_TV['series'][series_item_info['Id']] = series_item_info['UserData']['IsFavorite']
-
-        isfav_TV['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_TV['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
-
-    elif (does_key_exist(season_item_info, 'ParentId')):
-        series_item_info = get_additional_item_info(server_url, user_key, season_item_info['ParentId'], auth_key, 'series_info')
-        #Check if series' favorite value already exists in dictionary
-        if not series_item_info['Id'] in isfav_TV['series']:
-            if (does_key_index_exist(series_item_info,'UserData','IsFavorite')):
-                #Store if the series is marked as a favorite
-                isfav_TV['series'][series_item_info['Id']] = series_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #but if the value is True save it anyway
-            if (series_item_info['UserData']['IsFavorite']):
-                #Store if the series is marked as a favorite
-                isfav_TV['series'][series_item_info['Id']] = series_item_info['UserData']['IsFavorite']
-
-        isfav_TV['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_TV['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
-
-### End Series ####################################################################################
-
-### TV Library ########################################################################################
-
-    if (does_key_exist(series_item_info, 'ParentId')):
-        tvlibrary_item_info = get_additional_item_info(server_url, user_key, series_item_info['ParentId'], auth_key, 'tv_library_info')
-        #Check if tv library's favorite value already exists in dictionary
-        if not tvlibrary_item_info['Id'] in isfav_TV['tvlibrary']:
-            if (does_key_index_exist(tvlibrary_item_info,'UserData','IsFavorite')):
-                #Store if the tv library is marked as a favorite
-                isfav_TV['tvlibrary'][tvlibrary_item_info['Id']] = tvlibrary_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            if (tvlibrary_item_info['UserData']['IsFavorite']):
-                #Store if the tv library is marked as a favorite
-                isfav_TV['tvlibrary'][tvlibrary_item_info['Id']] = tvlibrary_item_info['UserData']['IsFavorite']
-
-        isfav_TV['tvlibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvlibrary_item_info,isfav_TV['tvlibrarygenre'],keep_favorites_advanced_tv_library_genre,'tv_library_genre')
-
-### End TV Library ####################################################################################
-
-### Studio Network #######################################################################################
-
-    if (does_key_index_exist(series_item_info, 'Studios', 0)):
-        #Get studio network's item info
-        tvstudionetwork_item_info = get_additional_item_info(server_url, user_key, series_item_info['Studios'][0]['Id'], auth_key, 'studio_network_info')
-        #Check if bitmask for favorites by item genre is enabled
-        if (keep_favorites_advanced_tv_studio_network):
-            #Check if bitmask for any or first item genre is enabled
-            if (keep_favorites_advanced_tv_studio_network == 1):
-                #Check if studio-network's favorite value already exists in dictionary
-                if not tvstudionetwork_item_info['Id'] in isfav_TV['seriesstudionetwork']:
-                    if (does_key_index_exist(tvstudionetwork_item_info,'UserData','IsFavorite')):
-                        #Store if the studio network is marked as a favorite
-                        isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-                else: #it already exists
-                    #if the value is True save it anyway
-                    if (tvstudionetwork_item_info['UserData']['IsFavorite']):
-                        #Store if the studio network is marked as a favorite
-                        isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-
-                isfav_TV['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_TV['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
-
-            else:
-                for studios in range(len(series_item_info['Studios'])):
-                    #Get studio network's item info
-                    tvstudionetwork_item_info = get_additional_item_info(server_url, user_key, series_item_info['Studios'][studios]['Id'], auth_key, 'studio_network_info')
-                    #Check if studio network's favorite value already exists in dictionary
-                    if not tvstudionetwork_item_info['Id'] in isfav_TV['seriesstudionetwork']:
-                        if (does_key_index_exist(tvstudionetwork_item_info,'UserData','IsFavorite')):
-                            #Store if the studio network is marked as a favorite
-                            isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-                    else: #it already exists
-                        #if the value is True save it anyway
-                        if (tvstudionetwork_item_info['UserData']['IsFavorite']):
-                            #Store if the studio network is marked as a favorite
-                            isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-
-                    isfav_TV['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_TV['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
-
-    elif (does_key_exist(series_item_info, 'SeriesStudio')):
-        #Get series studio network's item info
-        tvstudionetwork_item_info = get_studio_item_info(server_url, user_key, series_item_info['SeriesStudio'], auth_key)
-        #Check if series studio network's favorite value already exists in dictionary
-        if not tvstudionetwork_item_info['Id'] in isfav_TV['seriesstudionetwork']:
-            if (does_key_index_exist(tvstudionetwork_item_info,'UserData','IsFavorite')):
-                #Store if the series studio network is marked as a favorite
-                isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (tvstudionetwork_item_info['UserData']['IsFavorite']):
-                #Store if the series studio network is marked as a favorite
-                isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']] = tvstudionetwork_item_info['UserData']['IsFavorite']
-
-        isfav_TV['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_TV['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
-
-### End Studio Network ###################################################################################
-
-    if bool(cfg.DEBUG):
-        #DEBUG
-        print('-----------------------------------------------------------')
-        if (does_key_exist(item, 'Id')):
-            print('  Episode is favorite: ' + str(isfav_TV['episode'][item['Id']]))
-        if (does_key_index_exist(item, 'GenreItems', 0)):
-            if (keep_favorites_advanced_episode_genre):
-                if (keep_favorites_advanced_episode_genre == 1):
-                    print(' Episode Genre is favorite: ' + str(isfav_TV['epsiodegenre'][item['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for episodegenre in range(len(item['GenreItems'])):
-                        print('Episode Genre' + str(i) + ' is favorite: ' + str(isfav_TV['episodegenre'][item['GenreItems'][episodegenre]['Id']]))
-                        i+=1
-
-        if (does_key_exist(season_item_info, 'Id')):
-            print('   Season is favorite: ' + str(isfav_TV['season'][season_item_info['Id']]))
-        if (does_key_index_exist(season_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_season_genre):
-                if (keep_favorites_advanced_season_genre == 1):
-                    print(' Season Genre is favorite: ' + str(isfav_TV['seasongenre'][season_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for seasongenre in range(len(season_item_info['GenreItems'])):
-                        print('Season Genre' + str(i) + ' is favorite: ' + str(isfav_TV['seasongenre'][season_item_info['GenreItems'][seasongenre]['Id']]))
-                        i+=1
-
-        if (does_key_exist(series_item_info, 'Id')):
-            print('   Series is favorite: ' + str(isfav_TV['series'][series_item_info['Id']]))
-        if (does_key_index_exist(series_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_series_genre):
-                if (keep_favorites_advanced_series_genre == 1):
-                    print(' Series Genre is favorite: ' + str(isfav_TV['seriesgenre'][series_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for seriesgenre in range(len(series_item_info['GenreItems'])):
-                        print('Series Genre' + str(i) + ' is favorite: ' + str(isfav_TV['seriesgenre'][series_item_info['GenreItems'][seriesgenre]['Id']]))
-                        i+=1
-
-        if (does_key_exist(tvlibrary_item_info, 'Id')):
-            print('   TV Library is favorite: ' + str(isfav_TV['tvlibrary'][tvlibrary_item_info['Id']]))
-        if (does_key_index_exist(tvlibrary_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_tv_library_genre):
-                if (keep_favorites_advanced_tv_library_genre == 1):
-                    print(' TV Library Genre is favorite: ' + str(isfav_TV['tvlibrarygenre'][tvlibrary_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for tvlibrarygenre in range(len(tvlibrary_item_info['GenreItems'])):
-                        print('TV Library Genre' + str(i) + ' is favorite: ' + str(isfav_TV['tvlibrarygenre'][tvlibrary_item_info['GenreItems'][tvlibrarygenre]['Id']]))
-                        i+=1
-
-        if (does_key_exist(tvstudionetwork_item_info, 'Id')):
-            print('   Studio Network is favorite: ' + str(isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']]))
-        if (does_key_index_exist(tvstudionetwork_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_tv_studio_network_genre):
-                if (keep_favorites_advanced_tv_studio_network_genre == 1):
-                    print(' Studio Network Genre is favorite: ' + str(isfav_TV['seriesstudionetworkgenre'][tvstudionetwork_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for seriestudionetworkgenre in range(len(tvstudionetwork_item_info['GenreItems'])):
-                        print('Studio Network Genre' + str(i) + ' is favorite: ' + str(isfav_TV['seriesstudionetworkgenre'][tvstudionetwork_item_info['GenreItems'][seriestudionetworkgenre]['Id']]))
-                        i+=1
-
-    itemisfav_TVepiseaserlibnet=False
-    if (does_key_exist(item, 'Id')):
-        if (does_key_exist(isfav_TV['episode'],item['Id'])):
-            if (isfav_TV['episode'][item['Id']]):
-                itemisfav_TVepiseaserlibnet=True
-
-    if (does_key_exist(season_item_info, 'Id')):
-        if (does_key_exist(isfav_TV['season'],season_item_info['Id'])):
-            if (isfav_TV['season'][season_item_info['Id']]):
-                itemisfav_TVepiseaserlibnet=True
-
-    if (does_key_exist(series_item_info, 'Id')):
-        if (does_key_exist(isfav_TV['series'],series_item_info['Id'])):
-            if (isfav_TV['series'][series_item_info['Id']]):
-                itemisfav_TVepiseaserlibnet=True
-
-    if (does_key_exist(tvlibrary_item_info, 'Id')):
-        if (does_key_exist(isfav_TV['tvlibrary'],tvlibrary_item_info['Id'])):
-            if (isfav_TV['tvlibrary'][tvlibrary_item_info['Id']]):
-                itemisfav_TVepiseaserlibnet=True
-
-    if (does_key_exist(tvstudionetwork_item_info, 'Id')):
-        if (does_key_exist(isfav_TV['seriesstudionetwork'],tvstudionetwork_item_info['Id'])):
-            if (isfav_TV['seriesstudionetwork'][tvstudionetwork_item_info['Id']]):
-                itemisfav_TVepiseaserlibnet=True
-
-    itemisfav_TVepiseaserlibnetgenre=False
-    if (does_key_index_exist(item, 'GenreItems', 0)):
-        #Check if item genre was stored as a favorite
-        if (keep_favorites_advanced_episode_genre):
-            if (keep_favorites_advanced_episode_genre == 1):
-                if (isfav_TV['episodegenre'][str(item['GenreItems'][0]['Id'])]):
-                    itemisfav_TVepiseaserlibnetgenre=True
-            else:
-                #Check if any item genre was stored as a favorite
-                for episodegenre in range(len(item['GenreItems'])):
-                    if (isfav_TV['episodegenre'][str(item['GenreItems'][episodegenre]['Id'])]):
-                        itemisfav_TVepiseaserlibnetgenre=True
-
-    if (does_key_index_exist(season_item_info, 'GenreItems', 0)):
-        #Check if season genre was stored as a favorite
-        if (keep_favorites_advanced_season_genre):
-            if (keep_favorites_advanced_season_genre == 1):
-                if (isfav_TV['seasongenre'][str(season_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_TVepiseaserlibnetgenre=True
-            else:
-                #Check if any season genre was stored as a favorite
-                for seasongenre in range(len(season_item_info['GenreItems'])):
-                    if (isfav_TV['seasongenre'][str(season_item_info['GenreItems'][seasongenre]['Id'])]):
-                        itemisfav_TVepiseaserlibnetgenre=True
-
-    if (does_key_index_exist(series_item_info, 'GenreItems', 0)):
-        #Check if series genre was stored as a favorite
-        if (keep_favorites_advanced_series_genre):
-            if (keep_favorites_advanced_series_genre == 1):
-                if (isfav_TV['seriesgenre'][str(series_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_TVepiseaserlibnetgenre=True
-            else:
-                #Check if any series genre was stored as a favorite
-                for seriesgenre in range(len(series_item_info['GenreItems'])):
-                    if (isfav_TV['seriesgenre'][str(series_item_info['GenreItems'][seriesgenre]['Id'])]):
-                        itemisfav_TVepiseaserlibnetgenre=True
-
-    if (does_key_index_exist(tvlibrary_item_info, 'GenreItems', 0)):
-        #Check if library genre was stored as a favorite
-        if (keep_favorites_advanced_tv_library_genre):
-            if (keep_favorites_advanced_tv_library_genre == 1):
-                if (isfav_TV['librarygenre'][str(tvlibrary_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_TVepiseaserlibnetgenre=True
-            else:
-                #Check if any library genre was stored as a favorite
-                for librarygenre in range(len(tvlibrary_item_info['GenreItems'])):
-                    if (isfav_TV['librarygenre'][str(tvlibrary_item_info['GenreItems'][librarygenre]['Id'])]):
-                        itemisfav_TVepiseaserlibnetgenre=True
-
-    if (does_key_index_exist(tvstudionetwork_item_info, 'GenreItems', 0)):
-        #Check if studio network genre was stored as a favorite
-        if (keep_favorites_advanced_tv_studio_network_genre):
-            if (keep_favorites_advanced_tv_studio_network_genre == 1):
-                if (isfav_TV['seriesstudionetworkgenre'][str(tvstudionetwork_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_TVepiseaserlibnetgenre=True
-            else:
-                #Check if any studio network genre was stored as a favorite
-                for seriesstudionetworkgenre in range(len(tvstudionetwork_item_info['GenreItems'])):
-                    if (isfav_TV['seriesstudionetworkgenre'][str(tvstudionetwork_item_info['GenreItems'][seriesstudionetworkgenre]['Id'])]):
-                        itemisfav_TVepiseaserlibnetgenre=True
-
-    #Check if episode, season, series, series genre(s), or network/channel are a favorite
-    itemisfav_TV=False
-    if (
-       (itemisfav_TVepiseaserlibnet) or
-       (itemisfav_TVepiseaserlibnetgenre)
-       ):
-        #Either the episode, season, series, series genre(s), or network/channel are set as a favorite
-        itemisfav_TV=True
-
-    return(itemisfav_TV)
-
-
-#determine if movie is set to favorite
-def get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key):
-    keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
-    keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
-
-### Movie #######################################################################################
-
-    #Check if movie's favorite value already exists in dictionary
-    if not item['Id'] in isfav_MOVIE['movie']:
-        #Store if this movie is marked as a favorite
-        isfav_MOVIE['movie'][item['Id']] = item['UserData']['IsFavorite']
-    else: #it already exists
-        #if the value is True save it anyway
-        if (item['UserData']['IsFavorite']):
-            #Store if the movie is marked as a favorite
-            isfav_MOVIE['movie'][item['Id']] = item['UserData']['IsFavorite']
-
-    isfav_MOVIE['moviegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_MOVIE['moviegenre'],keep_favorites_advanced_movie_genre,'movie_genre')
-
-### End Movie ###################################################################################
-
-### Movie Library #######################################################################################
-
-    if (does_key_exist(item, 'ParentId')):
-        movielibrary_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'movie_library_info')
-        #Check if library's favorite value already exists in dictionary
-        if not movielibrary_item_info['Id'] in isfav_MOVIE['movielibrary']:
-            #Store if the folder is marked as a favorite
-            isfav_MOVIE['movielibrary'][movielibrary_item_info['Id']] = movielibrary_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (movielibrary_item_info['UserData']['IsFavorite']):
-                #Store if the library is marked as a favorite
-                isfav_MOVIE['movielibrary'][movielibrary_item_info['Id']] = movielibrary_item_info['UserData']['IsFavorite']
-
-        isfav_MOVIE['movielibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,movielibrary_item_info,isfav_MOVIE['movielibrarygenre'],keep_favorites_advanced_movie_library_genre,'movie_library_genre')
-
-### End Movie Library ###################################################################################
-
-    if bool(cfg.DEBUG):
-        #DEBUG
-        print('-----------------------------------------------------------')
-        if (does_key_exist(item, 'Id')):
-            print('    Movie is favorite: ' + str(isfav_MOVIE['movie'][item['Id']]))
-        if (does_key_index_exist(item, 'GenreItems', 0)):
-            if (keep_favorites_advanced_movie_genre):
-                if (keep_favorites_advanced_movie_genre == 1):
-                    print(' MovieGenre is favorite: ' + str(isfav_MOVIE['Moviegenre'][item['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for moviegenre in range(len(item['GenreItems'])):
-                        print('MovieGenre' + str(i) + ' is favorite: ' + str(isfav_MOVIE['moviegenre'][item['GenreItems'][moviegenre]['Id']]))
-                        i+=1
-
-        if (does_key_exist(movielibrary_item_info, 'Id')):
-            print('   Library is favorite: ' + str(isfav_MOVIE['movielibrary'][movielibrary_item_info['Id']]))
-        if (does_key_index_exist(movielibrary_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_movie_library_genre):
-                if (keep_favorites_advanced_movie_library_genre == 1):
-                    print(' LibraryGenre is favorite: ' + str(isfav_MOVIE['librarygenre'][movielibrary_item_info['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for librarygenre in range(len(movielibrary_item_info['GenreItems'])):
-                        print('LibraryGenre' + str(i) + ' is favorite: ' + str(isfav_MOVIE['librarygenre'][movielibrary_item_info['GenreItems'][librarygenre]['Id']]))
-                        i+=1
-
-    itemisfav_MOVIEmovlib=False
-    if (does_key_exist(item, 'Id')):
-        if (does_key_exist(isfav_MOVIE['movie'],item['Id'])):
-            if(isfav_MOVIE['movie'][item['Id']]):
-                itemisfav_MOVIEmovlib=True
-
-    if (does_key_exist(movielibrary_item_info, 'Id')):
-        if (does_key_exist(isfav_MOVIE['movielibrary'],movielibrary_item_info['Id'])):
-            if(isfav_MOVIE['movielibrary'][movielibrary_item_info['Id']]):
-                itemisfav_MOVIEmovlib=True
-
-    itemisfav_MOVIEmovlibgenre=False
-    if (does_key_index_exist(item, 'GenreItems', 0)):
-        #Check if item genre was stored as a favorite
-        if (keep_favorites_advanced_movie_genre):
-            if (keep_favorites_advanced_movie_genre == 1):
-                if (isfav_MOVIE['moviegenre'][str(item['GenreItems'][0]['Id'])]):
-                    itemisfav_MOVIEmovlibgenre=True
-            else:
-                #Check if any item genre was stored as a favorite
-                for moviegenre in range(len(item['GenreItems'])):
-                    if (isfav_MOVIE['moviegenre'][str(item['GenreItems'][moviegenre]['Id'])]):
-                        itemisfav_MOVIEmovlibgenre=True
-
-    if (does_key_index_exist(movielibrary_item_info, 'GenreItems', 0)):
-        #Check if library genre was stored as a favorite
-        if (keep_favorites_advanced_movie_library_genre):
-            if (keep_favorites_advanced_movie_library_genre == 1):
-                if (isfav_MOVIE['librarygenre'][str(movielibrary_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_MOVIEmovlibgenre=True
-            else:
-                #Check if any library genre was stored as a favorite
-                for librarygenre in range(len(movielibrary_item_info['GenreItems'])):
-                    if (isfav_MOVIE['librarygenre'][str(movielibrary_item_info['GenreItems'][librarygenre]['Id'])]):
-                        itemisfav_MOVIEmovlibgenre=True
-
-    #Check if movie, movie genre(s), library or library genre(s) are a favorite
-    itemisfav_MOVIE=False
-    if (
-       (itemisfav_MOVIEmovlib) or
-       (itemisfav_MOVIEmovlibgenre)
-       ):
-        #Either the movie, movie genre(s), library or library genre(s) are set as a favorite
-        itemisfav_MOVIE=True
-
-    return(itemisfav_MOVIE)
 
 
 #Handle favorites across multiple users
@@ -2257,6 +1814,7 @@ def get_isItemMatching(item_one, item_two):
                             print(item_one + ' : ' + single_item_one)
 
                         return(items_match, single_item_one)
+
     return(items_match, matching_item)
 
 #Determine if item can be monitored
@@ -2278,6 +1836,7 @@ def get_isItemMonitored(mediasource):
             itemIsMonitored=True
     else:
         itemIsMonitored=False
+
     return(itemIsMonitored)
 
 
@@ -2566,7 +2125,7 @@ def get_isItemTagged(usertags,tagged_items,item,user_key,tagtype):
 
 
 #check and populate unknown movie output data
-def get_movieOutput(item):
+def prep_movieOutput(item):
 
     if not (does_key_exist(item,'Type')):
         item['Type']='Movie'
@@ -2598,7 +2157,7 @@ def get_movieOutput(item):
 
 
 #check and populate unknown episode output data
-def get_episodeOutput(item):
+def prep_episodeOutput(item):
 
     if not (does_key_exist(item,'Type')):
         item['Type']='Episode'
@@ -2612,6 +2171,37 @@ def get_episodeOutput(item):
         item['Name']='Unknown'
     if not (does_key_exist(item,'SeriesStudio')):
         item['SeriesStudio']='Unknown'
+    if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+    else:
+        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+            item['UserData']['LastPlayedDate']='Unknown'
+    if not (does_key_exist(item,'DateCreated')):
+        item['DateCreated']='1970-01-01T00:00:00.00Z'
+    if not (does_key_exist(item,'Id')):
+        item['item']='Unknown'
+
+    return item
+
+
+#check and populate unknown audio output data
+def prep_audioOutput(item):
+
+    if not (does_key_exist(item,'Type')):
+        item['Type']='Episode'
+    if not (does_key_exist(item,'IndexNumber')):
+        item['IndexNumber']=999
+    if not (does_key_exist(item,'Name')):
+        item['Name']='Unknown'
+    if not (does_key_exist(item,'Album')):
+        item['Album']='Unknown'
+    if not (does_key_exist(item,'Artist')):
+        item['Artist']='Unknown'
+    if not (does_key_exist(item,'Studios')):
+        item['Studios']=[{'Name':'Unknown'}]
+    if not (does_index_exist(item['Studios'],0)):
+        item['Studios']=[{'Name':'Unknown'}]
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not (does_key_exist(item['UserData'],'LastPlayedDate')):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
@@ -2929,11 +2519,12 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
-                                for mediasource in item['MediaSources']:
-                                    itemIsMonitored=get_isItemMonitored(mediasource)
+                                if (item['Type'] == 'Movie'):
+                                    for mediasource in item['MediaSources']:
+                                        itemIsMonitored=get_isItemMonitored(mediasource)
 
                                 #find media item is ready to delete
-                                if ((item['Type'] == 'Movie') and (itemIsMonitored)):
+                                if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
                                     if (cfg.max_age_movie >= 0):
@@ -2942,33 +2533,11 @@ def get_items(server_url, user_keys, auth_key):
                                         max_cut_off_date_movie=date_time_now=datetime.utcnow() + timedelta(1)
 
                                     #Get if media item is set as favorite
-                                    itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key)
+                                    itemisfav_MOVIE=item['UserData']['IsFavorite']
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
                                         isfav_byUserId[user_key][item['Id']] = itemisfav_MOVIE
-
-                                    itemisfav_MOVIE = False
-                                    itemisfav_OthersMOVIE = False
-                                    if ((item['Type'] == 'Movie') and (cfg.keep_favorites_movie == 2)):
-                                        #loop thru all users to see if any have media item or parent set as favorite
-                                        for fav_user_key in user_keys_json:
-                                            if (fav_user_key == user_key):
-                                                #Get if media item is set as favorite for current user
-                                                itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, fav_user_key, auth_key)
-                                            else:
-                                                #Get if media item is set as favorite for other users
-                                                itemisfav_OthersMOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, fav_user_key, auth_key)
-                                            #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                            if (itemisfav_MOVIE):
-                                                #store for this user
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_MOVIE
-                                            elif (itemisfav_OthersMOVIE):
-                                                #store for other users
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_OthersMOVIE
-                                    elif (item['Type'] == 'Movie'):
-                                        #Get if media item is set as favorite
-                                        itemisfav_MOVIE=get_isfav_MOVIE(isfav_MOVIE, item, server_url, user_key, auth_key)
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -3031,16 +2600,11 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
-
-                                                item=get_movieOutput(item)
+                                                item=prep_movieOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                             ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #else:
-                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                #' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                #' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3051,16 +2615,11 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
-
-                                                item=get_movieOutput(item)
+                                                item=prep_movieOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                             ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #else:
-                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                                #' - Favorite: ' + str(itemisfav_MOVIE) + ' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
-                                                                #' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3239,14 +2798,12 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
-                                if not ((item['Type'] == 'Season') or (item['Type'] == 'Series')):
+                                if (item['Type'] == 'Episode'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
-                                else:
-                                    itemIsMonitored=True
 
                                 #find media item is ready to delete
-                                if ((item['Type'] == 'Episode') and (itemIsMonitored)):
+                                if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
                                     if (cfg.max_age_episode >= 0):
@@ -3254,27 +2811,12 @@ def get_items(server_url, user_keys, auth_key):
                                     else:
                                         max_cut_off_date_episode=date_time_now=datetime.utcnow() + timedelta(1)
 
-                                    itemisfav_TV = False
-                                    itemisfav_OthersTV = False
-                                    if ((item['Type'] == 'Episode') and (cfg.keep_favorites_episode == 2)):
-                                        #loop thru all users to see if any have media item or parent set as favorite
-                                        for fav_user_key in user_keys_json:
-                                            if (fav_user_key == user_key):
-                                                #Get if media item is set as favorite for current user
-                                                itemisfav_TV=get_isfav_TV(isfav_TV, item, server_url, fav_user_key, auth_key)
-                                            else:
-                                                #Get if media item is set as favorite for other users
-                                                itemisfav_OthersTV=get_isfav_TV(isfav_TV, item, server_url, fav_user_key, auth_key)
-                                            #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                            if (itemisfav_TV):
-                                                #store for this user
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_TV
-                                            elif (itemisfav_OthersTV):
-                                                #store for other users
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_OthersTV
-                                    elif (item['Type'] == 'Episode'):
-                                        #Get if media item is set as favorite
-                                        itemisfav_TV=get_isfav_TV(isfav_TV, item, server_url, user_key, auth_key)
+                                    #Get if media item is set as favorite
+                                    itemisfav_TV=item['UserData']['IsFavorite']
+
+                                    #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
+                                    if ((cfg.keep_favorites_episode == 2) and (itemisfav_TV)):
+                                        isfav_byUserId[user_key][item['Id']] = itemisfav_TV
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
@@ -3336,19 +2878,12 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
-                                                item=get_episodeOutput(item)
+                                                item=prep_episodeOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                             ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                             ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #elif (item['Type'] == 'Season'):
-                                                    #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
-                                                                  #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                  #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #elif (item['Type'] == 'Series'):
-                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                  #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3359,19 +2894,12 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
-                                                item=get_episodeOutput(item)
+                                                item=prep_episodeOutput(item)
                                                 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
                                                             ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                             ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
                                                             ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #elif (item['Type'] == 'Season'):
-                                                    #item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) +
-                                                                    #' - Favorite: ' + str(itemisfav_TV) + ' - Whitelisted: ' + str(displayIsWhiteListed) +
-                                                                    #' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
-                                                #elif (item['Type'] == 'Series'):
-                                                    #item_details=(item['Type'] + ' - ' + item['Name'] + ' - Remaining Episodes: ' + str(item['UserData']['UnplayedItemCount']) + ' - Favorite: ' + str(itemisfav_TV) +
-                                                                    #' - Whitelisted: ' + str(displayIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3403,7 +2931,7 @@ def get_items(server_url, user_keys, auth_key):
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
-                    if (cfg.max_age_episode >= 0):
+                    if (cfg.max_age_audio >= 0):
                         IsPlayedState_Blacklist=''
                     else:
                         IsPlayedState_Blacklist='True'
@@ -3550,54 +3078,37 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
-                                if not ((item['Type'] == 'Season') or (item['Type'] == 'Series')):
+                                if (item['Type'] == 'Audio'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
-                                else:
-                                    itemIsMonitored=True
 
                                 #find media item is ready to delete
-                                if (item['Type'] == 'Audio'):
+                                if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
-                                    if (cfg.max_age_episode >= 0):
-                                        max_cut_off_date_episode=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_episode)
+                                    if (cfg.max_age_audio >= 0):
+                                        max_cut_off_date_audio=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audio)
                                     else:
-                                        max_cut_off_date_episode=date_time_now=datetime.utcnow() + timedelta(1)
+                                        max_cut_off_date_audio=date_time_now=datetime.utcnow() + timedelta(1)
 
-                                    itemisfav_AUDIO = False
-                                    itemisfav_OthersAUDIO = False
-                                    if ((item['Type'] == 'Audio') and (cfg.keep_favorites_episode == 2)):
-                                        #loop thru all users to see if any have media item or parent set as favorite
-                                        for fav_user_key in user_keys_json:
-                                            if (fav_user_key == user_key):
-                                                #Get if media item is set as favorite for current user
-                                                itemisfav_AUDIO=get_isfav_AUDIO(isfav_AUDIO, item, server_url, fav_user_key, auth_key,item['Type'])
-                                            else:
-                                                #Get if media item is set as favorite for other users
-                                                itemisfav_OthersAUDIO=get_isfav_AUDIO(isfav_AUDIO, item, server_url, fav_user_key, auth_key,item['Type'])
-                                            #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                            if (itemisfav_AUDIO):
-                                                #store for this user
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_AUDIO
-                                            elif (itemisfav_OthersAUDIO):
-                                                #store for other users
-                                                isfav_byUserId[fav_user_key][item['Id']] = itemisfav_OthersAUDIO
-                                    elif (item['Type'] == 'Audio'):
-                                        #Get if media item is set as favorite
-                                        itemisfav_AUDIO=get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key,item['Type'])
+                                    #Get if media item is set as favorite
+                                    itemisfav_AUDIO=item['UserData']['IsFavorite']
+
+                                    #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
+                                    if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIO)):
+                                        isfav_byUserId[user_key][item['Id']] = itemisfav_AUDIO
 
                                     itemIsWhiteListed=False
                                     itemIsWhiteListedTaggedNotWatched=False
                                     #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                    if (cfg.multiuser_whitelist_episode == 1):
+                                    if (cfg.multiuser_whitelist_audio == 1):
                                         #Get if media item is whitelisted
                                         for wllib_pos in range(len(user_wllib_keys_json)):
                                             if not (wllib_pos == currentPosition):
                                                 itemIsWhiteListed, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
                                                 #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                                 if (itemIsWhiteListed):
-                                                    episode_whitelists.add(item['Id'])
+                                                    audio_whitelists.add(item['Id'])
                                                     if bool(cfg.DEBUG):
                                                         iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
                                             else:
@@ -3631,9 +3142,6 @@ def get_items(server_url, user_keys, auth_key):
                                     #if not (itemIsWhiteTagged):
                                         #blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,blacktaglists,item,user_key,'blacktag')
 
-
-
-
                                     if (does_key_exist(item['UserData'], 'Played')):
                                     #if ((does_key_exist(item['UserData'], 'Played')) and (item['UserData']['Played'] == True)):
 
@@ -3642,23 +3150,21 @@ def get_items(server_url, user_keys, auth_key):
                                         (item['UserData']['PlayCount'] >= 1) and
                                         (cut_off_date_audio > parse(item['UserData']['LastPlayedDate'])) and
                                         (not bool(cfg.keep_favorites_audio) or (not itemisfav_AUDIO)) and
-                                        (not itemIsWhiteListed))
+                                        (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         or
                                         ((cfg.max_age_audio >= 0) and
                                         (max_cut_off_date_audio <= datetime.utcnow()) and
                                         (((not bool(cfg.keep_favorites_audio)) or (not itemisfav_AUDIO)) and
                                         ((not bool(cfg.max_keep_favorites_audio)) or (not itemisfav_AUDIO))) and
-                                        (not itemIsWhiteListed))
+                                        (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
-                                                if (does_key_exist(item['UserData'], 'LastPlayedDate')):
-                                                    item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name'] +
-                                                                ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO) +
-                                                                ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item['Id'])
-                                                else:
-                                                    item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name'] +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO) +
-                                                                ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item['Id'])
+                                                item=prep_audioOutput(item)
+
+                                                item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
+                                                            ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
+                                                            ' - Favorite: ' + str(itemisfav_AUDIO) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                            ' - TrackID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - Track: ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
@@ -3668,14 +3174,12 @@ def get_items(server_url, user_keys, auth_key):
                                             deleteItems.append(item)
                                         else:
                                             try:
-                                                if (does_key_exist(item['UserData'], 'LastPlayedDate')):
-                                                    item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name'] +
-                                                                ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO) +
-                                                                ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item['Id'])
-                                                else:
-                                                    item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name'] +
-                                                                ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO) +
-                                                                ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item['Id'])
+                                                item=prep_audioOutput(item)
+
+                                                item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
+                                                            ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
+                                                            ' - Favorite: ' + str(itemisfav_AUDIO) + ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) +
+                                                            ' - TrackID: ' + item['Id'])
                                             except (KeyError, IndexError):
                                                 item_details=item['Type'] + ' - Track: ' + item['Name'] + ' - ' + item['Id']
                                                 if bool(cfg.DEBUG):
