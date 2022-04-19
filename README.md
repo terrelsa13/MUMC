@@ -313,6 +313,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
 
 # First Run
+* (OPTIONAL) - Update **media_cleaner_config_defaults.py** with desired default values
 * $```/path/to/python3.x /path/to/media_cleaner.py```
 * You may get the below python error if the python-dateutil module is not installed
    - ModuleNotFoundError: No module named 'dateutil' python-dateutil
