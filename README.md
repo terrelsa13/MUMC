@@ -58,7 +58,7 @@ multiuser_whitelist_audiobook=1
 ```python
 #----------------------------------------------------------#
 # User entered blacktag name; chosen during setup
-#  Use comma ',' to seperate multiple tag names
+#  Use a comma ',' to seperate multiple tag names
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
@@ -68,7 +68,7 @@ blacktag='bt_tagname,bt_tag name,bt_tag-name'
 ```python
 #----------------------------------------------------------#
 # User entered whitetag name; chosen during setup
-#  Use comma ',' to seperate multiple tag names
+#  Use a comma ',' to seperate multiple tag names
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
