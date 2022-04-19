@@ -157,14 +157,17 @@ def get_setup_behavior(script_behavior):
 
 #Blacktagging or Whitetagging String Name?
 def get_tag_name(tagbehavior,existingtag):
-    defaulttag=''
+    defaulttag=get_default_config_values(tagbehavior)
     valid_tag=False
     while (valid_tag == False):
         print('Enter the desired ' + tagbehavior + ' name. Do not use backslash \'\\\'.')
         print('Use a comma \',\' to seperate multiple tag names.')
         print(' Ex: tagname,tag name,tag-name')
-        print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
-        inputtagname=input('Desired ' + tagbehavior + 's are: ')
+        if (defaulttag == ''):
+            print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
+            inputtagname=input('Input desired ' + tagbehavior + 's: ')
+        else:
+            inputtagname=input('Input desired ' + tagbehavior + 's (default \'' + defaulttag + '\'): ')
         if (inputtagname == ''):
             valid_tag=True
             return(defaulttag)
