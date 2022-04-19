@@ -156,24 +156,34 @@ def get_setup_behavior(script_behavior):
 
 
 #Blacktagging or Whitetagging String Name?
-def get_tag_name(tagbehavior):
+def get_tag_name(tagbehavior,existingtag):
     defaulttag=''
     valid_tag=False
     while (valid_tag == False):
         print('Enter the desired ' + tagbehavior + ' name. Do not use backslash \'\\\'.')
-        print('Use comma \',\' to seperate multiple tag names.')
+        print('Use a comma \',\' to seperate multiple tag names.')
         print(' Ex: tagname,tag name,tag-name')
         print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
-        tagname=input('Desired ' + tagbehavior + 's are: ')
-        if (tagname == ''):
+        inputtagname=input('Desired ' + tagbehavior + 's are: ')
+        if (inputtagname == ''):
             valid_tag=True
             return(defaulttag)
         else:
-            if (tagname.find('\\') <= 0):
-                valid_tag=True
+            if (inputtagname.find('\\') <= 0):
                 #replace single quote (') with backslash-single quote (\')
-                tagname=tagname.replace('\'','\\\'')
-                return(tagname)
+                inputtagname=inputtagname.replace('\'','\\\'')
+                valid_tag=True
+                inputtagname_split=inputtagname.split(',')
+                for inputtag in inputtagname_split:
+                    existingtag_split=existingtag.split(',')
+                    for donetag in existingtag_split:
+                        if (inputtag == donetag):
+                            valid_tag=False
+                if (valid_tag):
+                    return(inputtagname)
+                else:
+                    print('\nCannot use the same tag as a blacktag and a whitetag.\n')
+                    print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
             else:
                 print('\nDo not use backslash \'\\\'. Try again.\n')
 
@@ -243,10 +253,14 @@ def generate_config(cfg,updateConfig):
         script_behavior=get_setup_behavior(None)
         print('-----------------------------------------------------------')
 
-        blacktag=get_tag_name('blacktag')
+        #Initialize for compare with other tag to prevent using the same tag in both blacktag and whitetag
+        blacktag=''
+        whitetag=''
+
+        blacktag=get_tag_name('blacktag',whitetag)
         print('-----------------------------------------------------------')
 
-        whitetag=get_tag_name('whitetag')
+        whitetag=get_tag_name('whitetag',blacktag)
         print('-----------------------------------------------------------')
 
         user_keys_and_bllibs, user_keys_and_wllibs=get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
@@ -357,7 +371,7 @@ def generate_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User entered blacktag name; chosen during setup\n"
-    config_file += "#  Use comma \',\' to seperate multiple tag names\n"
+    config_file += "#  Use a comma \',\' to seperate multiple tag names\n"
     config_file += "#   Ex: tagname,tag name,tag-name\n"
     config_file += "#  Backslash \'\\\' not allowed\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -369,7 +383,7 @@ def generate_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User entered whitetag name; chosen during setup\n"
-    config_file += "#  Use comma \',\' to seperate multiple tag names\n"
+    config_file += "#  Use a comma \',\' to seperate multiple tag names\n"
     config_file += "#   Ex: tagname,tag name,tag-name\n"
     config_file += "#  Backslash \'\\\' not allowed\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1044,11 +1058,11 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
             #Get user input for libraries
             if ((mandatory) and (first_run)):
                 first_run=False
-                path_number=input('Select one or more libraries.\n*Use commas to separate multiple selections.\nMust select at least one library to monitor: ')
+                path_number=input('Select one or more libraries.\n*Use a comma to separate multiple selections.\nMust select at least one library to monitor: ')
             elif (mandatory):
-                path_number=input('Select one or more libraries.\n*Use commas to separate multiple selections.\nLeave blank when finished: ')
+                path_number=input('Select one or more libraries.\n*Use a comma to separate multiple selections.\nLeave blank when finished: ')
             else:
-                path_number=input('Select one or more libraries.\n*Use commas to separate multiple selections.\nLeave blank for none or when finished: ')
+                path_number=input('Select one or more libraries.\n*Use a comma to separate multiple selections.\nLeave blank for none or when finished: ')
 
         if not (path_number == ''):
             #replace spaces with commas (assuming people will use spaces because the space bar is bigger and easier to push)
@@ -1408,8 +1422,193 @@ def get_isfav_ARTIST(server_url,user_key,auth_key,item,isfav_ITEMartist,keep_fav
     return(isfav_ITEMartist)
 
 
-#determine if track, album/book, or artist/author are set to favorite
-def get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key, itemType):
+#Determine if artist is favorited
+def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntwk,keep_favorites_advanced,lookupTopic):
+
+    if (does_key_index_exist(item, 'Studios', 0)):
+        #Check if bitmask for favorites by item genre is enabled
+        if (keep_favorites_advanced):
+            #Check if bitmask for any or first item genre is enabled
+            if (keep_favorites_advanced == 1):
+                #Get studio network's item info
+                studionetwork_item_info = get_additional_item_info(server_url, user_key, item['Studios'][0]['Id'], auth_key, 'studio_network_info')
+                #Check if studio-network's favorite value already exists in dictionary
+                if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
+                    if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                        #Store if the studio network is marked as a favorite
+                        isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+                else: #it already exists
+                    #if the value is True save it anyway
+                    if (studionetwork_item_info['UserData']['IsFavorite']):
+                        #Store if the studio network is marked as a favorite
+                        isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+
+            else:
+                for studios in range(len(item['Studios'])):
+                    #Get studio network's item info
+                    studionetwork_item_info = get_additional_item_info(server_url, user_key, item['Studios'][studios]['Id'], auth_key, 'studio_network_info')
+                    #Check if studio network's favorite value already exists in dictionary
+                    if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
+                        if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                            #Store if the studio network is marked as a favorite
+                            isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+                    else: #it already exists
+                        #if the value is True save it anyway
+                        if (studionetwork_item_info['UserData']['IsFavorite']):
+                            #Store if the studio network is marked as a favorite
+                            isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+
+    elif (does_key_exist(item, 'SeriesStudio')):
+        #Check if bitmask for favorites by item genre is enabled
+        if (keep_favorites_advanced):
+            #Get series studio network's item info
+            studionetwork_item_info = get_studio_item_info(server_url, user_key, item['SeriesStudio'], auth_key)
+            #Check if series studio network's favorite value already exists in dictionary
+            if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
+                if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                    #Store if the series studio network is marked as a favorite
+                    isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+            else: #it already exists
+                #if the value is True save it anyway
+                if (studionetwork_item_info['UserData']['IsFavorite']):
+                    #Store if the series studio network is marked as a favorite
+                    isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
+
+    return(isfav_ITEMstdo_ntwk)
+
+
+#determine if genres for movie or library are set to favorite
+def get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key):
+    keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
+    keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
+    #define empty dictionary for favorited Movies
+    isfav_MOVIE={'movie':{},'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
+
+### Movie #######################################################################################
+
+    if (does_key_exist(item, 'Id')):
+
+        isfav_MOVIE['moviegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_MOVIE['moviegenre'],keep_favorites_advanced_movie_genre,'movie_genre')
+
+### End Movie ###################################################################################
+
+### Movie Library #######################################################################################
+
+    if (does_key_exist(item, 'ParentId')):
+        movielibrary_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'movie_library_info')
+
+        isfav_MOVIE['movielibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,movielibrary_item_info,isfav_MOVIE['movielibrarygenre'],keep_favorites_advanced_movie_library_genre,'movie_library_genre')
+
+### End Movie Library ###################################################################################
+
+    for isfavkey in isfav_MOVIE:
+        for isfavID in isfav_MOVIE[isfavkey]:
+            if (isfav_MOVIE[isfavkey][isfavID]):
+                return(True)
+                
+    return(False)
+
+
+#determine if genres for episode, season, series, or studio-network are set to favorite
+def get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key):
+    keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
+    keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
+    keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
+    keep_favorites_advanced_tv_library_genre=cfg.keep_favorites_advanced_tv_library_genre
+    keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
+    keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
+    #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
+    isfav_EPISODE={'episode':{},'season':{},'series':{},'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
+
+### Episode #######################################################################################
+
+    if (does_key_exist(item, 'Id')):
+
+        isfav_EPISODE['episodegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_EPISODE['episodegenre'],keep_favorites_advanced_episode_genre,'episode_genre')
+
+### End Episode ###################################################################################
+
+### Season ########################################################################################
+
+    if (does_key_exist(item, 'SeasonId')):
+        season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'season_info')
+
+        isfav_EPISODE['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
+
+    elif (does_key_exist(item, 'ParentId')):
+        season_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'season_info')
+
+        isfav_EPISODE['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
+
+### End Season ####################################################################################
+
+### Series ########################################################################################
+
+    if (does_key_exist(item, 'SeriesId')):
+        series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'series_info')
+
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+
+    elif (does_key_exist(season_item_info, 'SeriesId')):
+        series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'series_info')
+
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+
+    elif (does_key_exist(item, 'ParentId')):
+        series_item_info = get_additional_item_info(server_url, user_key, season_item_info['ParentId'], auth_key, 'series_info')
+
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+
+    elif (does_key_exist(season_item_info, 'ParentId')):
+        series_item_info = get_additional_item_info(server_url, user_key, season_item_info['ParentId'], auth_key, 'series_info')
+
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+
+### End Series ####################################################################################
+
+### TV Library ########################################################################################
+
+    if (does_key_exist(series_item_info, 'ParentId')):
+        tvlibrary_item_info = get_additional_item_info(server_url, user_key, series_item_info['ParentId'], auth_key, 'tv_library_info')
+
+        isfav_EPISODE['tvlibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvlibrary_item_info,isfav_EPISODE['tvlibrarygenre'],keep_favorites_advanced_tv_library_genre,'tv_library_genre')
+
+### End TV Library ####################################################################################
+
+### Studio Network #######################################################################################
+
+    if (does_key_index_exist(series_item_info, 'Studios', 0)):
+        #Get studio network's item info
+        tvstudionetwork_item_info = get_additional_item_info(server_url, user_key, series_item_info['Studios'][0]['Id'], auth_key, 'studio_network_info')
+
+        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
+
+    elif (does_key_exist(series_item_info, 'SeriesStudio')):
+        #Get series studio network's item info
+        tvstudionetwork_item_info = get_studio_item_info(server_url, user_key, series_item_info['SeriesStudio'], auth_key)
+
+        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
+
+### End Studio Network ###################################################################################
+
+    for isfavkey in isfav_EPISODE:
+        for isfavID in isfav_EPISODE[isfavkey]:
+            if (isfav_EPISODE[isfavkey][isfavID]):
+                return(True)
+
+    return(False)
+
+
+#determine if genres for music track, album, or artist are set to favorite
+def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
 
     if (itemType == 'Audio'):
         lookupTopicTrack='track'
@@ -1438,20 +1637,14 @@ def get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key, itemType)
         keep_favorites_advanced_album_artist=cfg.keep_favorites_advanced_audio_book_author
         keep_favorites_advanced_music_library_artist=cfg.keep_favorites_advanced_audio_book_library_author
     else:
-        raise ValueError('ValueError: Unknown itemType passed into get_isfav_AUDIO')
+        raise ValueError('ValueError: Unknown itemType passed into get_isfav_AUDIO_ADVANCED')
+
+    #define empty dictionary for favorited Tracks, Albums, Artists
+    isfav_AUDIO={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'trackartist':{},'albumartist':{},'audiolibraryartist':{},'composergenre':{},'audiolibrarygenre':{}}
 
 ### Track #########################################################################################
 
     if (does_key_exist(item, 'Id')):
-        #Check if track's favorite value already exists in dictionary
-        if not item['Id'] in isfav_AUDIO['track']:
-            #Store if this track is marked as a favorite
-            isfav_AUDIO['track'][item['Id']] = item['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (item['UserData']['IsFavorite']):
-                #Store if the track is marked as a favorite
-                isfav_AUDIO['track'][item['Id']] = item['UserData']['IsFavorite']
 
         isfav_AUDIO['trackgenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_AUDIO['trackgenre'],keep_favorites_advanced_track_genre,lookupTopicTrack + '_genre')
 
@@ -1464,15 +1657,12 @@ def get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key, itemType)
     #Albums for music
     if (does_key_exist(item, 'ParentId')):
         album_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'album_info')
-        #Check if album's favorite value already exists in dictionary
-        if not album_item_info['Id'] in isfav_AUDIO['album']:
-            #Check if album's favorite value already exists in dictionary
-            isfav_AUDIO['album'][album_item_info['Id']] = album_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (album_item_info['UserData']['IsFavorite']):
-                #Store if the album is marked as a favorite
-                isfav_AUDIO['album'][album_item_info['Id']] = album_item_info['UserData']['IsFavorite']
+
+        isfav_AUDIO['albumgenre']=get_isfav_GENRE(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
+
+        isfav_AUDIO['albumartist']=get_isfav_ARTIST(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicLibrary + '_artist')
+    elif (does_key_exist(item, 'AlbumId')):
+        album_item_info = get_additional_item_info(server_url, user_key, item['AlbumId'], auth_key, 'album_info')
 
         isfav_AUDIO['albumgenre']=get_isfav_GENRE(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
 
@@ -1485,189 +1675,22 @@ def get_isfav_AUDIO(isfav_AUDIO, item, server_url, user_key, auth_key, itemType)
     #Library
     if (does_key_exist(album_item_info, 'ParentId')):
         audiolibrary_item_info = get_additional_item_info(server_url, user_key, album_item_info['ParentId'], auth_key, 'library_info')
-        #Check if audio library's favorite value already exists in dictionary
-        if not audiolibrary_item_info['Id'] in isfav_AUDIO['audiolibrary']:
-            #Check if audio library's favorite value already exists in dictionary
-            isfav_AUDIO['audiolibrary'][audiolibrary_item_info['Id']] = audiolibrary_item_info['UserData']['IsFavorite']
-        else: #it already exists
-            #if the value is True save it anyway
-            if (audiolibrary_item_info['UserData']['IsFavorite']):
-                #Store if the audio library is marked as a favorite
-                isfav_AUDIO['audiolibrary'][audiolibrary_item_info['Id']] = audiolibrary_item_info['UserData']['IsFavorite']
 
         isfav_AUDIO['audiolibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,audiolibrary_item_info,isfav_AUDIO['audiolibrarygenre'],keep_favorites_advanced_music_library_genre,lookupTopicLibrary + '_genre')
 
 ### End Library #####################################################################################
 
-    #Check if album_item_info was created before trying to use it
-    #try:
-        #album_item_info
-    #except NameError:
-        #item_exists = False
-    #else:
-        #item_exists = True
+    for isfavkey in isfav_AUDIO:
+        for isfavID in isfav_AUDIO[isfavkey]:
+            if (isfav_AUDIO[isfavkey][isfavID]):
+                return(True)
 
-    if bool(cfg.DEBUG):
-        #DEBUG
-        print('-----------------------------------------------------------')
-        if (does_key_exist(item, 'Id')):
-            print('  Track is favorite: ' + str(isfav_AUDIO['track'][item['Id']]))
-        if (does_key_index_exist(item, 'GenreItems', 0)):
-            if (keep_favorites_advanced_track_genre):
-                if (keep_favorites_advanced_track_genre == 1):
-                    print(' Track Genre is favorite: ' + str(isfav_AUDIO['trackgenre'][item['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for trackgenre in range(len(item['GenreItems'])):
-                        print('Track Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIO['trackgenre'][item['GenreItems'][trackgenre]['Id']]))
-                        i+=1
-        if (does_key_index_exist(item, 'ArtistItems', 0)):
-            if (keep_favorites_advanced_track_artist):
-                if (keep_favorites_advanced_track_artist == 1):
-                    print(' Track Artist is favorite: ' + str(isfav_AUDIO['trackartist'][item['ArtistItems'][0]['Id']]))
-                else:
-                    i=0
-                    for trackartist in range(len(item['ArtistItems'])):
-                        print('Track Artist' + str(i) + ' is favorite: ' + str(isfav_AUDIO['trackartist'][item['ArtistItems'][trackartist]['Id']]))
-                        i+=1
-
-        if (does_key_exist(album_item_info, 'Id')):
-            print('  Album is favorite: ' + str(isfav_AUDIO['album'][item['Id']]))
-        if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_album_genre):
-                if (keep_favorites_advanced_album_genre == 1):
-                    print(' Album Genre is favorite: ' + str(isfav_AUDIO['albumgenre'][item['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for albumgenre in range(len(item['GenreItems'])):
-                        print('Album Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIO['albumgenre'][item['GenreItems'][albumgenre]['Id']]))
-                        i+=1
-        if (does_key_index_exist(album_item_info, 'ArtistItems', 0)):
-            if (keep_favorites_advanced_album_artist):
-                if (keep_favorites_advanced_album_artist == 1):
-                    print(' Album Artist is favorite: ' + str(isfav_AUDIO['albumartist'][item['ArtistItems'][0]['Id']]))
-                else:
-                    i=0
-                    for albumartist in range(len(item['ArtistItems'])):
-                        print('Album Artist' + str(i) + ' is favorite: ' + str(isfav_AUDIO['albumartist'][item['ArtistItems'][albumartist]['Id']]))
-                        i+=1
-
-        if (does_key_exist(audiolibrary_item_info, 'Id')):
-            print('  Music Library is favorite: ' + str(isfav_AUDIO['audiolibrary'][item['Id']]))
-        if (does_key_index_exist(audiolibrary_item_info, 'GenreItems', 0)):
-            if (keep_favorites_advanced_music_library_genre):
-                if (keep_favorites_advanced_music_library_genre == 1):
-                    print(' Music Library Genre is favorite: ' + str(isfav_AUDIO['audiolibrarygenre'][item['GenreItems'][0]['Id']]))
-                else:
-                    i=0
-                    for librarygenre in range(len(item['GenreItems'])):
-                        print('Music Library Genre' + str(i) + ' is favorite: ' + str(isfav_AUDIO['audiolibrarygenre'][item['GenreItems'][librarygenre]['Id']]))
-                        i+=1
-
-    itemisfav_AUDIOtrkalblib=False
-    if (does_key_exist(item, 'Id')):
-        if (does_key_exist(isfav_AUDIO['track'],item['Id'])):
-            if (isfav_AUDIO['track'][item['Id']]):
-                itemisfav_AUDIOtrkalblib=True
-
-    if (does_key_exist(album_item_info, 'Id')):
-        if (does_key_exist(isfav_AUDIO['album'],album_item_info['Id'])):
-            if (isfav_AUDIO['album'][album_item_info['Id']]):
-                itemisfav_AUDIOtrkalblib=True
-
-    if (does_key_exist(audiolibrary_item_info, 'Id')):
-        if (does_key_exist(isfav_AUDIO['audiolibrary'],audiolibrary_item_info['Id'])):
-            if (isfav_AUDIO['audiolibrary'][audiolibrary_item_info['Id']]):
-                itemisfav_AUDIOtrkalblib=True
-
-    itemisfav_AUDIOtrkalblibgenre=False
-    if (does_key_index_exist(item, 'GenreItems', 0)):
-        #Check if item genre was stored as a favorite
-        if (keep_favorites_advanced_track_genre):
-            if (keep_favorites_advanced_track_genre == 1):
-                if (isfav_AUDIO['trackgenre'][str(item['GenreItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalblibgenre=True
-            else:
-                #Check if any item genre was stored as a favorite
-                for trackgenre in range(len(item['GenreItems'])):
-                    if (isfav_AUDIO['trackgenre'][str(item['GenreItems'][trackgenre]['Id'])]):
-                        itemisfav_AUDIOtrkalblibgenre=True
-
-    if (does_key_index_exist(album_item_info, 'GenreItems', 0)):
-        #Check if album genre was stored as a favorite
-        if (keep_favorites_advanced_album_genre):
-            if (keep_favorites_advanced_album_genre == 1):
-                if (isfav_AUDIO['albumgenre'][str(album_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalblibgenre=True
-            else:
-                #Check if any album genre was stored as a favorite
-                for albumgenre in range(len(album_item_info['GenreItems'])):
-                    if (isfav_AUDIO['albumgenre'][str(album_item_info['GenreItems'][albumgenre]['Id'])]):
-                        itemisfav_AUDIOtrkalblibgenre=True
-
-    if (does_key_index_exist(audiolibrary_item_info, 'GenreItems', 0)):
-        #Check if library genre was stored as a favorite
-        if (keep_favorites_advanced_music_library_genre):
-            if (keep_favorites_advanced_music_library_genre == 1):
-                if (isfav_AUDIO['audiolibrarygenre'][str(audiolibrary_item_info['GenreItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalblibgenre=True
-            else:
-                #Check if any library genre was stored as a favorite
-                for audiolibrarygenre in range(len(audiolibrary_item_info['GenreItems'])):
-                    if (isfav_AUDIO['audiolibrarygenre'][str(audiolibrary_item_info['GenreItems'][audiolibrarygenre]['Id'])]):
-                        itemisfav_AUDIOtrkalblibgenre=True
-
-    itemisfav_AUDIOtrkalbartist=False
-    if (does_key_index_exist(item, 'ArtistItems', 0)):
-        #Check if item artist was stored as a favorite
-        if (keep_favorites_advanced_track_artist):
-            if (keep_favorites_advanced_track_artist == 1):
-                if (isfav_AUDIO['trackartist'][str(item['ArtistItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalbartist=True
-            else:
-                #Check if any item artist was stored as a favorite
-                for trackartist in range(len(item['ArtistItems'])):
-                    if (isfav_AUDIO['trackartist'][str(item['ArtistItems'][trackartist]['Id'])]):
-                        itemisfav_AUDIOtrkalbartist=True
-
-    if (does_key_index_exist(album_item_info, 'ArtistItems', 0)):
-        #Check if album artist was stored as a favorite
-        if (keep_favorites_advanced_album_artist):
-            if (keep_favorites_advanced_album_artist == 1):
-                if (isfav_AUDIO['albumartist'][str(album_item_info['ArtistItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalbartist=True
-            else:
-                #Check if any album artist was stored as a favorite
-                for albumartist in range(len(album_item_info['ArtistItems'])):
-                    if (isfav_AUDIO['albumartist'][str(album_item_info['ArtistItems'][albumartist]['Id'])]):
-                        itemisfav_AUDIOtrkalbartist=True
-
-    if (does_key_index_exist(audiolibrary_item_info, 'ArtistItems', 0)):
-        #Check if library artist was stored as a favorite
-        if (keep_favorites_advanced_music_library_artist):
-            if (keep_favorites_advanced_music_library_artist == 1):
-                if (isfav_AUDIO['audiolibraryartist'][str(audiolibrary_item_info['ArtistItems'][0]['Id'])]):
-                    itemisfav_AUDIOtrkalbartist=True
-            else:
-                #Check if any library artist was stored as a favorite
-                for audiolibraryartist in range(len(audiolibrary_item_info['ArtistItems'])):
-                    if (isfav_AUDIO['audiolibraryartist'][str(audiolibrary_item_info['ArtistItems'][audiolibraryartist]['Id'])]):
-                        itemisfav_AUDIOtrkalbartist=True
-
-    #Check if track, album, or artist are a favorite
-    itemisfav_AUDIO=False
-    if (
-       (itemisfav_AUDIOtrkalblib) or
-       (itemisfav_AUDIOtrkalblibgenre) or
-       (itemisfav_AUDIOtrkalbartist)
-       ):
-        #Either the track, album(book), artist(s)(author(s)), track genre(s), or album(book) genre(s) are set as a favorite
-        itemisfav_AUDIO=True
-
-    return(itemisfav_AUDIO)
+    return(False)
 
 
-#determine if episode, season, series, or network are set to favorite
+#determine if genres for audiobok track, book, or author are set to favorite
+def get_isfav_AUDIOBOOK_ADVANCED(item, server_url, user_key, auth_key, itemType):
+    return get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType)
 
 
 #Handle favorites across multiple users
@@ -1855,10 +1878,11 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
 
             user_processed_itemsId_list=set()
 
-            #Initialize api_return_limiter() variables for watched child media items
+            #Initialize api_query_handler() variables for watched child media items
             StartIndex=0
             TotalItems=1
             QueryLimit=1
+            QueriesRemaining=True
             APIDebugMsg='find_children_of_favortied_media_data'
 
             if not (data['Id'] == ''):
@@ -1877,9 +1901,7 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                     else:
                         IsPlayedState='True'
 
-                    QueryItemsRemaining=True
-
-                    while (QueryItemsRemaining):
+                    while (QueriesRemaining):
 
                         if not (data['Id'] == ''):
                             #Built query for watched items in s
@@ -1893,12 +1915,7 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                             QueryLimit=0
 
                         #Send the API query for for watched media items in blacklists
-                        children_data,StartIndex,TotalItems,QueryLimit=api_return_limiter(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
-
-                        #Determine if we are done processing queries or if there are still queries to be sent
-                        QueryItemsRemaining=False
-                        if (QueryLimit > 0):
-                            QueryItemsRemaining=True
+                        children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
 
                         for child_item in children_data['Items']:
                             child_itemTag=''
@@ -1936,10 +1953,11 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
 
             user_processed_itemsId_list=set()
 
-            #Initialize api_return_limiter() variables for watched child media items
+            #Initialize api_query_handler() variables for watched child media items
             StartIndex=0
             TotalItems=1
             QueryLimit=1
+            QueriesRemaining=True
             APIDebugMsg='find_children_' + tag_Type + 'ged_media_data'
 
             if not (data['Id'] == ''):
@@ -1958,9 +1976,7 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
                     else:
                         IsPlayedState='True'
 
-                    QueryItemsRemaining=True
-
-                    while (QueryItemsRemaining):
+                    while (QueriesRemaining):
 
                         if not (data['Id'] == ''):
                             #Built query for watched items in s
@@ -1975,12 +1991,7 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
                             QueryLimit=0
 
                         #Send the API query for for watched media items in blacklists
-                        children_data,StartIndex,TotalItems,QueryLimit=api_return_limiter(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
-
-                        #Determine if we are done processing queries or if there are still queries to be sent
-                        QueryItemsRemaining=False
-                        if (QueryLimit > 0):
-                            QueryItemsRemaining=True
+                        children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
 
                         for child_item in children_data['Items']:
                             child_itemTag=''
@@ -2017,7 +2028,7 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
 
 
 #Limit the amount of data returned for a single API call
-def api_return_limiter(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
+def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
 
     data=requestURL(url, cfg.DEBUG, APIDebugMsg, cfg.api_request_attempts)
 
@@ -2027,7 +2038,11 @@ def api_return_limiter(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
     if ((StartIndex + QueryLimit) >= (TotalItems)):
         QueryLimit = TotalItems - StartIndex
 
-    return(data,StartIndex,TotalItems,QueryLimit)
+    QueryItemsRemaining=False
+    if (QueryLimit > 0):
+        QueryItemsRemaining=True
+
+    return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
 
 
 #Unpack library data structure from config
@@ -2187,7 +2202,7 @@ def prep_episodeOutput(item):
     return item
 
 
-#check and populate unknown audio output data
+#check and populate unknown audio and audiobook output data
 def prep_audioOutput(item):
 
     if not (does_key_exist(item,'Type')):
@@ -2344,15 +2359,6 @@ def get_items(server_url, user_keys, auth_key):
 
         media_found=False
 
-        #define empty dictionary for favorited Movies
-        isfav_MOVIE={'movie':{},'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
-        #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
-        isfav_EPISODE={'episode':{},'season':{},'series':{},'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
-        #define empty dictionary for favorited Tracks, Albums, Artists
-        isfav_AUDIO={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'audiolibrarygenre':{},'trackartist':{},'albumartist':{},'audiolibraryartist':{},'composergenre':{}}
-        #define empty dictionary for favorited Tracks, Albums(Books), Artists(Authors)
-        isfav_AUDIOBOOK={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'artistgenre':{},'composergenre':{},'audiolibrarygenre':{}}
-
 ############# Movies #############
 
         if ((cfg.played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
@@ -2361,10 +2367,11 @@ def get_items(server_url, user_keys, auth_key):
 
             for LibraryID in user_bllib_keys_json[currentPosition].split(','):
 
-                #Initialize api_return_limiter() variables for watched media items in blacklists
+                #Initialize api_query_handler() variables for watched media items in blacklists
                 StartIndex_Blacklist=0
                 TotalItems_Blacklist=1
                 QueryLimit_Blacklist=1
+                QueriesRemaining_Blacklist=True
                 APIDebugMsg_Blacklist='movie_blacklist_media_data'
 
                 if not (LibraryID == ''):
@@ -2382,10 +2389,11 @@ def get_items(server_url, user_keys, auth_key):
                     else:
                         IsPlayedState_Blacklist='True'
 
-                #Initialize api_return_limiter() variables for Favorited media items
+                #Initialize api_query_handler() variables for Favorited media items
                 StartIndex_Favorited=0
                 TotalItems_Favorited=1
                 QueryLimit_Favorited=1
+                QueriesRemaining_Favorited=True
                 APIDebugMsg_Favorited='movie_Favorited_media_data'
 
                 #Build query for Favorited media items
@@ -2399,10 +2407,11 @@ def get_items(server_url, user_keys, auth_key):
                 CollapseBoxSetItems_Favorited='False'
                 IsFavorite='True'
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged=0
                 TotalItems_BlackTagged=1
                 QueryLimit_BlackTagged=1
+                QueriesRemaining_BlackTagged=True
                 APIDebugMsg_BlackTagged='movie_favortied_media_data'
 
                 #Build query for blacktagged media items
@@ -2417,10 +2426,11 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode blacktags so they are url acceptable
                 BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged=0
                 TotalItems_WhiteTagged=1
                 QueryLimit_WhiteTagged=1
+                QueriesRemaining_WhiteTagged=True
                 APIDebugMsg_WhiteTagged='movie_favortied_media_data'
 
                 #Build query for whitetagged media items
@@ -2435,9 +2445,9 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode whitetags so they are url acceptable
                 WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
 
-                QueryItemsRemaining=True
+                QueryItemsRemaining_All=True
 
-                while (QueryItemsRemaining):
+                while (QueryItemsRemaining_All):
 
                     if not (LibraryID == ''):
                         #Built query for watched items in blacklists
@@ -2447,12 +2457,13 @@ def get_items(server_url, user_keys, auth_key):
                         '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
-                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist=api_return_limiter(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
+                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
                         #When no libraries are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0}
                         QueryLimit_Blacklist=0
+                        QueriesRemaining_Blacklist=False
 
                     #Built query for Favorited media items
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
@@ -2461,7 +2472,7 @@ def get_items(server_url, user_keys, auth_key):
                     '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
 
                     #Send the API query for for Favorited media items
-                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited=api_return_limiter(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
+                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
 
                     #Built query for blacktagged media items
                     apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
@@ -2472,10 +2483,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if blacktag is not an empty string
                     if not (BlackTags_Tagged == ''):
                         #Send the API query for for blacktagged media items
-                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged=api_return_limiter(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
+                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,QueriesRemaining_BlackTagged=api_query_handler(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
                     else: #(BlackTags_Tagged == '')
                         data_Blacktagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_BlackTagged=0
+                        QueriesRemaining_BlackTagged=False
 
                     #Built query for whitetagged media items
                     apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
@@ -2486,10 +2498,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if whitetag is not an empty string
                     if not (WhiteTags_Tagged == ''):
                         #Send the API query for for whitetagged media items
-                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged=api_return_limiter(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
+                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,QueriesRemaining_WhiteTagged=api_query_handler(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
                     else: #(WhiteTags_Tagged == '')
                         data_Whitetagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_WhiteTagged=0
+                        QueriesRemaining_WhiteTagged=False
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
@@ -2509,10 +2522,7 @@ def get_items(server_url, user_keys, auth_key):
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
-                    QueryItemsRemaining=False
-                    for items_remaining in QueryLimit_list:
-                        if (items_remaining > 0):
-                            QueryItemsRemaining=True
+                    QueryItemsRemaining_All=(QueriesRemaining_Blacklist | QueriesRemaining_Favorited | QueriesRemaining_BlackTagged | QueriesRemaining_WhiteTagged)
 
                     #Determine if media item is to be deleted or kept
                     #Loop thru each dictionary in data_list[#]
@@ -2527,6 +2537,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
+                                itemIsMonitored=False
                                 if (item['Type'] == 'Movie'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
@@ -2541,7 +2552,10 @@ def get_items(server_url, user_keys, auth_key):
                                         max_cut_off_date_movie=date_time_now=datetime.utcnow() + timedelta(1)
 
                                     #Get if media item is set as favorite
-                                    itemisfav_MOVIE=item['UserData']['IsFavorite']
+                                    if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                        itemisfav_MOVIE=True
+                                    else:
+                                        itemisfav_MOVIE=get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key)
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
@@ -2608,6 +2622,7 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_movieOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
@@ -2623,6 +2638,7 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_movieOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
@@ -2644,10 +2660,11 @@ def get_items(server_url, user_keys, auth_key):
 
             for LibraryID in user_bllib_keys_json[currentPosition].split(','):
 
-                #Initialize api_return_limiter() variables for watched media items in blacklists
+                #Initialize api_query_handler() variables for watched media items in blacklists
                 StartIndex_Blacklist=0
                 TotalItems_Blacklist=1
                 QueryLimit_Blacklist=1
+                QueriesRemaining_Blacklist=True
                 APIDebugMsg_Blacklist='episode_blacklist_media_data'
 
                 if not (LibraryID == ''):
@@ -2664,10 +2681,11 @@ def get_items(server_url, user_keys, auth_key):
                     else:
                         IsPlayedState_Blacklist='True'
 
-                #Initialize api_return_limiter() variables for Favorited media items
+                #Initialize api_query_handler() variables for Favorited media items
                 StartIndex_Favorited=0
                 TotalItems_Favorited=1
                 QueryLimit_Favorited=1
+                QueriesRemaining_Favorited=True
                 APIDebugMsg_Favorited='episode_Favorited_media_data'
 
                 #Build query for Favorited media items
@@ -2680,10 +2698,11 @@ def get_items(server_url, user_keys, auth_key):
                 EnableImages_Favorited='False'
                 IsFavorite='True'
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged=0
                 TotalItems_BlackTagged=1
                 QueryLimit_BlackTagged=1
+                QueriesRemaining_BlackTagged=True
                 APIDebugMsg_BlackTagged='episode_favortied_media_data'
 
                 #Build query for tagged media items
@@ -2697,10 +2716,11 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode blacktags so they are url acceptable
                 BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged=0
                 TotalItems_WhiteTagged=1
                 QueryLimit_WhiteTagged=1
+                QueriesRemaining_WhiteTagged=True
                 APIDebugMsg_WhiteTagged='episode_favortied_media_data'
 
                 #Build query for tagged media items
@@ -2714,34 +2734,34 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode whitetags so they are url acceptable
                 WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
 
-                QueryItemsRemaining=True
+                QueryItemsRemaining_All=True
 
-                while (QueryItemsRemaining):
+                while (QueryItemsRemaining_All):
 
                     if not (LibraryID == ''):
                         #Built query for watched items in blacklists
                         apiQuery_Blacklist=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Blacklist +
                         '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
                         '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
-                        '&EnableImages=' + EnableImages_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
+                        '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
-                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist=api_return_limiter(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
-
+                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
                         #When no libraries are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0}
                         QueryLimit_Blacklist=0
+                        QueriesRemaining_Blacklist=False
 
                     #Built query for Favorited media items
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
                     '&StartIndex=' + str(StartIndex_Favorited) + '&Limit=' + str(QueryLimit_Favorited) + '&Fields=' + FieldsState_Favorited +
                     '&Recursive=' + Recursive_Favorited + '&SortBy=' + SortBy_Favorited + '&SortOrder=' + SortOrder_Favorited + '&EnableImages=' + EnableImages_Favorited +
-                    '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
+                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
 
                     #Send the API query for for Favorited media items
-                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited=api_return_limiter(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
+                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
 
                     #Built query for blacktagged media items
                     apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
@@ -2752,10 +2772,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if blacktag is not an empty string
                     if not (BlackTags_Tagged == ''):
                         #Send the API query for for blacktagged media items
-                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged=api_return_limiter(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
+                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,QueriesRemaining_BlackTagged=api_query_handler(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
                     else: #(BlackTags_Tagged == '')
                         data_Blacktagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_BlackTagged=0
+                        QueriesRemaining_BlackTagged=False
 
                     #Built query for whitetagged media items
                     apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
@@ -2766,10 +2787,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if whitetag is not an empty string
                     if not (WhiteTags_Tagged == ''):
                         #Send the API query for for whitetagged media items
-                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged=api_return_limiter(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
+                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,QueriesRemaining_WhiteTagged=api_query_handler(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
                     else: #(WhiteTags_Tagged == '')
                         data_Whitetagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_WhiteTagged=0
+                        QueriesRemaining_WhiteTagged=False
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
@@ -2789,10 +2811,7 @@ def get_items(server_url, user_keys, auth_key):
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
-                    QueryItemsRemaining=False
-                    for items_remaining in QueryLimit_list:
-                        if (items_remaining > 0):
-                            QueryItemsRemaining=True
+                    QueryItemsRemaining_All=(QueriesRemaining_Blacklist | QueriesRemaining_Favorited | QueriesRemaining_BlackTagged | QueriesRemaining_WhiteTagged)
 
                     #Determine if media item is to be deleted or kept
                     #Loop thru each dictionary in data_list[#]
@@ -2807,6 +2826,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
+                                itemIsMonitored=False
                                 if (item['Type'] == 'Episode'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
@@ -2821,7 +2841,10 @@ def get_items(server_url, user_keys, auth_key):
                                         max_cut_off_date_episode=date_time_now=datetime.utcnow() + timedelta(1)
 
                                     #Get if media item is set as favorite
-                                    itemisfav_EPISODE=item['UserData']['IsFavorite']
+                                    if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                        itemisfav_EPISODE=True
+                                    else:
+                                        itemisfav_EPISODE=get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key)
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_episode == 2) and (itemisfav_EPISODE)):
@@ -2888,6 +2911,7 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_episodeOutput(item)
 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
@@ -2904,6 +2928,7 @@ def get_items(server_url, user_keys, auth_key):
                                                 deleteItems.append(item)
                                         else:
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_episodeOutput(item)
                                                 
                                                 item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'], item['IndexNumber']) +
@@ -2926,10 +2951,11 @@ def get_items(server_url, user_keys, auth_key):
 
             for LibraryID in user_bllib_keys_json[currentPosition].split(','):
 
-                #Initialize api_return_limiter() variables for watched media items in blacklists
+                #Initialize api_query_handler() variables for watched media items in blacklists
                 StartIndex_Blacklist=0
                 TotalItems_Blacklist=1
                 QueryLimit_Blacklist=1
+                QueriesRemaining_Blacklist=True
                 APIDebugMsg_Blacklist='audio_blacklist_media_data'
 
                 if not (LibraryID == ''):
@@ -2946,10 +2972,11 @@ def get_items(server_url, user_keys, auth_key):
                     else:
                         IsPlayedState_Blacklist='True'
 
-                #Initialize api_return_limiter() variables for Favorited media items
+                #Initialize api_query_handler() variables for Favorited media items
                 StartIndex_Favorited=0
                 TotalItems_Favorited=1
                 QueryLimit_Favorited=1
+                QueriesRemaining_Favorited=True
                 APIDebugMsg_Favorited='audio_Favorited_media_data'
 
                 #Build query for Favorited media items
@@ -2962,10 +2989,11 @@ def get_items(server_url, user_keys, auth_key):
                 EnableImages_Favorited='False'
                 IsFavorite='True'
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged=0
                 TotalItems_BlackTagged=1
                 QueryLimit_BlackTagged=1
+                QueriesRemaining_BlackTagged=True
                 APIDebugMsg_BlackTagged='audio_favortied_media_data'
 
                 #Build query for tagged media items
@@ -2979,10 +3007,11 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode blacktags so they are url acceptable
                 BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
-                #Initialize api_return_limiter() variables for tagged media items
+                #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged=0
                 TotalItems_WhiteTagged=1
                 QueryLimit_WhiteTagged=1
+                QueriesRemaining_WhiteTagged=True
                 APIDebugMsg_WhiteTagged='audio_favortied_media_data'
 
                 #Build query for tagged media items
@@ -2996,34 +3025,34 @@ def get_items(server_url, user_keys, auth_key):
                 #Encode whitetags so they are url acceptable
                 WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
 
-                QueryItemsRemaining=True
+                QueryItemsRemaining_All=True
 
-                while (QueryItemsRemaining):
+                while (QueryItemsRemaining_All):
 
                     if not (LibraryID == ''):
                         #Built query for watched items in blacklists
                         apiQuery_Blacklist=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Blacklist +
                         '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
                         '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
-                        '&EnableImages=' + EnableImages_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
+                        '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
-                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist=api_return_limiter(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
-
+                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
                         #When no libraries are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0}
                         QueryLimit_Blacklist=0
+                        QueriesRemaining_Blacklist=False
 
                     #Built query for Favorited media items
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
                     '&StartIndex=' + str(StartIndex_Favorited) + '&Limit=' + str(QueryLimit_Favorited) + '&Fields=' + FieldsState_Favorited +
                     '&Recursive=' + Recursive_Favorited + '&SortBy=' + SortBy_Favorited + '&SortOrder=' + SortOrder_Favorited + '&EnableImages=' + EnableImages_Favorited +
-                    '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
+                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
 
                     #Send the API query for for Favorited media items
-                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited=api_return_limiter(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
+                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
 
                     #Built query for blacktagged media items
                     apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
@@ -3034,10 +3063,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if blacktag is not an empty string
                     if not (BlackTags_Tagged == ''):
                         #Send the API query for for blacktagged media items
-                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged=api_return_limiter(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
+                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,QueriesRemaining_BlackTagged=api_query_handler(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
                     else: #(BlackTags_Tagged == '')
                         data_Blacktagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_BlackTagged=0
+                        QueriesRemaining_BlackTagged=False
 
                     #Built query for whitetagged media items
                     apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
@@ -3048,10 +3078,11 @@ def get_items(server_url, user_keys, auth_key):
                     #Check if whitetag is not an empty string
                     if not (WhiteTags_Tagged == ''):
                         #Send the API query for for whitetagged media items
-                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged=api_return_limiter(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
+                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,QueriesRemaining_WhiteTagged=api_query_handler(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
                     else: #(WhiteTags_Tagged == '')
                         data_Whitetagged={'Items':[],'TotalRecordCount':0}
                         QueryLimit_WhiteTagged=0
+                        QueriesRemaining_WhiteTagged=False
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
@@ -3071,10 +3102,7 @@ def get_items(server_url, user_keys, auth_key):
                     QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
-                    QueryItemsRemaining=False
-                    for items_remaining in QueryLimit_list:
-                        if (items_remaining > 0):
-                            QueryItemsRemaining=True
+                    QueryItemsRemaining_All=(QueriesRemaining_Blacklist | QueriesRemaining_Favorited | QueriesRemaining_BlackTagged | QueriesRemaining_WhiteTagged)
 
                     #Determine if media item is to be deleted or kept
                     #Loop thru each dictionary in data_list[#]
@@ -3089,6 +3117,7 @@ def get_items(server_url, user_keys, auth_key):
 
                                 media_found=True
 
+                                itemIsMonitored=False
                                 if (item['Type'] == 'Audio'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
@@ -3103,7 +3132,10 @@ def get_items(server_url, user_keys, auth_key):
                                         max_cut_off_date_audio=date_time_now=datetime.utcnow() + timedelta(1)
 
                                     #Get if media item is set as favorite
-                                    itemisfav_AUDIO=item['UserData']['IsFavorite']
+                                    if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                        itemisfav_AUDIO=True
+                                    else:
+                                        itemisfav_AUDIO=get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, 'Audio')
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIO)):
@@ -3170,6 +3202,7 @@ def get_items(server_url, user_keys, auth_key):
                                         (not itemIsWhiteListed) and (not itemIsWhiteTagged))
                                         ):
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_audioOutput(item)
 
                                                 item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
@@ -3185,6 +3218,7 @@ def get_items(server_url, user_keys, auth_key):
                                             deleteItems.append(item)
                                         else:
                                             try:
+                                                #Fill in the blanks
                                                 item=prep_audioOutput(item)
 
                                                 item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
@@ -3209,134 +3243,288 @@ def get_items(server_url, user_keys, auth_key):
            ((cfg.played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
            ):
 
-            if ((hasattr(cfg, 'request_not_played')) and (cfg.request_not_played == 0)):
-                IsPlayedState='True'
-            else:
-                IsPlayedState=''
-            FieldsState='Id,Path,Genres,ParentId'
-            if (cfg.max_age_audiobook >= 0):
-                IsPlayedState=''
+            user_processed_itemsId_list=set()
 
-            StartIndex=0
-            TotalItems=1
-            ItemsChunk=1
+            for LibraryID in user_bllib_keys_json[currentPosition].split(','):
 
-            while (ItemsChunk > 0):
+                #Initialize api_query_handler() variables for watched media items in blacklists
+                StartIndex_Blacklist=0
+                TotalItems_Blacklist=1
+                QueryLimit_Blacklist=1
+                QueriesRemaining_Blacklist=True
+                APIDebugMsg_Blacklist='audiobook_blacklist_media_data'
 
-                url=(server_url + '/Users/' + user_key  + '/Items?includeItemTypes=AudioBook&StartIndex=' + str(StartIndex) + '&Limit=' + str(ItemsChunk) + '&IsPlayed=' + str(IsPlayedState) + '&Fields=' + str(FieldsState) +
-                    '&Recursive=true&SortBy=AlbumArtist,Album,IndexNumber,Name&SortOrder=Ascending&enableImages=False&api_key=' + auth_key)
+                if not (LibraryID == ''):
+                    #Build query for watched media items in blacklists
+                    IncludeItemTypes_Blacklist='Audio'
+                    FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
+                    SortBy_Blacklist='AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                    SortOrder_Blacklist='Ascending'
+                    EnableUserData_Blacklist='True'
+                    Recursive_Blacklist='True'
+                    EnableImages_Blacklist='False'
+                    if (cfg.max_age_audio >= 0):
+                        IsPlayedState_Blacklist=''
+                    else:
+                        IsPlayedState_Blacklist='True'
 
-                if bool(cfg.DEBUG):
-                    #DEBUG
-                    print(url)
+                #Initialize api_query_handler() variables for Favorited media items
+                StartIndex_Favorited=0
+                TotalItems_Favorited=1
+                QueryLimit_Favorited=1
+                QueriesRemaining_Favorited=True
+                APIDebugMsg_Favorited='audiobook_Favorited_media_data'
 
-                data=requestURL(url, cfg.DEBUG, 'audiobook_media_data', cfg.api_request_attempts)
+                #Build query for Favorited media items
+                IncludeItemTypes_Favorited='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
+                FieldsState_Favorited='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
+                SortBy_Favorited='AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                SortOrder_Favorited='Ascending'
+                EnableUserData_Favorited='True'
+                Recursive_Favorited='True'
+                EnableImages_Favorited='False'
+                IsFavorite='True'
 
-                TotalItems = data['TotalRecordCount']
-                StartIndex = StartIndex + ItemsChunk
-                ItemsChunk = cfg.api_return_limit
-                if ((StartIndex + ItemsChunk) >= (TotalItems)):
-                    ItemsChunk = TotalItems - StartIndex
+                #Initialize api_query_handler() variables for tagged media items
+                StartIndex_BlackTagged=0
+                TotalItems_BlackTagged=1
+                QueryLimit_BlackTagged=1
+                QueriesRemaining_BlackTagged=True
+                APIDebugMsg_BlackTagged='audiobook_favortied_media_data'
 
-                #Determine if media item is to be deleted or kept
-                for item in data['Items']:
+                #Build query for tagged media items
+                IncludeItemTypes_BlackTagged='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
+                FieldsState_BlackTagged='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
+                SortBy_BlackTagged='ParentIndexNumber,IndexNumber,Name'
+                SortOrder_BlackTagged='Ascending'
+                EnableUserData_Blacktagged='True'
+                Recursive_Tagged_Blacktagged='True'
+                EnableImages_Blacktagged='False'
+                #Encode blacktags so they are url acceptable
+                BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
 
-                    media_found=True
+                #Initialize api_query_handler() variables for tagged media items
+                StartIndex_WhiteTagged=0
+                TotalItems_WhiteTagged=1
+                QueryLimit_WhiteTagged=1
+                QueriesRemaining_WhiteTagged=True
+                APIDebugMsg_WhiteTagged='audiobook_favortied_media_data'
 
-                    #Get if media item path is monitored
-                    item_info=get_additional_item_info(server_url, user_key, item['Id'], auth_key, 'audiobook_item')
+                #Build query for tagged media items
+                IncludeItemTypes_WhiteTagged='Audio,MusicAlbum,Playlist,CollectionFolder'
+                FieldsState_WhiteTagged='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
+                SortBy_WhiteTagged='ParentIndexNumber,IndexNumber,Name'
+                SortOrder_WhiteTagged='Ascending'
+                EnableUserData_Whitetagged='True'
+                Recursive_Tagged_Whitetagged='True'
+                EnableImages_Whitetagged='False'
+                #Encode whitetags so they are url acceptable
+                WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
 
-                    for mediasource in item_info['MediaSources']:
+                QueryItemsRemaining_All=True
 
-                        if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
-                            if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
+                while (QueryItemsRemaining_All):
+
+                    if not (LibraryID == ''):
+                        #Built query for watched items in blacklists
+                        apiQuery_Blacklist=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Blacklist +
+                        '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
+                        '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
+                        '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
+
+                        #Send the API query for for watched media items in blacklists
+                        data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
+                    else:
+                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
+                        data_Blacklist={'Items':[],'TotalRecordCount':0}
+                        QueryLimit_Blacklist=0
+                        QueriesRemaining_Blacklist=False
+
+                    #Built query for Favorited media items
+                    apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
+                    '&StartIndex=' + str(StartIndex_Favorited) + '&Limit=' + str(QueryLimit_Favorited) + '&Fields=' + FieldsState_Favorited +
+                    '&Recursive=' + Recursive_Favorited + '&SortBy=' + SortBy_Favorited + '&SortOrder=' + SortOrder_Favorited + '&EnableImages=' + EnableImages_Favorited +
+                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
+
+                    #Send the API query for for Favorited media items
+                    data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
+
+                    #Built query for blacktagged media items
+                    apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
+                    '&StartIndex=' + str(StartIndex_BlackTagged) + '&Limit=' + str(QueryLimit_BlackTagged) + '&Fields=' + FieldsState_BlackTagged +
+                    '&Recursive=' + Recursive_Tagged_Blacktagged + '&SortBy=' + SortBy_BlackTagged + '&SortOrder=' + SortOrder_BlackTagged + '&EnableImages=' + EnableImages_Blacktagged +
+                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacktagged + '&Tags=' + BlackTags_Tagged + '&EnableUserData=' + EnableUserData_Blacktagged + '&api_key=' + auth_key)
+
+                    #Check if blacktag is not an empty string
+                    if not (BlackTags_Tagged == ''):
+                        #Send the API query for for blacktagged media items
+                        data_Blacktagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,QueriesRemaining_BlackTagged=api_query_handler(apiQuery_BlackTagged,StartIndex_BlackTagged,TotalItems_BlackTagged,QueryLimit_BlackTagged,APIDebugMsg_BlackTagged)
+                    else: #(BlackTags_Tagged == '')
+                        data_Blacktagged={'Items':[],'TotalRecordCount':0}
+                        QueryLimit_BlackTagged=0
+                        QueriesRemaining_BlackTagged=False
+
+                    #Built query for whitetagged media items
+                    apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
+                    '&StartIndex=' + str(StartIndex_WhiteTagged) + '&Limit=' + str(QueryLimit_WhiteTagged) + '&Fields=' + FieldsState_WhiteTagged +
+                    '&Recursive=' + Recursive_Tagged_Whitetagged + '&SortBy=' + SortBy_WhiteTagged + '&SortOrder=' + SortOrder_WhiteTagged + '&EnableImages=' + EnableImages_Whitetagged +
+                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Whitetagged + '&Tags=' + WhiteTags_Tagged + '&EnableUserData=' + EnableUserData_Whitetagged + '&api_key=' + auth_key)
+
+                    #Check if whitetag is not an empty string
+                    if not (WhiteTags_Tagged == ''):
+                        #Send the API query for for whitetagged media items
+                        data_Whitetagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,QueriesRemaining_WhiteTagged=api_query_handler(apiQuery_WhiteTagged,StartIndex_WhiteTagged,TotalItems_WhiteTagged,QueryLimit_WhiteTagged,APIDebugMsg_WhiteTagged)
+                    else: #(WhiteTags_Tagged == '')
+                        data_Whitetagged={'Items':[],'TotalRecordCount':0}
+                        QueryLimit_WhiteTagged=0
+                        QueriesRemaining_WhiteTagged=False
+
+                    #Define reasoning for lookup
+                    APIDebugMsg_Favortied_Child='favortied child'
+                    data_Favorited_Children=getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited)
+                    #Define reasoning for lookup
+                    APIDebugMsg_Blacktag_Child='blacktag'
+                    data_Blacktagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
+                    #Define reasoning for lookup
+                    APIDebugMsg_Whitetag_Child='whitetag'
+                    data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
+                    
+                    #Combine dictionaries into list of dictionaries
+                    #Order here is important
+                    data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
+
+                    #Combine remaining query items into list of dictionaries
+                    QueryLimit_list=[QueryLimit_Blacklist,QueryLimit_Favorited,QueryLimit_BlackTagged]
+
+                    #Determine if we are done processing queries or if there are still queries to be sent
+                    QueryItemsRemaining_All=(QueriesRemaining_Blacklist | QueriesRemaining_Favorited | QueriesRemaining_BlackTagged | QueriesRemaining_WhiteTagged)
+
+                    #Determine if media item is to be deleted or kept
+                    #Loop thru each dictionary in data_list[#]
+                    for data in data_list:
+
+                        #Loop thru each dictionary[item]
+                        for item in data['Items']: 
+
+                            #Check if item was already processed for this user
+                            if not (item['Id'] in user_processed_itemsId_list):
+                                user_processed_itemsId_list.add(item['Id'])
+
+                                media_found=True
+
                                 itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
-                        elif (does_key_exist(mediasource, 'Type')):
-                            if (mediasource['Type'] == 'Placeholder'):
-                                itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
-                        elif (does_key_exist(mediasource, 'Size')):
-                            if (mediasource['Size'] == 0):
-                                itemIsMonitored=False
-                            else:
-                                itemIsMonitored=get_isItemMatching(item_info['Path'], user_bllib_json[currentPosition])
-                        else:
-                            itemIsMonitored=False
+                                if (item['Type'] == 'Audio'):
+                                    for mediasource in item['MediaSources']:
+                                        itemIsMonitored=get_isItemMonitored(mediasource)
 
-                    #find audiobook media items ready to delete
-                    if ((item_info['Type'] == 'AudioBook') and (itemIsMonitored)):
+                                #find media item is ready to delete
+                                if (itemIsMonitored):
 
-                        #establish max cutoff date for media item
-                        if (cfg.max_age_audiobook >= 0):
-                            max_cut_off_date_audiobook=datetime.strptime(item_info['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item_info['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audiobook)
-                        else:
-                            max_cut_off_date_audiobook=date_time_now = datetime.utcnow() + timedelta(1)
-
-                        #Get if track, album(book), or artist(author) is set as favorite
-                        itemisfav_AUDIOBOOK=get_isfav_AUDIO(isfav_AUDIOBOOK, item, server_url, user_key, auth_key, item_info['Type'])
-
-                        #Get if media item path is whitelisted
-                        itemIsWhiteListed, itemWhiteListedPath=get_isWhitelisted(item_info['Path'], user_wllib_json[currentPosition])
-
-                        #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                        if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK)):
-                            isfav_byUserId_AudioBook[user_key][item_info['Id']] = itemisfav_AUDIOBOOK
-
-                        #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                        if ((cfg.multiuser_whitelist_audiobook == 1) and (itemIsWhiteListed)):
-                            iswhitelist_byUserId[user_key][item_info['Id']] = itemIsWhiteListed
-                            audiobook_whitelists.add(itemWhiteListedPath)
-
-                        if ((does_key_exist(item_info['UserData'], 'Played')) and (item_info['UserData']['Played'] == True)):
-
-                            if (
-                            ((cfg.played_age_audiobook >= 0) and
-                            (item_info['UserData']['PlayCount'] >= 1) and
-                            (cut_off_date_audiobook > parse(item_info['UserData']['LastPlayedDate'])) and
-                            (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOK)) and
-                            (not itemIsWhiteListed))
-                            or
-                            ((cfg.max_age_audiobook >= 0) and
-                            (max_cut_off_date_audiobook <= datetime.utcnow()) and
-                            (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOK)) and
-                            ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOK))) and
-                            (not itemIsWhiteListed))
-                            ):
-                                try:
-                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
-                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                    #establish max cutoff date for media item
+                                    if (cfg.max_age_audiobook >= 0):
+                                        max_cut_off_date_audiobook=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audiobook)
                                     else:
-                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
-                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                except (KeyError, IndexError):
-                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                    if bool(cfg.DEBUG):
-                                        #DEBUG
-                                        print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                                print(':*[DELETE] - ' + item_details)
-                                deleteItems.append(item)
-                            else:
-                                try:
-                                    if (does_key_exist(item_info['UserData'], 'LastPlayedDate')):
-                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Author: ' + item_info['Artists'][0] +
-                                                    ' - ' + get_days_since_played(item_info['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
-                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
+                                        max_cut_off_date_audiobook=date_time_now=datetime.utcnow() + timedelta(1)
+
+                                    #Get if media item is set as favorite
+                                    if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                        itemisfav_AUDIOBOOK=True
                                     else:
-                                        item_details=(item_info['Type'] + ' - Book: ' + item_info['Album'] + ' - Track #' + str(item_info['IndexNumber']) + ': ' + item_info['Name'] + ' - Artist: ' + item_info['Artists'][0] +
-                                                    ' - ' + get_days_since_created(item_info['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
-                                                    ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - ' + 'TrackID: ' + item_info['Id'])
-                                except (KeyError, IndexError):
-                                    item_details=item_info['Type'] + ' - Track: ' + item_info['Name'] + ' - ' + item_info['Id']
-                                    if bool(cfg.DEBUG):
-                                        #DEBUG
-                                        print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem_info' + str(item_info))
-                                print(':[KEEPING] - ' + item_details)
+                                        itemisfav_AUDIOBOOK=get_isfav_AUDIOBOOK_ADVANCED(item, server_url, user_key, auth_key, 'AudioBook')
+
+                                    #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
+                                    if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK)):
+                                        isfav_byUserId_Audio[user_key][item['Id']] = itemisfav_AUDIOBOOK
+
+                                    itemIsWhiteListed=False
+                                    itemIsWhiteListedTaggedNotWatched=False
+                                    #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                                    if (cfg.multiuser_whitelist_audiobook == 1):
+                                        #Get if media item is whitelisted
+                                        for wllib_pos in range(len(user_wllib_keys_json)):
+                                            if not (wllib_pos == currentPosition):
+                                                itemIsWhiteListed, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                                                #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
+                                                if (itemIsWhiteListed):
+                                                    audiobook_whitelists.add(item['Id'])
+                                                    if bool(cfg.DEBUG):
+                                                        iswhitelist_byUserId[user_key][item['Id']] = itemIsWhiteListed
+                                            else:
+                                                #media item could be seen due to matching tag and not watched state
+                                                itemIsWhiteListedTaggedNotWatched, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                                    else:
+                                        #Get if media item is whitelisted
+                                        for wllib_pos in range(len(user_wllib_keys_json)):
+                                            if (wllib_pos == currentPosition):
+                                                #media item could be seen due to matching tag and not watched state
+                                                itemIsWhiteListedTaggedNotWatched, itemWhiteListedValue=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+
+                                    #Determine what to show based on whitelist outputs
+                                    if ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == False)):
+                                        displayIsWhiteListed=False
+                                    elif ((itemIsWhiteListed == False) and (itemIsWhiteListedTaggedNotWatched == True)):
+                                        displayIsWhiteListed=True
+                                    elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == False)):
+                                        displayIsWhiteListed=False
+                                    elif ((itemIsWhiteListed == True) and (itemIsWhiteListedTaggedNotWatched == True)):
+                                        displayIsWhiteListed=True
+
+                                    #Override for when LibraryID == ''
+                                    #This means all libraries are whitelisted for this user
+                                    if (LibraryID == ''):
+                                        displayIsWhiteListed=True
+
+                                    audiobook_whitetaglists,itemIsWhiteTagged=get_isItemTagged(whitetags,audiobook_whitetaglists,item,user_key,'whitetag')
+
+                                    itemIsBlackTagged=False
+                                    #Skip blacktagging if already whitetagged
+                                    if not (itemIsWhiteTagged):
+                                        audiobook_blacktaglists,itemIsBlackTagged=get_isItemTagged(blacktags,audiobook_blacktaglists,item,user_key,'blacktag')
+
+                                    if (does_key_exist(item['UserData'], 'Played')):
+
+                                        if (
+                                        ((cfg.played_age_audiobook >= 0) and
+                                        (item['UserData']['PlayCount'] >= 1) and
+                                        (cut_off_date_audiobook > parse(item['UserData']['LastPlayedDate'])) and
+                                        (not bool(cfg.keep_favorites_audiobook) or (not itemisfav_AUDIOBOOK)) and
+                                        (not itemIsWhiteListed) and (not itemIsWhiteTagged))
+                                        or
+                                        ((cfg.max_age_audiobook >= 0) and
+                                        (max_cut_off_date_audiobook <= datetime.utcnow()) and
+                                        (((not bool(cfg.keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOK)) and
+                                        ((not bool(cfg.max_keep_favorites_audiobook)) or (not itemisfav_AUDIOBOOK))) and
+                                        (not itemIsWhiteListed) and (not itemIsWhiteTagged))
+                                        ):
+                                            try:
+                                                #Fill in the blanks; same as audio
+                                                item=prep_audioOutput(item)
+
+                                                item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
+                                                            ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
+                                                            ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - TrackID: ' + item['Id'])
+                                            except (KeyError, IndexError):
+                                                item_details=item['Type'] + ' - Track: ' + item['Name'] + ' - ' + item['Id']
+                                                if bool(cfg.DEBUG):
+                                                    #DEBUG
+                                                    print('\nError encountered - Delete AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
+                                            print(':*[DELETE] -     ' + item_details)
+                                            deleteItems.append(item)
+                                        else:
+                                            try:
+                                                #Fill in the blanks; same as audio
+                                                item=prep_audioOutput(item)
+
+                                                item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
+                                                            ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK) +
+                                                            ' - Whitelisted: ' + str(itemIsWhiteListed) + ' - Tag Match: ' + str(itemIsBlackTagged or itemIsWhiteTagged) + ' - TrackID: ' + item['Id'])
+                                            except (KeyError, IndexError):
+                                                item_details=item['Type'] + ' - Track: ' + item['Name'] + ' - ' + item['Id']
+                                                if bool(cfg.DEBUG):
+                                                    #DEBUG
+                                                    print('\nError encountered - Keep AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
+                                            print(':[KEEPING] -     ' + item_details)
 
 ############# End Media Types #############
 
@@ -3962,7 +4150,7 @@ def cfgCheck():
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: blacktag must be a string; backlash \'\\\' not allowed\n'
+            error_found_in_media_cleaner_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The blacktag variable is missing from media_cleaner_config.py\n'
 
@@ -3972,7 +4160,7 @@ def cfgCheck():
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: whitetag must be a string; backlash \'\\\' not allowed\n'
+            error_found_in_media_cleaner_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The whitetag variable is missing from media_cleaner_config.py\n'
 
@@ -4098,15 +4286,6 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The server_url variable is missing from media_cleaner_config.py\n'
 
-    #if hasattr(cfg, 'admin_username'):
-        #check=cfg.admin_username
-        #if (
-            #not (type(check) is str)
-        #):
-            #error_found_in_media_cleaner_config_py+='ValueError: admin_username must be a string\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The admin_username variable is missing from media_cleaner_config.py\n'
-
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
         if (
@@ -4129,7 +4308,7 @@ def cfgCheck():
                 (len(check_irt) == 32) and
                 (str(check_irt).isalnum()))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: user_keys must be a single list with commas separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
+                error_found_in_media_cleaner_config_py+='ValueError: user_keys must be a single list with a comma separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The user_keys variable is missing from media_cleaner_config.py\n'
 
