@@ -641,14 +641,14 @@ def generate_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
-    config_file += "#  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata\n"
+    config_file += "#  This is especially true when using the max_age_xyz options; which requires every item of the specified media type send its metadata\n"
     config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value\n"
     config_file += "#  (50 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if (updateConfig == 'FALSE'):
-        config_file += "api_return_limit=50\n"
+        config_file += "api_query_limit=50\n"
     elif (updateConfig == 'TRUE'):
-        config_file += "api_return_limit=" + str(cfg.api_return_limit) + "\n"
+        config_file += "api_query_limit=" + str(cfg.api_query_limit) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# 0 - Debug messages disabled\n"
@@ -759,7 +759,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.2 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.3 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -2037,7 +2037,7 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
 
     TotalItems = data['TotalRecordCount']
     StartIndex = StartIndex + QueryLimit
-    QueryLimit = cfg.api_return_limit
+    QueryLimit = cfg.api_query_limit
     if ((StartIndex + QueryLimit) >= (TotalItems)):
         QueryLimit = TotalItems - StartIndex
 
@@ -4356,16 +4356,16 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The api_request_attempts variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'api_return_limit'):
-        check=cfg.api_return_limit
+    if hasattr(cfg, 'api_query_limit'):
+        check=cfg.api_query_limit
         if (
             not ((type(check) is int) and
             (check >= 1) and
             (check <= 10000))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: api_return_limit must be an integer; valid range 0 thru 10000\n'
+            error_found_in_media_cleaner_config_py+='ValueError: api_query_limit must be an integer; valid range 0 thru 10000\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The api_return_limit variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The api_query_limit variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
