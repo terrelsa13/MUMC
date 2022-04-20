@@ -162,6 +162,7 @@ keep_favorites_advanced_audio_book_library_author=0
 # Must be string with UPPERCASE letters
 #  FALSE - Operate normally
 #  TRUE  - Enable configuration editor mode; will NOT delete media items
+#           Resets remove_files=0
 # (FALSE : default)
 #----------------------------------------------------------#
 UPDATE_CONFIG='FALSE'
@@ -260,7 +261,7 @@ user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ff
 #### Number of times to send an API query before giving up
 ```python
 #----------------------------------------------------------#
-# API request attempts; number of times to retry an API request
+# API query attempts; number of times to retry an API request
 #  delay between initial attempt and the first retry is 1 second
 #  The delay will double with each attempt after the first retry
 #  Delay between the orginal request and retry #1 is (2^0) 1 second
@@ -274,17 +275,17 @@ user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ff
 #  0-16 - number of retry attempts
 #  (4 : default)
 #----------------------------------------------------------#
-api_request_attempts=4
+api_query_attempts=4
 ```
 #### Throttle how aggressively the script sends queries
 ```python
 #----------------------------------------------------------#
-# API query limit; large libraries sometimes cannot return all of the media metadata items in a single API call
+# API query item limit; large libraries sometimes cannot return all of the media metadata items in a single API call
 #  This is especially true when using the max_age_xyz options; which requires every item of the specified media type send its metadata
 #  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
 #  (50 : default)
 #----------------------------------------------------------##
-api_query_limit=50
+api_query_item_limit=50
 ```
 #### DEBUG
 ```python
