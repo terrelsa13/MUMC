@@ -13,12 +13,6 @@ from collections import defaultdict
 from datetime import datetime,date,timedelta,timezone
 from media_cleaner_config_defaults import get_default_config_values
 
-# Hash password if not hashed
-#if cfg.admin_password_sha1 == '':
-#     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
-#auth_key=''
-#print('Hash:'+ cfg.admin_password_sha1)
-
 
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
@@ -58,7 +52,6 @@ def get_url():
         if (url.find('://',3,8) >= 0):
             return(url)
         else:
-           #print('No http:// or https:// entered.')
            url='http://' + url
            print('Assuming server ip or name is: ' + url)
            return(url)
@@ -168,6 +161,8 @@ def get_tag_name(tagbehavior,existingtag):
             inputtagname=input('Input desired ' + tagbehavior + 's: ')
         else:
             inputtagname=input('Input desired ' + tagbehavior + 's (default \'' + defaulttag + '\'): ')
+        #Remove duplicates
+        inputtagname = ','.join(set(inputtagname.split(',')))
         if (inputtagname == ''):
             valid_tag=True
             return(defaulttag)
@@ -178,12 +173,15 @@ def get_tag_name(tagbehavior,existingtag):
                 valid_tag=True
                 inputtagname_split=inputtagname.split(',')
                 for inputtag in inputtagname_split:
-                    existingtag_split=existingtag.split(',')
-                    for donetag in existingtag_split:
-                        if (inputtag == donetag):
-                            valid_tag=False
+                    if not (inputtag == ''):
+                        existingtag_split=existingtag.split(',')
+                        for donetag in existingtag_split:
+                            if (inputtag == donetag):
+                                valid_tag=False
+                    else:
+                        inputtagname_split.remove(inputtag)
                 if (valid_tag):
-                    return(inputtagname)
+                    return(','.join(inputtagname_split))
                 else:
                     print('\nCannot use the same tag as a blacktag and a whitetag.\n')
                     print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
@@ -227,6 +225,11 @@ def get_played_age(mediaType):
 #    password_sha1=hashlib.sha1(password.encode()).hexdigest()
 #    return(password_sha1)
 
+# Hash password if not hashed
+#if cfg.admin_password_sha1 == '':
+#     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
+#auth_key=''
+#print('Hash:'+ cfg.admin_password_sha1)
 
 #get user input needed to build the media_cleaner_config.py file
 def generate_config(cfg,updateConfig):
@@ -278,6 +281,9 @@ def generate_config(cfg,updateConfig):
         if (server_brand == 'jellyfin'):
             print('-----------------------------------------------------------')
             played_age_audiobook = get_played_age('audiobook')
+
+        remove_files=0
+
     else: #Prepare to run the config editor
         print('-----------------------------------------------------------')
         script_behavior=get_setup_behavior(cfg.script_behavior)
@@ -401,10 +407,7 @@ def generate_config(cfg,updateConfig):
     config_file += "#  1 - Enable the ability to delete media\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "remove_files=0\n"
-    elif (updateConfig == 'TRUE'):
-        config_file += "remove_files=" + str(cfg.remove_files) + "\n"
+    config_file += "remove_files=0\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -675,14 +678,12 @@ def generate_config(cfg,updateConfig):
 
     if (updateConfig == 'FALSE'):
         try:
-            #try importing the media_cleaner_config.py file
-            #if media_cleaner_config.py file does not exsit go to except and create one
-            import media_cleaner_config as cfg
 
-            if ((cfg.played_age_movie == -1) and
-                (cfg.played_age_episode == -1) and
-                (cfg.played_age_audio == -1) and
-                ((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook')))):
+            if ((played_age_movie == -1) and
+                (played_age_episode == -1) and
+                (played_age_audio == -1) and
+                #((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook')))):
+                (((server_brand == 'jellyfin') and (played_age_audiobook == -1)) or (server_brand == 'emby'))):
                     print('\n\n-----------------------------------------------------------')
                     print('Config file is not setup to find played media.')
                     print('-----------------------------------------------------------')
@@ -692,7 +693,7 @@ def generate_config(cfg,updateConfig):
                     print('    Set \'played_age_audio\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
                         print('    Set \'played_age_audiobook\' to zero or a positive number')
-            if (cfg.remove_files == 0):
+            if (remove_files == 0):
                 print('-----------------------------------------------------------')
                 print('Config file is not setup to delete played media.')
                 print('Config file is in dry run mode to prevent deleting media.')
@@ -759,7 +760,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.3 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.4 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -4390,7 +4391,7 @@ try:
     #if media_cleaner_config.py file does not exsit go to except and create one
     import media_cleaner_config as cfg
 
-    #try setting DEBUG variable from media_cleaner_config.py file
+    #try assigning the DEBUG variable from media_cleaner_config.py file
     #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
     check=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
