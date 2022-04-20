@@ -279,12 +279,12 @@ api_request_attempts=4
 #### Throttle how aggressively the script sends queries
 ```python
 #----------------------------------------------------------#
-# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call
-#  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata
+# API query limit; large libraries sometimes cannot return all of the media metadata items in a single API call
+#  This is especially true when using the max_age_xyz options; which requires every item of the specified media type send its metadata
 #  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
 #  (50 : default)
 #----------------------------------------------------------##
-api_return_limit=50
+api_query_limit=50
 ```
 #### DEBUG
 ```python
