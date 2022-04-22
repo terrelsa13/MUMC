@@ -271,7 +271,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.4 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.5 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -311,7 +311,7 @@ def get_users_and_libraries(server_url, auth_key, script_behavior, updateConfig)
     user_bl_libs_json=''
 
     #Check if not running for the first time
-    if (updateConfig == 'TRUE'):
+    if (updateConfig):
         #load user_keys to json
         user_keys_json=json.loads(cfg.user_keys)
         #load user_wl_libs to json
@@ -684,7 +684,7 @@ def parse_library_Paths(libPath_str):
 #get user input needed to build the media_cleaner_config.py file
 def generate_config(cfg,updateConfig):
 
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         print('-----------------------------------------------------------')
         server_brand=get_brand()
 
@@ -732,7 +732,8 @@ def generate_config(cfg,updateConfig):
             print('-----------------------------------------------------------')
             played_age_audiobook = get_played_age('audiobook')
 
-        remove_files=0
+        #set REMOVE_FILES
+        REMOVE_FILES=False
 
     else: #Prepare to run the config editor
         print('-----------------------------------------------------------')
@@ -770,13 +771,13 @@ def generate_config(cfg,updateConfig):
     config_file += "#  -1 - to disable managing specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "played_age_movie=" + str(played_age_movie) + "\n"
         config_file += "played_age_episode=" + str(played_age_episode) + "\n"
         config_file += "played_age_audio=" + str(played_age_audio) + "\n"
         if (server_brand == 'jellyfin'):
             config_file += "played_age_audiobook=" + str(played_age_audiobook) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "played_age_movie=" + str(cfg.played_age_movie) + "\n"
         config_file += "played_age_episode=" + str(cfg.played_age_episode) + "\n"
         config_file += "played_age_audio=" + str(cfg.played_age_audio) + "\n"
@@ -794,13 +795,13 @@ def generate_config(cfg,updateConfig):
     config_file += "#  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "keep_favorites_movie=" + str(get_default_config_values('keep_favorites_movie')) + "\n"
         config_file += "keep_favorites_episode=" + str(get_default_config_values('keep_favorites_episode')) + "\n"
         config_file += "keep_favorites_audio=" + str(get_default_config_values('keep_favorites_audio')) + "\n"
         if (server_brand == 'jellyfin'):
             config_file += "keep_favorites_audiobook=" + str(get_default_config_values('keep_favorites_audiobook')) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "keep_favorites_movie=" + str(cfg.keep_favorites_movie) + "\n"
         config_file += "keep_favorites_episode=" + str(cfg.keep_favorites_episode) + "\n"
         config_file += "keep_favorites_audio=" + str(cfg.keep_favorites_audio) + "\n"
@@ -814,13 +815,13 @@ def generate_config(cfg,updateConfig):
     config_file += "#  1 - do not delete media item when ANY monitored users have the parent library whitelisted\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(get_default_config_values('multiuser_whitelist_movie')) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(get_default_config_values('multiuser_whitelist_episode')) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(get_default_config_values('multiuser_whitelist_audio')) + "\n"
         if (server_brand == 'jellyfin'):
             config_file += "multiuser_whitelist_audiobook=" + str(get_default_config_values('multiuser_whitelist_audiobook')) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(cfg.multiuser_whitelist_movie) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(cfg.multiuser_whitelist_episode) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(cfg.multiuser_whitelist_audio) + "\n"
@@ -834,9 +835,9 @@ def generate_config(cfg,updateConfig):
     config_file += "#   Ex: tagname,tag name,tag-name\n"
     config_file += "#  Backslash \'\\\' not allowed\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "blacktag='" + blacktag + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "blacktag='" + cfg.blacktag + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -846,18 +847,19 @@ def generate_config(cfg,updateConfig):
     config_file += "#   Ex: tagname,tag name,tag-name\n"
     config_file += "#  Backslash \'\\\' not allowed\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "whitetag='" + whitetag + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "whitetag='" + cfg.whitetag + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  0 - Disable the ability to delete media (dry run mode)\n"
-    config_file += "#  1 - Enable the ability to delete media\n"
-    config_file += "# (0 : default)\n"
+    config_file += "# Must be a boolean True or False value\n"
+    config_file += "#  False - Disables the ability to delete media (dry run mode)\n"
+    config_file += "#  True - Enable the ability to delete media\n"
+    config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "remove_files=0\n"
+    config_file += "REMOVE_FILES=False\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -870,10 +872,10 @@ def generate_config(cfg,updateConfig):
     config_file += "#  2 - keep movie if ANY genre listed is set as a favorite\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "keep_favorites_advanced_movie_genre=" + str(get_default_config_values('keep_favorites_advanced_movie_genre')) + "\n"
         config_file += "keep_favorites_advanced_movie_library_genre=" + str(get_default_config_values('keep_favorites_advanced_movie_library_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "keep_favorites_advanced_movie_genre=" + str(cfg.keep_favorites_advanced_movie_genre) + "\n"
         config_file += "keep_favorites_advanced_movie_library_genre=" + str(cfg.keep_favorites_advanced_movie_library_genre) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
@@ -888,14 +890,14 @@ def generate_config(cfg,updateConfig):
     config_file += "#  2 - keep episode if ANY genres or studio-networks are set as a favorite\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "keep_favorites_advanced_episode_genre=" + str(get_default_config_values('keep_favorites_advanced_episode_genre')) + "\n"
         config_file += "keep_favorites_advanced_season_genre=" + str(get_default_config_values('keep_favorites_advanced_season_genre')) + "\n"
         config_file += "keep_favorites_advanced_series_genre=" + str(get_default_config_values('keep_favorites_advanced_series_genre')) + "\n"
         config_file += "keep_favorites_advanced_tv_library_genre=" + str(get_default_config_values('keep_favorites_advanced_tv_library_genre')) + "\n"
         config_file += "keep_favorites_advanced_tv_studio_network=" + str(get_default_config_values('keep_favorites_advanced_tv_studio_network')) + "\n"
         config_file += "keep_favorites_advanced_tv_studio_network_genre=" + str(get_default_config_values('keep_favorites_advanced_tv_studio_network_genre')) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "keep_favorites_advanced_episode_genre=" + str(cfg.keep_favorites_advanced_episode_genre) + "\n"
         config_file += "keep_favorites_advanced_season_genre=" + str(cfg.keep_favorites_advanced_season_genre) + "\n"
         config_file += "keep_favorites_advanced_series_genre=" + str(cfg.keep_favorites_advanced_series_genre) + "\n"
@@ -914,14 +916,14 @@ def generate_config(cfg,updateConfig):
     config_file += "#  2 - keep track if ANY genres or artists are set as a favorite\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "keep_favorites_advanced_track_genre=" + str(get_default_config_values('keep_favorites_advanced_track_genre')) + "\n"
         config_file += "keep_favorites_advanced_album_genre=" + str(get_default_config_values('keep_favorites_advanced_album_genre')) + "\n"
         config_file += "keep_favorites_advanced_music_library_genre=" + str(get_default_config_values('keep_favorites_advanced_music_library_genre')) + "\n"
         config_file += "keep_favorites_advanced_track_artist=" + str(get_default_config_values('keep_favorites_advanced_track_artist')) + "\n"
         config_file += "keep_favorites_advanced_album_artist=" + str(get_default_config_values('keep_favorites_advanced_album_artist')) + "\n"
         config_file += "keep_favorites_advanced_music_library_artist=" + str(get_default_config_values('keep_favorites_advanced_music_library_artist')) + "\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "keep_favorites_advanced_track_genre=" + str(cfg.keep_favorites_advanced_track_genre) + "\n"
         config_file += "keep_favorites_advanced_album_genre=" + str(cfg.keep_favorites_advanced_album_genre) + "\n"
         config_file += "keep_favorites_advanced_music_library_genre=" + str(cfg.keep_favorites_advanced_music_library_genre) + "\n"
@@ -929,8 +931,8 @@ def generate_config(cfg,updateConfig):
         config_file += "keep_favorites_advanced_album_artist=" + str(cfg.keep_favorites_advanced_album_artist) + "\n"
         config_file += "keep_favorites_advanced_music_library_artist=" + str(cfg.keep_favorites_advanced_music_library_artist) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
-    if (((updateConfig == 'FALSE') and (server_brand == 'jellyfin')) or
-         (updateConfig == 'TRUE') and (hasattr(cfg, 'server_brand') and (cfg.server_brand == 'jellyfin'))):
+    if ((( not (updateConfig)) and (server_brand == 'jellyfin')) or
+         (updateConfig) and (hasattr(cfg, 'server_brand') and (cfg.server_brand == 'jellyfin'))):
         config_file += "\n"
         config_file += "#----------------------------------------------------------#\n"
         config_file += "# Advanced audio book track genre/author configurations\n"
@@ -942,14 +944,14 @@ def generate_config(cfg,updateConfig):
         config_file += "#  2 - keep audio book track if ANY genres or authors are set as a favorite\n"
         config_file += "# (0 : default)\n"
         config_file += "#----------------------------------------------------------#\n"
-        if (updateConfig == 'FALSE'):
+        if not (updateConfig):
             config_file += "keep_favorites_advanced_audio_book_track_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_track_genre')) + "\n"
             config_file += "keep_favorites_advanced_audio_book_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_genre')) + "\n"
             config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(get_default_config_values('keep_favorites_advanced_audio_book_library_genre')) + "\n"
             config_file += "keep_favorites_advanced_audio_book_track_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_track_author')) + "\n"
             config_file += "keep_favorites_advanced_audio_book_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_author')) + "\n"
             config_file += "keep_favorites_advanced_audio_book_library_author=" + str(get_default_config_values('keep_favorites_advanced_audio_book_library_author')) + "\n"
-        elif (updateConfig == 'TRUE'):
+        elif (updateConfig):
             config_file += "keep_favorites_advanced_audio_book_track_genre=" + str(cfg.keep_favorites_advanced_audio_book_track_genre) + "\n"
             config_file += "keep_favorites_advanced_audio_book_genre=" + str(cfg.keep_favorites_advanced_audio_book_genre) + "\n"
             config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(cfg.keep_favorites_advanced_audio_book_library_genre) + "\n"
@@ -959,16 +961,16 @@ def generate_config(cfg,updateConfig):
         #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Set to 'TRUE' to add new users or edit existing users\n"
-    config_file += "# Must be string with UPPERCASE letters\n"
-    config_file += "#  FALSE - Operate normally\n"
-    config_file += "#  TRUE  - Enable configuration editor mode; will NOT delete media items\n"
-    config_file += "#           Resets remove_files=0\n"
-    config_file += "# (FALSE : default)\n"
+    config_file += "# Set to True to add new users or edit existing users\n"
+    config_file += "# Must be a boolean True or False value\n"
+    config_file += "#  False - Operate normally\n"
+    config_file += "#  True  - Enable configuration editor mode; will NOT delete media items\n"
+    config_file += "#           Resets REMOVE_FILES=False\n"
+    config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
-        config_file += "UPDATE_CONFIG='FALSE'\n"
-    elif (updateConfig == 'TRUE'):
+    if not (updateConfig):
+        config_file += "UPDATE_CONFIG=False\n"
+    elif (updateConfig):
         config_file += "UPDATE_CONFIG='" + str(cfg.UPDATE_CONFIG) + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -982,13 +984,13 @@ def generate_config(cfg,updateConfig):
     config_file += "#  -1 - to disable managing max age of specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "max_age_movie=-1\n"
         config_file += "max_age_episode=-1\n"
         config_file += "max_age_audio=-1\n"
         if (server_brand == 'jellyfin'):
             config_file += "max_age_audiobook=-1\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "max_age_movie=" + str(cfg.max_age_movie) + "\n"
         config_file += "max_age_episode=" + str(cfg.max_age_episode) + "\n"
         config_file += "max_age_audio=" + str(cfg.max_age_audio) + "\n"
@@ -1002,13 +1004,13 @@ def generate_config(cfg,updateConfig):
     config_file += "#  1 - do not delete max age media items when set as a favorite\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "max_keep_favorites_movie=1\n"
         config_file += "max_keep_favorites_episode=1\n"
         config_file += "max_keep_favorites_audio=1\n"
         if (server_brand == 'jellyfin'):
             config_file += "max_keep_favorites_audiobook=1\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
         config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
         config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
@@ -1023,26 +1025,26 @@ def generate_config(cfg,updateConfig):
     config_file += "#  0 - 'emby'\n"
     config_file += "#  1 - 'jellyfin'\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "server_brand='" + server_brand + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "server_brand='" + cfg.server_brand + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Server URL; created during setup\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "server_url='" + server_url + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "server_url='" + cfg.server_url + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Authentication Key; requested from server during setup\n"
     config_file += "#  Also know as an Access Token\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "auth_key='" + auth_key + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "auth_key='" + cfg.auth_key + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1051,9 +1053,9 @@ def generate_config(cfg,updateConfig):
     config_file += "#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted.\n"
     config_file += "# (blacklist : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "script_behavior='" + script_behavior + "'\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "script_behavior='" + cfg.script_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1088,9 +1090,9 @@ def generate_config(cfg,updateConfig):
     config_file += "#  0-16 - number of retry attempts\n"
     config_file += "#  (4 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "api_query_attempts=4\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "api_query_attempts=" + str(cfg.api_query_attempts) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1099,9 +1101,9 @@ def generate_config(cfg,updateConfig):
     config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value\n"
     config_file += "#  (50 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "api_query_item_limit=50\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "api_query_item_limit=" + str(cfg.api_query_item_limit) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1109,9 +1111,9 @@ def generate_config(cfg,updateConfig):
     config_file += "# 1 - Debug messages enabled\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         config_file += "DEBUG=0\n"
-    elif (updateConfig == 'TRUE'):
+    elif (updateConfig):
         config_file += "DEBUG=" + str(cfg.DEBUG) + "\n"
 
     #Create config file next to the script even when cwd (Current Working Directory) is not the same
@@ -1127,7 +1129,7 @@ def generate_config(cfg,updateConfig):
     f.close()
     os.chdir(cwd)
 
-    if (updateConfig == 'FALSE'):
+    if not (updateConfig):
         try:
 
             if ((played_age_movie == -1) and
@@ -1144,13 +1146,13 @@ def generate_config(cfg,updateConfig):
                     print('    Set \'played_age_audio\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
                         print('    Set \'played_age_audiobook\' to zero or a positive number')
-            if (remove_files == 0):
+            if (REMOVE_FILES == 0):
                 print('-----------------------------------------------------------')
                 print('Config file is not setup to delete played media.')
                 print('Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
                 print('To delete media open media_cleaner_config.py in a text editor:')
-                print('    Set \'remove_files=1\' in media_cleaner_config.py')
+                print('    Set REMOVE_FILES=\'TRUE\' in media_cleaner_config.py')
             print('-----------------------------------------------------------')
             print('Edit the media_cleaner_config.py file and try running again.')
             print('-----------------------------------------------------------')
@@ -1313,8 +1315,9 @@ def requestURL(url, debugBool, debugMessage, retries):
 
 
 #Get the favorited children of specified favorited parents
-def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
-
+def getChildren_favoriteMetaData(user_key,data_Favorited):
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
     child_list=[]
     child_list_Id=[]
 
@@ -1354,7 +1357,7 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                             #Built query for watched items in s
                             apiQuery=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
                             '&StartIndex=' + str(StartIndex) + '&Limit=' + str(QueryLimit) + '&IsPlayed=' + IsPlayedState + '&Fields=' + FieldsState +
-                            '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
+                            '&CollapseBoxSetItems=' + CollapseBoxSetItems + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
                         else:
                             #When no libraries are ed; simulate an empty query being returned
                             #this will prevent trying to compare to an empty  string '' to the whitelist libraries later on
@@ -1376,7 +1379,7 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
                                     #if it does not; add fav to metadata
                                     child_item['UserData']['IsFavorite']=True
                                 #if child_item is not already a fav; update this temp metadata so it is a fav
-                                if not (child_item['UserData']['IsFavorite']):
+                                elif not (child_item['UserData']['IsFavorite']):
                                     child_item['UserData']['IsFavorite']=True
 
                                 #assign fav to metad
@@ -1388,10 +1391,14 @@ def getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited):
 
 
 #Get watched children of parents
-def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,tag_Type):
-
+def getChildren_tagMetaData(user_key,data_Tagged,user_tags,tag_Type):
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
+    parent_tag=[]
     child_list=[]
     child_list_Id=[]
+    insert_tagName=user_tags.split(',')[0]
+    insert_tagId=uuid.uuid4().int
 
     for data in data_Tagged['Items']:
 
@@ -1445,28 +1452,36 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
                             child_itemIsTagged=False
                             if not (child_item['Id'] in user_processed_itemsId_list):
                                 if (cfg.server_brand == 'emby'):
-                                    #Check if media item has any tags
-                                    if (len(child_item['TagItems']) == 0):
-                                        #if it does not; add tag to metadata
-                                        child_item['TagItems']=[{'Id':str(uuid.uuid4()),'Name':user_tags.split(',')[0]}]
-                                    else:
-                                        #if item already has tags check if it matches the user defined tag
+                                    #Does 'TagItems' exist
+                                    if not (does_key_exist(child_item,'TagItems')):
+                                        #if it does not; add desired tag to metadata
+                                        child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                    #Does 'TagItems'[] exist
+                                    elif not (does_index_exist(child_item['TagItems'],0)):
+                                        #if it does not; add desired tag to metadata
+                                        child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                    else: #Tag already exists
+                                        #Determine if the existing tags are any of the tags we are looking for
                                         child_list_Id,child_itemIsTagged=get_isItemTagged(user_tags,child_list_Id,child_item,user_key,tag_Type)
-                                        if (child_itemIsTagged == False):
-                                            last_tag_position=len(child_item['TagItems']) + 1
-                                            child_item['TagItems'][last_tag_position]={'Id':str(uuid.uuid4()),'Name':user_tags.split(',')[0]}
+                                        #If existing tags are not ones we are lookign for then insert desired tag
+                                        if not (child_itemIsTagged):
+                                            child_item['TagItems'].append({'Name':insert_tagName,'Id':insert_tagId})
                                 else: #(cfg.server_brand == 'jellyfin')
-                                    #Check if media item has any tags
-                                    if (len(child_item['Tags']) == 0):
-                                        #if it does not; add tag to metadata
-                                        child_item['Tags'][0]=user_tags.split(',')[0]
+                                    #Does 'TagItems' exist
+                                    if not (does_key_exist(child_item,'Tag')):
+                                        #if it does not; add desired tag to metadata
+                                        child_item['Tags']=[insert_tagName]
+                                    #Does 'Tags'[] exist
+                                    elif (child_item['Tags'] == []):
+                                        #if it does not; add desired tag to metadata
+                                        child_item['Tags'].append(insert_tagName)
                                     else:
-                                        #if item already has tags check if it matches the user defined tag
+                                        #Determine if the existing tags are any of the tags we are looking for
                                         child_list_Id,child_itemIsTagged=get_isItemTagged(user_tags,child_list_Id,child_item,user_key,tag_Type)
-                                        if (child_itemIsTagged == False):
-                                            last_tag_position=len(child_item['Tags']) + 1
-                                            child_item['Tags'][last_tag_position]=user_tags.split(',')[0]
-                                #assign tag to metad
+                                        #If existing tags are not ones we are lookign for then insert desired tag
+                                        if not (child_itemIsTagged):
+                                            child_item['Tags'].append(insert_tagName)
+                                #keep track of tagged child items
                                 child_list.append(child_item)
                                 user_processed_itemsId_list.add(child_item['Id'])
 
@@ -1475,7 +1490,10 @@ def getChildren_tagMetaData(server_url,user_key,auth_key,data_Tagged,user_tags,t
 
 
 #get additional item info needed to make a decision about a media item
-def get_additional_item_info(server_url, user_key, itemId, auth_key, lookupTopic):
+def get_additional_item_info(user_key,itemId,lookupTopic):
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
+
     #Get additonal item information
     url=(server_url + '/Users/' + user_key  + '/Items/' + str(itemId) +
         '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags&api_key=' + auth_key)
@@ -1491,7 +1509,9 @@ def get_additional_item_info(server_url, user_key, itemId, auth_key, lookupTopic
 
 
 #get additional channel/network/studio info needed to determine if item is favorite
-def get_studio_item_info(server_url, user_key, studioNetworkName, auth_key):
+def get_studio_item_info(user_key,studioNetworkName):
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
     #Encode studio name
     studio_network=urllib.parse.quote(studioNetworkName)
 
@@ -1601,16 +1621,14 @@ def get_isItemMatching(item_one, item_two):
 
 
 #Determine if genre is favorited
-def get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookupTopic):
+def get_isfav_GENRE(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookupTopic):
 
     if (does_key_index_exist(item, 'GenreItems', 0)):
         #Check if bitmask for favorites by item genre is enabled
         if (keep_favorites_advanced):
             #Check if bitmask for any or first item genre is enabled
             if (keep_favorites_advanced == 1):
-                #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
-                if not (item['GenreItems'][0]['Name'] == 'Audiobook'):
-                    genre_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][0]['Id'], auth_key, lookupTopic)
+                    genre_item_info = get_additional_item_info(user_key,item['GenreItems'][0]['Id'],lookupTopic)
                     #Check if genre's favorite value already exists in dictionary
                     if not genre_item_info['Id'] in isfav_ITEMgenre:
                         #Store if first genre is marked as favorite
@@ -1622,13 +1640,11 @@ def get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_ITEMgenre,keep_favor
                             isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
             else:
                 for genre_item in range(len(item['GenreItems'])):
-                    #For audiobooks the genre is sometimes the same as the Type; ignore when this happens
-                    if not (item['GenreItems'][genre_item]['Name'] == 'Audiobook'):
-                        genre_item_info = get_additional_item_info(server_url, user_key, item['GenreItems'][genre_item]['Id'], auth_key, lookupTopic + '_any')
-                        #Check if genre's favorite value already exists in dictionary
-                        if not genre_item_info['Id'] in isfav_ITEMgenre:
-                            #Store if any genre is marked as a favorite
-                            isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
+                    genre_item_info = get_additional_item_info(user_key,item['GenreItems'][genre_item]['Id'],lookupTopic + '_any')
+                    #Check if genre's favorite value already exists in dictionary
+                    if not genre_item_info['Id'] in isfav_ITEMgenre:
+                        #Store if any genre is marked as a favorite
+                        isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
                     else: #it already exists
                         #if the value is True save it anyway
                         if (genre_item_info['UserData']['IsFavorite']):
@@ -1639,14 +1655,14 @@ def get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_ITEMgenre,keep_favor
 
 
 #Determine if artist is favorited
-def get_isfav_ARTIST(server_url,user_key,auth_key,item,isfav_ITEMartist,keep_favorites_advanced,lookupTopic):
+def get_isfav_ARTIST(user_key,item,isfav_ITEMartist,keep_favorites_advanced,lookupTopic):
 
     if (does_key_index_exist(item, 'ArtistItems', 0)):
         #Check if bitmask for favorites by artist is enabled
         if (keep_favorites_advanced):
             #Check if bitmask for any or first artist is enabled
             if (keep_favorites_advanced == 1):
-                artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][0]['Id'], auth_key, lookupTopic + '_info')
+                artist_item_info = get_additional_item_info(user_key,item['ArtistItems'][0]['Id'],lookupTopic + '_info')
                 #Check if artist's favorite value already exists in dictionary
                 if not artist_item_info['Id'] in isfav_ITEMartist:
                     #Store if first artist is marked as favorite
@@ -1658,7 +1674,7 @@ def get_isfav_ARTIST(server_url,user_key,auth_key,item,isfav_ITEMartist,keep_fav
                         isfav_ITEMartist[artist_item_info['Id']] = artist_item_info['UserData']['IsFavorite']
             else:
                 for artist in range(len(item['ArtistItems'])):
-                    artist_item_info = get_additional_item_info(server_url, user_key, item['ArtistItems'][artist]['Id'], auth_key, lookupTopic + '_info_any')
+                    artist_item_info = get_additional_item_info(user_key,item['ArtistItems'][artist]['Id'],lookupTopic + '_info_any')
                     #Check if artist's favorite value already exists in dictionary
                     if not artist_item_info['Id'] in isfav_ITEMartist:
                         #Store if any track artist is marked as a favorite
@@ -1673,7 +1689,7 @@ def get_isfav_ARTIST(server_url,user_key,auth_key,item,isfav_ITEMartist,keep_fav
 
 
 #Determine if artist is favorited
-def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntwk,keep_favorites_advanced,lookupTopic):
+def get_isfav_STUDIONETWORK(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_advanced,lookupTopic):
 
     if (does_key_index_exist(item, 'Studios', 0)):
         #Check if bitmask for favorites by item genre is enabled
@@ -1681,7 +1697,7 @@ def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntw
             #Check if bitmask for any or first item genre is enabled
             if (keep_favorites_advanced == 1):
                 #Get studio network's item info
-                studionetwork_item_info = get_additional_item_info(server_url, user_key, item['Studios'][0]['Id'], auth_key, 'studio_network_info')
+                studionetwork_item_info = get_additional_item_info(user_key,item['Studios'][0]['Id'],'studio_network_info')
                 #Check if studio-network's favorite value already exists in dictionary
                 if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
                     if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
@@ -1696,7 +1712,7 @@ def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntw
             else:
                 for studios in range(len(item['Studios'])):
                     #Get studio network's item info
-                    studionetwork_item_info = get_additional_item_info(server_url, user_key, item['Studios'][studios]['Id'], auth_key, 'studio_network_info')
+                    studionetwork_item_info = get_additional_item_info(user_key,item['Studios'][studios]['Id'],'studio_network_info')
                     #Check if studio network's favorite value already exists in dictionary
                     if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
                         if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
@@ -1712,7 +1728,7 @@ def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntw
         #Check if bitmask for favorites by item genre is enabled
         if (keep_favorites_advanced):
             #Get series studio network's item info
-            studionetwork_item_info = get_studio_item_info(server_url, user_key, item['SeriesStudio'], auth_key)
+            studionetwork_item_info = get_studio_item_info(user_key,item['SeriesStudio'])
             #Check if series studio network's favorite value already exists in dictionary
             if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
                 if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
@@ -1728,7 +1744,8 @@ def get_isfav_STUDIONETWORK(server_url,user_key,auth_key,item,isfav_ITEMstdo_ntw
 
 
 #determine if genres for movie or library are set to favorite
-def get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key):
+def get_isfav_MOVIE_ADVANCED(item,user_key):
+
     keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
     keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
     #define empty dictionary for favorited Movies
@@ -1738,16 +1755,16 @@ def get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key):
 
     if (does_key_exist(item, 'Id')):
 
-        isfav_MOVIE['moviegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_MOVIE['moviegenre'],keep_favorites_advanced_movie_genre,'movie_genre')
+        isfav_MOVIE['moviegenre']=get_isfav_GENRE(user_key,item,isfav_MOVIE['moviegenre'],keep_favorites_advanced_movie_genre,'movie_genre')
 
 ### End Movie ###################################################################################
 
 ### Movie Library #######################################################################################
 
     if (does_key_exist(item, 'ParentId')):
-        movielibrary_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'movie_library_info')
+        movielibrary_item_info = get_additional_item_info(user_key,item['ParentId'],'movie_library_info')
 
-        isfav_MOVIE['movielibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,movielibrary_item_info,isfav_MOVIE['movielibrarygenre'],keep_favorites_advanced_movie_library_genre,'movie_library_genre')
+        isfav_MOVIE['movielibrarygenre']=get_isfav_GENRE(user_key,movielibrary_item_info,isfav_MOVIE['movielibrarygenre'],keep_favorites_advanced_movie_library_genre,'movie_library_genre')
 
 ### End Movie Library ###################################################################################
 
@@ -1760,7 +1777,8 @@ def get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key):
 
 
 #determine if genres for episode, season, series, or studio-network are set to favorite
-def get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key):
+def get_isfav_EPISODE_ADVANCED(item,user_key):
+
     keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
     keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
     keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
@@ -1774,62 +1792,62 @@ def get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key):
 
     if (does_key_exist(item, 'Id')):
 
-        isfav_EPISODE['episodegenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_EPISODE['episodegenre'],keep_favorites_advanced_episode_genre,'episode_genre')
+        isfav_EPISODE['episodegenre']=get_isfav_GENRE(user_key,item,isfav_EPISODE['episodegenre'],keep_favorites_advanced_episode_genre,'episode_genre')
 
 ### End Episode ###################################################################################
 
 ### Season ########################################################################################
 
     if (does_key_exist(item, 'SeasonId')):
-        season_item_info = get_additional_item_info(server_url, user_key, item['SeasonId'], auth_key, 'season_info')
+        season_item_info = get_additional_item_info(user_key,item['SeasonId'],'season_info')
 
-        isfav_EPISODE['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
+        isfav_EPISODE['seasongenre']=get_isfav_GENRE(user_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
 
     elif (does_key_exist(item, 'ParentId')):
-        season_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'season_info')
+        season_item_info = get_additional_item_info(user_key,item['ParentId'],'season_info')
 
-        isfav_EPISODE['seasongenre']=get_isfav_GENRE(server_url,user_key,auth_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
+        isfav_EPISODE['seasongenre']=get_isfav_GENRE(user_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
 
 ### End Season ####################################################################################
 
 ### Series ########################################################################################
 
     if (does_key_exist(item, 'SeriesId')):
-        series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'series_info')
+        series_item_info = get_additional_item_info(user_key,item['SeriesId'],'series_info')
 
-        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
-        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
     elif (does_key_exist(season_item_info, 'SeriesId')):
-        series_item_info = get_additional_item_info(server_url, user_key, item['SeriesId'], auth_key, 'series_info')
+        series_item_info = get_additional_item_info(user_key,item['SeriesId'],'series_info')
 
-        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
-        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
     elif (does_key_exist(item, 'ParentId')):
-        series_item_info = get_additional_item_info(server_url, user_key, season_item_info['ParentId'], auth_key, 'series_info')
+        series_item_info = get_additional_item_info(user_key,season_item_info['ParentId'],'series_info')
 
-        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
-        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
     elif (does_key_exist(season_item_info, 'ParentId')):
-        series_item_info = get_additional_item_info(server_url, user_key, season_item_info['ParentId'], auth_key, 'series_info')
+        series_item_info = get_additional_item_info(user_key,season_item_info['ParentId'],'series_info')
 
-        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
+        isfav_EPISODE['seriesgenre']=get_isfav_GENRE(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
-        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(server_url,user_key,auth_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
+        isfav_EPISODE['seriesstudionetwork']=get_isfav_STUDIONETWORK(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
 ### End Series ####################################################################################
 
 ### TV Library ########################################################################################
 
     if (does_key_exist(series_item_info, 'ParentId')):
-        tvlibrary_item_info = get_additional_item_info(server_url, user_key, series_item_info['ParentId'], auth_key, 'tv_library_info')
+        tvlibrary_item_info = get_additional_item_info(user_key,series_item_info['ParentId'],'tv_library_info')
 
-        isfav_EPISODE['tvlibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvlibrary_item_info,isfav_EPISODE['tvlibrarygenre'],keep_favorites_advanced_tv_library_genre,'tv_library_genre')
+        isfav_EPISODE['tvlibrarygenre']=get_isfav_GENRE(user_key,tvlibrary_item_info,isfav_EPISODE['tvlibrarygenre'],keep_favorites_advanced_tv_library_genre,'tv_library_genre')
 
 ### End TV Library ####################################################################################
 
@@ -1837,15 +1855,15 @@ def get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key):
 
     if (does_key_index_exist(series_item_info, 'Studios', 0)):
         #Get studio network's item info
-        tvstudionetwork_item_info = get_additional_item_info(server_url, user_key, series_item_info['Studios'][0]['Id'], auth_key, 'studio_network_info')
+        tvstudionetwork_item_info = get_additional_item_info(user_key,series_item_info['Studios'][0]['Id'],'studio_network_info')
 
-        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
+        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(user_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
 
     elif (does_key_exist(series_item_info, 'SeriesStudio')):
         #Get series studio network's item info
-        tvstudionetwork_item_info = get_studio_item_info(server_url, user_key, series_item_info['SeriesStudio'], auth_key)
+        tvstudionetwork_item_info = get_studio_item_info(user_key,series_item_info['SeriesStudio'])
 
-        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(server_url,user_key,auth_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
+        isfav_EPISODE['seriesstudionetworkgenre']=get_isfav_GENRE(user_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
 
 ### End Studio Network ###################################################################################
 
@@ -1858,7 +1876,7 @@ def get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key):
 
 
 #determine if genres for music track, album, or artist are set to favorite
-def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
+def get_isfav_AUDIO_ADVANCED(item,user_key,itemType):
 
     if (itemType == 'Audio'):
         lookupTopicTrack='track'
@@ -1896,9 +1914,9 @@ def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
 
     if (does_key_exist(item, 'Id')):
 
-        isfav_AUDIO['trackgenre']=get_isfav_GENRE(server_url,user_key,auth_key,item,isfav_AUDIO['trackgenre'],keep_favorites_advanced_track_genre,lookupTopicTrack + '_genre')
+        isfav_AUDIO['trackgenre']=get_isfav_GENRE(user_key,item,isfav_AUDIO['trackgenre'],keep_favorites_advanced_track_genre,lookupTopicTrack + '_genre')
 
-        isfav_AUDIO['trackartist']=get_isfav_ARTIST(server_url,user_key,auth_key,item,isfav_AUDIO['trackartist'],keep_favorites_advanced_track_artist,lookupTopicTrack + '_artist')
+        isfav_AUDIO['trackartist']=get_isfav_ARTIST(user_key,item,isfav_AUDIO['trackartist'],keep_favorites_advanced_track_artist,lookupTopicTrack + '_artist')
 
 ### End Track #####################################################################################
 
@@ -1906,17 +1924,17 @@ def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
 
     #Albums for music
     if (does_key_exist(item, 'ParentId')):
-        album_item_info = get_additional_item_info(server_url, user_key, item['ParentId'], auth_key, 'album_info')
+        album_item_info = get_additional_item_info(user_key,item['ParentId'],'album_info')
 
-        isfav_AUDIO['albumgenre']=get_isfav_GENRE(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
+        isfav_AUDIO['albumgenre']=get_isfav_GENRE(user_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
 
-        isfav_AUDIO['albumartist']=get_isfav_ARTIST(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicLibrary + '_artist')
+        isfav_AUDIO['albumartist']=get_isfav_ARTIST(user_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicLibrary + '_artist')
     elif (does_key_exist(item, 'AlbumId')):
-        album_item_info = get_additional_item_info(server_url, user_key, item['AlbumId'], auth_key, 'album_info')
+        album_item_info = get_additional_item_info(user_key,item['AlbumId'],'album_info')
 
-        isfav_AUDIO['albumgenre']=get_isfav_GENRE(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
+        isfav_AUDIO['albumgenre']=get_isfav_GENRE(user_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicLibrary + '_genre')
 
-        isfav_AUDIO['albumartist']=get_isfav_ARTIST(server_url,user_key,auth_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicLibrary + '_artist')
+        isfav_AUDIO['albumartist']=get_isfav_ARTIST(user_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicLibrary + '_artist')
 
 ### End Album/Book #####################################################################################
 
@@ -1924,9 +1942,9 @@ def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
 
     #Library
     if (does_key_exist(album_item_info, 'ParentId')):
-        audiolibrary_item_info = get_additional_item_info(server_url, user_key, album_item_info['ParentId'], auth_key, 'library_info')
+        audiolibrary_item_info = get_additional_item_info(user_key,album_item_info['ParentId'],'library_info')
 
-        isfav_AUDIO['audiolibrarygenre']=get_isfav_GENRE(server_url,user_key,auth_key,audiolibrary_item_info,isfav_AUDIO['audiolibrarygenre'],keep_favorites_advanced_music_library_genre,lookupTopicLibrary + '_genre')
+        isfav_AUDIO['audiolibrarygenre']=get_isfav_GENRE(user_key,audiolibrary_item_info,isfav_AUDIO['audiolibrarygenre'],keep_favorites_advanced_music_library_genre,lookupTopicLibrary + '_genre')
 
 ### End Library #####################################################################################
 
@@ -1939,8 +1957,8 @@ def get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType):
 
 
 #determine if genres for audiobok track, book, or author are set to favorite
-def get_isfav_AUDIOBOOK_ADVANCED(item, server_url, user_key, auth_key, itemType):
-    return get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, itemType)
+def get_isfav_AUDIOBOOK_ADVANCED(item,user_key,itemType):
+    return get_isfav_AUDIO_ADVANCED(item,user_key,itemType)
 
 
 #Handle favorites across multiple users
@@ -2214,7 +2232,10 @@ def user_lib_builder(lib_json):
 
 
 #get played media items; track media items ready to be deleted
-def get_items(server_url, user_keys, auth_key):
+def get_items():
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
+    
     #Get list of all played items
     print('')
     print('-----------------------------------------------------------')
@@ -2289,7 +2310,7 @@ def get_items(server_url, user_keys, auth_key):
         iswhitetag_byUserId[user_key]={}
 
     #load user_keys to json
-    user_keys_json=json.loads(user_keys)
+    user_keys_json=json.loads(cfg.user_keys)
     #load user_bl_libs to json
     user_bllib_json=json.loads(cfg.user_bl_libs)
     #load_user_wl_libs to json
@@ -2486,16 +2507,16 @@ def get_items(server_url, user_keys, auth_key):
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
-                    data_Favorited_Children=getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited)
+                    data_Favorited_Children=getChildren_favoriteMetaData(user_key,data_Favorited)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_Child='blacktag'
-                    data_Blacktagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
+                    data_Blacktagged_Children=getChildren_tagMetaData(user_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_Child='whitetag'
-                    data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
+                    data_Whitetagged_Children=getChildren_tagMetaData(user_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    #Order here is important
+                    #Order here is important [0-Fav,1-FavChid,2-Whitetag,3-WhitetagChild,4-BlackTag,5-BlacktagChild,6-Blacklist]
                     data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
@@ -2535,7 +2556,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
                                         itemisfav_MOVIE=True
                                     else:
-                                        itemisfav_MOVIE=get_isfav_MOVIE_ADVANCED(item, server_url, user_key, auth_key)
+                                        itemisfav_MOVIE=get_isfav_MOVIE_ADVANCED(item,user_key)
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE)):
@@ -2723,7 +2744,7 @@ def get_items(server_url, user_keys, auth_key):
                         apiQuery_Blacklist=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Blacklist +
                         '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
                         '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
-                        '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
+                        '&EnableImages=' + EnableImages_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
@@ -2738,7 +2759,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
                     '&StartIndex=' + str(StartIndex_Favorited) + '&Limit=' + str(QueryLimit_Favorited) + '&Fields=' + FieldsState_Favorited +
                     '&Recursive=' + Recursive_Favorited + '&SortBy=' + SortBy_Favorited + '&SortOrder=' + SortOrder_Favorited + '&EnableImages=' + EnableImages_Favorited +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
+                    '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
 
                     #Send the API query for for Favorited media items
                     data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
@@ -2747,7 +2768,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
                     '&StartIndex=' + str(StartIndex_BlackTagged) + '&Limit=' + str(QueryLimit_BlackTagged) + '&Fields=' + FieldsState_BlackTagged +
                     '&Recursive=' + Recursive_Tagged_Blacktagged + '&SortBy=' + SortBy_BlackTagged + '&SortOrder=' + SortOrder_BlackTagged + '&EnableImages=' + EnableImages_Blacktagged +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacktagged + '&Tags=' + BlackTags_Tagged + '&EnableUserData=' + EnableUserData_Blacktagged + '&api_key=' + auth_key)
+                    '&Tags=' + BlackTags_Tagged + '&EnableUserData=' + EnableUserData_Blacktagged + '&api_key=' + auth_key)
 
                     #Check if blacktag is not an empty string
                     if not (BlackTags_Tagged == ''):
@@ -2762,7 +2783,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
                     '&StartIndex=' + str(StartIndex_WhiteTagged) + '&Limit=' + str(QueryLimit_WhiteTagged) + '&Fields=' + FieldsState_WhiteTagged +
                     '&Recursive=' + Recursive_Tagged_Whitetagged + '&SortBy=' + SortBy_WhiteTagged + '&SortOrder=' + SortOrder_WhiteTagged + '&EnableImages=' + EnableImages_Whitetagged +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Whitetagged + '&Tags=' + WhiteTags_Tagged + '&EnableUserData=' + EnableUserData_Whitetagged + '&api_key=' + auth_key)
+                    '&Tags=' + WhiteTags_Tagged + '&EnableUserData=' + EnableUserData_Whitetagged + '&api_key=' + auth_key)
 
                     #Check if whitetag is not an empty string
                     if not (WhiteTags_Tagged == ''):
@@ -2775,16 +2796,16 @@ def get_items(server_url, user_keys, auth_key):
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
-                    data_Favorited_Children=getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited)
+                    data_Favorited_Children=getChildren_favoriteMetaData(user_key,data_Favorited)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_Child='blacktag'
-                    data_Blacktagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
+                    data_Blacktagged_Children=getChildren_tagMetaData(user_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_Child='whitetag'
-                    data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
+                    data_Whitetagged_Children=getChildren_tagMetaData(user_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    #Order here is important
+                    #Order here is important [0-Fav,1-FavChid,2-Whitetag,3-WhitetagChild,4-BlackTag,5-BlacktagChild,6-Blacklist]
                     data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
@@ -2824,7 +2845,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
                                         itemisfav_EPISODE=True
                                     else:
-                                        itemisfav_EPISODE=get_isfav_EPISODE_ADVANCED(item, server_url, user_key, auth_key)
+                                        itemisfav_EPISODE=get_isfav_EPISODE_ADVANCED(item,user_key)
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_episode == 2) and (itemisfav_EPISODE)):
@@ -3014,7 +3035,7 @@ def get_items(server_url, user_keys, auth_key):
                         apiQuery_Blacklist=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Blacklist +
                         '&StartIndex=' + str(StartIndex_Blacklist) + '&Limit=' + str(QueryLimit_Blacklist) + '&IsPlayed=' + IsPlayedState_Blacklist +
                         '&Fields=' + FieldsState_Blacklist + '&Recursive=' + Recursive_Blacklist + '&SortBy=' + SortBy_Blacklist + '&SortOrder=' + SortOrder_Blacklist +
-                        '&EnableImages=' + EnableImages_Blacklist + '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
+                        '&EnableImages=' + EnableImages_Blacklist + '&EnableUserData=' + EnableUserData_Blacklist + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
@@ -3029,7 +3050,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_Favorited=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + LibraryID + '&IncludeItemTypes=' + IncludeItemTypes_Favorited +
                     '&StartIndex=' + str(StartIndex_Favorited) + '&Limit=' + str(QueryLimit_Favorited) + '&Fields=' + FieldsState_Favorited +
                     '&Recursive=' + Recursive_Favorited + '&SortBy=' + SortBy_Favorited + '&SortOrder=' + SortOrder_Favorited + '&EnableImages=' + EnableImages_Favorited +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Favorited + '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
+                    '&IsFavorite=' + IsFavorite + '&EnableUserData=' + EnableUserData_Favorited + '&api_key=' + auth_key)
 
                     #Send the API query for for Favorited media items
                     data_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,QueriesRemaining_Favorited=api_query_handler(apiQuery_Favorited,StartIndex_Favorited,TotalItems_Favorited,QueryLimit_Favorited,APIDebugMsg_Favorited)
@@ -3038,7 +3059,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_BlackTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_BlackTagged +
                     '&StartIndex=' + str(StartIndex_BlackTagged) + '&Limit=' + str(QueryLimit_BlackTagged) + '&Fields=' + FieldsState_BlackTagged +
                     '&Recursive=' + Recursive_Tagged_Blacktagged + '&SortBy=' + SortBy_BlackTagged + '&SortOrder=' + SortOrder_BlackTagged + '&EnableImages=' + EnableImages_Blacktagged +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Blacktagged + '&Tags=' + BlackTags_Tagged + '&EnableUserData=' + EnableUserData_Blacktagged + '&api_key=' + auth_key)
+                    '&Tags=' + BlackTags_Tagged + '&EnableUserData=' + EnableUserData_Blacktagged + '&api_key=' + auth_key)
 
                     #Check if blacktag is not an empty string
                     if not (BlackTags_Tagged == ''):
@@ -3053,7 +3074,7 @@ def get_items(server_url, user_keys, auth_key):
                     apiQuery_WhiteTagged=(server_url + '/Users/' + user_key  + '/Items?IncludeItemTypes=' + IncludeItemTypes_WhiteTagged +
                     '&StartIndex=' + str(StartIndex_WhiteTagged) + '&Limit=' + str(QueryLimit_WhiteTagged) + '&Fields=' + FieldsState_WhiteTagged +
                     '&Recursive=' + Recursive_Tagged_Whitetagged + '&SortBy=' + SortBy_WhiteTagged + '&SortOrder=' + SortOrder_WhiteTagged + '&EnableImages=' + EnableImages_Whitetagged +
-                    '&CollapseBoxSetItems=' + CollapseBoxSetItems_Whitetagged + '&Tags=' + WhiteTags_Tagged + '&EnableUserData=' + EnableUserData_Whitetagged + '&api_key=' + auth_key)
+                    '&Tags=' + WhiteTags_Tagged + '&EnableUserData=' + EnableUserData_Whitetagged + '&api_key=' + auth_key)
 
                     #Check if whitetag is not an empty string
                     if not (WhiteTags_Tagged == ''):
@@ -3066,16 +3087,16 @@ def get_items(server_url, user_keys, auth_key):
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
-                    data_Favorited_Children=getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited)
+                    data_Favorited_Children=getChildren_favoriteMetaData(user_key,data_Favorited)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_Child='blacktag'
-                    data_Blacktagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
+                    data_Blacktagged_Children=getChildren_tagMetaData(user_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_Child='whitetag'
-                    data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
+                    data_Whitetagged_Children=getChildren_tagMetaData(user_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    #Order here is important
+                    #Order here is important [0-Fav,1-FavChid,2-Whitetag,3-WhitetagChild,4-BlackTag,5-BlacktagChild,6-Blacklist]
                     data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
@@ -3115,7 +3136,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIO=True
                                     else:
-                                        itemisfav_AUDIO=get_isfav_AUDIO_ADVANCED(item, server_url, user_key, auth_key, 'Audio')
+                                        itemisfav_AUDIO=get_isfav_AUDIO_ADVANCED(item,user_key,'Audio')
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIO)):
@@ -3362,16 +3383,16 @@ def get_items(server_url, user_keys, auth_key):
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favortied_Child='favortied child'
-                    data_Favorited_Children=getChildren_favoriteMetaData(server_url,user_key,auth_key,data_Favorited)
+                    data_Favorited_Children=getChildren_favoriteMetaData(user_key,data_Favorited)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_Child='blacktag'
-                    data_Blacktagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
+                    data_Blacktagged_Children=getChildren_tagMetaData(user_key,data_Blacktagged,cfg.blacktag,APIDebugMsg_Blacktag_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_Child='whitetag'
-                    data_Whitetagged_Children=getChildren_tagMetaData(server_url,user_key,auth_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
+                    data_Whitetagged_Children=getChildren_tagMetaData(user_key,data_Whitetagged,cfg.whitetag,APIDebugMsg_Whitetag_Child)
                     
                     #Combine dictionaries into list of dictionaries
-                    #Order here is important
+                    #Order here is important [0-Fav,1-FavChid,2-Whitetag,3-WhitetagChild,4-BlackTag,5-BlacktagChild,6-Blacklist]
                     data_list=[data_Favorited,data_Favorited_Children,data_Whitetagged,data_Whitetagged_Children,data_Blacktagged,data_Blacktagged_Children,data_Blacklist]
 
                     #Combine remaining query items into list of dictionaries
@@ -3411,7 +3432,7 @@ def get_items(server_url, user_keys, auth_key):
                                     if ((does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIOBOOK=True
                                     else:
-                                        itemisfav_AUDIOBOOK=get_isfav_AUDIOBOOK_ADVANCED(item, server_url, user_key, auth_key, 'AudioBook')
+                                        itemisfav_AUDIOBOOK=get_isfav_AUDIOBOOK_ADVANCED(item,user_key,'AudioBook')
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK)):
@@ -3563,9 +3584,9 @@ def list_delete_items(deleteItems):
     #List items to be deleted
     print('-----------------------------------------------------------')
     print('Summary Of Deleted Media:')
-    if not bool(cfg.remove_files):
+    if not bool(cfg.REMOVE_FILES):
         print('* Trial Run Mode       ')
-        print('* remove_files=0       ')
+        print('* REMOVE_FILES=\'TRUE\'')
         print('* No Media Deleted     ')
         print('* Items = ' + str(len(deleteItems)))
         print('-----------------------------------------------------------')
@@ -3608,7 +3629,6 @@ def list_delete_items(deleteItems):
 #api call to delete items
 def delete_item(itemID):
     #build API delete request for specified media item
-    #url=url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
     url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
 
     req = request.Request(url,method='DELETE')
@@ -3620,9 +3640,9 @@ def delete_item(itemID):
         print(req)
 
     #check if in dry-run mode
-    #if remove_files=0; exit this function
-    #else remove_files=1; send request to Emby/Jellyfin to delete specified media item
-    if (not bool(cfg.remove_files)):
+    #if REMOVE_FILES='FALSE'; exit this function
+    #else REMOVE_FILES='TRUE'; send request to Emby/Jellyfin to delete specified media item
+    if not (cfg.REMOVE_FILES):
         return
     else:
         try:
@@ -4124,26 +4144,27 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'remove_files'):
-        check=cfg.remove_files
+    if hasattr(cfg, 'REMOVE_FILES'):
+        check=cfg.REMOVE_FILES
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: remove_files must be an integer; valid values 0 and 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The remove_files variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The REMOVE_FILES variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
         if (
-            not (#(type(check) is str) and
-            (check.isupper()) and
-            ((check == 'TRUE') or
-            (check == 'FALSE')))
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be an all UPPERCASE string; valid values \'TRUE\' and \'FALSE\'\n'
+            error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
 
@@ -4406,7 +4427,7 @@ except (AttributeError, ModuleNotFoundError):
     #another possible reason we are here...
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
-    update_config = 'FALSE'
+    update_config = False
     generate_config(None,update_config)
 
     #exit gracefully after setup
@@ -4416,7 +4437,7 @@ except (AttributeError, ModuleNotFoundError):
 cfgCheck()
 
 #check if user wants to update the existing config file
-if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
+if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG)):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
     if (hasattr(cfg, 'script_behavior')):
         #we are here because we want to add new users to the media_cleaner_config.py file
@@ -4428,7 +4449,7 @@ if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG == 'TRUE')):
     exit(0)
 
 #now we can get media items that are ready to be deleted;
-deleteItems=get_items(cfg.server_url, cfg.user_keys, cfg.auth_key)
+deleteItems=get_items()
 
 #show and delete media items
 list_delete_items(deleteItems)
