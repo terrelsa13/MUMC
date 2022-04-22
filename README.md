@@ -166,7 +166,7 @@ keep_favorites_advanced_audio_book_library_author=0
 #           Resets REMOVE_FILES=False
 # (False : default)
 #----------------------------------------------------------#
-UPDATE_CONFIG='FALSE'
+UPDATE_CONFIG=False
 ```
 #### !!!CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
