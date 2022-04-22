@@ -77,11 +77,12 @@ whitetag='wt_tagname,wt_tag name,wt_tag-name'
 #### Deleting media items is disabled by default:
 ```python
 #----------------------------------------------------------#
-#  0 - Disable the ability to delete media (dry run mode)
-#  1 - Enable the ability to delete media
-# (0 : default)
+# Must be a boolean True or False value
+#  False - Disables the ability to delete media (dry run mode)
+#  True - Enable the ability to delete media
+# (False : default)
 #----------------------------------------------------------#
-remove_files=0
+REMOVE_FILES=False
 ```
 #### Keep movie if genre favorited:
 ```python
@@ -158,12 +159,12 @@ keep_favorites_advanced_audio_book_library_author=0
 #### Edit user to library assocations using current config
 ```python
 #----------------------------------------------------------#
-# Set to 'TRUE' to add new users or edit existing users
-# Must be string with UPPERCASE letters
-#  FALSE - Operate normally
-#  TRUE  - Enable configuration editor mode; will NOT delete media items
-#           Resets remove_files=0
-# (FALSE : default)
+# Set to True to add new users or edit existing users
+# Must be a boolean True or False value
+#  False - Operate normally
+#  True  - Enable configuration editor mode; will NOT delete media items
+#           Resets REMOVE_FILES=False
+# (False : default)
 #----------------------------------------------------------#
 UPDATE_CONFIG='FALSE'
 ```
