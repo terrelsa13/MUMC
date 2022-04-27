@@ -308,7 +308,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.10 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.11 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1236,7 +1236,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Whitelisted libraries with corresponding user keys(s)\n"
-    config_file += "# These libraries are NOT actively monitored for media items to delete; chosen during setup\n"
+    config_file += "# These libraries are actively monitored for blacktagged media items to delete; chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "\n"
