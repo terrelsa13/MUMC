@@ -267,7 +267,7 @@ user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00
 ```python
 #----------------------------------------------------------#"
 # Whitelisted libraries with corresponding user keys(s)"
-# These libraries are NOT actively monitored for media items to delete; chosen during setup"
+# These libraries are actively monitored for blacktagged media items to delete; chosen during setup"
 #----------------------------------------------------------#"
 user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
 ```
@@ -329,7 +329,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 4. Whitelist (Blacklist ignored)
 5. Blacklist (Lowest priority)
 
-<sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ingored
+<sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ignored
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
