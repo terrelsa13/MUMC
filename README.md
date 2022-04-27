@@ -62,7 +62,7 @@ multiuser_whitelist_audiobook=1
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
-blacktag='bt_tagname,bt_tag name,bt_tag-name'
+blacktag='black_tagname,black_tag name,black_tag-name'
 ```
 #### Whitetag a media item to be kept after it is watched:
 ```python
@@ -72,7 +72,7 @@ blacktag='bt_tagname,bt_tag name,bt_tag-name'
 #   Ex: tagname,tag name,tag-name
 #  Backslash '\' not allowed
 #----------------------------------------------------------#
-whitetag='wt_tagname,wt_tag name,wt_tag-name'
+whitetag='white_tagname,white_tag name,white_tag-name'
 ```
 #### Deleting media items is disabled by default:
 ```python
@@ -229,17 +229,28 @@ auth_key='0123456789abcdef0123456789abcdef'
 #### How were libraries selected during setup?
 ```python
 #----------------------------------------------------------#
-# Decide how the script will use the libraries chosen for each user.
-#  0 - blacklist - Media items in the libraries you choose will be allowed to be deleted.
-#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted.
+# Decide how the script will use the libraries chosen for each user
+#  Only used during creation or editing of the configuration file
+#  0 - blacklist - Media items in the libraries you choose will be allowed to be deleted
+#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted
 # (blacklist : default)
 #----------------------------------------------------------#
 script_behavior='abclist'
+```
+```python
+#----------------------------------------------------------#
+# Decide how the script will match media items to the blacklisted and whiteliested libraries
+#  0 - Library Id - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'
+#  1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\' or \'Path\'
+# (byId : default)
+#----------------------------------------------------------#
+library_matching_behavior='byAbc'
 ```
 #### UserId for each monitored user
 ```python
 #----------------------------------------------------------#
 # User key(s) of monitored account(s); chosen during setup
+# These are not used during runtime and only serve as a visual reminder
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
 ```
@@ -291,11 +302,12 @@ api_query_item_limit=50
 #### DEBUG
 ```python
 #----------------------------------------------------------#
-# 0 - Debug messages disabled
-# 1 - Debug messages enabled
-# (0 : default)
+# Must be a boolean True or False value
+# False - Debug messages disabled
+# True - Debug messages enabled
+# (False : default)
 #----------------------------------------------------------#
-DEBUG=0
+DEBUG=False
 ```
 
 # Usage
@@ -307,6 +319,15 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * python3.x
 * python-dateutil
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+
+# Priorities (Lower Number == Higher Priority)
+* 1. Played State (At least x1 monitored user must have played the media item before it will be deleted)<sup>1</sup>
+* 2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored)
+* 3. Blacktag (Whitelist ignored and Blacklist ignored)
+* 4. Whitelist (Blacklist ignored)
+* 5. Blacklist (Lowest priority)
+
+<sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ingored
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
