@@ -322,11 +322,11 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # Priorities (Lower Number == Higher Priority)
-* 1. Played State (At least x1 monitored user must have played the media item before it will be deleted)<sup>1</sup>
-* 2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored)
-* 3. Blacktag (Whitelist ignored and Blacklist ignored)
-* 4. Whitelist (Blacklist ignored)
-* 5. Blacklist (Lowest priority)
+1. Played State (At least x1 monitored user must have played the media item before it will be deleted)<sup>1</sup>
+2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored)
+3. Blacktag (Whitelist ignored and Blacklist ignored)
+4. Whitelist (Blacklist ignored)
+5. Blacklist (Lowest priority)
 
 <sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ingored
 
