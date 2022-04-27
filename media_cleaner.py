@@ -185,9 +185,9 @@ def get_library_matching_behavior(library_matching_behavior):
     valid_behavior=False
     while (valid_behavior == False):
         print('Decide how the script will match media items to the blacklisted and whiteliested libraries.')
-        print('0 - Library Id - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'.')
-        print('1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the \'Path\'.')
-        print('2 - Library Network Path - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\'.')
+        print('0 - byId - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'.')
+        print('1 - byPath - Media items will be matched to blacklisted and whitelisted libraries using the \'Path\'.')
+        print('2 - byNetworkPath - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\'.')
         if ((library_matching_behavior == 'byId') or (library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')):
             print('')
             print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
@@ -308,7 +308,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.9 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.10 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -2384,9 +2384,6 @@ def prep_movieOutput(item):
         item['Studios'][0]={'Name':'Unknown'}
     if not (does_key_exist(item['Studios'][0],'Name')):
         item['Studios'][0]={'Name':'Unknown'}
-    #tbd
-    #if not (does_key_exist(item,'SeriesStudio')):
-        #item['SeriesStudio']='Unknown'
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not (does_key_exist(item['UserData'],'LastPlayedDate')):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
