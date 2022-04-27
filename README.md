@@ -241,7 +241,8 @@ script_behavior='abclist'
 #----------------------------------------------------------#
 # Decide how the script will match media items to the blacklisted and whiteliested libraries
 #  0 - Library Id - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'
-#  1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\' or \'Path\'
+#  1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the \'Path\'
+#  2 - Library Network Path - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\'\n"
 # (byId : default)
 #----------------------------------------------------------#
 library_matching_behavior='byAbc'
