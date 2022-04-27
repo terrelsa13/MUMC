@@ -475,6 +475,65 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     return(userId_bllib_dict, userId_wllib_dict)
 
 
+#Create output string to show library information to user for them to choose
+def parse_library_data_for_display(libFolder,subLibPath):
+
+    libDisplayString=' - ' + libFolder['Name']
+
+    if ('LibraryOptions' in libFolder):
+        if ('PathInfos' in libFolder['LibraryOptions']):
+            if not (len(libFolder['LibraryOptions']['PathInfos']) == 0):
+                if ('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
+                    libDisplayString+=' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path']
+                if ('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
+                    libDisplayString+=' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath']
+
+    if ('ItemId' in libFolder):
+        libDisplayString+=' - LibId: ' + libFolder['ItemId']
+
+    return libDisplayString
+
+
+#Store the chosen library's data in temporary location for use when building blacklist and whitelist
+def parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,pos):
+
+    libraryTemp_dict[pos]['libid']=libFolder['ItemId']
+
+    if ('CollectionType' in libFolder):
+        libraryTemp_dict[pos]['collectiontype']=libFolder['CollectionType']
+    else:
+        libraryTemp_dict[pos]['collectiontype']='Unknown'
+
+    if ('LibraryOptions' in libFolder):
+        if ('PathInfos' in libFolder['LibraryOptions']):
+            if not (len(libFolder['LibraryOptions']['PathInfos']) == 0):
+                if ('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
+                    libraryTemp_dict[pos]['path']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path']
+                else:
+                    libraryTemp_dict[pos]['path']=''
+                if ('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
+                    libraryTemp_dict[pos]['networkpath']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath']
+                else:
+                    libraryTemp_dict[pos]['networkpath']=''
+            else:
+                libraryTemp_dict[pos]['path']=''
+                libraryTemp_dict[pos]['networkpath']=''
+        else:
+            libraryTemp_dict[pos]['path']=''
+            libraryTemp_dict[pos]['networkpath']=''
+    else:
+        libraryTemp_dict[pos]['path']=''
+        libraryTemp_dict[pos]['networkpath']=''
+
+    return libraryTemp_dict
+
+
+#Parse library Paths
+def cleanup_library_paths(libPath_str):
+    libPath_str=libPath_str.replace('\\','/')
+    return(libPath_str)
+
+
 #API call to get library folders; choose which libraries to blacklist and whitelist
 def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, user_number, mandatory, library_matching_behavior):
     #get all library paths
@@ -496,7 +555,8 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
     library_dict=defaultdict(dict)
     not_library_dict=defaultdict(dict)
     #define empty sets
-    libraryPath_set=set()
+    #libraryPath_set=set()
+    libraryPath_tracker=[]
     enabledFolderIds_set=set()
     #delete_channels=[]
 
@@ -555,6 +615,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
     #Go thru libaries this user has permissions to access and show them on the screen
     stop_loop=False
     first_run=True
+    libInfoPrinted=False
     while (stop_loop == False):
         j=0
         k=0
@@ -562,60 +623,61 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
         for libFolder in data_folders:
             if (('ItemId' in libFolder) and ('CollectionType' in libFolder) and ((enabledFolderIds_set == set()) or (libFolder['ItemId'] in enabledFolderIds_set))):
                 for subLibPath in range(len(libFolder['LibraryOptions']['PathInfos'])):
-                    if (('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath]) and ('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath])):
+                    if ((library_matching_behavior == 'byId') and ('ItemId' in libFolder)):
                         #option made here to check for either ItemId or Path when deciding what to show
                         # when ItemId libraries with multiple folders but same libId will be removed together
                         # when Path libraries with multiple folders but the same libId will be removed individually
-                        if not (((library_matching_behavior == 'byId') and (libFolder['ItemId'] in libraryPath_set)) or
-                                ((library_matching_behavior == 'byPath') and (libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] in libraryPath_set)) or
-                                ((library_matching_behavior == 'byNetworkPath') and (libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] in libraryPath_set))):
-                            print(str(j) + ' - ' + libFolder['Name'] + ' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] + ' - (' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] +') - LibId: ' + libFolder['ItemId'])
+                        if ((library_matching_behavior == 'byId') and ( not (libFolder['ItemId'] in libraryPath_tracker))):
+                            print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
+                            libInfoPrinted=True
                         else:
                             #show blank entry
                             print(str(j) + ' - ' + libFolder['Name'] + ' - ' )
+                            libInfoPrinted=True
                         if not ('userid' in libraryTemp_dict):
                             libraryTemp_dict['userid']=user_id
-                        libraryTemp_dict[k]['libid']=libFolder['ItemId']
-                        libraryTemp_dict[k]['collectiontype']=libFolder['CollectionType']
-                        libraryTemp_dict[k]['path']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path']
-                        libraryTemp_dict[k]['networkpath']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath']
-                    elif ('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
-                        if not (((library_matching_behavior == 'byId') and (libFolder['ItemId'] in libraryPath_set)) or
-                                ((library_matching_behavior == 'byPath') and (libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] in libraryPath_set))):
-                            print(str(j) + ' - ' + libFolder['Name'] + ' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] + ' - LibId: ' + libFolder['ItemId'])
+                        libraryTemp_dict=parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,k)
+                    elif ((library_matching_behavior == 'byPath') and ('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath])):
+                        #option made here to check for either ItemId or Path when deciding what to show
+                        # when ItemId libraries with multiple folders but same libId will be removed together
+                        # when Path libraries with multiple folders but the same libId will be removed individually
+                        if ((library_matching_behavior == 'byPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] in libraryPath_tracker))):
+                            print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
+                            libInfoPrinted=True
                         else:
                             #show blank entry
                             print(str(j) + ' - ' + libFolder['Name'] + ' - ' )
+                            libInfoPrinted=True
                         if not ('userid' in libraryTemp_dict):
                             libraryTemp_dict['userid']=user_id
-                        libraryTemp_dict[k]['libid']=libFolder['ItemId']
-                        libraryTemp_dict[k]['collectiontype']=libFolder['CollectionType']
-                        libraryTemp_dict[k]['path']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path']
-                        libraryTemp_dict[k]['networkpath']=''
-                    else: #('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
-                        if not (((library_matching_behavior == 'byId') and (libFolder['ItemId'] in libraryPath_set)) or
-                                ((library_matching_behavior == 'byNetworkPath') and (libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] in libraryPath_set))):
-                            print(str(j) + ' - ' + libFolder['Name'] + ' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] + ' - LibId: ' + libFolder['ItemId'])
+                        libraryTemp_dict=parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,k)
+                    elif ((library_matching_behavior == 'byNetworkPath') and ('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath])):
+                        #option made here to check for either ItemId or Path when deciding what to show
+                        # when ItemId libraries with multiple folders but same libId will be removed together
+                        # when Path libraries with multiple folders but the same libId will be removed individually
+                        if ((library_matching_behavior == 'byNetworkPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] in libraryPath_tracker))):
+                            print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
+                            libInfoPrinted=True
                         else:
                             #show blank entry
                             print(str(j) + ' - ' + libFolder['Name'] + ' - ' )
+                            libInfoPrinted=True
                         if not ('userid' in libraryTemp_dict):
                             libraryTemp_dict['userid']=user_id
-                        libraryTemp_dict[k]['libid']=libFolder['ItemId']
-                        libraryTemp_dict[k]['collectiontype']=libFolder['CollectionType']
-                        libraryTemp_dict[k]['path']=''
-                        libraryTemp_dict[k]['networkpath']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath']
+                        libraryTemp_dict=parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,k)
                     showpos_correlation[k]=j
                     k += 1
-                    if ((library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')):
+                    if (((library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')) and (libInfoPrinted)):
+                        libInfoPrinted=False
                         j += 1
-                if (library_matching_behavior == 'byId'):
+                if ((library_matching_behavior == 'byId') and (libInfoPrinted)):
+                    libInfoPrinted=False
                     j += 1
 
         #Go thru channels this user has permissions to access and show them on the screen
         #for libChannel in data_channels:
             #if (('Id' in libChannel) and ('Type' in libChannel) and ((enabledFolderIds_set == set()) or (libChannel['Id'] in enabledFolderIds_set))):
-                #if not (libChannel['Id'] in libraryPath_set):
+                #if not (libChannel['Id'] in libraryPath_tracker):
                     #print(str(j) + ' - ' + libChannel['Name'] + ' - ' + libChannel['Type'] + ' - LibId: ' + libChannel['Id'])
                 #else:
                     #show blank entry
@@ -658,7 +720,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
         #loop thru user chosen libraries
         for input_path_number in list_path_number:
             try:
-                if ((input_path_number == '') and (len(libraryPath_set) == 0) and (mandatory)):
+                if ((input_path_number == '') and (len(libraryPath_tracker) == 0) and (mandatory)):
                     print('\nMust select at least one library to monitor for this user. Try again.\n')
                 elif (input_path_number == ''):
                     #Add valid library selecitons to the library dicitonary
@@ -676,52 +738,45 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                                 library_dict['userid']=libraryTemp_dict['userid']
                             for showpos in showpos_correlation:
                                 if (showpos_correlation[showpos] == path_number_int):
-                                    #library_dict[showpos]['libid']=libraryTemp_dict[showpos]['libid']
-                                    #library_dict[showpos]['collectiontype']=libraryTemp_dict[showpos]['collectiontype']
-                                    #library_dict[showpos]['path']=libraryTemp_dict[showpos]['path']
-                                    #library_dict[showpos]['networkpath']=libraryTemp_dict[showpos]['networkpath']
-
                                     for checkallpos in libraryTemp_dict:
-                                        if not (checkallpos == 'userid'):
+                                        libMatchFound=False
+                                        if not ((checkallpos == 'userid') or (checkallpos in library_dict)):
                                             if ((library_matching_behavior == 'byId') and (libraryTemp_dict[showpos]['libid'] == libraryTemp_dict[checkallpos]['libid'])):
-                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
-                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+                                                libMatchFound=True
+                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
                                             elif ((library_matching_behavior == 'byPath') and (libraryTemp_dict[showpos]['path'] == libraryTemp_dict[checkallpos]['path'])):
-                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
-                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+                                                libMatchFound=True
+                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
                                             elif ((library_matching_behavior == 'byNetworkPath') and (libraryTemp_dict[showpos]['networkpath'] == libraryTemp_dict[checkallpos]['networkpath'])):
-                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
-                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+                                                libMatchFound=True
+                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
 
-                                            #The chosen library is removed from the "not chosen" data structure
-                                            #Remove valid library selecitons from the not_library dicitonary
-                                            if (checkallpos in not_library_dict):
-                                                not_library_dict.pop(checkallpos)
+                                            if (libMatchFound):
+                                                #The chosen library is removed from the "not chosen" data structure
+                                                #Remove valid library selecitons from the not_library dicitonary
+                                                if (checkallpos in not_library_dict):
+                                                    not_library_dict.pop(checkallpos)
 
-                                        #The chosen library is removed from the "not chosen" data structure
-                                        #Remove valid library selecitons from the not_library dicitonary
-                                        #if (showpos in not_library_dict):
-                                            #not_library_dict.pop(showpos)
-
-                                            #The chosen library is added to the "chosen" data structure
-                                            # Add library ID/Path to chosen list type behavior
-                                            if (( not (library_dict[checkallpos].get('libid') == '')) and (library_matching_behavior == 'byId')):
-                                                libraryPath_set.add(library_dict[checkallpos]['libid'])
-                                            elif (( not (library_dict[checkallpos].get('path') == '')) and (library_matching_behavior == 'byPath')):
-                                                libraryPath_set.add(library_dict[checkallpos]['path'])
-                                            elif (( not (library_dict[checkallpos].get('networkpath') == '')) and (library_matching_behavior == 'byNetworkPath')):
-                                                libraryPath_set.add(library_dict[checkallpos]['networkpath'])
-                                            else:
-                                                pass #raise an error
+                                                #The chosen library is added to the "chosen" data structure
+                                                # Add library ID/Path to chosen list type behavior
+                                                if (( not (library_dict[checkallpos].get('libid') == '')) and (library_matching_behavior == 'byId')):
+                                                    libraryPath_tracker.append(library_dict[checkallpos]['libid'])
+                                                elif (( not (library_dict[checkallpos].get('path') == '')) and (library_matching_behavior == 'byPath')):
+                                                    libraryPath_tracker.append(library_dict[checkallpos]['path'])
+                                                elif (( not (library_dict[checkallpos].get('networkpath') == '')) and (library_matching_behavior == 'byNetworkPath')):
+                                                    libraryPath_tracker.append(library_dict[checkallpos]['networkpath'])
 
                             #When all libraries selected we can automatically exit the library chooser
-                            if (len(libraryPath_set) >= j):
+                            if (len(libraryPath_tracker) >= j):
                                 stop_loop=True
                             else:
                                 stop_loop=False
@@ -729,7 +784,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
 
                             #DEBUG
                             #print('selected library folders')
-                            #print(libraryPath_set)
+                            #print(libraryPath_tracker)
                         else:
                             print('\nIgnoring Out Of Range Value: ' + input_path_number + '\n')
                     else:
@@ -771,12 +826,6 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
         #This should never happen
         #empty libraries for blacklist and whitelist
         return(not_library_dict,library_dict)
-
-
-#Parse library Paths
-def cleanup_library_paths(libPath_str):
-    libPath_str=libPath_str.replace('\\','/')
-    return(libPath_str)
 
 
 #get user input needed to build or edit the media_cleaner_config.py file
