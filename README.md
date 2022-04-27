@@ -240,9 +240,9 @@ script_behavior='abclist'
 ```python
 #----------------------------------------------------------#
 # Decide how the script will match media items to the blacklisted and whiteliested libraries
-#  0 - Library Id - Media items will be matched to blacklisted and whitelisted libraries using the 'LibraryId'
-#  1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the 'Path'
-#  2 - Library Network Path - Media items will be matched to blacklisted and whitelisted libraries using the 'NetworkPath'
+#  0 - byId - Media items will be matched to blacklisted and whitelisted libraries using the 'LibraryId'
+#  1 - byPath - Media items will be matched to blacklisted and whitelisted libraries using the 'Path'
+#  2 - byNetworkPath - Media items will be matched to blacklisted and whitelisted libraries using the 'NetworkPath'
 # (byId : default)
 #----------------------------------------------------------#
 library_matching_behavior='byAbc'
@@ -335,6 +335,9 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 
 # Blacktagging vs Whitetagging
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
+
+# Library Matching By Id, By Path, or By Network Path
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18)
 
 # First Run
 * (OPTIONAL) - Update **media_cleaner_config_defaults.py** with desired default values
