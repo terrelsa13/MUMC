@@ -1,4 +1,4 @@
-# BREAKING CHANGES COMING!
+# UPDATES AND BREAKING CHANGES COMING!
 
 **All,**
 Work has been underway to improve this script.
