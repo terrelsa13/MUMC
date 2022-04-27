@@ -318,7 +318,8 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * Linux or Windows
 * Mac (probably works but do not have a Mac to confirm)
 * python3.x
-* python-dateutil
+* python-dateutil \*must be installed\*
+* media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # Priorities (Lower Number == Higher Priority)
@@ -340,7 +341,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18)
 
 # First Run
-* (OPTIONAL) - Update **media_cleaner_config_defaults.py** with desired default values
+* **\*OPTIONAL\*** Update **media_cleaner_config_defaults.py** with desired default values
 * $```/path/to/python3.x /path/to/media_cleaner.py```
 * You may get the below python error if the python-dateutil module is not installed
    - ModuleNotFoundError: No module named 'dateutil' python-dateutil
