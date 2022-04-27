@@ -308,7 +308,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.8 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.9 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -665,8 +665,9 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                         if not ('userid' in libraryTemp_dict):
                             libraryTemp_dict['userid']=user_id
                         libraryTemp_dict=parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,k)
-                    showpos_correlation[k]=j
-                    k += 1
+                    if (libInfoPrinted):
+                        showpos_correlation[k]=j
+                        k += 1
                     if (((library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')) and (libInfoPrinted)):
                         libInfoPrinted=False
                         j += 1
@@ -776,7 +777,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                                                     libraryPath_tracker.append(library_dict[checkallpos]['networkpath'])
 
                             #When all libraries selected we can automatically exit the library chooser
-                            if (len(libraryPath_tracker) >= j):
+                            if (len(libraryPath_tracker) >= len(showpos_correlation)):
                                 stop_loop=True
                             else:
                                 stop_loop=False
