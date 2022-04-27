@@ -308,7 +308,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.7 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.8 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -682,42 +682,43 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                                     #library_dict[showpos]['networkpath']=libraryTemp_dict[showpos]['networkpath']
 
                                     for checkallpos in libraryTemp_dict:
-                                        if ((library_matching_behavior == 'byId') and (library_dict[showpos]['libid'] == libraryTemp_dict[checkallpos]['libid'])):
-                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
-                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
-                                        elif ((library_matching_behavior == 'byPath') and (library_dict[showpos]['path'] == libraryTemp_dict[checkallpos]['path'])):
-                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
-                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
-                                        elif ((library_matching_behavior == 'byNetworkPath') and (library_dict[showpos]['networkpath'] == libraryTemp_dict[checkallpos]['networkpath'])):
-                                                library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
-                                                library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
-                                                library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
-                                                library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                        if not (checkallpos == 'userid'):
+                                            if ((library_matching_behavior == 'byId') and (libraryTemp_dict[showpos]['libid'] == libraryTemp_dict[checkallpos]['libid'])):
+                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+                                            elif ((library_matching_behavior == 'byPath') and (libraryTemp_dict[showpos]['path'] == libraryTemp_dict[checkallpos]['path'])):
+                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+                                            elif ((library_matching_behavior == 'byNetworkPath') and (libraryTemp_dict[showpos]['networkpath'] == libraryTemp_dict[checkallpos]['networkpath'])):
+                                                    library_dict[checkallpos]['libid']=libraryTemp_dict[checkallpos]['libid']
+                                                    library_dict[checkallpos]['collectiontype']=libraryTemp_dict[checkallpos]['collectiontype']
+                                                    library_dict[checkallpos]['path']=libraryTemp_dict[checkallpos]['path']
+                                                    library_dict[checkallpos]['networkpath']=libraryTemp_dict[checkallpos]['networkpath']
+
+                                            #The chosen library is removed from the "not chosen" data structure
+                                            #Remove valid library selecitons from the not_library dicitonary
+                                            if (checkallpos in not_library_dict):
+                                                not_library_dict.pop(checkallpos)
 
                                         #The chosen library is removed from the "not chosen" data structure
                                         #Remove valid library selecitons from the not_library dicitonary
-                                        if (checkallpos in not_library_dict):
-                                            not_library_dict.pop(checkallpos)
+                                        #if (showpos in not_library_dict):
+                                            #not_library_dict.pop(showpos)
 
-                                    #The chosen library is removed from the "not chosen" data structure
-                                    #Remove valid library selecitons from the not_library dicitonary
-                                    #if (showpos in not_library_dict):
-                                        #not_library_dict.pop(showpos)
-
-                                        #The chosen library is added to the "chosen" data structure
-                                        # Add library ID/Path to chosen list type behavior
-                                        if (( not (library_dict[showpos].get('libid') == '')) and (library_matching_behavior == 'byId')):
-                                            libraryPath_set.add(library_dict[showpos]['libid'])
-                                        elif (( not (library_dict[showpos].get('path') == '')) and (library_matching_behavior == 'byPath')):
-                                            libraryPath_set.add(library_dict[showpos]['path'])
-                                        elif (( not (library_dict[showpos].get('networkpath') == '')) and (library_matching_behavior == 'byNetworkPath')):
-                                            libraryPath_set.add(library_dict[showpos]['networkpath'])
-                                        else:
-                                            pass #raise an error
+                                            #The chosen library is added to the "chosen" data structure
+                                            # Add library ID/Path to chosen list type behavior
+                                            if (( not (library_dict[checkallpos].get('libid') == '')) and (library_matching_behavior == 'byId')):
+                                                libraryPath_set.add(library_dict[checkallpos]['libid'])
+                                            elif (( not (library_dict[checkallpos].get('path') == '')) and (library_matching_behavior == 'byPath')):
+                                                libraryPath_set.add(library_dict[checkallpos]['path'])
+                                            elif (( not (library_dict[checkallpos].get('networkpath') == '')) and (library_matching_behavior == 'byNetworkPath')):
+                                                libraryPath_set.add(library_dict[checkallpos]['networkpath'])
+                                            else:
+                                                pass #raise an error
 
                             #When all libraries selected we can automatically exit the library chooser
                             if (len(libraryPath_set) >= j):
