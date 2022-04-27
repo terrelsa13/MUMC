@@ -3848,7 +3848,7 @@ def get_items():
                                     if ((cfg.keep_favorites_audio) and (cfg.keep_favorites_advanced_track_genre or cfg.keep_favorites_advanced_album_genre or
                                         cfg.keep_favorites_advanced_music_library_genre or cfg.keep_favorites_advanced_track_artist or
                                         cfg.keep_favorites_advanced_album_artist or cfg.keep_favorites_advanced_music_library_artist)):
-                                        itemisfav_AUDIO_Advanced=get_isfav_AUDIO_ADVANCED(item,user_key)
+                                        itemisfav_AUDIO_Advanced=get_isfav_AUDIO_ADVANCED(item,user_key,'Audio')
 
                                     itemisfav_AUDIO_Display=False
                                     if (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced):
@@ -4272,7 +4272,7 @@ def get_items():
                                     if ((cfg.keep_favorites_audiobook) and (cfg.keep_favorites_advanced_audio_book_track_genre or cfg.keep_favorites_advanced_audio_book_genre or
                                         cfg.keep_favorites_advanced_audio_book_library_genre or cfg.keep_favorites_advanced_audio_book_track_author or
                                         cfg.keep_favorites_advanced_audio_book_author or cfg.keep_favorites_advanced_audio_book_library_author)):
-                                        itemisfav_AUDIOBOOK_Advanced=get_isfav_AUDIOBOOK_ADVANCED(item,user_key)
+                                        itemisfav_AUDIOBOOK_Advanced=get_isfav_AUDIOBOOK_ADVANCED(item,user_key,'AudioBook')
 
                                     itemisfav_AUDIOBOOK_Display=False
                                     if (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced):
