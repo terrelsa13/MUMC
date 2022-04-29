@@ -57,6 +57,92 @@ def does_key_index_exist(item, keyvalue, indexvalue):
     return(does_key_exist(item, keyvalue) and does_index_exist(item[keyvalue], indexvalue))
 
 
+#send url request
+def requestURL(url, debugBool, reqeustDebugMessage, retries):
+
+    if (debugBool):
+        #DEBUG
+        print(reqeustDebugMessage + ' - url request')
+        print(url)
+
+    #first delay if needed
+        #delay value doubles each time the same API request is resent
+    delay = 1
+    #number of times after the intial API request to retry if an exception occurs
+    retryAttempts = int(retries)
+
+    getdata = True
+    #try sending url request specified number of times
+        #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
+    while(getdata):
+        try:
+            with request.urlopen(url) as response:
+                if response.getcode() == 200:
+                    try:
+                        source = response.read()
+                        data = json.loads(source)
+                        getdata = False
+                        if (debugBool):
+                            #DEBUG
+                            print(reqeustDebugMessage + ' - data')
+                            print2json(data)
+                        #return(data)
+                    except Exception as err:
+                        if (err.msg == 'Unauthorized'):
+                            print('\n' + str(err))
+                            raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
+                        else:
+                            time.sleep(delay)
+                            #delay value doubles each time the same API request is resent
+                            delay += delay
+                            if (delay >= (2**retryAttempts)):
+                                print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + reqeustDebugMessage + '\" lookup.')
+                                return(err)
+                else:
+                    getdata = False
+                    print('An error occurred while attempting to retrieve data from the API.')
+                    return('Attempt to get data at: ' + reqeustDebugMessage + '. Server responded with code: ' + str(response.getcode()))
+        except Exception as err:
+            if (err.msg == 'Unauthorized'):
+                print('\n' + str(err))
+                raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
+            else:
+                time.sleep(delay)
+                #delay value doubles each time the same API request is resent
+                delay += delay
+                if (delay >= (2**retryAttempts)):
+                    print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + reqeustDebugMessage + '\" lookup.')
+                    return(err)
+    return(data)
+
+
+#Limit the amount of data returned for a single API call
+def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
+
+    data=requestURL(url, cfg.DEBUG, APIDebugMsg, cfg.api_query_attempts)
+
+    TotalItems = data['TotalRecordCount']
+    StartIndex = StartIndex + QueryLimit
+    QueryLimit = cfg.api_query_item_limit
+    if ((StartIndex + QueryLimit) >= (TotalItems)):
+        QueryLimit = TotalItems - StartIndex
+
+    QueryItemsRemaining=False
+    if (QueryLimit > 0):
+        QueryItemsRemaining=True
+
+    if (cfg.DEBUG):
+        #DEBUG
+        print(APIDebugMsg + ' - API query handler')
+        print(url)
+        print('Starting at record index ' + str(StartIndex))
+        print('Asking for ' + str(QueryLimit) + ' records')
+        print('Total records for this query is ' + str(TotalItems))
+        print('There are records remaining: ' + str(QueryItemsRemaining))
+
+    return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
+
+
 #emby or jellyfin?
 def get_brand():
     defaultbrand='emby'
@@ -308,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.11 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.12 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -834,13 +920,17 @@ def generate_edit_config(cfg,updateConfig):
 
     if not (updateConfig):
         print('-----------------------------------------------------------')
+        #ask user for server brand (i.e. emby or jellyfin)
         server_brand=get_brand()
 
         print('-----------------------------------------------------------')
+        #ask user for server's url
         server=get_url()
         print('-----------------------------------------------------------')
+        #ask user for the emby or jellyfin port number
         port=get_port()
         print('-----------------------------------------------------------')
+        #ask user for url-base
         server_base=get_base(server_brand)
         if (len(port)):
             server_url=server + ':' + port + '/' + server_base
@@ -848,15 +938,20 @@ def generate_edit_config(cfg,updateConfig):
             server_url=server + '/' + server_base
         print('-----------------------------------------------------------')
 
+        #ask user for administrator username
         username=get_admin_username()
         print('-----------------------------------------------------------')
+        #ask user for administrator password
         password=get_admin_password()
         print('-----------------------------------------------------------')
+        #ask server for authentication key using administrator username and password
         auth_key=get_auth_key(server_url, username, password, server_brand)
 
+        #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(None)
         print('-----------------------------------------------------------')
 
+        #ask user how they want media items to be matched to libraries/folders
         library_matching_behavior=get_library_matching_behavior(None)
         print('-----------------------------------------------------------')
 
@@ -864,23 +959,29 @@ def generate_edit_config(cfg,updateConfig):
         blacktag=''
         whitetag=''
 
+        #ask user for blacktag(s)
         blacktag=get_tag_name('blacktag',whitetag)
         print('-----------------------------------------------------------')
 
+        #ask user for whitetag(s)
         whitetag=get_tag_name('whitetag',blacktag)
         print('-----------------------------------------------------------')
 
+        #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
         print('-----------------------------------------------------------')
 
-
+        #ask user for number of days to wait before attempting to delete a watched movie
         played_age_movie = get_played_age('movie')
         print('-----------------------------------------------------------')
+        #ask user for number of days to wait before attempting to delete a watched episode
         played_age_episode = get_played_age('episode')
         print('-----------------------------------------------------------')
+        #ask user for number of days to wait before attempting to delete a played audio track
         played_age_audio = get_played_age('audio')
         if (server_brand == 'jellyfin'):
             print('-----------------------------------------------------------')
+            #ask user for number of days to wait before attempting to delete a played audiobook track
             played_age_audiobook = get_played_age('audiobook')
 
         #set REMOVE_FILES
@@ -888,10 +989,10 @@ def generate_edit_config(cfg,updateConfig):
 
     else: #Prepare to run the config editor
         print('-----------------------------------------------------------')
+        #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
         print('-----------------------------------------------------------')
-        library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior)
-        print('-----------------------------------------------------------')
+        #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(cfg.server_url,cfg.auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
 
     userkeys_bllibs_list=[]
@@ -1302,7 +1403,6 @@ def generate_edit_config(cfg,updateConfig):
             if ((played_age_movie == -1) and
                 (played_age_episode == -1) and
                 (played_age_audio == -1) and
-                #((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook')))):
                 (((server_brand == 'jellyfin') and (played_age_audiobook == -1)) or (server_brand == 'emby'))):
                     print('\n\n-----------------------------------------------------------')
                     print('Config file is not setup to find played media.')
@@ -1313,7 +1413,7 @@ def generate_edit_config(cfg,updateConfig):
                     print('    Set \'played_age_audio\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
                         print('    Set \'played_age_audiobook\' to zero or a positive number')
-            if (REMOVE_FILES == 0):
+            if not (REMOVE_FILES):
                 print('-----------------------------------------------------------')
                 print('Config file is not setup to delete played media.')
                 print('Config file is in dry run mode to prevent deleting media.')
@@ -1331,10 +1431,8 @@ def generate_edit_config(cfg,updateConfig):
             #we are here because the media_cleaner_config.py file does not exist
             #this is either the first time the script is running or media_cleaner_config.py file was deleted
 
+            #raise error
             raise RuntimeError('\nConfigError: Cannot find or open media_cleaner_config.py')
-
-            #exit gracefully
-            exit(0)
 
 
 #Get count of days since last played
@@ -1387,135 +1485,35 @@ def get_days_since_created(date_last_created):
     return(get_days_since_played(date_last_created).replace('Played', 'Created', 1))
 
 
-#get season and episode numbers
-def get_season_episode(item):
+#get season and episode numbers; pad with zeros to make them equal lengths
+def get_season_episode(ParentIndexNumber,IndexNumber):
 
-    #Make sure needed dictionary keys exist
-    if (does_key_exist(item,'ParentIndexNumber') and does_key_exist(item,'IndexNumber')):
-        #Get season number
-        season_number=item['ParentIndexNumber']
-        #Get episode number
-        episode_number=item['IndexNumber']
+    #convert season number to string
+    season_num_str = str(ParentIndexNumber)
+    #convert episode number to string
+    episode_num_str = str(IndexNumber)
 
-        #convert to string then get length
-        season_num = str(season_number)
-        season_num_len=len(str(season_number))
+    #make the pad the season number or epsiode number with zeros until they are the same length
+    while not (len(season_num_str) == len(episode_num_str)):
+        #pad episode number when season number is longer
+        if (len(episode_num_str) < len(season_num_str)):
+            episode_num_str = '0' + episode_num_str
+        #pad season number when episode number is longer
+        elif (len(episode_num_str) > len(season_num_str)):
+            season_num_str = '0' + season_num_str
 
-        #convert to string then get length
-        episode_num = str(episode_number)
-        episode_num_len=len(str(episode_num))
-
-        #at the least; print season.episode with 2-digits zero padded
-        #if season or episode has more than 2-digits print x-digits zero padded
-        if (season_num_len <= 2) and (episode_num_len <= 2):
-            season_num = season_num.zfill(2)
-            episode_num = episode_num.zfill(2)
-        elif (season_num_len >= episode_num_len):
-            season_num = season_num.zfill(season_num_len)
-            episode_num = episode_num.zfill(season_num_len)
-        else: #(season_num_len < episode_num_len):
-            season_num = season_num.zfill(episode_num_len)
-            episode_num = episode_num.zfill(episode_num_len)
-
-        #Format the season and episode into something easily readable
-        season_episode = 's' + season_num + '.e' + episode_num
-    else:
-        #if needed dictionary keys do not exist then return unknown
-        season_episode='s??.e??'
+    #Format the season and episode into something easily readable (i.e. s01.e23)
+    formatted_season_episode = 's' + season_num_str + '.e' + episode_num_str
 
     if (cfg.DEBUG):
         #DEBUG
-        print('Season #' + str(item['ParentIndexNumber']))
-        print('Episode #' + str(item['IndexNumber']))
-        print('Formatted season.episode string is: ' + str(season_episode))
+        print('Season # is: ' + str(ParentIndexNumber))
+        print('Episode # is: ' + str(IndexNumber))
+        print('Padded Season #: ' + season_num_str)
+        print('Padded Episode #: ' + episode_num_str)
+        print('Formatted season#.episode# is: ' + str(formatted_season_episode))
 
-    return(season_episode)
-
-
-#Limit the amount of data returned for a single API call
-def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
-
-    data=requestURL(url, cfg.DEBUG, APIDebugMsg, cfg.api_query_attempts)
-
-    TotalItems = data['TotalRecordCount']
-    StartIndex = StartIndex + QueryLimit
-    QueryLimit = cfg.api_query_item_limit
-    if ((StartIndex + QueryLimit) >= (TotalItems)):
-        QueryLimit = TotalItems - StartIndex
-
-    QueryItemsRemaining=False
-    if (QueryLimit > 0):
-        QueryItemsRemaining=True
-
-    if (cfg.DEBUG):
-        #DEBUG
-        print(APIDebugMsg + ' - API query handler')
-        print(url)
-        print('Starting at record index ' + str(StartIndex))
-        print('Asking for ' + str(QueryLimit) + ' records')
-        print('Total records for this query is ' + str(TotalItems))
-        print('There are records remaining: ' + str(QueryItemsRemaining))
-
-    return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
-
-
-#send url request
-def requestURL(url, debugBool, reqeustDebugMessage, retries):
-
-    if (debugBool):
-        #DEBUG
-        print(reqeustDebugMessage + ' - url request')
-        print(url)
-
-    #first delay if needed
-        #delay value doubles each time the same API request is resent
-    delay = 1
-    #number of times after the intial API request to retry if an exception occurs
-    retryAttempts = int(retries)
-
-    getdata = True
-    #try sending url request specified number of times
-        #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
-    while(getdata):
-        try:
-            with request.urlopen(url) as response:
-                if response.getcode() == 200:
-                    try:
-                        source = response.read()
-                        data = json.loads(source)
-                        getdata = False
-                        if (debugBool):
-                            #DEBUG
-                            print(reqeustDebugMessage + ' - data')
-                            print2json(data)
-                        #return(data)
-                    except Exception as err:
-                        if (err.msg == 'Unauthorized'):
-                            print('\n' + str(err))
-                            raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
-                        else:
-                            time.sleep(delay)
-                            #delay value doubles each time the same API request is resent
-                            delay += delay
-                            if (delay >= (2**retryAttempts)):
-                                print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + debugMessage + '\" lookup.')
-                                return(err)
-                else:
-                    getdata = False
-                    print('An error occurred while attempting to retrieve data from the API.')
-                    return('Attempt to get data at: ' + debugMessage + '. Server responded with code: ' + str(response.getcode()))
-        except Exception as err:
-            if (err.msg == 'Unauthorized'):
-                print('\n' + str(err))
-                raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
-            else:
-                time.sleep(delay)
-                #delay value doubles each time the same API request is resent
-                delay += delay
-                if (delay >= (2**retryAttempts)):
-                    print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + debugMessage + '\" lookup.')
-                    return(err)
-    return(data)
+    return(formatted_season_episode)
 
 
 #Get children of favorited parents
@@ -1885,7 +1883,9 @@ def get_isItemMatching(item_one, item_two):
                     #DEBUG
                     print('Comparing the below two items')
                     print('\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'')
-                if ((not (single_item_one == '')) and (not (single_item_two == '')) and (not (single_item_one == "''")) and (not (single_item_two == "''"))):
+                if ((not (single_item_one == '')) and (not (single_item_two == '')) and
+                    (not (single_item_one == "''")) and (not (single_item_two == "''")) and
+                    (not (single_item_one == '""')) and (not (single_item_two == '""'))):
                     if (single_item_one == single_item_two):
                         items_match=True
 
@@ -2618,17 +2618,6 @@ def get_items():
     audio_whitetaglists=[]
     if (cfg.server_brand == 'jellyfin'):
         audiobook_whitetaglists=[]
-
-    if (cfg.DEBUG):
-        #dictionary of whitelisted items by userId
-        #iswhitelist_byUserId={}
-        iswhitelist_byUserId[user_key]={}
-        #dictionary of blacktagged items by userId
-        #isblacktag_byUserId={}
-        isblacktag_byUserId[user_key]={}
-        #dictionary of whitetagged items by userId
-        #iswhitetag_byUserId={}
-        iswhitetag_byUserId[user_key]={}
 
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
@@ -3503,7 +3492,7 @@ def get_items():
                                             #Fill in the blanks
                                             item=prep_episodeOutput(item)
 
-                                            item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                            item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
                                                         ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
@@ -4404,17 +4393,17 @@ def get_items():
         print('-----------------------------------------------------------')
         print('')
         print('isfav_MOVIE: ')
-        print(isfav_MOVIE)
+        print(isfav_byUserId_Movie)
         print('')
         print('isfav_EPISODE: ')
-        print(isfav_EPISODE)
+        print(isfav_byUserId_Episode)
         print('')
         print('isfav_AUDIO: ')
-        print(isfav_AUDIO)
+        print(isfav_byUserId_Audio)
         print('')
         if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'keep_favorites_audiobook')):
             print('isfav_AUDIOBOOK: ')
-            print(isfav_AUDIOBOOK)
+            print(isfav_byUserId_AudioBook)
             print('')
 
     print('\n')
@@ -4442,7 +4431,7 @@ def list_delete_items(deleteItems):
                 item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Episode':
                 try:
-                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item) + ' - ' + item['Name'] + ' - ' + item['Id']
+                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
                     item_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if (cfg.DEBUG):
