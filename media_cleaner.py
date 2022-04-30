@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.12 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.13 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1517,7 +1517,7 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
 
 
 #Get children of favorited parents
-def getChildren_favoriteMetaData(user_key,data_Favorited):
+def getChildren_favoriteMetaData(user_key,data_Favorited,APIDebugMsg):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     child_list=[]
@@ -1537,7 +1537,6 @@ def getChildren_favoriteMetaData(user_key,data_Favorited):
             TotalItems=1
             QueryLimit=1
             QueriesRemaining=True
-            APIDebugMsg='find_children_of_favorited_media_item_parent'
 
             if not (data['Id'] == ''):
                 #Build query for child media items
@@ -1572,8 +1571,6 @@ def getChildren_favoriteMetaData(user_key,data_Favorited):
 
                     #Loop thru the returned child items
                     for child_item in children_data['Items']:
-                        child_itemTag=''
-                        child_itemIsFavorited=False
                         #Check if child item has already been processed
                         if not (child_item['Id'] in user_processed_itemsId_list):
                             #Check if media item has any favs
@@ -2950,10 +2947,10 @@ def get_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_tagMetaData(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
@@ -3364,10 +3361,10 @@ def get_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_tagMetaData(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
@@ -3780,10 +3777,10 @@ def get_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_tagMetaData(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
@@ -4204,10 +4201,10 @@ def get_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoriteMetaData(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_tagMetaData(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
