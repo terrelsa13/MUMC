@@ -1,6 +1,5 @@
 # UPDATES COMING!
 
-**All,**
 Work has been underway to improve this script.
 
 The updated script will not be backwards compatible with the existing config file. I went back and forth on this for a while and ultimately settled on what allowed me to make these improvements quickly without it cutting into my personal life too much.
