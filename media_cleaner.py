@@ -3,10 +3,10 @@
 import urllib.request as request
 import json, urllib
 import traceback
-import hashlib
+#import hashlib
 import time
 import uuid
-import sys
+#import sys
 import os
 from dateutil.parser import parse
 from collections import defaultdict
@@ -1419,7 +1419,7 @@ def generate_edit_config(cfg,updateConfig):
                 print('Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
                 print('To delete media open media_cleaner_config.py in a text editor:')
-                print('    Set REMOVE_FILES=\'TRUE\' in media_cleaner_config.py')
+                print('    Set REMOVE_FILES=\'True\' in media_cleaner_config.py')
             print('-----------------------------------------------------------')
             print('Edit the media_cleaner_config.py file and try running again.')
             print('-----------------------------------------------------------')
@@ -2350,6 +2350,22 @@ def get_iswhitetagged_ByMultiUser(whitetags, deleteItems):
     return get_iswhitelist_ByMultiUser(whitetags, deleteItems)
 
 
+#decide if this item is played and meets the cutoff date or meets the max age cutoff date
+def get_playedStatus(played_age,play_count,cut_off_date_movie,LastPlayedDate,max_age,max_cut_off_date):
+
+    itemIsPlayed=False
+
+    if (
+    ((played_age >= 0) and (play_count >= 1) and
+    (cut_off_date_movie > parse(LastPlayedDate)))
+    or
+    ((max_age >= 0) and (max_cut_off_date <= datetime.utcnow()))
+    ):
+        itemIsPlayed=True
+
+    return itemIsPlayed
+
+
 #decide if this item is ok to be deleted; still has to meet other criteria
 def get_deleteStatus(itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote):
 
@@ -2359,7 +2375,7 @@ def get_deleteStatus(itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIs
         okToDelete=True
     elif (itemIsWhiteListed_Local or itemIsWhiteListed_Remote):
         okToDelete=False
-    else:
+    else: #itemIsBlackListed
         okToDelete=True
 
     return okToDelete
@@ -2671,6 +2687,7 @@ def get_items():
         user_bllib_path_json_lensplit=user_bllib_path_json[currentPosition].split(',')
         user_wllib_path_json_lensplit=user_wllib_path_json[currentPosition].split(',')
 
+        #make all list attributes the same length
         while not (len(user_bllib_keys_json_lensplit) == len(user_wllib_keys_json_lensplit)):
             if (len(user_bllib_keys_json_lensplit) > len(user_wllib_keys_json_lensplit)):
                 user_wllib_keys_json_lensplit.append('')
@@ -3064,6 +3081,8 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
 
+                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
+                                    itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],cfg.max_age_movie,max_cut_off_date_movie)
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -3073,25 +3092,20 @@ def get_items():
                                             #Fill in the blanks
                                             item=prep_movieOutput(item)
 
-                                            item_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                            item_output_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
                                                         ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
-                                            item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                                            item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
                                                 print('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item))
 
-                                        if (
-                                        ((cfg.played_age_movie >= 0) and (item['UserData']['PlayCount'] >= 1) and
-                                        (cut_off_date_movie > parse(item['UserData']['LastPlayedDate'])) and itemIsOKToDelete)
-                                        or
-                                        ((cfg.max_age_movie >= 0) and (max_cut_off_date_movie <= datetime.utcnow()) and itemIsOKToDelete)
-                                        ):
-                                            print(':*[DELETE] - ' + item_details)
+                                        if (itemIsPlayed and itemIsOKToDelete):
+                                            print(':*[DELETE] - ' + item_output_details)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_details)
+                                            print(':[KEEPING] - ' + item_output_details)
 
                         data_list_pos += 1
 
@@ -3480,6 +3494,8 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
 
+                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
+                                    itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],cfg.max_age_episode,max_cut_off_date_episode)
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -3489,25 +3505,20 @@ def get_items():
                                             #Fill in the blanks
                                             item=prep_episodeOutput(item)
 
-                                            item_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
+                                            item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
                                                         ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
-                                            item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                                            item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
                                                 print('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item))
 
-                                        if (
-                                        ((cfg.played_age_episode >= 0) and (item['UserData']['PlayCount'] >= 1) and
-                                        (cut_off_date_episode > parse(item['UserData']['LastPlayedDate'])) and itemIsOKToDelete)
-                                        or
-                                        ((cfg.max_age_episode >= 0) and (max_cut_off_date_episode <= datetime.utcnow()) and itemIsOKToDelete)
-                                        ):
-                                            print(':*[DELETE] - ' + item_details)
+                                        if (itemIsPlayed and itemIsOKToDelete):
+                                            print(':*[DELETE] - ' + item_output_details)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_details)
+                                            print(':[KEEPING] - ' + item_output_details)
 
                         data_list_pos += 1
 
@@ -3896,6 +3907,8 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
 
+                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
+                                    itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],cfg.max_age_audio,max_cut_off_date_audio)
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -3905,26 +3918,21 @@ def get_items():
                                             #Fill in the blanks
                                             item=prep_audioOutput(item)
 
-                                            item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
+                                            item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
                                                           ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                           ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
                                                           ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
-                                            item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                                            item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
                                                 print('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item))
 
-                                        if (
-                                        ((cfg.played_age_audio >= 0) and (item['UserData']['PlayCount'] >= 1) and
-                                        (cut_off_date_audio > parse(item['UserData']['LastPlayedDate'])) and itemIsOKToDelete)
-                                        or
-                                        ((cfg.max_age_audio >= 0) and (max_cut_off_date_audio <= datetime.utcnow()) and itemIsOKToDelete)
-                                        ):
-                                            print(':*[DELETE] - ' + item_details)
+                                        if (itemIsPlayed and itemIsOKToDelete):
+                                            print(':*[DELETE] - ' + item_output_details)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_details)
+                                            print(':[KEEPING] - ' + item_output_details)
 
                         data_list_pos += 1
 
@@ -4320,6 +4328,8 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
 
+                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
+                                    itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],cfg.max_age_audiobook,max_cut_off_date_audiobook)
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -4329,26 +4339,21 @@ def get_items():
                                             #Fill in the blanks
                                             item=prep_audiobookOutput(item)
 
-                                            item_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
+                                            item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
                                                           ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
                                                           ' - Favorite: ' + str(itemisfav_AUDIOBOOK_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) + ' - BlackTag: ' + str(itemIsBlackTagged) +
                                                           ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
-                                            item_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                                            item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
                                                 print('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
 
-                                        if (
-                                        ((cfg.played_age_audiobook >= 0) and (item['UserData']['PlayCount'] >= 1) and
-                                        (cut_off_date_audiobook > parse(item['UserData']['LastPlayedDate'])) and itemIsOKToDelete)
-                                        or
-                                        ((cfg.max_age_audiobook >= 0) and (max_cut_off_date_audiobook <= datetime.utcnow()) and itemIsOKToDelete)
-                                        ):
-                                            print(':*[DELETE] - ' + item_details)
+                                        if (itemIsPlayed and itemIsOKToDelete):
+                                            print(':*[DELETE] - ' + item_output_details)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_details)
+                                            print(':[KEEPING] - ' + item_output_details)
 
                         data_list_pos += 1
 
@@ -4414,7 +4419,7 @@ def list_delete_items(deleteItems):
     print('Summary Of Deleted Media:')
     if not bool(cfg.REMOVE_FILES):
         print('* Trial Run Mode       ')
-        print('* REMOVE_FILES=\'TRUE\'')
+        print('* REMOVE_FILES=\'False\'')
         print('* No Media Deleted     ')
         print('* Items = ' + str(len(deleteItems)))
         print('-----------------------------------------------------------')
@@ -4425,24 +4430,24 @@ def list_delete_items(deleteItems):
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
-                item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'Episode':
                 try:
-                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
+                    item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
-                    item_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if (cfg.DEBUG):
                         #DEBUG
                         print('Error encountered - Delete Episode: \n\n' + str(item))
             elif item['Type'] == 'Audio':
-                item_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             elif item['Type'] == 'AudioBook':
-                item_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                item_output_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             else: # item['Type'] == 'Unknown':
                 pass
             #Delete media item
             delete_item(item['Id'])
-            print(item_details)
+            print(item_output_details)
     else:
         print('[NO ITEMS TO DELETE]')
 
@@ -4468,10 +4473,10 @@ def delete_item(itemID):
         print(req)
 
     #check if in dry-run mode
-    #if REMOVE_FILES='FALSE'; exit this function
-    #else REMOVE_FILES='TRUE'; send request to Emby/Jellyfin to delete specified media item
+    #if REMOVE_FILES='False'; exit this function
     if not (cfg.REMOVE_FILES):
         return
+    #else REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
     else:
         try:
             request.urlopen(req)
