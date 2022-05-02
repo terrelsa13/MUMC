@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.14 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.15 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -518,10 +518,10 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (library_setup_behavior == 'blacklist'):
                     message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],user_number_int,False,library_matching_behavior)
+                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
                 else: #(library_setup_behavior == 'whitelist'):
                     message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                    userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],user_number_int,False,library_matching_behavior)
+                    userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
 
             #We get here when we are done selecting users to monitor
             elif ((user_number == '') and (not (len(userId_set) == 0))):
@@ -542,10 +542,10 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                     #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                     if (library_setup_behavior == 'blacklist'):
                         message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                        userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],user_number_int,False,library_matching_behavior)
+                        userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
                     else: #(library_setup_behavior == 'whitelist'):
                         message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                        userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],user_number_int,False,library_matching_behavior)
+                        userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=list_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
 
                     if (len(userId_set) >= i):
                         stop_loop=True
@@ -621,8 +621,8 @@ def cleanup_library_paths(libPath_str):
 
 
 #API call to get library folders; choose which libraries to blacklist and whitelist
-def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, user_number, mandatory, library_matching_behavior):
-    #get all library paths
+def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, mandatory, library_matching_behavior):
+    #get all library paths for a given user
 
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
     req_folders=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
@@ -642,7 +642,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
     not_library_dict=defaultdict(dict)
     #define empty sets
     #libraryPath_set=set()
-    libraryPath_tracker=[]
+    library_tracker=[]
     enabledFolderIds_set=set()
     #delete_channels=[]
 
@@ -713,7 +713,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                         #option made here to check for either ItemId or Path when deciding what to show
                         # when ItemId libraries with multiple folders but same libId will be removed together
                         # when Path libraries with multiple folders but the same libId will be removed individually
-                        if ((library_matching_behavior == 'byId') and ( not (libFolder['ItemId'] in libraryPath_tracker))):
+                        if ((library_matching_behavior == 'byId') and ( not (libFolder['ItemId'] in library_tracker))):
                             print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
                             libInfoPrinted=True
                         else:
@@ -727,7 +727,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                         #option made here to check for either ItemId or Path when deciding what to show
                         # when ItemId libraries with multiple folders but same libId will be removed together
                         # when Path libraries with multiple folders but the same libId will be removed individually
-                        if ((library_matching_behavior == 'byPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] in libraryPath_tracker))):
+                        if ((library_matching_behavior == 'byPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path'] in library_tracker))):
                             print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
                             libInfoPrinted=True
                         else:
@@ -741,7 +741,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                         #option made here to check for either ItemId or Path when deciding what to show
                         # when ItemId libraries with multiple folders but same libId will be removed together
                         # when Path libraries with multiple folders but the same libId will be removed individually
-                        if ((library_matching_behavior == 'byNetworkPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] in libraryPath_tracker))):
+                        if ((library_matching_behavior == 'byNetworkPath') and ( not (libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath'] in library_tracker))):
                             print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
                             libInfoPrinted=True
                         else:
@@ -764,7 +764,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
         #Go thru channels this user has permissions to access and show them on the screen
         #for libChannel in data_channels:
             #if (('Id' in libChannel) and ('Type' in libChannel) and ((enabledFolderIds_set == set()) or (libChannel['Id'] in enabledFolderIds_set))):
-                #if not (libChannel['Id'] in libraryPath_tracker):
+                #if not (libChannel['Id'] in library_tracker):
                     #print(str(j) + ' - ' + libChannel['Name'] + ' - ' + libChannel['Type'] + ' - LibId: ' + libChannel['Id'])
                 #else:
                     #show blank entry
@@ -807,7 +807,7 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
         #loop thru user chosen libraries
         for input_path_number in list_path_number:
             try:
-                if ((input_path_number == '') and (len(libraryPath_tracker) == 0) and (mandatory)):
+                if ((input_path_number == '') and (len(library_tracker) == 0) and (mandatory)):
                     print('\nMust select at least one library to monitor for this user. Try again.\n')
                 elif (input_path_number == ''):
                     #Add valid library selecitons to the library dicitonary
@@ -856,22 +856,26 @@ def list_library_folders(server_url, auth_key, infotext, user_policy, user_id, u
                                                 #The chosen library is added to the "chosen" data structure
                                                 # Add library ID/Path to chosen list type behavior
                                                 if (( not (library_dict[checkallpos].get('libid') == '')) and (library_matching_behavior == 'byId')):
-                                                    libraryPath_tracker.append(library_dict[checkallpos]['libid'])
+                                                    library_tracker.append(library_dict[checkallpos]['libid'])
                                                 elif (( not (library_dict[checkallpos].get('path') == '')) and (library_matching_behavior == 'byPath')):
-                                                    libraryPath_tracker.append(library_dict[checkallpos]['path'])
+                                                    library_tracker.append(library_dict[checkallpos]['path'])
                                                 elif (( not (library_dict[checkallpos].get('networkpath') == '')) and (library_matching_behavior == 'byNetworkPath')):
-                                                    libraryPath_tracker.append(library_dict[checkallpos]['networkpath'])
+                                                    library_tracker.append(library_dict[checkallpos]['networkpath'])
 
                             #When all libraries selected we can automatically exit the library chooser
-                            if (len(libraryPath_tracker) >= len(showpos_correlation)):
+                            if (len(library_tracker) >= len(showpos_correlation)):
                                 stop_loop=True
                             else:
                                 stop_loop=False
                             print('')
 
                             #DEBUG
-                            #print('selected library folders')
-                            #print(libraryPath_tracker)
+                            if(preConfigDebug):
+                                print('libraryTemp_dict = ' + str(libraryTemp_dict) + '\n')
+                                print('library_dict = ' + str(library_dict) + '\n')
+                                print('not_library_dict = ' + str(not_library_dict) + '\n')
+                                print('library_tracker = ' + str(library_tracker) + '\n')
+
                         else:
                             print('\nIgnoring Out Of Range Value: ' + input_path_number + '\n')
                     else:
@@ -3067,14 +3071,14 @@ def get_items():
                                     if not (blacktags == ''):
                                         itemIsBlackTagged,movie_blacktaglists=get_isItemTagged(blacktags,movie_blacktaglists,item,user_key,'blacktag')
 
-                                    #check if we are at a whitelist quried data_list_pos
+                                    #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_list_from_whitelists):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
-                                    else: #check if we are at a blacklist quried data_list_pos
+                                    else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
@@ -3480,14 +3484,14 @@ def get_items():
                                     if not (blacktags == ''):
                                         itemIsBlackTagged,episode_blacktaglists=get_isItemTagged(blacktags,episode_blacktaglists,item,user_key,'blacktag')
 
-                                    #check if we are at a whitelist quried data_list_pos
+                                    #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_list_from_whitelists):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
-                                    else: #check if we are at a blacklist quried data_list_pos
+                                    else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
@@ -3893,14 +3897,14 @@ def get_items():
                                     if not (blacktags == ''):
                                         itemIsBlackTagged,audio_blacktaglists=get_isItemTagged(blacktags,audio_blacktaglists,item,user_key,'blacktag')
 
-                                    #check if we are at a whitelist quried data_list_pos
+                                    #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_list_from_whitelists):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
-                                    else: #check if we are at a blacklist quried data_list_pos
+                                    else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
@@ -4314,14 +4318,14 @@ def get_items():
                                     if not (blacktags == ''):
                                         itemIsBlackTagged,audiobook_blacktaglists=get_isItemTagged(blacktags,audiobook_blacktaglists,item,user_key,'blacktag')
 
-                                    #check if we are at a whitelist quried data_list_pos
+                                    #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_list_from_whitelists):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
-                                    else: #check if we are at a blacklist quried data_list_pos
+                                    else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
