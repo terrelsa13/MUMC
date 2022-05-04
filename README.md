@@ -135,7 +135,6 @@ keep_favorites_advanced_album_genre=0
 keep_favorites_advanced_music_library_genre=0
 keep_favorites_advanced_track_artist=0
 keep_favorites_advanced_album_artist=0
-keep_favorites_advanced_music_library_artist=0
 ```
 #### Keep audio book track if genre or author favorited:
 ```python
@@ -154,7 +153,6 @@ keep_favorites_advanced_audio_book_genre=0
 keep_favorites_advanced_audio_book_library_genre=0
 keep_favorites_advanced_audio_book_track_author=0
 keep_favorites_advanced_audio_book_author=0
-keep_favorites_advanced_audio_book_library_author=0
 ```
 #### Edit user to library assocations using current config
 ```python
@@ -324,10 +322,10 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 
 # Priorities (Lower Number == Higher Priority)
 1. Played State (At least x1 monitored user must have played the media item before it will be deleted)<sup>1</sup>
-2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored)
-3. Blacktag (Whitelist ignored and Blacklist ignored)
-4. Whitelist (Blacklist ignored)
-5. Blacklist (Lowest priority)
+2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored) *[media item will be kept]*
+3. Blacktag (Whitelist ignored and Blacklist ignored) *[media item will be deleted]*
+4. Whitelist (Blacklist ignored) *[media item will be kept]*
+5. Blacklist (Lowest priority) *[media item will be deleted]*
 
 <sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ignored
 
