@@ -1,0 +1,26 @@
+version: '3.3'
+services:
+    jellyfin:
+        container_name: jellyfin
+        volumes:
+            - '/<your_jellyfin_config_folder>/docker/jellyfin/config:/config'
+            - '/<your_tv_folder>/video/TV:/tv'
+            - '/<your_movie_folder>/video/Films:/films'
+        restart: unless-stopped
+        ports:
+            - 8096:8096
+            - 8920:8920 #optional
+            # - 7359:7359/udp #optional
+            # - 1900:1900/udp #optional
+        image: lscr.io/linuxserver/jellyfin
+        environment:
+            - PUID=<UID>
+            - PGID=<GID>
+            - TZ=Europe/London
+    media-cleaner:
+        image: media-cleaner:latest
+        container_name: media-cleaner
+        volumes:
+        # The media cleaner folder address needs to be relative to the Jellyfin folder
+        - <your_media_cleaner_folder>/media_cleaner/:/media-cleaner/
+        restart: unless-stopped

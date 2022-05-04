@@ -102,3 +102,16 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# VS Code stuff
+
+*.code-workspace
+
+# Python files
+
+media_cleaner_config.py
+
+# Docker stuff
+
+docker-compose.yml
+cleaner.log

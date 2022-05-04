@@ -1,0 +1,1 @@
+0 16 * * * python /media-cleaner/media_cleaner.py >> /media-cleaner/cleaner.log
