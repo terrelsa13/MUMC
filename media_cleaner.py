@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.16 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.17 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1419,7 +1419,7 @@ def generate_edit_config(cfg,updateConfig):
                 print('Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
                 print('To delete media open media_cleaner_config.py in a text editor:')
-                print('    Set REMOVE_FILES=\'True\' in media_cleaner_config.py')
+                print('    Set REMOVE_FILES=\'True\'')
             print('-----------------------------------------------------------')
             print('Edit the media_cleaner_config.py file and try running again.')
             print('-----------------------------------------------------------')
@@ -3260,16 +3260,25 @@ def get_items():
                                             itemIsBlackTagged=True
                                             movie_blacktaglists.append(item['Id'])
 
+                                    itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
@@ -3290,7 +3299,7 @@ def get_items():
 
                                             item_output_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
-                                                        ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                        ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
@@ -3691,16 +3700,25 @@ def get_items():
                                             itemIsBlackTagged=True
                                             episode_blacktaglists.append(item['Id'])
 
+                                    itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
@@ -3721,7 +3739,7 @@ def get_items():
 
                                             item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
-                                                        ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                        ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
@@ -4122,16 +4140,25 @@ def get_items():
                                             itemIsBlackTagged=True
                                             audio_blacktaglists.append(item['Id'])
 
+                                    itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
@@ -4153,7 +4180,7 @@ def get_items():
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
                                                           ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                           ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
-                                                          ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                          ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
@@ -4561,16 +4588,25 @@ def get_items():
                                             itemIsBlackTagged=True
                                             audiobook_blacktaglists.append(item['Id'])
 
+                                    itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+
+                                        #Display True if media item is locally or remotely whitelisted
+                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
@@ -4592,7 +4628,7 @@ def get_items():
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
                                                           ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
                                                           ' - Favorite: ' + str(itemisfav_AUDIOBOOK_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) + ' - BlackTag: ' + str(itemIsBlackTagged) +
-                                                          ' - Whitelisted: ' + str(itemIsWhiteListed_Local) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                          ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
@@ -4668,10 +4704,13 @@ def list_delete_items(deleteItems):
     print('-----------------------------------------------------------')
     print('Summary Of Deleted Media:')
     if not bool(cfg.REMOVE_FILES):
-        print('* Trial Run Mode       ')
+        print('* Trial Run Mode')
         print('* REMOVE_FILES=\'False\'')
-        print('* No Media Deleted     ')
+        print('* No Media Deleted')
         print('* Items = ' + str(len(deleteItems)))
+        print('-----------------------------------------------------------')
+        print('*To delete media open media_cleaner_config.py in a text editor:')
+        print('*    Set REMOVE_FILES=\'True\'')
         print('-----------------------------------------------------------')
     else:
         print('* Items Deleted = ' + str(len(deleteItems)) + '    *')
