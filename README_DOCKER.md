@@ -5,9 +5,33 @@
 
 # DOCKER SET UP
 
+I suggest cloning the *media_cleaner* folder to the parent directory of your Jellyfin *config* folder. 
+
 1. Set your crontab settings to how you want them. `0 16 * * *` is currently running once a day at 4pm. 
-2. Run the Docker build command: `docker build -t media-cleaner .`
-3. Have a look at the *docker-compose.yml.sample* file, either adapt your existing Jellyfin file, adding the *media_cleaner* reference, or just use that one. Note that this uses the linuxserver image due to the network mode NOT being host, as per the OG Jellyfin docker file, if you're running it in host mode, you'll have a headache getting the images to talk to each other. 
+```
+# * * * * *  command to execute
+# │ │ │ │ │
+# │ │ │ │ │
+# │ │ │ │ └───── day of week (0 - 6) (0 to 6 are Sunday to Saturday, or use names; 7 is Sunday, the same as 0)
+# │ │ │ └────────── month (1 - 12)
+# │ │ └─────────────── day of month (1 - 31)
+# │ └──────────────────── hour (0 - 23)
+# └───────────────────────── min (0 - 59)
+```
+2. `cd` into your *media_cleaner* folder and run the Docker build command: `docker build -t media-cleaner .`
+3. Have a look at the *docker-compose.yml.sample* file, either adapt your existing Jellyfin file, adding the *media_cleaner* reference, or just use that one. Note that this uses the linuxserver image due to the network mode NOT being host, as per the OG Jellyfin docker file, if you're running it in host mode, you'll have a headache getting the images to talk to each other. Move this to the . Once done, your directory structure should look a bit like this:
+```
+├── config # Your Jellyfin config folder
+├── media_cleaner
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── media_cleaner.py
+│   ├── README_DOCKER.md
+│   ├── requirements.txt
+│   ├── test.py
+│   └── crontab
+└── docker-compose.yml
+```
 4. Once the image is built, head to the Jellyfin folder and run the new docker-compose (don't forget to remove the *.sample* extension) you just made with the command `docker-compose up -d`. 
 5. If this is the first run, you'll need to create the config file. Run `docker exec -it media-cleaner python media_cleaner.py` 
 6. Follow the steps. For the address, *http://jellyfin* should work, and your port (unless you've changed it) you can leave to default, or explicitly, *8096*. 
