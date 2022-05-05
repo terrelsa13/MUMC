@@ -64,6 +64,19 @@ multiuser_whitelist_audiobook=1
 #----------------------------------------------------------#
 blacktag='black_tagname,black_tag name,black_tag-name'
 ```
+#### When enabled, blacktagged media will not be deleted until ALL users have watched it:
+```python
+#----------------------------------------------------------#
+# Decide when blacktagged media items are deleted; chosen during setup
+#  0 - ok to delete blacktagged media item after ANY monitored user has watched it
+#  1 - ok to delete blacktagged media item after ALL monitored users have watched it
+# (1 : default)
+#----------------------------------------------------------#
+keep_blacktagged_movie=1
+keep_blacktagged_episode=1
+keep_blacktagged_audio=1
+keep_blacktagged_audiobook=1
+```
 #### Whitetag a media item to be kept after it is watched:
 ```python
 #----------------------------------------------------------#

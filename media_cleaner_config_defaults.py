@@ -26,6 +26,12 @@ def get_default_config_values(config_value):
         'multiuser_whitelist_audiobook':1,
 
         'blacktag':'',
+
+        'keep_blacktagged_movie':1,
+        'keep_blacktagged_episode':1,
+        'keep_blacktagged_audio':1,
+        'keep_blacktagged_audiobook':1,
+
         'whitetag':'',
 
         'keep_favorites_advanced_movie_genre':0,

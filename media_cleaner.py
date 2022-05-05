@@ -1104,6 +1104,26 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Decide when blacktagged media items are deleted; chosen during setup\n"
+    config_file += "#  0 - ok to delete blacktagged media item after ANY monitored user has watched it\n"
+    config_file += "#  1 - ok to delete blacktagged media item after ALL monitored users have watched it\n"
+    config_file += "# (1 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "keep_blacktagged_movie=" + str(get_default_config_values('keep_blacktagged_movie')) + "\n"
+        config_file += "keep_blacktagged_episode=" + str(get_default_config_values('keep_blacktagged_episode')) + "\n"
+        config_file += "keep_blacktagged_audio=" + str(get_default_config_values('keep_blacktagged_audio')) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "keep_blacktagged_audiobook=" + str(get_default_config_values('keep_blacktagged_audiobook')) + "\n"
+    elif (updateConfig):
+        config_file += "keep_blacktagged_movie=" + str(cfg.keep_blacktagged_movie) + "\n"
+        config_file += "keep_blacktagged_episode=" + str(cfg.keep_blacktagged_episode) + "\n"
+        config_file += "keep_blacktagged_audio=" + str(cfg.keep_blacktagged_audio) + "\n"
+        if (cfg.server_brand == 'jellyfin'):
+            config_file += "keep_blacktagged_audiobook=" + str(cfg.keep_blacktagged_audiobook) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
     config_file += "# User entered whitetag name; chosen during setup\n"
     config_file += "#  Use a comma \',\' to seperate multiple tag names\n"
     config_file += "#   Ex: tagname,tag name,tag-name\n"
@@ -1793,7 +1813,7 @@ def get_isItemMonitored(mediasource):
 
 
 #Determine if media item whitelisted for the current user or for another user
-def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
+def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,multiuser_whitelist,
                                 user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json):
 
     library_matching_behavior=cfg.library_matching_behavior
@@ -1805,7 +1825,7 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
     itemWhiteListedValue_Remote=''
 
     #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-    if (cfg.multiuser_whitelist_movie == 1):
+    if (multiuser_whitelist == 1):
         #Get if media item is whitelisted
         for wllib_pos in range(len(user_wllib_keys_json)):
             #Looking in this users libraries
@@ -2526,6 +2546,54 @@ def get_iswhitetagged_ByMultiUser(whitetags, deleteItems):
     return get_iswhitelist_ByMultiUser(whitetags, deleteItems)
 
 
+#Determine if a blacktagged item has been watched by all monitored users
+def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
+
+    removeItem_list=[]
+    pos_tracker=[]
+    temp_deleteItems=deleteItems.copy()
+
+    for userId in blacktagged_and_watched:
+        for itemId in blacktagged_and_watched[userId]:
+            if not (itemId in removeItem_list):
+                if (blacktagged_and_watched[userId][itemId]):
+                    all_users_watched=True
+                    for sub_userId in blacktagged_and_watched:
+                        if not (itemId in blacktagged_and_watched[sub_userId]):
+                            all_users_watched=False
+                    if not (all_users_watched):
+                        removeItem_list.append(itemId)
+
+    #converting to a set and then back to a list removes duplicates
+    removeItem_list=list(set(removeItem_list))
+
+    i=0
+    for delItemPos in deleteItems:
+        for remItemPos in removeItem_list:
+            if (delItemPos['Id'] == remItemPos):
+                pos_tracker.append(i)
+        i+=1
+
+    #converting to a set and then back to a list removes duplicates
+    pos_tracker=list(set(pos_tracker))
+
+    #reverse the order to not worry about shifting indexes when removing items from deleteItems list
+    pos_tracker.reverse()
+
+    #remove favorited items we want to keep
+    for delItem in pos_tracker:
+        try:
+           deleteItems.pop(delItem)
+        except IndexError as err:
+           print(str(err))
+           print(delItem)
+           print(pos_tracker)
+           print2json(deleteItems)
+           exit(0)
+
+    return (deleteItems)
+
+
 #decide if this item is played and meets the cutoff date or meets the max age cutoff date
 def get_playedStatus(played_age,play_count,cut_off_date_movie,LastPlayedDate,max_age,max_cut_off_date):
 
@@ -2787,6 +2855,12 @@ def get_items():
     isfav_byUserId_Audio={}
     if (cfg.server_brand == 'jellyfin'):
         isfav_byUserId_AudioBook={}
+    #dictionary of blacktagged items by userId
+    isblacktag_and_watched_byUserId_Movie={}
+    isblacktag_and_watched_byUserId_Episode={}
+    isblacktag_and_watched_byUserId_Audio={}
+    if (cfg.server_brand == 'jellyfin'):
+        isblacktag_and_watched_byUserId_AudioBook={}
     #whitelisted Id per media type according to media types metadata
     movie_whitelists=[]
     episode_whitelists=[]
@@ -2838,6 +2912,13 @@ def get_items():
         isfav_byUserId_Audio[user_key]={}
         if (cfg.server_brand == 'jellyfin'):
             isfav_byUserId_AudioBook[user_key]={}
+    
+        #dictionary of blacktagged items by userId
+        isblacktag_and_watched_byUserId_Movie[user_key]={}
+        isblacktag_and_watched_byUserId_Episode[user_key]={}
+        isblacktag_and_watched_byUserId_Audio[user_key]={}
+        if (cfg.server_brand == 'jellyfin'):
+            isblacktag_and_watched_byUserId_AudioBook[user_key]={}
 
     currentPosition=0
 
@@ -3261,7 +3342,7 @@ def get_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_movie,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3271,7 +3352,7 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_movie,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3288,6 +3369,9 @@ def get_items():
                                         itemIsPlayed=False
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+
+                                    if ((cfg.keep_blacktagged_movie == 1) and itemIsBlackTagged and itemIsPlayed):
+                                        isblacktag_and_watched_byUserId_Movie[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -3701,7 +3785,7 @@ def get_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_episode,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3711,7 +3795,7 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_episode,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3728,6 +3812,9 @@ def get_items():
                                         itemIsPlayed=False
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+
+                                    if ((cfg.keep_blacktagged_episode == 1) and itemIsBlackTagged and itemIsPlayed):
+                                        isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -4141,7 +4228,7 @@ def get_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_audio,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4151,7 +4238,7 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audio,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4168,6 +4255,9 @@ def get_items():
                                         itemIsPlayed=False
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+
+                                    if ((cfg.keep_blacktagged_audio == 1) and itemIsBlackTagged and itemIsPlayed):
+                                        isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -4589,7 +4679,7 @@ def get_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_audiobook,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4599,7 +4689,7 @@ def get_items():
                                         if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audiobook,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4616,6 +4706,9 @@ def get_items():
                                         itemIsPlayed=False
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+
+                                    if ((cfg.keep_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsPlayed):
+                                        isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
 
@@ -4658,22 +4751,29 @@ def get_items():
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
-    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+    if (cfg.server_brand == 'jellyfin'):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+    if (cfg.server_brand == 'jellyfin'):
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetaglists, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetaglists, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetaglists, deleteItems)
-    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'multiuser_whitelist_audiobook')):
+    if (cfg.server_brand == 'jellyfin'):
         deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetaglists, deleteItems)
+
+    #When blacktagged; Determine media items to remove them from deletion list depending on cfg.isblacktag_and_watched_byUserId_*
+    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
+    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
+    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
+    if (cfg.server_brand == 'jellyfin'):
+        deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
     if (cfg.DEBUG):
         print('-----------------------------------------------------------')
@@ -5203,6 +5303,17 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_author variable is missing from media_cleaner_config.py\n'
 
+    if hasattr(cfg, 'multiuser_whitelist_movie'):
+        check=cfg.multiuser_whitelist_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
+
     if hasattr(cfg, 'multiuser_whitelist_episode'):
         check=cfg.multiuser_whitelist_episode
         if (
@@ -5272,6 +5383,53 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The blacktag variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_blacktagged_movie'):
+        check=cfg.keep_blacktagged_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_blacktagged_episode'):
+        check=cfg.keep_blacktagged_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_episode must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_blacktagged_audio'):
+        check=cfg.keep_blacktagged_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audio must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'keep_blacktagged_audiobook'):
+                check=cfg.keep_blacktagged_audiobook
+                if (
+                    not ((type(check) is int) and
+                    (check >= 0) and
+                    (check <= 1))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
+            else:
+                error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'whitetag'):
         check=cfg.whitetag
