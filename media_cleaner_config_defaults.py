@@ -57,4 +57,8 @@ def get_default_config_values(config_value):
     #DEBUG
     #convert2json(defaultConfigValues)
 
+<<<<<<< HEAD
     return(defaultConfigValues[config_value])
+=======
+    return(defaultConfigValues[config_value])
+>>>>>>> 9692e18d09a2a2bdad8a01809491b498e137eeb6
