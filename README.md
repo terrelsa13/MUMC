@@ -2,7 +2,7 @@
 
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
+This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
 
 # Configuration
 ## media_cleaner_config.py
@@ -161,7 +161,7 @@ keep_favorites_advanced_audio_book_author=0
 # Must be a boolean True or False value
 #  False - Operate normally
 #  True  - Enable configuration editor mode; will NOT delete media items
-#           Resets REMOVE_FILES=False
+#           Resets to dry run mode (REMOVE_FILES=False)
 # (False : default)
 #----------------------------------------------------------#
 UPDATE_CONFIG=False
@@ -183,7 +183,7 @@ max_age_episode=-1
 max_age_audio=-1
 max_age_audiobook=-1
 ```
-#### CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   CAUTION!!!
+#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
@@ -255,25 +255,28 @@ user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba987654321
 ```
 #### Blacklisted library information
 ```python
-#----------------------------------------------------------#"
-# Blacklisted libraries with corresponding user keys(s)"
-# These libraries are actively monitored for media items to delete; chosen during setup"
-#----------------------------------------------------------#"
+#----------------------------------------------------------#
+# Blacklisted libraries with corresponding user keys(s)
+# These libraries are typically searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
 user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00112233445566778899aabbccddeeff", "collectiontype": "abc", "networkpath": "smb://some/netpath/0", "path": "/some/path/0"}, "#": {"libid": "aabbccddeeff00112233445566778899", "collectiontype": "def", "networkpath": "smb://some/netpath/1", "path": "/some/path/1"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
 ```
 #### Whitelisted library information
 ```python
-#----------------------------------------------------------#"
-# Whitelisted libraries with corresponding user keys(s)"
-# These libraries are actively monitored for blacktagged media items to delete; chosen during setup"
-#----------------------------------------------------------#"
+#----------------------------------------------------------#
+# Whitelisted libraries with corresponding user keys(s)
+# These libraries are typically not searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
 user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
 ```
 #### Number of times to send an API query before giving up
 ```python
 #----------------------------------------------------------#
-# API query attempts; number of times to retry an API request
-#  delay between initial attempt and the first retry is 1 second
+# API query attempts
+# Number of times to retry an API request
+#  Delay between initial attempt and the first retry is 1 second
 #  The delay will double with each attempt after the first retry
 #  Delay between the orginal request and retry #1 is (2^0) 1 second
 #  Delay between retry #1 and retry #2 is (2^1) 2 seconds
@@ -291,9 +294,10 @@ api_query_attempts=4
 #### Throttle how aggressively the script sends queries
 ```python
 #----------------------------------------------------------#
-# API query item limit; large libraries sometimes cannot return all of the media metadata items in a single API call
-#  This is especially true when using the max_age_xyz options; which requires every item of the specified media type send its metadata
-#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
+# API query item limit
+# To keep the server running smoothly we do not want it to return a large amount of metadata from a single API query
+#  ALL media items and their metadata are processed regardless of this value
+#  1-10000 - maximum number of media items the server will return for each API query
 #  (50 : default)
 #----------------------------------------------------------##
 api_query_item_limit=50

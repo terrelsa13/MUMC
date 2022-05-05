@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.18 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.19 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1223,7 +1223,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "# Must be a boolean True or False value\n"
     config_file += "#  False - Operate normally\n"
     config_file += "#  True  - Enable configuration editor mode; will NOT delete media items\n"
-    config_file += "#           Resets REMOVE_FILES=False\n"
+    config_file += "#           Resets to dry run mode (REMOVE_FILES=False)\n"
     config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1331,19 +1331,22 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Blacklisted libraries with corresponding user keys(s)\n"
-    config_file += "# These libraries are monitored for media items to delete; chosen during setup\n"
+    config_file += "# These libraries are typically searched for media items to delete\n"
+    config_file += "# Chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_bl_libs='" + user_bl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Whitelisted libraries with corresponding user keys(s)\n"
-    config_file += "# These libraries are actively monitored for blacktagged media items to delete; chosen during setup\n"
+    config_file += "# These libraries are typically not searched for media items to delete\n"
+    config_file += "# Chosen during setup\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_wl_libs='" + user_wl_libs + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# API query attempts; number of times to retry an API request\n"
-    config_file += "#  delay between initial attempt and the first retry is 1 second\n"
+    config_file += "# API query attempts\n"
+    config_file += "# Number of times to retry an API request\n"
+    config_file += "#  Delay between initial attempt and the first retry is 1 second\n"
     config_file += "#  The delay will double with each attempt after the first retry\n"
     config_file += "#  Delay between the orginal request and retry #1 is (2^0) 1 second\n"
     config_file += "#  Delay between retry #1 and retry #2 is (2^1) 2 seconds\n"
@@ -1362,9 +1365,10 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "api_query_attempts=" + str(cfg.api_query_attempts) + "\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# API query item limit; large libraries sometimes cannot return all of the media metadata items in a single API call\n"
-    config_file += "#  This is especially true when using the max_age_xyz options; which requires every item of the specified media type send its metadata\n"
-    config_file += "#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value\n"
+    config_file += "# API query item limit\n"
+    config_file += "# To keep the server running smoothly we do not want it to return a large amount of metadata from a single API query\n"
+    config_file += "#  ALL media items and their metadata are processed regardless of this value\n"
+    config_file += "#  1-10000 - maximum number of media items the server will return for each API query\n"
     config_file += "#  (50 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1939,21 +1943,15 @@ def get_istag_EPISODE(item,user_key,usertags):
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
 
-        #istag_EPISODE['seriesstudionetwork']=get_istag_STUDIONETWORK(user_key,series_item_info,istag_EPISODE['seriesstudionetwork'],keep_tagorites_advanced_tv_studio_network,'studio_network')
-
     elif (does_key_exist(season_item_info, 'SeriesId')):
         series_item_info = get_additional_item_info(user_key,item['SeriesId'],'series_info')
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
 
-        #istag_EPISODE['seriesstudionetwork']=get_istag_STUDIONETWORK(user_key,series_item_info,istag_EPISODE['seriesstudionetwork'],keep_tagorites_advanced_tv_studio_network,'studio_network')
-
     elif (does_key_exist(season_item_info, 'ParentId')):
         series_item_info = get_additional_item_info(user_key,season_item_info['ParentId'],'series_info')
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
-
-        #istag_EPISODE['seriesstudionetwork']=get_istag_STUDIONETWORK(user_key,series_item_info,istag_EPISODE['seriesstudionetwork'],keep_tagorites_advanced_tv_studio_network,'studio_network')
 
 ### End Series ####################################################################################
 
@@ -4709,7 +4707,7 @@ def list_delete_items(deleteItems):
         print('* No Media Deleted')
         print('* Items = ' + str(len(deleteItems)))
         print('-----------------------------------------------------------')
-        print('*To delete media open media_cleaner_config.py in a text editor:')
+        print('* To delete media open media_cleaner_config.py in a text editor:')
         print('*    Set REMOVE_FILES=\'True\'')
         print('-----------------------------------------------------------')
     else:
