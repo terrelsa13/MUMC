@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.19 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.20 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -430,8 +430,8 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     userId_set=set()
 
     user_keys_json=''
-    user_bl_libs_json=''
-    user_wl_libs_json=''
+    #user_bl_libs_json=''
+    #user_wl_libs_json=''
 
     #Check if not running for the first time
     if (updateConfig):
@@ -1525,7 +1525,7 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
     if (len(episode_num_str) == 1):
         episode_num_str = '0' + episode_num_str
 
-    #make the pad the season number or epsiode number with zeros until they are the same length
+    #Pad the season number or epsiode number with zeros until they are the same length
     while not (len(season_num_str) == len(episode_num_str)):
         #pad episode number when season number is longer
         if (len(episode_num_str) < len(season_num_str)):
@@ -1779,7 +1779,7 @@ def get_studio_item_info(user_key,studioNetworkName):
 
 #Determine if item can be monitored
 def get_isItemMonitored(mediasource):
-    #When script is run before a media item is physically avaible ignore that media item
+    #When script is run before a media item is physically available ignore that media item
     if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
             #ignore this media item
