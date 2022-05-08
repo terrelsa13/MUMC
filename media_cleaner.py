@@ -2551,7 +2551,7 @@ def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
 
     removeItem_list=[]
     pos_tracker=[]
-    temp_deleteItems=deleteItems.copy()
+    #temp_deleteItems=deleteItems.copy()
 
     for userId in blacktagged_and_watched:
         for itemId in blacktagged_and_watched[userId]:
@@ -2580,7 +2580,7 @@ def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
     #reverse the order to not worry about shifting indexes when removing items from deleteItems list
     pos_tracker.reverse()
 
-    #remove favorited items we want to keep
+    #remove items we do not want to delete
     for delItem in pos_tracker:
         try:
            deleteItems.pop(delItem)
@@ -2899,11 +2899,12 @@ def get_items():
     whitetags=cfg.whitetag
 
     #establish deletion date for played media items
-    cut_off_date_movie=datetime.now(timezone.utc) - timedelta(cfg.played_age_movie)
-    cut_off_date_episode=datetime.now(timezone.utc) - timedelta(cfg.played_age_episode)
-    cut_off_date_audio=datetime.now(timezone.utc) - timedelta(cfg.played_age_audio)
+    date_time_now=datetime.now(timezone.utc)
+    cut_off_date_movie=date_time_now - timedelta(cfg.played_age_movie)
+    cut_off_date_episode=date_time_now - timedelta(cfg.played_age_episode)
+    cut_off_date_audio=date_time_now - timedelta(cfg.played_age_audio)
     if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'played_age_audiobook')):
-        cut_off_date_audiobook=datetime.now(timezone.utc) - timedelta(cfg.played_age_audiobook)
+        cut_off_date_audiobook=date_time_now - timedelta(cfg.played_age_audiobook)
 
     for user_key in user_keys_json:
         #define dictionary user_key to store media item favorite states by userId and itemId
@@ -3256,12 +3257,10 @@ def get_items():
 
                     #Order here is important (must match above)
                     data_from_favorited_queries=[0,1,6,7]
-                    data_from_whitelist_queries=[0,1,2,3,4,5]
                     data_from_whitetag_queries=[2,3,8,9]
                     data_from_blacktag_queries=[4,5,10,11]
-
-                    #Combine remaining query items into list of dictionaries
-                    #QueryLimit_list=[QueryLimit_Favorited,QueryLimit_WhiteTagged,QueryLimit_BlackTagged_From_BlackList,QueryLimit_BlackTagged_From_WhiteList,QueryLimit_Blacklist]
+                    data_from_whitelist_queries=[0,1,2,3,4,5]
+                    #data_from_blacklist_queries=[6,7,8,9,10,11,12]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
                     QueryItemsRemaining_All=(QueriesRemaining_Favorited_From_Blacklist |
@@ -3284,7 +3283,6 @@ def get_items():
 
                             #Check if item was already processed for this user
                             if not (item['Id'] in user_processed_itemsId_list):
-                                user_processed_itemsId_list.add(item['Id'])
 
                                 media_found=True
 
@@ -3300,7 +3298,7 @@ def get_items():
                                     if (cfg.max_age_movie >= 0):
                                         max_cut_off_date_movie=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_movie)
                                     else:
-                                        max_cut_off_date_movie=date_time_now=datetime.utcnow() + timedelta(1)
+                                        max_cut_off_date_movie=date_time_now + timedelta(1)
 
                                     itemisfav_MOVIE_Local=False
                                     #Get if media item is set as favorite
@@ -3393,6 +3391,9 @@ def get_items():
                                             deleteItems.append(item)
                                         else:
                                             print(':[KEEPING] - ' + item_output_details)
+
+                                #Add media item Id to tracking list so it is not processed more than once
+                                user_processed_itemsId_list.add(item['Id'])
 
                         data_list_pos += 1
 
@@ -3697,12 +3698,10 @@ def get_items():
 
                     #Order here is important (must match above)
                     data_from_favorited_queries=[0,1,6,7]
-                    data_from_whitelist_queries=[0,1,2,3,4,5]
                     data_from_whitetag_queries=[2,3,8,9]
                     data_from_blacktag_queries=[4,5,10,11]
-
-                    #Combine remaining query items into list of dictionaries
-                    #QueryLimit_list=[QueryLimit_Favorited,QueryLimit_WhiteTagged,QueryLimit_BlackTagged_From_BlackList,QueryLimit_BlackTagged_From_WhiteList,QueryLimit_Blacklist]
+                    data_from_whitelist_queries=[0,1,2,3,4,5]
+                    #data_from_blacklist_queries=[6,7,8,9,10,11,12]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
                     QueryItemsRemaining_All=(QueriesRemaining_Favorited_From_Blacklist |
@@ -3725,7 +3724,6 @@ def get_items():
 
                             #Check if item was already processed for this user
                             if not (item['Id'] in user_processed_itemsId_list):
-                                user_processed_itemsId_list.add(item['Id'])
 
                                 media_found=True
 
@@ -3741,7 +3739,7 @@ def get_items():
                                     if (cfg.max_age_episode >= 0):
                                         max_cut_off_date_episode=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_episode)
                                     else:
-                                        max_cut_off_date_episode=date_time_now=datetime.utcnow() + timedelta(1)
+                                        max_cut_off_date_episode=date_time_now + timedelta(1)
 
                                     itemisfav_EPISODE_Local=False
                                     #Get if media item is set as favorite
@@ -3836,6 +3834,9 @@ def get_items():
                                             deleteItems.append(item)
                                         else:
                                             print(':[KEEPING] - ' + item_output_details)
+
+                                #Add media item Id to tracking list so it is not processed more than once
+                                user_processed_itemsId_list.add(item['Id'])
 
                         data_list_pos += 1
 
@@ -4140,12 +4141,10 @@ def get_items():
 
                     #Order here is important (must match above)
                     data_from_favorited_queries=[0,1,6,7]
-                    data_from_whitelist_queries=[0,1,2,3,4,5]
                     data_from_whitetag_queries=[2,3,8,9]
                     data_from_blacktag_queries=[4,5,10,11]
-
-                    #Combine remaining query items into list of dictionaries
-                    #QueryLimit_list=[QueryLimit_Favorited,QueryLimit_WhiteTagged,QueryLimit_BlackTagged_From_BlackList,QueryLimit_BlackTagged_From_WhiteList,QueryLimit_Blacklist]
+                    data_from_whitelist_queries=[0,1,2,3,4,5]
+                    #data_from_blacklist_queries=[6,7,8,9,10,11,12]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
                     QueryItemsRemaining_All=(QueriesRemaining_Favorited_From_Blacklist |
@@ -4168,7 +4167,6 @@ def get_items():
 
                             #Check if item was already processed for this user
                             if not (item['Id'] in user_processed_itemsId_list):
-                                user_processed_itemsId_list.add(item['Id'])
 
                                 media_found=True
 
@@ -4184,7 +4182,7 @@ def get_items():
                                     if (cfg.max_age_audio >= 0):
                                         max_cut_off_date_audio=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audio)
                                     else:
-                                        max_cut_off_date_audio=date_time_now=datetime.utcnow() + timedelta(1)
+                                        max_cut_off_date_audio=date_time_now + timedelta(1)
 
                                     itemisfav_AUDIO_Local=False
                                     #Get if media item is set as favorite
@@ -4280,6 +4278,9 @@ def get_items():
                                             deleteItems.append(item)
                                         else:
                                             print(':[KEEPING] - ' + item_output_details)
+
+                                #Add media item Id to tracking list so it is not processed more than once
+                                user_processed_itemsId_list.add(item['Id'])
 
                         data_list_pos += 1
 
@@ -4591,12 +4592,10 @@ def get_items():
 
                     #Order here is important (must match above)
                     data_from_favorited_queries=[0,1,6,7]
-                    data_from_whitelist_queries=[0,1,2,3,4,5]
                     data_from_whitetag_queries=[2,3,8,9]
                     data_from_blacktag_queries=[4,5,10,11]
-
-                    #Combine remaining query items into list of dictionaries
-                    #QueryLimit_list=[QueryLimit_Favorited,QueryLimit_WhiteTagged,QueryLimit_BlackTagged_From_BlackList,QueryLimit_BlackTagged_From_WhiteList,QueryLimit_Blacklist]
+                    data_from_whitelist_queries=[0,1,2,3,4,5]
+                    #data_from_blacklist_queries=[6,7,8,9,10,11,12]
 
                     #Determine if we are done processing queries or if there are still queries to be sent
                     QueryItemsRemaining_All=(QueriesRemaining_Favorited_From_Blacklist |
@@ -4619,7 +4618,6 @@ def get_items():
 
                             #Check if item was already processed for this user
                             if not (item['Id'] in user_processed_itemsId_list):
-                                user_processed_itemsId_list.add(item['Id'])
 
                                 media_found=True
 
@@ -4635,7 +4633,7 @@ def get_items():
                                     if (cfg.max_age_audiobook >= 0):
                                         max_cut_off_date_audiobook=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audiobook)
                                     else:
-                                        max_cut_off_date_audiobook=date_time_now=datetime.utcnow() + timedelta(1)
+                                        max_cut_off_date_audiobook=date_time_now + timedelta(1)
 
                                     itemisfav_AUDIOBOOK_Local=False
                                     #Get if media item is set as favorite
@@ -4732,6 +4730,9 @@ def get_items():
                                         else:
                                             print(':[KEEPING] - ' + item_output_details)
 
+                                #Add media item Id to tracking list so it is not processed more than once
+                                user_processed_itemsId_list.add(item['Id'])
+
                         data_list_pos += 1
 
                 currentSubPosition += 1
@@ -4787,13 +4788,87 @@ def get_items():
         print('isfav_AUDIO: ')
         print(isfav_byUserId_Audio)
         print('')
-        if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'keep_favorites_audiobook')):
+        if (cfg.server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(isfav_byUserId_AudioBook)
             print('')
 
+        print('-----------------------------------------------------------')
+        print('')
+        print('isfav_MOVIE: ')
+        print(movie_whitelists)
+        print('')
+        print('isfav_EPISODE: ')
+        print(episode_whitelists)
+        print('')
+        print('isfav_AUDIO: ')
+        print(audio_whitelists)
+        print('')
+        if (cfg.server_brand == 'jellyfin'):
+            print('isfav_AUDIOBOOK: ')
+            print(audiobook_whitelists)
+            print('')
+
+        print('-----------------------------------------------------------')
+        print('')
+        print('isfav_MOVIE: ')
+        print(movie_whitetaglists)
+        print('')
+        print('isfav_EPISODE: ')
+        print(episode_whitetaglists)
+        print('')
+        print('isfav_AUDIO: ')
+        print(audio_whitetaglists)
+        print('')
+        if (cfg.server_brand == 'jellyfin'):
+            print('isfav_AUDIOBOOK: ')
+            print(audiobook_whitetaglists)
+            print('')
+
+        print('-----------------------------------------------------------')
+        print('')
+        print('isfav_MOVIE: ')
+        print(isblacktag_and_watched_byUserId_Movie)
+        print('')
+        print('isfav_EPISODE: ')
+        print(isblacktag_and_watched_byUserId_Episode)
+        print('')
+        print('isfav_AUDIO: ')
+        print(isblacktag_and_watched_byUserId_Audio)
+        print('')
+        if (cfg.server_brand == 'jellyfin'):
+            print('isfav_AUDIOBOOK: ')
+            print(isblacktag_and_watched_byUserId_AudioBook)
+            print('')
+
     print('\n')
     return(deleteItems)
+
+
+#api call to delete items
+def delete_item(itemID):
+    #build API delete request for specified media item
+    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
+
+    req = request.Request(url,method='DELETE')
+
+    if (cfg.DEBUG):
+        #DEBUG
+        print(itemID)
+        print(url)
+        print(req)
+
+    #check if in dry-run mode
+    #if REMOVE_FILES='False'; exit this function
+    if not (cfg.REMOVE_FILES):
+        return
+    #else REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
+    else:
+        try:
+            request.urlopen(req)
+        except Exception:
+            print('generic exception: ' + traceback.format_exc())
+        return
 
 
 #list and delete items past played threshold
@@ -4844,32 +4919,6 @@ def list_delete_items(deleteItems):
     print('Done.')
     print('-----------------------------------------------------------')
     print('')
-
-
-#api call to delete items
-def delete_item(itemID):
-    #build API delete request for specified media item
-    url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
-
-    req = request.Request(url,method='DELETE')
-
-    if (cfg.DEBUG):
-        #DEBUG
-        print(itemID)
-        print(url)
-        print(req)
-
-    #check if in dry-run mode
-    #if REMOVE_FILES='False'; exit this function
-    if not (cfg.REMOVE_FILES):
-        return
-    #else REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
-    else:
-        try:
-            request.urlopen(req)
-        except Exception:
-            print('generic exception: ' + traceback.format_exc())
-        return
 
 
 #Check blacklist and whitelist config variables are as expected
@@ -5703,14 +5752,8 @@ except (AttributeError, ModuleNotFoundError):
 cfgCheck()
 
 #check if user wants to update the existing config file
-#if (hasattr(cfg, 'UPDATE_CONFIG') and (cfg.UPDATE_CONFIG)):
 if (cfg.UPDATE_CONFIG):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
-    #if (hasattr(cfg, 'library_setup_behavior')):
-        #we are here because we want to add new users to the media_cleaner_config.py file
-        #generate_edit_config(cfg,cfg.UPDATE_CONFIG)
-    #else:
-        #raise NameError('Error! The library_setup_behavior variable is missing from media_cleaner_config.py. It is needed to use the UPDATE_CONFIG functionality.')
     generate_edit_config(cfg,cfg.UPDATE_CONFIG)
 
     #exit gracefully after conifig update
