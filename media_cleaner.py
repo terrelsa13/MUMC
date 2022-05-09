@@ -1104,10 +1104,10 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide when blacktagged media items are deleted; chosen during setup\n"
+    config_file += "# Decide when blacktagged media items are deleted\n"
     config_file += "#  0 - ok to delete blacktagged media item after ANY monitored user has watched it\n"
     config_file += "#  1 - ok to delete blacktagged media item after ALL monitored users have watched it\n"
-    config_file += "# (1 : default)\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "keep_blacktagged_movie=" + str(get_default_config_values('keep_blacktagged_movie')) + "\n"
@@ -2876,11 +2876,11 @@ def get_items():
         audiobook_blacktaglists=[]
 
     #whitetagged items per media type according to media types metadata
-    movie_whitetaglists=[]
-    episode_whitetaglists=[]
-    audio_whitetaglists=[]
+    movie_whitetag_list=[]
+    episode_whitetag_list=[]
+    audio_whitetag_list=[]
     if (cfg.server_brand == 'jellyfin'):
-        audiobook_whitetaglists=[]
+        audiobook_whitetag_list=[]
 
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
@@ -3322,11 +3322,11 @@ def get_items():
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
                                         itemIsWhiteTagged=True
-                                        movie_whitetaglists.append(item['Id'])
+                                        movie_whitetag_list.append(item['Id'])
                                     elif not (whitetags == ''):
                                         if (get_istag_MOVIE(item,user_key,whitetags)):
                                             itemIsWhiteTagged=True
-                                            movie_whitetaglists.append(item['Id'])
+                                            movie_whitetag_list.append(item['Id'])
 
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
@@ -3765,11 +3765,11 @@ def get_items():
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
                                         itemIsWhiteTagged=True
-                                        episode_whitetaglists.append(item['Id'])
+                                        episode_whitetag_list.append(item['Id'])
                                     elif not (whitetags == ''):
                                         if (get_istag_EPISODE(item,user_key,whitetags)):
                                             itemIsWhiteTagged=True
-                                            episode_whitetaglists.append(item['Id'])
+                                            episode_whitetag_list.append(item['Id'])
 
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
@@ -4208,11 +4208,11 @@ def get_items():
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
                                         itemIsWhiteTagged=True
-                                        audio_whitetaglists.append(item['Id'])
+                                        audio_whitetag_list.append(item['Id'])
                                     elif not (whitetags == ''):
                                         if (get_istag_AUDIO(item,user_key,whitetags)):
                                             itemIsWhiteTagged=True
-                                            audio_whitetaglists.append(item['Id'])
+                                            audio_whitetag_list.append(item['Id'])
 
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
@@ -4659,11 +4659,11 @@ def get_items():
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
                                         itemIsWhiteTagged=True
-                                        audiobook_whitetaglists.append(item['Id'])
+                                        audiobook_whitetag_list.append(item['Id'])
                                     elif not (whitetags == ''):
                                         if (get_istag_AUDIOBOOK(item,user_key,whitetags)):
                                             itemIsWhiteTagged=True
-                                            audiobook_whitetaglists.append(item['Id'])
+                                            audiobook_whitetag_list.append(item['Id'])
 
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
@@ -4763,11 +4763,11 @@ def get_items():
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetaglists, deleteItems)
-    deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetaglists, deleteItems)
-    deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetaglists, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
+    deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
     if (cfg.server_brand == 'jellyfin'):
-        deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetaglists, deleteItems)
+        deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.isblacktag_and_watched_byUserId_*
     deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
@@ -4812,17 +4812,17 @@ def get_items():
         print('-----------------------------------------------------------')
         print('')
         print('isfav_MOVIE: ')
-        print(movie_whitetaglists)
+        print(movie_whitetag_list)
         print('')
         print('isfav_EPISODE: ')
-        print(episode_whitetaglists)
+        print(episode_whitetag_list)
         print('')
         print('isfav_AUDIO: ')
-        print(audio_whitetaglists)
+        print(audio_whitetag_list)
         print('')
         if (cfg.server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
-            print(audiobook_whitetaglists)
+            print(audiobook_whitetag_list)
             print('')
 
         print('-----------------------------------------------------------')
@@ -5037,9 +5037,10 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
 #Check select config variables are as expected
 def cfgCheck():
 
-    errorfound=False
     error_found_in_media_cleaner_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
+
+#######################################################################################################
 
     if hasattr(cfg, 'played_age_movie'):
         check=cfg.played_age_movie
@@ -5092,6 +5093,8 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The played_age_audiobook variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     if hasattr(cfg, 'keep_favorites_movie'):
         check=cfg.keep_favorites_movie
         if (
@@ -5139,6 +5142,144 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
+    if hasattr(cfg, 'multiuser_whitelist_movie'):
+        check=cfg.multiuser_whitelist_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_episode'):
+        check=cfg.multiuser_whitelist_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_whitelist_audio'):
+        check=cfg.multiuser_whitelist_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'multiuser_whitelist_audiobook'):
+                check=cfg.multiuser_whitelist_audiobook
+                if (
+                    not ((type(check) is int) and
+                    (check >= 0) and
+                    (check <= 1))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer; valid range 0 thru 1\n'
+            else:
+                error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'blacktag'):
+        check=cfg.blacktag
+        if not (
+            (type(check) is str) and
+            (check.find('\\') < 0)
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The blacktag variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'keep_blacktagged_movie'):
+        check=cfg.keep_blacktagged_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_movie must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_blacktagged_episode'):
+        check=cfg.keep_blacktagged_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_episode must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'keep_blacktagged_audio'):
+        check=cfg.keep_blacktagged_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audio must be an integer; valid range 0 thru 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'keep_blacktagged_audiobook'):
+                check=cfg.keep_blacktagged_audiobook
+                if (
+                    not ((type(check) is int) and
+                    (check >= 0) and
+                    (check <= 1))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
+            else:
+                error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'whitetag'):
+        check=cfg.whitetag
+        if not (
+            (type(check) is str) and
+            (check.find('\\') < 0)
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The whitetag variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'REMOVE_FILES'):
+        check=cfg.REMOVE_FILES
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The REMOVE_FILES variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
     if hasattr(cfg, 'keep_favorites_advanced_movie_genre'):
         check=cfg.keep_favorites_advanced_movie_genre
         if (
@@ -5160,6 +5301,8 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_movie_library_genre variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
 
     if hasattr(cfg, 'keep_favorites_advanced_episode_genre'):
         check=cfg.keep_favorites_advanced_episode_genre
@@ -5227,6 +5370,8 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_tv_studio_network_genre variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     if hasattr(cfg, 'keep_favorites_advanced_track_genre'):
         check=cfg.keep_favorites_advanced_track_genre
         if (
@@ -5281,6 +5426,8 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_album_artist must be an integer; valid range 0 thru 2\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_album_artist variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
@@ -5352,64 +5499,7 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_author variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'multiuser_whitelist_movie'):
-        check=cfg.multiuser_whitelist_movie
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'multiuser_whitelist_episode'):
-        check=cfg.multiuser_whitelist_episode
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'multiuser_whitelist_audio'):
-        check=cfg.multiuser_whitelist_audio
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audio variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'multiuser_whitelist_audiobook'):
-                check=cfg.multiuser_whitelist_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 1))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'REMOVE_FILES'):
-        check=cfg.REMOVE_FILES
-        if (
-            not ((type(check) is bool) and
-            #(check.isupper()) and
-            ((check == True) or
-            (check == False)))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The REMOVE_FILES variable is missing from media_cleaner_config.py\n'
+#######################################################################################################
 
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
@@ -5423,72 +5513,7 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'blacktag'):
-        check=cfg.blacktag
-        if not (
-            (type(check) is str) and
-            (check.find('\\') < 0)
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The blacktag variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'keep_blacktagged_movie'):
-        check=cfg.keep_blacktagged_movie
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_movie must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_movie variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'keep_blacktagged_episode'):
-        check=cfg.keep_blacktagged_episode
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_episode must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'keep_blacktagged_audio'):
-        check=cfg.keep_blacktagged_audio
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 1))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audio must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audio variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'keep_blacktagged_audiobook'):
-                check=cfg.keep_blacktagged_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 1))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'whitetag'):
-        check=cfg.whitetag
-        if not (
-            (type(check) is str) and
-            (check.find('\\') < 0)
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The whitetag variable is missing from media_cleaner_config.py\n'
+#######################################################################################################
 
     if hasattr(cfg, 'max_age_movie'):
         check=cfg.max_age_movie
@@ -5545,6 +5570,8 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     if hasattr(cfg, 'max_keep_favorites_movie'):
         check=cfg.max_keep_favorites_movie
         if (
@@ -5592,6 +5619,8 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (
@@ -5602,6 +5631,8 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The server_brand variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
 
     if hasattr(cfg, 'server_url'):
         check=cfg.server_url
@@ -5623,6 +5654,32 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The auth_key variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
+    if hasattr(cfg, 'library_setup_behavior'):
+        check=cfg.library_setup_behavior
+        if (
+            not (type(check) is str) and
+            ((check == 'blacklist') or (check == 'whitelist'))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The library_setup_behavior variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'library_matching_behavior'):
+        check=cfg.library_matching_behavior
+        if (
+            not (type(check) is str) and
+            ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The library_matching_behavior variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
     #continuning to config check user_keys length and type
     # this config is not used for anything in the script; only as an easy place to see monitored userIds
     if hasattr(cfg, 'user_keys'):
@@ -5640,25 +5697,7 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The user_keys variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'library_setup_behavior'):
-        check=cfg.library_setup_behavior
-        if (
-            not (type(check) is str) and
-            ((check == 'blacklist') or (check == 'whitelist'))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The library_setup_behavior variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'library_matching_behavior'):
-        check=cfg.library_matching_behavior
-        if (
-            not (type(check) is str) and
-            ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The library_matching_behavior variable is missing from media_cleaner_config.py\n'
+#######################################################################################################
 
     if hasattr(cfg, 'user_bl_libs'):
         check=cfg.user_bl_libs
@@ -5670,6 +5709,8 @@ def cfgCheck():
         else:
             error_found_in_media_cleaner_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_bl_libs')
 
+#######################################################################################################
+
     if hasattr(cfg, 'user_wl_libs'):
         check=cfg.user_wl_libs
         check_list=json.loads(check)
@@ -5679,6 +5720,8 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: Number of configured users does not match the number of configured whitelists\n'
         else:
             error_found_in_media_cleaner_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_wl_libs')
+
+#######################################################################################################
 
     if hasattr(cfg, 'api_query_attempts'):
         check=cfg.api_query_attempts
@@ -5691,6 +5734,8 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The api_query_attempts variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     if hasattr(cfg, 'api_query_item_limit'):
         check=cfg.api_query_item_limit
         if (
@@ -5701,6 +5746,8 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The api_query_item_limit variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
 
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
@@ -5714,9 +5761,13 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The DEBUG variable is missing from media_cleaner_config.py\n'
 
+#######################################################################################################
+
     #Bring all errors found to users attention
     if (not error_found_in_media_cleaner_config_py == ''):
         raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
+
+#######################################################################################################
 
 
 ############# START OF SCRIPT #############

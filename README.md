@@ -8,7 +8,7 @@ This script will go through played, favorited, and/or tagged movies, tv episodes
 ## media_cleaner_config.py
 The first time you run the script it will attempt to create the config file by asking a handful of questions.
 ## media_cleaner_config_defaults.py
-Customize your default values before running for the script the first time.
+Customize your default values before running the script for the first time.
 ## Configuration Contents
 
 #### Media will be deleted once it has been played the configured number of days ago:
@@ -67,15 +67,15 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 #### When enabled, blacktagged media will not be deleted until ALL users have watched it:
 ```python
 #----------------------------------------------------------#
-# Decide when blacktagged media items are deleted; chosen during setup
+# Decide when blacktagged media items are deleted
 #  0 - ok to delete blacktagged media item after ANY monitored user has watched it
 #  1 - ok to delete blacktagged media item after ALL monitored users have watched it
-# (1 : default)
+# (0 : default)
 #----------------------------------------------------------#
-keep_blacktagged_movie=1
-keep_blacktagged_episode=1
-keep_blacktagged_audio=1
-keep_blacktagged_audiobook=1
+keep_blacktagged_movie=0
+keep_blacktagged_episode=0
+keep_blacktagged_audio=0
+keep_blacktagged_audiobook=0
 ```
 #### Whitetag a media item to be kept after it is watched:
 ```python
