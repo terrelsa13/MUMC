@@ -394,7 +394,7 @@ def get_auth_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.20 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.21 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1812,6 +1812,38 @@ def get_isItemMonitored(mediasource):
     return(itemIsMonitored)
 
 
+#Determine if there is a matching item
+def get_isItemMatching(item_one, item_two):
+
+    #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
+    item_one = item_one.replace('\\','/')
+    item_two = item_two.replace('\\','/')
+
+    #read and split Ids to compare to
+    item_one_split=item_one.split(',')
+    item_two_split=item_two.split(',')
+
+    items_match=False
+    #determine if media Id matches one of the other Ids
+    for single_item_one in item_one_split:
+            for single_item_two in item_two_split:
+                if (cfg.DEBUG):
+                    #DEBUG
+                    print('Comparing the below two items')
+                    print('\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'')
+                if ((not (single_item_one == '')) and (not (single_item_two == '')) and
+                    (not (single_item_one == "''")) and (not (single_item_two == "''")) and
+                    (not (single_item_one == '""')) and (not (single_item_two == '""'))):
+                    if (single_item_one == single_item_two):
+                        items_match=True
+
+                        #found a match; return true and the matching value
+                        return(items_match, single_item_one)
+    
+    #nothing matched; return false and empty string
+    return(items_match,'')
+
+
 #Determine if media item whitelisted for the current user or for another user
 def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,multiuser_whitelist,
                                 user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json):
@@ -2066,38 +2098,6 @@ def get_istag_AUDIO(item,user_key,usertags):
 #determine if genres for audiobook track, book, or audio book library are tagged
 def get_istag_AUDIOBOOK(item,user_key,usertags):
     return get_istag_AUDIO(item,user_key,usertags,)
-
-
-#Determine if there is a matching item
-def get_isItemMatching(item_one, item_two):
-
-    #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
-    item_one = item_one.replace('\\','/')
-    item_two = item_two.replace('\\','/')
-
-    #read and split Ids to compare to
-    item_one_split=item_one.split(',')
-    item_two_split=item_two.split(',')
-
-    items_match=False
-    #determine if media Id matches one of the other Ids
-    for single_item_one in item_one_split:
-            for single_item_two in item_two_split:
-                if (cfg.DEBUG):
-                    #DEBUG
-                    print('Comparing the below two items')
-                    print('\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'')
-                if ((not (single_item_one == '')) and (not (single_item_two == '')) and
-                    (not (single_item_one == "''")) and (not (single_item_two == "''")) and
-                    (not (single_item_one == '""')) and (not (single_item_two == '""'))):
-                    if (single_item_one == single_item_two):
-                        items_match=True
-
-                        #found a match; return true and the matching value
-                        return(items_match, single_item_one)
-    
-    #nothing matched; return false and empty string
-    return(items_match,'')
 
 
 #Determine if genre is favorited
@@ -2775,18 +2775,6 @@ def user_lib_builder(json_lib_entry):
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Collection Type: ' + currentUser[keySlots][keySlotLibData])
-                    #Store networkPath
-                    elif (keySlotLibData == 'networkpath'):
-                        if (networkpath_append == ''):
-                            networkpath_append=currentUser[keySlots][keySlotLibData]
-                        else:
-                            if not (currentUser[keySlots][keySlotLibData] == ''):
-                                networkpath_append=networkpath_append + ',' + currentUser[keySlots][keySlotLibData]
-                            else:
-                                networkpath_append=networkpath_append + ',\'\''
-                        if (cfg.DEBUG):
-                            #DEBUG
-                            print('Network Path: ' + currentUser[keySlots][keySlotLibData])
                     #Store path
                     elif (keySlotLibData == 'path'):
                         if (path_append == ''):
@@ -2799,10 +2787,22 @@ def user_lib_builder(json_lib_entry):
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Path: ' + currentUser[keySlots][keySlotLibData])
+                    #Store networkPath
+                    elif (keySlotLibData == 'networkpath'):
+                        if (networkpath_append == ''):
+                            networkpath_append=currentUser[keySlots][keySlotLibData]
+                        else:
+                            if not (currentUser[keySlots][keySlotLibData] == ''):
+                                networkpath_append=networkpath_append + ',' + currentUser[keySlots][keySlotLibData]
+                            else:
+                                networkpath_append=networkpath_append + ',\'\''
+                        if (cfg.DEBUG):
+                            #DEBUG
+                            print('Network Path: ' + currentUser[keySlots][keySlotLibData])
         built_libid.insert(datapos,libid_append)
         built_collectiontype.insert(datapos,collectiontype_append)
-        built_networkpath.insert(datapos,networkpath_append)
         built_path.insert(datapos,path_append)
+        built_networkpath.insert(datapos,networkpath_append)
         datapos+=1
     return(built_userid,built_libid,built_collectiontype,built_networkpath,built_path)
 
@@ -4909,6 +4909,7 @@ def list_delete_items(deleteItems):
                 pass
             #Delete media item
             delete_item(item['Id'])
+            #Print output for deleted media item
             print(item_output_details)
     else:
         print('[NO ITEMS TO DELETE]')
