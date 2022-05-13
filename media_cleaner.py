@@ -1592,14 +1592,15 @@ def getChildren_favoriteMediaItems(user_key,data_Favorited,APIDebugMsg):
                         apiQuery=(server_url + '/Users/' + user_key  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
                         '&StartIndex=' + str(StartIndex) + '&Limit=' + str(QueryLimit) + '&IsPlayed=' + IsPlayedState + '&Fields=' + FieldsState +
                         '&CollapseBoxSetItems=' + CollapseBoxSetItems + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
+
+                        #Send the API query for for watched media items in blacklists
+                        children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
                     else:
                         #When no libraries are returned; simulate an empty query being returned
                         #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
-                        data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+                        children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit=0
-
-                    #Send the API query for for watched media items in blacklists
-                    children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
+                        QueriesRemaining=False
 
                     #Loop thru the returned child items
                     for child_item in children_data['Items']:
@@ -1678,14 +1679,15 @@ def getChildren_tagMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                             '&StartIndex=' + str(StartIndex) + '&Limit=' + str(QueryLimit) + '&IsPlayed=' + IsPlayedState +
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
+
+                            #Send the API query for for watched media items in blacklists
+                            children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
                         else:
                             #When no libraries are returned; simulate an empty query being returned
                             #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
-                            data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+                            children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                             QueryLimit=0
-
-                        #Send the API query for for watched media items in blacklists
-                        children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
+                            QueriesRemaining=False
 
                         #Loop thru the returned child items
                         for child_item in children_data['Items']:
