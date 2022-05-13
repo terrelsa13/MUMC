@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from media_cleaner import convert2json
+
 #This module can be used to change some of the default configuration values used before the script is first run
 #Script will check for valid values after the first run
 #Configuration values outside of the valid range will throw an error
@@ -9,6 +11,9 @@
 def get_default_config_values(config_value):
     
     defaultConfigValues={
+
+        #'example_config':0
+        #'example_config':'abc'
 
         'played_age_movie':-1,
         'played_age_episode':-1,
@@ -59,8 +64,12 @@ def get_default_config_values(config_value):
         'keep_favorites_advanced_audio_book_library_author':0,
 
     }
+
+    #preConfigDebug = True
+    preConfigDebug = False
     
     #DEBUG
-    #convert2json(defaultConfigValues)
+    if (preConfigDebug):
+        print(str(config_value) + '=' + str(defaultConfigValues[config_value]))
 
     return(defaultConfigValues[config_value])
