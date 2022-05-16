@@ -2831,8 +2831,8 @@ def prep_AUDIOBOOKoutput(item):
     return prep_AUDIOoutput(item)
 
 
-#get played media items
-# track media items ready to be deleted
+# get played, favorited, and tagged media items
+# save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
 def get_media_items():
     server_url=cfg.server_url
@@ -2873,18 +2873,21 @@ def get_media_items():
 
     #list of items to be deleted
     deleteItems=[]
+
     #dictionary of favorited items by userId
     isfav_byUserId_Movie={}
     isfav_byUserId_Episode={}
     isfav_byUserId_Audio={}
     if (cfg.server_brand == 'jellyfin'):
         isfav_byUserId_AudioBook={}
+
     #dictionary of blacktagged items by userId
     isblacktag_and_watched_byUserId_Movie={}
     isblacktag_and_watched_byUserId_Episode={}
     isblacktag_and_watched_byUserId_Audio={}
     if (cfg.server_brand == 'jellyfin'):
         isblacktag_and_watched_byUserId_AudioBook={}
+
     #whitelisted Id per media type according to media types metadata
     movie_whitelists=[]
     episode_whitelists=[]
@@ -2908,6 +2911,7 @@ def get_media_items():
 
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
+
     #Build the library data from the data structures stored in the configuration file
     wluser_keys_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
 
@@ -2919,6 +2923,7 @@ def get_media_items():
 
     #Get blacktags
     blacktags=cfg.blacktag
+
     #Get whitetags
     whitetags=cfg.whitetag
 
@@ -3371,7 +3376,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_movie,
@@ -3381,7 +3386,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
@@ -3814,7 +3819,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_episode,
@@ -3824,7 +3829,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
@@ -4257,7 +4262,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audio,
@@ -4267,7 +4272,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
@@ -4708,7 +4713,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audiobook,
@@ -4718,7 +4723,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((not itemIsBlackTagged) and (itemIsWhiteListed_Remote) and (cfg.multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
