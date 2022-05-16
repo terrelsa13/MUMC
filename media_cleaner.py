@@ -394,7 +394,7 @@ def get_authentication_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.22 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.23 Beta", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1893,7 +1893,7 @@ def get_isItemMatching(item_one, item_two):
 
 
 #Determine if media item whitelisted for the current user or for another user
-def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,multiuser_whitelist,
+def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                                 user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json):
 
     library_matching_behavior=cfg.library_matching_behavior
@@ -1904,45 +1904,44 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,m
     itemIsWhiteListed_Remote=False
     itemWhiteListedValue_Remote=''
 
-    #Store media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-    if (multiuser_whitelist == 1):
-        #Get if media item is whitelisted
-        for wllib_pos in range(len(user_wllib_keys_json)):
-            #Looking in this users libraries
-            if (wllib_pos == currentPosition):
-                if not (itemIsWhiteListed_Local):
-                    if (library_matching_behavior == 'byId'):
-                        itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
-                    elif (library_matching_behavior == 'byPath'):
-                        itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
-                    elif (library_matching_behavior == 'byNetworkPath'):
-                        itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
+    #Store media item's local and remote whitelist state
+    #Get if media item is whitelisted
+    for wllib_pos in range(len(user_wllib_keys_json)):
+        #Looking in this users libraries
+        if (wllib_pos == currentPosition):
+            if not (itemIsWhiteListed_Local):
+                if (library_matching_behavior == 'byId'):
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                elif (library_matching_behavior == 'byPath'):
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
+                elif (library_matching_behavior == 'byNetworkPath'):
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
-                    if (cfg.DEBUG):
-                        print('Item is whitelisted for this user: ' + itemIsWhiteListed_Local)
-                        print('Matching whitelisted value for this user is: ' + itemWhiteListedValue_Local)
+                if (cfg.DEBUG):
+                    print('Item is whitelisted for this user: ' + itemIsWhiteListed_Local)
+                    print('Matching whitelisted value for this user is: ' + itemWhiteListedValue_Local)
 
-            #Looking in other users libraries
-            else: #(wllib_pos == currentPosition)
-                if not (itemIsWhiteListed_Remote):
-                    if (library_matching_behavior == 'byId'):
-                        itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
-                    elif (library_matching_behavior == 'byPath'):
-                        itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
-                    elif (library_matching_behavior == 'byNetworkPath'):
-                        itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
+        #Looking in other users libraries
+        else: #(wllib_pos == currentPosition)
+            if not (itemIsWhiteListed_Remote):
+                if (library_matching_behavior == 'byId'):
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                elif (library_matching_behavior == 'byPath'):
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
+                elif (library_matching_behavior == 'byNetworkPath'):
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
-                    if (cfg.DEBUG):
-                        print('Item is whitelisted for another user: ' + itemIsWhiteListed_Remote)
-                        print('Matching whitelisted value for another user is: ' + itemWhiteListedValue_Remote)
+                if (cfg.DEBUG):
+                    print('Item is whitelisted for another user: ' + itemIsWhiteListed_Remote)
+                    print('Matching whitelisted value for another user is: ' + itemWhiteListedValue_Remote)
 
-            if (cfg.DEBUG):
-                print('LibraryId is: ' + LibraryID)
-                print('LibraryPath is: ' + LibraryPath)
-                print('LibraryNetPath is: ' + LibraryNetPath)
-                print('Whitelisted Keys are: ' + user_wllib_keys_json[wllib_pos])
-                print('Whitelisted Paths are: ' + user_wllib_path_json[wllib_pos])
-                print('Whitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos])
+        if (cfg.DEBUG):
+            print('LibraryId is: ' + LibraryID)
+            print('LibraryPath is: ' + LibraryPath)
+            print('LibraryNetPath is: ' + LibraryNetPath)
+            print('Whitelisted Keys are: ' + user_wllib_keys_json[wllib_pos])
+            print('Whitelisted Paths are: ' + user_wllib_path_json[wllib_pos])
+            print('Whitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos])
 
     return itemIsWhiteListed_Local,itemIsWhiteListed_Remote
 
@@ -3369,7 +3368,7 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_movie,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3379,7 +3378,7 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_movie,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3812,7 +3811,7 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_episode,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -3822,7 +3821,7 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_episode,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4255,7 +4254,7 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_audio,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4265,7 +4264,7 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audio,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4706,7 +4705,7 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,cfg.multiuser_whitelist_audiobook,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
@@ -4716,7 +4715,7 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,cfg.multiuser_whitelist_audiobook,
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
 
                                         #Display True if media item is locally or remotely whitelisted
