@@ -1,5 +1,3 @@
-
-
 # Script
 ## media_cleaner.py
 This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
@@ -308,11 +306,14 @@ api_query_attempts=4
 ```python
 #----------------------------------------------------------#
 # API query item limit
-# To keep the server running smoothly we do not want it to return a large amount of metadata from a single API query
-#  ALL media items and their metadata are processed regardless of this value
+# To keep the server running smoothly we do not want it to return a
+#  large amount of metadata from a single API query
+# If the server lags or bogs down when this script runs try lowering
+#  this value to allow the server to return smaller amounts of data
+# ALL media items and their metadata are processed regardless of this value
 #  1-10000 - maximum number of media items the server will return for each API query
 #  (50 : default)
-#----------------------------------------------------------##
+#----------------------------------------------------------#
 api_query_item_limit=50
 ```
 #### DEBUG
