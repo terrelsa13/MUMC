@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from media_cleaner import convert2json
-
 #This module can be used to change some of the default configuration values used before the script is first run
 #Script will check for valid values after the first run
 #Configuration values outside of the valid range will throw an error
