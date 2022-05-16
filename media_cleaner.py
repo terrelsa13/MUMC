@@ -1658,7 +1658,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
 
             if not (data['Id'] == ''):
                 #Build query for child media items
-                #include all item types; filter applied in firt API calls for each media type in get_items()
+                #include all item types; filter applied in firt API calls for each media type in get_media_items()
                 IncludeItemTypes=''
                 FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
                 SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
@@ -1744,7 +1744,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
             if not (data['Id'] == ''):
                 #Build query for child media items; check is not Movie, Episode, or Audio
                 if not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio')):
-                    #include all item types; filter applied in firt API calls for each media type in get_items()
+                    #include all item types; filter applied in firt API calls for each media type in get_media_items()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
                     SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
@@ -2834,7 +2834,7 @@ def prep_AUDIOBOOKoutput(item):
 #get played media items
 # track media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
-def get_items():
+def get_media_items():
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     
@@ -4870,7 +4870,7 @@ def get_items():
 
 
 #api call to delete items
-def delete_item(itemID):
+def delete_media_item(itemID):
     #build API delete request for specified media item
     url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
 
@@ -4932,7 +4932,7 @@ def output_itemsToDelete(deleteItems):
             else: # item['Type'] == 'Unknown':
                 pass
             #Delete media item
-            delete_item(item['Id'])
+            delete_media_item(item['Id'])
             #Print output for deleted media item
             print(item_output_details)
     else:
@@ -5836,7 +5836,7 @@ if (cfg.UPDATE_CONFIG):
     exit(0)
 
 #now we can get media items that are ready to be deleted;
-deleteItems=get_items()
+deleteItems=get_media_items()
 
 #show and delete media items
 output_itemsToDelete(deleteItems)
