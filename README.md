@@ -328,7 +328,7 @@ DEBUG=False
 ```
 
 # Usage
-Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
+Make ```media_cleaner.py``` executable and run ```/path/to/python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
 
 # Requirements
 * Linux or Windows
