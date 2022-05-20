@@ -13,6 +13,7 @@ from collections import defaultdict
 from datetime import datetime,date,timedelta,timezone
 from media_cleaner_config_defaults import get_default_config_values
 
+scriptVersion="2.0.24.Beta"
 
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
@@ -394,7 +395,7 @@ def get_authentication_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="2.0.23 Beta", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + scriptVersion + '", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -2841,6 +2842,7 @@ def get_media_items():
     print('')
     print('-----------------------------------------------------------')
     print('Start...')
+    print('Script Verion: ' + scriptVersion)
     print('Cleaning media for server at: ' + server_url)
     print('-----------------------------------------------------------')
     print('')

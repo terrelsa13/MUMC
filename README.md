@@ -333,7 +333,7 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
 # Requirements
 * Linux or Windows
 * Mac (probably works but do not have a Mac to confirm)
-* python3.x
+* python 3.10.4 (other versions of python 3.x will likely work; but are not supported)
 * python-dateutil \*must be installed\*
 * media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
@@ -365,16 +365,16 @@ Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_clean
    - $```sudo apt-get update```
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
-   - $```sudo pip3 install -U pip```
-   - $```sudo pip3 install python-dateutil```
+   - $```pip3 install -U pip```
+   - $```pip3 install python-dateutil```
 * For other operating systems
    - Please consult Google
 
 # Scheduled Run Using Crontab
 * Below cron entry runs script everyday at 00:00hrs (aka 12AM)
-   - $```0 0 * * * /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py```
+   - $```0 0 * * * /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py```
 * Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
-   - $```23 1 * * 1 /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
+   - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
 
 
 # Donation
