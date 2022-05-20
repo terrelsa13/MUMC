@@ -1,3 +1,16 @@
+# UPDATES COMING!
+
+Work has been underway to improve this script.
+
+The updated script will not be backwards compatible with the existing config file. I went back and forth on this for a while and ultimately settled on what allowed me to make these improvements quickly without it cutting into my personal life too much.
+
+Fortunately some of those improvements include entering multiple libraries for a user instead of having to do it one library at a time. This should help speed up re-building the config for most.
+
+If you want to try it out or see what the other improvement are check out [the BETA branch](https://github.com/terrelsa13/media_cleaner/tree/media_cleaner_2p0_beta).
+
+Let me know what you think!
+
+
 
 
 # Script
