@@ -360,6 +360,7 @@ DEBUG=False
    - $```chmod +x /path/to/media_cleaner.py```
 * Run the script
    - $```/path/to/python3.x /path/to/media_cleaner.py```
+* First time the script is run it will walk you through building the media_cleaner_config.py file
 * You may get the below python error if the python-dateutil module is not installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
 * The python-dateutil module can be installed with the following commands:
