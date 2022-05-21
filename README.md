@@ -330,7 +330,7 @@ DEBUG=False
 # Requirements
 * Linux or Windows
 * Mac (probably works but do not have a Mac to confirm)
-* python 3.10.4 (other versions of python 3.x will likely work; but are not supported)
+* Python 3.10 (other versions of python 3.x will likely work; but are not supported)
 * python-dateutil \*must be installed\*
 * media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
