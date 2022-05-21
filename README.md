@@ -326,10 +326,7 @@ api_query_item_limit=50
 #----------------------------------------------------------#
 DEBUG=False
 ```
-
-# Usage
-Make ```media_cleaner.py``` executable and run ```/path/to/python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
-
+#
 # Requirements
 * Linux or Windows
 * Mac (probably works but do not have a Mac to confirm)
@@ -356,12 +353,16 @@ Make ```media_cleaner.py``` executable and run ```/path/to/python3.x /path/to/me
 # Library Matching By Id, By Path, or By Network Path
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18)
 
-# First Run
-* **\*OPTIONAL\*** Update **media_cleaner_config_defaults.py** with desired default values
-* $```/path/to/python3.x /path/to/media_cleaner.py```
+# First Run (Debian, Ubuntu, and Linux Mint)
+* **\*OPTIONAL\*** Update the media_cleaner_config_defaults.py file with desired default values
+   - $```nano /path/to/media_cleaner_config_defaults.py```
+* Make the script executable
+   - $```chmod +x /path/to/media_cleaner.py```
+* Run the script
+   - $```/path/to/python3.x /path/to/media_cleaner.py```
 * You may get the below python error if the python-dateutil module is not installed
-   - ModuleNotFoundError: No module named 'dateutil' python-dateutil
-* For Debian/Ubuntu/Linux Mint type systems you can install the python-dateutil module with the following commands:
+   - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
+* The python-dateutil module can be installed with the following commands:
    - $```sudo apt-get update```
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
