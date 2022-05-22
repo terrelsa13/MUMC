@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.25.Beta'
+    Version='2.0.26.Beta'
 
     return(Version)
 
@@ -250,8 +250,10 @@ def get_library_setup_behavior(library_setup_behavior):
     valid_behavior=False
     while (valid_behavior == False):
         print('Decide how the script will use the libraries chosen for each user.')
-        print('0 - blacklist - Media items in the libraries you choose will be allowed to be deleted.')
-        print('1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted.')
+        print('0 - blacklist - Chosen libraries will blacklisted.')
+        print('                All other libraries will be whitelisted.')
+        print('1 - whitelist - Chosen libraries will whitelisted.')
+        print('                All other libraries will be blacklisted.')
         if (library_setup_behavior == 'blacklist'):
             print('')
             print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
@@ -277,14 +279,14 @@ def get_library_matching_behavior(library_matching_behavior):
     defaultbehavior='byId'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Decide how the script will match media items to the blacklisted and whiteliested libraries.')
-        print('0 - byId - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'.')
-        print('1 - byPath - Media items will be matched to blacklisted and whitelisted libraries using the \'Path\'.')
-        print('2 - byNetworkPath - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\'.')
+        print('Decide how the script will match media items to libraries.')
+        print('0 - byId - Media items will be matched to libraries using \'LibraryIds\'.')
+        print('1 - byPath - Media items will be matched to libraries using \'Paths\'.')
+        print('2 - byNetworkPath - Media items will be matched to libraries using \'NetworkPaths\'.')
         if ((library_matching_behavior == 'byId') or (library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')):
             print('')
             print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
-        behavior=input('Choose how the script will match media items to the blacklisted and whiteliested libraries. (default ' + defaultbehavior + '): ')
+        behavior=input('Choose how the script will match media items to libraries. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -558,7 +560,7 @@ def cleanup_library_paths(libPath_str):
 
 
 #API call to get library folders; choose which libraries to blacklist and whitelist
-def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, mandatory, library_matching_behavior):
+def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, user_name, mandatory, library_matching_behavior):
     #get all library paths for a given user
 
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
@@ -750,6 +752,10 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, ma
                     #Add valid library selecitons to the library dicitonary
                     if not ('userid' in library_dict):
                         library_dict['userid']=libraryTemp_dict['userid']
+                    if not ('username' in library_dict):
+                        library_dict['username']=user_name
+                    if not ('username' in not_library_dict):
+                        not_library_dict['username']=user_name
                     stop_loop=True
                     print('')
                 else:
@@ -760,6 +766,8 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, ma
                             #Add valid library selecitons to the library dicitonary
                             if not ('userid' in library_dict):
                                 library_dict['userid']=libraryTemp_dict['userid']
+                            if not ('username' in library_dict):
+                                library_dict['username']=user_name
                             for showpos in showpos_correlation:
                                 if (showpos_correlation[showpos] == path_number_int):
                                     for checkallpos in libraryTemp_dict:
@@ -788,6 +796,8 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, ma
                                                 #The chosen library is removed from the "not chosen" data structure
                                                 #Remove valid library selecitons from the not_library dicitonary
                                                 if (checkallpos in not_library_dict):
+                                                    if not ('username' in not_library_dict):
+                                                        not_library_dict['username']=user_name
                                                     not_library_dict.pop(checkallpos)
 
                                                 #The chosen library is added to the "chosen" data structure
@@ -822,29 +832,29 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, ma
 
     #Determine how many entries are in the "choosen" and "not choosen" data structures
     #When both have >1 parse both data structures
-    if ((len(library_dict) > 1) and (len(not_library_dict) > 1)):
+    if ((len(library_dict) > 2) and (len(not_library_dict) > 2)):
         for entry in library_dict:
-            if not (entry == 'userid'):
+            if not ((entry == 'userid') or (entry == 'username')):
                 library_dict[entry]['path']=cleanup_library_paths(library_dict[entry].get('path'))
                 library_dict[entry]['networkpath']=cleanup_library_paths(library_dict[entry].get('networkpath'))
         for entry in not_library_dict:
-            if not (entry == 'userid'):
+            if not ((entry == 'userid') or (entry == 'username')):
                 not_library_dict[entry]['path']=cleanup_library_paths(not_library_dict[entry].get('path'))
                 not_library_dict[entry]['networkpath']=cleanup_library_paths(not_library_dict[entry].get('networkpath'))
         #libraries for blacklist and whitelist
         return(not_library_dict,library_dict)
     #When only one is >1 parse that data structur
-    elif ((len(library_dict) == 1) and (len(not_library_dict) > 1)):
+    elif ((len(library_dict) == 2) and (len(not_library_dict) > 2)):
         for entry in not_library_dict:
-            if not (entry == 'userid'):
+            if not ((entry == 'userid') or (entry == 'username')):
                 not_library_dict[entry]['path']=cleanup_library_paths(not_library_dict[entry].get('path'))
                 not_library_dict[entry]['networkpath']=cleanup_library_paths(not_library_dict[entry].get('networkpath'))
         #libraries for blacklist and whitelist
         return(not_library_dict,library_dict)
     #When only one is >1 parse that data structur
-    elif ((len(library_dict) > 1) and (len(not_library_dict) == 1)):
+    elif ((len(library_dict) > 2) and (len(not_library_dict) == 2)):
         for entry in library_dict:
-            if not (entry == 'userid'):
+            if not ((entry == 'userid') or (entry == 'username')):
                 library_dict[entry]['path']=cleanup_library_paths(library_dict[entry].get('path'))
                 library_dict[entry]['networkpath']=cleanup_library_paths(library_dict[entry].get('networkpath'))
         #libraries for blacklist and whitelist
@@ -967,10 +977,10 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (library_setup_behavior == 'blacklist'):
                     message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
+                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
                 else: #(library_setup_behavior == 'whitelist'):
                     message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                    userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
+                    userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
 
             #We get here when we are done selecting users to monitor
             elif ((user_number == '') and (not (len(userId_set) == 0))):
@@ -991,10 +1001,10 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                     #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                     if (library_setup_behavior == 'blacklist'):
                         message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                        userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
+                        userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
                     else: #(library_setup_behavior == 'whitelist'):
                         message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                        userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],False,library_matching_behavior)
+                        userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
 
                     if (len(userId_set) >= i):
                         stop_loop=True
@@ -1090,8 +1100,10 @@ def generate_edit_config(cfg,updateConfig):
         #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
         print('-----------------------------------------------------------')
+        #set auth_key to allow printing username next to userkey
+        auth_key=cfg.auth_key
         #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
-        user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(cfg.server_url,cfg.auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
+        user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(cfg.server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
 
     userkeys_bllibs_list=[]
     userbllibs_list=[]
@@ -1100,12 +1112,15 @@ def generate_edit_config(cfg,updateConfig):
 
     #Attach userkeys to blacklist library data structure
     for userkey, userbllib in user_keys_and_bllibs.items():
-        userkeys_bllibs_list.append(userkey)
+        #Get all users
+        userkeys_bllibs_list.append(userbllib['username'] + ':' + userkey)
+        userbllib.pop('username')
         userbllibs_list.append(userbllib)
 
     #Attach userkeys to whitelist library data structure
     for userkey, userwllib in user_keys_and_wllibs.items():
-        userkeys_wllibs_list.append(userkey)
+        userkeys_wllibs_list.append(userwllib['username'] + ':' + userkey)
+        userwllib.pop('username')
         userwllibs_list.append(userwllib)
 
     #Check each user has an entry in blacklists and whitelists
@@ -1204,17 +1219,17 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "keep_blacktagged_movie=" + str(get_default_config_values('keep_blacktagged_movie')) + "\n"
-        config_file += "keep_blacktagged_episode=" + str(get_default_config_values('keep_blacktagged_episode')) + "\n"
-        config_file += "keep_blacktagged_audio=" + str(get_default_config_values('keep_blacktagged_audio')) + "\n"
+        config_file += "delete_blacktagged_movie=" + str(get_default_config_values('delete_blacktagged_movie')) + "\n"
+        config_file += "delete_blacktagged_episode=" + str(get_default_config_values('delete_blacktagged_episode')) + "\n"
+        config_file += "delete_blacktagged_audio=" + str(get_default_config_values('delete_blacktagged_audio')) + "\n"
         if (server_brand == 'jellyfin'):
-            config_file += "keep_blacktagged_audiobook=" + str(get_default_config_values('keep_blacktagged_audiobook')) + "\n"
+            config_file += "delete_blacktagged_audiobook=" + str(get_default_config_values('delete_blacktagged_audiobook')) + "\n"
     elif (updateConfig):
-        config_file += "keep_blacktagged_movie=" + str(cfg.keep_blacktagged_movie) + "\n"
-        config_file += "keep_blacktagged_episode=" + str(cfg.keep_blacktagged_episode) + "\n"
-        config_file += "keep_blacktagged_audio=" + str(cfg.keep_blacktagged_audio) + "\n"
+        config_file += "delete_blacktagged_movie=" + str(cfg.delete_blacktagged_movie) + "\n"
+        config_file += "delete_blacktagged_episode=" + str(cfg.delete_blacktagged_episode) + "\n"
+        config_file += "delete_blacktagged_audio=" + str(cfg.delete_blacktagged_audio) + "\n"
         if (cfg.server_brand == 'jellyfin'):
-            config_file += "keep_blacktagged_audiobook=" + str(cfg.keep_blacktagged_audiobook) + "\n"
+            config_file += "delete_blacktagged_audiobook=" + str(cfg.delete_blacktagged_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1412,6 +1427,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Authentication Key; requested from server during setup\n"
+    config_file += "#  Used for API queries sent to the server\n"
     config_file += "#  Also know as an Access Token\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1422,24 +1438,27 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how the script will use the libraries chosen for each user\n"
     config_file += "#  Only used during creation or editing of the configuration file\n"
-    config_file += "#  0 - blacklist - Media items in the libraries you choose will be allowed to be deleted\n"
-    config_file += "#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted\n"
+    config_file += "#  0 - blacklist - Chosen libraries will blacklisted\n"
+    config_file += "#                  All other libraries will be whitelisted\n"
+    config_file += "#  1 - whitelist - Chosen libraries will whitelisted\n"
+    config_file += "#                  All other libraries will be blacklisted\n"
     config_file += "# (blacklist : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "library_setup_behavior='" + library_setup_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide how the script will match media items to the blacklisted and whiteliested libraries\n"
-    config_file += "#  0 - Library Id - Media items will be matched to blacklisted and whitelisted libraries using the \'LibraryId\'\n"
-    config_file += "#  1 - Library Path - Media items will be matched to blacklisted and whitelisted libraries using the \'Path\'\n"
-    config_file += "#  2 - Library Network Path - Media items will be matched to blacklisted and whitelisted libraries using the \'NetworkPath\'\n"
+    config_file += "# Decide how the script will match media items to libraries\n"
+    config_file += "#  0 - byId - Media items will be matched to libraries using \'LibraryIds\'\n"
+    config_file += "#  1 - byPath - Media items will be matched to libraries using \'Paths\'\n"
+    config_file += "#  2 - byNetwork Path - Media items will be matched to libraries using \'NetworkPaths\'\n"
     config_file += "# (byId : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "library_matching_behavior='" + library_matching_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# User key(s) of monitored account(s); chosen during setup\n"
-    config_file += "# These are not used during runtime and only serve as a visual reminder\n"
+    config_file += "# The order of the keys here must match the order of the keys\n"
+    config_file += "#  in user_bl_libs and user_wl_libs\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_keys='" + user_keys + "'\n"
     config_file += "\n"
@@ -3408,7 +3427,7 @@ def get_media_items():
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.keep_blacktagged_movie == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((cfg.delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
@@ -3851,7 +3870,7 @@ def get_media_items():
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.keep_blacktagged_episode == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((cfg.delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
@@ -4294,7 +4313,7 @@ def get_media_items():
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.keep_blacktagged_audio == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((cfg.delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
@@ -4745,7 +4764,7 @@ def get_media_items():
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.keep_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((cfg.delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
 
                                     if (does_key_exist(item['UserData'], 'Played')):
@@ -5246,52 +5265,52 @@ def cfgCheck():
 
 #######################################################################################################
 
-    if hasattr(cfg, 'keep_blacktagged_movie'):
-        check=cfg.keep_blacktagged_movie
+    if hasattr(cfg, 'delete_blacktagged_movie'):
+        check=cfg.delete_blacktagged_movie
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_movie must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_movie must be an integer; valid range 0 thru 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_movie variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'keep_blacktagged_episode'):
-        check=cfg.keep_blacktagged_episode
+    if hasattr(cfg, 'delete_blacktagged_episode'):
+        check=cfg.delete_blacktagged_episode
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_episode must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_episode must be an integer; valid range 0 thru 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_episode variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'keep_blacktagged_audio'):
-        check=cfg.keep_blacktagged_audio
+    if hasattr(cfg, 'delete_blacktagged_audio'):
+        check=cfg.delete_blacktagged_audio
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audio must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audio must be an integer; valid range 0 thru 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audio variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (check == 'jellyfin'):
-            if hasattr(cfg, 'keep_blacktagged_audiobook'):
-                check=cfg.keep_blacktagged_audiobook
+            if hasattr(cfg, 'delete_blacktagged_audiobook'):
+                check=cfg.delete_blacktagged_audiobook
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
                     (check <= 1))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
+                    error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
+                error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -5726,9 +5745,11 @@ def cfgCheck():
     if hasattr(cfg, 'user_keys'):
         check=cfg.user_keys
         check_list=json.loads(check)
-        user_check_list=check_list
         check_user_keys_length=len(check_list)
-        for check_irt in check_list:
+        user_check_list=[]
+        for user_info in check_list:
+            user_check_list.append(user_info.split(':',1)[1])
+        for check_irt in user_check_list:
             if (
                 not ((type(check_irt) is str) and
                 (len(check_irt) == 32) and

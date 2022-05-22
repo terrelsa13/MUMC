@@ -70,10 +70,10 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 #  1 - ok to delete blacktagged media item after ALL monitored users have watched it
 # (0 : default)
 #----------------------------------------------------------#
-keep_blacktagged_movie=0
-keep_blacktagged_episode=0
-keep_blacktagged_audio=0
-keep_blacktagged_audiobook=0
+delete_blacktagged_movie=0
+delete_blacktagged_episode=0
+delete_blacktagged_audio=0
+delete_blacktagged_audiobook=0
 ```
 #### Whitetag a media item to be kept after it is watched:
 ```python
@@ -231,6 +231,7 @@ server_url='http://localhost.abc:8096/basename'
 ```python
 #----------------------------------------------------------#
 # Authentication Key; requested from server during setup
+#  Used for API queries sent to the server
 #  Also know as an Access Token
 #----------------------------------------------------------#
 auth_key='0123456789abcdef0123456789abcdef'
@@ -240,8 +241,10 @@ auth_key='0123456789abcdef0123456789abcdef'
 #----------------------------------------------------------#
 # Decide how the script will use the libraries chosen for each user
 #  Only used during creation or editing of the configuration file
-#  0 - blacklist - Media items in the libraries you choose will be allowed to be deleted
-#  1 - whitelist - Media items in the libraries you choose will NOT be allowed to be deleted
+#  0 - blacklist - Chosen libraries will blacklisted
+#                  All other libraries will be whitelisted
+#  1 - whitelist - Chosen libraries will whitelisted
+#                  All other libraries will be blacklisted
 # (blacklist : default)
 #----------------------------------------------------------#
 script_behavior='abclist'
@@ -249,9 +252,9 @@ script_behavior='abclist'
 ```python
 #----------------------------------------------------------#
 # Decide how the script will match media items to the blacklisted and whiteliested libraries
-#  0 - byId - Media items will be matched to blacklisted and whitelisted libraries using the 'LibraryId'
-#  1 - byPath - Media items will be matched to blacklisted and whitelisted libraries using the 'Path'
-#  2 - byNetworkPath - Media items will be matched to blacklisted and whitelisted libraries using the 'NetworkPath'
+#  0 - byId - Media items will be matched to libraries using 'LibraryIds'
+#  1 - byPath - Media items will be matched to libraries using 'Paths'
+#  2 - byNetworkPath - Media items will be matched to libraries using 'NetworkPaths'
 # (byId : default)
 #----------------------------------------------------------#
 library_matching_behavior='byAbc'
@@ -260,7 +263,8 @@ library_matching_behavior='byAbc'
 ```python
 #----------------------------------------------------------#
 # User key(s) of monitored account(s); chosen during setup
-# These are not used during runtime and only serve as a visual reminder
+# The order of the keys here must match the order of the keys
+#  in user_bl_libs and user_wl_libs
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
 ```

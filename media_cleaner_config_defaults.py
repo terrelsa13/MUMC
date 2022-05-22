@@ -30,10 +30,10 @@ def get_default_config_values(config_value):
 
         'blacktag':'',
 
-        'keep_blacktagged_movie':0,
-        'keep_blacktagged_episode':0,
-        'keep_blacktagged_audio':0,
-        'keep_blacktagged_audiobook':0,
+        'delete_blacktagged_movie':0,
+        'delete_blacktagged_episode':0,
+        'delete_blacktagged_audio':0,
+        'delete_blacktagged_audiobook':0,
 
         'whitetag':'',
 
