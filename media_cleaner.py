@@ -13,7 +13,13 @@ from collections import defaultdict
 from datetime import datetime,date,timedelta,timezone
 from media_cleaner_config_defaults import get_default_config_values
 
-scriptVersion="2.0.24.Beta"
+
+def get_script_version():
+
+    Version='2.0.25.Beta'
+
+    return(Version)
+
 
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
@@ -395,7 +401,7 @@ def get_authentication_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + scriptVersion + '", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -1006,6 +1012,9 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
 
 #get user input needed to build or edit the media_cleaner_config.py file
 def generate_edit_config(cfg,updateConfig):
+
+    print('-----------------------------------------------------------')
+    print('Script Verion: ' + get_script_version())
 
     if not (updateConfig):
         print('-----------------------------------------------------------')
@@ -2841,8 +2850,9 @@ def get_media_items():
     #Get list of all played items
     print('')
     print('-----------------------------------------------------------')
+    print('Script Verion: ' + get_script_version())
+    print('-----------------------------------------------------------')
     print('Start...')
-    print('Script Verion: ' + scriptVersion)
     print('Cleaning media for server at: ' + server_url)
     print('-----------------------------------------------------------')
     print('')
