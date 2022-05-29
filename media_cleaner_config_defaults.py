@@ -10,8 +10,8 @@ def get_default_config_values(config_value):
     
     defaultConfigValues={
 
-        #'example_config':0
-        #'example_config':'abc'
+        #'example_number_config':0
+        #'example_string_config':'abc'
 
         'played_age_movie':-1,
         'played_age_episode':-1,
