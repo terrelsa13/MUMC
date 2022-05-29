@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.26.Beta'
+    Version='2.0.27.Beta'
 
     return(Version)
 
@@ -33,19 +33,6 @@ def print2json(rawjson):
     print(ezjson)
 
 
-#Check if json key exists
-def does_key_exist(item, keyvalue):
-    try:
-        exists = item[keyvalue]
-    except KeyError:
-        if (cfg.DEBUG):
-            print(str(keyvalue) + 'does NOT exist in item')
-        return(False)
-    if (cfg.DEBUG):
-        print(str(keyvalue) + 'does exist in item')
-    return(True)
-
-
 #Check if json index exists
 def does_index_exist(item, indexvalue):
     try:
@@ -57,11 +44,6 @@ def does_index_exist(item, indexvalue):
     if (cfg.DEBUG):
         print(str(indexvalue) + 'does exist in item')
     return(True)
-
-
-#Check if json key and index exist
-def does_key_index_exist(item, keyvalue, indexvalue):
-    return(does_key_exist(item, keyvalue) and does_index_exist(item[keyvalue], indexvalue))
 
 
 #send url request
@@ -1722,10 +1704,10 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
                         #Check if child item has already been processed
                         if not (child_item['Id'] in user_processed_itemsId):
                             #Check if media item has any favs
-                            if not (does_key_exist(child_item,'UserData')):
+                            if not ('UserData' in child_item):
                                 #if it does not; add fav to metadata
                                 child_item['UserData']={'IsFavorite':True}
-                            elif not (does_key_exist(child_item['UserData'],'IsFavorite')):
+                            elif not ('IsFavorite' in child_item['UserData']):
                                 #if it does not; add fav to metadata
                                 child_item['UserData']['IsFavorite']=True
                             #if child_item is not already a fav; update this temp metadata so it is a fav
@@ -1813,7 +1795,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                                 #Emby and jellyfin store tags differently
                                 if (cfg.server_brand == 'emby'):
                                     #Does 'TagItems' exist
-                                    if not (does_key_exist(child_item,'TagItems')):
+                                    if not ('TagItems' in child_item):
                                         #if it does not; add desired tag to metadata
                                         child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
                                     #Does 'TagItems'[] exist
@@ -1829,7 +1811,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                                 #Emby and jellyfin store tags differently
                                 else: #(cfg.server_brand == 'jellyfin')
                                     #Does 'TagItems' exist
-                                    if not (does_key_exist(child_item,'Tag')):
+                                    if not ('Tag' in child_item):
                                         #if it does not; add desired tag to metadata
                                         child_item['Tags']=[insert_tagName]
                                     #Does 'Tags'[] exist
@@ -1857,21 +1839,21 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
 #Determine if item can be monitored
 def get_isItemMonitored(mediasource):
     #When script is run before a media item is physically available ignore that media item
-    if (does_key_exist(mediasource, 'Type') and does_key_exist(mediasource, 'Size')):
+    if ('Type' in mediasource) and ('Size' in mediasource):
         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
             #ignore this media item
             itemIsMonitored=False
         else:
             #ok to monitor this media item
             itemIsMonitored=True
-    elif (does_key_exist(mediasource, 'Type')):
+    elif ('Type' in mediasource):
         if (mediasource['Type'] == 'Placeholder'):
             #ignore this media item
             itemIsMonitored=False
         else:
             #ok to monitor this media item
             itemIsMonitored=True
-    elif (does_key_exist(mediasource, 'Size')):
+    elif ('Size' in mediasource):
         if (mediasource['Size'] == 0):
             #ignore this media item
             itemIsMonitored=False
@@ -1983,7 +1965,7 @@ def get_isItemTagged(usertags,tagged_items,item):
     #Emby and jellyfin store tags differently
     if (cfg.server_brand == 'emby'):
         #Check if media item is tagged
-        if ((not (usertags == '')) and (does_key_exist(item,'TagItems'))):
+        if ((not (usertags == '')) and ('TagItems' in item)):
             #Check if media item is tagged
             taglist=set()
             #Loop thru tags; store them for comparison to the media item
@@ -2000,7 +1982,7 @@ def get_isItemTagged(usertags,tagged_items,item):
     else: #(cfg.server_brand == 'jellyfin')
         #Jellyfin tags
         #Check if media item is tagged
-        if ((not (usertags == '')) and (does_key_exist(item,'Tags'))):
+        if ((not (usertags == '')) and ('Tags' in item)):
             #Check if media item is tagged
             taglist=set()
             #Loop thru tags; store them for comparison to the media item
@@ -2067,7 +2049,7 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
 
 ### Movie #######################################################################################
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         istag_MOVIE['movie'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item)
 
@@ -2075,7 +2057,7 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
 
 ### Movie Library #######################################################################################
 
-    if (does_key_exist(item, 'ParentId')):
+    if ('ParentId' in item):
         movielibrary_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'movie_library_info')
 
         istag_MOVIE['movielibrary'][movielibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,movielibrary_item_info)
@@ -2100,7 +2082,7 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
 ### Episode #######################################################################################
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         istag_EPISODE['episode'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item)
 
@@ -2108,12 +2090,12 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
 ### Season ########################################################################################
 
-    if (does_key_exist(item, 'SeasonId')):
+    if ('SeasonId' in item):
         season_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeasonId'],'season_info')
 
         istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info)
 
-    elif (does_key_exist(item, 'ParentId')):
+    elif ('ParentId' in item):
         season_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'season_info')
 
         istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info)
@@ -2122,17 +2104,17 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
 ### Series ########################################################################################
 
-    if (does_key_exist(item, 'SeriesId')):
+    if ('SeriesId' in item):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
 
-    elif (does_key_exist(season_item_info, 'SeriesId')):
+    elif ('SeriesId' in season_item_info):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
 
-    elif (does_key_exist(season_item_info, 'ParentId')):
+    elif ('ParentId' in season_item_info):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
 
         istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
@@ -2141,7 +2123,7 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
 ### TV Library ########################################################################################
 
-    if (does_key_exist(series_item_info, 'ParentId')):
+    if ('ParentId' in series_item_info):
         tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_key,series_item_info['ParentId'],'tv_library_info')
 
         istag_EPISODE['tvlibrary'][tvlibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvlibrary_item_info)
@@ -2150,13 +2132,13 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
 ### Studio Network #######################################################################################
 
-    if (does_key_index_exist(series_item_info, 'Studios', 0)):
+    if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0)):
         #Get studio network's item info
         tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_key,series_item_info['Studios'][0]['Id'],'studio_network_info')
 
         istag_EPISODE['seriesstudionetwork'][tvstudionetwork_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvstudionetwork_item_info)
 
-    elif (does_key_exist(series_item_info, 'SeriesStudio')):
+    elif ('SeriesStudio' in series_item_info):
         #Get series studio network's item info
         tvstudionetwork_item_info = get_STUDIO_itemInfo(user_key,series_item_info['SeriesStudio'])
 
@@ -2183,7 +2165,7 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
 
     tagged_items=[]
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         istag_AUDIO['track'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item)
 
@@ -2194,13 +2176,13 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
 ### Album/Book #########################################################################################
 
     #Albums for music
-    if (does_key_exist(item, 'ParentId')):
+    if ('ParentId' in item):
         album_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'album_info')
 
         istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info)
 
         #istag_AUDIO['albumartist']=get_istag_ARTIST(user_key,album_item_info,istag_AUDIO['albumartist'],keep_tagorites_advanced_album_artist,lookupTopicAlbum + '_artist')
-    elif (does_key_exist(item, 'AlbumId')):
+    elif ('AlbumId' in item):
         album_item_info = get_ADDITIONAL_itemInfo(user_key,item['AlbumId'],'album_info')
 
         istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info)
@@ -2212,7 +2194,7 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
 ### Library ########################################################################################
 
     #Library
-    if (does_key_exist(album_item_info, 'ParentId')):
+    if ('ParentId' in album_item_info):
         audiolibrary_item_info = get_ADDITIONAL_itemInfo(user_key,album_item_info['ParentId'],'library_info')
 
         istag_AUDIO['audiolibrary'][audiolibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,audiolibrary_item_info)
@@ -2235,7 +2217,7 @@ def get_isAUDIOBOOK_Tagged(item,user_key,usertags):
 #Determine if genre is favorited
 def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookupTopic):
 
-    if (does_key_index_exist(item, 'GenreItems', 0)):
+    if (('GenreItems' in item) and (does_index_exist(item['GenreItems'],0))):
         #Check if bitmask for favorites by item genre is enabled
         if (keep_favorites_advanced):
             #Check if bitmask for any or first item genre is enabled
@@ -2269,7 +2251,7 @@ def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookup
 #Determine if artist is favorited
 def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,lookupTopic):
 
-    if (does_key_index_exist(item, 'ArtistItems', 0)):
+    if (('ArtistItems' in item) and (does_index_exist(item['ArtistItems'],0))):
         #Check if bitmask for favorites by artist is enabled
         if (keep_favorites_advanced):
             #Check if bitmask for any or first artist is enabled
@@ -2303,7 +2285,7 @@ def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,look
 #Determine if artist is favorited
 def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_advanced,lookupTopic):
 
-    if (does_key_index_exist(item, 'Studios', 0)):
+    if (('Studios' in  item) and (does_index_exist(item['Studios'],0))):
         #Check if bitmask for favorites by item genre is enabled
         if (keep_favorites_advanced):
             #Check if bitmask for any or first item genre is enabled
@@ -2312,7 +2294,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
                 studionetwork_item_info = get_ADDITIONAL_itemInfo(user_key,item['Studios'][0]['Id'],'studio_network_info')
                 #Check if studio-network's favorite value already exists in dictionary
                 if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
-                    if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                    if (('UserData' in studionetwork_item_info) and ('IsFavorite' in studionetwork_item_info['UserData'])):
                         #Store if the studio network is marked as a favorite
                         isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
                 else: #it already exists
@@ -2327,7 +2309,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
                     studionetwork_item_info = get_ADDITIONAL_itemInfo(user_key,item['Studios'][studios]['Id'],'studio_network_info')
                     #Check if studio network's favorite value already exists in dictionary
                     if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
-                        if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                        if (('UserData' in studionetwork_item_info) and ('IsFavorite' in studionetwork_item_info['UserData'])):
                             #Store if the studio network is marked as a favorite
                             isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
                     else: #it already exists
@@ -2336,14 +2318,14 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
                             #Store if the studio network is marked as a favorite
                             isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
 
-    elif (does_key_exist(item, 'SeriesStudio')):
+    elif ('SeriesStudio' in item):
         #Check if bitmask for favorites by item genre is enabled
         if (keep_favorites_advanced):
             #Get series studio network's item info
             studionetwork_item_info = get_STUDIO_itemInfo(user_key,item['SeriesStudio'])
             #Check if series studio network's favorite value already exists in dictionary
             if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
-                if (does_key_index_exist(studionetwork_item_info,'UserData','IsFavorite')):
+                if (('UserData' in studionetwork_item_info) and ('IsFavorite' in studionetwork_item_info['UserData'])):
                     #Store if the series studio network is marked as a favorite
                     isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
             else: #it already exists
@@ -2365,7 +2347,7 @@ def get_isMOVIE_AdvancedFav(item,user_key):
 
 ### Movie #######################################################################################
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         isfav_MOVIE['moviegenre']=get_isGENRE_Fav(user_key,item,isfav_MOVIE['moviegenre'],keep_favorites_advanced_movie_genre,'movie_genre')
 
@@ -2373,7 +2355,7 @@ def get_isMOVIE_AdvancedFav(item,user_key):
 
 ### Movie Library #######################################################################################
 
-    if (does_key_exist(item, 'ParentId')):
+    if ('ParentId' in item):
         movielibrary_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'movie_library_info')
 
         isfav_MOVIE['movielibrarygenre']=get_isGENRE_Fav(user_key,movielibrary_item_info,isfav_MOVIE['movielibrarygenre'],keep_favorites_advanced_movie_library_genre,'movie_library_genre')
@@ -2402,7 +2384,7 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 ### Episode #######################################################################################
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         isfav_EPISODE['episodegenre']=get_isGENRE_Fav(user_key,item,isfav_EPISODE['episodegenre'],keep_favorites_advanced_episode_genre,'episode_genre')
 
@@ -2410,12 +2392,12 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 ### Season ########################################################################################
 
-    if (does_key_exist(item, 'SeasonId')):
+    if ('SeasonId' in item):
         season_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeasonId'],'season_info')
 
         isfav_EPISODE['seasongenre']=get_isGENRE_Fav(user_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
 
-    elif (does_key_exist(item, 'ParentId')):
+    elif ('ParentId' in item):
         season_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'season_info')
 
         isfav_EPISODE['seasongenre']=get_isGENRE_Fav(user_key,season_item_info,isfav_EPISODE['seasongenre'],keep_favorites_advanced_season_genre,'season_genre')
@@ -2424,21 +2406,21 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 ### Series ########################################################################################
 
-    if (does_key_exist(item, 'SeriesId')):
+    if ('SeriesId' in item):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
 
         isfav_EPISODE['seriesgenre']=get_isGENRE_Fav(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
         isfav_EPISODE['seriesstudionetwork']=get_isSTUDIONETWORK_Fav(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
-    elif (does_key_exist(season_item_info, 'SeriesId')):
+    elif ('SeriesId' in season_item_info):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
 
         isfav_EPISODE['seriesgenre']=get_isGENRE_Fav(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
         isfav_EPISODE['seriesstudionetwork']=get_isSTUDIONETWORK_Fav(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
-    elif (does_key_exist(season_item_info, 'ParentId')):
+    elif ('ParentId' in season_item_info):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
 
         isfav_EPISODE['seriesgenre']=get_isGENRE_Fav(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
@@ -2449,7 +2431,7 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 ### TV Library ########################################################################################
 
-    if (does_key_exist(series_item_info, 'ParentId')):
+    if ('ParentId' in series_item_info):
         tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_key,series_item_info['ParentId'],'tv_library_info')
 
         isfav_EPISODE['tvlibrarygenre']=get_isGENRE_Fav(user_key,tvlibrary_item_info,isfav_EPISODE['tvlibrarygenre'],keep_favorites_advanced_tv_library_genre,'tv_library_genre')
@@ -2458,13 +2440,13 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 ### Studio Network #######################################################################################
 
-    if (does_key_index_exist(series_item_info, 'Studios', 0)):
+    if (('Studios' in series_item_info) and (does_index_exist(series_item_info['Studios'],0))):
         #Get studio network's item info
         tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_key,series_item_info['Studios'][0]['Id'],'studio_network_info')
 
         isfav_EPISODE['seriesstudionetworkgenre']=get_isGENRE_Fav(user_key,tvstudionetwork_item_info,isfav_EPISODE['seriesstudionetworkgenre'],keep_favorites_advanced_tv_studio_network_genre,'studio_network_genre')
 
-    elif (does_key_exist(series_item_info, 'SeriesStudio')):
+    elif ('SeriesStudio' in series_item_info):
         #Get series studio network's item info
         tvstudionetwork_item_info = get_STUDIO_itemInfo(user_key,series_item_info['SeriesStudio'])
 
@@ -2513,7 +2495,7 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
 
 ### Track #########################################################################################
 
-    if (does_key_exist(item, 'Id')):
+    if ('Id' in item):
 
         isfav_AUDIO['trackgenre']=get_isGENRE_Fav(user_key,item,isfav_AUDIO['trackgenre'],keep_favorites_advanced_track_genre,lookupTopicTrack + '_genre')
 
@@ -2524,13 +2506,13 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
 ### Album/Book #########################################################################################
 
     #Albums for music
-    if (does_key_exist(item, 'ParentId')):
+    if ('ParentId' in item):
         album_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'album_info')
 
         isfav_AUDIO['albumgenre']=get_isGENRE_Fav(user_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicAlbum + '_genre')
 
         isfav_AUDIO['albumartist']=get_isARTIST_Fav(user_key,album_item_info,isfav_AUDIO['albumartist'],keep_favorites_advanced_album_artist,lookupTopicAlbum + '_artist')
-    elif (does_key_exist(item, 'AlbumId')):
+    elif ('AlbumId' in item):
         album_item_info = get_ADDITIONAL_itemInfo(user_key,item['AlbumId'],'album_info')
 
         isfav_AUDIO['albumgenre']=get_isGENRE_Fav(user_key,album_item_info,isfav_AUDIO['albumgenre'],keep_favorites_advanced_album_genre,lookupTopicAlbum + '_genre')
@@ -2542,7 +2524,7 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
 ### Library ########################################################################################
 
     #Library
-    if (does_key_exist(album_item_info, 'ParentId')):
+    if ('ParentId' in album_item_info):
         audiolibrary_item_info = get_ADDITIONAL_itemInfo(user_key,album_item_info['ParentId'],'library_info')
 
         isfav_AUDIO['audiolibrarygenre']=get_isGENRE_Fav(user_key,audiolibrary_item_info,isfav_AUDIO['audiolibrarygenre'],keep_favorites_advanced_music_library_genre,lookupTopicLibrary + '_genre')
@@ -2763,29 +2745,29 @@ def get_deleteStatus(itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIs
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prep_MOVIEoutput(item):
+def prepare_MOVIEoutput(item):
 
-    if not (does_key_exist(item,'Type')):
+    if not ('Type' in item):
         item['Type']='Movie'
-    if not (does_key_exist(item,'Name')):
+    if not ('Name' in item):
         item['Name']='Unknown'
-    if not (does_key_exist(item,'Studios')):
+    if not ('Studios' in item):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
-    if not (does_key_exist(item['Studios'],0)):
+    if not (0 in item['Studios']):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
-    if not (does_key_exist(item['Studios'][0],'Name')):
+    if not ('Name' in item['Studios'][0]):
         item['Studios'][0]={'Name':'Unknown'}
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
     else:
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='Unplayed'
-    if not (does_key_exist(item,'DateCreated')):
+    if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
-    if not (does_key_exist(item,'Id')):
+    if not ('Id' in item):
         item['item']='Unknown'
 
     return item
@@ -2793,29 +2775,29 @@ def prep_MOVIEoutput(item):
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prep_EPISODEoutput(item):
+def prepare_EPISODEoutput(item):
 
-    if not (does_key_exist(item,'Type')):
+    if not ('Type' in item):
         item['Type']='Episode'
-    if not (does_key_exist(item,'SeriesName')):
+    if not ('SeriesName' in item):
         item['SeriesName']='Unknown'
-    if not (does_key_exist(item,'ParentIndexNumber')):
+    if not ('ParentIndexNumber' in item):
         item['ParentIndexNumber']='??'
-    if not (does_key_exist(item,'IndexNumber')):
+    if not ('IndexNumber' in item):
         item['IndexNumber']='??'
-    if not (does_key_exist(item,'Name')):
+    if not ('Name' in item):
         item['Name']='Unknown'
-    if not (does_key_exist(item,'SeriesStudio')):
+    if not ('SeriesStudio' in item):
         item['SeriesStudio']='Unknown'
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
     else:
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='Unplayed'
-    if not (does_key_exist(item,'DateCreated')):
+    if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
-    if not (does_key_exist(item,'Id')):
+    if not ('Id' in item):
         item['item']='Unknown'
 
     return item
@@ -2823,31 +2805,31 @@ def prep_EPISODEoutput(item):
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prep_AUDIOoutput(item):
+def prepare_AUDIOoutput(item):
 
-    if not (does_key_exist(item,'Type')):
+    if not ('Type' in item):
         item['Type']='Episode'
-    if not (does_key_exist(item,'IndexNumber')):
+    if not ('IndexNumber' in item):
         item['IndexNumber']=999
-    if not (does_key_exist(item,'Name')):
+    if not ('Name' in item):
         item['Name']='Unknown'
-    if not (does_key_exist(item,'Album')):
+    if not ('Album' in item):
         item['Album']='Unknown'
-    if not (does_key_exist(item,'Artist')):
+    if not ('Artist' in item):
         item['Artist']='Unknown'
-    if not (does_key_exist(item,'Studios')):
+    if not ('Studios' in item):
         item['Studios']=[{'Name':'Unknown'}]
     if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[{'Name':'Unknown'}]
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
     else:
-        if not (does_key_exist(item['UserData'],'LastPlayedDate')):
+        if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='Unplayed'
-    if not (does_key_exist(item,'DateCreated')):
+    if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
-    if not (does_key_exist(item,'Id')):
+    if not ('Id' in item):
         item['item']='Unknown'
 
     return item
@@ -2855,8 +2837,8 @@ def prep_AUDIOoutput(item):
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prep_AUDIOBOOKoutput(item):
-    return prep_AUDIOoutput(item)
+def prepare_AUDIOBOOKoutput(item):
+    return prepare_AUDIOoutput(item)
 
 
 # get played, favorited, and tagged media items
@@ -3363,7 +3345,7 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_MOVIE_Local=True
-                                    elif ((cfg.keep_favorites_movie) and (does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                    elif ((cfg.keep_favorites_movie) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_MOVIE_Local=True
 
                                     itemisfav_MOVIE_Advanced=False
@@ -3430,11 +3412,11 @@ def get_media_items():
                                     if ((cfg.delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']] = True
 
-                                    if (does_key_exist(item['UserData'], 'Played')):
+                                    if ('Played' in item['UserData']):
 
                                         try:
                                             #Fill in the blanks
-                                            item=prep_MOVIEoutput(item)
+                                            item=prepare_MOVIEoutput(item)
 
                                             item_output_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
@@ -3804,7 +3786,7 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_EPISODE_Local=True
-                                    elif ((cfg.keep_favorites_episode) and (does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                    elif ((cfg.keep_favorites_episode) and ('UserData'in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_EPISODE_Local=True
 
                                     itemisfav_EPISODE_Advanced=False
@@ -3873,11 +3855,11 @@ def get_media_items():
                                     if ((cfg.delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
 
-                                    if (does_key_exist(item['UserData'], 'Played')):
+                                    if ('Played' in item['UserData']):
 
                                         try:
                                             #Fill in the blanks
-                                            item=prep_EPISODEoutput(item)
+                                            item=prepare_EPISODEoutput(item)
 
                                             item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
@@ -4247,7 +4229,7 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIO_Local=True
-                                    elif ((cfg.keep_favorites_audio) and (does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                    elif ((cfg.keep_favorites_audio) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIO_Local=True
 
                                     itemisfav_AUDIO_Advanced=False
@@ -4316,11 +4298,11 @@ def get_media_items():
                                     if ((cfg.delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
 
-                                    if (does_key_exist(item['UserData'], 'Played')):
+                                    if ('Played' in item['UserData']):
 
                                         try:
                                             #Fill in the blanks
-                                            item=prep_AUDIOoutput(item)
+                                            item=prepare_AUDIOoutput(item)
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
                                                           ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
@@ -4698,7 +4680,7 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIOBOOK_Local=True
-                                    elif ((cfg.keep_favorites_audiobook) and (does_key_exist(item,'UserData')) and (does_key_exist(item['UserData'],'IsFavorite')) and (item['UserData']['IsFavorite'])):
+                                    elif ((cfg.keep_favorites_audiobook) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIOBOOK_Local=True
 
                                     itemisfav_AUDIOBOOK_Advanced=False
@@ -4767,11 +4749,11 @@ def get_media_items():
                                     if ((cfg.delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsPlayed):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
 
-                                    if (does_key_exist(item['UserData'], 'Played')):
+                                    if ('Played' in item['UserData']):
 
                                         try:
                                             #Fill in the blanks
-                                            item=prep_AUDIOBOOKoutput(item)
+                                            item=prepare_AUDIOBOOKoutput(item)
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
                                                           ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
@@ -4988,7 +4970,7 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
 
     for check_irt in check_list:
         #Check if userid exists
-        if (does_key_exist(check_irt, 'userid')):
+        if ('userid' in check_irt):
             #Set user tracker to zero
             user_found=0
             #Check user from user_keys is also a user in this blacklist/whitelist
@@ -5023,7 +5005,7 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
                     networkpath_found=0
                     path_found=0
                     #Check if this num_element exists before proceeding
-                    if (does_key_exist(check_irt, num_elements)):
+                    if (num_elements in check_irt):
                         for libinfo in check_irt[num_elements]:
                             if (libinfo == 'libid'):
                                 libid_found += 1
