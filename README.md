@@ -1,13 +1,13 @@
 # Script
 ## media_cleaner.py
-This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
+This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media items played past the configured number of days.
 
 # Configuration
 ## media_cleaner_config.py
 The first time you run the script it will attempt to create the config file by asking a handful of questions.
 ## media_cleaner_config_defaults.py
-Customize your default values before running the script for the first time.
-## Configuration Contents
+_**Optional:**_ Before running the script for the first time; edit ```media_cleaner_config_defaults.py``` to customize the default values used to create ```media_cleaner_config.py```.
+## Contents Of The Configuration File
 
 #### Media will be deleted once it has been played the configured number of days ago:
 ```python
@@ -333,20 +333,34 @@ DEBUG=False
 #
 # Requirements
 * Linux or Windows
-* Mac (probably works but do not have a Mac to confirm)
-* Python 3.10 (other versions of python 3.x will likely work; but are not supported)
-* python-dateutil \*must be installed\*
+   - Mac - I do not have a Mac to confirm
+   - If someone has confirmed this works on Mac, let me know and I will update this.
+* Python 3.10
+   - Other versions of python 3.x will likely work; but are not supported
+* python-dateutil \***must** be installed\*
 * media_cleaner_config_defaults.py **\*new\***
-* Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+* Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
-# Priorities (Lower Number == Higher Priority)
-1. Played State (At least x1 monitored user must have played the media item before it will be deleted)<sup>1</sup>
-2. Favorite & Whitetag (Blacktag ignored, Whitelist ignored, and Blacklist ignored) *[media item will be kept]*
-3. Blacktag (Whitelist ignored and Blacklist ignored) *[media item will be deleted]*
-4. Whitelist (Blacklist ignored) *[media item will be kept]*
-5. Blacklist (Lowest priority) *[media item will be deleted]*
+# Delete Or Keep Priorities Of A Played Media Item
 
-<sup>1</sup> If max_age_* is enabled the media item's Creation Date is used; Played State is ignored
+At least one monitored user must have played the media item before it will be considered for deletion.<sup>1</sup>
+
+1. **Favorites & Whitetags** (Highest Priority)
+   - *media item will be kept*
+      - Blacktags ignored
+      - Whitelists ignored
+      - Blacklists ignored
+2. **Blacktags**
+   - *media item will be deleted*
+      - Whitelists ignored
+      - Blacklists ignored
+3. **Whitelists**
+   - *media item will be kept*
+      - Blacklists ignored
+4. **Blacklists** (Lowest priority)
+   - *media item will be deleted*
+
+<sup>1</sup> If max_age_* is enabled the media item's 'Creation Date' is used and its 'Played State' is ignored.
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
@@ -358,14 +372,18 @@ DEBUG=False
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18)
 
 # First Run (Debian, Ubuntu, and Linux Mint)
+* Install Python version mentioned in the 'Requirements' section above
+   - If this version of Python is not installed do NOT overwrite the OS default Python version
+   - Instead use the link below to create an alternate install of Python
+      - [Python 3.7.x example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
 * **\*OPTIONAL\*** Update the media_cleaner_config_defaults.py file with desired default values
    - $```nano /path/to/media_cleaner_config_defaults.py```
 * Make the script executable
    - $```chmod +x /path/to/media_cleaner.py```
 * Run the script
    - $```/path/to/python3.x /path/to/media_cleaner.py```
-* First time the script is run it will walk you through building the media_cleaner_config.py file
-* You may get the below python error if the python-dateutil module is not installed
+* First time the script is run, it will walk through building the media_cleaner_config.py file
+* The below python error may be generated if the python-dateutil module is not installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
 * The python-dateutil module can be installed with the following commands:
    - $```sudo apt-get update```
@@ -373,17 +391,20 @@ DEBUG=False
    - $```sudo apt-get install python3-pip -y```
    - $```pip3 install -U pip```
    - $```pip3 install python-dateutil```
-* For other operating systems
-   - Please consult Google
 
-# Scheduled Run Using Crontab
+# First Run (Other Operating Systems)
+* Please consult your favorite search engine
+
+# Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
 * Below cron entry runs script everyday at 00:00hrs (aka 12AM)
    - $```0 0 * * * /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py```
 * Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
    - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
 
+# Schedule To Run (Other Operating Systems)
+* Please consult your favorite search engine
 
 # Donation
-If you find this script useful and you would like to show your support, please consider the option below.
+If you find this script useful and would like to show support, please consider the option below.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
