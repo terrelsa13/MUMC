@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.27.Beta'
+    Version='2.0.28.Beta'
 
     return(Version)
 
@@ -1006,7 +1006,7 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
 def generate_edit_config(cfg,updateConfig):
 
     print('-----------------------------------------------------------')
-    print('Script Verion: ' + get_script_version())
+    print('Version: ' + get_script_version())
 
     if not (updateConfig):
         print('-----------------------------------------------------------')
@@ -1233,6 +1233,19 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "REMOVE_FILES=False\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Decide the minimum number of episodes to remain in all tv series'\n"
+    config_file += "# Keeping one or more epsiodes for each series allows the \"Next Up\"\n"
+    config_file += "#  functionality to notify user(s) when a new episode for a series\n"
+    config_file += "#  is available\n"
+    config_file += "#  0 - Episodes will be deleted as they are watched\n"
+    config_file += "#  1-730500 - All but the latest selected number of episodes will be deleted as they are watched\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "minimum_number_episodes=" + str(get_default_config_values('minimum_number_episodes')) + "\n"
+    elif (updateConfig):
+        config_file += "minimum_number_episodes=" + str(cfg.minimum_number_episodes) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -2544,6 +2557,56 @@ def get_isAUDIOBOOK_AdvancedFav(item,user_key,itemType):
     return get_isAUDIO_AdvancedFav(item,user_key,itemType)
 
 
+#get series item info from episode
+def get_SERIES_itemInfo(episode,user_key):
+
+    series_item_info={}
+
+### Series ########################################################################################
+
+    if ('SeriesId' in episode):
+        series_item_info = get_ADDITIONAL_itemInfo(user_key,episode['SeriesId'],'series_info')
+
+    elif ('SeasonId' in episode):
+        season_item_info = get_ADDITIONAL_itemInfo(user_key,episode['SeasonId'],'season_info')
+
+        if ('SeriesId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['SeriesId'],'series_info')
+
+        elif ('ParentId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
+
+    elif ('ParentId' in episode):
+        season_item_info = get_ADDITIONAL_itemInfo(user_key,episode['ParentId'],'season_info')
+
+        if ('SeriesId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['SeriesId'],'series_info')
+
+        elif ('ParentId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
+
+### End Series ####################################################################################
+
+    return series_item_info
+
+
+# get number of additional episodes needing to be kept
+def get_EPISODES_toKeep(series_item_info):
+
+    minimum_number_episodes=cfg.minimum_number_episodes
+
+    unplayed_episode_count = int(series_item_info['UserData']['UnplayedItemCount'])
+    total_episode_count = int(series_item_info['RecursiveItemCount'])
+
+    additional_episodes_to_keep=0
+    if (unplayed_episode_count < minimum_number_episodes):
+        additional_episodes_to_keep = minimum_number_episodes - unplayed_episode_count
+        if (total_episode_count < additional_episodes_to_keep):
+            additional_episodes_to_keep = total_episode_count
+
+    return additional_episodes_to_keep
+
+
 #Handle favorites across multiple users
 def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
     deleteIndexes=[]
@@ -2606,6 +2669,62 @@ def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
             print(deleteIndexes)
             print2json(deleteItems)
             exit(0)
+
+    return(deleteItems)
+
+
+# Determine episodes to be removed from deletion list to keep mininum number
+def get_minEpisodesToKeep(min_episodesToKeep,deleteItems):
+
+    minimum_number_episodes = cfg.minimum_number_episodes
+
+    #Check if enabled
+    if (minimum_number_episodes):
+        #loop thru each series in min_episodesToKeep
+        for seriesId in min_episodesToKeep:
+            #loop thru each episode item in deleteItems
+            for deleteItem in deleteItems:
+                #check if series Ids match
+                if (deleteItem['SeriesId'] == seriesId):
+                    #loop thru episodes in season
+                    for episodeId in min_episodesToKeep[seriesId]:
+                        #check if media item Id matches
+                        if (deleteItem['Id'] == episodeId):
+                            season_episode_keep={}
+                            season_episode_keep['seasonNum']=deleteItem['ParentIndexNumber']
+                            season_episode_keep['episodeNum']=deleteItem['IndexNumber']
+                            season_episode_keep['toKeep']=min_episodesToKeep[seriesId][episodeId]
+                            min_episodesToKeep[seriesId][episodeId]=season_episode_keep
+
+            seasonTracking=[]
+            episodeTracking=[]
+            
+            for episodeId in min_episodesToKeep[seriesId]:
+                seasonTracking.append(min_episodesToKeep[seriesId][episodeId]['seasonNum'])
+                episodeTracking.append(min_episodesToKeep[seriesId][episodeId]['episodeNum'])
+
+            season_episode_grid=[[''] * ((max(episodeTracking) - min(episodeTracking)) + 2) for x in range((max(seasonTracking) - min(seasonTracking)) + 2)]
+
+            for episodeId in min_episodesToKeep[seriesId]:
+                if (min_episodesToKeep[seriesId][episodeId]['toKeep']):
+                    toKeep=min_episodesToKeep[seriesId][episodeId]['toKeep']
+                    season_episode_grid[min_episodesToKeep[seriesId][episodeId]['seasonNum'] - (min(seasonTracking) - 1)][min_episodesToKeep[seriesId][episodeId]['episodeNum'] - (min(episodeTracking) - 1)]=episodeId
+
+            deleteIndexes=[]
+
+            for seasonNum in range(len(season_episode_grid)):
+                for episodeNum in range(len(season_episode_grid[seasonNum])):
+                    if not (season_episode_grid[seasonNum][episodeNum] == ''):
+                        for deleteItem in deleteItems:
+                            if (deleteItem['Id'] == season_episode_grid[seasonNum][episodeNum]):
+                                deleteIndexes.append(deleteItems.index(deleteItem))
+
+            deleteIndexes.sort(reverse = True)
+
+            for removeItem in deleteIndexes:
+                if (toKeep):
+                    deleteItems.pop(removeItem)
+                    toKeep-=1
 
     return(deleteItems)
 
@@ -3406,6 +3525,7 @@ def get_media_items():
                                         itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],cfg.max_age_movie,max_cut_off_date_movie)
                                     else:
                                         itemIsPlayed=False
+
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -3445,6 +3565,8 @@ def get_media_items():
         if ((cfg.played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
             user_processed_itemsId=set()
+
+            min_episodesToKeep=defaultdict(dict)
 
             currentSubPosition=0
 
@@ -3812,6 +3934,15 @@ def get_media_items():
                                             itemIsWhiteTagged=True
                                             episode_whitetag_list.append(item['Id'])
 
+                                    if (cfg.minimum_number_episodes):
+                                        #determine minimum number of additional episodes to keep for its series
+                                        series_info = get_SERIES_itemInfo(item,user_key)
+                                        if (series_info):
+                                            if not (item['Id'] in min_episodesToKeep[series_info['Id']]):
+                                                if not ('SeriesId' in item):
+                                                    item['SeriesId']=series_info['Id']
+                                                min_episodesToKeep[series_info['Id']][item['Id']]=get_EPISODES_toKeep(series_info)
+
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
                                         itemIsBlackTagged=True
@@ -3849,6 +3980,7 @@ def get_media_items():
                                         itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],cfg.max_age_episode,max_cut_off_date_episode)
                                     else:
                                         itemIsPlayed=False
+
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -4292,6 +4424,7 @@ def get_media_items():
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],cfg.max_age_audio,max_cut_off_date_audio)
                                     else:
                                         itemIsPlayed=False
+
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -4743,6 +4876,7 @@ def get_media_items():
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],cfg.max_age_audiobook,max_cut_off_date_audiobook)
                                     else:
                                         itemIsPlayed=False
+
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
@@ -4796,19 +4930,22 @@ def get_media_items():
     if (cfg.server_brand == 'jellyfin'):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
-    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if (cfg.server_brand == 'jellyfin'):
-        deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
-
     #When whitetagged; Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
     if (cfg.server_brand == 'jellyfin'):
         deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
+
+    #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
+    deleteItems=get_minEpisodesToKeep(min_episodesToKeep, deleteItems)
+
+    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
+    deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
+    deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
+    if (cfg.server_brand == 'jellyfin'):
+        deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.isblacktag_and_watched_byUserId_*
     deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
@@ -4837,22 +4974,6 @@ def get_media_items():
         print('-----------------------------------------------------------')
         print('')
         print('isfav_MOVIE: ')
-        print(movie_whitelists)
-        print('')
-        print('isfav_EPISODE: ')
-        print(episode_whitelists)
-        print('')
-        print('isfav_AUDIO: ')
-        print(audio_whitelists)
-        print('')
-        if (cfg.server_brand == 'jellyfin'):
-            print('isfav_AUDIOBOOK: ')
-            print(audiobook_whitelists)
-            print('')
-
-        print('-----------------------------------------------------------')
-        print('')
-        print('isfav_MOVIE: ')
         print(movie_whitetag_list)
         print('')
         print('isfav_EPISODE: ')
@@ -4864,6 +4985,28 @@ def get_media_items():
         if (cfg.server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitetag_list)
+            print('')
+
+        print('-----------------------------------------------------------')
+        print('')
+        print('min_EPISODE_ToKeep: ')
+        print(min_episodesToKeep)
+        print('')
+
+        print('-----------------------------------------------------------')
+        print('')
+        print('isfav_MOVIE: ')
+        print(movie_whitelists)
+        print('')
+        print('isfav_EPISODE: ')
+        print(episode_whitelists)
+        print('')
+        print('isfav_AUDIO: ')
+        print(audio_whitelists)
+        print('')
+        if (cfg.server_brand == 'jellyfin'):
+            print('isfav_AUDIOBOOK: ')
+            print(audiobook_whitelists)
             print('')
 
         print('-----------------------------------------------------------')
@@ -5319,6 +5462,19 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The REMOVE_FILES variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'minimum_number_episodes'):
+        check=cfg.minimum_number_episodes
+        if (
+            not ((type(check) is int) and
+            (check >= -1) and
+            (check <= 730500))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The minimum_number_episodes variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 

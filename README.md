@@ -95,6 +95,19 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #----------------------------------------------------------#
 REMOVE_FILES=False
 ```
+#### At least this many episodes will reamain in each tv series:
+```python
+#----------------------------------------------------------#
+# Decide the minimum number of episodes to remain in all tv series'
+# Keeping one or more epsiodes for each series allows the "Next Up"
+#  functionality to notify user(s) when a new episode for a series
+#  is ready to be watched
+#  0 - Episodes will be deleted as they are watched
+#  1-730500 - All but the latest selected number of episodes will be deleted as they are watched
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_episodes=0
+```
 #### Keep movie if genre favorited:
 ```python
 #----------------------------------------------------------#
@@ -368,8 +381,11 @@ At least one monitored user must have played the media item before it will be co
 # Blacktagging vs Whitetagging
 * [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
 
+# minimum_number_episodes=#
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/21#issue-1258905586)
+
 # Library Matching By Id, By Path, or By Network Path
-* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18)
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18#issue-1217953189)
 
 # First Run (Debian, Ubuntu, and Linux Mint)
 * Install Python version mentioned in the 'Requirements' section above
