@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.28.Beta'
+    Version='2.0.29.Beta'
 
     return(Version)
 
@@ -3026,6 +3026,9 @@ def get_media_items():
     if (cfg.server_brand == 'jellyfin'):
         audiobook_whitelists=[]
 
+    #dictionary for episodes to keep to meet cfg.minimum_number_episodes
+    min_episodesToKeep=defaultdict(dict)
+
     #blacktagged items per media type according to media types metadata
     movie_blacktaglists=[]
     episode_blacktaglists=[]
@@ -3565,8 +3568,6 @@ def get_media_items():
         if ((cfg.played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
 
             user_processed_itemsId=set()
-
-            min_episodesToKeep=defaultdict(dict)
 
             currentSubPosition=0
 
