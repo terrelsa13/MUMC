@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.30.Beta'
+    Version='2.0.31.Beta'
 
     return(Version)
 
@@ -1234,6 +1234,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     config_file += "REMOVE_FILES=False\n"
     #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
     config_file += "# Decide the minimum number of episodes to remain in all tv series'\n"
     config_file += "# Keeping one or more epsiodes for each series allows the \"Next Up\"\n"
     config_file += "#  functionality to notify user(s) when a new episode for a series\n"
@@ -2685,7 +2686,7 @@ def get_minEpisodesToKeep(min_episodesToKeep,deleteItems):
             #loop thru each episode item in deleteItems
             for deleteItem in deleteItems:
                 #check if series Ids match
-                if (deleteItem['SeriesId'] == seriesId):
+                if ((deleteItem['Type'] == 'Episode') and (deleteItem['SeriesId'] == seriesId)):
                     #loop thru episodes in season
                     for episodeId in min_episodesToKeep[seriesId]:
                         #check if media item Id matches
@@ -2698,6 +2699,7 @@ def get_minEpisodesToKeep(min_episodesToKeep,deleteItems):
 
             seasonTracking=[]
             episodeTracking=[]
+            toKeep=0
             toKeepReduceBy=0
 
             for episodeId in min_episodesToKeep[seriesId]:
