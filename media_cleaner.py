@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.0.29.Beta'
+    Version='2.0.30.Beta'
 
     return(Version)
 
@@ -2698,33 +2698,43 @@ def get_minEpisodesToKeep(min_episodesToKeep,deleteItems):
 
             seasonTracking=[]
             episodeTracking=[]
-            
-            for episodeId in min_episodesToKeep[seriesId]:
-                seasonTracking.append(min_episodesToKeep[seriesId][episodeId]['seasonNum'])
-                episodeTracking.append(min_episodesToKeep[seriesId][episodeId]['episodeNum'])
-
-            season_episode_grid=[[''] * ((max(episodeTracking) - min(episodeTracking)) + 2) for x in range((max(seasonTracking) - min(seasonTracking)) + 2)]
+            toKeepReduceBy=0
 
             for episodeId in min_episodesToKeep[seriesId]:
-                if (min_episodesToKeep[seriesId][episodeId]['toKeep']):
+                if ((not (type(min_episodesToKeep[seriesId][episodeId]) is int)) and (not (type(min_episodesToKeep[seriesId][episodeId]) is int))):
                     toKeep=min_episodesToKeep[seriesId][episodeId]['toKeep']
-                    season_episode_grid[min_episodesToKeep[seriesId][episodeId]['seasonNum'] - (min(seasonTracking) - 1)][min_episodesToKeep[seriesId][episodeId]['episodeNum'] - (min(episodeTracking) - 1)]=episodeId
+                    seasonTracking.append(min_episodesToKeep[seriesId][episodeId]['seasonNum'])
+                    episodeTracking.append(min_episodesToKeep[seriesId][episodeId]['episodeNum'])
+                else:
+                    toKeepReduceBy += 1
 
-            deleteIndexes=[]
+            toKeep = toKeep - toKeepReduceBy
+            if (toKeep < 0):
+                toKeep = 0
 
-            for seasonNum in range(len(season_episode_grid)):
-                for episodeNum in range(len(season_episode_grid[seasonNum])):
-                    if not (season_episode_grid[seasonNum][episodeNum] == ''):
-                        for deleteItem in deleteItems:
-                            if (deleteItem['Id'] == season_episode_grid[seasonNum][episodeNum]):
-                                deleteIndexes.append(deleteItems.index(deleteItem))
+            if (toKeep):
+                season_episode_grid=[[''] * ((max(episodeTracking) - min(episodeTracking)) + 2) for x in range((max(seasonTracking) - min(seasonTracking)) + 2)]
 
-            deleteIndexes.sort(reverse = True)
+                for episodeId in min_episodesToKeep[seriesId]:
+                    if (min_episodesToKeep[seriesId][episodeId]['toKeep']):
+                        #toKeep=min_episodesToKeep[seriesId][episodeId]['toKeep']
+                        season_episode_grid[min_episodesToKeep[seriesId][episodeId]['seasonNum'] - (min(seasonTracking) - 1)][min_episodesToKeep[seriesId][episodeId]['episodeNum'] - (min(episodeTracking) - 1)]=episodeId
 
-            for removeItem in deleteIndexes:
-                if (toKeep):
-                    deleteItems.pop(removeItem)
-                    toKeep-=1
+                deleteIndexes=[]
+
+                for seasonNum in range(len(season_episode_grid)):
+                    for episodeNum in range(len(season_episode_grid[seasonNum])):
+                        if not (season_episode_grid[seasonNum][episodeNum] == ''):
+                            for deleteItem in deleteItems:
+                                if (deleteItem['Id'] == season_episode_grid[seasonNum][episodeNum]):
+                                    deleteIndexes.append(deleteItems.index(deleteItem))
+
+                deleteIndexes.sort(reverse = True)
+
+                for removeItem in deleteIndexes:
+                    if (toKeep):
+                        deleteItems.pop(removeItem)
+                        toKeep-=1
 
     return(deleteItems)
 
