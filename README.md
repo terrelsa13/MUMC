@@ -1,27 +1,14 @@
-# UPDATES COMING!
-
-Work has been underway to improve this script.
-
-The updated script will not be backwards compatible with the existing config file. I went back and forth on this for a while and ultimately settled on what allowed me to make these improvements quickly without it cutting into my personal life too much.
-
-Fortunately some of those improvements include entering multiple libraries for a user instead of having to do it one library at a time. This should help speed up re-building the config for most.
-
-If you want to try it out or see what the other improvement are check out [the BETA branch](https://github.com/terrelsa13/media_cleaner/tree/media_cleaner_2p0_beta).
-
-Let me know what you think!
-
-
-
-
 # Script
 ## media_cleaner.py
-This script will go through all played movies, tv episodes, videos, trailers, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media played past the configured number of days.
+This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media items played past the configured number of days.
 
 # Configuration
 ## media_cleaner_config.py
 The first time you run the script it will attempt to create the config file by asking a handful of questions.
+## media_cleaner_config_defaults.py
+_**Optional:**_ Before running the script for the first time; edit ```media_cleaner_config_defaults.py``` to customize the default values used to create ```media_cleaner_config.py```.
+## Contents Of The Configuration File
 
-## Configuration Contents
 #### Media will be deleted once it has been played the configured number of days ago:
 ```python
 #----------------------------------------------------------#
@@ -30,12 +17,10 @@ The first time you run the script it will attempt to create the config file by a
 #  -1 - to disable managing specified media type
 # (-1 : default)
 #----------------------------------------------------------#
-not_played_age_movie=-1
-not_played_age_episode=-1
-not_played_age_video=-1
-not_played_age_trailer=-1
-not_played_age_audio=-1
-not_played_age_audiobook=-1
+played_age_movie=-1
+played_age_episode=-1
+played_age_audio=-1
+played_age_audiobook=-1
 ```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
@@ -43,7 +28,7 @@ not_played_age_audiobook=-1
 # Decide if media set as a favorite should be deleted
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
-# Similar logic applies for other media types (movies, trailers, etc...)
+# Similar logic applies for other media types (movies, audio books, etc...)
 #  0 - ok to delete media items set as a favorite
 #  1 - when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
 #  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
@@ -51,54 +36,10 @@ not_played_age_audiobook=-1
 #----------------------------------------------------------#
 keep_favorites_movie=1
 keep_favorites_episode=1
-keep_favorites_video=1
-keep_favorites_trailer=1
 keep_favorites_audio=1
 keep_favorites_audiobook=1
 ```
-#### Additional options for determining if a media item should be considered marked as a favorite based on specified metadata item:
-```python
-#----------------------------------------------------------#
-# Advanced favorites configuration bitmask
-#     Requires 'keep_favorites_*=1'
-#  xxxxxxxxxA - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the track's 'artist' metadata is favorited
-#  xxxxxxxxBx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST artist listed in the tracks's 'album artist' metadata is favorited
-#  xxxxxxxCxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the tracks's metadata is favorited
-#  xxxxxxDxxx - keep_favorites_audio must be enabled; keep audio tracks based on if the FIRST genre listed in the album's metadata is favorited
-#  xxxxxExxxx - keep_favorites_episode must be enabled; keep episode based on if the FIRST genre listed in the series' metadata is favorited
-#  xxxxFxxxxx - keep_favorites_movie must be enabled; keep movie based on if the FIRST genre listed in the movie's metadata is favorited
-#  xxxGxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the track's 'artist(author)' metadata is favorited
-#  xxHxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST artist(author) listed in the tracks's 'album(book) artist(author)' metadata is favorited
-#  xIxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the tracks's metadata is favorited
-#  Jxxxxxxxxx - keep_favorites_audiobook must be enabled; keep audiobook tracks based on if the FIRST genre listed in the album's(book's) metadata is favorited
-#  0 bit - disabled
-#  1 bit - enabled
-# (0001000001 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced='0001000001'
-```
-#### Dependent on the above "advanced options", determines if only the first metadata item should be considered or all metadata items should be considered:
-```python
-#----------------------------------------------------------#
-# Advanced favorites any configuration bitmask
-#     Requires matching bit in 'keep_favorites_advanced' bitmask is enabled
-#  xxxxxxxxxa - xxxxxxxxxA must be enabled; will use ANY artists listed in the track's 'artist' metadata
-#  xxxxxxxxbx - xxxxxxxxBx must be enabled; will use ANY artists listed in the track's 'album artist' metadata
-#  xxxxxxxcxx - xxxxxxxCxx must be enabled; will use ANY genres listed in the track's metadata
-#  xxxxxxdxxx - xxxxxxDxxx must be enabled; will use ANY genres listed in the album's metadata
-#  xxxxxexxxx - xxxxxExxxx must be enabled; will use ANY genres listed in the series' metadata
-#  xxxxfxxxxx - xxxxFxxxxx must be enabled; will use ANY genres listed in the movie's metadata
-#  xxxgxxxxxx - xxxGxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'artist(author)' metadata
-#  xxhxxxxxxx - xxHxxxxxxx must be enabled; will use ANY artists(authors) listed in the track's 'album(book) artist(autor)' metadata
-#  xixxxxxxxx - xIxxxxxxxx must be enabled; will use ANY genres listed in the track's metadata
-#  jxxxxxxxxx - Jxxxxxxxxx must be enabled; will use ANY genres listed in the album's(book's) metadata
-#  0 bit - disabled
-#  1 bit - enabled
-# (0000000000 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_any='0000000000'
-```
-#### When monitoring multiple users whitelisted libraries will be treated accordingly:
+#### Option for determining if a media item should be deleted or kept based on other users whitelisted libraries:
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
@@ -108,66 +49,165 @@ keep_favorites_advanced_any='0000000000'
 #----------------------------------------------------------#
 multiuser_whitelist_movie=1
 multiuser_whitelist_episode=1
-multiuser_whitelist_video=1
-multiuser_whitelist_trailer=1
 multiuser_whitelist_audio=1
 multiuser_whitelist_audiobook=1
 ```
-#### Control if the script will request metadata only for played media items OR played and not played media items:
+#### Blacktag a media item to be deleted after it is watched:
 ```python
 #----------------------------------------------------------#
-#  0 - Request metadata only for played media items in monitored libraries
-#   When single user, script will complete faster, no downside
-#   When multiple users, script will complete faster BUT...
-#   The script will only be able to keep a media item when a user has set it as a favorite and has played it
-#  1 - Request metadata for played and not played media items in monitored libraries
-#   When single user, script will complete slower, slower is the downside
-#   When multiple users, script will complete slower BUT...
-#   The script is able to keep a media item when a user has set it as a favortie but has not played it
-# (1 : default)
+# User entered blacktag name; chosen during setup
+#  Use a comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
 #----------------------------------------------------------#
-request_not_played=1
+blacktag='black_tagname,black_tag name,black_tag-name'
 ```
-#### Allows the script to be run without deleting media (i.e. for testing and setup); Set to 1 when ready for "production":
+#### When enabled, blacktagged media will not be deleted until ALL users have watched it:
 ```python
 #----------------------------------------------------------#
-# 0 - Disable the ability to delete media (dry run mode)
-# 1 - Enable the ability to delete media
+# Decide when blacktagged media items are deleted
+#  0 - ok to delete blacktagged media item after ANY monitored user has watched it
+#  1 - ok to delete blacktagged media item after ALL monitored users have watched it
 # (0 : default)
 #----------------------------------------------------------#
-remove_files=0
+delete_blacktagged_movie=0
+delete_blacktagged_episode=0
+delete_blacktagged_audio=0
+delete_blacktagged_audiobook=0
 ```
-#### Allows adding new users and their associated libraries to the existing config without deleting it; Set to 'FALSE' when ready for "production":
+#### Whitetag a media item to be kept after it is watched:
 ```python
 #----------------------------------------------------------#
-# Used to add new users to the existing media_cleaner_config.py file; must be string with UPPERCASE letters
-# Does not show existing users in the choice list; but existing users can be updated if you know their position
-#  FALSE - Operate as configured
-#  TRUE  - Allow adding new users to existing config; will NOT delete media items
-# (FALSE : default)
+# User entered whitetag name; chosen during setup
+#  Use a comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
 #----------------------------------------------------------#
-UPDATE_CONFIG='FALSE'
+whitetag='white_tagname,white_tag name,white_tag-name'
 ```
-#### When enabled, media items will be deleted based on DateCreated; played state will be ignored:
+#### Deleting media items is disabled by default:
+```python
+#----------------------------------------------------------#
+# Must be a boolean True or False value
+#  False - Disables the ability to delete media (dry run mode)
+#  True - Enable the ability to delete media
+# (False : default)
+#----------------------------------------------------------#
+REMOVE_FILES=False
+```
+#### At least this many episodes will reamain in each tv series:
+```python
+#----------------------------------------------------------#
+# Decide the minimum number of episodes to remain in all tv series'
+# Keeping one or more epsiodes for each series allows the "Next Up"
+#  functionality to notify user(s) when a new episode for a series
+#  is ready to be watched
+#  0 - Episodes will be deleted as they are watched
+#  1-730500 - All but the latest selected number of episodes will be deleted as they are watched
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_episodes=0
+```
+#### Keep movie if genre favorited:
+```python
+#----------------------------------------------------------#
+# Advanced movie genre configurations
+#     Requires 'keep_favorites_movie=1'
+#----------------------------------------------------------#
+#  Keep movie based on the genres
+#  0 - ok to delete movie when genres are set as a favorite
+#  1 - keep movie if FIRST genre listed is set as a favorite
+#  2 - keep movie if ANY genre listed is set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_movie_genre=0
+keep_favorites_advanced_movie_library_genre=0
+```
+#### Keep episode if genre or studio-network favorited:
+```python
+#----------------------------------------------------------#
+# Advanced episode genre/studio-network configurations
+#     Requires 'keep_favorites_episode=1'
+#----------------------------------------------------------#
+#  Keep episode based on the genre(s) or studio-network(s)
+#  0 - ok to delete episode when its genres or studio-networks are set as a favorite
+#  1 - keep episode if FIRST genre or studio-network is set as a favorite
+#  2 - keep episode if ANY genres or studio-networks are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_episode_genre=0
+keep_favorites_advanced_season_genre=0
+keep_favorites_advanced_series_genre=0
+keep_favorites_advanced_tv_library_genre=0
+keep_favorites_advanced_tv_studio_network=0
+keep_favorites_advanced_tv_studio_network_genre=0
+```
+#### Keep track if genre or artist favorited:
+```python
+#----------------------------------------------------------#
+# Advanced track genre/artist configurations
+#     Requires 'keep_favorites_audio=1'
+#----------------------------------------------------------#
+#  Keep track based on the genre(s) or artist(s)
+#  0 - ok to delete track when its genres or artists are set as a favorite
+#  1 - keep track if FIRST genre or artist is set as a favorite
+#  2 - keep track if ANY genres or artists are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_track_genre=0
+keep_favorites_advanced_album_genre=0
+keep_favorites_advanced_music_library_genre=0
+keep_favorites_advanced_track_artist=0
+keep_favorites_advanced_album_artist=0
+```
+#### Keep audio book track if genre or author favorited:
+```python
+#----------------------------------------------------------#
+# Advanced audio book track genre/author configurations
+#     Requires 'keep_favorites_audiobook=1'
+#----------------------------------------------------------#
+#  Keep audio book track based on the genres or authors
+#  0 - ok to delete audio book track when its genres or authors are set as a favorite
+#  1 - keep audio book track if FIRST genre or author is set as a favorite
+#  2 - keep audio book track if ANY genres or authors are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+keep_favorites_advanced_audio_book_track_genre=0
+keep_favorites_advanced_audio_book_genre=0
+keep_favorites_advanced_audio_book_library_genre=0
+keep_favorites_advanced_audio_book_track_author=0
+keep_favorites_advanced_audio_book_author=0
+```
+#### Edit user to library assocations using current config
+```python
+#----------------------------------------------------------#
+# Set to True to add new users or edit existing users
+# Must be a boolean True or False value
+#  False - Operate normally
+#  True  - Enable configuration editor mode; will NOT delete media items
+#           Resets to dry run mode (REMOVE_FILES=False)
+# (False : default)
+#----------------------------------------------------------#
+UPDATE_CONFIG=False
+```
+#### !!!CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
 #----------------------------------------------------------#
 # CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
 # Do NOT enable any max_age_xyz options unless you know what you are doing
 # Use at your own risk; You alone are responsible for your actions
 # Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
-# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding not_played_age_xyz
+# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding played_age_xyz
 #   0-730500 - number of days to wait before deleting "old" media
 #  -1 - to disable managing max age of specified media type
 # (-1 : default)
 #----------------------------------------------------------#
 max_age_movie=-1
 max_age_episode=-1
-max_age_video=-1
-max_age_trailer=-1
 max_age_audio=-1
 max_age_audiobook=-1
 ```
-#### When enabled, favorited media items will not be deleted using the corresponding max_age_xyz:
+#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
@@ -177,13 +217,12 @@ max_age_audiobook=-1
 #----------------------------------------------------------#
 max_keep_favorites_movie=1
 max_keep_favorites_episode=1
-max_keep_favorites_video=1
-max_keep_favorites_trailer=1
 max_keep_favorites_audio=1
 max_keep_favorites_audiobook=1
 ```
 
-#### Created first time the script runs; Do **_NOT_** edit or modify these:
+### Created first time the script runs; Do **_NOT_** edit or modify these:
+#### Needed for differences between Emby and Jellyfin?
 ```python
 #------------DO NOT MODIFY BELOW---------------------------#
 
@@ -193,114 +232,195 @@ max_keep_favorites_audiobook=1
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
 server_brand='serverbrand'
-
+```
+#### Full URL of media server
+```python
 #----------------------------------------------------------#
 # Server URL; created during setup
 #----------------------------------------------------------#
 server_url='http://localhost.abc:8096/basename'
-
+```
+#### Server authentication key
+```python
 #----------------------------------------------------------#
-# Admin username; chosen during setup
+# Authentication Key; requested from server during setup
+#  Used for API queries sent to the server
+#  Also know as an Access Token
 #----------------------------------------------------------#
-admin_username='username'
-
+auth_key='0123456789abcdef0123456789abcdef'
+```
+#### How were libraries selected during setup?
+```python
 #----------------------------------------------------------#
-# Access token; requested from server during setup
-#----------------------------------------------------------#
-access_token='0123456789abcdef0123456789abcdef'
-
-#----------------------------------------------------------#
-# Script setup to use the whitelisting method or the blacklistling method; chosen during setup
-#  Only used when run with UPDATE_CONFIG='TRUE'
-# 'whitelist' - Script setup to store whitelisted libraries
-# 'blacklist' - Script setup to store blacklisted libraries
+# Decide how the script will use the libraries chosen for each user
+#  Only used during creation or editing of the configuration file
+#  0 - blacklist - Chosen libraries will blacklisted
+#                  All other libraries will be whitelisted
+#  1 - whitelist - Chosen libraries will whitelisted
+#                  All other libraries will be blacklisted
+# (blacklist : default)
 #----------------------------------------------------------#
 script_behavior='abclist'
-
+```
+```python
 #----------------------------------------------------------#
-# User key(s) of account(s) to monitor media items; chosen during setup
+# Decide how the script will match media items to the blacklisted and whiteliested libraries
+#  0 - byId - Media items will be matched to libraries using 'LibraryIds'
+#  1 - byPath - Media items will be matched to libraries using 'Paths'
+#  2 - byNetworkPath - Media items will be matched to libraries using 'NetworkPaths'
+# (byId : default)
+#----------------------------------------------------------#
+library_matching_behavior='byAbc'
+```
+#### UserId for each monitored user
+```python
+#----------------------------------------------------------#
+# User key(s) of monitored account(s); chosen during setup
+# The order of the keys here must match the order of the keys
+#  in user_bl_libs and user_wl_libs
 #----------------------------------------------------------#
 user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
-
-#----------------------------------------------------------#
-
-#----------------------------------------------------------#
-# User blacklisted libraries of corresponding user account(s) to monitor media items; chosen during setup
-#----------------------------------------------------------#
-user_bl_libs='["/some/path/0,/some/path/1,/some/path/2", "/some/path/1,/some/path/2,/some/path/3", "/some/path/x,/some/path/etc..."]'
-
-#----------------------------------------------------------#
-# User whitelisted libraries of corresponding user account(s) to exclude monitoring media items; chosen during setup
-#----------------------------------------------------------#
-user_wl_libs='["/some/path/4,/some/path/5,/some/path/6", "/some/path/5,/some/path/6,/some/path/7", "/some/path/y,/some/path/etc..."]'
-
-#----------------------------------------------------------#
-# API request attempts; number of times to retry an API request
-#  delay between initial attempt and the first retry is 1 second
-#  the delay will double with each attempt after the first retry
-#  Delay between the orginal request and retry 1 is (2^0) 1 second
-#  Delay between retry 1 and retry 2 is (2^1) 2 seconds
-#  Delay between retry 2 and retry 3 is (2^2) 4 seconds
-#  Delay between retry 3 and retry 4 is (2^3) 8 seconds
-#  Delay between retry 4 and retry 5 is (2^4) 16 seconds
-#  Delay between retry 5 and retry 6 is (2^5) 32 seconds
-#  ...
-#  Delay between retry 15 and retry 16 is (2^15) 32768 seconds
-#  0-16 - number of retry attempts
-#  (6 : default)
-#----------------------------------------------------------#
-api_request_attempts=6
-
-#----------------------------------------------------------#
-# API return limit; large libraries sometimes cannot return all of the media metadata items in a single API call
-#  This is especially true when using the max_age_xyz or return_not_played options; both require every item of the specified media type send its metadata
-#  1-10000 - number of media metadata items the server will return for each API call for media item metadata; ALL queried items will be processed regardless of this value
-#  (100 : default)
-#----------------------------------------------------------#
-api_return_limit=100
-
-#----------------------------------------------------------#
-# 0 - Debug messages disabled
-# 1 - Debug messages enabled
-# (0 : default)
-#----------------------------------------------------------#
-DEBUG=0
 ```
-
-# Usage
-Make ```media_cleaner.py``` executable and run ```python3.x /path/to/media_cleaner.py```.  If no ```media_cleaner_conifg.py``` file is found the script will query for the information needed to create one.  After the config is created, run the script again to view files that will be deleted.
-
+#### Blacklisted library information
+```python
+#----------------------------------------------------------#
+# Blacklisted libraries with corresponding user keys(s)
+# These libraries are typically searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
+user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00112233445566778899aabbccddeeff", "collectiontype": "abc", "networkpath": "smb://some/netpath/0", "path": "/some/path/0"}, "#": {"libid": "aabbccddeeff00112233445566778899", "collectiontype": "def", "networkpath": "smb://some/netpath/1", "path": "/some/path/1"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+```
+#### Whitelisted library information
+```python
+#----------------------------------------------------------#
+# Whitelisted libraries with corresponding user keys(s)
+# These libraries are typically not searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
+user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+```
+#### Number of times to send an API query before giving up
+```python
+#----------------------------------------------------------#
+# API query attempts
+# Number of times to retry an API request
+#  Delay between initial attempt and the first retry is 1 second
+#  The delay will double with each attempt after the first retry
+#  Delay between the orginal request and retry #1 is (2^0) 1 second
+#  Delay between retry #1 and retry #2 is (2^1) 2 seconds
+#  Delay between retry #2 and retry #3 is (2^2) 4 seconds
+#  Delay between retry #3 and retry #4 is (2^3) 8 seconds
+#  Delay between retry #4 and retry #5 is (2^4) 16 seconds
+#  Delay between retry #5 and retry #6 is (2^5) 32 seconds
+#  ...
+#  Delay between retry #15 and retry #16 is (2^15) 32768 seconds
+#  0-16 - number of retry attempts
+#  (4 : default)
+#----------------------------------------------------------#
+api_query_attempts=4
+```
+#### Throttle how aggressively the script sends queries
+```python
+#----------------------------------------------------------#
+# API query item limit
+# To keep the server running smoothly we do not want it to return a
+#  large amount of metadata from a single API query
+# If the server lags or bogs down when this script runs try lowering
+#  this value to allow the server to return smaller amounts of data
+# ALL media items and their metadata are processed regardless of this value
+#  1-10000 - maximum number of media items the server will return for each API query
+#  (50 : default)
+#----------------------------------------------------------#
+api_query_item_limit=50
+```
+#### DEBUG
+```python
+#----------------------------------------------------------#
+# Must be a boolean True or False value
+# False - Debug messages disabled
+# True - Debug messages enabled
+# (False : default)
+#----------------------------------------------------------#
+DEBUG=False
+```
+#
 # Requirements
 * Linux or Windows
-* Mac (probably works but do not have a Mac to confirm)
-* python3.x
-* python-dateutil
-* Emby/Jellyfin need to have permissions to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+   - Mac - I do not have a Mac to confirm
+   - If someone has confirmed this works on Mac, let me know and I will update this.
+* Python 3.10
+   - Other versions of python 3.x will likely work; but are not supported
+* python-dateutil \***must** be installed\*
+* media_cleaner_config_defaults.py **\*new\***
+* Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+
+# Delete Or Keep Priorities Of A Played Media Item
+
+At least one monitored user must have played the media item before it will be considered for deletion.<sup>1</sup>
+
+1. **Favorites & Whitetags** (Highest Priority)
+   - *media item will be kept*
+      - Blacktags ignored
+      - Whitelists ignored
+      - Blacklists ignored
+2. **Blacktags**
+   - *media item will be deleted*
+      - Whitelists ignored
+      - Blacklists ignored
+3. **Whitelists**
+   - *media item will be kept*
+      - Blacklists ignored
+4. **Blacklists** (Lowest priority)
+   - *media item will be deleted*
+
+<sup>1</sup> If max_age_* is enabled the media item's 'Creation Date' is used and its 'Played State' is ignored.
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
 
-# First Run
-* $```/path/to/python3.x /path/to/media_cleaner.py```
-* You may get the below python error if the python-dateutil module is not installed
-   - ModuleNotFoundError: No module named 'dateutil' python-dateutil
-* For Debian/Ubuntu/Linux Mint type systems you can install the python-dateutil module with the following commands:
+# Blacktagging vs Whitetagging
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
+
+# minimum_number_episodes=#
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/21#issue-1258905586)
+
+# Library Matching By Id, By Path, or By Network Path
+* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18#issue-1217953189)
+
+# First Run (Debian, Ubuntu, and Linux Mint)
+* Install Python version mentioned in the 'Requirements' section above
+   - If this version of Python is not installed do NOT overwrite the OS default Python version
+   - Instead use the link below to create an alternate install of Python
+      - [Python 3.7.x example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
+* **\*OPTIONAL\*** Update the media_cleaner_config_defaults.py file with desired default values
+   - $```nano /path/to/media_cleaner_config_defaults.py```
+* Make the script executable
+   - $```chmod +x /path/to/media_cleaner.py```
+* Run the script
+   - $```/path/to/python3.x /path/to/media_cleaner.py```
+* First time the script is run, it will walk through building the media_cleaner_config.py file
+* The below python error may be generated if the python-dateutil module is not installed
+   - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
+* The python-dateutil module can be installed with the following commands:
    - $```sudo apt-get update```
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
-   - $```sudo pip3 install -U pip```
-   - $```sudo pip3 install python-dateutil```
-* For other operating systems
-   - Please consult Google
+   - $```pip3 install -U pip```
+   - $```pip3 install python-dateutil```
 
-# Scheduled Run Using Crontab
+# First Run (Other Operating Systems)
+* Please consult your favorite search engine
+
+# Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
 * Below cron entry runs script everyday at 00:00hrs (aka 12AM)
-   - $```0 0 * * * /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py```
+   - $```0 0 * * * /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py```
 * Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
-   - $```23 1 * * 1 /usr/local/bin/python3.8 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
+   - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
 
+# Schedule To Run (Other Operating Systems)
+* Please consult your favorite search engine
 
 # Donation
-If you find this script useful and you would like to show your support, please consider the option below.
+If you find this script useful and would like to show support, please consider the option below.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
