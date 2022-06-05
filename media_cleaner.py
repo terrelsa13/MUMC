@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.0'
+    Version='2.1.1'
 
     return(Version)
 
@@ -1235,6 +1235,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "REMOVE_FILES=False\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide the minimum number of episodes to remain in all tv series'\n"
     config_file += "# Keeping one or more epsiodes for each series allows the \"Next Up\"\n"
     config_file += "#  functionality to notify user(s) when a new episode for a series\n"
