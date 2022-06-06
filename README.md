@@ -289,11 +289,11 @@ library_matching_behavior='byAbc'
 #### UserId for each monitored user
 ```python
 #----------------------------------------------------------#
-# User key(s) of monitored account(s); chosen during setup
-# The order of the keys here must match the order of the keys
+# User name(s) and user key(s) of monitored account(s); chosen during setup
+# The order of the names:keys here must match the order of the names:keys
 #  in user_bl_libs and user_wl_libs
 #----------------------------------------------------------#
-user_keys='["abcdef0123456789abcdef0123456789", "fedcba9876543210fedcba9876543210", "9876543210fedcba9876543210fedcba", "etc..."]'
+user_keys='["user1:abcdef0123456789abcdef0123456789", "user2:fedcba9876543210fedcba9876543210", "user3:9876543210fedcba9876543210fedcba", "etc..."]'
 ```
 #### Blacklisted library information
 ```python
