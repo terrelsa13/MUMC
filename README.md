@@ -268,14 +268,15 @@ auth_key='0123456789abcdef0123456789abcdef'
 #----------------------------------------------------------#
 # Decide how the script will use the libraries chosen for each user
 #  Only used during creation or editing of the configuration file
-#  0 - blacklist - Chosen libraries will blacklisted
+#  0 - blacklist - Chosen libraries will be blacklisted
 #                  All other libraries will be whitelisted
-#  1 - whitelist - Chosen libraries will whitelisted
+#  1 - whitelist - Chosen libraries will be whitelisted
 #                  All other libraries will be blacklisted
 # (blacklist : default)
 #----------------------------------------------------------#
 script_behavior='abclist'
 ```
+#### How will media items be matched to their respective libraries?
 ```python
 #----------------------------------------------------------#
 # Decide how the script will match media items to the blacklisted and whiteliested libraries
@@ -363,7 +364,8 @@ DEBUG=False
    - Mac - I do not have a Mac to confirm
    - If someone has confirmed this works on Mac, let me know and I will update this.
 * Python 3.10
-   - Other versions of python 3.x will likely work; but are not supported
+   - Older versions of python 3.x will likely work; but are not supported
+   - Python 2.x or earlier are not supported and will not work
 * python-dateutil \***must** be installed\*
 * media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
