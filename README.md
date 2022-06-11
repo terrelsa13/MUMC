@@ -389,7 +389,7 @@ At least one monitored user must have played the media item before it will be co
 4. **Blacklists** (Lowest priority)
    - *media item will be deleted*
 
-<sup>1</sup> If max_age_* is enabled the media item's 'Creation Date' is used and its 'Played State' is ignored.
+<sup>1</sup> If max_age_* is enabled both the media item's 'Creation Date' and 'Played State' are used.
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
