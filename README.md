@@ -4,7 +4,7 @@
 * If you are running an unversioned script or a version before version 2.1.0 you will need to do the following:
    - Renaming the current media_cleaner folder
    - Create a new media_cleaner folder
-   - Downloading the updated version of the script into the new folder
+   - Download the updated version of the script into the new folder
    - [Manually run the script](https://github.com/terrelsa13/media_cleaner#first-run-debian-ubuntu-and-linux-mint) the first time to allow it to rebuild the config file
    - Make any manual changes to the config that are needed
    - Verify script runs as desired
