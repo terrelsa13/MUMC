@@ -12,6 +12,7 @@ def get_default_config_values(config_value):
 
         #'example_number_config':0
         #'example_string_config':'abc'
+        #'example_boolean_config':True
 
         'played_age_movie':-1,
         'played_age_episode':-1,
@@ -54,7 +55,6 @@ def get_default_config_values(config_value):
         'keep_favorites_advanced_music_library_genre':0,
         'keep_favorites_advanced_track_artist':0,
         'keep_favorites_advanced_album_artist':0,
-        'keep_favorites_advanced_music_library_artist':0,
 
         'keep_favorites_advanced_audio_book_track_genre':0,
         'keep_favorites_advanced_audio_book_genre':0,
@@ -62,6 +62,27 @@ def get_default_config_values(config_value):
         'keep_favorites_advanced_audio_book_track_author':0,
         'keep_favorites_advanced_audio_book_author':0,
         'keep_favorites_advanced_audio_book_library_author':0,
+
+        'print_script_header':True,
+        'print_warnings':True,
+        'print_user_header':True,
+        'print_movie_delete_info':True,
+        'print_movie_keep_info':True,
+        'print_movie_error_info':True,
+        'print_episode_delete_info':True,
+        'print_episode_keep_info':True,
+        'print_episode_error_info':True,
+        'print_audio_delete_info':True,
+        'print_audio_keep_info':True,
+        'print_audio_error_info':True,
+        'print_audiobook_delete_info':True,
+        'print_audiobook_keep_info':True,
+        'print_audiobook_error_info':True,
+        'print_summary_header':True,
+        'print_movie_summary':True,
+        'print_episode_summary':True,
+        'print_audio_summary':True,
+        'print_audiobook_summary':True
 
     }
 

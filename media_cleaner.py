@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.1'
+    Version='2.1.2'
 
     return(Version)
 
@@ -1342,7 +1342,65 @@ def generate_edit_config(cfg,updateConfig):
             config_file += "keep_favorites_advanced_audio_book_library_genre=" + str(cfg.keep_favorites_advanced_audio_book_library_genre) + "\n"
             config_file += "keep_favorites_advanced_audio_book_track_author=" + str(cfg.keep_favorites_advanced_audio_book_track_author) + "\n"
             config_file += "keep_favorites_advanced_audio_book_author=" + str(cfg.keep_favorites_advanced_audio_book_author) + "\n"
-        #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Enable/Disable console outputs by type\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "#  Should the script print its output to the console\n"
+    config_file += "#  False - Do not print this output type to the console\n"
+    config_file += "#  True - Print this output type to the console\n"
+    config_file += "# (True : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "print_script_header=" + str(get_default_config_values('print_script_header')) + "\n"
+        config_file += "print_warnings=" + str(get_default_config_values('print_warnings')) + "\n"
+        config_file += "print_user_header=" + str(get_default_config_values('print_user_header')) + "\n"
+        config_file += "print_movie_delete_info=" + str(get_default_config_values('print_movie_delete_info')) + "\n"
+        config_file += "print_movie_keep_info=" + str(get_default_config_values('print_movie_keep_info')) + "\n"
+        config_file += "print_movie_error_info=" + str(get_default_config_values('print_movie_error_info')) + "\n"
+        config_file += "print_episode_delete_info=" + str(get_default_config_values('print_episode_delete_info')) + "\n"
+        config_file += "print_episode_keep_info=" + str(get_default_config_values('print_episode_keep_info')) + "\n"
+        config_file += "print_episode_error_info=" + str(get_default_config_values('print_episode_error_info')) + "\n"
+        config_file += "print_audio_delete_info=" + str(get_default_config_values('print_audio_delete_info')) + "\n"
+        config_file += "print_audio_keep_info=" + str(get_default_config_values('print_audio_keep_info')) + "\n"
+        config_file += "print_audio_error_info=" + str(get_default_config_values('print_audio_error_info')) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "print_audiobook_delete_info=" + str(get_default_config_values('print_audiobook_delete_info')) + "\n"
+            config_file += "print_audiobook_keep_info=" + str(get_default_config_values('print_audiobook_keep_info')) + "\n"
+            config_file += "print_audiobook_error_info=" + str(get_default_config_values('print_audiobook_error_info')) + "\n"
+        config_file += "print_summary_header=" + str(get_default_config_values('print_summary_header')) + "\n"
+        config_file += "print_movie_summary=" + str(get_default_config_values('print_movie_summary')) + "\n"
+        config_file += "print_episode_summary=" + str(get_default_config_values('print_episode_summary')) + "\n"
+        config_file += "print_audio_summary=" + str(get_default_config_values('print_audio_summary')) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "print_audiobook_summary=" + str(get_default_config_values('print_audiobook_summary')) + "\n"
+    elif (updateConfig):
+        config_file += "print_script_header=" + str(cfg.print_script_header) + "\n"
+        config_file += "print_warnings" + str(cfg.print_warnings) + "\n"
+        config_file += "print_user_header" + str(cfg.print_user_header) + "\n"
+        config_file += "print_movie_delete_info" + str(cfg.print_movie_delete_info) + "\n"
+        config_file += "print_movie_keep_info" + str(cfg.print_movie_keep_info) + "\n"
+        config_file += "print_movie_error_info" + str(cfg.print_movie_error_info) + "\n"
+        config_file += "print_episode_delete_info" + str(cfg.print_episode_delete_info) + "\n"
+        config_file += "print_episode_keep_info" + str(cfg.print_episode_keep_info) + "\n"
+        config_file += "print_episode_error_info" + str(cfg.print_episode_error_info) + "\n"
+        config_file += "print_audio_delete_info" + str(cfg.print_audio_delete_info) + "\n"
+        config_file += "print_audio_keep_info" + str(cfg.print_audio_keep_info) + "\n"
+        config_file += "print_audio_error_info" + str(cfg.print_audio_error_info) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_delete_info'))):
+            config_file += "print_audiobook_delete_info" + str(cfg.print_audiobook_delete_info) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_keep_info'))):
+            config_file += "print_audiobook_keep_info" + str(cfg.print_audiobook_keep_info) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_error_info'))):
+            config_file += "print_audiobook_error_info" + str(cfg.print_audiobook_error_info) + "\n"
+        config_file += "print_summary_header" + str(cfg.print_summary_header) + "\n"
+        config_file += "print_movie_summary" + str(cfg.print_movie_summary) + "\n"
+        config_file += "print_episode_summary" + str(cfg.print_episode_summary) + "\n"
+        config_file += "print_audio_summary" + str(cfg.print_audio_summary) + "\n"
+        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_summary'))):
+            config_file += "print_audiobook_summary" + str(cfg.print_audiobook_summary) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Set to True to add new users or edit existing users\n"
@@ -1732,7 +1790,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
                             #assign fav to metadata
                             child_list.append(child_item)
                             user_processed_itemsId.add(child_item['Id'])
-                            
+
                             if (cfg.DEBUG):
                                 #DEBUG
                                 print('Child item with Id: ' + str(child_item['Id']) + 'marked as favorite')
@@ -1913,7 +1971,7 @@ def get_isItemMatching(item_one, item_two):
 
                         #found a match; return true and the matching value
                         return(items_match, single_item_one)
-    
+
     #nothing matched; return false and empty string
     return(items_match,'')
 
@@ -2083,7 +2141,7 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
         for istagID in istag_MOVIE[istagkey]:
             if (istag_MOVIE[istagkey][istagID]):
                 return(True)
-                
+
     return(False)
 
 
@@ -2381,7 +2439,7 @@ def get_isMOVIE_AdvancedFav(item,user_key):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 return(True)
-                
+
     return(False)
 
 
@@ -2868,7 +2926,7 @@ def get_deleteStatus(itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIs
     #when item is whitelisted do not allow it to be deleted
     elif (itemIsWhiteListed_Local or itemIsWhiteListed_Remote):
         okToDelete=False
-    #when item is blacklisted allow it to be deleted    
+    #when item is blacklisted allow it to be deleted
     else: #itemIsBlackListed
         okToDelete=True
 
@@ -2972,6 +3030,11 @@ def prepare_AUDIOoutput(item):
 def prepare_AUDIOBOOKoutput(item):
     return prepare_AUDIOoutput(item)
 
+#determine if the requested console output line should be shown or hidden
+def print_byType(string_to_print,ok_to_print):
+    if (ok_to_print):
+        print(string_to_print)
+
 
 # get played, favorited, and tagged media items
 # save media items ready to be deleted
@@ -2979,16 +3042,90 @@ def prepare_AUDIOBOOKoutput(item):
 def get_media_items():
     server_url=cfg.server_url
     auth_key=cfg.auth_key
-    
+
+    if (hasattr(cfg,'print_script_header')):
+        print_script_header=cfg.print_script_header
+    else:
+        print_script_header=True
+    if (hasattr(cfg,'print_warnings')):
+        print_warnings=cfg.print_warnings
+    else:
+        print_warnings=True
+    if (hasattr(cfg,'print_user_header')):
+        print_user_header=cfg.print_user_header
+    else:
+        print_user_header=True
+
+    if (hasattr(cfg,'print_movie_delete_info')):
+        print_movie_delete_info=cfg.print_movie_delete_info
+    else:
+        print_movie_delete_info=True
+    if (hasattr(cfg,'print_movie_keep_info')):
+        print_movie_keep_info=cfg.print_movie_keep_info
+    else:
+        print_movie_keep_info=True
+    if (hasattr(cfg,'print_movie_error_info')):
+        print_movie_error_info=cfg.print_movie_error_info
+    else:
+        print_movie_error_info=True
+    if (hasattr(cfg,'print_episode_delete_info')):
+        print_episode_delete_info=cfg.print_episode_delete_info
+    else:
+        print_episode_delete_info=True
+    if (hasattr(cfg,'print_episode_keep_info')):
+        print_episode_keep_info=cfg.print_episode_keep_info
+    else:
+        print_episode_keep_info=True
+    if (hasattr(cfg,'print_episode_error_info')):
+        print_episode_error_info=cfg.print_episode_error_info
+    else:
+        print_episode_error_info=True
+    if (hasattr(cfg,'print_audio_delete_info')):
+        print_audio_delete_info=cfg.print_audio_delete_info
+    else:
+        print_audio_delete_info=True
+    if (hasattr(cfg,'print_audio_keep_info')):
+        print_audio_keep_info=cfg.print_audio_keep_info
+    else:
+        print_audio_keep_info=False
+    if (hasattr(cfg,'print_audio_error_info')):
+        print_audio_error_info=cfg.print_audio_error_info
+    else:
+        print_audio_error_info=True
+    if (hasattr(cfg, 'print_audiobook_delete_info')):
+        if (cfg.server_brand == 'jellyfin'):
+            print_audiobook_delete_info=cfg.print_audiobook_delete_info
+        else:
+            print_audiobook_delete_info=False
+    else:
+        print_audiobook_delete_info=True
+    if (hasattr(cfg, 'print_audiobook_keep_info')):
+        if (cfg.server_brand == 'jellyfin'):
+            print_audiobook_keep_info=cfg.print_audiobook_keep_info
+        else:
+            print_audiobook_keep_info=False
+    else:
+        print_audiobook_keep_info=True
+    if (hasattr(cfg, 'print_audiobook_error_info')):
+        if (cfg.server_brand == 'jellyfin'):
+            print_audiobook_error_info=cfg.print_audiobook_error_info
+        else:
+            print_audiobook_error_info=False
+    else:
+        print_audiobook_error_info=True
+
+    print_common_delete_keep_info=(print_movie_delete_info or print_movie_keep_info or print_episode_delete_info or print_episode_keep_info or
+                                   print_audio_delete_info or print_audio_keep_info or print_audiobook_delete_info or print_audiobook_keep_info)
+
     #Get list of all played items
-    print('')
-    print('-----------------------------------------------------------')
-    print('Script Verion: ' + get_script_version())
-    print('-----------------------------------------------------------')
-    print('Start...')
-    print('Cleaning media for server at: ' + server_url)
-    print('-----------------------------------------------------------')
-    print('')
+    print_byType('',print_script_header)
+    print_byType('-----------------------------------------------------------',print_script_header)
+    print_byType('Script Verion: ' + get_script_version(),print_script_header)
+    print_byType('-----------------------------------------------------------',print_script_header)
+    print_byType('Start...',print_script_header)
+    print_byType('Cleaning media for server at: ' + server_url,print_script_header)
+    print_byType('-----------------------------------------------------------',print_script_header)
+    print_byType('',print_script_header)
 
     all_media_disabled=False
 
@@ -3002,17 +3139,17 @@ def get_media_items():
        (cfg.max_age_audio == -1) and
        ((hasattr(cfg, 'max_age_audiobook') and (cfg.max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
        ):
-        print('* ATTENTION!!!                                            *')
-        print('* No media types are being monitored.                     *')
-        print('* Open the media_cleaner_config.py file in a text editor. *')
-        print('* Set at least one media type to >=0.                     *')
-        print('*                                                         *')
-        print('* played_age_movie=-1                                     *')
-        print('* played_age_episode=-1                                   *')
-        print('* played_age_audio=-1                                     *')
+        print_byType('* ATTENTION!!!                                            *',print_warnings)
+        print_byType('* No media types are being monitored.                     *',print_warnings)
+        print_byType('* Open the media_cleaner_config.py file in a text editor. *',print_warnings)
+        print_byType('* Set at least one media type to >=0.                     *',print_warnings)
+        print_byType('*                                                         *',print_warnings)
+        print_byType('* played_age_movie=-1                                     *',print_warnings)
+        print_byType('* played_age_episode=-1                                   *',print_warnings)
+        print_byType('* played_age_audio=-1                                     *',print_warnings)
         if (cfg.server_brand == 'jellyfin'):
-            print('* played_age_audiobook=-1                             *')
-        print('-----------------------------------------------------------')
+            print_byType('* played_age_audiobook=-1                             *',print_warnings)
+        print_byType('-----------------------------------------------------------',print_warnings)
         all_media_disabled=True
 
     #list of items to be deleted
@@ -3089,7 +3226,7 @@ def get_media_items():
         isfav_byUserId_Audio[user_key]={}
         if (cfg.server_brand == 'jellyfin'):
             isfav_byUserId_AudioBook[user_key]={}
-    
+
         #dictionary of blacktagged items by userId
         isblacktag_and_watched_byUserId_Movie[user_key]={}
         isblacktag_and_watched_byUserId_Episode[user_key]={}
@@ -3108,11 +3245,11 @@ def get_media_items():
 
         user_data=requestURL(url, cfg.DEBUG, 'current_user', cfg.api_query_attempts)
 
-        print('')
-        print('-----------------------------------------------------------')
-        print('Get List Of Media For:')
-        print(user_data['Name'] + ' - ' + user_data['Id'])
-        print('-----------------------------------------------------------')
+        print_byType('',print_user_header)
+        print_byType('-----------------------------------------------------------',print_user_header)
+        print_byType('Get List Of Media For:',print_user_header)
+        print_byType(user_data['Name'] + ' - ' + user_data['Id'],print_user_header)
+        print_byType('-----------------------------------------------------------',print_user_header)
 
         user_bllib_keys_json_lensplit=user_bllib_keys_json[currentPosition].split(',')
         user_wllib_keys_json_lensplit=user_wllib_keys_json[currentPosition].split(',')
@@ -3561,13 +3698,13 @@ def get_media_items():
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
-                                                print('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                print_byType('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item),print_movie_error_info)
 
                                         if (itemIsPlayed and itemIsOKToDelete):
-                                            print(':*[DELETE] - ' + item_output_details)
+                                            print_byType(':*[DELETE] - ' + item_output_details,print_movie_delete_info)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_output_details)
+                                            print_byType(':[KEEPING] - ' + item_output_details,print_movie_keep_info)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4014,13 +4151,13 @@ def get_media_items():
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
-                                                print('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                print_byType('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item),print_episode_error_info)
 
                                         if (itemIsPlayed and itemIsOKToDelete):
-                                            print(':*[DELETE] - ' + item_output_details)
+                                            print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_output_details)
+                                            print_byType(':[KEEPING] - ' + item_output_details,print_episode_keep_info)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4459,13 +4596,13 @@ def get_media_items():
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
-                                                print('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                print_byType('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item),print_audio_error_info)
 
                                         if (itemIsPlayed and itemIsOKToDelete):
-                                            print(':*[DELETE] - ' + item_output_details)
+                                            print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_output_details)
+                                            print_byType(':[KEEPING] - ' + item_output_details,print_audio_keep_info)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4911,13 +5048,13 @@ def get_media_items():
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (cfg.DEBUG):
                                                 #DEBUG
-                                                print('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                print_byType('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item),print_audiobook_error_info)
 
                                         if (itemIsPlayed and itemIsOKToDelete):
-                                            print(':*[DELETE] - ' + item_output_details)
+                                            print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
                                             deleteItems.append(item)
                                         else:
-                                            print(':[KEEPING] - ' + item_output_details)
+                                            print_byType(':[KEEPING] - ' + item_output_details,print_audiobook_keep_info)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4931,9 +5068,9 @@ def get_media_items():
 
         if (not all_media_disabled):
             if not (media_found):
-                print('[NO PLAYED ITEMS]')
+                print_byType('[NO PLAYED ITEMS]',print_warnings)
 
-        print('-----------------------------------------------------------')
+        print_byType('-----------------------------------------------------------',print_common_delete_keep_info)
         currentPosition+=1
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
@@ -5039,7 +5176,7 @@ def get_media_items():
             print(isblacktag_and_watched_byUserId_AudioBook)
             print('')
 
-    print('\n')
+    print_byType('\n',print_common_delete_keep_info)
     return(deleteItems)
 
 
@@ -5071,26 +5208,57 @@ def delete_media_item(itemID):
 
 #list and delete items past played threshold
 def output_itemsToDelete(deleteItems):
-    #List items to be deleted
-    print('-----------------------------------------------------------')
-    print('Summary Of Deleted Media:')
-    if not bool(cfg.REMOVE_FILES):
-        print('* Trial Run Mode')
-        print('* REMOVE_FILES=\'False\'')
-        print('* No Media Deleted')
-        print('* Items = ' + str(len(deleteItems)))
-        print('-----------------------------------------------------------')
-        print('* To delete media open media_cleaner_config.py in a text editor:')
-        print('*    Set REMOVE_FILES=\'True\'')
-        print('-----------------------------------------------------------')
+
+    if (hasattr(cfg,'print_summary_header')):
+        print_summary_header=cfg.print_summary_header
     else:
-        print('* Items Deleted = ' + str(len(deleteItems)) + '    *')
-        print('-----------------------------------------------------------')
+        print_summary_header=True
+    if (hasattr(cfg,'print_summary_header')):
+        print_movie_summary=cfg.print_movie_summary
+    else:
+        print_movie_summary=True
+    if (hasattr(cfg,'print_episode_summary')):
+        print_episode_summary=cfg.print_episode_summary
+    else:
+        print_episode_summary=True
+    if (hasattr(cfg,'print_episode_summary')):
+        print_audio_summary=cfg.print_audio_summary
+    else:
+        print_audio_summary=True
+    if (hasattr(cfg,'print_audiobook_summary')):
+        if (cfg.server_brand == 'jellyfin'):
+            print_audiobook_summary=cfg.print_audiobook_summary
+        else:
+            print_audiobook_summary=False
+    else:
+        print_audiobook_summary=True
+
+    print_common_summary = (print_movie_summary or print_episode_summary or print_audio_summary or print_audiobook_summary)
+
+    #List items to be deleted
+    print_byType('-----------------------------------------------------------',print_summary_header)
+    print_byType('Summary Of Deleted Media:',print_summary_header)
+    if not bool(cfg.REMOVE_FILES):
+        print_byType('* Trial Run Mode',print_summary_header)
+        print_byType('* REMOVE_FILES=\'False\'',print_summary_header)
+        print_byType('* No Media Deleted',print_summary_header)
+        print_byType('* Items = ' + str(len(deleteItems)),print_summary_header)
+        print_byType('-----------------------------------------------------------',print_summary_header)
+        print_byType('* To delete media open media_cleaner_config.py in a text editor:',print_summary_header)
+        print_byType('*    Set REMOVE_FILES=\'True\'',print_summary_header)
+        print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
+    else:
+        print_byType('* Items Deleted = ' + str(len(deleteItems)) + '    *',print_summary_header)
+        print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
 
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                #Delete media item
+                delete_media_item(item['Id'])
+                #Print output for deleted media item
+                print_byType(item_output_details,print_movie_summary)
             elif item['Type'] == 'Episode':
                 try:
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
@@ -5099,25 +5267,33 @@ def output_itemsToDelete(deleteItems):
                     if (cfg.DEBUG):
                         #DEBUG
                         print('Error encountered - Delete Episode: \n\n' + str(item))
+                #Delete media item
+                delete_media_item(item['Id'])
+                #Print output for deleted media item
+                print_byType(item_output_details,print_episode_summary)
             elif item['Type'] == 'Audio':
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                #Delete media item
+                delete_media_item(item['Id'])
+                #Print output for deleted media item
+                print_byType(item_output_details,print_audio_summary)
             elif item['Type'] == 'AudioBook':
                 item_output_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                #Delete media item
+                delete_media_item(item['Id'])
+                #Print output for deleted media item
+                print_byType(item_output_details,print_audiobook_summary)
             else: # item['Type'] == 'Unknown':
                 pass
-            #Delete media item
-            delete_media_item(item['Id'])
-            #Print output for deleted media item
-            print(item_output_details)
     else:
-        print('[NO ITEMS TO DELETE]')
+        print('[NO ITEMS TO DELETE]',print_common_summary)
 
-    print('-----------------------------------------------------------')
-    print('\n')
-    print('-----------------------------------------------------------')
-    print('Done.')
-    print('-----------------------------------------------------------')
-    print('')
+    print_byType('-----------------------------------------------------------',print_common_summary)
+    print_byType('\n',print_common_summary)
+    print_byType('-----------------------------------------------------------',print_common_summary)
+    print_byType('Done.',print_common_summary)
+    print_byType('-----------------------------------------------------------',print_common_summary)
+    print_byType('',print_common_summary)
 
 
 #Check blacklist and whitelist config variables are as expected
@@ -5713,6 +5889,260 @@ def cfgCheck():
 
 #######################################################################################################
 
+    if hasattr(cfg, 'print_script_header'):
+        check=cfg.print_script_header
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_script_header must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_script_header variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_warnings'):
+        check=cfg.print_warnings
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_warnings must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_warnings variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_user_header'):
+        check=cfg.print_user_header
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_user_header must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_user_header variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_movie_delete_info'):
+        check=cfg.print_movie_delete_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_delete_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_movie_keep_info'):
+        check=cfg.print_movie_keep_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_keep_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_movie_error_info'):
+        check=cfg.print_movie_error_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_movie_error_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_error_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_episode_delete_info'):
+        check=cfg.print_episode_delete_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_delete_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_episode_keep_info'):
+        check=cfg.print_episode_keep_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_keep_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_episode_error_info'):
+        check=cfg.print_episode_error_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_episode_error_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_error_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_audio_delete_info'):
+        check=cfg.print_audio_delete_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_delete_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_audio_keep_info'):
+        check=cfg.print_audio_keep_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_keep_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_audio_error_info'):
+        check=cfg.print_audio_error_info
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_audio_error_info must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_error_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'print_audiobook_delete_info'):
+                check=cfg.print_audiobook_delete_info
+                if (
+                    not ((type(check) is bool) and
+                    #(check.isupper()) and
+                    ((check == True) or
+                    (check == False)))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_delete_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'print_audiobook_keep_info'):
+                check=cfg.print_audiobook_keep_info
+                if (
+                    not ((type(check) is bool) and
+                    #(check.isupper()) and
+                    ((check == True) or
+                    (check == False)))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_keep_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'print_audiobook_error_info'):
+                check=cfg.print_audiobook_error_info
+                if (
+                    not ((type(check) is bool) and
+                    #(check.isupper()) and
+                    ((check == True) or
+                    (check == False)))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_error_info must be a boolean; valid values True and False\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_error_info variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_summary_header'):
+        check=cfg.print_summary_header
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_summary_header must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_summary_header variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_movie_summary'):
+        check=cfg.print_movie_summary
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_movie_summary must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_summary variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_episode_summary'):
+        check=cfg.print_episode_summary
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_episode_summary must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_summary variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'print_audio_summary'):
+        check=cfg.print_audio_summary
+        if (
+            not ((type(check) is bool) and
+            #(check.isupper()) and
+            ((check == True) or
+            (check == False)))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: print_audio_summary must be a boolean; valid values True and False\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_summary variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'print_audiobook_summary'):
+                check=cfg.print_audiobook_summary
+                if (
+                    not ((type(check) is bool) and
+                    #(check.isupper()) and
+                    ((check == True) or
+                    (check == False)))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_summary variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
         if (
@@ -5996,8 +6426,12 @@ try:
     check=cfg.DEBUG
     #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
 
-    print('-----------------------------------------------------------')
-    print ('\n')
+    if (hasattr(cfg,'print_script_header')):
+        print_script_header=cfg.print_script_header
+    else:
+        print_script_header=True
+    print_byType('-----------------------------------------------------------',print_script_header)
+    print_byType('\n',print_script_header)
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
