@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.2'
+    Version='2.1.3'
 
     return(Version)
 
@@ -1439,25 +1439,27 @@ def generate_edit_config(cfg,updateConfig):
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
             config_file += "max_age_audiobook=" + str(cfg.max_age_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide if max age media set as a favorite should be deleted\n"
-    config_file += "#  0 - ok to delete max age media items set as a favorite\n"
-    config_file += "#  1 - do not delete max age media items when set as a favorite\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if not (updateConfig):
-        config_file += "max_keep_favorites_movie=1\n"
-        config_file += "max_keep_favorites_episode=1\n"
-        config_file += "max_keep_favorites_audio=1\n"
-        if (server_brand == 'jellyfin'):
-            config_file += "max_keep_favorites_audiobook=1\n"
-    elif (updateConfig):
-        config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
-        config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
-        config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
-            config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
+    #config_file += "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "# !!!OBSOLETE!!! - Use any of the other keep_favorites_* config options\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "# Decide if max age media set as a favorite should be deleted\n"
+    #config_file += "#  0 - ok to delete max age media items set as a favorite\n"
+    #config_file += "#  1 - do not delete max age media items when set as a favorite\n"
+    #config_file += "# (1 : default)\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #if not (updateConfig):
+        #config_file += "max_keep_favorites_movie=1\n"
+        #config_file += "max_keep_favorites_episode=1\n"
+        #config_file += "max_keep_favorites_audio=1\n"
+        #if (server_brand == 'jellyfin'):
+            #config_file += "max_keep_favorites_audiobook=1\n"
+    #elif (updateConfig):
+        #config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
+        #config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
+        #config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
+        #if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
+            #config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -3674,7 +3676,7 @@ def get_media_items():
                                             movie_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_movie >= 0)):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],cfg.max_age_movie,max_cut_off_date_movie)
                                     else:
                                         itemIsPlayed=False
@@ -4127,7 +4129,7 @@ def get_media_items():
                                             episode_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_episode >= 0)):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],cfg.max_age_episode,max_cut_off_date_episode)
                                     else:
                                         itemIsPlayed=False
@@ -4571,7 +4573,7 @@ def get_media_items():
                                             audio_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_audio >= 0)):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],cfg.max_age_audio,max_cut_off_date_audio)
                                     else:
                                         itemIsPlayed=False
@@ -5023,7 +5025,7 @@ def get_media_items():
                                             audiobook_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_audiobook >= 0)):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],cfg.max_age_audiobook,max_cut_off_date_audiobook)
                                     else:
                                         itemIsPlayed=False
@@ -6222,8 +6224,8 @@ def cfgCheck():
             (check <= 1))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_movie must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_movie variable is missing from media_cleaner_config.py\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_movie variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_keep_favorites_episode'):
         check=cfg.max_keep_favorites_episode
@@ -6233,8 +6235,8 @@ def cfgCheck():
             (check <= 1))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'max_keep_favorites_audio'):
         check=cfg.max_keep_favorites_audio
@@ -6244,8 +6246,8 @@ def cfgCheck():
             (check <= 1))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audio must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audio variable is missing from media_cleaner_config.py\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audio variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
@@ -6258,8 +6260,8 @@ def cfgCheck():
                     (check <= 1))
                 ):
                     error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 

@@ -252,20 +252,21 @@ max_age_episode=-1
 max_age_audio=-1
 max_age_audiobook=-1
 ```
-#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
+#### !!!OBSOLETE!!! - Use any of the other keep_favorites_* config options
+#----------------------------------------------------------#
+# !!!OBSOLETE!!! - Use any of the other keep_favorites_* config options
 #----------------------------------------------------------#
 # Decide if max age media set as a favorite should be deleted
 #  0 - ok to delete max age media items set as a favorite
 #  1 - do not delete max age media items when set as a favorite
 # (1 : default)
 #----------------------------------------------------------#
-max_keep_favorites_movie=1
-max_keep_favorites_episode=1
-max_keep_favorites_audio=1
-max_keep_favorites_audiobook=1
+#max_keep_favorites_movie=1
+#max_keep_favorites_episode=1
+#max_keep_favorites_audio=1
+#max_keep_favorites_audiobook=1
 ```
-
 ### Created first time the script runs; Do **_NOT_** edit or modify these:
 #### Needed for differences between Emby and Jellyfin?
 ```python
