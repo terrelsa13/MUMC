@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.2'
+    Version='2.1.3'
 
     return(Version)
 
@@ -1251,6 +1251,69 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Keep or delete media item when play count is greater/less than or equal to played_count_*\n"
+    config_file += "#  0 - Delete media items when play count is Greater Than or Equal To played_count_*\n"
+    config_file += "#  1 - Delete media items when play count is Less Than or Equal To played_count_*\n"
+    config_file += "#  2 - Keep media items when play count is Greater Than or Equal To played_count_*\n"
+    config_file += "#  3 - Keep media items when play count is Less Than or Equal To played_count_*\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "played_count_movie_action=" + str(get_default_config_values('played_count_movie_action')) + "\n"
+        config_file += "played_count_episode_action=" + str(get_default_config_values('played_count_episode_action')) + "\n"
+        config_file += "played_count_audio_action=" + str(get_default_config_values('played_count_audio_action')) + "\n"
+        config_file += "played_count_audiobook_action=" + str(get_default_config_values('played_count_audiobook_action')) + "\n"
+    elif (updateConfig):
+        if (hasattr(cfg,'played_count_movie_action')):
+            config_file += "played_count_movie_action=" + str(cfg.played_count_movie_action) + "\n"
+        else:
+            config_file += "played_count_movie_action=0\n"
+        if (hasattr(cfg,'played_count_episode_action')):
+            config_file += "played_count_episode_action=" + str(cfg.played_count_episode_action) + "\n"
+        else:
+            config_file += "played_count_episode_action=0\n"
+        if (hasattr(cfg,'played_count_audio_action')):
+            config_file += "played_count_audio_action=" + str(cfg.played_count_audio_action) + "\n"
+        else:
+            config_file += "played_count_audio_action=0\n"
+        if (cfg.server_brand == 'jellyfin'):
+            if (hasattr(cfg,'played_count_audiobook_action')):
+                config_file += "played_count_audiobook_action" + str(cfg.played_count_audiobook_action) + "\n"
+            else:
+                config_file += "played_count_audiobook_action=0\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Keep or delete media item when play count is greater/less than or equal to # times\n"
+    config_file += "#   1-730500 - number of play counts\n"
+    config_file += "# (1 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "played_count_movie=" + str(get_default_config_values('played_count_movie')) + "\n"
+        config_file += "played_count_episode=" + str(get_default_config_values('played_count_episode')) + "\n"
+        config_file += "played_count_audio=" + str(get_default_config_values('played_count_audio')) + "\n"
+        config_file += "played_count_audiobook=" + str(get_default_config_values('played_count_audiobook')) + "\n"
+    elif (updateConfig):
+        if (hasattr(cfg,'played_count_movie')):
+            config_file += "played_count_movie=" + str(cfg.played_count_movie) + "\n"
+        else:
+            config_file += "played_count_movie=1\n"
+        if (hasattr(cfg,'played_count_episode')):
+            config_file += "played_count_episode=" + str(cfg.played_count_episode) + "\n"
+        else:
+            config_file += "played_count_episode=1\n"
+        if (hasattr(cfg,'played_count_audio')):
+            config_file += "played_count_audio=" + str(cfg.played_count_audio) + "\n"
+        else:
+            config_file += "played_count_audio=1\n"
+        if (cfg.server_brand == 'jellyfin'):
+            if (hasattr(cfg,'played_count_audiobook')):
+                config_file += "played_count_audiobook" + str(cfg.played_count_audiobook) + "\n"
+            else:
+                config_file += "played_count_audiobook=1\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
     config_file += "# Advanced movie genre configurations\n"
     config_file += "#     Requires 'keep_favorites_movie=1'\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1441,23 +1504,60 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide if max age media set as a favorite should be deleted\n"
-    config_file += "#  0 - ok to delete max age media items set as a favorite\n"
-    config_file += "#  1 - do not delete max age media items when set as a favorite\n"
-    config_file += "# (1 : default)\n"
+    config_file += "# When using max_age_*; decide if played, unplayed, or both max age media items should be deleted\n"
+    config_file += "#  0 - ok to delete both played and unplayed max age media items\n"
+    config_file += "#  1 - ok to delete played max age media items; keep unplayed max age media items\n"
+    config_file += "#  2 - ok to delete unplayed max age media items; keep played max age media items\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "max_keep_favorites_movie=1\n"
-        config_file += "max_keep_favorites_episode=1\n"
-        config_file += "max_keep_favorites_audio=1\n"
-        if (server_brand == 'jellyfin'):
-            config_file += "max_keep_favorites_audiobook=1\n"
+        config_file += "max_delete_played_state_movie=0\n"
+        config_file += "max_delete_played_state_episode=0\n"
+        config_file += "max_delete_played_state_audio=0\n"
+        config_file += "max_delete_played_state_audiobook=0\n"
     elif (updateConfig):
-        config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
-        config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
-        config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
-            config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
+        if (hasattr(cfg, 'max_delete_played_state_movie')):
+            config_file += "max_delete_played_state_movie=" + str(cfg.max_delete_played_state_movie) + "\n"
+        else:
+            config_file += "max_delete_played_state_movie=0\n"
+        if (hasattr(cfg, 'max_delete_played_state_episode')):
+            config_file += "max_delete_played_state_episode=" + str(cfg.max_delete_played_state_episode) + "\n"
+        else:
+            config_file += "max_delete_played_state_episode=0\n"
+        if (hasattr(cfg, 'max_delete_played_state_audio')):
+            config_file += "max_delete_played_state_audio=" + str(cfg.max_delete_played_state_audio) + "\n"
+        else:
+            config_file += "max_delete_played_state_audio=0\n"
+        if (cfg.server_brand == 'jellyfin'):
+            if (hasattr(cfg, 'max_delete_played_state_audiobook')):
+                config_file += "max_delete_played_state_audiobook=" + str(cfg.max_delete_played_state_audiobook) + "\n"
+            else:
+                config_file += "max_delete_played_state_audiobook=0"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "# !!!OBSOLETE!!! - Use any of the other keep_favorites_* config options\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #config_file += "# Decide if max age media set as a favorite should be deleted\n"
+    #config_file += "#  0 - ok to delete max age media items set as a favorite\n"
+    #config_file += "#  1 - do not delete max age media items when set as a favorite\n"
+    #config_file += "# (1 : default)\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    #if not (updateConfig):
+        #config_file += "max_keep_favorites_movie=1\n"
+        #config_file += "max_keep_favorites_episode=1\n"
+        #config_file += "max_keep_favorites_audio=1\n"
+        #if (server_brand == 'jellyfin'):
+            #config_file += "max_keep_favorites_audiobook=1\n"
+    #elif (updateConfig):
+        #if (hasattr(cfg, 'max_keep_favorites_movie')):
+            #config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
+        #if (hasattr(cfg, 'max_keep_favorites_episode')):
+            #config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
+        #if (hasattr(cfg, 'max_keep_favorites_audio')):
+            #config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
+        #if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
+            #config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -1751,7 +1851,12 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
                 EnableImages='False'
                 CollapseBoxSetItems='False'
                 if (cfg.max_age_movie >= 0):
-                    IsPlayedState=''
+                    if (cfg.max_delete_played_state_movie == 0):
+                        IsPlayedState=''
+                    elif (cfg.max_delete_played_state_movie == 1):
+                        IsPlayedState='True'
+                    else: #(cfg.max_delete_played_state_movie == 2)
+                        IsPlayedState='False'
                 else:
                     IsPlayedState='True'
 
@@ -1837,7 +1942,12 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                     EnableImages='False'
                     CollapseBoxSetItems='False'
                     if (cfg.max_age_movie >= 0):
-                        IsPlayedState=''
+                        if (cfg.max_delete_played_state_movie == 0):
+                            IsPlayedState=''
+                        elif (cfg.max_delete_played_state_movie == 1):
+                            IsPlayedState='True'
+                        else: #(cfg.max_delete_played_state_movie == 2)
+                            IsPlayedState='False'
                     else:
                         IsPlayedState='True'
 
@@ -2899,19 +3009,160 @@ def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
 
 
 #decide if this item is played and meets the cutoff date or if this item meets the max age cutoff date
-def get_playedStatus(played_age,play_count,cut_off_date_movie,LastPlayedDate,max_age,max_cut_off_date):
+def get_playedStatus(played_age,play_count,cut_off_date,LastPlayedDate,max_age,max_cut_off_date,max_delete_played_state,played_count_action,played_count):
 
-    itemIsPlayed=False
+    #ok to delete media items past the max_age_*
+    if (((max_age >= 0) and (max_cut_off_date <= datetime.utcnow()) and (max_delete_played_state == 0))):
+        #ok to delete unplayed and played
+        if (max_delete_played_state == 0):
+            #delete media items played greater than or equal to played_count times
+            if (played_count_action == 0):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=True
+                #item played at least played_count times
+                elif (play_count >= played_count):
+                    itemPlayedStateIsDeletable=True
+                #item played less than played_count times
+                else: #(play_count < played_count)
+                    itemPlayedStateIsDeletable=False
+            #delete media items played less than or equal to played_count times
+            elif (played_count_action == 1):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=True
+                #item played at most played_count times
+                elif (play_count <= played_count):
+                    itemPlayedStateIsDeletable=True
+                #item played less than played_count times
+                else: #(play_count > played_count)
+                    itemPlayedStateIsDeletable=False
+            #keep media items played greater than or equal to played_count times
+            elif (played_count_action == 2):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=True
+                #item played at least played_count times
+                elif (play_count >= played_count):
+                    itemPlayedStateIsDeletable=False
+                #item played less than played_count times
+                else: #(play_count < played_count)
+                    itemPlayedStateIsDeletable=True
+            #keep media items played less than or equal to played_count times
+            else: #(played_count_action == 3)
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=True
+                #item played at most played_count times
+                elif (play_count <= played_count):
+                    itemPlayedStateIsDeletable=False
+                #item played less than played_count times
+                else: #(play_count > played_count)
+                    itemPlayedStateIsDeletable=True
 
-    if (
-    ((played_age >= 0) and (play_count >= 1) and
-    (cut_off_date_movie > parse(LastPlayedDate)))
-    or
-    ((max_age >= 0) and (max_cut_off_date <= datetime.utcnow()))
-    ):
-        itemIsPlayed=True
+        #ok to delete played; keep unplayed
+        elif (max_delete_played_state == 1):
+            #delete media items played greater than or equal to played_count times
+            if (played_count_action == 0):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=False
+                #item played at least played_count times
+                elif (play_count >= played_count):
+                    itemPlayedStateIsDeletable=True
+                #item played less than played_count times
+                else: #(play_count < played_count)
+                    itemPlayedStateIsDeletable=False
+            #delete media items played less than or equal to played_count times
+            elif (played_count_action == 1):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=False
+                #item played at most played_count times
+                elif (play_count <= played_count):
+                    itemPlayedStateIsDeletable=True
+                #item played less than played_count times
+                else: #(play_count > played_count)
+                    itemPlayedStateIsDeletable=False
+            #keep media items played greater than or equal to played_count times
+            elif (played_count_action == 2):
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=False
+                #item played at least played_count times
+                elif (play_count >= played_count):
+                    itemPlayedStateIsDeletable=False
+                #item played less than played_count times
+                else: #(play_count < played_count)
+                    itemPlayedStateIsDeletable=True
+            #keep media items played less than or equal to played_count times
+            else: #(played_count_action == 3)
+                #item unplayed
+                if (play_count == 0):
+                    itemPlayedStateIsDeletable=False
+                #item played at most played_count times
+                elif (play_count <= played_count):
+                    itemPlayedStateIsDeletable=False
+                #item played less than played_count times
+                else: #(play_count > played_count)
+                    itemPlayedStateIsDeletable=True
 
-    return itemIsPlayed
+        #ok to delete unplayed; keep played
+        elif (max_delete_played_state == 2):
+            #item unplayed
+            if (play_count == 0):
+                itemPlayedStateIsDeletable=False
+
+    #ok to delete media items past the played_age_*
+    elif (((played_age >= 0) and (cut_off_date > parse(LastPlayedDate)))):
+        #delete media items played greater than or equal to played_count times
+        if (played_count_action == 0):
+            #item unplayed
+            if (play_count == 0):
+                itemPlayedStateIsDeletable=False
+            #item played at least played_count times
+            elif (play_count >= played_count):
+                itemPlayedStateIsDeletable=True
+            #item played less than played_count times
+            else: #(play_count < played_count)
+                itemPlayedStateIsDeletable=False
+        #delete media items played less than or equal to played_count times
+        elif (played_count_action == 1):
+            #item unplayed
+            if (play_count == 0):
+                itemPlayedStateIsDeletable=False
+            #item played at most played_count times
+            elif (play_count <= played_count):
+                itemPlayedStateIsDeletable=True
+            #item played less than played_count times
+            else: #(play_count > played_count)
+                itemPlayedStateIsDeletable=False
+        #keep media items played greater than or equal to played_count times
+        elif (played_count_action == 2):
+            #item unplayed
+            if (play_count == 0):
+                itemPlayedStateIsDeletable=False
+            #item played at least played_count times
+            elif (play_count >= played_count):
+                itemPlayedStateIsDeletable=False
+            #item played less than played_count times
+            else: #(play_count < played_count)
+                itemPlayedStateIsDeletable=True
+        #keep media items played less than or equal to played_count times
+        else: #(played_count_action == 3)
+            #item unplayed
+            if (play_count == 0):
+                itemPlayedStateIsDeletable=False
+            #item played at most played_count times
+            elif (play_count <= played_count):
+                itemPlayedStateIsDeletable=False
+            #item played less than played_count times
+            else: #(play_count > played_count)
+                itemPlayedStateIsDeletable=True
+    else:
+        itemPlayedStateIsDeletable=False
+
+    return itemPlayedStateIsDeletable
 
 
 #decide if this item is ok to be deleted; still has to meet other criteria
@@ -3040,8 +3291,126 @@ def print_byType(string_to_print,ok_to_print):
 # save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
 def get_media_items():
+    DEBUG=cfg.DEBUG
+    server_brand=cfg.server_brand
     server_url=cfg.server_url
     auth_key=cfg.auth_key
+    api_query_attempts=cfg.api_query_attempts
+
+    played_age_movie=cfg.played_age_movie
+    played_age_episode=cfg.played_age_episode
+    played_age_audio=cfg.played_age_audio
+    if (cfg.server_brand == 'jellyfin'):
+        played_age_audiobook=cfg.played_age_audiobook
+
+    keep_favorites_movie=cfg.keep_favorites_movie
+    keep_favorites_episode=cfg.keep_favorites_episode
+    keep_favorites_audio=cfg.keep_favorites_audio
+    if (cfg.server_brand == 'jellyfin'):
+        keep_favorites_audiobook=cfg.keep_favorites_audiobook
+
+    multiuser_whitelist_movie=cfg.multiuser_whitelist_movie
+    multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
+    multiuser_whitelist_audio=cfg.multiuser_whitelist_audio
+    if (cfg.server_brand == 'jellyfin'):
+        multiuser_whitelist_audiobook=cfg.multiuser_whitelist_audiobook
+
+    delete_blacktagged_movie=cfg.delete_blacktagged_movie
+    delete_blacktagged_episode=cfg.delete_blacktagged_episode
+    delete_blacktagged_audio=cfg.delete_blacktagged_audio
+    if (cfg.server_brand == 'jellyfin'):
+        delete_blacktagged_audiobook=cfg.delete_blacktagged_audiobook
+
+    minimum_number_episodes=cfg.minimum_number_episodes
+
+    if (hasattr(cfg,'played_count_movie_action')):
+        played_count_movie_action=cfg.played_count_movie_action
+    else:
+        played_count_movie_action=0
+    if (hasattr(cfg,'played_count_episode_action')):
+        played_count_episode_action=cfg.played_count_episode_action
+    else:
+        played_count_episode_action=0
+    if (hasattr(cfg,'played_count_audio_action')):
+        played_count_audio_action=cfg.played_count_audio_action
+    else:
+        played_count_audio_action=0
+    if (server_brand == 'jellyfin'):
+        if (hasattr(cfg,'played_count_audiobook_action')):
+            played_count_audiobook_action=cfg.played_count_audiobook_action
+        else:
+            played_count_audiobook_action=0
+
+    if (server_brand == 'jellyfin'):
+        if (hasattr(cfg,'max_delete_played_state_audiobook')):
+            max_delete_played_state_audiobook=cfg.max_delete_played_state_audiobook
+        else:
+            max_delete_played_state_audiobook=0
+
+    if (hasattr(cfg,'played_count_movie')):
+        played_count_movie=cfg.played_count_movie
+    else:
+        played_count_movie=0
+    if (hasattr(cfg,'played_count_episode')):
+        played_count_episode=cfg.played_count_episode
+    else:
+        played_count_episode=0
+    if (hasattr(cfg,'played_count_audio')):
+        played_count_audio=cfg.played_count_audio
+    else:
+        played_count_audio=0
+    if (server_brand == 'jellyfin'):
+        if (hasattr(cfg,'played_count_audiobook')):
+            played_count_audiobook=cfg.played_count_audiobook
+        else:
+            played_count_audiobook=0
+
+    keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
+    keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
+
+    keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
+    keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
+    keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
+    keep_favorites_advanced_tv_library_genre=cfg.keep_favorites_advanced_tv_library_genre
+    keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
+    keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
+
+    keep_favorites_advanced_track_genre=cfg.keep_favorites_advanced_track_genre
+    keep_favorites_advanced_album_genre=cfg.keep_favorites_advanced_album_genre
+    keep_favorites_advanced_music_library_genre=cfg.keep_favorites_advanced_music_library_genre
+    keep_favorites_advanced_track_artist=cfg.keep_favorites_advanced_track_artist
+    keep_favorites_advanced_album_artist=cfg.keep_favorites_advanced_album_artist
+
+    if (cfg.server_brand == 'jellyfin'):
+        keep_favorites_advanced_audio_book_track_genre=cfg.keep_favorites_advanced_audio_book_track_genre
+        keep_favorites_advanced_audio_book_genre=cfg.keep_favorites_advanced_audio_book_genre
+        keep_favorites_advanced_audio_book_library_genre=cfg.keep_favorites_advanced_audio_book_library_genre
+        keep_favorites_advanced_audio_book_track_author=cfg.keep_favorites_advanced_audio_book_track_author
+        keep_favorites_advanced_audio_book_author=cfg.keep_favorites_advanced_audio_book_author
+
+    max_age_movie=cfg.max_age_movie
+    max_age_episode=cfg.max_age_episode
+    max_age_audio=cfg.max_age_audio
+    if (server_brand == 'jellyfin'):
+        max_age_audiobook=cfg.max_age_audiobook
+
+    if (hasattr(cfg,'max_delete_played_state_movie')):
+        max_delete_played_state_movie=cfg.max_delete_played_state_movie
+    else:
+        max_delete_played_state_movie=0
+    if (hasattr(cfg,'max_delete_played_state_episode')):
+        max_delete_played_state_episode=cfg.max_delete_played_state_episode
+    else:
+        max_delete_played_state_episode=0
+    if (hasattr(cfg,'max_delete_played_state_audio')):
+        max_delete_played_state_audio=cfg.max_delete_played_state_audio
+    else:
+        max_delete_played_state_audio=0
+    if (server_brand == 'jellyfin'):
+        if (hasattr(cfg,'max_delete_played_state_audiobook')):
+            max_delete_played_state_audiobook=cfg.max_delete_played_state_audiobook
+        else:
+            max_delete_played_state_audiobook=0
 
     if (hasattr(cfg,'print_script_header')):
         print_script_header=cfg.print_script_header
@@ -3093,21 +3462,21 @@ def get_media_items():
     else:
         print_audio_error_info=True
     if (hasattr(cfg, 'print_audiobook_delete_info')):
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print_audiobook_delete_info=cfg.print_audiobook_delete_info
         else:
             print_audiobook_delete_info=False
     else:
         print_audiobook_delete_info=True
     if (hasattr(cfg, 'print_audiobook_keep_info')):
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print_audiobook_keep_info=cfg.print_audiobook_keep_info
         else:
             print_audiobook_keep_info=False
     else:
         print_audiobook_keep_info=True
     if (hasattr(cfg, 'print_audiobook_error_info')):
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print_audiobook_error_info=cfg.print_audiobook_error_info
         else:
             print_audiobook_error_info=False
@@ -3130,14 +3499,14 @@ def get_media_items():
     all_media_disabled=False
 
     if (
-       (cfg.played_age_movie == -1) and
-       (cfg.played_age_episode == -1) and
-       (cfg.played_age_audio == -1) and
-       ((hasattr(cfg, 'played_age_audiobook') and (cfg.played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook'))) and
-       (cfg.max_age_movie == -1) and
-       (cfg.max_age_episode == -1) and
-       (cfg.max_age_audio == -1) and
-       ((hasattr(cfg, 'max_age_audiobook') and (cfg.max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
+       (played_age_movie == -1) and
+       (played_age_episode == -1) and
+       (played_age_audio == -1) and
+       ((hasattr(cfg, 'played_age_audiobook') and (played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook'))) and
+       (max_age_movie == -1) and
+       (max_age_episode == -1) and
+       (max_age_audio == -1) and
+       ((hasattr(cfg, 'max_age_audiobook') and (max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
        ):
         print_byType('* ATTENTION!!!                                            *',print_warnings)
         print_byType('* No media types are being monitored.                     *',print_warnings)
@@ -3147,7 +3516,7 @@ def get_media_items():
         print_byType('* played_age_movie=-1                                     *',print_warnings)
         print_byType('* played_age_episode=-1                                   *',print_warnings)
         print_byType('* played_age_audio=-1                                     *',print_warnings)
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print_byType('* played_age_audiobook=-1                             *',print_warnings)
         print_byType('-----------------------------------------------------------',print_warnings)
         all_media_disabled=True
@@ -3159,21 +3528,21 @@ def get_media_items():
     isfav_byUserId_Movie={}
     isfav_byUserId_Episode={}
     isfav_byUserId_Audio={}
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         isfav_byUserId_AudioBook={}
 
     #dictionary of blacktagged items by userId
     isblacktag_and_watched_byUserId_Movie={}
     isblacktag_and_watched_byUserId_Episode={}
     isblacktag_and_watched_byUserId_Audio={}
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         isblacktag_and_watched_byUserId_AudioBook={}
 
     #whitelisted Id per media type according to media types metadata
     movie_whitelists=[]
     episode_whitelists=[]
     audio_whitelists=[]
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         audiobook_whitelists=[]
 
     #dictionary for episodes to keep to meet cfg.minimum_number_episodes
@@ -3183,14 +3552,14 @@ def get_media_items():
     movie_blacktaglists=[]
     episode_blacktaglists=[]
     audio_blacktaglists=[]
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         audiobook_blacktaglists=[]
 
     #whitetagged items per media type according to media types metadata
     movie_whitetag_list=[]
     episode_whitetag_list=[]
     audio_whitetag_list=[]
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         audiobook_whitetag_list=[]
 
     #Build the library data from the data structures stored in the configuration file
@@ -3213,25 +3582,25 @@ def get_media_items():
 
     #establish deletion date for played media items
     date_time_now=datetime.now(timezone.utc)
-    cut_off_date_movie=date_time_now - timedelta(cfg.played_age_movie)
-    cut_off_date_episode=date_time_now - timedelta(cfg.played_age_episode)
-    cut_off_date_audio=date_time_now - timedelta(cfg.played_age_audio)
-    if ((cfg.server_brand == 'jellyfin') and hasattr(cfg, 'played_age_audiobook')):
-        cut_off_date_audiobook=date_time_now - timedelta(cfg.played_age_audiobook)
+    cut_off_date_movie=date_time_now - timedelta(played_age_movie)
+    cut_off_date_episode=date_time_now - timedelta(played_age_episode)
+    cut_off_date_audio=date_time_now - timedelta(played_age_audio)
+    if ((server_brand == 'jellyfin') and hasattr(cfg, 'played_age_audiobook')):
+        cut_off_date_audiobook=date_time_now - timedelta(played_age_audiobook)
 
     for user_key in user_keys_json:
         #define dictionary user_key to store media item favorite states by userId and itemId
         isfav_byUserId_Movie[user_key]={}
         isfav_byUserId_Episode[user_key]={}
         isfav_byUserId_Audio[user_key]={}
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             isfav_byUserId_AudioBook[user_key]={}
 
         #dictionary of blacktagged items by userId
         isblacktag_and_watched_byUserId_Movie[user_key]={}
         isblacktag_and_watched_byUserId_Episode[user_key]={}
         isblacktag_and_watched_byUserId_Audio[user_key]={}
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             isblacktag_and_watched_byUserId_AudioBook[user_key]={}
 
     currentPosition=0
@@ -3239,11 +3608,11 @@ def get_media_items():
     for user_key in user_keys_json:
         url=server_url + '/Users/' + user_key  + '/?api_key=' + auth_key
 
-        if (cfg.DEBUG):
+        if (DEBUG):
             #DEBUG
             print(url)
 
-        user_data=requestURL(url, cfg.DEBUG, 'current_user', cfg.api_query_attempts)
+        user_data=requestURL(url, DEBUG, 'current_user', api_query_attempts)
 
         print_byType('',print_user_header)
         print_byType('-----------------------------------------------------------',print_user_header)
@@ -3273,7 +3642,7 @@ def get_media_items():
 
 ############# Movies #############
 
-        if ((cfg.played_age_movie >= 0) or (cfg.max_age_movie >= 0)):
+        if ((played_age_movie >= 0) or (max_age_movie >= 0)):
 
             user_processed_itemsId=set()
 
@@ -3298,8 +3667,13 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (cfg.max_age_movie >= 0):
-                        IsPlayedState_Blacklist=''
+                    if (max_age_movie >= 0):
+                         if (max_delete_played_state_movie == 0):
+                            IsPlayedState_Blacklist=''
+                         elif (max_delete_played_state_movie == 1):
+                            IsPlayedState_Blacklist='True'
+                         else: #(max_delete_played_state_movie == 2)
+                            IsPlayedState_Blacklist='False'
                     else:
                         IsPlayedState_Blacklist='True'
 
@@ -3541,16 +3915,16 @@ def get_media_items():
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -3608,8 +3982,8 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
-                                    if (cfg.max_age_movie >= 0):
-                                        max_cut_off_date_movie=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_movie)
+                                    if (max_age_movie >= 0):
+                                        max_cut_off_date_movie=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_movie)
                                     else:
                                         max_cut_off_date_movie=date_time_now + timedelta(1)
 
@@ -3617,11 +3991,11 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_MOVIE_Local=True
-                                    elif ((cfg.keep_favorites_movie) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
+                                    elif ((keep_favorites_movie) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_MOVIE_Local=True
 
                                     itemisfav_MOVIE_Advanced=False
-                                    if ((cfg.keep_favorites_movie) and (cfg.keep_favorites_advanced_movie_genre or cfg.keep_favorites_advanced_movie_library_genre)):
+                                    if ((keep_favorites_movie) and (keep_favorites_advanced_movie_genre or keep_favorites_advanced_movie_library_genre)):
                                         itemisfav_MOVIE_Advanced=get_isMOVIE_AdvancedFav(item,user_key)
 
                                     itemisfav_MOVIE_Display=False
@@ -3629,7 +4003,7 @@ def get_media_items():
                                         itemisfav_MOVIE_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((cfg.keep_favorites_movie == 2) and (itemisfav_MOVIE_Local or itemisfav_MOVIE_Advanced)):
+                                    if ((keep_favorites_movie == 2) and (itemisfav_MOVIE_Local or itemisfav_MOVIE_Advanced)):
                                         isfav_byUserId_Movie[user_key][item['Id']] = True
 
                                     itemIsWhiteTagged=False
@@ -3660,7 +4034,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -3670,19 +4044,20 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie)):
                                             movie_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
-                                        itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],cfg.max_age_movie,max_cut_off_date_movie)
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_movie >= 0)):
+                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],
+                                                                                    max_age_movie,max_cut_off_date_movie,max_delete_played_state_movie,played_count_movie_action,played_count_movie)
                                     else:
-                                        itemIsPlayed=False
+                                        itemPlayedStateIsDeletable=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((delete_blacktagged_movie == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -3696,11 +4071,11 @@ def get_media_items():
                                                         ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                                            if (cfg.DEBUG):
+                                            if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item),print_movie_error_info)
 
-                                        if (itemIsPlayed and itemIsOKToDelete):
+                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_movie_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -3715,7 +4090,7 @@ def get_media_items():
 
 ############# Episodes #############
 
-        if ((cfg.played_age_episode >= 0) or (cfg.max_age_episode >= 0)):
+        if ((played_age_episode >= 0) or (max_age_episode >= 0)):
 
             user_processed_itemsId=set()
 
@@ -3740,8 +4115,13 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (cfg.max_age_episode >= 0):
-                        IsPlayedState_Blacklist=''
+                    if (max_age_episode >= 0):
+                         if (max_delete_played_state_episode == 0):
+                            IsPlayedState_Blacklist=''
+                         elif (max_delete_played_state_episode == 1):
+                            IsPlayedState_Blacklist='True'
+                         else: #(max_delete_played_state_episode == 2)
+                            IsPlayedState_Blacklist='False'
                     else:
                         IsPlayedState_Blacklist='True'
 
@@ -3983,16 +4363,16 @@ def get_media_items():
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4050,8 +4430,8 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
-                                    if (cfg.max_age_episode >= 0):
-                                        max_cut_off_date_episode=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_episode)
+                                    if (max_age_episode >= 0):
+                                        max_cut_off_date_episode=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_episode)
                                     else:
                                         max_cut_off_date_episode=date_time_now + timedelta(1)
 
@@ -4059,13 +4439,13 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_EPISODE_Local=True
-                                    elif ((cfg.keep_favorites_episode) and ('UserData'in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
+                                    elif ((keep_favorites_episode) and ('UserData'in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_EPISODE_Local=True
 
                                     itemisfav_EPISODE_Advanced=False
-                                    if ((cfg.keep_favorites_episode) and (cfg.keep_favorites_advanced_episode_genre or cfg.keep_favorites_advanced_season_genre or
-                                       cfg.keep_favorites_advanced_series_genre or cfg.keep_favorites_advanced_tv_library_genre or
-                                       cfg.keep_favorites_advanced_tv_studio_network or cfg.keep_favorites_advanced_tv_studio_network_genre)):
+                                    if ((keep_favorites_episode) and (keep_favorites_advanced_episode_genre or keep_favorites_advanced_season_genre or
+                                       keep_favorites_advanced_series_genre or keep_favorites_advanced_tv_library_genre or
+                                       keep_favorites_advanced_tv_studio_network or keep_favorites_advanced_tv_studio_network_genre)):
                                         itemisfav_EPISODE_Advanced=get_isEPISODE_AdvancedFav(item,user_key)
 
                                     itemisfav_EPISODE_Display=False
@@ -4073,7 +4453,7 @@ def get_media_items():
                                         itemisfav_EPISODE_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((cfg.keep_favorites_episode == 2) and (itemisfav_EPISODE_Local or itemisfav_EPISODE_Advanced)):
+                                    if ((keep_favorites_episode == 2) and (itemisfav_EPISODE_Local or itemisfav_EPISODE_Advanced)):
                                         isfav_byUserId_Episode[user_key][item['Id']] = True
 
                                     itemIsWhiteTagged=False
@@ -4085,7 +4465,7 @@ def get_media_items():
                                             itemIsWhiteTagged=True
                                             episode_whitetag_list.append(item['Id'])
 
-                                    if (cfg.minimum_number_episodes):
+                                    if (minimum_number_episodes):
                                         #determine minimum number of additional episodes to keep for its series
                                         series_info = get_SERIES_itemInfo(item,user_key)
                                         if (series_info):
@@ -4113,7 +4493,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -4123,19 +4503,20 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
-                                        itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],cfg.max_age_episode,max_cut_off_date_episode)
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_episode >= 0)):
+                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],
+                                                                                    max_age_episode,max_cut_off_date_episode,max_delete_played_state_episode,played_count_episode_action,played_count_episode)
                                     else:
-                                        itemIsPlayed=False
+                                        itemPlayedStateIsDeletable=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -4149,11 +4530,11 @@ def get_media_items():
                                                         ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                                            if (cfg.DEBUG):
+                                            if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item),print_episode_error_info)
 
-                                        if (itemIsPlayed and itemIsOKToDelete):
+                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -4168,7 +4549,7 @@ def get_media_items():
 
 ############# Audio #############
 
-        if ((cfg.played_age_audio >= 0) or (cfg.max_age_audio >= 0)):
+        if ((played_age_audio >= 0) or (max_age_audio >= 0)):
 
             user_processed_itemsId=set()
 
@@ -4193,8 +4574,13 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (cfg.max_age_audio >= 0):
-                        IsPlayedState_Blacklist=''
+                    if (max_age_audio >= 0):
+                         if (max_delete_played_state_audio == 0):
+                            IsPlayedState_Blacklist=''
+                         elif (max_delete_played_state_audio == 1):
+                            IsPlayedState_Blacklist='True'
+                         else: #(max_delete_played_state_audio == 2)
+                            IsPlayedState_Blacklist='False'
                     else:
                         IsPlayedState_Blacklist='True'
 
@@ -4436,16 +4822,16 @@ def get_media_items():
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4503,8 +4889,8 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
-                                    if (cfg.max_age_audio >= 0):
-                                        max_cut_off_date_audio=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audio)
+                                    if (max_age_audio >= 0):
+                                        max_cut_off_date_audio=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_audio)
                                     else:
                                         max_cut_off_date_audio=date_time_now + timedelta(1)
 
@@ -4512,13 +4898,13 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIO_Local=True
-                                    elif ((cfg.keep_favorites_audio) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
+                                    elif ((keep_favorites_audio) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIO_Local=True
 
                                     itemisfav_AUDIO_Advanced=False
-                                    if ((cfg.keep_favorites_audio) and (cfg.keep_favorites_advanced_track_genre or cfg.keep_favorites_advanced_album_genre or
-                                        cfg.keep_favorites_advanced_music_library_genre or cfg.keep_favorites_advanced_track_artist or
-                                        cfg.keep_favorites_advanced_album_artist)):
+                                    if ((keep_favorites_audio) and (keep_favorites_advanced_track_genre or keep_favorites_advanced_album_genre or
+                                        keep_favorites_advanced_music_library_genre or keep_favorites_advanced_track_artist or
+                                        keep_favorites_advanced_album_artist)):
                                         itemisfav_AUDIO_Advanced=get_isAUDIO_AdvancedFav(item,user_key,'Audio')
 
                                     itemisfav_AUDIO_Display=False
@@ -4526,7 +4912,7 @@ def get_media_items():
                                         itemisfav_AUDIO_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((cfg.keep_favorites_audio == 2) and (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced)):
+                                    if ((keep_favorites_audio == 2) and (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced)):
                                         isfav_byUserId_Audio[user_key][item['Id']] = True
 
                                     itemIsWhiteTagged=False
@@ -4557,7 +4943,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -4567,19 +4953,20 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
-                                        itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],cfg.max_age_audio,max_cut_off_date_audio)
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_audio >= 0)):
+                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],
+                                                                                    max_age_audio,max_cut_off_date_audio,max_delete_played_state_audio,played_count_audio_action,played_count_audio)
                                     else:
-                                        itemIsPlayed=False
+                                        itemPlayedStateIsDeletable=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -4594,11 +4981,11 @@ def get_media_items():
                                                           ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                                            if (cfg.DEBUG):
+                                            if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item),print_audio_error_info)
 
-                                        if (itemIsPlayed and itemIsOKToDelete):
+                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -4617,9 +5004,9 @@ def get_media_items():
         #Jellyfin sets audio books to a media type of audioBook
         #Emby sets audio books to a media type of audio (see audio section)
         if (
-           ((cfg.server_brand == 'jellyfin') and
+           ((server_brand == 'jellyfin') and
            hasattr(cfg, 'played_age_audiobook') and hasattr(cfg, 'max_age_audiobook')) and
-           ((cfg.played_age_audiobook >= 0) or (cfg.max_age_audiobook >= 0))
+           ((played_age_audiobook >= 0) or (max_age_audiobook >= 0))
            ):
 
             user_processed_itemsId=set()
@@ -4645,8 +5032,13 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (cfg.max_age_audiobook >= 0):
-                        IsPlayedState_Blacklist=''
+                    if (max_age_audiobook >= 0):
+                         if (max_delete_played_state_audiobook == 0):
+                            IsPlayedState_Blacklist=''
+                         elif (max_delete_played_state_audiobook == 1):
+                            IsPlayedState_Blacklist='True'
+                         else: #(max_delete_played_state_audiobook == 2)
+                            IsPlayedState_Blacklist='False'
                     else:
                         IsPlayedState_Blacklist='True'
 
@@ -4888,16 +5280,16 @@ def get_media_items():
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4955,8 +5347,8 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     #establish max cutoff date for media item
-                                    if (cfg.max_age_audiobook >= 0):
-                                        max_cut_off_date_audiobook=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(cfg.max_age_audiobook)
+                                    if (max_age_audiobook >= 0):
+                                        max_cut_off_date_audiobook=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_audiobook)
                                     else:
                                         max_cut_off_date_audiobook=date_time_now + timedelta(1)
 
@@ -4964,13 +5356,13 @@ def get_media_items():
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIOBOOK_Local=True
-                                    elif ((cfg.keep_favorites_audiobook) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
+                                    elif ((keep_favorites_audiobook) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
                                         itemisfav_AUDIOBOOK_Local=True
 
                                     itemisfav_AUDIOBOOK_Advanced=False
-                                    if ((cfg.keep_favorites_audiobook) and (cfg.keep_favorites_advanced_audio_book_track_genre or cfg.keep_favorites_advanced_audio_book_genre or
-                                        cfg.keep_favorites_advanced_audio_book_library_genre or cfg.keep_favorites_advanced_audio_book_track_author or
-                                        cfg.keep_favorites_advanced_audio_book_author)):
+                                    if ((keep_favorites_audiobook) and (keep_favorites_advanced_audio_book_track_genre or keep_favorites_advanced_audio_book_genre or
+                                        keep_favorites_advanced_audio_book_library_genre or keep_favorites_advanced_audio_book_track_author or
+                                        keep_favorites_advanced_audio_book_author)):
                                         itemisfav_AUDIOBOOK_Advanced=get_isAUDIOBOOK_AdvancedFav(item,user_key,'AudioBook')
 
                                     itemisfav_AUDIOBOOK_Display=False
@@ -4978,7 +5370,7 @@ def get_media_items():
                                         itemisfav_AUDIOBOOK_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((cfg.keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced)):
+                                    if ((keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced)):
                                         isfav_byUserId_AudioBook[user_key][item['Id']] = True
 
                                     itemIsWhiteTagged=False
@@ -5009,7 +5401,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -5019,19 +5411,20 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (cfg.multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
-                                        itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],cfg.max_age_audiobook,max_cut_off_date_audiobook)
+                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_audiobook >= 0)):
+                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],
+                                                                                    max_age_audiobook,max_cut_off_date_audiobook,max_delete_played_state_audiobook,played_count_audiobook_action,played_count_audiobook)
                                     else:
-                                        itemIsPlayed=False
+                                        itemPlayedStateIsDeletable=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((cfg.delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsPlayed):
+                                    if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -5046,11 +5439,11 @@ def get_media_items():
                                                           ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                                            if (cfg.DEBUG):
+                                            if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item),print_audiobook_error_info)
 
-                                        if (itemIsPlayed and itemIsOKToDelete):
+                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -5066,7 +5459,7 @@ def get_media_items():
 
 ############# End Media Types #############
 
-        if (not all_media_disabled):
+        if not (all_media_disabled):
             if not (media_found):
                 print_byType('[NO PLAYED ITEMS]',print_warnings)
 
@@ -5078,14 +5471,14 @@ def get_media_items():
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
     deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
     deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
     deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
@@ -5095,17 +5488,17 @@ def get_media_items():
     deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
     deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.isblacktag_and_watched_byUserId_*
     deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
     deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
     deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
-    if (cfg.server_brand == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
-    if (cfg.DEBUG):
+    if (DEBUG):
         print('-----------------------------------------------------------')
         print('')
         print('isfav_MOVIE: ')
@@ -5117,7 +5510,7 @@ def get_media_items():
         print('isfav_AUDIO: ')
         print(isfav_byUserId_Audio)
         print('')
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(isfav_byUserId_AudioBook)
             print('')
@@ -5133,7 +5526,7 @@ def get_media_items():
         print('isfav_AUDIO: ')
         print(audio_whitetag_list)
         print('')
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitetag_list)
             print('')
@@ -5155,7 +5548,7 @@ def get_media_items():
         print('isfav_AUDIO: ')
         print(audio_whitelists)
         print('')
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitelists)
             print('')
@@ -5171,7 +5564,7 @@ def get_media_items():
         print('isfav_AUDIO: ')
         print(isblacktag_and_watched_byUserId_Audio)
         print('')
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             print('isfav_AUDIOBOOK: ')
             print(isblacktag_and_watched_byUserId_AudioBook)
             print('')
@@ -5665,6 +6058,104 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The minimum_number_episodes variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'played_count_movie_action'):
+        check=cfg.played_count_movie_action
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 3))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_movie_action must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_movie_action variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'played_count_episode_action'):
+        check=cfg.played_count_episode_action
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 3))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_episode_action must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_episode_action variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'played_count_audio_action'):
+        check=cfg.played_count_audio_action
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 3))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_audio_action must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_audio_action variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'played_count_audiobook_action'):
+                check=cfg.played_count_audiobook_action
+                if (
+                    not ((type(check) is int) and
+                    (check >= 0) and
+                    (check <= 3))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: played_count_audiobook_action must be an integer; valid range 0 thru 1\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The played_count_audiobook_action variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'played_count_movie'):
+        check=cfg.played_count_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 1) and
+            (check <= 730500))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_movie must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'played_count_episode'):
+        check=cfg.played_count_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 1) and
+            (check <= 730500))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_episode must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'played_count_audio'):
+        check=cfg.played_count_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 1) and
+            (check <= 730500))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: played_count_audio must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The played_count_audio variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'server_brand'):
+        check=cfg.server_brand
+        if (check == 'jellyfin'):
+            if hasattr(cfg, 'played_count_audiobook'):
+                check=cfg.played_count_audiobook
+                if (
+                    not ((type(check) is int) and
+                    (check >= 1) and
+                    (check <= 730500))
+                ):
+                    error_found_in_media_cleaner_config_py+='ValueError: played_count_audiobook must be an integer; valid range 0 thru 1\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The played_count_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6214,52 +6705,52 @@ def cfgCheck():
 
 #######################################################################################################
 
-    if hasattr(cfg, 'max_keep_favorites_movie'):
-        check=cfg.max_keep_favorites_movie
+    if hasattr(cfg, 'max_delete_played_state_movie'):
+        check=cfg.max_delete_played_state_movie
         if (
             not ((type(check) is int) and
             (check >= 0) and
-            (check <= 1))
+            (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_movie must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_movie variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_movie must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_movie variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'max_keep_favorites_episode'):
-        check=cfg.max_keep_favorites_episode
+    if hasattr(cfg, 'max_delete_played_state_episode'):
+        check=cfg.max_delete_played_state_episode
         if (
             not ((type(check) is int) and
             (check >= 0) and
-            (check <= 1))
+            (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_episode must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_episode must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_episode variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'max_keep_favorites_audio'):
-        check=cfg.max_keep_favorites_audio
+    if hasattr(cfg, 'max_delete_played_state_audio'):
+        check=cfg.max_delete_played_state_audio
         if (
             not ((type(check) is int) and
             (check >= 0) and
-            (check <= 1))
+            (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audio must be an integer; valid range 0 thru 1\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audio variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_audio must be an integer; valid range 0 thru 1\n'
+    #else:
+        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_audio variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (check == 'jellyfin'):
-            if hasattr(cfg, 'max_keep_favorites_audiobook'):
-                check=cfg.max_keep_favorites_audiobook
+            if hasattr(cfg, 'max_delete_played_state_audiobook'):
+                check=cfg.max_delete_played_state_audiobook
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
-                    (check <= 1))
+                    (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: max_keep_favorites_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The max_keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+                    error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_audiobook must be an integer; valid range 0 thru 1\n'
+            #else:
+                #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6408,7 +6899,7 @@ def cfgCheck():
 #######################################################################################################
 
     #Bring all errors found to users attention
-    if (not error_found_in_media_cleaner_config_py == ''):
+    if not (error_found_in_media_cleaner_config_py == ''):
         raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
 
 #######################################################################################################

@@ -109,7 +109,7 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #----------------------------------------------------------#
 REMOVE_FILES=False
 ```
-#### At least this many episodes will reamain in each tv series:
+#### At least this many episodes will remain in each tv series:
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
@@ -121,6 +121,33 @@ REMOVE_FILES=False
 # (0 : default)
 #----------------------------------------------------------#
 minimum_number_episodes=0
+```
+#### Delete or Keep by play count
+```python
+#----------------------------------------------------------#
+# Keep or delete media item when play count is greater/less than or equal to played_count_*
+#  0 - Delete media items when play count is Greater Than or Equal To played_count_*
+#  1 - Delete media items when play count is Less Than or Equal To played_count_*
+#  2 - Keep media items when play count is Greater Than or Equal To played_count_*
+#  3 - Keep media items when play count is Less Than or Equal To played_count_*
+# (0 : default)
+#----------------------------------------------------------#
+played_count_movie_action=0
+played_count_episode_action=0
+played_count_audio_action=0
+played_count_audiobook_action=0
+```
+#### Number of plays to use for Delete or Keep by play count
+```python
+#----------------------------------------------------------#
+# Keep or delete media item when play count is greater/less than or equal to # times
+#   1-730500 - number of play counts
+# (1 : default)
+#----------------------------------------------------------#
+played_count_movie=1
+played_count_episode=1
+played_count_audio=1
+played_count_audiobook=1
 ```
 #### Keep movie if genre favorited:
 ```python
@@ -252,19 +279,21 @@ max_age_episode=-1
 max_age_audio=-1
 max_age_audiobook=-1
 ```
-#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
+#### !!!CAUTION!!!   READ max_delete_played_state_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 ```python
 #----------------------------------------------------------#
-# Decide if max age media set as a favorite should be deleted
-#  0 - ok to delete max age media items set as a favorite
-#  1 - do not delete max age media items when set as a favorite
-# (1 : default)
+# When using max_age_*; decide if played, unplayed, or both max age media items should be deleted
+#  0 - ok to delete both played and unplayed max age media items
+#  1 - ok to delete played max age media items; keep unplayed max age media items
+#  2 - ok to delete unplayed max age media items; keep played max age media items
+# (0 : default)
 #----------------------------------------------------------#
-max_keep_favorites_movie=1
-max_keep_favorites_episode=1
-max_keep_favorites_audio=1
-max_keep_favorites_audiobook=1
+max_delete_played_state_movie=0
+max_delete_played_state_episode=0
+max_delete_played_state_audio=0
+max_delete_played_state_audiobook=0
 ```
+#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
 
 ### Created first time the script runs; Do **_NOT_** edit or modify these:
 #### Needed for differences between Emby and Jellyfin?

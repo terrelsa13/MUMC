@@ -40,6 +40,16 @@ def get_default_config_values(config_value):
 
         'minimum_number_episodes':0,
 
+        'played_count_movie_action':0,
+        'played_count_episode_action':0,
+        'played_count_audio_action':0,
+        'played_count_audiobook_action':0,
+
+        'played_count_movie':1,
+        'played_count_episode':1,
+        'played_count_audio':1,
+        'played_count_audiobook':1,
+
         'keep_favorites_advanced_movie_genre':0,
         'keep_favorites_advanced_movie_library_genre':0,
 
