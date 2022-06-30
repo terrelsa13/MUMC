@@ -1,4 +1,4 @@
-# Version 3.0.0 And Later Are Not Backwards Compatible
+# Version prior to 3.0.0 Are Not Compatible
 * Previous versions of the config are not compatible with this latest version of the script.
 # Script
 ## media_cleaner.py
