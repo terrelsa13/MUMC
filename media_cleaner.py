@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.3'
+    Version='2.1.4'
 
     return(Version)
 
@@ -2946,7 +2946,7 @@ def prepare_MOVIEoutput(item):
     if not ('Studios' in item):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
-    if not (0 in item['Studios']):
+    if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
     if not ('Name' in item['Studios'][0]):
