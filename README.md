@@ -1,17 +1,5 @@
-# Version 2.1.0 And Later Are Not Backwards Compatible
-* media_cleaner.py [Version 2.1.0 updates and changes](https://github.com/terrelsa13/media_cleaner/issues/23#issue-1260958344)
+# Version 3.0.0 And Later Are Not Backwards Compatible
 * Previous versions of the config are not compatible with this latest version of the script.
-* If you are running an unversioned script or a version before version 2.1.0 you will need to do the following:
-   - Renaming the current media_cleaner folder
-   - Create a new media_cleaner folder
-   - Download the updated version of the script into the new folder
-   - [Manually run the script](https://github.com/terrelsa13/media_cleaner#first-run-debian-ubuntu-and-linux-mint) the first time to allow it to rebuild the config file
-   - Make any manual changes to the config that are needed
-   - Verify script runs as desired
-   - After running as desired set `REMOVE_FILES=True`
-   - If Linux set script to [run in crontab](https://github.com/terrelsa13/media_cleaner/edit/master/README.md#schedule-to-run-using-crontab-debian-ubuntu-and-linux-mint)
-   - Delete the renamed folder from the first step
-   - Enjoy not having to manually delete episodes, movies, audio tracks, and audio books
 # Script
 ## media_cleaner.py
 This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media items played past the configured number of days.
