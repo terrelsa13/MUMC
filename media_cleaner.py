@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.4'
+    Version='2.1.5'
 
     return(Version)
 
@@ -1722,7 +1722,7 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
 
 
 #Get children of favorited parents
-def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
+def getChildren_favoritedMediaItems(user_key,data_Favorited,max_age,APIDebugMsg):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     child_list=[]
@@ -1752,7 +1752,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                if (cfg.max_age_movie >= 0):
+                if (max_age >= 0):
                     IsPlayedState=''
                 else:
                     IsPlayedState='True'
@@ -1802,7 +1802,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
 
 
 #Get children of tagged parents
-def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
+def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,max_age,tag_Type):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     #parent_tag=[]
@@ -1838,7 +1838,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    if (cfg.max_age_movie >= 0):
+                    if (max_age >= 0):
                         IsPlayedState=''
                     else:
                         IsPlayedState='True'
@@ -3537,22 +3537,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,cfg.max_age_movie,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,cfg.max_age_movie,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,cfg.max_age_movie,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,cfg.max_age_movie,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,cfg.max_age_movie,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,cfg.max_age_movie,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -3979,22 +3979,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,cfg.max_age_episode,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,cfg.max_age_episode,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,cfg.max_age_episode,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,cfg.max_age_episode,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,cfg.max_age_episode,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,cfg.max_age_episode,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4432,22 +4432,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,cfg.max_age_audio,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,cfg.max_age_audio,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,cfg.max_age_audio,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,cfg.max_age_audio,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,cfg.max_age_audio,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,cfg.max_age_audio,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4884,22 +4884,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,cfg.max_age_audiobook,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,cfg.max_age_audiobook,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,cfg.blacktag,cfg.max_age_audiobook,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,cfg.blacktag,cfg.max_age_audiobook,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,cfg.whitetag,cfg.max_age_audiobook,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,cfg.whitetag,cfg.max_age_audiobook,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
