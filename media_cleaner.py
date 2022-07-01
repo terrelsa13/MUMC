@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from pickle import TRUE
 import urllib.request as request
 import json, urllib
 import traceback
@@ -16,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.0_ALPHA'
+    Version='3.0.1_ALPHA'
 
     return(Version)
 
@@ -1819,8 +1820,55 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
     return(formatted_season_episode)
 
 
+#Get isPlayed state for API filtering
+def get_isPlayed_FilterValue(play_count_comparison,play_count):
+
+    if (play_count_comparison == '>'):
+        isPlayed_Filter_Value='True'
+    elif (play_count_comparison == '<'):
+        if ((play_count == 0) or (play_count == 1)):
+            isPlayed_Filter_Value='False'
+        else:
+            isPlayed_Filter_Value=''
+    elif (play_count_comparison == '>='):
+        if (play_count == 0):
+            isPlayed_Filter_Value=''
+        else:
+            isPlayed_Filter_Value='True'
+    elif (play_count_comparison == '<='):
+        if (play_count == 0):
+            isPlayed_Filter_Value='False'
+        else:
+            isPlayed_Filter_Value=''
+    elif (play_count_comparison == '=='):
+        if (play_count == 0):
+            isPlayed_Filter_Value='False'
+        else:
+            isPlayed_Filter_Value='True'
+    elif (play_count_comparison == 'not >'):
+        if ((play_count == 0) or (play_count == 1)):
+            isPlayed_Filter_Value='False'
+        else:
+            isPlayed_Filter_Value=''
+    elif (play_count_comparison == 'not <'):
+        isPlayed_Filter_Value='True'
+    elif (play_count_comparison == 'not >='):
+        if ((play_count == 0) or (play_count == 1)):
+            isPlayed_Filter_Value='False'
+        else:
+            isPlayed_Filter_Value=''
+    elif (play_count_comparison == 'not <='):
+        isPlayed_Filter_Value='True'
+    elif (play_count_comparison == 'not =='):
+        isPlayed_Filter_Value='True'
+    else:
+        isPlayed_Filter_Value=''
+
+    return isPlayed_Filter_Value
+
+
 #Get children of favorited parents
-def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
+def getChildren_favoritedMediaItems(user_key,data_Favorited,play_count_comparison,play_count,APIDebugMsg):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     child_list=[]
@@ -1850,15 +1898,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                if (cfg.max_age_movie >= 0):
-                    if (cfg.max_delete_played_state_movie == 0):
-                        IsPlayedState=''
-                    elif (cfg.max_delete_played_state_movie == 1):
-                        IsPlayedState='True'
-                    else: #(cfg.max_delete_played_state_movie == 2)
-                        IsPlayedState='False'
-                else:
-                    IsPlayedState='True'
+                IsPlayedState=get_isPlayed_FilterValue(play_count_comparison,play_count)
 
                 while (QueriesRemaining):
 
@@ -1905,7 +1945,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,APIDebugMsg):
 
 
 #Get children of tagged parents
-def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
+def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,play_count_comparison,play_count,tag_Type):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     #parent_tag=[]
@@ -1941,15 +1981,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,tag_Type):
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    if (cfg.max_age_movie >= 0):
-                        if (cfg.max_delete_played_state_movie == 0):
-                            IsPlayedState=''
-                        elif (cfg.max_delete_played_state_movie == 1):
-                            IsPlayedState='True'
-                        else: #(cfg.max_delete_played_state_movie == 2)
-                            IsPlayedState='False'
-                    else:
-                        IsPlayedState='True'
+                    IsPlayedState=get_isPlayed_FilterValue(play_count_comparison,play_count)
 
                     while (QueriesRemaining):
 
@@ -3202,6 +3234,21 @@ def get_media_items():
     blacktags=cfg.blacktag
     whitetags=cfg.whitetag
     minimum_number_episodes=cfg.minimum_number_episodes
+    print_script_header=cfg.print_script_header
+    print_warnings=cfg.print_warnings
+    print_user_header=cfg.print_user_header
+    print_movie_delete_info=cfg.print_movie_delete_info
+    print_movie_keep_info=cfg.print_movie_keep_info
+    print_episode_delete_info=cfg.print_episode_delete_info
+    print_episode_keep_info=cfg.print_episode_keep_info
+    print_audio_delete_info=cfg.print_audio_delete_info
+    print_audio_keep_info=cfg.print_audio_keep_info
+    if (cfg.server_brand == 'jellyfin'):
+        print_audiobook_delete_info=cfg.print_audiobook_delete_info
+        print_audiobook_keep_info=cfg.print_audiobook_keep_info
+    else:
+        print_audiobook_delete_info=False
+        print_audiobook_keep_info=False
 
     #establish deletion date for played media items
     date_time_now=datetime.now(timezone.utc)
@@ -3216,173 +3263,58 @@ def get_media_items():
         delete_blacktagged_movie=cfg.delete_blacktagged_movie
         keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
         keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
-        print_movie_delete_info=cfg.print_movie_delete_info
-        print_movie_keep_info=cfg.print_movie_keep_info
         print_movie_error_info=cfg.print_movie_error_info
         cut_off_date_movie=date_time_now - timedelta(movie_condition_days)
     if (episode_condition_days >= 0):
-        cut_off_date_episode=date_time_now - timedelta(played_age_episode)
+        episode_condition=cfg.episode_condition
+        #episode_condition_days=cfg.episode_condition_days
+        episode_play_count_comparison=cfg.episode_play_count_comparison
+        episode_play_count=cfg.episode_play_count
+        keep_favorites_episode=cfg.keep_favorites_episode
+        multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
+        delete_blacktagged_episode=cfg.delete_blacktagged_episode
+        minimum_number_episodes=cfg.minimum_number_episodes
+        keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
+        keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
+        keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
+        keep_favorites_advanced_tv_library_genre=cfg.keep_favorites_advanced_tv_library_genre
+        keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
+        keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
+        print_episode_error_info=cfg.print_episode_error_info
+        cut_off_date_episode=date_time_now - timedelta(episode_condition_days)
     if (audio_condition_days >= 0):
-        cut_off_date_audio=date_time_now - timedelta(played_age_audio)
+        audio_condition=cfg.audio_condition
+        #audio_condition_days=cfg.audio_condition_days
+        audio_play_count_comparison=cfg.audio_play_count_comparison
+        audio_play_count=cfg.audio_play_count
+        keep_favorites_audio=cfg.keep_favorites_audio
+        multiuser_whitelist_audio=cfg.multiuser_whitelist_audio
+        delete_blacktagged_audio=cfg.delete_blacktagged_audio
+        keep_favorites_advanced_track_genre=cfg.keep_favorites_advanced_track_genre
+        keep_favorites_advanced_album_genre=cfg.keep_favorites_advanced_album_genre
+        keep_favorites_advanced_music_library_genre=cfg.keep_favorites_advanced_music_library_genre
+        keep_favorites_advanced_track_artist=cfg.keep_favorites_advanced_track_artist
+        keep_favorites_advanced_album_artist=cfg.keep_favorites_advanced_album_artist
+        print_audio_error_info=cfg.print_audio_error_info
+        cut_off_date_audio=date_time_now - timedelta(audio_condition_days)
     if (audiobook_condition_days >= 0):
-        cut_off_date_audiobook=date_time_now - timedelta(played_age_audiobook)
-
-    keep_favorites_episode=cfg.keep_favorites_episode
-    keep_favorites_audio=cfg.keep_favorites_audio
-    if (cfg.server_brand == 'jellyfin'):
+        audiobook_condition=cfg.audiobook_condition
+        #audiobook_condition_days=cfg.audiobook_condition_days
+        audiobook_play_count_comparison=cfg.audiobook_play_count_comparison
+        audiobook_play_count=cfg.audiobook_play_count
         keep_favorites_audiobook=cfg.keep_favorites_audiobook
-
-    multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
-    multiuser_whitelist_audio=cfg.multiuser_whitelist_audio
-    if (cfg.server_brand == 'jellyfin'):
         multiuser_whitelist_audiobook=cfg.multiuser_whitelist_audiobook
-
-    delete_blacktagged_episode=cfg.delete_blacktagged_episode
-    delete_blacktagged_audio=cfg.delete_blacktagged_audio
-    if (cfg.server_brand == 'jellyfin'):
         delete_blacktagged_audiobook=cfg.delete_blacktagged_audiobook
-
-    if (hasattr(cfg,'played_count_episode_action')):
-        played_count_episode_action=cfg.played_count_episode_action
-    else:
-        played_count_episode_action=0
-    if (hasattr(cfg,'played_count_audio_action')):
-        played_count_audio_action=cfg.played_count_audio_action
-    else:
-        played_count_audio_action=0
-    if (server_brand == 'jellyfin'):
-        if (hasattr(cfg,'played_count_audiobook_action')):
-            played_count_audiobook_action=cfg.played_count_audiobook_action
-        else:
-            played_count_audiobook_action=0
-
-    if (server_brand == 'jellyfin'):
-        if (hasattr(cfg,'max_delete_played_state_audiobook')):
-            max_delete_played_state_audiobook=cfg.max_delete_played_state_audiobook
-        else:
-            max_delete_played_state_audiobook=0
-
-    if (hasattr(cfg,'played_count_episode')):
-        played_count_episode=cfg.played_count_episode
-    else:
-        played_count_episode=0
-    if (hasattr(cfg,'played_count_audio')):
-        played_count_audio=cfg.played_count_audio
-    else:
-        played_count_audio=0
-    if (server_brand == 'jellyfin'):
-        if (hasattr(cfg,'played_count_audiobook')):
-            played_count_audiobook=cfg.played_count_audiobook
-        else:
-            played_count_audiobook=0
-
-    keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
-    keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
-    keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
-    keep_favorites_advanced_tv_library_genre=cfg.keep_favorites_advanced_tv_library_genre
-    keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
-    keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
-
-    keep_favorites_advanced_track_genre=cfg.keep_favorites_advanced_track_genre
-    keep_favorites_advanced_album_genre=cfg.keep_favorites_advanced_album_genre
-    keep_favorites_advanced_music_library_genre=cfg.keep_favorites_advanced_music_library_genre
-    keep_favorites_advanced_track_artist=cfg.keep_favorites_advanced_track_artist
-    keep_favorites_advanced_album_artist=cfg.keep_favorites_advanced_album_artist
-
-    if (cfg.server_brand == 'jellyfin'):
         keep_favorites_advanced_audio_book_track_genre=cfg.keep_favorites_advanced_audio_book_track_genre
         keep_favorites_advanced_audio_book_genre=cfg.keep_favorites_advanced_audio_book_genre
         keep_favorites_advanced_audio_book_library_genre=cfg.keep_favorites_advanced_audio_book_library_genre
         keep_favorites_advanced_audio_book_track_author=cfg.keep_favorites_advanced_audio_book_track_author
         keep_favorites_advanced_audio_book_author=cfg.keep_favorites_advanced_audio_book_author
-
-    if (hasattr(cfg,'max_delete_played_state_episode')):
-        max_delete_played_state_episode=cfg.max_delete_played_state_episode
-    else:
-        max_delete_played_state_episode=0
-    if (hasattr(cfg,'max_delete_played_state_audio')):
-        max_delete_played_state_audio=cfg.max_delete_played_state_audio
-    else:
-        max_delete_played_state_audio=0
-    if (server_brand == 'jellyfin'):
-        if (hasattr(cfg,'max_delete_played_state_audiobook')):
-            max_delete_played_state_audiobook=cfg.max_delete_played_state_audiobook
-        else:
-            max_delete_played_state_audiobook=0
-
-    if (hasattr(cfg,'print_script_header')):
-        print_script_header=cfg.print_script_header
-    else:
-        print_script_header=True
-    if (hasattr(cfg,'print_warnings')):
-        print_warnings=cfg.print_warnings
-    else:
-        print_warnings=True
-    if (hasattr(cfg,'print_user_header')):
-        print_user_header=cfg.print_user_header
-    else:
-        print_user_header=True
-
-    if (hasattr(cfg,'print_movie_delete_info')):
-        print_movie_delete_info=cfg.print_movie_delete_info
-    else:
-        print_movie_delete_info=True
-    if (hasattr(cfg,'print_movie_keep_info')):
-        print_movie_keep_info=cfg.print_movie_keep_info
-    else:
-        print_movie_keep_info=True
-    if (hasattr(cfg,'print_movie_error_info')):
-        print_movie_error_info=cfg.print_movie_error_info
-    else:
-        print_movie_error_info=True
-    if (hasattr(cfg,'print_episode_delete_info')):
-        print_episode_delete_info=cfg.print_episode_delete_info
-    else:
-        print_episode_delete_info=True
-    if (hasattr(cfg,'print_episode_keep_info')):
-        print_episode_keep_info=cfg.print_episode_keep_info
-    else:
-        print_episode_keep_info=True
-    if (hasattr(cfg,'print_episode_error_info')):
-        print_episode_error_info=cfg.print_episode_error_info
-    else:
-        print_episode_error_info=True
-    if (hasattr(cfg,'print_audio_delete_info')):
-        print_audio_delete_info=cfg.print_audio_delete_info
-    else:
-        print_audio_delete_info=True
-    if (hasattr(cfg,'print_audio_keep_info')):
-        print_audio_keep_info=cfg.print_audio_keep_info
-    else:
-        print_audio_keep_info=False
-    if (hasattr(cfg,'print_audio_error_info')):
-        print_audio_error_info=cfg.print_audio_error_info
-    else:
-        print_audio_error_info=True
-    if (hasattr(cfg, 'print_audiobook_delete_info')):
-        if (server_brand == 'jellyfin'):
-            print_audiobook_delete_info=cfg.print_audiobook_delete_info
-        else:
-            print_audiobook_delete_info=False
-    else:
-        print_audiobook_delete_info=True
-    if (hasattr(cfg, 'print_audiobook_keep_info')):
-        if (server_brand == 'jellyfin'):
-            print_audiobook_keep_info=cfg.print_audiobook_keep_info
-        else:
-            print_audiobook_keep_info=False
-    else:
-        print_audiobook_keep_info=True
-    if (hasattr(cfg, 'print_audiobook_error_info')):
-        if (server_brand == 'jellyfin'):
-            print_audiobook_error_info=cfg.print_audiobook_error_info
-        else:
-            print_audiobook_error_info=False
-    else:
-        print_audiobook_error_info=True
+        print_audiobook_error_info=cfg.print_audiobook_error_info
+        cut_off_date_audiobook=date_time_now - timedelta(audiobook_condition_days)
 
     print_common_delete_keep_info=(print_movie_delete_info or print_movie_keep_info or print_episode_delete_info or print_episode_keep_info or
-                                   print_audio_delete_info or print_audio_keep_info or print_audiobook_delete_info or print_audiobook_keep_info)
+                                    print_audio_delete_info or print_audio_keep_info or print_audiobook_delete_info or print_audiobook_keep_info)
 
     #Get list of all played items
     print_byType('',print_script_header)
@@ -3398,12 +3330,9 @@ def get_media_items():
 
     if (
        (movie_condition_days == -1) and
-       (played_age_episode == -1) and
-       (played_age_audio == -1) and
-       ((hasattr(cfg, 'played_age_audiobook') and (played_age_audiobook == -1)) or (not hasattr(cfg, 'played_age_audiobook'))) and
-       (max_age_episode == -1) and
-       (max_age_audio == -1) and
-       ((hasattr(cfg, 'max_age_audiobook') and (max_age_audiobook == -1)) or (not hasattr(cfg, 'max_age_audiobook')))
+       (episode_condition_days == -1) and
+       (audio_condition_days == -1) and
+       ((hasattr(cfg, 'audiobook_condition_days') and (audiobook_condition_days == -1)) or (not hasattr(cfg, 'audiobook_condition_days')))
        ):
         print_byType('* ATTENTION!!!                                            *',print_warnings)
         print_byType('* No media types are being monitored.                     *',print_warnings)
@@ -3411,10 +3340,10 @@ def get_media_items():
         print_byType('* Set at least one media type to >=0.                     *',print_warnings)
         print_byType('*                                                         *',print_warnings)
         print_byType('* movie_condition_days=-1                                 *',print_warnings)
-        print_byType('* played_age_episode=-1                                   *',print_warnings)
-        print_byType('* played_age_audio=-1                                     *',print_warnings)
+        print_byType('* episode_condition_days=-1                               *',print_warnings)
+        print_byType('* audio_condition_days=-1                                 *',print_warnings)
         if (server_brand == 'jellyfin'):
-            print_byType('* played_age_audiobook=-1                             *',print_warnings)
+            print_byType('* audiobook_condition_days=-1                         *',print_warnings)
         print_byType('-----------------------------------------------------------',print_warnings)
         all_media_disabled=True
 
@@ -3552,10 +3481,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (movie_condition == 'played'):
-                        IsPlayedState_Blacklist='True'
-                    else:
-                        IsPlayedState_Blacklist=''
+                    IsPlayedState_Blacklist=get_isPlayed_FilterValue(movie_play_count_comparison,movie_play_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -3789,22 +3715,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,movie_play_count_comparison,movie_play_count,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,movie_play_count_comparison,movie_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4005,15 +3931,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (max_age_episode >= 0):
-                         if (max_delete_played_state_episode == 0):
-                            IsPlayedState_Blacklist=''
-                         elif (max_delete_played_state_episode == 1):
-                            IsPlayedState_Blacklist='True'
-                         else: #(max_delete_played_state_episode == 2)
-                            IsPlayedState_Blacklist='False'
-                    else:
-                        IsPlayedState_Blacklist='True'
+                    IsPlayedState_Blacklist=get_isPlayed_FilterValue(episode_play_count_comparison,episode_play_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -4247,22 +4165,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,episode_play_count_comparison,episode_play_count,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,episode_play_count_comparison,episode_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4319,11 +4237,20 @@ def get_media_items():
                                 #find media item is ready to delete
                                 if (itemIsMonitored):
 
-                                    #establish max cutoff date for media item
-                                    if (max_age_episode >= 0):
-                                        max_cut_off_date_episode=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_episode)
+                                    #establish cutoff date for media item
+                                    if ((episode_condition == 'played') and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                        if ((cut_off_date_episode) > (parse(item['UserData']['LastPlayedDate']))):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
+                                    elif ((episode_condition == 'created') and ('DateCreated' in item)):
+                                        if (cut_off_date_episode <= date_time_now):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
                                     else:
-                                        max_cut_off_date_episode=date_time_now + timedelta(1)
+                                        #cut_off_date_episode=date_time_now + timedelta(1)
+                                        item_matches_condition_day_filter=False
 
                                     itemisfav_EPISODE_Local=False
                                     #Get if media item is set as favorite
@@ -4396,17 +4323,17 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode)):
                                             episode_whitelists.append(item['Id'])
 
-                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_episode >= 0)):
-                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],
-                                                                                    max_age_episode,max_cut_off_date_episode,max_delete_played_state_episode,played_count_episode_action,played_count_episode)
+                                    #Decide if media item meets the filter criteria
+                                    if (('UserData' in item) and ('PlayCount' in item['UserData'])):
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],episode_play_count_comparison,episode_play_count,episode_condition)
                                     else:
-                                        itemPlayedStateIsDeletable=False
+                                        #itemPlayedStateIsDeletable=False
+                                        item_matches_play_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
+                                    if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -4415,16 +4342,17 @@ def get_media_items():
                                             #Fill in the blanks
                                             item=prepare_EPISODEoutput(item)
 
-                                            item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                        ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
-                                                        ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                            item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] +
+                                                        ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + get_days_since_created(item['DateCreated']) +
+                                                        ' - Favorite: ' + str(itemisfav_EPISODE_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) + ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) +
+                                                        ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item),print_episode_error_info)
 
-                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
+                                        if (itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -4464,15 +4392,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (max_age_audio >= 0):
-                         if (max_delete_played_state_audio == 0):
-                            IsPlayedState_Blacklist=''
-                         elif (max_delete_played_state_audio == 1):
-                            IsPlayedState_Blacklist='True'
-                         else: #(max_delete_played_state_audio == 2)
-                            IsPlayedState_Blacklist='False'
-                    else:
-                        IsPlayedState_Blacklist='True'
+                    IsPlayedState_Blacklist=get_isPlayed_FilterValue(audio_play_count_comparison,audio_play_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -4706,22 +4626,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,audio_play_count_comparison,audio_play_count,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,audio_play_count_comparison,audio_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -4778,11 +4698,20 @@ def get_media_items():
                                 #find media item is ready to delete
                                 if (itemIsMonitored):
 
-                                    #establish max cutoff date for media item
-                                    if (max_age_audio >= 0):
-                                        max_cut_off_date_audio=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_audio)
+                                    #establish cutoff date for media item
+                                    if ((audio_condition == 'played') and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                        if ((cut_off_date_audio) > (parse(item['UserData']['LastPlayedDate']))):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
+                                    elif ((audio_condition == 'created') and ('DateCreated' in item)):
+                                        if (cut_off_date_audio <= date_time_now):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
                                     else:
-                                        max_cut_off_date_audio=date_time_now + timedelta(1)
+                                        #cut_off_date_audio=date_time_now + timedelta(1)
+                                        item_matches_condition_day_filter=False
 
                                     itemisfav_AUDIO_Local=False
                                     #Get if media item is set as favorite
@@ -4846,17 +4775,17 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio)):
                                             audio_whitelists.append(item['Id'])
 
-                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_audio >= 0)):
-                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],
-                                                                                    max_age_audio,max_cut_off_date_audio,max_delete_played_state_audio,played_count_audio_action,played_count_audio)
+                                    #Decide if media item meets the filter criteria
+                                    if (('UserData' in item) and ('PlayCount' in item['UserData'])):
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audio_play_count_comparison,audio_play_count,audio_condition)
                                     else:
-                                        itemPlayedStateIsDeletable=False
+                                        #itemPlayedStateIsDeletable=False
+                                        item_matches_play_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
+                                    if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -4867,15 +4796,16 @@ def get_media_items():
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
                                                           ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
-                                                          ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
-                                                          ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                          ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIO_Display) +
+                                                          ' - WhiteTag: ' + str(itemIsWhiteTagged) + ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) +
+                                                          ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item),print_audio_error_info)
 
-                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
+                                        if (itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
                                             deleteItems.append(item)
                                         else:
@@ -4893,11 +4823,7 @@ def get_media_items():
         #audioBook meida type only applies to jellyfin
         #Jellyfin sets audio books to a media type of audioBook
         #Emby sets audio books to a media type of audio (see audio section)
-        if (
-           ((server_brand == 'jellyfin') and
-           hasattr(cfg, 'played_age_audiobook') and hasattr(cfg, 'max_age_audiobook')) and
-           (audiobook_condition_days >= 0)
-           ):
+        if ((server_brand == 'jellyfin') and (hasattr(cfg, 'movie_condition_days')) and (audiobook_condition_days >= 0)):
 
             user_processed_itemsId=set()
 
@@ -4922,15 +4848,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (max_age_audiobook >= 0):
-                         if (max_delete_played_state_audiobook == 0):
-                            IsPlayedState_Blacklist=''
-                         elif (max_delete_played_state_audiobook == 1):
-                            IsPlayedState_Blacklist='True'
-                         else: #(max_delete_played_state_audiobook == 2)
-                            IsPlayedState_Blacklist='False'
-                    else:
-                        IsPlayedState_Blacklist='True'
+                    IsPlayedState_Blacklist=get_isPlayed_FilterValue(audiobook_play_count_comparison,audiobook_play_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -5164,22 +5082,22 @@ def get_media_items():
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
-                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist_Child)
+                    data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Favorited_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
-                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist_Child)
+                    data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
-                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,APIDebugMsg_Blacktag_From_BlackList_Child)
+                    data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
-                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,APIDebugMsg_Blacktag_From_WhiteList_Child)
+                    data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,APIDebugMsg_Whitetag_From_Blacklist_Child)
+                    data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Whitetag_From_Blacklist_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Whitelist_Child='whitetag_child_from_blacklist_child'
-                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,APIDebugMsg_Whitetag_From_Whitelist_Child)
+                    data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Whitetag_From_Whitelist_Child)
 
                     #Combine dictionaries into list of dictionaries
                     #Order here is important
@@ -5236,11 +5154,20 @@ def get_media_items():
                                 #find media item is ready to delete
                                 if (itemIsMonitored):
 
-                                    #establish max cutoff date for media item
-                                    if (max_age_audiobook >= 0):
-                                        max_cut_off_date_audiobook=datetime.strptime(item['DateCreated'], '%Y-%m-%dT%H:%M:%S.' + item['DateCreated'].split(".")[1]) + timedelta(max_age_audiobook)
+                                    #establish cutoff date for media item
+                                    if ((audiobook_condition == 'played') and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                        if ((cut_off_date_audiobook) > (parse(item['UserData']['LastPlayedDate']))):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
+                                    elif ((audiobook_condition == 'created') and ('DateCreated' in item)):
+                                        if (cut_off_date_audiobook <= date_time_now):
+                                            item_matches_condition_day_filter=True
+                                        else:
+                                            item_matches_condition_day_filter=False
                                     else:
-                                        max_cut_off_date_audiobook=date_time_now + timedelta(1)
+                                        #cut_off_date_audiobook=date_time_now + timedelta(1)
+                                        item_matches_condition_day_filter=False
 
                                     itemisfav_AUDIOBOOK_Local=False
                                     #Get if media item is set as favorite
@@ -5304,17 +5231,17 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook)):
                                             audiobook_whitelists.append(item['Id'])
 
-                                    #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (max_age_audiobook >= 0)):
-                                        itemPlayedStateIsDeletable=get_playedStatus(played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],
-                                                                                    max_age_audiobook,max_cut_off_date_audiobook,max_delete_played_state_audiobook,played_count_audiobook_action,played_count_audiobook)
+                                    #Decide if media item meets the filter criteria
+                                    if (('UserData' in item) and ('PlayCount' in item['UserData'])):
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audiobook_play_count_comparison,audiobook_play_count,audiobook_condition)
                                     else:
-                                        itemPlayedStateIsDeletable=False
+                                        #itemPlayedStateIsDeletable=False
+                                        item_matches_play_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
-                                    if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemPlayedStateIsDeletable):
+                                    if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
 
                                     if ('Played' in item['UserData']):
@@ -5324,16 +5251,16 @@ def get_media_items():
                                             item=prepare_AUDIOBOOKoutput(item)
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
-                                                          ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - ' + get_days_since_created(item['DateCreated']) +
-                                                          ' - Favorite: ' + str(itemisfav_AUDIOBOOK_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) + ' - BlackTag: ' + str(itemIsBlackTagged) +
-                                                          ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
+                                                          ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - Play Count: ' + str(item['UserData']['PlayCount']) +
+                                                          ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_AUDIOBOOK_Display) + ' - WhiteTag: ' + str(itemIsWhiteTagged) +
+                                                          ' - BlackTag: ' + str(itemIsBlackTagged) + ' - Whitelisted: ' + str(itemIsWhiteListed_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id'])
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (DEBUG):
                                                 #DEBUG
                                                 print_byType('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item),print_audiobook_error_info)
 
-                                        if (itemPlayedStateIsDeletable and itemIsOKToDelete):
+                                        if (itemIsOKToDelete):
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
                                             deleteItems.append(item)
                                         else:
