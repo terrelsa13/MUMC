@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.2_ALPHA'
+    Version='3.0.3_ALPHA'
 
     return(Version)
 
@@ -1158,7 +1158,7 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "#   movie_condition='created'; movie_condition_days=9898; movie_play_count_comparison='=='; movie_play_count=0\n"
     config_file += "#\n"
     config_file += "# Delete episodes created at least 9876 days ago with a play count not >= 1.\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=9876; episode_play_count_comparison='>='; episode_play_count=1\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=9876; episode_play_count_comparison='not >='; episode_play_count=1\n"
     config_file += "#----------------------------------------------------------#\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1207,27 +1207,28 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Condition: Delete or Keep media items based on when last Played or based on when Created.\n"
+    config_file += "# Condition: Delete media items based on when they were last played or\n"
+    config_file += "#             based on when they were created.\n"
     config_file += "#   played - Filter will keep or delete media items based on last played date\n"
     config_file += "#   created - Filter will keep or delete media items based on creation date\n"
     config_file += "# (played : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "movie_condition=" + get_default_config_values('movie_condition') + "\n"
-        config_file += "episode_condition=" + get_default_config_values('episode_condition') + "\n"
-        config_file += "audio_condition=" + get_default_config_values('audio_condition') + "\n"
+        config_file += "movie_condition='" + get_default_config_values('movie_condition') + "'\n"
+        config_file += "episode_condition='" + get_default_config_values('episode_condition') + "'\n"
+        config_file += "audio_condition='" + get_default_config_values('audio_condition') + "'\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_condition=" + get_default_config_values('audiobook_condition') + "\n"
+            config_file += "audiobook_condition='" + get_default_config_values('audiobook_condition') + "'\n"
     elif (updateConfig):
-        config_file += "movie_condition=" + cfg.movie_condition + "\n"
-        config_file += "episode_condition=" + cfg.episode_condition + "\n"
-        config_file += "audio_condition=" + cfg.audio_condition + "\n"
+        config_file += "movie_condition='" + cfg.movie_condition + "'\n"
+        config_file += "episode_condition='" + cfg.episode_condition + "'\n"
+        config_file += "audio_condition='" + cfg.audio_condition + "'\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_condition=" + cfg.audiobook_condition + "\n"
+            config_file += "audiobook_condition='" + cfg.audiobook_condition + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Condition Days: Find media items last played or created at least this many days ago.\n"
+    config_file += "# Condition Days: Delete media items last played or created at least this many days ago\n"
     config_file += "#   0-730500 - Number of days filter will use to determine when the media items was\n"
     config_file += "#              last played or when the media item was created\n"
     config_file += "#  -1 - To disable cleaning specified media type\n"
@@ -1235,20 +1236,20 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "movie_condition_days=" + str(get_default_config_values('movie_condition_days')) + "\n"
-        config_file += "episode_condition=" + str(get_default_config_values('episode_condition')) + "\n"
-        config_file += "audio_condition=" + str(get_default_config_values('audio_condition')) + "\n"
+        config_file += "episode_condition_days=" + str(get_default_config_values('episode_condition_days')) + "\n"
+        config_file += "audio_condition_days=" + str(get_default_config_values('audio_condition_days')) + "\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_condition=" + str(get_default_config_values('audiobook_condition')) + "\n"
+            config_file += "audiobook_condition_days=" + str(get_default_config_values('audiobook_condition_days')) + "\n"
     elif (updateConfig):
         config_file += "movie_condition_days=" + str(cfg.movie_condition_days) + "\n"
-        config_file += "episode_condition=" + str(cfg.episode_condition) + "\n"
-        config_file += "audio_condition=" + str(cfg.audio_condition) + "\n"
+        config_file += "episode_condition_days=" + str(cfg.episode_condition_days) + "\n"
+        config_file += "audio_condition_days=" + str(cfg.audio_condition_days) + "\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_condition=" + str(cfg.audiobook_condition) + "\n"
+            config_file += "audiobook_condition_days=" + str(cfg.audiobook_condition_days) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Play Count Inequality: Find media items falling within the *_play_count range.\n"
+    config_file += "# Play Count Inequality: Delete media items within this range based off of the chosen *_play_count.\n"
     config_file += "#   > - Filter media items last played or created greater than *_play_count days ago\n"
     config_file += "#   < - Filter media items last played or created less than *_play_count days ago\n"
     config_file += "#   >= - Filter media items last played or created greater than or equal to *_play_count days ago\n"
@@ -1262,21 +1263,21 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "# (>= : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "movie_play_count_comparison=" + get_default_config_values('movie_play_count_comparison') + "\n"
-        config_file += "episode_play_count_comparison=" + get_default_config_values('episode_play_count_comparison') + "\n"
-        config_file += "audio_play_count_comparison=" + get_default_config_values('audio_play_count_comparison') + "\n"
+        config_file += "movie_play_count_comparison='" + get_default_config_values('movie_play_count_comparison') + "'\n"
+        config_file += "episode_play_count_comparison='" + get_default_config_values('episode_play_count_comparison') + "'\n"
+        config_file += "audio_play_count_comparison='" + get_default_config_values('audio_play_count_comparison') + "'\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_play_count_comparison=" + get_default_config_values('audiobook_play_count_comparison') + "\n"
+            config_file += "audiobook_play_count_comparison='" + get_default_config_values('audiobook_play_count_comparison') + "'\n"
     elif (updateConfig):
-        config_file += "movie_play_count_comparison=" + cfg.movie_play_count_comparison + "\n"
-        config_file += "episode_play_count_comparison=" + cfg.episode_play_count_comparison + "\n"
-        config_file += "audio_play_count_comparison=" + cfg.audio_play_count_comparison + "\n"
+        config_file += "movie_play_count_comparison='" + cfg.movie_play_count_comparison + "'\n"
+        config_file += "episode_play_count_comparison='" + cfg.episode_play_count_comparison + "'\n"
+        config_file += "audio_play_count_comparison='" + cfg.audio_play_count_comparison + "'\n"
         if (server_brand == 'jellyfin'):
-            config_file += "audiobook_play_count_comparison=" + cfg.audiobook_play_count_comparison + "\n"
+            config_file += "audiobook_play_count_comparison='" + cfg.audiobook_play_count_comparison + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Play Count: Find media items with a play count based on this number.\n"
+    config_file += "# Play Count: Delete media items with a play count relative to this number.\n"
     config_file += "#   0-730500 - Number of times a media item has been played\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1715,15 +1716,15 @@ def generate_edit_config(cfg,updateConfig):
     #Check config edditing wasn't requested
     if not (updateConfig):
         try:
-            #when all played_age_* config options are disabled print notification
+            #when all *_condition_days config options are disabled print notification
             if ((get_default_config_values('movie_condition_days') == -1) and
                 (get_default_config_values('episode_condition_days') == -1) and
                 (get_default_config_values('audio_condition_days') == -1) and
                 (((server_brand == 'jellyfin') and (get_default_config_values('audiobook_condition_days') == -1)) or (server_brand == 'emby'))):
                     print('\n\n-----------------------------------------------------------')
-                    print('Config file is not setup to find played media.')
+                    print('Config file is not setup to find media.')
                     print('-----------------------------------------------------------')
-                    print('To find played media open media_cleaner_config.py in a text editor:')
+                    print('To find media open media_cleaner_config.py in a text editor:')
                     print('    Set \'movie_condition_days\' to zero or a positive number')
                     print('    Set \'episode_condition_days\' to zero or a positive number')
                     print('    Set \'audio_condition_days\' to zero or a positive number')
@@ -1731,7 +1732,7 @@ def generate_edit_config(cfg,updateConfig):
                         print('    Set \'audiobook_condition_days\' to zero or a positive number')
             if not (REMOVE_FILES):
                 print('-----------------------------------------------------------')
-                print('Config file is not setup to delete played media.')
+                print('Config file is not setup to delete media.')
                 print('Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
                 print('To delete media open media_cleaner_config.py in a text editor:')
