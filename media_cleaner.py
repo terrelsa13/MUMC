@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.3_ALPHA'
+    Version='3.0.4_ALPHA'
 
     return(Version)
 
@@ -1020,7 +1020,7 @@ def save_config_file(config_file):
 
 
 #get user input needed to build or edit the media_cleaner_config.py file
-def generate_edit_config(cfg,updateConfig):
+def build_configuration_file(cfg,updateConfig):
 
     print('-----------------------------------------------------------')
     print('Version: ' + get_script_version())
@@ -1140,70 +1140,127 @@ def generate_edit_config(cfg,updateConfig):
     print('-----------------------------------------------------------')
     config_file=''
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Valid Filter Examples:\n"
+    config_file += "# Building Generic Filter Statements:\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "#\n"
+    config_file += "# Filter Statement Parts (each media type has their own Filter Statement Parts):\n"
+    config_file += "#   Part #1 - Condition\n"
+    config_file += "#   Part #2 - Condition Days\n"
+    config_file += "#   Part #3 - Play Count Inequality\n"
+    config_file += "#   Part #4 - Play Count\n"
+    config_file += "#\n"
+    config_file += "# Start with a blank Filter Statement:\n"
+    config_file += "#   Delete media type Part #1 at least Part #2 days ago with a play count Part #3 Part #4.\n"
+    config_file += "#\n"
+    config_file += "# Filling in the blanks for the Filter Statement above:\n"
+    config_file += "#   Part #1 - played\n"
+    config_file += "#   Part #2 - 60\n"
+    config_file += "#   Part #3 - >=\n"
+    config_file += "#   Part #4 - 1\n"
+    config_file += "#      Delete media type played at least 60 days ago with a play count >= 1.\n"
+    config_file += "#\n"
+    config_file += "# Filling in the blanks for the Filter Statement above using different values:\n"
+    config_file += "#   Part #1 - created\n"
+    config_file += "#   Part #2 - 3650\n"
+    config_file += "#   Part #3 - <\n"
+    config_file += "#   Part #4 - 2\n"
+    config_file += "#      Delete media type created at least 3650 days ago with a play count < 2.\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Filter Statement Examples With Media Types Specified:\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Delete movies played at least 22 days ago with a play count >= 1.\n"
-    config_file += "#   movie_condition='played'; movie_condition_days=22; movie_play_count_comparison='>='; movie_play_count=1\n"
+    config_file += "#   movie_condition='played'\n"
+    config_file += "#   movie_condition_days=22\n"
+    config_file += "#   movie_play_count_comparison='>='\n"
+    config_file += "#   movie_play_count=1\n"
     config_file += "#\n"
     config_file += "# Delete episodes played at least 55 days ago with a play count not < 0.\n"
-    config_file += "#   episode_condition='played'; episode_condition_days=55; episode_play_count_comparison='not <'; episode_play_count=0\n"
+    config_file += "#   episode_condition='played'\n"
+    config_file += "#   episode_condition_days=55\n"
+    config_file += "#   episode_play_count_comparison='not <'\n"
+    config_file += "#   episode_play_count=0\n"
     config_file += "#\n"
-    config_file += "# Delete movies played at least 123 days ago with a play count == 4.\n"
-    config_file += "#   movie_condition='played'; movie_condition_days=123; movie_play_count_comparison='=='; movie_play_count=4\n"
+    config_file += "# Delete audio tracks played at least 123 days ago with a play count == 4.\n"
+    config_file += "#   audio_condition='played'\n"
+    config_file += "#   audio_condition_days=123\n"
+    config_file += "#   audio_play_count_comparison='=='\n"
+    config_file += "#   audio_play_count=4\n"
     config_file += "#\n"
-    config_file += "# Delete episodes created at least 9988 days ago with a play count > 0.\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=9988; episode_play_count_comparison='>'; episode_play_count=0\n"
+    config_file += "# Delete episodes created at least 3456 days ago with a play count > 0.\n"
+    config_file += "#   episode_condition='created'\n"
+    config_file += "#   episode_condition_days=3456\n"
+    config_file += "#   episode_play_count_comparison='>'\n"
+    config_file += "#   episode_play_count=0\n"
     config_file += "#\n"
-    config_file += "# Delete movies created at least 9898 days ago with a play count not == 0.\n"
-    config_file += "#   movie_condition='created'; movie_condition_days=9898; movie_play_count_comparison='=='; movie_play_count=0\n"
+    config_file += "# Delete movies created at least 4567 days ago with a play count not == 0.\n"
+    config_file += "#   movie_condition='created'\n"
+    config_file += "#   movie_condition_days=4567\n"
+    config_file += "#   movie_play_count_comparison='not =='\n"
+    config_file += "#   movie_play_count=0\n"
     config_file += "#\n"
-    config_file += "# Delete episodes created at least 9876 days ago with a play count not >= 1.\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=9876; episode_play_count_comparison='not >='; episode_play_count=1\n"
+    config_file += "# Delete audio tracks created at least 5678 days ago with a play count not >= 11.\n"
+    config_file += "#   audio_condition='created'\n"
+    config_file += "#   audio_condition_days=5678\n"
+    config_file += "#   audio_play_count_comparison='not >='\n"
+    config_file += "#   audio_play_count=11\n"
+    config_file += "#\n"
+    config_file += "# There are many many more possible combinations!\n"
     config_file += "#----------------------------------------------------------#\n"
-    #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# !!!DANGEROUS!!! Filter Examples:\n"
+    config_file += "# !!!DANGEROUS!!! Filter Statement Examples: !BEWARE!\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "#  When *_condition='created' if *_condition_days=0 every media item\n"
-    config_file += "#    created before the script was run will be deleted assuming it\n"
-    config_file += "#   also matches the *_play_count_comparison and *_play_count filter.\n"
+    config_file += "#  What you NEVER want to do is to set *_condition='created' and\n"
+    config_file += "#   *_condition_days=TO_SOME_LOW_NUMBER. Doing this WILL delete MOST\n"
+    config_file += "#   if not ALL of your library.\n"
+    config_file += "#\n"
+    config_file += "# Never do this unless you are 1000% confident it is doing exactly what you expect:\n"
     config_file += "#\n"
     config_file += "# Delete movies created at least 0 days ago...\n"
-    config_file += "#   movie_condition='created'; movie_condition_days=0;...\n"
+    config_file += "#   movie_condition='created'\n"
+    config_file += "#   movie_condition_days=0\n"
+    config_file += "#   ...\n"
     config_file += "#\n"
     config_file += "# Delete episodes created at least 1 day ago...\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=1;...\n"
+    config_file += "#   episode_condition='created'\n"
+    config_file += "#   episode_condition_days=1\n"
+    config_file += "#   ...\n"
     config_file += "#\n"
-    config_file += "# Delete movies created at least 2 days ago...\n"
-    config_file += "#   movie_condition='created'; movie_condition_days=2;...\n"
+    config_file += "# Delete audio track created at least 2 days ago...\n"
+    config_file += "#   audio_condition='created'\n"
+    config_file += "#   audio_condition_days=2\n"
+    config_file += "#   ...\n"
     config_file += "#\n"
-    config_file += "# Delete episodes created at least 3 days ago...\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=3;...\n"
+    config_file += "# Delete movie created at least 3 days ago...\n"
+    config_file += "#   movie_condition='created'\n"
+    config_file += "#   movie_condition_days=3\n"
+    config_file += "#   ...\n"
     config_file += "#\n"
-    config_file += "# Delete movies created at least 4 days ago...\n"
-    config_file += "#   movie_condition='created'; movie_condition_days=4;...\n"
-    config_file += "#\n"
-    config_file += "# ...\n"
-    config_file += "# Delete episodes created at least X days ago...\n"
-    config_file += "#   episode_condition='created'; episode_condition_days=X;...\n"
+    config_file += "# You get the point right?\n"
     config_file += "#----------------------------------------------------------#\n"
-    #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Invalid Filter Examples:\n"
+    config_file += "# Invalid Filter Statement Examples:\n"
     config_file += "#----------------------------------------------------------#\n"
+    config_file += "# A media item cannot have a negative play count; negative\n"
+    config_file += "#    play counts will evalute as play_count=0 (aka unplayed)\n"
+    config_file += "#\n"
     config_file += "# ...with a play count < 0.\n"
-    config_file += "#   ...episode_play_count_comparison='<'; episode_play_count=0\n"
+    config_file += "#   ...\n"
+    config_file += "#   episode_play_count_comparison='<'\n"
+    config_file += "#   episode_play_count=0\n"
     config_file += "#\n"
     config_file += "# ...with a play count not >= 0.\n"
-    config_file += "#   ...movie_play_count_comparison='not >='; movie_play_count=0\n"
+    config_file += "#   ...\n"
+    config_file += "#   movie_play_count_comparison='not >='\n"
+    config_file += "#   movie_play_count=0\n"
     config_file += "#\n"
-    config_file += "#  A media item cannot have a negative play count; this will evalute as play_count=0 (aka unplayed)\n"
     config_file += "#----------------------------------------------------------#\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
-    config_file += "#--------------------Config Starts Here--------------------#\n"
+    config_file += "#-------------Basic Config Options Start Here---------------#\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1295,8 +1352,11 @@ def generate_edit_config(cfg,updateConfig):
             config_file += "audiobook_play_count=" + str(cfg.audiobook_play_count) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
+    config_file += "#------------Advanced Config Options Start Here-------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide how play count with multiple users behaves\n"
+    config_file += "# Decide how play count with multiple users will behave\n"
     config_file += "#  0 - ok to delete media item when ANY monitored users meet the\n"
     config_file += "#      *_play_count_comparison and *_play_count\n"
     config_file += "#  1 - ok to delete media item when ALL monitored users meet the\n"
@@ -1592,7 +1652,14 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "UPDATE_CONFIG=" + str(cfg.UPDATE_CONFIG) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
-    config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
+    config_file += "#---------!!!DO NOT MODIFY ANYTHING BELOW!!!----------------#\n"
+    config_file += "# These configuration options are automatically created during setup.\n"
+    config_file += "#   If you do not know EXACTLY what you are doing changing these\n"
+    config_file += "#      can and will cause script failure.\n"
+    config_file += "#   The only way to recover from script failure is to revert the\n"
+    config_file += "#      config back to the way it was OR rebuilding a new config.\n"
+    config_file += "#----------------------------------------------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"    
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Server branding; chosen during setup\n"
@@ -1750,6 +1817,11 @@ def generate_edit_config(cfg,updateConfig):
 
             #raise error
             raise RuntimeError('\nConfigError: Cannot find or open media_cleaner_config.py')
+
+
+#get user input needed to edit the media_cleaner_config.py file
+def edit_configuration_file(cfg,updateConfig):
+    return build_configuration_file(cfg,updateConfig)
 
 
 #Get count of days since last played
@@ -3254,6 +3326,7 @@ def prepare_AUDIOoutput(item):
 def prepare_AUDIOBOOKoutput(item):
     return prepare_AUDIOoutput(item)
 
+
 #determine if the requested console output line should be shown or hidden
 def print_byType(string_to_print,ok_to_print):
     if (ok_to_print):
@@ -3463,25 +3536,34 @@ def get_media_items():
 
 
     for user_key in user_keys_json:
-        #define dictionary user_key to store media item favorite states by userId and itemId
-        isfav_byUserId_Movie[user_key]={}
-        isfav_byUserId_Episode[user_key]={}
-        isfav_byUserId_Audio[user_key]={}
-        if (server_brand == 'jellyfin'):
+
+        if (movie_condition_days >= 0):
+            #define dictionary user_key to store media item favorite states by userId and itemId
+            isfav_byUserId_Movie[user_key]={}
+            #define dictionary user key to story media items meeting the play count filter by userId and itemId
+            isMeeting_PlayCountFilter_Movie[user_key]={}
+            #dictionary of blacktagged items by userId
+            isblacktag_and_watched_byUserId_Movie[user_key]={}
+        if (episode_condition_days >= 0):
+            #define dictionary user_key to store media item favorite states by userId and itemId
+            isfav_byUserId_Episode[user_key]={}
+            #define dictionary user key to story media items meeting the play count filter by userId and itemId
+            isMeeting_PlayCountFilter_Episode[user_key]={}
+            #dictionary of blacktagged items by userId
+            isblacktag_and_watched_byUserId_Episode[user_key]={}
+        if (audio_condition_days >= 0):
+            #define dictionary user_key to store media item favorite states by userId and itemId
+            isfav_byUserId_Audio[user_key]={}
+            #define dictionary user key to story media items meeting the play count filter by userId and itemId
+            isMeeting_PlayCountFilter_Audio[user_key]={}
+            #dictionary of blacktagged items by userId
+            isblacktag_and_watched_byUserId_Audio[user_key]={}
+        if (audiobook_condition_days >= 0):
+            #define dictionary user_key to store media item favorite states by userId and itemId
             isfav_byUserId_AudioBook[user_key]={}
-
-        #define dictionary user key to story media items meeting the play count filter by userId and itemId
-        isMeeting_PlayCountFilter_Movie[user_key]={}
-        isMeeting_PlayCountFilter_Episode[user_key]={}
-        isMeeting_PlayCountFilter_Audio[user_key]={}
-        if (server_brand == 'jellyfin'):
+            #define dictionary user key to story media items meeting the play count filter by userId and itemId
             isMeeting_PlayCountFilter_AudioBook[user_key]={}
-
-        #dictionary of blacktagged items by userId
-        isblacktag_and_watched_byUserId_Movie[user_key]={}
-        isblacktag_and_watched_byUserId_Episode[user_key]={}
-        isblacktag_and_watched_byUserId_Audio[user_key]={}
-        if (server_brand == 'jellyfin'):
+            #dictionary of blacktagged items by userId
             isblacktag_and_watched_byUserId_AudioBook[user_key]={}
 
     currentPosition=0
@@ -5614,7 +5696,7 @@ def output_itemsToDelete(deleteItems):
             else: # item['Type'] == 'Unknown':
                 pass
     else:
-        print('[NO ITEMS TO DELETE]',print_common_summary)
+        print_byType('[NO ITEMS TO DELETE]',print_common_summary)
 
     print_byType('-----------------------------------------------------------',print_common_summary)
     print_byType('\n',print_common_summary)
@@ -5782,16 +5864,17 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The audio_condition variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'audiobook_condition'):
-        check=cfg.audiobook_condition
-        if (
-            not ((type(check) is str) and
-            ((check == 'played') or
-            (check == 'created')))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
-    else:
-        error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'audiobook_condition'):
+            check=cfg.audiobook_condition
+            if (
+                not ((type(check) is str) and
+                ((check == 'played') or
+                (check == 'created')))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6764,7 +6847,7 @@ except (AttributeError, ModuleNotFoundError):
     #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
     #when this happens create a new media_cleaner_config.py file
     update_config = False
-    generate_edit_config(None,update_config)
+    build_configuration_file(None,update_config)
 
     #exit gracefully after setup
     exit(0)
@@ -6775,7 +6858,7 @@ cfgCheck()
 #check if user wants to update the existing config file
 if (cfg.UPDATE_CONFIG):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
-    generate_edit_config(cfg,cfg.UPDATE_CONFIG)
+    edit_configuration_file(cfg,cfg.UPDATE_CONFIG)
 
     #exit gracefully after conifig update
     exit(0)

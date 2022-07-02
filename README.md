@@ -1,28 +1,209 @@
-# Version prior to 3.0.0 Are Not Compatible
-* Previous versions of the config are not compatible with this latest version of the script.
-# Script
+# Multi-User Media Cleaner
+The Multi-User Media Cleaner (MUMC) will go through your libraries and delete the movies, tv episodes, audio tracks, and audiobooks you no longer want taking up precious disk space.
+# What Is Included?
 ## media_cleaner.py
-This script will go through played, favorited, and/or tagged movies, tv episodes, audio, and audiobooks for the specified user(s) and their configured libraries; deleting any media items played past the configured number of days.
-
+This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
+## media_cleaner_config_defaults.py
+_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```media_cleaner_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```media_cleaner_config.py``` later.
 # Configuration
 ## media_cleaner_config.py
-The first time you run the script it will attempt to create the config file by asking a handful of questions.
-## media_cleaner_config_defaults.py
-_**Optional:**_ Before running the script for the first time; edit ```media_cleaner_config_defaults.py``` to customize the default values used to create ```media_cleaner_config.py```.
-## Contents Of The Configuration File
+Also referred to as ```media_cleaner_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to make MUMC delete the media items you want it to delete and keep the ones you want to keep.
+# Cool! How Do I Use This?
+## Step 1: What Is A Filter Statement?
+### Objective - To trick you into reading these bullet points
+* A Filter Statement is an simple way to tell this script how to find and delete the media items taking up your disk space.
+  - This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
+## Step 2: How Do I Make A Filter Statement?
+### Objective - Help you understand the basics to building a generic Filter Statement.
 
-#### Media will be deleted once it has been played the configured number of days ago:
+* Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
+  - Part #1 - Condition
+  - Part #2 - Condition Days
+  - Part #3 - Play Count Inequality
+  - Part #4 - Play Count
+
+Start with a generic Filter Statement:
+* Delete media type Part #1 at least Part #2 days ago with a play count Part #3 Part #4.
+
+* Filling in the blanks for the generic Filter Statement above:
+  - Part #1 - played
+  - Part #2 - 60
+  - Part #3 - >=
+  - Part #4 - 1
+    - Delete media type played at least 60 days ago with a play count >= 1.
+
+* Filling in the blanks for the generic Filter Statement above using different values:
+- Part #1 - created
+  - Part #2 - 3650
+  - Part #3 - <
+  - Part #4 - 2
+    - Delete media type created at least 3650 days ago with a play count < 2.
+## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...)
+### Objective - Show you how to build a Filter Statement for each media type.
+
+* Delete movies played at least 22 days ago with a play count >= 1.
+  - movie_condition='played'
+  - movie_condition_days=22
+  - movie_play_count_comparison='>='
+  - movie_play_count=1
+
+* Delete episodes played at least 55 days ago with a play count not < 0.
+  - episode_condition='played'
+  - episode_condition_days=55
+  - episode_play_count_comparison='not <'
+  - episode_play_count=0
+
+* Delete audio tracks played at least 123 days ago with a play count == 4.
+  - audio_condition='played'
+  - audio_condition_days=123
+  - audio_play_count_comparison='=='
+  - audio_play_count=4
+
+* Delete episodes created at least 3456 days ago with a play count > 0.
+  - episode_condition='created'
+  - episode_condition_days=3456
+  - episode_play_count_comparison='>'
+  - episode_play_count=0
+
+* Delete movies created at least 4567 days ago with a play count not == 0.
+  - movie_condition='created'
+  - movie_condition_days=4567
+  - movie_play_count_comparison='not =='
+  - movie_play_count=0
+
+* Delete audio tracks created at least 5678 days ago with a play count not >= 11.
+  - audio_condition='created'
+  - audio_condition_days=5678
+  - audio_play_count_comparison='not >='
+  - audio_play_count=11
+
+There are many many more possible combinations!
+
+## Step 4: You Are Probably Thinking, "Well This Is Easy!". Well Yes It Is, BUT...
+### Objective - Educate you on the dangers of ill-thought-out filters
+You are SOLEY RESPONSIBLE if you delete large portions of your library.
+#### !!!DANGEROUS!!! Filter Examples Below !BEWARE!
+What you NEVER want to do is to set ```*_condition='created'``` and ```*_condition_days=TO_SOME_LOW_NUMBER```.
+Doing this WILL delete MOST if not ALL of your library.
+
+##### Never do this unless you are 1000% confident it is doing exactly what you expect:
+* Delete movies created at least 0 days ago...
+  - movie_condition='created'
+  - movie_condition_days=0
+  - ...
+
+* Delete episodes created at least 1 day ago...
+  - episode_condition='created'
+  - episode_condition_days=1
+  - ...
+
+* Delete audio track created at least 2 days ago...
+  - audio_condition='created'
+  - audio_condition_days=2
+  - ...
+
+* Delete movie created at least 3 days ago...
+  - movie_condition='created'
+  - movie_condition_days=3
+  - ...
+
+You get the point right?
+
+## Step 5: Remember, Neither Of The Ms In MUMC Is For Magic, It Still Has To Obey The Laws Of Physics
+### Objective - Remind you a media item cannot have a negative play count
+I know what you are thinking; "If you watch a movie backwards that should *totally be a -1 play count".
+*sigh* Fine, let just say I agree with you. Unfortunately Emby and Jellyfin do NOT count it as a -1 play count.
+Soooo... my hands are tied. **BUT** I can give you the next best thing.
+
+Filter Statements which imply a negative play count, like the ones below, will evalute as play_count=0 (aka unplayed).
+
+* ...with a play count < 0.
+  - ...
+  - episode_play_count_comparison='<'
+  - episode_play_count=0
+#
+* ...with a play count not >= 0.
+  - ...
+  - movie_play_count_comparison='not >='
+  - movie_play_count=0
+#  Contents Of The Configuration File
+### Basic Configuration File Options
+#### Part #1 of the filter statement:
 ```python
 #----------------------------------------------------------#
-# Delete media type once it has been played # days ago
-#   0-730500 - number of days to wait before deleting played media
-#  -1 - to disable managing specified media type
+# Condition: Delete media items based on when they were last played or
+#             based on when they were created.
+#   played - Filter will keep or delete media items based on last played date
+#   created - Filter will keep or delete media items based on creation date
+# (played : default)
+#----------------------------------------------------------#
+movie_condition='played'
+episode_condition='played'
+audio_condition='played'
+audiobook_condition='played'
+```
+#### Part #2 of the filter statement:
+```python
+#----------------------------------------------------------#
+# Condition Days: Delete media items last played or created at least this many days ago
+#   0-730500 - Number of days filter will use to determine when the media items was
+#              last played or when the media item was created
+#  -1 - To disable cleaning specified media type
 # (-1 : default)
 #----------------------------------------------------------#
-played_age_movie=-1
-played_age_episode=-1
-played_age_audio=-1
-played_age_audiobook=-1
+movie_condition_days=-1
+episode_condition_days=-1
+audio_condition_days=-1
+audiobook_condition_days=-1
+```
+#### Part #3 of the filter statement:
+```python
+#----------------------------------------------------------#
+# Play Count Inequality: Delete media items within this range based off of the chosen *_play_count.
+#   > - Filter media items last played or created greater than *_play_count days ago
+#   < - Filter media items last played or created less than *_play_count days ago
+#   >= - Filter media items last played or created greater than or equal to *_play_count days ago
+#   <= - Filter media items last played or created less than or equal to *_play_count days ago
+#   == - Filter media items last played or created equal to *_play_count days ago
+#   not > - Filter media items last played or created not greater than *_play_count days ago
+#   not < - Filter media items last played or created not less than *_play_count days ago
+#   not >= - Filter media items last played or created not greater than or equal to *_play_count days ago
+#   not <= - Filter media items last played or created not less than or equal to *_play_count days ago
+#   not == - Filter media items last played or created not equal to *_play_count days ago
+# (>= : default)
+#----------------------------------------------------------#
+movie_play_count_comparison='>='
+episode_play_count_comparison='>='
+audio_play_count_comparison='>='
+audiobook_play_count_comparison='>='
+```
+#### Part #4 of the filter statement:
+```python
+#----------------------------------------------------------#
+# Play Count: Delete media items with a play count relative to this number.
+#   0-730500 - Number of times a media item has been played
+# (1 : default)
+#----------------------------------------------------------#
+movie_play_count=1
+episode_play_count=1
+audio_play_count=1
+audiobook_play_count=1
+```
+### Advanced Configuration File Options
+#### Option for determining if a media item should be deleted or kept based on individual users' or all users' play counts:
+```python
+#----------------------------------------------------------#
+# Decide how play count with multiple users will behave
+#  0 - ok to delete media item when ANY monitored users meet the
+#      *_play_count_comparison and *_play_count
+#  1 - ok to delete media item when ALL monitored users meet the
+#      *_play_count_comparison and *_play_count
+# (0 : default)
+#----------------------------------------------------------#
+multiuser_play_count_movie=0
+multiuser_play_count_episode=0
+multiuser_play_count_audio=0
+multiuser_play_count_audiobook=0
 ```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
@@ -41,7 +222,7 @@ keep_favorites_episode=1
 keep_favorites_audio=1
 keep_favorites_audiobook=1
 ```
-#### Option for determining if a media item should be deleted or kept based on other users whitelisted libraries:
+#### Option for determining if a media item should be deleted or kept based on other users' whitelisted libraries:
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
@@ -109,33 +290,6 @@ REMOVE_FILES=False
 # (0 : default)
 #----------------------------------------------------------#
 minimum_number_episodes=0
-```
-#### Delete or Keep by play count
-```python
-#----------------------------------------------------------#
-# Keep or delete media item when play count is greater/less than or equal to played_count_*
-#  0 - Delete media items when play count is Greater Than or Equal To played_count_*
-#  1 - Delete media items when play count is Less Than or Equal To played_count_*
-#  2 - Keep media items when play count is Greater Than or Equal To played_count_*
-#  3 - Keep media items when play count is Less Than or Equal To played_count_*
-# (0 : default)
-#----------------------------------------------------------#
-played_count_movie_action=0
-played_count_episode_action=0
-played_count_audio_action=0
-played_count_audiobook_action=0
-```
-#### Number of plays to use for Delete or Keep by play count
-```python
-#----------------------------------------------------------#
-# Keep or delete media item when play count is greater/less than or equal to # times
-#   1-730500 - number of play counts
-# (1 : default)
-#----------------------------------------------------------#
-played_count_movie=1
-played_count_episode=1
-played_count_audio=1
-played_count_audiobook=1
 ```
 #### Keep movie if genre favorited:
 ```python
@@ -207,7 +361,7 @@ keep_favorites_advanced_audio_book_library_genre=0
 keep_favorites_advanced_audio_book_track_author=0
 keep_favorites_advanced_audio_book_author=0
 ```
-### Control output printed to the console
+#### Control output printed to the console
 ```python
 #----------------------------------------------------------#
 # Enable/Disable console outputs by type
@@ -248,46 +402,20 @@ print_audiobook_summary=True
 #           Resets to dry run mode (REMOVE_FILES=False)
 # (False : default)
 #----------------------------------------------------------#
-UPDATE_CONFIG=False
+UPDATE_CONFIG=Falsea
 ```
-#### !!!CAUTION!!!   READ max_age_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
+### Automatically Created Configuration File Options
 ```python
+#---------!!!DO NOT MODIFY ANYTHING BELOW!!!----------------#
+# These configuration options are automatically created during setup.
+#   If you do not know EXACTLY what you are doing, changing these
+#      can and will cause script failure.
+#   The only way to recover from script failure is to revert the
+#      config back to the way it was OR rebuilding a new config.
 #----------------------------------------------------------#
-# CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!
-# Do NOT enable any max_age_xyz options unless you know what you are doing
-# Use at your own risk; You alone are responsible for your actions
-# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY
-# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding played_age_xyz
-#   0-730500 - number of days to wait before deleting "old" media
-#  -1 - to disable managing max age of specified media type
-# (-1 : default)
-#----------------------------------------------------------#
-max_age_movie=-1
-max_age_episode=-1
-max_age_audio=-1
-max_age_audiobook=-1
 ```
-#### !!!CAUTION!!!   READ max_delete_played_state_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
+#### Needed for differences between Emby and Jellyfin
 ```python
-#----------------------------------------------------------#
-# When using max_age_*; decide if played, unplayed, or both max age media items should be deleted
-#  0 - ok to delete both played and unplayed max age media items
-#  1 - ok to delete played max age media items; keep unplayed max age media items
-#  2 - ok to delete unplayed max age media items; keep played max age media items
-# (0 : default)
-#----------------------------------------------------------#
-max_delete_played_state_movie=0
-max_delete_played_state_episode=0
-max_delete_played_state_audio=0
-max_delete_played_state_audiobook=0
-```
-#### !!!CAUTION!!!   READ max_keep_favorites_* DESCRIPTION VERY CAREFULLY   !!!CAUTION!!!
-
-### Created first time the script runs; Do **_NOT_** edit or modify these:
-#### Needed for differences between Emby and Jellyfin?
-```python
-#------------DO NOT MODIFY BELOW---------------------------#
-
 #----------------------------------------------------------#
 # Server branding; chosen during setup
 #  0 - 'emby'
@@ -407,6 +535,9 @@ api_query_item_limit=50
 DEBUG=False
 ```
 #
+# Configuration file version prior to 3.0.0 Are Not Compatible
+* Previous ```media_cleaner_config.py``` files made with script versions before 3.0.0 are NOT compatible.
+  - A new ```media_cleaner_config.py``` will need to be created using the latest version of this script.
 # Requirements
 * Linux or Windows
    - Mac - I do not have a Mac to confirm
