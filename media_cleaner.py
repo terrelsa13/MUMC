@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.1_ALPHA'
+    Version='3.0.2_ALPHA'
 
     return(Version)
 
@@ -327,12 +327,12 @@ def get_tag_name(tagbehavior,existingtag):
                 print('\nDo not use backslash \'\\\'. Try again.\n')
 
 
-#Get played ages for media types?
-def get_played_age(mediaType):
-    defaultage=get_default_config_values('played_age_' + mediaType)
+#Get condition days media types?
+def get_condition_days(mediaType):
+    defaultage=get_default_config_values(mediaType + '_condition_days')
     valid_age=False
     while (valid_age == False):
-        print('Choose the number of days to wait before deleting played ' + mediaType + ' media items')
+        print('Choose the number of days to wait before deleting ' + mediaType + ' media items')
         print('Valid values: 0-730500 days')
         print('             -1 to disable deleting ' + mediaType + ' media items')
         print('Press Enter to use default value')
@@ -1003,12 +1003,29 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     return(userId_bllib_dict, userId_wllib_dict)
 
 
+#Save the config file to the directory this script is running from
+def save_config_file(config_file):
+    #Create config file next to the script even when cwd (Current Working Directory) is not the same
+    cwd = os.getcwd()
+    script_dir = os.path.dirname(__file__)
+    if (script_dir == ''):
+        #script must have been run from the cwd
+        #set script_dir to cwd (aka this directory) to prevent error when attempting to change to '' (aka a blank directory)
+        script_dir=cwd
+    os.chdir(script_dir)
+    f = open("media_cleaner_config.py", "w")
+    f.write(config_file)
+    f.close()
+    os.chdir(cwd)
+
+
 #get user input needed to build or edit the media_cleaner_config.py file
 def generate_edit_config(cfg,updateConfig):
 
     print('-----------------------------------------------------------')
     print('Version: ' + get_script_version())
 
+    #Building the config
     if not (updateConfig):
         print('-----------------------------------------------------------')
         #ask user for server brand (i.e. emby or jellyfin)
@@ -1062,23 +1079,24 @@ def generate_edit_config(cfg,updateConfig):
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
         print('-----------------------------------------------------------')
 
-        #ask user for number of days to wait before attempting to delete a watched movie
-        played_age_movie = get_played_age('movie')
-        print('-----------------------------------------------------------')
-        #ask user for number of days to wait before attempting to delete a watched episode
-        played_age_episode = get_played_age('episode')
-        print('-----------------------------------------------------------')
-        #ask user for number of days to wait before attempting to delete a played audio track
-        played_age_audio = get_played_age('audio')
-        if (server_brand == 'jellyfin'):
-            print('-----------------------------------------------------------')
-            #ask user for number of days to wait before attempting to delete a played audiobook track
-            played_age_audiobook = get_played_age('audiobook')
+        #ask user for number of days to wait before attempting to delete movie
+        #movie_condition_days = get_condition_days('movie')
+        #print('-----------------------------------------------------------')
+        #ask user for number of days to wait before attempting to delete episode
+        #episode_condition_days = get_condition_days('episode')
+        #print('-----------------------------------------------------------')
+        #ask user for number of days to wait before attempting to delete audio track
+        #audio_condition_days = get_condition_days('audio')
+        #if (server_brand == 'jellyfin'):
+            #print('-----------------------------------------------------------')
+            #ask user for number of days to wait before attempting to delete audiobook track
+            #audiobook_condition_days = get_condition_days('audiobook')
 
         #set REMOVE_FILES
         REMOVE_FILES=False
 
-    else: #Prepare to run the config editor
+    #Updating the config; Prepare to run the config editor
+    else: #(Update_Config):
         print('-----------------------------------------------------------')
         #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
@@ -1087,6 +1105,9 @@ def generate_edit_config(cfg,updateConfig):
         auth_key=cfg.auth_key
         #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(cfg.server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
+
+        #get the server brand so it can be used when updating the config to exculed audiobook type when server_brand == 'emby'
+        server_brand=cfg.server_brand
 
     userkeys_bllibs_list=[]
     userbllibs_list=[]
@@ -1117,26 +1138,182 @@ def generate_edit_config(cfg,updateConfig):
         raise ValueError('Error! User key values do not match.')
 
     print('-----------------------------------------------------------')
-
     config_file=''
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Delete media type once it has been played # days ago\n"
-    config_file += "#   0-730500 - number of days to wait before deleting played media\n"
-    config_file += "#  -1 - to disable managing specified media type\n"
+    config_file += "# Valid Filter Examples:\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Delete movies played at least 22 days ago with a play count >= 1.\n"
+    config_file += "#   movie_condition='played'; movie_condition_days=22; movie_play_count_comparison='>='; movie_play_count=1\n"
+    config_file += "#\n"
+    config_file += "# Delete episodes played at least 55 days ago with a play count not < 0.\n"
+    config_file += "#   episode_condition='played'; episode_condition_days=55; episode_play_count_comparison='not <'; episode_play_count=0\n"
+    config_file += "#\n"
+    config_file += "# Delete movies played at least 123 days ago with a play count == 4.\n"
+    config_file += "#   movie_condition='played'; movie_condition_days=123; movie_play_count_comparison='=='; movie_play_count=4\n"
+    config_file += "#\n"
+    config_file += "# Delete episodes created at least 9988 days ago with a play count > 0.\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=9988; episode_play_count_comparison='>'; episode_play_count=0\n"
+    config_file += "#\n"
+    config_file += "# Delete movies created at least 9898 days ago with a play count not == 0.\n"
+    config_file += "#   movie_condition='created'; movie_condition_days=9898; movie_play_count_comparison='=='; movie_play_count=0\n"
+    config_file += "#\n"
+    config_file += "# Delete episodes created at least 9876 days ago with a play count not >= 1.\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=9876; episode_play_count_comparison='>='; episode_play_count=1\n"
+    config_file += "#----------------------------------------------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# !!!DANGEROUS!!! Filter Examples:\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "#  When *_condition='created' if *_condition_days=0 every media item\n"
+    config_file += "#    created before the script was run will be deleted assuming it\n"
+    config_file += "#   also matches the *_play_count_comparison and *_play_count filter.\n"
+    config_file += "#\n"
+    config_file += "# Delete movies created at least 0 days ago...\n"
+    config_file += "#   movie_condition='created'; movie_condition_days=0;...\n"
+    config_file += "#\n"
+    config_file += "# Delete episodes created at least 1 day ago...\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=1;...\n"
+    config_file += "#\n"
+    config_file += "# Delete movies created at least 2 days ago...\n"
+    config_file += "#   movie_condition='created'; movie_condition_days=2;...\n"
+    config_file += "#\n"
+    config_file += "# Delete episodes created at least 3 days ago...\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=3;...\n"
+    config_file += "#\n"
+    config_file += "# Delete movies created at least 4 days ago...\n"
+    config_file += "#   movie_condition='created'; movie_condition_days=4;...\n"
+    config_file += "#\n"
+    config_file += "# ...\n"
+    config_file += "# Delete episodes created at least X days ago...\n"
+    config_file += "#   episode_condition='created'; episode_condition_days=X;...\n"
+    config_file += "#----------------------------------------------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Invalid Filter Examples:\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# ...with a play count < 0.\n"
+    config_file += "#   ...episode_play_count_comparison='<'; episode_play_count=0\n"
+    config_file += "#\n"
+    config_file += "# ...with a play count not >= 0.\n"
+    config_file += "#   ...movie_play_count_comparison='not >='; movie_play_count=0\n"
+    config_file += "#\n"
+    config_file += "#  A media item cannot have a negative play count; this will evalute as play_count=0 (aka unplayed)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#--------------------Config Starts Here--------------------#\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Condition: Delete or Keep media items based on when last Played or based on when Created.\n"
+    config_file += "#   played - Filter will keep or delete media items based on last played date\n"
+    config_file += "#   created - Filter will keep or delete media items based on creation date\n"
+    config_file += "# (played : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "movie_condition=" + get_default_config_values('movie_condition') + "\n"
+        config_file += "episode_condition=" + get_default_config_values('episode_condition') + "\n"
+        config_file += "audio_condition=" + get_default_config_values('audio_condition') + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_condition=" + get_default_config_values('audiobook_condition') + "\n"
+    elif (updateConfig):
+        config_file += "movie_condition=" + cfg.movie_condition + "\n"
+        config_file += "episode_condition=" + cfg.episode_condition + "\n"
+        config_file += "audio_condition=" + cfg.audio_condition + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_condition=" + cfg.audiobook_condition + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Condition Days: Find media items last played or created at least this many days ago.\n"
+    config_file += "#   0-730500 - Number of days filter will use to determine when the media items was\n"
+    config_file += "#              last played or when the media item was created\n"
+    config_file += "#  -1 - To disable cleaning specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "played_age_movie=" + str(played_age_movie) + "\n"
-        config_file += "played_age_episode=" + str(played_age_episode) + "\n"
-        config_file += "played_age_audio=" + str(played_age_audio) + "\n"
+        config_file += "movie_condition_days=" + str(get_default_config_values('movie_condition_days')) + "\n"
+        config_file += "episode_condition=" + str(get_default_config_values('episode_condition')) + "\n"
+        config_file += "audio_condition=" + str(get_default_config_values('audio_condition')) + "\n"
         if (server_brand == 'jellyfin'):
-            config_file += "played_age_audiobook=" + str(played_age_audiobook) + "\n"
+            config_file += "audiobook_condition=" + str(get_default_config_values('audiobook_condition')) + "\n"
     elif (updateConfig):
-        config_file += "played_age_movie=" + str(cfg.played_age_movie) + "\n"
-        config_file += "played_age_episode=" + str(cfg.played_age_episode) + "\n"
-        config_file += "played_age_audio=" + str(cfg.played_age_audio) + "\n"
-        if (cfg.server_brand == 'jellyfin'):
-            config_file += "played_age_audiobook=" + str(cfg.played_age_audiobook) + "\n"
+        config_file += "movie_condition_days=" + str(cfg.movie_condition_days) + "\n"
+        config_file += "episode_condition=" + str(cfg.episode_condition) + "\n"
+        config_file += "audio_condition=" + str(cfg.audio_condition) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_condition=" + str(cfg.audiobook_condition) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Play Count Inequality: Find media items falling within the *_play_count range.\n"
+    config_file += "#   > - Filter media items last played or created greater than *_play_count days ago\n"
+    config_file += "#   < - Filter media items last played or created less than *_play_count days ago\n"
+    config_file += "#   >= - Filter media items last played or created greater than or equal to *_play_count days ago\n"
+    config_file += "#   <= - Filter media items last played or created less than or equal to *_play_count days ago\n"
+    config_file += "#   == - Filter media items last played or created equal to *_play_count days ago\n"
+    config_file += "#   not > - Filter media items last played or created not greater than *_play_count days ago\n"
+    config_file += "#   not < - Filter media items last played or created not less than *_play_count days ago\n"
+    config_file += "#   not >= - Filter media items last played or created not greater than or equal to *_play_count days ago\n"
+    config_file += "#   not <= - Filter media items last played or created not less than or equal to *_play_count days ago\n"
+    config_file += "#   not == - Filter media items last played or created not equal to *_play_count days ago\n"
+    config_file += "# (>= : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "movie_play_count_comparison=" + get_default_config_values('movie_play_count_comparison') + "\n"
+        config_file += "episode_play_count_comparison=" + get_default_config_values('episode_play_count_comparison') + "\n"
+        config_file += "audio_play_count_comparison=" + get_default_config_values('audio_play_count_comparison') + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_play_count_comparison=" + get_default_config_values('audiobook_play_count_comparison') + "\n"
+    elif (updateConfig):
+        config_file += "movie_play_count_comparison=" + cfg.movie_play_count_comparison + "\n"
+        config_file += "episode_play_count_comparison=" + cfg.episode_play_count_comparison + "\n"
+        config_file += "audio_play_count_comparison=" + cfg.audio_play_count_comparison + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_play_count_comparison=" + cfg.audiobook_play_count_comparison + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Play Count: Find media items with a play count based on this number.\n"
+    config_file += "#   0-730500 - Number of times a media item has been played\n"
+    config_file += "# (1 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "movie_play_count=" + str(get_default_config_values('movie_play_count')) + "\n"
+        config_file += "episode_play_count=" + str(get_default_config_values('episode_play_count')) + "\n"
+        config_file += "audio_play_count=" + str(get_default_config_values('audio_play_count')) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_play_count=" + str(get_default_config_values('audiobook_play_count')) + "\n"
+    elif (updateConfig):
+        config_file += "movie_play_count=" + str(cfg.movie_play_count) + "\n"
+        config_file += "episode_play_count=" + str(cfg.episode_play_count) + "\n"
+        config_file += "audio_play_count=" + str(cfg.audio_play_count) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "audiobook_play_count=" + str(cfg.audiobook_play_count) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Decide how play count with multiple users behaves\n"
+    config_file += "#  0 - ok to delete media item when ANY monitored users meet the\n"
+    config_file += "#      *_play_count_comparison and *_play_count\n"
+    config_file += "#  1 - ok to delete media item when ALL monitored users meet the\n"
+    config_file += "#      *_play_count_comparison and *_play_count\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "multiuser_play_count_movie=" + str(get_default_config_values('multiuser_play_count_movie')) + "\n"
+        config_file += "multiuser_play_count_episode=" + str(get_default_config_values('multiuser_play_count_episode')) + "\n"
+        config_file += "multiuser_play_count_audio=" + str(get_default_config_values('multiuser_play_count_audio')) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "multiuser_play_count_audiobook=" + str(get_default_config_values('multiuser_play_count_audiobook')) + "\n"
+    elif (updateConfig):
+        config_file += "multiuser_play_count_movie=" + str(cfg.multiuser_play_count_movie) + "\n"
+        config_file += "multiuser_play_count_episode=" + str(cfg.multiuser_play_count_episode) + "\n"
+        config_file += "multiuser_play_count_audio=" + str(cfg.multiuser_play_count_audio) + "\n"
+        if (server_brand == 'jellyfin'):
+            config_file += "multiuser_play_count_audiobook=" + str(cfg.multiuser_play_count_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1159,7 +1336,7 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "keep_favorites_movie=" + str(cfg.keep_favorites_movie) + "\n"
         config_file += "keep_favorites_episode=" + str(cfg.keep_favorites_episode) + "\n"
         config_file += "keep_favorites_audio=" + str(cfg.keep_favorites_audio) + "\n"
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             config_file += "keep_favorites_audiobook=" + str(cfg.keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1179,7 +1356,7 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(cfg.multiuser_whitelist_movie) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(cfg.multiuser_whitelist_episode) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(cfg.multiuser_whitelist_audio) + "\n"
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             config_file += "multiuser_whitelist_audiobook=" + str(cfg.multiuser_whitelist_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1211,7 +1388,7 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "delete_blacktagged_movie=" + str(cfg.delete_blacktagged_movie) + "\n"
         config_file += "delete_blacktagged_episode=" + str(cfg.delete_blacktagged_episode) + "\n"
         config_file += "delete_blacktagged_audio=" + str(cfg.delete_blacktagged_audio) + "\n"
-        if (cfg.server_brand == 'jellyfin'):
+        if (server_brand == 'jellyfin'):
             config_file += "delete_blacktagged_audiobook=" + str(cfg.delete_blacktagged_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1225,15 +1402,6 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "whitetag='" + whitetag + "'\n"
     elif (updateConfig):
         config_file += "whitetag='" + cfg.whitetag + "'\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Must be a boolean True or False value\n"
-    config_file += "#  False - Disables the ability to delete media (dry run mode)\n"
-    config_file += "#  True - Enable the ability to delete media\n"
-    config_file += "# (False : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "REMOVE_FILES=False\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1252,66 +1420,12 @@ def generate_edit_config(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Keep or delete media item when play count is greater/less than or equal to played_count_*\n"
-    config_file += "#  0 - Delete media items when play count is Greater Than or Equal To played_count_*\n"
-    config_file += "#  1 - Delete media items when play count is Less Than or Equal To played_count_*\n"
-    config_file += "#  2 - Keep media items when play count is Greater Than or Equal To played_count_*\n"
-    config_file += "#  3 - Keep media items when play count is Less Than or Equal To played_count_*\n"
-    config_file += "# (0 : default)\n"
+    config_file += "# Must be a boolean True or False value\n"
+    config_file += "#  False - Disables the ability to delete media (dry run mode)\n"
+    config_file += "#  True - Enable the ability to delete media\n"
+    config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
-    if not (updateConfig):
-        config_file += "played_count_movie_action=" + str(get_default_config_values('played_count_movie_action')) + "\n"
-        config_file += "played_count_episode_action=" + str(get_default_config_values('played_count_episode_action')) + "\n"
-        config_file += "played_count_audio_action=" + str(get_default_config_values('played_count_audio_action')) + "\n"
-        config_file += "played_count_audiobook_action=" + str(get_default_config_values('played_count_audiobook_action')) + "\n"
-    elif (updateConfig):
-        if (hasattr(cfg,'played_count_movie_action')):
-            config_file += "played_count_movie_action=" + str(cfg.played_count_movie_action) + "\n"
-        else:
-            config_file += "played_count_movie_action=0\n"
-        if (hasattr(cfg,'played_count_episode_action')):
-            config_file += "played_count_episode_action=" + str(cfg.played_count_episode_action) + "\n"
-        else:
-            config_file += "played_count_episode_action=0\n"
-        if (hasattr(cfg,'played_count_audio_action')):
-            config_file += "played_count_audio_action=" + str(cfg.played_count_audio_action) + "\n"
-        else:
-            config_file += "played_count_audio_action=0\n"
-        if (cfg.server_brand == 'jellyfin'):
-            if (hasattr(cfg,'played_count_audiobook_action')):
-                config_file += "played_count_audiobook_action" + str(cfg.played_count_audiobook_action) + "\n"
-            else:
-                config_file += "played_count_audiobook_action=0\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Keep or delete media item when play count is greater/less than or equal to # times\n"
-    config_file += "#   1-730500 - number of play counts\n"
-    config_file += "# (1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if not (updateConfig):
-        config_file += "played_count_movie=" + str(get_default_config_values('played_count_movie')) + "\n"
-        config_file += "played_count_episode=" + str(get_default_config_values('played_count_episode')) + "\n"
-        config_file += "played_count_audio=" + str(get_default_config_values('played_count_audio')) + "\n"
-        config_file += "played_count_audiobook=" + str(get_default_config_values('played_count_audiobook')) + "\n"
-    elif (updateConfig):
-        if (hasattr(cfg,'played_count_movie')):
-            config_file += "played_count_movie=" + str(cfg.played_count_movie) + "\n"
-        else:
-            config_file += "played_count_movie=1\n"
-        if (hasattr(cfg,'played_count_episode')):
-            config_file += "played_count_episode=" + str(cfg.played_count_episode) + "\n"
-        else:
-            config_file += "played_count_episode=1\n"
-        if (hasattr(cfg,'played_count_audio')):
-            config_file += "played_count_audio=" + str(cfg.played_count_audio) + "\n"
-        else:
-            config_file += "played_count_audio=1\n"
-        if (cfg.server_brand == 'jellyfin'):
-            if (hasattr(cfg,'played_count_audiobook')):
-                config_file += "played_count_audiobook" + str(cfg.played_count_audiobook) + "\n"
-            else:
-                config_file += "played_count_audiobook=1\n"
+    config_file += "REMOVE_FILES=False\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1381,8 +1495,7 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "keep_favorites_advanced_track_artist=" + str(cfg.keep_favorites_advanced_track_artist) + "\n"
         config_file += "keep_favorites_advanced_album_artist=" + str(cfg.keep_favorites_advanced_album_artist) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
-    if ((( not (updateConfig)) and (server_brand == 'jellyfin')) or
-         (updateConfig) and (hasattr(cfg, 'server_brand') and (cfg.server_brand == 'jellyfin'))):
+    if (server_brand == 'jellyfin'):
         config_file += "\n"
         config_file += "#----------------------------------------------------------#\n"
         config_file += "# Advanced audio book track genre/author configurations\n"
@@ -1452,17 +1565,15 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "print_audio_delete_info" + str(cfg.print_audio_delete_info) + "\n"
         config_file += "print_audio_keep_info" + str(cfg.print_audio_keep_info) + "\n"
         config_file += "print_audio_error_info" + str(cfg.print_audio_error_info) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_delete_info'))):
+        if (server_brand == 'jellyfin'):
             config_file += "print_audiobook_delete_info" + str(cfg.print_audiobook_delete_info) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_keep_info'))):
             config_file += "print_audiobook_keep_info" + str(cfg.print_audiobook_keep_info) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_error_info'))):
             config_file += "print_audiobook_error_info" + str(cfg.print_audiobook_error_info) + "\n"
         config_file += "print_summary_header" + str(cfg.print_summary_header) + "\n"
         config_file += "print_movie_summary" + str(cfg.print_movie_summary) + "\n"
         config_file += "print_episode_summary" + str(cfg.print_episode_summary) + "\n"
         config_file += "print_audio_summary" + str(cfg.print_audio_summary) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_summary'))):
+        if (server_brand == 'jellyfin'):
             config_file += "print_audiobook_summary" + str(cfg.print_audiobook_summary) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1478,87 +1589,6 @@ def generate_edit_config(cfg,updateConfig):
         config_file += "UPDATE_CONFIG=False\n"
     elif (updateConfig):
         config_file += "UPDATE_CONFIG=" + str(cfg.UPDATE_CONFIG) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!   CAUTION!!!\n"
-    config_file += "# Do NOT enable any max_age_xyz options unless you know what you are doing\n"
-    config_file += "# Use at your own risk; You alone are responsible for your actions\n"
-    config_file += "# Enabling any of these options with a low value WILL DELETE THE ENTIRE LIBRARY\n"
-    config_file += "# Delete media type if its creation date is x days ago; played state is ignored; value must be greater than or equal to the corresponding played_age_xyz\n"
-    config_file += "#   0-730500 - number of days to wait before deleting \"old\" media\n"
-    config_file += "#  -1 - to disable managing max age of specified media type\n"
-    config_file += "# (-1 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if not (updateConfig):
-        config_file += "max_age_movie=-1\n"
-        config_file += "max_age_episode=-1\n"
-        config_file += "max_age_audio=-1\n"
-        if (server_brand == 'jellyfin'):
-            config_file += "max_age_audiobook=-1\n"
-    elif (updateConfig):
-        config_file += "max_age_movie=" + str(cfg.max_age_movie) + "\n"
-        config_file += "max_age_episode=" + str(cfg.max_age_episode) + "\n"
-        config_file += "max_age_audio=" + str(cfg.max_age_audio) + "\n"
-        if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_age_audiobook'))):
-            config_file += "max_age_audiobook=" + str(cfg.max_age_audiobook) + "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    config_file += "\n"
-    config_file += "#----------------------------------------------------------#\n"
-    config_file += "# When using max_age_*; decide if played, unplayed, or both max age media items should be deleted\n"
-    config_file += "#  0 - ok to delete both played and unplayed max age media items\n"
-    config_file += "#  1 - ok to delete played max age media items; keep unplayed max age media items\n"
-    config_file += "#  2 - ok to delete unplayed max age media items; keep played max age media items\n"
-    config_file += "# (0 : default)\n"
-    config_file += "#----------------------------------------------------------#\n"
-    if not (updateConfig):
-        config_file += "max_delete_played_state_movie=0\n"
-        config_file += "max_delete_played_state_episode=0\n"
-        config_file += "max_delete_played_state_audio=0\n"
-        config_file += "max_delete_played_state_audiobook=0\n"
-    elif (updateConfig):
-        if (hasattr(cfg, 'max_delete_played_state_movie')):
-            config_file += "max_delete_played_state_movie=" + str(cfg.max_delete_played_state_movie) + "\n"
-        else:
-            config_file += "max_delete_played_state_movie=0\n"
-        if (hasattr(cfg, 'max_delete_played_state_episode')):
-            config_file += "max_delete_played_state_episode=" + str(cfg.max_delete_played_state_episode) + "\n"
-        else:
-            config_file += "max_delete_played_state_episode=0\n"
-        if (hasattr(cfg, 'max_delete_played_state_audio')):
-            config_file += "max_delete_played_state_audio=" + str(cfg.max_delete_played_state_audio) + "\n"
-        else:
-            config_file += "max_delete_played_state_audio=0\n"
-        if (cfg.server_brand == 'jellyfin'):
-            if (hasattr(cfg, 'max_delete_played_state_audiobook')):
-                config_file += "max_delete_played_state_audiobook=" + str(cfg.max_delete_played_state_audiobook) + "\n"
-            else:
-                config_file += "max_delete_played_state_audiobook=0"
-    #config_file += "#----------------------------------------------------------#\n"
-    #config_file += "\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #config_file += "# !!!OBSOLETE!!! - Use any of the other keep_favorites_* config options\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #config_file += "# Decide if max age media set as a favorite should be deleted\n"
-    #config_file += "#  0 - ok to delete max age media items set as a favorite\n"
-    #config_file += "#  1 - do not delete max age media items when set as a favorite\n"
-    #config_file += "# (1 : default)\n"
-    #config_file += "#----------------------------------------------------------#\n"
-    #if not (updateConfig):
-        #config_file += "max_keep_favorites_movie=1\n"
-        #config_file += "max_keep_favorites_episode=1\n"
-        #config_file += "max_keep_favorites_audio=1\n"
-        #if (server_brand == 'jellyfin'):
-            #config_file += "max_keep_favorites_audiobook=1\n"
-    #elif (updateConfig):
-        #if (hasattr(cfg, 'max_keep_favorites_movie')):
-            #config_file += "max_keep_favorites_movie=" + str(cfg.max_keep_favorites_movie) + "\n"
-        #if (hasattr(cfg, 'max_keep_favorites_episode')):
-            #config_file += "max_keep_favorites_episode=" + str(cfg.max_keep_favorites_episode) + "\n"
-        #if (hasattr(cfg, 'max_keep_favorites_audio')):
-            #config_file += "max_keep_favorites_audio=" + str(cfg.max_keep_favorites_audio) + "\n"
-        #if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'max_keep_favorites_audiobook'))):
-            #config_file += "max_keep_favorites_audiobook=" + str(cfg.max_keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#------------DO NOT MODIFY BELOW---------------------------#\n"
@@ -1661,10 +1691,10 @@ def generate_edit_config(cfg,updateConfig):
     config_file += "#  this value to allow the server to return smaller amounts of data\n"
     config_file += "# ALL media items and their metadata are processed regardless of this value\n"
     config_file += "#  1-10000 - maximum number of media items the server will return for each API query\n"
-    config_file += "#  (50 : default)\n"
+    config_file += "#  (25 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "api_query_item_limit=50\n"
+        config_file += "api_query_item_limit=25\n"
     elif (updateConfig):
         config_file += "api_query_item_limit=" + str(cfg.api_query_item_limit) + "\n"
     config_file += "\n"
@@ -1679,36 +1709,26 @@ def generate_edit_config(cfg,updateConfig):
     elif (updateConfig):
         config_file += "DEBUG=" + str(cfg.DEBUG) + "\n"
 
-    #Create config file next to the script even when cwd (Current Working Directory) is not the same
-    cwd = os.getcwd()
-    script_dir = os.path.dirname(__file__)
-    if (script_dir == ''):
-        #script must have been run from the cwd
-        #set script_dir to cwd (aka this directory) to prevent error when attempting to change to '' (aka a blank directory)
-        script_dir=cwd
-    os.chdir(script_dir)
-    f = open("media_cleaner_config.py", "w")
-    f.write(config_file)
-    f.close()
-    os.chdir(cwd)
+    #Save the config file to the directory this script is running from
+    save_config_file(config_file)
 
     #Check config edditing wasn't requested
     if not (updateConfig):
         try:
             #when all played_age_* config options are disabled print notification
-            if ((played_age_movie == -1) and
-                (played_age_episode == -1) and
-                (played_age_audio == -1) and
-                (((server_brand == 'jellyfin') and (played_age_audiobook == -1)) or (server_brand == 'emby'))):
+            if ((get_default_config_values('movie_condition_days') == -1) and
+                (get_default_config_values('episode_condition_days') == -1) and
+                (get_default_config_values('audio_condition_days') == -1) and
+                (((server_brand == 'jellyfin') and (get_default_config_values('audiobook_condition_days') == -1)) or (server_brand == 'emby'))):
                     print('\n\n-----------------------------------------------------------')
                     print('Config file is not setup to find played media.')
                     print('-----------------------------------------------------------')
                     print('To find played media open media_cleaner_config.py in a text editor:')
-                    print('    Set \'played_age_movie\' to zero or a positive number')
-                    print('    Set \'played_age_episode\' to zero or a positive number')
-                    print('    Set \'played_age_audio\' to zero or a positive number')
+                    print('    Set \'movie_condition_days\' to zero or a positive number')
+                    print('    Set \'episode_condition_days\' to zero or a positive number')
+                    print('    Set \'audio_condition_days\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
-                        print('    Set \'played_age_audiobook\' to zero or a positive number')
+                        print('    Set \'audiobook_condition_days\' to zero or a positive number')
             if not (REMOVE_FILES):
                 print('-----------------------------------------------------------')
                 print('Config file is not setup to delete played media.')
@@ -1821,54 +1841,75 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
 
 
 #Get isPlayed state for API filtering
-def get_isPlayed_FilterValue(play_count_comparison,play_count):
+def get_isPlayed_FilterValue(filter_play_count_comparison,filter_play_count):
 
-    if (play_count_comparison == '>'):
+    if (filter_play_count_comparison == '>'):
+        #Play counts 1 thru 730500
         isPlayed_Filter_Value='True'
-    elif (play_count_comparison == '<'):
-        if ((play_count == 0) or (play_count == 1)):
+    elif (filter_play_count_comparison == '<'):
+        if ((filter_play_count == 0) or (filter_play_count == 1)):
+            #Play counts 0 and 1
             isPlayed_Filter_Value='False'
         else:
+            #Paly counts 0 thru 730499
             isPlayed_Filter_Value=''
-    elif (play_count_comparison == '>='):
-        if (play_count == 0):
+    elif (filter_play_count_comparison == '>='):
+        if (filter_play_count == 0):
+            #Play counts 0 thru 730500
             isPlayed_Filter_Value=''
         else:
+            #Play counts 1 thru 730500
             isPlayed_Filter_Value='True'
-    elif (play_count_comparison == '<='):
-        if (play_count == 0):
+    elif (filter_play_count_comparison == '<='):
+        if (filter_play_count == 0):
+            #Play count 0
             isPlayed_Filter_Value='False'
         else:
+            #Play counts 0 thru 730500
             isPlayed_Filter_Value=''
-    elif (play_count_comparison == '=='):
-        if (play_count == 0):
+    elif (filter_play_count_comparison == '=='):
+        if (filter_play_count == 0):
+            #Play count 0
             isPlayed_Filter_Value='False'
         else:
+            #Play count 1 thru 730500
             isPlayed_Filter_Value='True'
-    elif (play_count_comparison == 'not >'):
-        if ((play_count == 0) or (play_count == 1)):
+    elif (filter_play_count_comparison == 'not >'):
+        if ((filter_play_count == 0) or (filter_play_count == 1)):
+            #Play count 0
             isPlayed_Filter_Value='False'
         else:
+            #Play count 1 thru 730499
             isPlayed_Filter_Value=''
-    elif (play_count_comparison == 'not <'):
+    elif (filter_play_count_comparison == 'not <'):
+        #Play counts 1 thru 730500
         isPlayed_Filter_Value='True'
-    elif (play_count_comparison == 'not >='):
-        if ((play_count == 0) or (play_count == 1)):
+    elif (filter_play_count_comparison == 'not >='):
+        if ((filter_play_count == 0) or (filter_play_count == 1)):
+            #Play count 0
             isPlayed_Filter_Value='False'
         else:
+            #Play count 1 thru 730499
             isPlayed_Filter_Value=''
-    elif (play_count_comparison == 'not <='):
+    elif (filter_play_count_comparison == 'not <='):
+        #Play count 1 thru 730500
         isPlayed_Filter_Value='True'
-    elif (play_count_comparison == 'not =='):
-        isPlayed_Filter_Value='True'
+    elif (filter_play_count_comparison == 'not =='):
+        if (filter_play_count == 0):
+            #Play count 1 thru 730500
+            isPlayed_Filter_Value='True'
+        else:
+            #Play count 0 thru 730500
+            isPlayed_Filter_Value=''
     else:
+        #Play count unknown
         isPlayed_Filter_Value=''
 
     return isPlayed_Filter_Value
 
 
 #Get children of favorited parents
-def getChildren_favoritedMediaItems(user_key,data_Favorited,play_count_comparison,play_count,APIDebugMsg):
+def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_play_count_comparison,filter_play_count,APIDebugMsg):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     child_list=[]
@@ -1898,7 +1939,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,play_count_compariso
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                IsPlayedState=get_isPlayed_FilterValue(play_count_comparison,play_count)
+                IsPlayedState=get_isPlayed_FilterValue(filter_play_count_comparison,filter_play_count)
 
                 while (QueriesRemaining):
 
@@ -1945,7 +1986,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,play_count_compariso
 
 
 #Get children of tagged parents
-def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,play_count_comparison,play_count,tag_Type):
+def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_play_count_comparison,filter_play_count,tag_Type):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     #parent_tag=[]
@@ -1981,7 +2022,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,play_count_compa
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    IsPlayedState=get_isPlayed_FilterValue(play_count_comparison,play_count)
+                    IsPlayedState=get_isPlayed_FilterValue(filter_play_count_comparison,filter_play_count)
 
                     while (QueriesRemaining):
 
@@ -3039,54 +3080,57 @@ def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
 
     return (deleteItems)
 
+
+#Determine if media item met the play count filter for all users
+def get_isplaycount_MetByAllUsers(playcount_met, deleteItems):
+    return get_isblacktagged_watchedByAllUsers(playcount_met, deleteItems)
+
+
 # determine if media item has been played specified amount of times
-def get_playCountComparison(item_play_count,filter_play_count_comparison,filter_play_count):
+def get_playedStatus(item_play_count,filter_play_count_comparison,filter_play_count):
 
     item_matches_play_count_filter=False
 
     if (filter_play_count_comparison == '>'):
         if (item_play_count > filter_play_count):
+            #media item play count greater than specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == '<'):
         if (item_play_count < filter_play_count):
+            #media item play count less than specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == '>='):
         if (item_play_count >= filter_play_count):
+            #media item play count greater than or equal to specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == '<='):
         if (item_play_count <= filter_play_count):
+            #media item play count less than or equal to specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == '=='):
         if (item_play_count == filter_play_count):
+            #media item play count equal to specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == 'not >'):
         if (not (item_play_count > filter_play_count)):
+            #media item play count not greater than specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == 'not <'):
         if (not (item_play_count < filter_play_count)):
+            #media item play count not less than specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == 'not >='):
         if (not (item_play_count >= filter_play_count)):
+            #media item play count not greater than or equal to specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == 'not <='):
         if (not (item_play_count <= filter_play_count)):
+            #media item play count not less than or equal to specified value
             item_matches_play_count_filter=True
     elif (filter_play_count_comparison == 'not =='):
         if (not (item_play_count == filter_play_count)):
+            #media item play count not equal to specified value
             item_matches_play_count_filter=True
-
-    return item_matches_play_count_filter
-
-
-#decide if this item is played and meets the cutoff date or if this item meets the max age cutoff date
-def get_playedStatus(item_play_count,filter_play_count_comparison,filter_play_count,filter_condition):
-
-    if (filter_condition == 'played'):
-        item_matches_play_count_filter=get_playCountComparison(item_play_count,filter_play_count_comparison,filter_play_count)
-    elif (filter_condition == 'created'):
-        item_matches_play_count_filter=get_playCountComparison(item_play_count,filter_play_count_comparison,filter_play_count)
-    else:
-        item_matches_play_count_filter=False
 
     return item_matches_play_count_filter
 
@@ -3233,7 +3277,6 @@ def get_media_items():
         audiobook_condition_days=-1
     blacktags=cfg.blacktag
     whitetags=cfg.whitetag
-    minimum_number_episodes=cfg.minimum_number_episodes
     print_script_header=cfg.print_script_header
     print_warnings=cfg.print_warnings
     print_user_header=cfg.print_user_header
@@ -3258,18 +3301,35 @@ def get_media_items():
         #movie_condition_days=cfg.movie_condition_days
         movie_play_count_comparison=cfg.movie_play_count_comparison
         movie_play_count=cfg.movie_play_count
+        multiuser_play_count_movie=cfg.multiuser_play_count_movie
         keep_favorites_movie=cfg.keep_favorites_movie
         multiuser_whitelist_movie=cfg.multiuser_whitelist_movie
         delete_blacktagged_movie=cfg.delete_blacktagged_movie
+        minimum_number_episodes=cfg.minimum_number_episodes
+        #dictionary for episodes to keep to meet cfg.minimum_number_episodes
+        min_episodesToKeep=defaultdict(dict)
         keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
         keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
         print_movie_error_info=cfg.print_movie_error_info
         cut_off_date_movie=date_time_now - timedelta(movie_condition_days)
+        #dictionary of favorited items by userId
+        isfav_byUserId_Movie={}
+        #dictionary of items meeting the play count filter by userId
+        isMeeting_PlayCountFilter_Movie={}
+        #dictionary of blacktagged items by userId
+        isblacktag_and_watched_byUserId_Movie={}
+        #whitelisted Id per media type according to media types metadata
+        movie_whitelists=[]
+        #blacktagged items per media type according to media types metadata
+        movie_blacktaglists=[]
+        #whitetagged items per media type according to media types metadata
+        movie_whitetag_list=[]
     if (episode_condition_days >= 0):
         episode_condition=cfg.episode_condition
         #episode_condition_days=cfg.episode_condition_days
         episode_play_count_comparison=cfg.episode_play_count_comparison
         episode_play_count=cfg.episode_play_count
+        multiuser_play_count_episode=cfg.multiuser_play_count_episode
         keep_favorites_episode=cfg.keep_favorites_episode
         multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
         delete_blacktagged_episode=cfg.delete_blacktagged_episode
@@ -3282,11 +3342,24 @@ def get_media_items():
         keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
         print_episode_error_info=cfg.print_episode_error_info
         cut_off_date_episode=date_time_now - timedelta(episode_condition_days)
+        #dictionary of favorited items by userId
+        isfav_byUserId_Episode={}
+        #dictionary of items meeting the play count filter by userId
+        isMeeting_PlayCountFilter_Episode={}
+        #dictionary of blacktagged items by userId
+        isblacktag_and_watched_byUserId_Episode={}
+        #whitelisted Id per media type according to media types metadata
+        episode_whitelists=[]
+        #blacktagged items per media type according to media types metadata
+        episode_blacktaglists=[]
+        #whitetagged items per media type according to media types metadata
+        episode_whitetag_list=[]
     if (audio_condition_days >= 0):
         audio_condition=cfg.audio_condition
         #audio_condition_days=cfg.audio_condition_days
         audio_play_count_comparison=cfg.audio_play_count_comparison
         audio_play_count=cfg.audio_play_count
+        multiuser_play_count_audio=cfg.multiuser_play_count_audio
         keep_favorites_audio=cfg.keep_favorites_audio
         multiuser_whitelist_audio=cfg.multiuser_whitelist_audio
         delete_blacktagged_audio=cfg.delete_blacktagged_audio
@@ -3297,11 +3370,24 @@ def get_media_items():
         keep_favorites_advanced_album_artist=cfg.keep_favorites_advanced_album_artist
         print_audio_error_info=cfg.print_audio_error_info
         cut_off_date_audio=date_time_now - timedelta(audio_condition_days)
+        #dictionary of favorited items by userId
+        isfav_byUserId_Audio={}
+        #dictionary of items meeting the play count filter by userId
+        isMeeting_PlayCountFilter_Audio={}
+        #dictionary of blacktagged items by userId
+        isblacktag_and_watched_byUserId_Audio={}
+        #whitelisted Id per media type according to media types metadata
+        audio_whitelists=[]
+        #blacktagged items per media type according to media types metadata
+        audio_blacktaglists=[]
+        #whitetagged items per media type according to media types metadata
+        audio_whitetag_list=[]
     if (audiobook_condition_days >= 0):
         audiobook_condition=cfg.audiobook_condition
         #audiobook_condition_days=cfg.audiobook_condition_days
         audiobook_play_count_comparison=cfg.audiobook_play_count_comparison
         audiobook_play_count=cfg.audiobook_play_count
+        multiuser_play_count_audiobook=cfg.multiuser_play_count_audiobook
         keep_favorites_audiobook=cfg.keep_favorites_audiobook
         multiuser_whitelist_audiobook=cfg.multiuser_whitelist_audiobook
         delete_blacktagged_audiobook=cfg.delete_blacktagged_audiobook
@@ -3312,6 +3398,18 @@ def get_media_items():
         keep_favorites_advanced_audio_book_author=cfg.keep_favorites_advanced_audio_book_author
         print_audiobook_error_info=cfg.print_audiobook_error_info
         cut_off_date_audiobook=date_time_now - timedelta(audiobook_condition_days)
+        #dictionary of favorited items by userId
+        isfav_byUserId_AudioBook={}
+        #dictionary of items meeting the play count filter by userId
+        isMeeting_PlayCountFilter_AudioBook={}
+        #dictionary of blacktagged items by userId
+        isblacktag_and_watched_byUserId_AudioBook={}
+        #whitelisted Id per media type according to media types metadata
+        audiobook_whitelists=[]
+        #blacktagged items per media type according to media types metadata
+        audiobook_blacktaglists=[]
+        #whitetagged items per media type according to media types metadata
+        audiobook_whitetag_list=[]
 
     print_common_delete_keep_info=(print_movie_delete_info or print_movie_keep_info or print_episode_delete_info or print_episode_keep_info or
                                     print_audio_delete_info or print_audio_keep_info or print_audiobook_delete_info or print_audiobook_keep_info)
@@ -3350,44 +3448,6 @@ def get_media_items():
     #list of items to be deleted
     deleteItems=[]
 
-    #dictionary of favorited items by userId
-    isfav_byUserId_Movie={}
-    isfav_byUserId_Episode={}
-    isfav_byUserId_Audio={}
-    if (server_brand == 'jellyfin'):
-        isfav_byUserId_AudioBook={}
-
-    #dictionary of blacktagged items by userId
-    isblacktag_and_watched_byUserId_Movie={}
-    isblacktag_and_watched_byUserId_Episode={}
-    isblacktag_and_watched_byUserId_Audio={}
-    if (server_brand == 'jellyfin'):
-        isblacktag_and_watched_byUserId_AudioBook={}
-
-    #whitelisted Id per media type according to media types metadata
-    movie_whitelists=[]
-    episode_whitelists=[]
-    audio_whitelists=[]
-    if (server_brand == 'jellyfin'):
-        audiobook_whitelists=[]
-
-    #dictionary for episodes to keep to meet cfg.minimum_number_episodes
-    min_episodesToKeep=defaultdict(dict)
-
-    #blacktagged items per media type according to media types metadata
-    movie_blacktaglists=[]
-    episode_blacktaglists=[]
-    audio_blacktaglists=[]
-    if (server_brand == 'jellyfin'):
-        audiobook_blacktaglists=[]
-
-    #whitetagged items per media type according to media types metadata
-    movie_whitetag_list=[]
-    episode_whitetag_list=[]
-    audio_whitetag_list=[]
-    if (server_brand == 'jellyfin'):
-        audiobook_whitetag_list=[]
-
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
 
@@ -3401,7 +3461,6 @@ def get_media_items():
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in media_cleaner_config.py; userIds need to be in the same order for both')
 
 
-
     for user_key in user_keys_json:
         #define dictionary user_key to store media item favorite states by userId and itemId
         isfav_byUserId_Movie[user_key]={}
@@ -3409,6 +3468,13 @@ def get_media_items():
         isfav_byUserId_Audio[user_key]={}
         if (server_brand == 'jellyfin'):
             isfav_byUserId_AudioBook[user_key]={}
+
+        #define dictionary user key to story media items meeting the play count filter by userId and itemId
+        isMeeting_PlayCountFilter_Movie[user_key]={}
+        isMeeting_PlayCountFilter_Episode[user_key]={}
+        isMeeting_PlayCountFilter_Audio[user_key]={}
+        if (server_brand == 'jellyfin'):
+            isMeeting_PlayCountFilter_AudioBook[user_key]={}
 
         #dictionary of blacktagged items by userId
         isblacktag_and_watched_byUserId_Movie[user_key]={}
@@ -3819,7 +3885,7 @@ def get_media_items():
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((keep_favorites_movie == 2) and (itemisfav_MOVIE_Local or itemisfav_MOVIE_Advanced)):
-                                        isfav_byUserId_Movie[user_key][item['Id']] = True
+                                        isfav_byUserId_Movie[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
@@ -3854,7 +3920,7 @@ def get_media_items():
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
                                                                                                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-
+ 
                                         #Display True if media item is locally or remotely whitelisted
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
@@ -3864,16 +3930,19 @@ def get_media_items():
 
                                     #Decide if media item meets the filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],movie_play_count_comparison,movie_play_count,movie_condition)
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],movie_play_count_comparison,movie_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
+
+                                    if ((multiuser_play_count_movie == 1) and (item_matches_play_count_filter)):
+                                        isMeeting_PlayCountFilter_Movie[user_key][item['Id']]=True
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsOKToDelete):
-                                        isblacktag_and_watched_byUserId_Movie[user_key][item['Id']] = True
+                                        isblacktag_and_watched_byUserId_Movie[user_key][item['Id']]=True
 
                                     if ('Played' in item['UserData']):
 
@@ -4271,7 +4340,7 @@ def get_media_items():
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((keep_favorites_episode == 2) and (itemisfav_EPISODE_Local or itemisfav_EPISODE_Advanced)):
-                                        isfav_byUserId_Episode[user_key][item['Id']] = True
+                                        isfav_byUserId_Episode[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
@@ -4325,16 +4394,19 @@ def get_media_items():
 
                                     #Decide if media item meets the filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],episode_play_count_comparison,episode_play_count,episode_condition)
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],episode_play_count_comparison,episode_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
+
+                                    if ((multiuser_play_count_episode == 1) and (item_matches_play_count_filter)):
+                                        isMeeting_PlayCountFilter_Episode[user_key][item['Id']]=True
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
-                                        isblacktag_and_watched_byUserId_Episode[user_key][item['Id']] = True
+                                        isblacktag_and_watched_byUserId_Episode[user_key][item['Id']]=True
 
                                     if ('Played' in item['UserData']):
 
@@ -4732,7 +4804,7 @@ def get_media_items():
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((keep_favorites_audio == 2) and (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced)):
-                                        isfav_byUserId_Audio[user_key][item['Id']] = True
+                                        isfav_byUserId_Audio[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
@@ -4777,16 +4849,19 @@ def get_media_items():
 
                                     #Decide if media item meets the filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audio_play_count_comparison,audio_play_count,audio_condition)
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audio_play_count_comparison,audio_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
+
+                                    if ((multiuser_play_count_audio == 1) and (item_matches_play_count_filter)):
+                                        isMeeting_PlayCountFilter_Audio[user_key][item['Id']]=True
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsOKToDelete):
-                                        isblacktag_and_watched_byUserId_Audio[user_key][item['Id']] = True
+                                        isblacktag_and_watched_byUserId_Audio[user_key][item['Id']]=True
 
                                     if ('Played' in item['UserData']):
 
@@ -4823,7 +4898,7 @@ def get_media_items():
         #audioBook meida type only applies to jellyfin
         #Jellyfin sets audio books to a media type of audioBook
         #Emby sets audio books to a media type of audio (see audio section)
-        if ((server_brand == 'jellyfin') and (hasattr(cfg, 'movie_condition_days')) and (audiobook_condition_days >= 0)):
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
 
             user_processed_itemsId=set()
 
@@ -5188,7 +5263,7 @@ def get_media_items():
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
                                     if ((keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced)):
-                                        isfav_byUserId_AudioBook[user_key][item['Id']] = True
+                                        isfav_byUserId_AudioBook[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
                                     if (data_list_pos in data_from_whitetag_queries):
@@ -5233,16 +5308,19 @@ def get_media_items():
 
                                     #Decide if media item meets the filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audiobook_play_count_comparison,audiobook_play_count,audiobook_condition)
+                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audiobook_play_count_comparison,audiobook_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
+
+                                    if ((multiuser_play_count_audiobook == 1) and (item_matches_play_count_filter)):
+                                        isMeeting_PlayCountFilter_AudioBook[user_key][item['Id']]=True
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
                                     itemIsOKToDelete=get_deleteStatus(item_matches_play_count_filter,item_matches_condition_day_filter,itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsOKToDelete):
-                                        isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']] = True
+                                        isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']]=True
 
                                     if ('Played' in item['UserData']):
 
@@ -5285,105 +5363,159 @@ def get_media_items():
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
-    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
-    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
-    deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
-    if (server_brand == 'jellyfin'):
+    if (movie_condition_days >= 0):
+        deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
+    if (episode_condition_days >= 0):
+        deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
+    if (audio_condition_days >= 0):
+        deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
-    deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
-    deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
-    if (server_brand == 'jellyfin'):
+    if (movie_condition_days >= 0):
+        deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
+    if (episode_condition_days >= 0):
+        deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
+    if (audio_condition_days >= 0):
+        deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
         deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
-    #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
-    deleteItems=get_minEpisodesToKeep(min_episodesToKeep, deleteItems)
+    if ((episode_condition_days >= 0) and (minimum_number_episodes >= 1)):
+        #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
+        deleteItems=get_minEpisodesToKeep(min_episodesToKeep, deleteItems)
 
     #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
-    deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
-    deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if (server_brand == 'jellyfin'):
+    if (movie_condition_days >= 0):
+        deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
+    if (episode_condition_days >= 0):
+        deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
+    if (audio_condition_days >= 0):
+        deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
-    #When blacktagged; Determine media items to remove them from deletion list depending on cfg.isblacktag_and_watched_byUserId_*
-    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
-    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
-    deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
-    if (server_brand == 'jellyfin'):
+    #When blacktagged; Determine media items to remove them from deletion list depending on cfg.delete_blacktagged_*
+    if (movie_condition_days >= 0):
+        deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
+    if (episode_condition_days >= 0):
+        deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
+    if (audio_condition_days >= 0):
+        deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
+
+    #When filtered; Determine media items to remove them from deletion list depending on cfg.multiuser_play_count_*
+    if (movie_condition_days >= 0):
+        deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Movie, deleteItems)
+    if (episode_condition_days >= 0):
+        deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Episode, deleteItems)
+    if (audio_condition_days >= 0):
+        deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Audio, deleteItems)
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+        deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
 
     if (DEBUG):
         print('-----------------------------------------------------------')
         print('')
-        print('isfav_MOVIE: ')
-        print(isfav_byUserId_Movie)
-        print('')
-        print('isfav_EPISODE: ')
-        print(isfav_byUserId_Episode)
-        print('')
-        print('isfav_AUDIO: ')
-        print(isfav_byUserId_Audio)
-        print('')
-        if (server_brand == 'jellyfin'):
+        if (movie_condition_days >= 0):
+            print('isfav_MOVIE: ')
+            print(isfav_byUserId_Movie)
+            print('')
+        if (episode_condition_days >= 0):
+            print('isfav_EPISODE: ')
+            print(isfav_byUserId_Episode)
+            print('')
+        if (audio_condition_days >= 0):
+            print('isfav_AUDIO: ')
+            print(isfav_byUserId_Audio)
+            print('')
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             print('isfav_AUDIOBOOK: ')
             print(isfav_byUserId_AudioBook)
             print('')
 
         print('-----------------------------------------------------------')
         print('')
-        print('isfav_MOVIE: ')
-        print(movie_whitetag_list)
-        print('')
-        print('isfav_EPISODE: ')
-        print(episode_whitetag_list)
-        print('')
-        print('isfav_AUDIO: ')
-        print(audio_whitetag_list)
-        print('')
-        if (server_brand == 'jellyfin'):
+        if (movie_condition_days >= 0):
+            print('isfav_MOVIE: ')
+            print(movie_whitetag_list)
+            print('')
+        if (episode_condition_days >= 0):
+            print('isfav_EPISODE: ')
+            print(episode_whitetag_list)
+            print('')
+        if (audio_condition_days >= 0):
+            print('isfav_AUDIO: ')
+            print(audio_whitetag_list)
+            print('')
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitetag_list)
             print('')
 
-        print('-----------------------------------------------------------')
-        print('')
-        print('min_EPISODE_ToKeep: ')
-        print(min_episodesToKeep)
-        print('')
+        if ((episode_condition_days >= 0) and (minimum_number_episodes >= 1)):
+            print('-----------------------------------------------------------')
+            print('')
+            print('min_EPISODE_ToKeep: ')
+            print(min_episodesToKeep)
+            print('')
 
         print('-----------------------------------------------------------')
         print('')
-        print('isfav_MOVIE: ')
-        print(movie_whitelists)
-        print('')
-        print('isfav_EPISODE: ')
-        print(episode_whitelists)
-        print('')
-        print('isfav_AUDIO: ')
-        print(audio_whitelists)
-        print('')
-        if (server_brand == 'jellyfin'):
+        if (movie_condition_days >= 0):
+            print('isfav_MOVIE: ')
+            print(movie_whitelists)
+            print('')
+        if (episode_condition_days >= 0):
+            print('isfav_EPISODE: ')
+            print(episode_whitelists)
+            print('')
+        if (audio_condition_days >= 0):
+            print('isfav_AUDIO: ')
+            print(audio_whitelists)
+            print('')
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitelists)
             print('')
 
         print('-----------------------------------------------------------')
         print('')
-        print('isfav_MOVIE: ')
-        print(isblacktag_and_watched_byUserId_Movie)
-        print('')
-        print('isfav_EPISODE: ')
-        print(isblacktag_and_watched_byUserId_Episode)
-        print('')
-        print('isfav_AUDIO: ')
-        print(isblacktag_and_watched_byUserId_Audio)
-        print('')
-        if (server_brand == 'jellyfin'):
-            print('isfav_AUDIOBOOK: ')
+        if (movie_condition_days >= 0):
+            print('isblacktag_MOVIE: ')
+            print(isblacktag_and_watched_byUserId_Movie)
+            print('')
+        if (episode_condition_days >= 0):
+            print('isblacktag_EPISODE: ')
+            print(isblacktag_and_watched_byUserId_Episode)
+            print('')
+        if (audio_condition_days >= 0):
+            print('isblacktag_AUDIO: ')
+            print(isblacktag_and_watched_byUserId_Audio)
+            print('')
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+            print('isblacktag_AUDIOBOOK: ')
             print(isblacktag_and_watched_byUserId_AudioBook)
+            print('')
+
+        print('-----------------------------------------------------------')
+        print('')
+        print('isplaycountmet_MOVIE: ')
+        print(isMeeting_PlayCountFilter_Movie)
+        print('')
+        if (episode_condition_days >= 0):
+            print('isplaycountmet_EPISODE: ')
+            print(isMeeting_PlayCountFilter_Episode)
+            print('')
+        if (audio_condition_days >= 0):
+            print('isplaycountmet_AUDIO: ')
+            print(isMeeting_PlayCountFilter_Audio)
+            print('')
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+            print('isplaycountmet_AUDIOBOOK: ')
+            print(isMeeting_PlayCountFilter_AudioBook)
             print('')
 
     print_byType('\n',print_common_delete_keep_info)
@@ -5419,29 +5551,14 @@ def delete_media_item(itemID):
 #list and delete items past played threshold
 def output_itemsToDelete(deleteItems):
 
-    if (hasattr(cfg,'print_summary_header')):
-        print_summary_header=cfg.print_summary_header
+    print_summary_header=cfg.print_summary_header
+    print_movie_summary=cfg.print_movie_summary
+    print_episode_summary=cfg.print_episode_summary
+    print_audio_summary=cfg.print_audio_summary
+    if (cfg.server_brand == 'jellyfin'):
+        print_audiobook_summary=cfg.print_audiobook_summary
     else:
-        print_summary_header=True
-    if (hasattr(cfg,'print_summary_header')):
-        print_movie_summary=cfg.print_movie_summary
-    else:
-        print_movie_summary=True
-    if (hasattr(cfg,'print_episode_summary')):
-        print_episode_summary=cfg.print_episode_summary
-    else:
-        print_episode_summary=True
-    if (hasattr(cfg,'print_episode_summary')):
-        print_audio_summary=cfg.print_audio_summary
-    else:
-        print_audio_summary=True
-    if (hasattr(cfg,'print_audiobook_summary')):
-        if (cfg.server_brand == 'jellyfin'):
-            print_audiobook_summary=cfg.print_audiobook_summary
-        else:
-            print_audiobook_summary=False
-    else:
-        print_audiobook_summary=True
+        print_audiobook_summary=False
 
     print_common_summary = (print_movie_summary or print_episode_summary or print_audio_summary or print_audiobook_summary)
 
@@ -5622,61 +5739,215 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
 #Check select config variables are as expected
 def cfgCheck():
 
+    if hasattr(cfg, 'server_brand'):
+        server_brand=cfg.server_brand
+    else:
+        server_brand='invalid'
     error_found_in_media_cleaner_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
 #######################################################################################################
 
-    if hasattr(cfg, 'played_age_movie'):
-        check=cfg.played_age_movie
-        check_played_age_movie=check
+    if hasattr(cfg, 'movie_condition'):
+        check=cfg.movie_condition
+        if (
+            not ((type(check) is str) and
+            ((check == 'played') or
+            (check == 'created')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: movie_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The movie_condition variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'episode_condition'):
+        check=cfg.episode_condition
+        if (
+            not ((type(check) is str) and
+            ((check == 'played') or
+            (check == 'created')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: episode_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The episode_condition variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'audio_condition'):
+        check=cfg.audio_condition
+        if (
+            not ((type(check) is str) and
+            ((check == 'played') or
+            (check == 'created')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: audio_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The audio_condition variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'audiobook_condition'):
+        check=cfg.audiobook_condition
+        if (
+            not ((type(check) is str) and
+            ((check == 'played') or
+            (check == 'created')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'movie_condition_days'):
+        check=cfg.movie_condition_days
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_age_movie must be an integer; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_age_movie variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: movie_condition_days must be an integer; valid range -1 thru 730500\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The movie_condition_days variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'played_age_episode'):
-        check=cfg.played_age_episode
-        check_played_age_episode=check
+    if hasattr(cfg, 'episode_condition_days'):
+        check=cfg.episode_condition_days
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_age_episode must be an integer; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_age_episode variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: episode_condition_days must be an integer; valid range -1 thru 730500\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The episode_condition_days variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'played_age_audio'):
-        check=cfg.played_age_audio
-        check_played_age_audio=check
+    if hasattr(cfg, 'audio_condition_days'):
+        check=cfg.audio_condition_days
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_age_audio must be an integer; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_age_audio variable is missing from media_cleaner_config.py\n'
+            error_found_in_media_cleaner_config_py+='ValueError: audio_condition_days must be an integer; valid range -1 thru 730500\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The audio_condition_days variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'played_age_audiobook'):
-                check=cfg.played_age_audiobook
-                check_played_age_audiobook=check
-                if (
-                    not ((type(check) is int) and
-                    (check >= -1) and
-                    (check <= 730500))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: played_age_audiobook must be an integer; valid range -1 thru 730500\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The played_age_audiobook variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'audiobook_condition_days'):
+            check=cfg.audiobook_condition_days
+            if (
+                not ((type(check) is int) and
+                (check >= -1) and
+                (check <= 730500))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition_days must be an integer; valid range -1 thru 730500\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition_days variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'movie_play_count_comparison'):
+        check=cfg.movie_play_count_comparison
+        if (
+            not ((type(check) is str) and
+            ((check == '>') or (check == '<') or
+            (check == '>=') or (check == '<=') or
+            (check == '==') or
+            (check == 'not >') or (check == 'not <') or
+            (check == 'not >=') or (check == 'not <=') or
+            (check == 'not ==')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: movie_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The movie_play_count_comparison variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'episode_play_count_comparison'):
+        check=cfg.episode_play_count_comparison
+        if (
+            not ((type(check) is str) and
+            ((check == '>') or (check == '<') or
+            (check == '>=') or (check == '<=') or
+            (check == '==') or
+            (check == 'not >') or (check == 'not <') or
+            (check == 'not >=') or (check == 'not <=') or
+            (check == 'not ==')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: episode_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The episode_play_count_comparison variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'audio_play_count_comparison'):
+        check=cfg.audio_play_count_comparison
+        if (
+            not ((type(check) is str) and
+            ((check == '>') or (check == '<') or
+            (check == '>=') or (check == '<=') or
+            (check == '==') or
+            (check == 'not >') or (check == 'not <') or
+            (check == 'not >=') or (check == 'not <=') or
+            (check == 'not ==')))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: audio_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The audio_play_count_comparison variable is missing from media_cleaner_config.py\n'
+
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'audiobook_play_count_comparison'):
+            check=cfg.audiobook_play_count_comparison
+            if (
+                not ((type(check) is str) and
+                ((check == '>') or (check == '<') or
+                (check == '>=') or (check == '<=') or
+                (check == '==') or
+                (check == 'not >') or (check == 'not <') or
+                (check == 'not >=') or (check == 'not <=') or
+                (check == 'not ==')))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: audiobook_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The audiobook_play_count_comparison variable is missing from media_cleaner_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'multiuser_play_count_movie'):
+        check=cfg.multiuser_play_count_movie
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_movie must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_movie variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_play_count_episode'):
+        check=cfg.multiuser_play_count_episode
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_episode must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_episode variable is missing from media_cleaner_config.py\n'
+
+    if hasattr(cfg, 'multiuser_play_count_audio'):
+        check=cfg.multiuser_play_count_audio
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_audio must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_audio variable is missing from media_cleaner_config.py\n'
+
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'multiuser_play_count_audiobook'):
+            check=cfg.multiuser_play_count_audiobook
+            if (
+                not ((type(check) is int) and
+                (check >= 0) and
+                (check <= 1))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_audiobook must be an integer; valid values 0 and 1\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -5713,19 +5984,17 @@ def cfgCheck():
     else:
         error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audio variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'keep_favorites_audiobook'):
-                check=cfg.keep_favorites_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'keep_favorites_audiobook'):
+            check=cfg.keep_favorites_audiobook
+            if (
+                not ((type(check) is int) and
+                (check >= 0) and
+                (check <= 2))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -5736,7 +6005,7 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
 
@@ -5747,7 +6016,7 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
 
@@ -5758,23 +6027,21 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audio variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'multiuser_whitelist_audiobook'):
-                check=cfg.multiuser_whitelist_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 1))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'multiuser_whitelist_audiobook'):
+            check=cfg.multiuser_whitelist_audiobook
+            if (
+                not ((type(check) is int) and
+                (check >= 0) and
+                (check <= 1))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer;valid values 0 and 1\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -5797,7 +6064,7 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_movie must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_movie must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_movie variable is missing from media_cleaner_config.py\n'
 
@@ -5808,7 +6075,7 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_episode must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_episode must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_episode variable is missing from media_cleaner_config.py\n'
 
@@ -5819,23 +6086,21 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audio must be an integer; valid range 0 thru 1\n'
+            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audio must be an integer;valid values 0 and 1\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audio variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'delete_blacktagged_audiobook'):
-                check=cfg.delete_blacktagged_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 1))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audiobook must be an integer; valid range 0 thru 1\n'
-            else:
-                error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'delete_blacktagged_audiobook'):
+            check=cfg.delete_blacktagged_audiobook
+            if (
+                not ((type(check) is int) and
+                (check >= 0) and
+                (check <= 1))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audiobook must be an integer;valid values 0 and 1\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -5855,7 +6120,7 @@ def cfgCheck():
         check=cfg.REMOVE_FILES
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
+            
             ((check == True) or
             (check == False)))
         ):
@@ -5875,104 +6140,6 @@ def cfgCheck():
             error_found_in_media_cleaner_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The minimum_number_episodes variable is missing from media_cleaner_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'played_count_movie_action'):
-        check=cfg.played_count_movie_action
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 3))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_movie_action must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_movie_action variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'played_count_episode_action'):
-        check=cfg.played_count_episode_action
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 3))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_episode_action must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_episode_action variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'played_count_audio_action'):
-        check=cfg.played_count_audio_action
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 3))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_audio_action must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_audio_action variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'played_count_audiobook_action'):
-                check=cfg.played_count_audiobook_action
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 3))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: played_count_audiobook_action must be an integer; valid range 0 thru 1\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The played_count_audiobook_action variable is missing from media_cleaner_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'played_count_movie'):
-        check=cfg.played_count_movie
-        if (
-            not ((type(check) is int) and
-            (check >= 1) and
-            (check <= 730500))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_movie must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_movie variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'played_count_episode'):
-        check=cfg.played_count_episode
-        if (
-            not ((type(check) is int) and
-            (check >= 1) and
-            (check <= 730500))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_episode must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'played_count_audio'):
-        check=cfg.played_count_audio
-        if (
-            not ((type(check) is int) and
-            (check >= 1) and
-            (check <= 730500))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: played_count_audio must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The played_count_audio variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'played_count_audiobook'):
-                check=cfg.played_count_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 1) and
-                    (check <= 730500))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: played_count_audiobook must be an integer; valid range 0 thru 1\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The played_count_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6125,9 +6292,7 @@ def cfgCheck():
 
 #######################################################################################################
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_track_genre
                 if (
@@ -6139,9 +6304,6 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_track_genre variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_genre
                 if (
@@ -6153,9 +6315,6 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_genre variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_library_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_library_genre
                 if (
@@ -6167,9 +6326,6 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_library_genre variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
                 if (
@@ -6181,9 +6337,6 @@ def cfgCheck():
             else:
                 error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_track_author variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_author'):
                 check=cfg.keep_favorites_advanced_audio_book_author
                 if (
@@ -6201,253 +6354,223 @@ def cfgCheck():
         check=cfg.print_script_header
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_script_header must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_script_header variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_script_header variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_warnings must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_warnings variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_warnings variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_user_header must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_user_header variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_user_header variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_delete_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_movie_delete_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_keep_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_movie_keep_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_movie_error_info'):
         check=cfg.print_movie_error_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_movie_error_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_error_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_movie_error_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_delete_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_episode_delete_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_keep_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_episode_keep_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_episode_error_info'):
         check=cfg.print_episode_error_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_episode_error_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_error_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_episode_error_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_delete_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_audio_delete_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_keep_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_audio_keep_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_audio_error_info'):
         check=cfg.print_audio_error_info
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_audio_error_info must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_error_info variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_audio_error_info variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'print_audiobook_delete_info'):
-                check=cfg.print_audiobook_delete_info
-                if (
-                    not ((type(check) is bool) and
-                    #(check.isupper()) and
-                    ((check == True) or
-                    (check == False)))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_delete_info variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'print_audiobook_delete_info'):
+            check=cfg.print_audiobook_delete_info
+            if (
+                not ((type(check) is bool) and
+                ((check == True) or
+                (check == False)))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_delete_info variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'print_audiobook_keep_info'):
-                check=cfg.print_audiobook_keep_info
-                if (
-                    not ((type(check) is bool) and
-                    #(check.isupper()) and
-                    ((check == True) or
-                    (check == False)))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_keep_info variable is missing from media_cleaner_config.py\n'
+        if hasattr(cfg, 'print_audiobook_keep_info'):
+            check=cfg.print_audiobook_keep_info
+            if (
+                not ((type(check) is bool) and
+                ((check == True) or
+                (check == False)))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_keep_info variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'print_audiobook_error_info'):
-                check=cfg.print_audiobook_error_info
-                if (
-                    not ((type(check) is bool) and
-                    #(check.isupper()) and
-                    ((check == True) or
-                    (check == False)))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_error_info must be a boolean; valid values True and False\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_error_info variable is missing from media_cleaner_config.py\n'
+        if hasattr(cfg, 'print_audiobook_error_info'):
+            check=cfg.print_audiobook_error_info
+            if (
+                not ((type(check) is bool) and
+                ((check == True) or
+                (check == False)))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_error_info must be a boolean; valid values True and False\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_error_info variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_summary_header must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_summary_header variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_summary_header variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_movie_summary must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_movie_summary variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_movie_summary variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_episode_summary must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_episode_summary variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_episode_summary variable is missing from media_cleaner_config.py\n'
 
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: print_audio_summary must be a boolean; valid values True and False\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The print_audio_summary variable is missing from media_cleaner_config.py\n'
+    else:
+        error_found_in_media_cleaner_config_py+='NameError: The print_audio_summary variable is missing from media_cleaner_config.py\n'
 
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'print_audiobook_summary'):
-                check=cfg.print_audiobook_summary
-                if (
-                    not ((type(check) is bool) and
-                    #(check.isupper()) and
-                    ((check == True) or
-                    (check == False)))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_summary variable is missing from media_cleaner_config.py\n'
+    if (server_brand == 'jellyfin'):
+        if hasattr(cfg, 'print_audiobook_summary'):
+            check=cfg.print_audiobook_summary
+            if (
+                not ((type(check) is bool) and
+                ((check == True) or
+                (check == False)))
+            ):
+                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
+        else:
+            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_summary variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6455,119 +6578,12 @@ def cfgCheck():
         check=cfg.UPDATE_CONFIG
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
             error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
     else:
         error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'max_age_movie'):
-        check=cfg.max_age_movie
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500) and
-            (((check >= check_played_age_movie) and (check >= 0)) or
-            (check == -1)))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_movie must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_age_movie variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_age_episode'):
-        check=cfg.max_age_episode
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500) and
-            (((check >= check_played_age_episode) and (check >= 0)) or
-            (check == -1)))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_episode must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_age_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_age_audio'):
-        check=cfg.max_age_audio
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500) and
-            (((check >= check_played_age_audio) and (check >= 0)) or
-            (check == -1)))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_age_audio must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_age_audio variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'max_age_audiobook'):
-                check=cfg.max_age_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= -1) and
-                    (check <= 730500) and
-                    (((check >= check_played_age_audiobook) and (check >= 0)) or
-                    (check == -1)))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: max_age_audiobook must be an integer greater than corresponding played_age_xyz; valid range -1 thru 730500\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The max_age_audiobook variable is missing from media_cleaner_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'max_delete_played_state_movie'):
-        check=cfg.max_delete_played_state_movie
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_movie must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_movie variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_delete_played_state_episode'):
-        check=cfg.max_delete_played_state_episode
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_episode must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_episode variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'max_delete_played_state_audio'):
-        check=cfg.max_delete_played_state_audio
-        if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
-        ):
-            error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_audio must be an integer; valid range 0 thru 1\n'
-    #else:
-        #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_audio variable is missing from media_cleaner_config.py\n'
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (check == 'jellyfin'):
-            if hasattr(cfg, 'max_delete_played_state_audiobook'):
-                check=cfg.max_delete_played_state_audiobook
-                if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
-                ):
-                    error_found_in_media_cleaner_config_py+='ValueError: max_delete_played_state_audiobook must be an integer; valid range 0 thru 1\n'
-            #else:
-                #error_found_in_media_cleaner_config_py+='NameError: The max_delete_played_state_audiobook variable is missing from media_cleaner_config.py\n'
 
 #######################################################################################################
 
@@ -6630,8 +6646,6 @@ def cfgCheck():
 
 #######################################################################################################
 
-    #continuning to config check user_keys length and type
-    # this config is not used for anything in the script; only as an easy place to see monitored userIds
     if hasattr(cfg, 'user_keys'):
         check=cfg.user_keys
         check_list=json.loads(check)
@@ -6705,7 +6719,6 @@ def cfgCheck():
         check=cfg.DEBUG
         if (
             not ((type(check) is bool) and
-            #(check.isupper()) and
             ((check == True) or
             (check == False)))
         ):
