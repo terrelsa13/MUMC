@@ -441,7 +441,7 @@ print_audiobook_summary=True
 #           Resets to dry run mode (REMOVE_FILES=False)
 # (False : default)
 #----------------------------------------------------------#
-UPDATE_CONFIG=Falsea
+UPDATE_CONFIG=False
 ```
 ### Automatically Created Configuration File Options
 ```python
