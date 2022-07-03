@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.5_BETA'
+    Version='3.0.6_BETA'
 
     return(Version)
 
@@ -1975,7 +1975,7 @@ def get_isPlayed_FilterValue(filter_play_count_comparison,filter_play_count):
             #Play count 0 thru 730500
             isPlayed_Filter_Value=''
     else:
-        #Play count unknown
+        #Play count comparison unknown
         isPlayed_Filter_Value=''
 
     return isPlayed_Filter_Value
@@ -2025,7 +2025,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_play_count_co
                         #Send the API query for for watched media items in blacklists
                         children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
                     else:
-                        #When no libraries are returned; simulate an empty query being returned
+                        #When no media items are returned; simulate an empty query being returned
                         #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
                         children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit=0
@@ -2109,7 +2109,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_play_coun
                             #Send the API query for for watched media items in blacklists
                             children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg)
                         else:
-                            #When no libraries are returned; simulate an empty query being returned
+                            #When no media items are returned; simulate an empty query being returned
                             #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
                             children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                             QueryLimit=0
@@ -3764,7 +3764,7 @@ def get_media_items():
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Blacklist=0
@@ -3780,7 +3780,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Blacklist media items
                         data_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,QueriesRemaining_Favorited_From_Blacklist=api_query_handler(apiQuery_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Favorited_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Blacklist=0
@@ -3796,7 +3796,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Whitelist media items
                         data_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,QueriesRemaining_Favorited_From_Whitelist=api_query_handler(apiQuery_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist)
                     else:
-                        #When no libraries are whitelisted; simulate an empty query being returned
+                        #When no media items are whitelisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
                         data_Favorited_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Whitelist=0
@@ -3869,10 +3869,10 @@ def get_media_items():
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,movie_play_count_comparison,movie_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
+                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_child_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
+                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_child_from_whitelist_child'
                     data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,movie_play_count_comparison,movie_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
@@ -4217,7 +4217,7 @@ def get_media_items():
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Blacklist=0
@@ -4233,7 +4233,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Blacklist media items
                         data_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,QueriesRemaining_Favorited_From_Blacklist=api_query_handler(apiQuery_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Favorited_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Blacklist=0
@@ -4249,7 +4249,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Whitelist media items
                         data_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,QueriesRemaining_Favorited_From_Whitelist=api_query_handler(apiQuery_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist)
                     else:
-                        #When no libraries are whitelisted; simulate an empty query being returned
+                        #When no media items are whitelisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
                         data_Favorited_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Whitelist=0
@@ -4322,10 +4322,10 @@ def get_media_items():
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,episode_play_count_comparison,episode_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
+                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_child_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
+                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_child_from_whitelist_child'
                     data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,episode_play_count_comparison,episode_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
@@ -4681,7 +4681,7 @@ def get_media_items():
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Blacklist=0
@@ -4697,7 +4697,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Blacklist media items
                         data_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,QueriesRemaining_Favorited_From_Blacklist=api_query_handler(apiQuery_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Favorited_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Blacklist=0
@@ -4713,7 +4713,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Whitelist media items
                         data_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,QueriesRemaining_Favorited_From_Whitelist=api_query_handler(apiQuery_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist)
                     else:
-                        #When no libraries are whitelisted; simulate an empty query being returned
+                        #When no media items are whitelisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
                         data_Favorited_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Whitelist=0
@@ -4786,10 +4786,10 @@ def get_media_items():
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,audio_play_count_comparison,audio_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
+                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_child_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
+                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_child_from_whitelist_child'
                     data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,audio_play_count_comparison,audio_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
@@ -5140,7 +5140,7 @@ def get_media_items():
                         #Send the API query for for watched media items in blacklists
                         data_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,QueriesRemaining_Blacklist=api_query_handler(apiQuery_Blacklist,StartIndex_Blacklist,TotalItems_Blacklist,QueryLimit_Blacklist,APIDebugMsg_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Blacklist=0
@@ -5156,7 +5156,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Blacklist media items
                         data_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,QueriesRemaining_Favorited_From_Blacklist=api_query_handler(apiQuery_Favorited_From_Blacklist,StartIndex_Favorited_From_Blacklist,TotalItems_Favorited_From_Blacklist,QueryLimit_Favorited_From_Blacklist,APIDebugMsg_Favorited_From_Blacklist)
                     else:
-                        #When no libraries are blacklisted; simulate an empty query being returned
+                        #When no media items are blacklisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
                         data_Favorited_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Blacklist=0
@@ -5172,7 +5172,7 @@ def get_media_items():
                         #Send the API query for for Favorited from Whitelist media items
                         data_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,QueriesRemaining_Favorited_From_Whitelist=api_query_handler(apiQuery_Favorited_From_Whitelist,StartIndex_Favorited_From_Whitelist,TotalItems_Favorited_From_Whitelist,QueryLimit_Favorited_From_Whitelist,APIDebugMsg_Favorited_From_Whitelist)
                     else:
-                        #When no libraries are whitelisted; simulate an empty query being returned
+                        #When no media items are whitelisted; simulate an empty query being returned
                         #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
                         data_Favorited_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Whitelist=0
@@ -5245,10 +5245,10 @@ def get_media_items():
                     APIDebugMsg_Favorited_From_Whitelist_Child='favorited_From_Whitelist_from_whitelist_child'
                     data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Favorited_From_Whitelist_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_from_blacklist_child'
+                    APIDebugMsg_Blacktag_From_BlackList_Child='blacktag_child_from_blacklist_child'
                     data_Blacktagged_From_BlackList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_BlackList,blacktags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Blacktag_From_BlackList_Child)
                     #Define reasoning for lookup
-                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_from_whitelist_child'
+                    APIDebugMsg_Blacktag_From_WhiteList_Child='blacktag_child_from_whitelist_child'
                     data_Blacktagged_From_WhiteList_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_WhiteList,blacktags,audiobook_play_count_comparison,audiobook_play_count,APIDebugMsg_Blacktag_From_WhiteList_Child)
                     #Define reasoning for lookup
                     APIDebugMsg_Whitetag_From_Blacklist_Child='whitetag_child_from_blacklist_child'
