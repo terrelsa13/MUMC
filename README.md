@@ -622,6 +622,12 @@ DEBUG=False
    - If this version of Python is not installed do NOT overwrite the OS default Python version
    - Instead use the link below to create an alternate install of Python
       - [Python 3.7.x example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
+* Install the python-dateutil module with the following commands:
+   - $```sudo apt-get update```
+   - $```sudo apt-get upgrade -y```
+   - $```sudo apt-get install python3-pip -y```
+   - $```pip3 install -U pip```
+   - $```pip3 install python-dateutil```
 * **\*OPTIONAL\*** Update the media_cleaner_config_defaults.py file with desired default values
    - $```nano /path/to/media_cleaner_config_defaults.py```
 * Make the script executable
@@ -629,14 +635,9 @@ DEBUG=False
 * Run the script
    - $```/path/to/python3.x /path/to/media_cleaner.py```
 * First time the script is run, it will walk through building the media_cleaner_config.py file
-* The below python error may be generated if the python-dateutil module is not installed
+
+* If you get the below python error the python-dateutil module was not properly installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
-* The python-dateutil module can be installed with the following commands:
-   - $```sudo apt-get update```
-   - $```sudo apt-get upgrade -y```
-   - $```sudo apt-get install python3-pip -y```
-   - $```pip3 install -U pip```
-   - $```pip3 install python-dateutil```
 
 # First Run (Other Operating Systems)
 * Please consult your favorite search engine
