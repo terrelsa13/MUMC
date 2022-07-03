@@ -167,7 +167,7 @@ To make a Filter Statement that deletes only unplayed media items CAREFULLY use 
   - movie_play_count=1
 #  Contents Of The Configuration File
 ### Basic Configuration File Options
-#### Part #1 of the filter statement:
+#### Part #1 of the Filter Statement: _Condition_
 ```python
 #----------------------------------------------------------#
 # Condition: Delete media items based on when they were last played or
@@ -181,7 +181,7 @@ episode_condition='played'
 audio_condition='played'
 audiobook_condition='played'
 ```
-#### Part #2 of the filter statement:
+#### Part #2 of the Filter Statement: _Condition Days_
 ```python
 #----------------------------------------------------------#
 # Condition Days: Delete media items last played or created at least this many days ago
@@ -195,7 +195,7 @@ episode_condition_days=-1
 audio_condition_days=-1
 audiobook_condition_days=-1
 ```
-#### Part #3 of the filter statement:
+#### Part #3 of the Filter Statement: _Play Count Inequality_
 ```python
 #----------------------------------------------------------#
 # Play Count Inequality: Delete media items within this range based off of the chosen *_play_count.
@@ -216,7 +216,7 @@ episode_play_count_comparison='>='
 audio_play_count_comparison='>='
 audiobook_play_count_comparison='>='
 ```
-#### Part #4 of the filter statement:
+#### Part #4 of the Filter Statement: _Play Count_
 ```python
 #----------------------------------------------------------#
 # Play Count: Delete media items with a play count relative to this number.
