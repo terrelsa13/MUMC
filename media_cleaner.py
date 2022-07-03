@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.5'
+    Version='2.1.6'
 
     return(Version)
 
@@ -794,9 +794,9 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
                             #When all libraries selected we can automatically exit the library chooser
                             if (len(library_tracker) >= len(showpos_correlation)):
                                 stop_loop=True
+                                print('')
                             else:
                                 stop_loop=False
-                            print('')
 
                             #DEBUG
                             if(preConfigDebug):
@@ -869,6 +869,7 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     userId_wllib_dict={}
     #define empty userId set
     userId_set=set()
+    userId_ReRun_set=set()
 
     user_keys_json=''
     #user_bl_libs_json=''
@@ -888,15 +889,30 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
             raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in media_cleaner_config.py; userIds need to be in the same order for both')
 
         i=0
-        #Pre-populate the existing userkeys and libraries; only new users are fully shown; but will display minimal existing user info
+        usernames_userkeys=json.loads(cfg.user_keys)
+        #Pre-populate the existing userkeys and libraries; only new users are fully shown; existing user will display minimal info
         for rerun_userkey in user_keys_json:
             userId_set.add(rerun_userkey)
             if (rerun_userkey == bluser_keys_json_verify[i]):
                 userId_bllib_dict[rerun_userkey]=json.loads(cfg.user_bl_libs)[i]
+                for usernames_userkeys_str in usernames_userkeys:
+                    usernames_userkeys_list=usernames_userkeys_str.split(":")
+                    if (len(usernames_userkeys_list) == 2):
+                        if (usernames_userkeys_list[1] == rerun_userkey):
+                            userId_bllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
+                    else:
+                        raise ValueError('\nUnable to edit config when username contains colon (:).')
             else:
                 raise ValueError('\nValueError: Order of user_keys and user_wl libs are not in the same order.')
             if (rerun_userkey == wluser_keys_json_verify[i]):
                 userId_wllib_dict[rerun_userkey]=json.loads(cfg.user_wl_libs)[i]
+                for usernames_userkeys_str in usernames_userkeys:
+                    usernames_userkeys_list=usernames_userkeys_str.split(":")
+                    if (len(usernames_userkeys_list) == 2):
+                        if (usernames_userkeys_list[1] == rerun_userkey):
+                            userId_wllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
+                    else:
+                        raise ValueError('\nUnable to edit config when username contains colon (:).')
             else:
                 raise ValueError('\nValueError: Order of user_keys and user_bl libs are not in the same order.')
             i += 1
@@ -979,6 +995,8 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                 if ((user_number_int >= 0) and (user_number_int < i)):
                     one_user_selected=True
                     userId_set.add(userId_dict[user_number_int])
+                    if (updateConfig):
+                        userId_ReRun_set.add(userId_dict[user_number_int])
 
                     #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                     if (library_setup_behavior == 'blacklist'):
@@ -988,7 +1006,9 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                         message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
                         userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
 
-                    if (len(userId_set) >= i):
+                    if ((len(userId_set) >= i) and (not updateConfig)):
+                        stop_loop=True
+                    elif ((len(userId_ReRun_set) >= i) and (updateConfig)):
                         stop_loop=True
                     else:
                         stop_loop=False
@@ -1081,6 +1101,9 @@ def generate_edit_config(cfg,updateConfig):
         print('-----------------------------------------------------------')
         #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
+        print('-----------------------------------------------------------')
+        #ask user how they want media items to be matched to libraries/folders
+        library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior)
         print('-----------------------------------------------------------')
         #set auth_key to allow printing username next to userkey
         auth_key=cfg.auth_key
