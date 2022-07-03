@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.6_BETA'
+    Version='3.0.7_BETA'
 
     return(Version)
 
