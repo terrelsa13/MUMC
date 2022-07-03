@@ -588,9 +588,7 @@ DEBUG=False
 * media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
-# Delete Or Keep Priorities Of A Played Media Item
-
-At least one monitored user must have played the media item before it will be considered for deletion.<sup>1</sup>
+# Delete Or Keep Priorities Of A Media Item
 
 1. **Favorites & Whitetags** (Highest Priority)
    - *media item will be kept*
@@ -606,8 +604,6 @@ At least one monitored user must have played the media item before it will be co
       - Blacklists ignored
 4. **Blacklists** (Lowest priority)
    - *media item will be deleted*
-
-<sup>1</sup> If max_age_* is enabled both the media item's 'Creation Date' and 'Played State' are used.
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
