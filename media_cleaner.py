@@ -17,7 +17,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.8_BETA'
+    Version='3.0.9_BETA'
 
     return(Version)
 
@@ -1199,10 +1199,10 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   movie_play_count_comparison='>='\n"
     config_file += "#   movie_play_count=1\n"
     config_file += "#\n"
-    config_file += "# Delete episodes played at least 55 days ago with a play count not < 0.\n"
+    config_file += "# Delete episodes played at least 55 days ago with a play count not <= 0.\n"
     config_file += "#   episode_condition='played'\n"
     config_file += "#   episode_condition_days=55\n"
-    config_file += "#   episode_play_count_comparison='not <'\n"
+    config_file += "#   episode_play_count_comparison='not <='\n"
     config_file += "#   episode_play_count=0\n"
     config_file += "#\n"
     config_file += "# Delete audio tracks played at least 123 days ago with a play count == 4.\n"
@@ -1676,7 +1676,7 @@ def build_configuration_file(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#---------!!!DO NOT MODIFY ANYTHING BELOW!!!----------------#\n"
-    config_file += "# These configuration options are automatically created during setup.\n"
+    config_file += "# These are automatically created during setup.\n"
     config_file += "#   If you do not know EXACTLY what you are doing changing these\n"
     config_file += "#      can and will cause script failure.\n"
     config_file += "#   The only way to recover from script failure is to revert the\n"

@@ -47,10 +47,10 @@ Start with a generic Filter Statement:
   - movie_play_count_comparison='>='
   - movie_play_count=1
 
-* Delete episodes played at least 55 days ago with a play count not < 0.
+* Delete episodes played at least 55 days ago with a play count not <= 0.
   - episode_condition='played'
   - episode_condition_days=55
-  - episode_play_count_comparison='not <'
+  - episode_play_count_comparison='not <='
   - episode_play_count=0
 
 * Delete audio tracks played at least 123 days ago with a play count == 4.
@@ -166,7 +166,7 @@ To make a Filter Statement that deletes only unplayed media items CAREFULLY use 
   - movie_play_count_comparison='not >='
   - movie_play_count=1
 #  Contents Of The Configuration File
-### Basic Configuration File Options
+### Basic Configuration File Variables
 #### Part #1 of the Filter Statement: _Condition_
 ```python
 #----------------------------------------------------------#
@@ -228,7 +228,7 @@ episode_play_count=1
 audio_play_count=1
 audiobook_play_count=1
 ```
-### Advanced Configuration File Options
+### Advanced Configuration File Variables
 #### Option for determining if a media item should be deleted or kept based on individual users' or all users' play counts:
 ```python
 #----------------------------------------------------------#
@@ -325,7 +325,7 @@ REMOVE_FILES=False
 #  functionality to notify user(s) when a new episode for a series
 #  is ready to be watched
 #  0 - Episodes will be deleted as they are watched
-#  1-730500 - All but the latest selected number of episodes will be deleted as they are watched
+#  1-730500 - All but the latest "selected number" of episodes will be deleted as they are watched
 # (0 : default)
 #----------------------------------------------------------#
 minimum_number_episodes=0
@@ -443,10 +443,10 @@ print_audiobook_summary=True
 #----------------------------------------------------------#
 UPDATE_CONFIG=False
 ```
-### Automatically Created Configuration File Options
+### Automatically Created Configuration File Variables
 ```python
 #---------!!!DO NOT MODIFY ANYTHING BELOW!!!----------------#
-# These configuration options are automatically created during setup.
+# These are automatically created during setup.
 #   If you do not know EXACTLY what you are doing, changing these
 #      can and will cause script failure.
 #   The only way to recover from script failure is to revert the
@@ -559,9 +559,9 @@ api_query_attempts=4
 #  this value to allow the server to return smaller amounts of data
 # ALL media items and their metadata are processed regardless of this value
 #  1-10000 - maximum number of media items the server will return for each API query
-#  (50 : default)
+#  (25 : default)
 #----------------------------------------------------------#
-api_query_item_limit=50
+api_query_item_limit=25
 ```
 #### DEBUG
 ```python
@@ -574,7 +574,7 @@ api_query_item_limit=50
 DEBUG=False
 ```
 #
-# Configuration file version prior to 3.0.0 Are Not Compatible
+# Configuration file versions prior to 3.0.0 Are Not Compatible
 * Previous ```media_cleaner_config.py``` files made with script versions before 3.0.0 are NOT compatible.
   - A new ```media_cleaner_config.py``` will need to be created using the latest version of this script.
 # Requirements
@@ -585,7 +585,6 @@ DEBUG=False
    - Older versions of python 3.x will likely work; but are not supported
    - Python 2.x or earlier are not supported and will not work
 * python-dateutil \***must** be installed\*
-* media_cleaner_config_defaults.py **\*new\***
 * Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
 
 # Delete Or Keep Priorities Of A Media Item
