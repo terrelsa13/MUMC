@@ -17,7 +17,7 @@ from mumc_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.9_BETA'
+    Version='3.0.10-beta'
 
     return(Version)
 
@@ -386,7 +386,7 @@ def get_authentication_key(server_url, username, password, server_brand):
     #else:
         #xAuth = 'X-Jellyfin-Authorization'
 
-    headers = {xAuth : 'Emby UserId="' + username  + '", Client="media_cleaner.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
+    headers = {xAuth : 'Emby UserId="' + username  + '", Client="mumc.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
 
     req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
@@ -887,7 +887,7 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
         if (bluser_keys_json_verify == wluser_keys_json_verify):
             user_keys_json = bluser_keys_json_verify
         else:
-            raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in media_cleaner_config.py; userIds need to be in the same order for both')
+            raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
         i=0
         usernames_userkeys=json.loads(cfg.user_keys)
@@ -1033,13 +1033,13 @@ def save_config_file(config_file):
         #set script_dir to cwd (aka this directory) to prevent error when attempting to change to '' (aka a blank directory)
         script_dir=cwd
     os.chdir(script_dir)
-    f = open("media_cleaner_config.py", "w")
+    f = open("mumc_config.py", "w")
     f.write(config_file)
     f.close()
     os.chdir(cwd)
 
 
-#get user input needed to build or edit the media_cleaner_config.py file
+#get user input needed to build or edit the mumc_config.py file
 def build_configuration_file(cfg,updateConfig):
 
     print('-----------------------------------------------------------')
@@ -1814,7 +1814,7 @@ def build_configuration_file(cfg,updateConfig):
                     print('\n\n-----------------------------------------------------------')
                     print('Config file is not setup to find media.')
                     print('-----------------------------------------------------------')
-                    print('To find media open media_cleaner_config.py in a text editor:')
+                    print('To find media open mumc_config.py in a text editor:')
                     print('    Set \'movie_condition_days\' to zero or a positive number')
                     print('    Set \'episode_condition_days\' to zero or a positive number')
                     print('    Set \'audio_condition_days\' to zero or a positive number')
@@ -1825,24 +1825,24 @@ def build_configuration_file(cfg,updateConfig):
                 print('Config file is not setup to delete media.')
                 print('Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
-                print('To delete media open media_cleaner_config.py in a text editor:')
+                print('To delete media open mumc_config.py in a text editor:')
                 print('    Set REMOVE_FILES=\'True\'')
             print('-----------------------------------------------------------')
-            print('Edit the media_cleaner_config.py file and try running again.')
+            print('Edit the mumc_config.py file and try running again.')
             print('-----------------------------------------------------------')
 
         #the exception
         except (AttributeError, ModuleNotFoundError):
             #something went wrong
-            #media_cleaner_config.py should have been created by now
-            #we are here because the media_cleaner_config.py file does not exist
-            #this is either the first time the script is running or media_cleaner_config.py file was deleted
+            #mumc_config.py should have been created by now
+            #we are here because the mumc_config.py file does not exist
+            #this is either the first time the script is running or mumc_config.py file was deleted
 
             #raise error
-            raise RuntimeError('\nConfigError: Cannot find or open media_cleaner_config.py')
+            raise RuntimeError('\nConfigError: Cannot find or open mumc_config.py')
 
 
-#get user input needed to edit the media_cleaner_config.py file
+#get user input needed to edit the mumc_config.py file
 def edit_configuration_file(cfg,updateConfig):
     return build_configuration_file(cfg,updateConfig)
 
@@ -3531,7 +3531,7 @@ def get_media_items():
        ):
         print_byType('* ATTENTION!!!                                            *',print_warnings)
         print_byType('* No media types are being monitored.                     *',print_warnings)
-        print_byType('* Open the media_cleaner_config.py file in a text editor. *',print_warnings)
+        print_byType('* Open the mumc_config.py file in a text editor. *',print_warnings)
         print_byType('* Set at least one media type to >=0.                     *',print_warnings)
         print_byType('*                                                         *',print_warnings)
         print_byType('* movie_condition_days=-1                                 *',print_warnings)
@@ -3555,7 +3555,7 @@ def get_media_items():
     if (bluser_keys_json_verify == wluser_keys_json_verify):
         user_keys_json = bluser_keys_json_verify
     else:
-        raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in media_cleaner_config.py; userIds need to be in the same order for both')
+        raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
 
     for user_key in user_keys_json:
@@ -5677,7 +5677,7 @@ def output_itemsToDelete(deleteItems):
         print_byType('* No Media Deleted',print_summary_header)
         print_byType('* Items = ' + str(len(deleteItems)),print_summary_header)
         print_byType('-----------------------------------------------------------',print_summary_header)
-        print_byType('* To delete media open media_cleaner_config.py in a text editor:',print_summary_header)
+        print_byType('* To delete media open mumc_config.py in a text editor:',print_summary_header)
         print_byType('*    Set REMOVE_FILES=\'True\'',print_summary_header)
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
     else:
@@ -5732,7 +5732,7 @@ def output_itemsToDelete(deleteItems):
 #Check blacklist and whitelist config variables are as expected
 def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
 
-    error_found_in_media_cleaner_config_py=''
+    error_found_in_mumc_config_py=''
 
     for check_irt in check_list:
         #Check if userid exists
@@ -5744,21 +5744,21 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
                 if (user_check in check_irt['userid']):
                     user_found+=1
             if (user_found == 0):
-                error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' does not match any user from user_keys\n'
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' does not match any user from user_keys\n'
             if (user_found > 1):
-                error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' is seen more than once\n'
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' is seen more than once\n'
             #Check userid is string
             if not (isinstance(check_irt['userid'], str)):
-                error_found_in_media_cleaner_config_py+='TypeError: In ' + config_var_name + ' the userid is not a string for at least one user\n'
+                error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' the userid is not a string for at least one user\n'
             else:
                 #Check userid is 32 character long alphanumeric
                 if not (
                     (check_irt['userid'].isalnum()) and
                     (len(check_irt['userid']) == 32)
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' + at least one userid is not a 32-character alphanumeric string\n'
+                    error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' + at least one userid is not a 32-character alphanumeric string\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: In ' + config_var_name + ' the userid key is missing for at least one user\n'
+            error_found_in_mumc_config_py+='NameError: In ' + config_var_name + ' the userid key is missing for at least one user\n'
         #Check if length is >1; which means a userid and at least one library are stored
         if (len(check_irt) > 1):
             #Get number of elements
@@ -5777,25 +5777,25 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
                                 libid_found += 1
                                 #Check libid is string
                                 if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
-                                    error_found_in_media_cleaner_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a string\n'
+                                    error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check libid is 32 character long alphanumeric
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].isalnum()) and
                                         (len(check_irt[str(num_elements)][libinfo]) == 32)
                                     ):
-                                        error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
                             elif (libinfo == 'collectiontype'):
                                 collectiontype_found += 1
                                 #Check collectiontype is string
                                 if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
-                                    error_found_in_media_cleaner_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a string\n'
+                                    error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check collectiontype is all alpha characters
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].isalpha())
                                     ):
-                                        error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
                                     else:
                                         #TODO verify we only see specific collection types (i.e. tvshows, movies, music, books, etc...)
                                         pass
@@ -5803,43 +5803,43 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
                                 networkpath_found += 1
                                 #Check networkpath is string
                                 if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
-                                    error_found_in_media_cleaner_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' is not a string\n'
+                                    error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check networkpath has no backslashes
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].find('\\') < 0)
                                     ):
-                                        error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' cannot have any forward slashes \'\\\'\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' cannot have any forward slashes \'\\\'\n'
                             elif (libinfo == 'path'):
                                 path_found += 1
                                 #Check path is string
                                 if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
-                                    error_found_in_media_cleaner_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' is not a string\n'
+                                    error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check path has no backslashes
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].find('\\') < 0)
                                     ):
-                                        error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' cannot have any backslashes \'\\\'\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' cannot have any backslashes \'\\\'\n'
                         if (libid_found == 0):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key libid is missing\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key libid is missing\n'
                         if (libid_found > 1):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key libid is seen more than once\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key libid is seen more than once\n'
                         if (collectiontype_found == 0):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key collectiontype is missing\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key collectiontype is missing\n'
                         if (collectiontype_found > 1):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key collectiontype is seen more than once\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key collectiontype is seen more than once\n'
                         if (networkpath_found == 0):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key networkpath is missing\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key networkpath is missing\n'
                         if (networkpath_found > 1):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key networkpath is seen more than once\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key networkpath is seen more than once\n'
                         if (path_found == 0):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key path is missing\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key path is missing\n'
                         if (path_found > 1):
-                            error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key path is seen more than once\n'
+                            error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key path is seen more than once\n'
                     else:
-                        error_found_in_media_cleaner_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' key'+ str(num_elements) +' does not exist\n'
-    return(error_found_in_media_cleaner_config_py)
+                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' key'+ str(num_elements) +' does not exist\n'
+    return(error_found_in_mumc_config_py)
 
 
 #Check select config variables are as expected
@@ -5849,7 +5849,7 @@ def cfgCheck():
         server_brand=cfg.server_brand
     else:
         server_brand='invalid'
-    error_found_in_media_cleaner_config_py=''
+    error_found_in_mumc_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
 #######################################################################################################
@@ -5861,9 +5861,9 @@ def cfgCheck():
             ((check == 'played') or
             (check == 'created')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: movie_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+            error_found_in_mumc_config_py+='ValueError: movie_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The movie_condition variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The movie_condition variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_condition'):
         check=cfg.episode_condition
@@ -5872,9 +5872,9 @@ def cfgCheck():
             ((check == 'played') or
             (check == 'created')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: episode_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+            error_found_in_mumc_config_py+='ValueError: episode_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The episode_condition variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The episode_condition variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_condition'):
         check=cfg.audio_condition
@@ -5883,9 +5883,9 @@ def cfgCheck():
             ((check == 'played') or
             (check == 'created')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: audio_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+            error_found_in_mumc_config_py+='ValueError: audio_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The audio_condition variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The audio_condition variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_condition'):
@@ -5895,9 +5895,9 @@ def cfgCheck():
                 ((check == 'played') or
                 (check == 'created')))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
+                error_found_in_mumc_config_py+='ValueError: audiobook_condition must be an all lower case string; valid values \'played\' and \'created\'\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The audiobook_condition variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -5908,9 +5908,9 @@ def cfgCheck():
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: movie_condition_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ValueError: movie_condition_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The movie_condition_days variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The movie_condition_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_condition_days'):
         check=cfg.episode_condition_days
@@ -5919,9 +5919,9 @@ def cfgCheck():
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: episode_condition_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ValueError: episode_condition_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The episode_condition_days variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The episode_condition_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_condition_days'):
         check=cfg.audio_condition_days
@@ -5930,9 +5930,9 @@ def cfgCheck():
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: audio_condition_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ValueError: audio_condition_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The audio_condition_days variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The audio_condition_days variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_condition_days'):
@@ -5942,9 +5942,9 @@ def cfgCheck():
                 (check >= -1) and
                 (check <= 730500))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: audiobook_condition_days must be an integer; valid range -1 thru 730500\n'
+                error_found_in_mumc_config_py+='ValueError: audiobook_condition_days must be an integer; valid range -1 thru 730500\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The audiobook_condition_days variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The audiobook_condition_days variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -5959,9 +5959,9 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: movie_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ValueError: movie_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The movie_play_count_comparison variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The movie_play_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_play_count_comparison'):
         check=cfg.episode_play_count_comparison
@@ -5974,9 +5974,9 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: episode_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ValueError: episode_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The episode_play_count_comparison variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The episode_play_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_play_count_comparison'):
         check=cfg.audio_play_count_comparison
@@ -5989,9 +5989,9 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: audio_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ValueError: audio_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The audio_play_count_comparison variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The audio_play_count_comparison variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_play_count_comparison'):
@@ -6005,9 +6005,9 @@ def cfgCheck():
                 (check == 'not >=') or (check == 'not <=') or
                 (check == 'not ==')))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: audiobook_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+                error_found_in_mumc_config_py+='ValueError: audiobook_play_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The audiobook_play_count_comparison variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The audiobook_play_count_comparison variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6018,9 +6018,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_movie must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_movie must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_play_count_episode'):
         check=cfg.multiuser_play_count_episode
@@ -6029,9 +6029,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_episode must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_episode must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_play_count_audio'):
         check=cfg.multiuser_play_count_audio
@@ -6040,9 +6040,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_audio must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_audio must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_play_count_audiobook'):
@@ -6052,9 +6052,9 @@ def cfgCheck():
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: multiuser_play_count_audiobook must be an integer; valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ValueError: multiuser_play_count_audiobook must be an integer; valid values 0 and 1\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The multiuser_play_count_audiobook variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The multiuser_play_count_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6065,9 +6065,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_episode'):
         check=cfg.keep_favorites_episode
@@ -6076,9 +6076,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_audio'):
         check=cfg.keep_favorites_audio
@@ -6087,9 +6087,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'keep_favorites_audiobook'):
@@ -6099,9 +6099,9 @@ def cfgCheck():
                 (check >= 0) and
                 (check <= 2))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
+                error_found_in_mumc_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_audiobook variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The keep_favorites_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6112,9 +6112,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_movie must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_movie must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_whitelist_episode'):
         check=cfg.multiuser_whitelist_episode
@@ -6123,9 +6123,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_episode must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_episode must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_whitelist_audio'):
         check=cfg.multiuser_whitelist_audio
@@ -6134,9 +6134,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audio must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_audio must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_whitelist_audiobook'):
@@ -6146,9 +6146,9 @@ def cfgCheck():
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer;valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer;valid values 0 and 1\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6158,9 +6158,9 @@ def cfgCheck():
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The blacktag variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The blacktag variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6171,9 +6171,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_movie must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_movie must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_movie variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'delete_blacktagged_episode'):
         check=cfg.delete_blacktagged_episode
@@ -6182,9 +6182,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_episode must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_episode must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_episode variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'delete_blacktagged_audio'):
         check=cfg.delete_blacktagged_audio
@@ -6193,9 +6193,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audio must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_audio must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audio variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'delete_blacktagged_audiobook'):
@@ -6205,9 +6205,9 @@ def cfgCheck():
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: delete_blacktagged_audiobook must be an integer;valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ValueError: delete_blacktagged_audiobook must be an integer;valid values 0 and 1\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6217,9 +6217,9 @@ def cfgCheck():
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The whitetag variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The whitetag variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6231,9 +6231,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The REMOVE_FILES variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The REMOVE_FILES variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6244,9 +6244,9 @@ def cfgCheck():
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The minimum_number_episodes variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6257,9 +6257,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_movie_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_movie_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_movie_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_movie_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_movie_library_genre'):
         check=cfg.keep_favorites_advanced_movie_library_genre
@@ -6268,9 +6268,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_movie_library_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_movie_library_genre variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6281,9 +6281,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_episode_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_episode_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_episode_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_episode_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_season_genre'):
         check=cfg.keep_favorites_advanced_season_genre
@@ -6292,9 +6292,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_season_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_season_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_season_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_season_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_series_genre'):
         check=cfg.keep_favorites_advanced_series_genre
@@ -6303,9 +6303,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_series_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_series_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_series_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_series_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_library_genre'):
         check=cfg.keep_favorites_advanced_tv_library_genre
@@ -6314,9 +6314,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_tv_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_tv_library_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_library_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network'):
         check=cfg.keep_favorites_advanced_tv_studio_network
@@ -6325,9 +6325,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_tv_studio_network must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_studio_network must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_tv_studio_network variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_studio_network variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network_genre'):
         check=cfg.keep_favorites_advanced_tv_studio_network_genre
@@ -6336,9 +6336,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_tv_studio_network_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_studio_network_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_tv_studio_network_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_studio_network_genre variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6349,9 +6349,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_track_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_track_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_track_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_track_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_album_genre'):
         check=cfg.keep_favorites_advanced_album_genre
@@ -6360,9 +6360,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_album_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_album_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_album_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_album_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_music_library_genre'):
         check=cfg.keep_favorites_advanced_music_library_genre
@@ -6371,9 +6371,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_music_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_music_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_music_library_genre variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_music_library_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_track_artist'):
         check=cfg.keep_favorites_advanced_track_artist
@@ -6382,9 +6382,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_track_artist must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_track_artist must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_track_artist variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_track_artist variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_album_artist'):
         check=cfg.keep_favorites_advanced_album_artist
@@ -6393,9 +6393,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_album_artist must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_album_artist must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_album_artist variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_album_artist variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6407,9 +6407,9 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_audio_book_track_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_track_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_track_genre variable is missing from media_cleaner_config.py\n'
+                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_track_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_genre
@@ -6418,9 +6418,9 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_audio_book_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_genre variable is missing from media_cleaner_config.py\n'
+                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_library_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_library_genre
@@ -6429,9 +6429,9 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_audio_book_library_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_library_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_library_genre variable is missing from media_cleaner_config.py\n'
+                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_library_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
@@ -6440,9 +6440,9 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_audio_book_track_author must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_track_author must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_track_author variable is missing from media_cleaner_config.py\n'
+                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_track_author variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_author'):
                 check=cfg.keep_favorites_advanced_audio_book_author
@@ -6451,9 +6451,9 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_media_cleaner_config_py+='ValueError: keep_favorites_advanced_audio_book_author must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_author must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_media_cleaner_config_py+='NameError: The keep_favorites_advanced_audio_book_author variable is missing from media_cleaner_config.py\n'
+                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_author variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6464,9 +6464,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_script_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_script_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_script_header variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_script_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
@@ -6475,9 +6475,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_warnings must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_warnings must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_warnings variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_warnings variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
@@ -6486,9 +6486,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_user_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_user_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_user_header variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_user_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
@@ -6497,9 +6497,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_movie_delete_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_movie_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
@@ -6508,9 +6508,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_movie_keep_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_movie_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_error_info'):
         check=cfg.print_movie_error_info
@@ -6519,9 +6519,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_movie_error_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_movie_error_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_movie_error_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_movie_error_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
@@ -6530,9 +6530,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_episode_delete_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_episode_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
@@ -6541,9 +6541,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_episode_keep_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_episode_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_error_info'):
         check=cfg.print_episode_error_info
@@ -6552,9 +6552,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_episode_error_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_episode_error_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_episode_error_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_episode_error_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
@@ -6563,9 +6563,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_audio_delete_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_audio_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
@@ -6574,9 +6574,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_audio_keep_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_audio_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_error_info'):
         check=cfg.print_audio_error_info
@@ -6585,9 +6585,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_audio_error_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_audio_error_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_audio_error_info variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_audio_error_info variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_delete_info'):
@@ -6597,9 +6597,9 @@ def cfgCheck():
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_delete_info variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The print_audiobook_delete_info variable is missing from mumc_config.py\n'
 
         if hasattr(cfg, 'print_audiobook_keep_info'):
             check=cfg.print_audiobook_keep_info
@@ -6608,9 +6608,9 @@ def cfgCheck():
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_keep_info variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The print_audiobook_keep_info variable is missing from mumc_config.py\n'
 
         if hasattr(cfg, 'print_audiobook_error_info'):
             check=cfg.print_audiobook_error_info
@@ -6619,9 +6619,9 @@ def cfgCheck():
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_error_info must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ValueError: print_audiobook_error_info must be a boolean; valid values True and False\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_error_info variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The print_audiobook_error_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
@@ -6630,9 +6630,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_summary_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_summary_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_summary_header variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_summary_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
@@ -6641,9 +6641,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_movie_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_movie_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_movie_summary variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_movie_summary variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
@@ -6652,9 +6652,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_episode_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_episode_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_episode_summary variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_episode_summary variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
@@ -6663,9 +6663,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: print_audio_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: print_audio_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The print_audio_summary variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The print_audio_summary variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_summary'):
@@ -6675,9 +6675,9 @@ def cfgCheck():
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
         else:
-            error_found_in_media_cleaner_config_py+='NameError: The print_audiobook_summary variable is missing from media_cleaner_config.py\n'
+            error_found_in_mumc_config_py+='NameError: The print_audiobook_summary variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6688,9 +6688,9 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The UPDATE_CONFIG variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The UPDATE_CONFIG variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6701,9 +6701,9 @@ def cfgCheck():
             ((check == 'emby') or
             (check == 'jellyfin')))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            error_found_in_mumc_config_py+='ValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The server_brand variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The server_brand variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6712,9 +6712,9 @@ def cfgCheck():
         if (
             not (type(check) is str)
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: server_url must be a string\n'
+            error_found_in_mumc_config_py+='ValueError: server_url must be a string\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The server_url variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The server_url variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
@@ -6723,9 +6723,9 @@ def cfgCheck():
             (len(check) == 32) and
             (str(check).isalnum()))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: auth_key must be a 32-character alphanumeric string\n'
+            error_found_in_mumc_config_py+='ValueError: auth_key must be a 32-character alphanumeric string\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The auth_key variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The auth_key variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6735,9 +6735,9 @@ def cfgCheck():
             not (type(check) is str) and
             ((check == 'blacklist') or (check == 'whitelist'))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
+            error_found_in_mumc_config_py+='ValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The library_setup_behavior variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The library_setup_behavior variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6747,9 +6747,9 @@ def cfgCheck():
             not (type(check) is str) and
             ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
+            error_found_in_mumc_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The library_matching_behavior variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The library_matching_behavior variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6766,9 +6766,9 @@ def cfgCheck():
                 (len(check_irt) == 32) and
                 (str(check_irt).isalnum()))
             ):
-                error_found_in_media_cleaner_config_py+='ValueError: user_keys must be a single list with a comma separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
+                error_found_in_mumc_config_py+='ValueError: user_keys must be a single list with a comma separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The user_keys variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The user_keys variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6778,9 +6778,9 @@ def cfgCheck():
         check_user_bllibs_length=len(check_list)
         #Check number of users matches the number of blacklist entries
         if not (check_user_bllibs_length == check_user_keys_length):
-            error_found_in_media_cleaner_config_py+='ValueError: Number of configured users does not match the number of configured blacklists\n'
+            error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured blacklists\n'
         else:
-            error_found_in_media_cleaner_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_bl_libs')
+            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_bl_libs')
 
 #######################################################################################################
 
@@ -6790,9 +6790,9 @@ def cfgCheck():
         check_user_wllibs_length=len(check_list)
         #Check number of users matches the number of whitelist entries
         if not (check_user_wllibs_length == check_user_keys_length):
-            error_found_in_media_cleaner_config_py+='ValueError: Number of configured users does not match the number of configured whitelists\n'
+            error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured whitelists\n'
         else:
-            error_found_in_media_cleaner_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_wl_libs')
+            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_wl_libs')
 
 #######################################################################################################
 
@@ -6803,9 +6803,9 @@ def cfgCheck():
             (check >= 0) and
             (check <= 16))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: api_query_attempts must be an integer; valid range 0 thru 16\n'
+            error_found_in_mumc_config_py+='ValueError: api_query_attempts must be an integer; valid range 0 thru 16\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The api_query_attempts variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The api_query_attempts variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6816,9 +6816,9 @@ def cfgCheck():
             (check >= 1) and
             (check <= 10000))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
+            error_found_in_mumc_config_py+='ValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The api_query_item_limit variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The api_query_item_limit variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6829,15 +6829,15 @@ def cfgCheck():
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_media_cleaner_config_py+='ValueError: DEBUG must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ValueError: DEBUG must be a boolean; valid values True and False\n'
     else:
-        error_found_in_media_cleaner_config_py+='NameError: The DEBUG variable is missing from media_cleaner_config.py\n'
+        error_found_in_mumc_config_py+='NameError: The DEBUG variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     #Bring all errors found to users attention
-    if not (error_found_in_media_cleaner_config_py == ''):
-        raise RuntimeError('\n' + error_found_in_media_cleaner_config_py)
+    if not (error_found_in_mumc_config_py == ''):
+        raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
 #######################################################################################################
 
@@ -6845,14 +6845,14 @@ def cfgCheck():
 ############# START OF SCRIPT #############
 
 try:
-    #try importing the media_cleaner_config.py file
-    #if media_cleaner_config.py file does not exsit go to except and create one
-    import media_cleaner_config as cfg
+    #try importing the mumc_config.py file
+    #if mumc_config.py file does not exsit go to except and create one
+    import mumc_config as cfg
 
-    #try assigning the DEBUG variable from media_cleaner_config.py file
-    #if DEBUG does not exsit go to except and completely rebuild the media_cleaner_config.py file
+    #try assigning the DEBUG variable from mumc_config.py file
+    #if DEBUG does not exsit go to except and completely rebuild the mumc_config.py file
     check=cfg.DEBUG
-    #removing DEBUG from media_cleaner_config.py file will allow the configuration to be reset
+    #removing DEBUG from mumc_config.py file will allow the configuration to be reset
 
     if (hasattr(cfg,'print_script_header')):
         print_script_header=cfg.print_script_header
@@ -6863,12 +6863,12 @@ try:
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
-    #we are here because the media_cleaner_config.py file does not exist
-    #this is either the first time the script is running or media_cleaner_config.py file was deleted
-    #when this happens create a new media_cleaner_config.py file
+    #we are here because the mumc_config.py file does not exist
+    #this is either the first time the script is running or mumc_config.py file was deleted
+    #when this happens create a new mumc_config.py file
     #another possible reason we are here...
-    #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the media_cleaner_config.py file
-    #when this happens create a new media_cleaner_config.py file
+    #the above attempt to set check=cfg.DEBUG failed likely because DEBUG is missing from the mumc_config.py file
+    #when this happens create a new mumc_config.py file
     update_config = False
     build_configuration_file(None,update_config)
 
