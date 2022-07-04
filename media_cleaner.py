@@ -12,7 +12,7 @@ import os
 from dateutil.parser import parse
 from collections import defaultdict
 from datetime import datetime,date,timedelta,timezone
-from media_cleaner_config_defaults import get_default_config_values
+from mumc_config_defaults import get_default_config_values
 
 
 def get_script_version():
