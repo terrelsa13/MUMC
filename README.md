@@ -1,5 +1,5 @@
 # Multi-User Media Cleaner
-The Multi-User Media Cleaner (MUMC) will go through your libraries and delete the movies, tv episodes, audio tracks, and audiobooks you no longer want taking up precious disk space.
+Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through your movies, tv episodes, audio tracks, and audiobooks in your library and delete media items you no longer want taking up disk space.
 # What Is Included?
 ## media_cleaner.py
 This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
