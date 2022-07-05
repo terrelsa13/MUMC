@@ -597,7 +597,7 @@ DEBUG=False
 # Blacktagging vs Whitetagging
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/16#issue-1205993797)
 
-# Minimum Number Of Episodes
+# Minimum Number of Episodes
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/21#issue-1258905586)
 
 # Library Matching By Id, By Path, or By Network Path
