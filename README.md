@@ -83,7 +83,7 @@ There are many possible combinations!
 ### Objective - Educate you on the dangers of ill-thought-out filters.
 You are SOLEY RESPONSIBLE if you misconfigure your Filter Statement and delete large portions of your library. I recommend staying in dry-run mode until you are certain things are working exactly as you want them to.
 #### !!!DANGEROUS!!! Filter Examples Below !BEWARE!
-What you NEVER want to do is to set ```*_condition='created'``` and ```*_condition_days=TO_SOME_LOW_NUMBER```.
+What you **_NEVER_** want to do is to set ```*_condition='created'``` and ```*_condition_days=TO_SOME_LOW_NUMBER```.
 Doing this WILL delete MOST if not ALL of your library.
 
 ##### Never do this unless you are 1000% confident it is doing exactly what you expect:
@@ -110,7 +110,7 @@ Doing this WILL delete MOST if not ALL of your library.
 You get the point right?
 
 ## Step 5: Oh Yeah, Duh!
-### Objective - Here are some things to keep in mind when building Filter Statements
+### Objective - Here are some subtlies to keep in mind when building Filter Statements
 
 Filter Statements which imply played media items with only negative play counts, like the ones below, will evalute as play_count=0 (i.e. unplayed).
 
@@ -119,7 +119,7 @@ Filter Statements which imply played media items with only negative play counts,
   - episode_play_count_comparison='<'
   - episode_play_count=0
 
-* ...with a play count not **>=** **0**.
+* ...with a play count **not >=** **0**.
   - ...
   - movie_play_count_comparison='not >='
   - movie_play_count=0
@@ -138,7 +138,7 @@ Filter Statements with a played condition and a play count overlapping zero and 
   - movie_play_count_comparison='>='
   - movie_play_count=0
 
-To make a Filter Statement that deletes played and unplayed media items CAREFULLY use the created condition, as shown below.
+To make a Filter Statement that deletes "old" played and unplayed media items; CAREFULLY use the created condition, as shown below.
 
 * Delete episodes **created** at least **2222** days ago with a play count **<=** **730500**.
   - episode_condition='created'
@@ -152,7 +152,7 @@ To make a Filter Statement that deletes played and unplayed media items CAREFULL
   - movie_play_count_comparison='>='
   - movie_play_count=0
 
-To make a Filter Statement that deletes only unplayed media items CAREFULLY use the created condition, as shown below.
+To make a Filter Statement that deletes only "old" unplayed media items; CAREFULLY use the created condition, as shown below.
 
 * Delete episodes **created** at least **7777** days ago with a play count **==** **0**.
   - episode_condition='created'
@@ -160,7 +160,7 @@ To make a Filter Statement that deletes only unplayed media items CAREFULLY use 
   - episode_play_count_comparison='=='
   - episode_play_count=0
 
-* Delete movies **created** at least **9999** days ago with a play count not **>=** **1**.
+* Delete movies **created** at least **9999** days ago with a play count **not >=** **1**.
   - movie_condition='created'
   - movie_condition_days=9999
   - movie_play_count_comparison='not >='
@@ -573,19 +573,6 @@ api_query_item_limit=25
 #----------------------------------------------------------#
 DEBUG=False
 ```
-#
-# Configuration file versions prior to 3.0.0 Are Not Compatible
-* Previous ```mumc_config.py``` files made with script versions before 3.0.0 are NOT compatible.
-  - A new ```mumc_config.py``` will need to be created using the latest version of this script.
-# Requirements
-* Linux or Windows
-   - Mac - I do not have a Mac to confirm
-   - If someone has confirmed this works on Mac, let me know and I will update this.
-* Python 3.10
-   - Older versions of python 3.x will likely work; but are not supported
-   - Python 2.x or earlier are not supported and will not work
-* python-dateutil \***must** be installed\*
-* Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
 
 # Delete Or Keep Priorities Of A Media Item
 
@@ -616,25 +603,34 @@ DEBUG=False
 # Library Matching By Id, By Path, or By Network Path
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/18#issue-1217953189)
 
+# Requirements
+* Linux, Windows, or MAC?
+   - I do not have a Mac to confirm; but should be similiar to Linux
+* Python 3.10
+   - Older versions of python 3.x will likely work; but are not supported
+   - Python 2.x or earlier are not supported and will not work
+* python-dateutil \***must** be installed\*
+* Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
+
 # First Run (Debian, Ubuntu, and Linux Mint)
 * Install Python version mentioned in the 'Requirements' section above
-   - If this version of Python is not installed do NOT overwrite the OS default Python version
-   - Instead use the link below to create an alternate install of Python
-      - [Python 3.7.x example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
-* Install the python-dateutil module with the following commands:
-   - $```sudo apt-get update```
+  - If this version of Python is not already installed do NOT overwrite the defaul OS Python version
+  - Instead use the link below to create an alternate install of Python
+    - [Python 3.7 example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
+* Verify your Python verison
+   - $```python3.x -V```
+* Next install the python-dateutil module with the following commands:
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
    - $```pip3 install -U pip```
    - $```pip3 install python-dateutil```
-* **\*OPTIONAL\*** Update the mumc_config_defaults.py file with desired default values
+* **\*OPTIONAL\*** Use a text editor to update the mumc_config_defaults.py file with desired default values
    - $```nano /path/to/mumc_config_defaults.py```
 * Make the script executable
    - $```chmod +x /path/to/mumc.py```
 * Run the script
    - $```/path/to/python3.x /path/to/mumc.py```
-* First time the script is run, it will walk through building the mumc_config.py file
-
+* First time the script is run, it will walk through creating the mumc_config.py file
 * If you get the below python error the python-dateutil module was not properly installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
 
@@ -642,15 +638,15 @@ DEBUG=False
 * Please consult your favorite search engine
 
 # Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
-* Below cron entry runs script everyday at 00:00hrs (aka 12AM)
+* Below cron entry runs ```mumc.py``` everyday at 00:00hrs (aka 12:00am)
    - $```0 0 * * * /usr/local/bin/python3.10 /opt/mumc/mumc.py```
-* Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called mumc.log in the /var/log/ directory
+* Below cron entry runs ```mumc.py``` every Monday at 01:23hrs (aka 1:23)am and saves the output to a file called mumc.log in the /var/log/ directory
    - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
 
 # Schedule To Run (Other Operating Systems)
 * Please consult your favorite search engine
 
 # Donation
-If you find this script useful and would like to show support, please consider the option below.
+If you find MUMC useful and would like to show support, please consider the option below.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
