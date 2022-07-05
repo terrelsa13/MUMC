@@ -17,7 +17,7 @@ from mumc_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.12-beta'
+    Version='3.0.13-beta'
 
     return(Version)
 
@@ -403,6 +403,7 @@ def get_authentication_key(server_url, username, password, server_brand):
 def user_lib_builder(json_lib_entry):
     lib_json=json.loads(json_lib_entry)
     built_userid=[]
+    built_username=[]
     built_libid=[]
     built_collectiontype=[]
     built_networkpath=[]
@@ -423,6 +424,11 @@ def user_lib_builder(json_lib_entry):
                 if (cfg.DEBUG):
                     #DEBUG
                     print('Building library for user with Id: ' + currentUser[keySlots])
+            elif (keySlots == 'username'):
+                built_username.append(currentUser[keySlots])
+                if (cfg.DEBUG):
+                    #DEBUG
+                    print('Building library for user with name: ' + currentUser[keySlots])
             #Store library data
             else:
                 #loop thru each library data item for this library
@@ -480,7 +486,7 @@ def user_lib_builder(json_lib_entry):
         built_path.insert(datapos,path_append)
         built_networkpath.insert(datapos,networkpath_append)
         datapos+=1
-    return(built_userid,built_libid,built_collectiontype,built_networkpath,built_path)
+    return(built_userid,built_username,built_libid,built_collectiontype,built_networkpath,built_path)
 
 
 #Create output string to show library information to user for them to choose
@@ -595,6 +601,8 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
             for subLibPath in range(len(libFolder['LibraryOptions']['PathInfos'])):
                 if not ('userid' in not_library_dict):
                     not_library_dict['userid']=user_id
+                if not ('username' in not_library_dict):
+                    not_library_dict['username']=user_name
                 not_library_dict[i]['libid']=libFolder['ItemId']
                 not_library_dict[i]['collectiontype']=libFolder['CollectionType']
                 if (('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath])):
@@ -737,8 +745,6 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
                         library_dict['userid']=libraryTemp_dict['userid']
                     if not ('username' in library_dict):
                         library_dict['username']=user_name
-                    if not ('username' in not_library_dict):
-                        not_library_dict['username']=user_name
                     stop_loop=True
                     print('')
                 else:
@@ -879,15 +885,19 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     #Check if not running for the first time
     if (updateConfig):
         #Build the library data from the data structures stored in the configuration file
-        bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
+        bluser_keys_json_verify,bluser_names_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
         #Build the library data from the data structures stored in the configuration file
-        wluser_keys_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
+        wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
 
-        #verify userId are in same order for both blacklist and whitelist libraries
+        #verify userIds are in same order for both blacklist and whitelist libraries
         if (bluser_keys_json_verify == wluser_keys_json_verify):
             user_keys_json = bluser_keys_json_verify
         else:
             raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
+
+        #verify userNames are in same order for both blacklist and whitelist libraries
+        if (not (bluser_names_json_verify == wluser_names_json_verify)):
+            raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userNames need to be in the same order for both')
 
         i=0
         usernames_userkeys=json.loads(cfg.user_keys)
@@ -1141,13 +1151,11 @@ def build_configuration_file(cfg,updateConfig):
     for userkey, userbllib in user_keys_and_bllibs.items():
         #Get all users
         userkeys_bllibs_list.append(userbllib['username'] + ':' + userkey)
-        userbllib.pop('username')
         userbllibs_list.append(userbllib)
 
     #Attach userkeys to whitelist library data structure
     for userkey, userwllib in user_keys_and_wllibs.items():
         userkeys_wllibs_list.append(userwllib['username'] + ':' + userkey)
-        userwllib.pop('username')
         userwllibs_list.append(userwllib)
 
     #Check each user has an entry in blacklists and whitelists
@@ -1380,10 +1388,8 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how play count with multiple users will behave\n"
-    config_file += "#  0 - ok to delete media item when ANY monitored users meet the\n"
-    config_file += "#      *_play_count_comparison and *_play_count\n"
-    config_file += "#  1 - ok to delete media item when ALL monitored users meet the\n"
-    config_file += "#      *_play_count_comparison and *_play_count\n"
+    config_file += "#  0 - ok to delete media item when ANY monitored users meet the *_play_count_comparison and *_play_count\n"
+    config_file += "#  1 - ok to delete media item when ALL monitored users meet the *_play_count_comparison and *_play_count\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1426,9 +1432,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide how whitelists with multiple users behave\n"
-    config_file += "#  0 - do not delete media item when ALL monitored users have the parent library whitelisted\n"
-    config_file += "#  1 - do not delete media item when ANY monitored users have the parent library whitelisted\n"
-    config_file += "# (1 : default)\n"
+    config_file += "#  0 - do not delete media item when ANY monitored users have the parent library whitelisted\n"
+    config_file += "#  1 - do not delete media item when ALL monitored users have the parent library whitelisted\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(get_default_config_values('multiuser_whitelist_movie')) + "\n"
@@ -2027,7 +2033,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_play_count_co
 
             if not (data['Id'] == ''):
                 #Build query for child media items
-                #include all item types; filter applied in firt API calls for each media type in get_media_items()
+                #include all item types; filter applied in first API calls for each media type in get_media_items()
                 IncludeItemTypes=''
                 FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
                 SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
@@ -2110,7 +2116,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_play_coun
             if not (data['Id'] == ''):
                 #Build query for child media items; check is not Movie, Episode, or Audio
                 if not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio')):
-                    #include all item types; filter applied in firt API calls for each media type in get_media_items()
+                    #include all item types; filter applied in first API calls for each media type in get_media_items()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
                     SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
@@ -3546,17 +3552,20 @@ def get_media_items():
     deleteItems=[]
 
     #Build the library data from the data structures stored in the configuration file
-    bluser_keys_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
+    bluser_keys_json_verify,bluser_names_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
 
     #Build the library data from the data structures stored in the configuration file
-    wluser_keys_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
+    wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
 
-    #verify userId are in same order for both blacklist and whitelist libraries
+    #verify userIds are in same order for both blacklist and whitelist libraries
     if (bluser_keys_json_verify == wluser_keys_json_verify):
         user_keys_json = bluser_keys_json_verify
     else:
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
+    #verify userNames are in same order for both blacklist and whitelist libraries
+    if (not (bluser_names_json_verify == wluser_names_json_verify)):
+        raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     for user_key in user_keys_json:
 
@@ -4021,7 +4030,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie == 0)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -4031,7 +4040,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie == 0)):
                                             movie_whitelists.append(item['Id'])
 
                                     #Decide if media item meets the filter criteria
@@ -4485,7 +4494,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode == 0)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -4495,7 +4504,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode == 0)):
                                             episode_whitelists.append(item['Id'])
 
                                     #Decide if media item meets the filter criteria
@@ -4940,7 +4949,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio == 0)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -4950,7 +4959,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio == 0)):
                                             audio_whitelists.append(item['Id'])
 
                                     #Decide if media item meets the filter criteria
@@ -5399,7 +5408,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook == 0)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
                                         itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
@@ -5409,7 +5418,7 @@ def get_media_items():
                                         itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
-                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook)):
+                                        if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook == 0)):
                                             audiobook_whitelists.append(item['Id'])
 
                                     #Decide if media item meets the filter criteria
@@ -5469,57 +5478,58 @@ def get_media_items():
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
-    if (movie_condition_days >= 0):
+    if ((movie_condition_days >= 0) and (keep_favorites_movie == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Movie, deleteItems)
-    if (episode_condition_days >= 0):
+    if ((episode_condition_days >= 0) and (keep_favorites_episode == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
-    if (audio_condition_days >= 0):
+    if ((audio_condition_days >= 0) and (keep_favorites_audio == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0) and (keep_favorites_audiobook == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
-    if (movie_condition_days >= 0):
-        deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
-    if (episode_condition_days >= 0):
-        deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
-    if (audio_condition_days >= 0):
-        deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
-    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
-        deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
+    if (not (whitetags == '')):
+        if (movie_condition_days >= 0):
+            deleteItems=get_iswhitetagged_ByMultiUser(movie_whitetag_list, deleteItems)
+        if (episode_condition_days >= 0):
+            deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
+        if (audio_condition_days >= 0):
+            deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
+        if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+            deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     if ((episode_condition_days >= 0) and (minimum_number_episodes >= 1)):
         #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
         deleteItems=get_minEpisodesToKeep(min_episodesToKeep, deleteItems)
 
-    #When multiple users and multiuser_whitelist_xyz==1 Determine media items to keep and remove them from deletion list
-    if (movie_condition_days >= 0):
+    #When multiple users and multiuser_whitelist_xyz==0 Determine media items to keep and remove them from deletion list
+    if ((movie_condition_days >= 0) and (multiuser_whitelist_movie == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
-    if (episode_condition_days >= 0):
+    if ((episode_condition_days >= 0) and (multiuser_whitelist_episode == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
-    if (audio_condition_days >= 0):
+    if ((audio_condition_days >= 0) and (multiuser_whitelist_audio == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0) and (multiuser_whitelist_audiobook == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.delete_blacktagged_*
-    if (movie_condition_days >= 0):
+    if ((movie_condition_days >= 0) and (delete_blacktagged_movie == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Movie, deleteItems)
-    if (episode_condition_days >= 0):
+    if ((episode_condition_days >= 0) and (delete_blacktagged_episode == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
-    if (audio_condition_days >= 0):
+    if ((audio_condition_days >= 0) and (delete_blacktagged_audio == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0) and (delete_blacktagged_audiobook == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
     #When filtered; Determine media items to remove them from deletion list depending on cfg.multiuser_play_count_*
-    if (movie_condition_days >= 0):
+    if ((movie_condition_days >= 0) and (multiuser_play_count_movie == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Movie, deleteItems)
-    if (episode_condition_days >= 0):
+    if ((episode_condition_days >= 0) and (multiuser_play_count_episode == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Episode, deleteItems)
-    if (audio_condition_days >= 0):
+    if ((audio_condition_days >= 0) and (multiuser_play_count_audio == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
+    if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0) and (multiuser_play_count_audiobook == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
 
     if (DEBUG):
@@ -5730,7 +5740,7 @@ def output_itemsToDelete(deleteItems):
 
 
 #Check blacklist and whitelist config variables are as expected
-def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
+def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, config_var_name):
 
     error_found_in_mumc_config_py=''
 
@@ -5740,13 +5750,13 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
             #Set user tracker to zero
             user_found=0
             #Check user from user_keys is also a user in this blacklist/whitelist
-            for user_check in user_check_list:
+            for user_check in userid_check_list:
                 if (user_check in check_irt['userid']):
                     user_found+=1
             if (user_found == 0):
-                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' does not match any user from user_keys\n'
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' userid ' + check_irt['userid'] + ' does not match any user from user_keys\n'
             if (user_found > 1):
-                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' is seen more than once\n'
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' userid ' + check_irt['userid'] + ' is seen more than once\n'
             #Check userid is string
             if not (isinstance(check_irt['userid'], str)):
                 error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' the userid is not a string for at least one user\n'
@@ -5759,12 +5769,33 @@ def cfgCheck_forLibraries(check_list, user_check_list, config_var_name):
                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' + at least one userid is not a 32-character alphanumeric string\n'
         else:
             error_found_in_mumc_config_py+='NameError: In ' + config_var_name + ' the userid key is missing for at least one user\n'
-        #Check if length is >1; which means a userid and at least one library are stored
-        if (len(check_irt) > 1):
+
+
+        #Check if username exists
+        if ('username' in check_irt):
+            #Set user tracker to zero
+            user_found=0
+            #Check user from user_name is also a user in this blacklist/whitelist
+            for user_check in username_check_list:
+                if (user_check in check_irt['username']):
+                    user_found+=1
+            if (user_found == 0):
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' username ' + check_irt['username'] + ' does not match any user from user_keys\n'
+            if (user_found > 1):
+                error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' username ' + check_irt['username'] + ' is seen more than once\n'
+            #Check username is string
+            if not (isinstance(check_irt['username'], str)):
+                error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' the username is not a string for at least one user\n'
+        else:
+            error_found_in_mumc_config_py+='NameError: In ' + config_var_name + ' the username is missing for at least one user\n'
+
+
+        #Check if length is >2; which means a userid, username, and at least one library are stored
+        if (len(check_irt) > 2):
             #Get number of elements
             for num_elements in check_irt:
-                #First element is always userid; ignore element at position zero
-                if ((not (num_elements == 'userid')) and (int(num_elements) > 0)):
+                #Ignore userid and username
+                if (((not (num_elements == 'userid')) and (not (num_elements == 'username'))) and (int(num_elements) >= 0)):
                     #Set library key trackers to zero
                     libid_found=0
                     collectiontype_found=0
@@ -6757,10 +6788,12 @@ def cfgCheck():
         check=cfg.user_keys
         check_list=json.loads(check)
         check_user_keys_length=len(check_list)
-        user_check_list=[]
+        userid_check_list=[]
+        username_check_list=[]
         for user_info in check_list:
-            user_check_list.append(user_info.split(':',1)[1])
-        for check_irt in user_check_list:
+            username_check_list.append(user_info.split(':',1)[0])
+            userid_check_list.append(user_info.split(':',1)[1])
+        for check_irt in userid_check_list:
             if (
                 not ((type(check_irt) is str) and
                 (len(check_irt) == 32) and
@@ -6780,7 +6813,7 @@ def cfgCheck():
         if not (check_user_bllibs_length == check_user_keys_length):
             error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured blacklists\n'
         else:
-            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_bl_libs')
+            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
 
 #######################################################################################################
 
@@ -6792,7 +6825,7 @@ def cfgCheck():
         if not (check_user_wllibs_length == check_user_keys_length):
             error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured whitelists\n'
         else:
-            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, user_check_list, 'user_wl_libs')
+            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
 
 #######################################################################################################
 

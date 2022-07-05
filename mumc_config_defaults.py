@@ -44,10 +44,10 @@ def get_default_config_values(config_value):
         'keep_favorites_audio':1,
         'keep_favorites_audiobook':1,
 
-        'multiuser_whitelist_movie':1,
-        'multiuser_whitelist_episode':1,
-        'multiuser_whitelist_audio':1,
-        'multiuser_whitelist_audiobook':1,
+        'multiuser_whitelist_movie':0,
+        'multiuser_whitelist_episode':0,
+        'multiuser_whitelist_audio':0,
+        'multiuser_whitelist_audiobook':0,
 
         'blacktag':'',
 

@@ -265,14 +265,14 @@ keep_favorites_audiobook=1
 ```python
 #----------------------------------------------------------#
 # Decide how whitelists with multiple users behave
-#  0 - do not delete media item when ALL monitored users have the parent library whitelisted
-#  1 - do not delete media item when ANY monitored users have the parent library whitelisted
-# (1 : default)
+#  0 - do not delete media item when ANY monitored users have the parent library whitelisted
+#  1 - do not delete media item when ALL monitored users have the parent library whitelisted
+# (0 : default)
 #----------------------------------------------------------#
-multiuser_whitelist_movie=1
-multiuser_whitelist_episode=1
-multiuser_whitelist_audio=1
-multiuser_whitelist_audiobook=1
+multiuser_whitelist_movie=0
+multiuser_whitelist_episode=0
+multiuser_whitelist_audio=0
+multiuser_whitelist_audiobook=0
 ```
 #### Blacktag a media item to be deleted after it is watched:
 ```python
