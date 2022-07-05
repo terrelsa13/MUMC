@@ -17,7 +17,7 @@ from mumc_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='3.0.10-beta'
+    Version='3.0.11-beta'
 
     return(Version)
 
@@ -1311,7 +1311,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# Condition Days: Delete media items last played or created at least this many days ago\n"
     config_file += "#   0-730500 - Number of days filter will use to determine when the media items was\n"
     config_file += "#              last played or when the media item was created\n"
-    config_file += "#  -1 - To disable cleaning specified media type\n"
+    config_file += "#  -1 - To disable deleting specified media type\n"
     config_file += "# (-1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):

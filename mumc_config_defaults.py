@@ -3,7 +3,7 @@
 #This module can be used to change some of the default configuration values used before the script is first run
 #Script will check for valid values after the first run
 #Configuration values outside of the valid range will throw an error
-#See https://github.com/terrelsa13/media_cleaner for a description of each configuration value
+#See https://github.com/terrelsa13/MUMC for a description of each configuration value
 
 #get default configuration values
 def get_default_config_values(config_value):

@@ -1,13 +1,13 @@
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through your movies, tv episodes, audio tracks, and audiobooks in your libraries and delete media items you no longer want taking up disk space.
 # What Is Included?
-## media_cleaner.py
+## mumc.py
 This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
-## media_cleaner_config_defaults.py
-_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```media_cleaner_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```media_cleaner_config.py``` later.
+## mumc_config_defaults.py
+_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```mumc_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```mumc_config.py``` later.
 # Configuration
-## media_cleaner_config.py
-Also referred to as ```media_cleaner_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to make MUMC delete the media items you want it to delete and keep the ones you want to keep.
+## mumc_config.py
+Also referred to as ```mumc_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to make MUMC delete the media items you want it to delete and keep the ones you want to keep.
 # Cool! How Do I Use This?
 ## Step 1: Learn What A Filter Statement Is
 ### Objective - Get you comfortable with what a Filter Statement does.
@@ -187,7 +187,7 @@ audiobook_condition='played'
 # Condition Days: Delete media items last played or created at least this many days ago
 #   0-730500 - Number of days filter will use to determine when the media items was
 #              last played or when the media item was created
-#  -1 - To disable cleaning specified media type
+#  -1 - To disable deleting specified media type
 # (-1 : default)
 #----------------------------------------------------------#
 movie_condition_days=-1
@@ -321,7 +321,7 @@ REMOVE_FILES=False
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
-# Keeping one or more epsiodes for each series allows the "Next Up"
+# Keeping one or more epsiodes for each series allows the "Next Up"m
 #  functionality to notify user(s) when a new episode for a series
 #  is ready to be watched
 #  0 - Episodes will be deleted as they are watched
@@ -575,8 +575,8 @@ DEBUG=False
 ```
 #
 # Configuration file versions prior to 3.0.0 Are Not Compatible
-* Previous ```media_cleaner_config.py``` files made with script versions before 3.0.0 are NOT compatible.
-  - A new ```media_cleaner_config.py``` will need to be created using the latest version of this script.
+* Previous ```mumc_config.py``` files made with script versions before 3.0.0 are NOT compatible.
+  - A new ```mumc_config.py``` will need to be created using the latest version of this script.
 # Requirements
 * Linux or Windows
    - Mac - I do not have a Mac to confirm
@@ -585,7 +585,7 @@ DEBUG=False
    - Older versions of python 3.x will likely work; but are not supported
    - Python 2.x or earlier are not supported and will not work
 * python-dateutil \***must** be installed\*
-* Emby/Jellyfin need to have permissions on Linux machines to delete media items (read from [this post](https://github.com/clara-j/media_cleaner/issues/2#issuecomment-547319398) down)
+* Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
 
 # Delete Or Keep Priorities Of A Media Item
 
@@ -605,16 +605,16 @@ DEBUG=False
    - *media item will be deleted*
 
 # Blacklisting vs Whitelisting
-* [Explaination and examples.](https://github.com/clara-j/media_cleaner/issues/32#issuecomment-1022755271)
+* [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/27#issue-1293645665)
 
 # Blacktagging vs Whitetagging
-* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/16#issue-1205993797)
+* [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/16#issue-1205993797)
 
 # minimum_number_episodes=#
-* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/21#issue-1258905586)
+* [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/21#issue-1258905586)
 
 # Library Matching By Id, By Path, or By Network Path
-* [Explaination and examples.](https://github.com/terrelsa13/media_cleaner/issues/18#issue-1217953189)
+* [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/18#issue-1217953189)
 
 # First Run (Debian, Ubuntu, and Linux Mint)
 * Install Python version mentioned in the 'Requirements' section above
@@ -627,13 +627,13 @@ DEBUG=False
    - $```sudo apt-get install python3-pip -y```
    - $```pip3 install -U pip```
    - $```pip3 install python-dateutil```
-* **\*OPTIONAL\*** Update the media_cleaner_config_defaults.py file with desired default values
-   - $```nano /path/to/media_cleaner_config_defaults.py```
+* **\*OPTIONAL\*** Update the mumc_config_defaults.py file with desired default values
+   - $```nano /path/to/mumc_config_defaults.py```
 * Make the script executable
-   - $```chmod +x /path/to/media_cleaner.py```
+   - $```chmod +x /path/to/mumc.py```
 * Run the script
-   - $```/path/to/python3.x /path/to/media_cleaner.py```
-* First time the script is run, it will walk through building the media_cleaner_config.py file
+   - $```/path/to/python3.x /path/to/mumc.py```
+* First time the script is run, it will walk through building the mumc_config.py file
 
 * If you get the below python error the python-dateutil module was not properly installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
@@ -643,9 +643,9 @@ DEBUG=False
 
 # Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
 * Below cron entry runs script everyday at 00:00hrs (aka 12AM)
-   - $```0 0 * * * /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py```
-* Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called media_cleaner.log in the /var/log/ directory
-   - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/media_cleaner/media_cleaner.py > /var/log/media_cleaner.log 2>&1```
+   - $```0 0 * * * /usr/local/bin/python3.10 /opt/mumc/mumc.py```
+* Below cron entry runs script every Monday at 01:23hrs (aka 1:23AM) and saves the output to a file called mumc.log in the /var/log/ directory
+   - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
 
 # Schedule To Run (Other Operating Systems)
 * Please consult your favorite search engine
