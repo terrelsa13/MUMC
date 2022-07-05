@@ -9,11 +9,11 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## mumc_config.py
 Also referred to as ```mumc_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
-## Step 1: What Is A Filter Statement
+## Step 1: What Is A Filter Statement?
 ### Objective - Get you comfortable with what a Filter Statement is.
 * A Filter Statement is a simple way to tell this script how to find and delete the media items taking up your disk space.
   - This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
-## Step 2: How Do I Make A Filter Statement
+## Step 2: How Do I Make A Filter Statement?
 ### Objective - Help you understand the basics to building a generic Filter Statement.
 
 * Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
@@ -38,7 +38,7 @@ Start with a generic Filter Statement:
   - Part #3 - <
   - Part #4 - 2
     - Delete media type **created** at least **3650** days ago with a play count **<** **2**.
-## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...)
+## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...).
 ### Objective - Show you how to build a Filter Statement for each media type.
 
 * Delete movies **played** at least **22** days ago with a play count **>=** **1**.
@@ -109,7 +109,7 @@ Doing this WILL delete MOST if not ALL of your library.
 
 You get the point right?
 
-## Step 5: Oh Yeah, Duh
+## Step 5: Oh Yeah, Duh!
 ### Objective - Here are some things to keep in mind when building Filter Statements
 
 Filter Statements which imply played media items with only negative play counts, like the ones below, will evalute as play_count=0 (i.e. unplayed).
