@@ -1,17 +1,17 @@
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through your movies, tv episodes, audio tracks, and audiobooks in your libraries and delete media items you no longer want taking up disk space.
-# What Is Included?
+# What Files Are Included?
 ## mumc.py
 This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
 ## mumc_config_defaults.py
 _**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```mumc_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```mumc_config.py``` later.
 # Configuration
 ## mumc_config.py
-Also referred to as ```mumc_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to make MUMC delete the media items you want it to delete and keep the ones you want to keep.
+Also referred to as ```mumc_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
-## Step 1: Learn What A Filter Statement Is
-### Objective - Get you comfortable with what a Filter Statement does.
-* A Filter Statement is an simple way to tell this script how to find and delete the media items taking up your disk space.
+## Step 1: What Is A Filter Statement
+### Objective - Get you comfortable with what a Filter Statement is.
+* A Filter Statement is a simple way to tell this script how to find and delete the media items taking up your disk space.
   - This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
 ## Step 2: How Do I Make A Filter Statement
 ### Objective - Help you understand the basics to building a generic Filter Statement.
@@ -30,48 +30,48 @@ Start with a generic Filter Statement:
   - Part #2 - 60
   - Part #3 - >=
   - Part #4 - 1
-    - Delete media type played at least 60 days ago with a play count >= 1.
+    - Delete media type **played** at least **60** days ago with a play count **>=** **1**.
 
 * Filling in the blanks for the generic Filter Statement above using different values:
-- Part #1 - created
+  - Part #1 - created
   - Part #2 - 3650
   - Part #3 - <
   - Part #4 - 2
-    - Delete media type created at least 3650 days ago with a play count < 2.
+    - Delete media type **created** at least **3650** days ago with a play count **<** **2**.
 ## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...)
 ### Objective - Show you how to build a Filter Statement for each media type.
 
-* Delete movies played at least 22 days ago with a play count >= 1.
+* Delete movies **played** at least **22** days ago with a play count **>=** **1**.
   - movie_condition='played'
   - movie_condition_days=22
   - movie_play_count_comparison='>='
   - movie_play_count=1
 
-* Delete episodes played at least 55 days ago with a play count not <= 0.
+* Delete episodes **played** at least **55** days ago with a play count not **<=** **0**.
   - episode_condition='played'
   - episode_condition_days=55
   - episode_play_count_comparison='not <='
   - episode_play_count=0
 
-* Delete audio tracks played at least 123 days ago with a play count == 4.
+* Delete audio tracks **played** at least **123** days ago with a play count **==** **4**.
   - audio_condition='played'
   - audio_condition_days=123
   - audio_play_count_comparison='=='
   - audio_play_count=4
 
-* Delete episodes created at least 3456 days ago with a play count > 0.
+* Delete episodes **created** at least **3456** days ago with a play count **>** **0**.
   - episode_condition='created'
   - episode_condition_days=3456
   - episode_play_count_comparison='>'
   - episode_play_count=0
 
-* Delete movies created at least 4567 days ago with a play count not == 0.
+* Delete movies **created** at least **4567** days ago with a play count **not ==** **0**.
   - movie_condition='created'
   - movie_condition_days=4567
   - movie_play_count_comparison='not =='
   - movie_play_count=0
 
-* Delete audio tracks created at least 5678 days ago with a play count not >= 11.
+* Delete audio tracks **created** at least **5678** days ago with a play count **not >=** **11**.
   - audio_condition='created'
   - audio_condition_days=5678
   - audio_play_count_comparison='not >='
@@ -87,22 +87,22 @@ What you NEVER want to do is to set ```*_condition='created'``` and ```*_conditi
 Doing this WILL delete MOST if not ALL of your library.
 
 ##### Never do this unless you are 1000% confident it is doing exactly what you expect:
-* Delete movies created at least 0 days ago...
+* Delete movies **created** at least **0** days ago...
   - movie_condition='created'
   - movie_condition_days=0
   - ...
 
-* Delete episodes created at least 1 day ago...
+* Delete episodes **created** at least **1** day ago...
   - episode_condition='created'
   - episode_condition_days=1
   - ...
 
-* Delete audio track created at least 2 days ago...
+* Delete audio track **created** at least **2** days ago...
   - audio_condition='created'
   - audio_condition_days=2
   - ...
 
-* Delete movie created at least 3 days ago...
+* Delete movie **created** at least **3** days ago...
   - movie_condition='created'
   - movie_condition_days=3
   - ...
@@ -114,25 +114,25 @@ You get the point right?
 
 Filter Statements which imply played media items with only negative play counts, like the ones below, will evalute as play_count=0 (i.e. unplayed).
 
-* ...with a play count < 0.
+* ...with a play count **<** **0**.
   - ...
   - episode_play_count_comparison='<'
   - episode_play_count=0
 
-* ...with a play count not >= 0.
+* ...with a play count not **>=** **0**.
   - ...
   - movie_play_count_comparison='not >='
   - movie_play_count=0
 
 Filter Statements with a played condition and a play count overlapping zero and non-zero numbers, like the ones shown below, will only delete the media items with non-zero play counts (i.e. the played media items).
 
-* Delete episodes played at least 44 days ago with a play count <= 1.
+* Delete episodes **played** at least **44** days ago with a play count **<=** **1**.
   - episode_condition='played'
   - episode_condition_days=44
   - episode_play_count_comparison='<='
   - episode_play_count=1
 
-* Delete movies played at least 88 days ago with a play count >= 0.
+* Delete movies **played** at least **88** days ago with a play count **>=** **0**.
   - movie_condition='played'
   - movie_condition_days=88
   - movie_play_count_comparison='>='
@@ -140,13 +140,13 @@ Filter Statements with a played condition and a play count overlapping zero and 
 
 To make a Filter Statement that deletes played and unplayed media items CAREFULLY use the created condition, as shown below.
 
-* Delete episodes created at least 2222 days ago with a play count <= 730500.
+* Delete episodes **created** at least **2222** days ago with a play count **<=** **730500**.
   - episode_condition='created'
   - episode_condition_days=2222
   - episode_play_count_comparison='<='
   - episode_play_count=730500
 
-* Delete movies created at least 3333 days ago with a play count >= 0.
+* Delete movies **created** at least **3333** days ago with a play count **>=** **0**.
   - movie_condition='created'
   - movie_condition_days=3333
   - movie_play_count_comparison='>='
@@ -154,13 +154,13 @@ To make a Filter Statement that deletes played and unplayed media items CAREFULL
 
 To make a Filter Statement that deletes only unplayed media items CAREFULLY use the created condition, as shown below.
 
-* Delete episodes created at least 7777 days ago with a play count == 0.
+* Delete episodes **created** at least **7777** days ago with a play count **==** **0**.
   - episode_condition='created'
   - episode_condition_days=7777
   - episode_play_count_comparison='=='
   - episode_play_count=0
 
-* Delete movies created at least 9999 days ago with a play count not >= 1.
+* Delete movies **created** at least **9999** days ago with a play count not **>=** **1**.
   - movie_condition='created'
   - movie_condition_days=9999
   - movie_play_count_comparison='not >='
