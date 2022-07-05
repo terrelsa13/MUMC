@@ -12,9 +12,9 @@ Also referred to as ```mumc_config.py```. It is created the first time the scrip
 ## Step 1: What Is A Filter Statement?
 ### Objective - Get you comfortable with what a Filter Statement is.
 * A Filter Statement is a simple way to tell this script how to find and delete the media items taking up your disk space.
-  - This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
+* This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
 ## Step 2: How Do I Make A Filter Statement?
-### Objective - Help you understand the basics to building a generic Filter Statement.
+### Objective - Help you understand the basics of building a generic Filter Statement.
 
 * Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
   - Part #1 - Condition
@@ -39,7 +39,7 @@ Start with a generic Filter Statement:
   - Part #4 - 2
     - Delete media type **created** at least **3650** days ago with a play count **<** **2**.
 ## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...).
-### Objective - Show you how to build a Filter Statement for each media type.
+### Objective - Show you how to build Filter Statements for specific media types.
 
 * Delete movies **played** at least **22** days ago with a play count **>=** **1**.
   - movie_condition='played'
@@ -47,7 +47,7 @@ Start with a generic Filter Statement:
   - movie_play_count_comparison='>='
   - movie_play_count=1
 
-* Delete episodes **played** at least **55** days ago with a play count not **<=** **0**.
+* Delete episodes **played** at least **55** days ago with a play count **not <=** **0**.
   - episode_condition='played'
   - episode_condition_days=55
   - episode_play_count_comparison='not <='
@@ -77,11 +77,11 @@ Start with a generic Filter Statement:
   - audio_play_count_comparison='not >='
   - audio_play_count=11
 
-There are many many more possible combinations!
+There are many possible combinations!
 
-## Step 4: You Are Probably Thinking, "Well This Is Easy!". Well Yes It Is, BUT...
+## Step 4: You Are Probably Thinking, "This Is Easy!". Yes It Is, BUT...
 ### Objective - Educate you on the dangers of ill-thought-out filters.
-You are SOLEY RESPONSIBLE if you delete large portions of your library.
+You are SOLEY RESPONSIBLE if you misconfigure your Filter Statement and delete large portions of your library. I recommend staying in dry-run mode until you are certain things are working exactly as you want them to.
 #### !!!DANGEROUS!!! Filter Examples Below !BEWARE!
 What you NEVER want to do is to set ```*_condition='created'``` and ```*_condition_days=TO_SOME_LOW_NUMBER```.
 Doing this WILL delete MOST if not ALL of your library.
