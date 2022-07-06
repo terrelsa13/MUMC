@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pickle import TRUE
+#from pickle import TRUE
 import urllib.request as request
 import json, urllib
 import traceback
@@ -15,9 +15,10 @@ from datetime import datetime,date,timedelta,timezone
 from mumc_config_defaults import get_default_config_values
 
 
+#Get the current script version
 def get_script_version():
 
-    Version='3.0.13-beta'
+    Version='3.0.14-beta'
 
     return(Version)
 
