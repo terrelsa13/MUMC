@@ -105,6 +105,7 @@ venv.bak/
 
 # configuration
 media_cleaner_config.py
+media_cleaner.py
 mumc_config.py
 
 # visual studio
