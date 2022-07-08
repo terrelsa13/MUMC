@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.14-beta'
+    Version='3.0.15-beta'
 
     return(Version)
 
@@ -749,6 +749,7 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
                     stop_loop=True
                     print('')
                 else:
+                    print('')
                     path_number_float=float(input_path_number)
                     if ((path_number_float % 1) == 0):
                         path_number_int=int(path_number_float)
@@ -3411,7 +3412,6 @@ def get_media_items():
         delete_blacktagged_movie=cfg.delete_blacktagged_movie
         minimum_number_episodes=cfg.minimum_number_episodes
         #dictionary for episodes to keep to meet cfg.minimum_number_episodes
-        min_episodesToKeep=defaultdict(dict)
         keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
         keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
         print_movie_error_info=cfg.print_movie_error_info
@@ -3437,6 +3437,7 @@ def get_media_items():
         keep_favorites_episode=cfg.keep_favorites_episode
         multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
         delete_blacktagged_episode=cfg.delete_blacktagged_episode
+        min_episodesToKeep=defaultdict(dict)
         minimum_number_episodes=cfg.minimum_number_episodes
         keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
         keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
