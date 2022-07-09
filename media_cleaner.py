@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.6'
+    Version='2.1.7'
 
     return(Version)
 
@@ -2027,7 +2027,7 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (cfg.DEBUG):
-                    print('Item is whitelisted for this user: ' + itemIsWhiteListed_Local)
+                    print('Item is whitelisted for this user: ' + str(itemIsWhiteListed_Local))
                     print('Matching whitelisted value for this user is: ' + itemWhiteListedValue_Local)
 
         #Looking in other users libraries
@@ -2041,7 +2041,7 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (cfg.DEBUG):
-                    print('Item is whitelisted for another user: ' + itemIsWhiteListed_Remote)
+                    print('Item is whitelisted for another user: ' + str(itemIsWhiteListed_Remote))
                     print('Matching whitelisted value for another user is: ' + itemWhiteListedValue_Remote)
 
         if (cfg.DEBUG):
