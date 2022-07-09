@@ -5620,9 +5620,10 @@ def get_media_items():
 
         print('-----------------------------------------------------------')
         print('')
-        print('isplaycountmet_MOVIE: ')
-        print(isMeeting_PlayCountFilter_Movie)
-        print('')
+        if (movie_condition_days >= 0):
+            print('isplaycountmet_MOVIE: ')
+            print(isMeeting_PlayCountFilter_Movie)
+            print('')
         if (episode_condition_days >= 0):
             print('isplaycountmet_EPISODE: ')
             print(isMeeting_PlayCountFilter_Episode)
