@@ -4,40 +4,40 @@ Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, 
 ## mumc.py
 This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
 ## mumc_config_defaults.py
-_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```mumc_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```mumc_config.py``` later.
+_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```mumc_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```mumc_config.py``` after it is created.
 # Configuration
 ## mumc_config.py
-Also referred to as ```mumc_config.py```. It is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
+```mumc_config.py```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
 ## Step 1: What Is A Filter Statement?
 ### Objective - Get you comfortable with what a Filter Statement is.
-* A Filter Statement is a simple way to tell this script how to find and delete the media items taking up your disk space.
-* This also means the media items not matching the Filter Statement are kept safe for watching at a later time.
+* A Filter Statement is a simple way to tell the script how to find and delete media items taking up your disk space.
+  - This also means the media items **not matching** the Filter Statement are kept safe for watching at a later time.
 ## Step 2: How Do I Make A Filter Statement?
 ### Objective - Help you understand the basics of building a generic Filter Statement.
 
-* Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
-  - Part #1 - Condition
-  - Part #2 - Condition Days
-  - Part #3 - Play Count Inequality
-  - Part #4 - Play Count
+Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
+* Part #1 - Condition
+* Part #2 - Condition Days
+* Part #3 - Play Count Inequality
+* Part #4 - Play Count
 
 Start with a generic Filter Statement:
 * Delete media type Part #1 at least Part #2 days ago with a play count Part #3 Part #4.
 
-* Filling in the blanks for the generic Filter Statement above:
-  - Part #1 - played
-  - Part #2 - 60
-  - Part #3 - >=
-  - Part #4 - 1
-    - Delete media type **played** at least **60** days ago with a play count **>=** **1**.
+  - Filling in the blanks for the generic Filter Statement above:
+    - Part #1 - played
+    - Part #2 - 60
+    - Part #3 - >=
+    - Part #4 - 1
+      - Delete media type **played** at least **60** days ago with a play count **>=** **1**.
 
-* Filling in the blanks for the generic Filter Statement above using different values:
-  - Part #1 - created
-  - Part #2 - 3650
-  - Part #3 - <
-  - Part #4 - 2
-    - Delete media type **created** at least **3650** days ago with a play count **<** **2**.
+  - Filling in the blanks for the generic Filter Statement above using different values:
+    - Part #1 - created
+    - Part #2 - 3650
+    - Part #3 - <
+    - Part #4 - 2
+      - Delete media type **created** at least **3650** days ago with a play count **<** **2**.
 ## Step 3: Build A Filter Statement For A Specific Media Type (i.e. movies, episodes, etc...).
 ### Objective - Show you how to build Filter Statements for specific media types.
 
@@ -80,9 +80,9 @@ Start with a generic Filter Statement:
 There are many possible combinations!
 
 ## Step 4: You Are Probably Thinking, "This Is Easy!". Yes It Is, BUT...
-### Objective - Educate you on the dangers of ill-thought-out filters.
-You are SOLEY RESPONSIBLE if you misconfigure your Filter Statement and delete large portions of your library. I recommend staying in dry-run mode until you are certain things are working exactly as you want them to.
-#### !!!DANGEROUS!!! Filter Examples Below !BEWARE!
+### Objective - Educate you on the dangers of ill-thought-out Filter Statements.
+You are **SOLEY RESPONSIBLE** if you misconfigure your Filter Statement and delete large portions of your library. I recommend staying in dry-run mode until you are certain things are working exactly as you want them to.
+#### !!!DANGEROUS Filter Examples Below BEWARE!!!
 What you **_NEVER_** want to do is to set ```*_condition='created'``` and ```*_condition_days=TO_SOME_LOW_NUMBER```.
 Doing this WILL delete MOST if not ALL of your library.
 
@@ -112,7 +112,7 @@ You get the point right?
 ## Step 5: Oh Yeah, Duh!
 ### Objective - Here are some subtlies to keep in mind when building Filter Statements
 
-Filter Statements which imply played media items with only negative play counts, like the ones below, will evalute as play_count=0 (i.e. unplayed).
+Filter Statements which imply played media items with only negative play counts, like the ones below, will be evaluted as play_count=0 (i.e. unplayed).
 
 * ...with a play count **<** **0**.
   - ...
@@ -164,6 +164,20 @@ To make a Filter Statement that deletes only "old" unplayed media items; CAREFUL
   - movie_condition='created'
   - movie_condition_days=9999
   - movie_play_count_comparison='not >='
+  - movie_play_count=1
+
+To make a Filter Statement that deletes only "old" played media items; CAREFULLY use the created condition, as shown below.
+
+* Delete episodes **created** at least **4444** days ago with a play count **>** **0**.
+  - episode_condition='created'
+  - episode_condition_days=4444
+  - episode_play_count_comparison='>'
+  - episode_play_count=0
+
+* Delete movies **created** at least **5555** days ago with a play count **not ==** **0**.
+  - movie_condition='created'
+  - movie_condition_days=5555
+  - movie_play_count_comparison='not =='
   - movie_play_count=1
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
@@ -518,7 +532,7 @@ user_keys='["user1:abcdef0123456789abcdef0123456789", "user2:fedcba9876543210fed
 # These libraries are typically searched for media items to delete
 # Chosen during setup
 #----------------------------------------------------------#
-user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00112233445566778899aabbccddeeff", "collectiontype": "abc", "networkpath": "smb://some/netpath/0", "path": "/some/path/0"}, "#": {"libid": "aabbccddeeff00112233445566778899", "collectiontype": "def", "networkpath": "smb://some/netpath/1", "path": "/some/path/1"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "username": "user1", "#": {"libid": "00112233445566778899aabbccddeeff", "collectiontype": "abc", "networkpath": "smb://some/netpath/0", "path": "/some/path/0"}, "#": {"libid": "aabbccddeeff00112233445566778899", "collectiontype": "def", "networkpath": "smb://some/netpath/1", "path": "/some/path/1"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
 ```
 #### Whitelisted library information
 ```python
@@ -527,7 +541,7 @@ user_bl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "00
 # These libraries are typically not searched for media items to delete
 # Chosen during setup
 #----------------------------------------------------------#
-user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
+user_wl_libs='[{"userid": "abcdef0123456789abcdef0123456789", "username": "user1", "#": {"libid": "ffeeddccbbaa99887766554433221100", "collectiontype": "uvw", "networkpath": "smb://some/netpath/2", "path": "/some/path/2"}, "#": {"libid": "998877665544332211ffeeddccbbaa", "collectiontype": "xyz", "networkpath": "smb://some/netpath/3", "path": "/some/path/3"}}, {"etc...": "etc...", "#": {"etc...":"etc..."}}]'
 ```
 #### Number of times to send an API query before giving up
 ```python
@@ -577,19 +591,19 @@ DEBUG=False
 # Delete Or Keep Priorities Of A Media Item
 
 1. **Favorites & Whitetags** (Highest Priority)
-   - *media item will be kept*
+   - _Media item will be kept_
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
 2. **Blacktags**
-   - *media item will be deleted*
+   - _Media item will be deleted_
       - Whitelists ignored
       - Blacklists ignored
 3. **Whitelists**
-   - *media item will be kept*
+   - _Media item will be kept_
       - Blacklists ignored
 4. **Blacklists** (Lowest priority)
-   - *media item will be deleted*
+   - _Media item will be deleted_
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/27#issue-1293645665)
@@ -609,16 +623,16 @@ DEBUG=False
 * Python 3.10
    - Older versions of python 3.x will likely work; but are not supported
    - Python 2.x or earlier are not supported and will not work
-* python-dateutil \***must** be installed\*
+* python-dateutil **must be installed**
 * Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
 
 # First Run (Debian, Ubuntu, and Linux Mint)
 * Install Python version mentioned in the 'Requirements' section above
   - If this version of Python is not already installed do NOT overwrite the defaul OS Python version
   - Instead use the link below to create an alternate install of Python
-    - [Python 3.7 example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/)
+    - [Python 3.7 example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/) (These instructions will apply to any version of Python.)
 * Verify your Python verison
-   - $```python3.x -V```
+   - $```python3 -V```
 * Next install the python-dateutil module with the following commands:
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
