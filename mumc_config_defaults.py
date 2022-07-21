@@ -59,6 +59,8 @@ def get_default_config_values(config_value):
         'whitetag':'',
 
         'minimum_number_episodes':0,
+        'minimum_number_played_episodes':0,
+        'minimum_number_episodes_behavior':'Min Played Min Unplayed',
 
         'keep_favorites_advanced_movie_genre':0,
         'keep_favorites_advanced_movie_library_genre':0,

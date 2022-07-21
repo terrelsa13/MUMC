@@ -321,6 +321,60 @@ delete_blacktagged_audiobook=0
 #----------------------------------------------------------#
 whitetag='white_tagname,white_tag name,white_tag-name'
 ```
+#### Set the minimum number of episodes to remain; Does not care about played or unplayed states:
+```python
+#----------------------------------------------------------#
+# Decide the minimum number of episodes to remain in all tv series'
+# This value applies to both played and unplayed episodes
+#  0 - Episodes will be deleted based on the Filter Statement
+#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
+#              the remaining played and unplayed episodes are less than or equal
+#              to the chosen value
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_episodes=1
+```
+#### Set the minimum number of played episodes to remain:
+```python
+#----------------------------------------------------------#
+# Decide the minimum number of played episodes to remain in all tv series'
+# Keeping one or more played epsiodes for each series allows the "Next Up"
+#  functionality to notify user(s) when a new episode for a series
+#  is available
+# This value applies only to played and episodes
+#  0 - Episodes will be deleted based on the Filter Statement
+#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
+#              the remaining played episodes are less than or equal to the
+#              chosen value
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_played_episodes=1
+```
+#### Set the behavior of ```minimum_number_episodes``` and ```minimum_number_played_episodes```:
+```python
+#----------------------------------------------------------#
+# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave
+#  when there are multiple users monitored
+# The minimum number of played and unplayed episodes will vary for each user and for each
+#  series when multiple users are watching the same series at different paces.
+# The following option gives a mechanism to control this in different ways.
+# The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...
+#  'User's Name' - The UserName specified
+#  'User's Id' - The UserId specified
+#  'Max Played' - The first user with the highest number of played episodes to be deleted for each series.
+#  'Min Played' - The first user with the lowest number of played episodes to be deleted for each series.
+#  'Max Unplayed' - The first user with the highest number of unplayed episodes to be deleted for each series.
+#  'Min Unplayed' - The first user with the lowest number of unplayed episodes to be deleted for each series.
+# The Max/Min Played/Unplayed values can be mixed and matched. For example...
+#  'Max Unplayed Min Played' - The number played episodes to be deleted is based off the user
+#                                with the highest number of unplayed episodes to be deleted for a
+#                                specified series. The number of unplayed episodes to be deleted is
+#                                based off the user with the lowest number of played episoded to be
+#                                deleted for a specified series.
+# (Min Played Min Unplayed : default)
+#----------------------------------------------------------#
+minimum_number_episodes_behavior='Min Played Min Unplayed'
+```
 #### Deleting media items is disabled by default:
 ```python
 #----------------------------------------------------------#
@@ -335,7 +389,7 @@ REMOVE_FILES=False
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
-# Keeping one or more epsiodes for each series allows the "Next Up"m
+# Keeping one or more episodes for each series allows the "Next Up"m
 #  functionality to notify user(s) when a new episode for a series
 #  is ready to be watched
 #  0 - Episodes will be deleted as they are watched

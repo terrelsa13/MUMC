@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.16-beta'
+    Version='3.0.17-beta'
 
     return(Version)
 
@@ -1498,17 +1498,62 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide the minimum number of episodes to remain in all tv series'\n"
-    config_file += "# Keeping one or more epsiodes for each series allows the \"Next Up\"\n"
-    config_file += "#  functionality to notify user(s) when a new episode for a series\n"
-    config_file += "#  is available\n"
-    config_file += "#  0 - Episodes will be deleted as they are watched\n"
-    config_file += "#  1-730500 - All but the latest selected number of episodes will be deleted as they are watched\n"
-    config_file += "# (0 : default)\n"
+    config_file += "# This ignores the played and unplayed states of episodes\n"
+    config_file += "#  0 - Episodes will be deleted based on the Filter Statement\n"
+    config_file += "#  1-730500 - Episodes will be deleted based on the Filter Statement; unless\n"
+    config_file += "#              the remaining played and unplayed episodes are less than or equal\n"
+    config_file += "#              to the chosen value\n"
+    config_file += " (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "minimum_number_episodes=" + str(get_default_config_values('minimum_number_episodes')) + "\n"
     elif (updateConfig):
         config_file += "minimum_number_episodes=" + str(cfg.minimum_number_episodes) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Decide the minimum number of played episodes to remain in all tv series'\n"
+    config_file += "# Keeping one or more played epsiodes for each series allows the \"Next Up\"\n"
+    config_file += "#  functionality to notify user(s) when a new episode for a series\n"
+    config_file += "#  is available\n"
+    config_file += "# This value applies only to played and episodes\n"
+    config_file += "#  0 - Episodes will be deleted based on the Filter Statement\n"
+    config_file += "#  1-730500 - Episodes will be deleted based on the Filter Statement; unless\n"
+    config_file += "#              the remaining played episodes are less than or equal to the\n"
+    config_file += "#              chosen value\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "minimum_number_played_episodes=" + str(get_default_config_values('minimum_number_played_episodes')) + "\n"
+    elif (updateConfig):
+        config_file += "minimum_number_played_episodes=" + str(cfg.minimum_number_played_episodes) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave\n"
+    config_file += "#  when there are multiple users monitored\n"
+    config_file += "# The minimum number of played and unplayed episodes will vary for each user and for each\n"
+    config_file += "#  series when multiple users are watching the same series at different paces.\n"
+    config_file += "# The following option gives a mechanism to control this in different ways.\n"
+    config_file += "# The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...\n"
+    config_file += "#  'User's Name' - The UserName specified\n"
+    config_file += "#  'User's Id' - The UserId specified\n"
+    config_file += "#  'Max Played' - The first user with the highest number of played episodes to be deleted for each series.\n"
+    config_file += "#  'Min Played' - The first user with the lowest number of played episodes to be deleted for each series.\n"
+    config_file += "#  'Max Unplayed' - The first user with the highest number of unplayed episodes to be deleted for each series.\n"
+    config_file += "#  'Min Unplayed' - The first user with the lowest number of unplayed episodes to be deleted for each series.\n"
+    config_file += "# The Max/Min Played/Unplayed values can be mixed and matched. For example...\n"
+    config_file += "#  'Max Unplayed Min Played' - The number played episodes to be deleted is based off the user\n"
+    config_file += "#                                with the highest number of unplayed episodes to be deleted for a\n"
+    config_file += "#                                specified series. The number of unplayed episodes to be deleted is\n"
+    config_file += "#                                based off the user with the lowest number of played episoded to be\n"
+    config_file += "#                                deleted for a specified series.\n"
+    config_file += "# (Min Played Min Unplayed : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "minimum_number_episodes_behavior=" + str(get_default_config_values('minimum_number_episodes_behavior')) + "\n"
+    elif (updateConfig):
+        config_file += "minimum_number_episodes_behavior=" + str(cfg.minimum_number_episodes_behavior) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1921,7 +1966,7 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
     if (len(episode_num_str) == 1):
         episode_num_str = '0' + episode_num_str
 
-    #Pad the season number or epsiode number with zeros until they are the same length
+    #Pad the season number or episode number with zeros until they are the same length
     while not (len(season_num_str) == len(episode_num_str)):
         #pad episode number when season number is longer
         if (len(episode_num_str) < len(season_num_str)):
@@ -2936,24 +2981,6 @@ def get_SERIES_itemInfo(episode,user_key):
 
     return series_item_info
 
-
-# get number of additional episodes needing to be kept
-def get_EPISODES_toKeep(series_item_info):
-
-    minimum_number_episodes=cfg.minimum_number_episodes
-
-    unplayed_episode_count = int(series_item_info['UserData']['UnplayedItemCount'])
-    total_episode_count = int(series_item_info['RecursiveItemCount'])
-
-    additional_episodes_to_keep=0
-    if (unplayed_episode_count < minimum_number_episodes):
-        additional_episodes_to_keep = minimum_number_episodes - unplayed_episode_count
-        if (total_episode_count < additional_episodes_to_keep):
-            additional_episodes_to_keep = total_episode_count
-
-    return additional_episodes_to_keep
-
-
 #Handle favorites across multiple users
 def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
     deleteIndexes=[]
@@ -3021,68 +3048,292 @@ def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
 
 
 # Determine episodes to be removed from deletion list to keep mininum number
-def get_minEpisodesToKeep(min_episodesToKeep,deleteItems):
+def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
 
     minimum_number_episodes = cfg.minimum_number_episodes
+    minimum_number_played_episodes = cfg.minimum_number_played_episodes
+    minimum_number_episodes_behavior = cfg.minimum_number_episodes_behavior
+    user_keys = json.loads(cfg.user_keys)
 
-    #Check if enabled
-    if (minimum_number_episodes):
-        #loop thru each series in min_episodesToKeep
-        for seriesId in min_episodesToKeep:
-            #loop thru each episode item in deleteItems
-            for deleteItem in deleteItems:
-                #check if series Ids match
-                if ((deleteItem['Type'] == 'Episode') and (deleteItem['SeriesId'] == seriesId)):
-                    #loop thru episodes in season
-                    for episodeId in min_episodesToKeep[seriesId]:
-                        #check if media item Id matches
-                        if (deleteItem['Id'] == episodeId):
-                            season_episode_keep={}
-                            season_episode_keep['seasonNum']=deleteItem['ParentIndexNumber']
-                            season_episode_keep['episodeNum']=deleteItem['IndexNumber']
-                            season_episode_keep['toKeep']=min_episodesToKeep[seriesId][episodeId]
-                            min_episodesToKeep[seriesId][episodeId]=season_episode_keep
+    episodes_toBeDeletedOrRemain={}
 
-            seasonTracking=[]
-            episodeTracking=[]
-            toKeep=0
-            toKeepReduceBy=0
+    if (minimum_number_played_episodes > minimum_number_episodes):
+        minimum_number_episodes = minimum_number_played_episodes
 
-            for episodeId in min_episodesToKeep[seriesId]:
-                if ((not (type(min_episodesToKeep[seriesId][episodeId]) is int)) and (not (type(min_episodesToKeep[seriesId][episodeId]) is int))):
-                    toKeep=min_episodesToKeep[seriesId][episodeId]['toKeep']
-                    seasonTracking.append(min_episodesToKeep[seriesId][episodeId]['seasonNum'])
-                    episodeTracking.append(min_episodesToKeep[seriesId][episodeId]['episodeNum'])
+    for userId in episodeCounts_byUserId:
+        for episodeItem in deleteItems:
+            if (episodeItem['SeriesId'] in episodeCounts_byUserId[userId]):
+                if not (episodeItem['SeriesId'] in episodes_toBeDeletedOrRemain):
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]={}
+                if not (userId in episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]):
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]=defaultdict(dict)
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] = 0
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] = 0
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['TotalEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['TotalEpisodeCount']
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['PlayedEpisodeCount']
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['UnplayedEpisodeCount']
+                if (get_ADDITIONAL_itemInfo(userId,episodeItem['Id'],'finding minEpisodesToKeep() play state')['UserData']['Played']):
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
                 else:
-                    toKeepReduceBy += 1
+                    episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
 
-            toKeep = toKeep - toKeepReduceBy
-            if (toKeep < 0):
-                toKeep = 0
+    for seriesId in episodes_toBeDeletedOrRemain:
+        for userId in episodes_toBeDeletedOrRemain[seriesId]:
+            episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedEpisodeCount'] - episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+            episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] = episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedEpisodeCount'] - episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
 
-            if (toKeep):
-                season_episode_grid=[[''] * ((max(episodeTracking) - min(episodeTracking)) + 2) for x in range((max(seasonTracking) - min(seasonTracking)) + 2)]
+            if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] <= minimum_number_played_episodes):
+                episode_gap = minimum_number_played_episodes - episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain']
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                    episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episode_gap
+                    episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episode_gap
+                else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] < episode_gap):
+                    episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                    episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                total_remaining = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] + episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain']
+                if (total_remaining <= minimum_number_episodes):
+                    episode_gap = minimum_number_episodes - total_remaining
+                    if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] >= episode_gap):
+                        episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] += episode_gap
+                        episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] -= episode_gap
+                    else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] < episode_gap):
+                        episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
+                        episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
+                    total_remaining = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] + episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain']
+                    if (total_remaining < minimum_number_episodes):
+                        episode_gap = minimum_number_episodes - total_remaining
+                        if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                            episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episode_gap
+                            episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episode_gap
+                        else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                            episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                            episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
 
-                for episodeId in min_episodesToKeep[seriesId]:
-                    if (min_episodesToKeep[seriesId][episodeId]['toKeep']):
-                        #toKeep=min_episodesToKeep[seriesId][episodeId]['toKeep']
-                        season_episode_grid[min_episodesToKeep[seriesId][episodeId]['seasonNum'] - (min(seasonTracking) - 1)][min_episodesToKeep[seriesId][episodeId]['episodeNum'] - (min(episodeTracking) - 1)]=episodeId
+    episodeTracker={}
+    for deleteItem in deleteItems:
+        if not (deleteItem['SeriesId'] in episodeTracker):
+            episodeTracker[deleteItem['SeriesId']]={}
+        if not (deleteItem['Id'] in episodeTracker[deleteItem['SeriesId']]):
+            if not ('MaxSeason' in episodeTracker[deleteItem['SeriesId']]):
+                episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = 0
+            if not ('MaxEpisode' in episodeTracker[deleteItem['SeriesId']]):
+                episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = 0
+            if (deleteItem['ParentIndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxSeason']):
+                episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = deleteItem['ParentIndexNumber']
+            if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
+                episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
+            episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
+            episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
 
-                deleteIndexes=[]
+    for seriesId in episodeTracker:
+        episodeTracker[seriesId]['SeasonEpisodeGrid'] = [[''] * (episodeTracker[seriesId]['MaxEpisode'] + 1) for e in range(episodeTracker[seriesId]['MaxSeason'] + 1)]
+        #episodes_toBeDeletedOrRemain[seriesId]['SeasonEpisodeGrid'] = [['' for s in range(episodeTracker[seriesId]['MaxSeason'] + 1)] for e in range(episodeTracker[seriesId]['MaxEpisode'] + 1)]
+        for episodeId in episodeTracker[seriesId]:
+            if not ((episodeId == 'MaxSeason') or (episodeId == 'MaxEpisode') or (episodeId == 'SeasonEpisodeGrid')):
+                seasonNum=list(episodeTracker[seriesId][episodeId].keys())
+                episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum[0]][episodeTracker[seriesId][episodeId][seasonNum[0]]]=episodeId
 
-                for seasonNum in range(len(season_episode_grid)):
-                    for episodeNum in range(len(season_episode_grid[seasonNum])):
-                        if not (season_episode_grid[seasonNum][episodeNum] == ''):
-                            for deleteItem in deleteItems:
-                                if (deleteItem['Id'] == season_episode_grid[seasonNum][episodeNum]):
-                                    deleteIndexes.append(deleteItems.index(deleteItem))
+    min_num_episode_behavior = 0
+    if ((minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxplayed') or (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxplayedmaxplayed')):
+        min_num_episode_behavior = 3
+    elif ((minimum_number_episodes_behavior.casefold().replace(' ','') == 'minplayed') or (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minplayedminplayed')):
+        min_num_episode_behavior = 4
+    elif ((minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxunplayed') or (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxunplayedmaxunplayed')):
+        min_num_episode_behavior = 5
+    elif ((minimum_number_episodes_behavior.casefold().replace(' ','') == 'minunplayed') or (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minunplayedminunplayed')):
+        min_num_episode_behavior = 6
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxplayedmaxunplayed'):
+        min_num_episode_behavior = 7
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minplayedminunplayed'):
+        min_num_episode_behavior = 8
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxplayedminunplayed'):
+        min_num_episode_behavior = 9
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minplayedmaxunplayed'):
+        min_num_episode_behavior = 10
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minunplayedminplayed'):
+        min_num_episode_behavior = 11
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minunplayedmaxunplayed'):
+        min_num_episode_behavior = 12
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minunplayedmaxplayed'):
+        min_num_episode_behavior = 13
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'minplayedmaxplayed'):
+        min_num_episode_behavior = 14
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxunplayedminunplayed'):
+        min_num_episode_behavior = 15
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxunplayedminplayed'):
+        min_num_episode_behavior = 16
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxunplayedmaxplayed'):
+        min_num_episode_behavior = 17
+    elif (minimum_number_episodes_behavior.casefold().replace(' ','') == 'maxplayedminplayed'):
+        min_num_episode_behavior = 18
+    else:
+        for userInfo in user_keys:
+            userNames_userIds_List=userInfo.split(":")
+            if (userNames_userIds_List[0].casefold() == minimum_number_episodes_behavior.casefold()):
+                min_num_episode_behavior = 1
+            if (userNames_userIds_List[1].casefold() == minimum_number_episodes_behavior.casefold()):
+                min_num_episode_behavior = 2
+        if (min_num_episode_behavior in range (1,(2+1))):
+            for seriesId in episodes_toBeDeletedOrRemain:
+                for userId in episodes_toBeDeletedOrRemain[seriesId]:
+                    if (userId == userNames_userIds_List[1]):
+                        episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = userNames_userIds_List[1]
+                        episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = userNames_userIds_List[1]
+                        episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['PlayedToBeDeleted']
+                        episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['UnplayedToBeDeleted']
+        if (min_num_episode_behavior == 0):
+            min_num_episode_behavior = 8
 
-                deleteIndexes.sort(reverse = True)
+    if (min_num_episode_behavior in range(3,(18+1))):
+        maxPlayed_ToBeDeleted=['',-1]
+        minPlayed_ToBeDeleted=['',-1]
+        maxUnplayed_ToBeDeleted=['',-1]
+        minUnplayed_ToBeDeleted=['',-1]
+        for seriesId in episodes_toBeDeletedOrRemain:
+            for userId in episodes_toBeDeletedOrRemain[seriesId]:
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxPlayed_ToBeDeleted[1]):
+                    maxPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                    maxPlayed_ToBeDeleted[0]=userId
 
-                for removeItem in deleteIndexes:
-                    if (toKeep):
-                        deleteItems.pop(removeItem)
-                        toKeep-=1
+                    if (minPlayed_ToBeDeleted[1] == -1):
+                        minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                        minPlayed_ToBeDeleted[0]=userId
+
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
+                    maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
+                    maxUnplayed_ToBeDeleted[0]=userId
+
+                    if (minUnplayed_ToBeDeleted[1] == -1):
+                        minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
+                        minUnplayed_ToBeDeleted[0]=userId
+
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] < minPlayed_ToBeDeleted[1]):
+                    minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
+                    minPlayed_ToBeDeleted[0]=userId
+
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] < minUnplayed_ToBeDeleted[1]):
+                    minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
+                    minUnplayed_ToBeDeleted[0]=userId
+
+            if (min_num_episode_behavior == 3):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 4):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 5):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 6):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 7):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 8):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 9):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 10):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 11):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 12):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 13):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 14):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 15):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 16):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 17):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+            elif (min_num_episode_behavior == 18):
+                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+
+    for seriesId in episodeTracker:
+        PlayedToBeDeleted_LoopControl=0
+        UnplayedToBeDeleted_LoopControl=0
+
+        if not ('TargetedEpisodeIds' in episodeTracker[seriesId]):
+            episodeTracker[seriesId]['TargetedEpisodeIds']=[]
+
+        if (episodeTracker[seriesId]['PlayedToBeDeleted'] > 0):
+            for seasonNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'])):
+                for episodeNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum])):
+                    if not (PlayedToBeDeleted_LoopControl >= episodeTracker[seriesId]['PlayedToBeDeleted']):
+                        episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
+                        if not (episodeId ==  ''):
+                            if (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for played item')['UserData']['Played']):
+                                episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
+                                PlayedToBeDeleted_LoopControl += 1
+
+        if (episodeTracker[seriesId]['UnplayedToBeDeleted'] > 0):
+            for seasonNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'])):
+                for episodeNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum])):
+                    if not (UnplayedToBeDeleted_LoopControl >= episodeTracker[seriesId]['UnplayedToBeDeleted']):
+                        episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
+                        if not (episodeId ==  ''):
+                            if not (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for unplayed item')['UserData']['Played']):
+                                episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
+                                UnplayedToBeDeleted_LoopControl += 1
+
+    deleteIndexes=[]
+    for seriesId in episodeTracker:
+        for delete_Items in deleteItems:
+            for episodeId in episodeTracker[seriesId]['TargetedEpisodeIds']:
+                if (episodeId == delete_Items['Id']):
+                    deleteIndexes.append(deleteItems.index(delete_Items))
+
+    deleteIndexes.sort(reverse = True)
+
+    for removeItem in deleteIndexes:
+        deleteItems.pop(removeItem)
 
     return(deleteItems)
 
@@ -3191,50 +3442,54 @@ def get_isplaycount_MetByAllUsers(playcount_met, deleteItems):
 
 
 # determine if media item has been played specified amount of times
-def get_playedStatus(item_play_count,filter_play_count_comparison,filter_play_count):
+def get_playedStatus(item,media_condition,filter_play_count_comparison,filter_play_count):
+
+    item_play_count=item['UserData']['PlayCount']
+    item_played=item['UserData']['Played']
 
     item_matches_play_count_filter=False
 
-    if (filter_play_count_comparison == '>'):
-        if (item_play_count > filter_play_count):
-            #media item play count greater than specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == '<'):
-        if (item_play_count < filter_play_count):
-            #media item play count less than specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == '>='):
-        if (item_play_count >= filter_play_count):
-            #media item play count greater than or equal to specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == '<='):
-        if (item_play_count <= filter_play_count):
-            #media item play count less than or equal to specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == '=='):
-        if (item_play_count == filter_play_count):
-            #media item play count equal to specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == 'not >'):
-        if (not (item_play_count > filter_play_count)):
-            #media item play count not greater than specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == 'not <'):
-        if (not (item_play_count < filter_play_count)):
-            #media item play count not less than specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == 'not >='):
-        if (not (item_play_count >= filter_play_count)):
-            #media item play count not greater than or equal to specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == 'not <='):
-        if (not (item_play_count <= filter_play_count)):
-            #media item play count not less than or equal to specified value
-            item_matches_play_count_filter=True
-    elif (filter_play_count_comparison == 'not =='):
-        if (not (item_play_count == filter_play_count)):
-            #media item play count not equal to specified value
-            item_matches_play_count_filter=True
+    if (item_played or (media_condition == 'created')):
+        if (filter_play_count_comparison == '>'):
+            if (item_play_count > filter_play_count):
+                #media item play count greater than specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == '<'):
+            if (item_play_count < filter_play_count):
+                #media item play count less than specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == '>='):
+            if (item_play_count >= filter_play_count):
+                #media item play count greater than or equal to specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == '<='):
+            if (item_play_count <= filter_play_count):
+                #media item play count less than or equal to specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == '=='):
+            if (item_play_count == filter_play_count):
+                #media item play count equal to specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == 'not >'):
+            if (not (item_play_count > filter_play_count)):
+                #media item play count not greater than specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == 'not <'):
+            if (not (item_play_count < filter_play_count)):
+                #media item play count not less than specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == 'not >='):
+            if (not (item_play_count >= filter_play_count)):
+                #media item play count not greater than or equal to specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == 'not <='):
+            if (not (item_play_count <= filter_play_count)):
+                #media item play count not less than or equal to specified value
+                item_matches_play_count_filter=True
+        elif (filter_play_count_comparison == 'not =='):
+            if (not (item_play_count == filter_play_count)):
+                #media item play count not equal to specified value
+                item_matches_play_count_filter=True
 
     return item_matches_play_count_filter
 
@@ -3410,7 +3665,6 @@ def get_media_items():
         keep_favorites_movie=cfg.keep_favorites_movie
         multiuser_whitelist_movie=cfg.multiuser_whitelist_movie
         delete_blacktagged_movie=cfg.delete_blacktagged_movie
-        minimum_number_episodes=cfg.minimum_number_episodes
         #dictionary for episodes to keep to meet cfg.minimum_number_episodes
         keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
         keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
@@ -3437,8 +3691,9 @@ def get_media_items():
         keep_favorites_episode=cfg.keep_favorites_episode
         multiuser_whitelist_episode=cfg.multiuser_whitelist_episode
         delete_blacktagged_episode=cfg.delete_blacktagged_episode
-        min_episodesToKeep=defaultdict(dict)
+        episodeCounts_byUserId={}
         minimum_number_episodes=cfg.minimum_number_episodes
+        minimum_number_played_episodes=cfg.minimum_number_played_episodes
         keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
         keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
         keep_favorites_advanced_series_genre=cfg.keep_favorites_advanced_series_genre
@@ -3585,6 +3840,7 @@ def get_media_items():
             isMeeting_PlayCountFilter_Episode[user_key]={}
             #dictionary of blacktagged items by userId
             isblacktag_and_watched_byUserId_Episode[user_key]={}
+            episodeCounts_byUserId[user_key]=defaultdict(dict)
         if (audio_condition_days >= 0):
             #define dictionary user_key to store media item favorite states by userId and itemId
             isfav_byUserId_Audio[user_key]={}
@@ -3977,12 +4233,11 @@ def get_media_items():
                                         else:
                                             item_matches_condition_day_filter=False
                                     elif ((movie_condition == 'created') and ('DateCreated' in item)):
-                                        if (cut_off_date_movie <= date_time_now):
+                                        if (cut_off_date_movie > parse(item['DateCreated'])):
                                             item_matches_condition_day_filter=True
                                         else:
                                             item_matches_condition_day_filter=False
                                     else:
-                                        #cut_off_date_movie=date_time_now + timedelta(1)
                                         item_matches_condition_day_filter=False
 
                                     itemisfav_MOVIE_Local=False
@@ -4045,9 +4300,9 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie == 0)):
                                             movie_whitelists.append(item['Id'])
 
-                                    #Decide if media item meets the filter criteria
+                                    #Decide if media item meets the play count filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],movie_play_count_comparison,movie_play_count)
+                                        item_matches_play_count_filter=get_playedStatus(item,movie_condition,movie_play_count_comparison,movie_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
@@ -4430,12 +4685,11 @@ def get_media_items():
                                         else:
                                             item_matches_condition_day_filter=False
                                     elif ((episode_condition == 'created') and ('DateCreated' in item)):
-                                        if (cut_off_date_episode <= date_time_now):
+                                        if (cut_off_date_episode > parse(item['DateCreated'])):
                                             item_matches_condition_day_filter=True
                                         else:
                                             item_matches_condition_day_filter=False
                                     else:
-                                        #cut_off_date_episode=date_time_now + timedelta(1)
                                         item_matches_condition_day_filter=False
 
                                     itemisfav_EPISODE_Local=False
@@ -4467,15 +4721,6 @@ def get_media_items():
                                         if (get_isEPISODE_Tagged(item,user_key,whitetags)):
                                             itemIsWhiteTagged=True
                                             episode_whitetag_list.append(item['Id'])
-
-                                    if (minimum_number_episodes):
-                                        #determine minimum number of additional episodes to keep for its series
-                                        series_info = get_SERIES_itemInfo(item,user_key)
-                                        if (series_info):
-                                            if not (item['Id'] in min_episodesToKeep[series_info['Id']]):
-                                                if not ('SeriesId' in item):
-                                                    item['SeriesId']=series_info['Id']
-                                                min_episodesToKeep[series_info['Id']][item['Id']]=get_EPISODES_toKeep(series_info)
 
                                     itemIsBlackTagged=False
                                     if (data_list_pos in data_from_blacktag_queries):
@@ -4509,9 +4754,9 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode == 0)):
                                             episode_whitelists.append(item['Id'])
 
-                                    #Decide if media item meets the filter criteria
+                                    #Decide if media item meets the play count filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],episode_play_count_comparison,episode_play_count)
+                                        item_matches_play_count_filter=get_playedStatus(item,episode_condition,episode_play_count_comparison,episode_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
@@ -4524,6 +4769,25 @@ def get_media_items():
 
                                     if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']]=True
+
+                                    if (minimum_number_episodes or minimum_number_played_episodes):
+                                        #Get seriesId and compare it to what the episode thinks its seriesId is
+                                        series_info = get_SERIES_itemInfo(item,user_key)
+                                        if ((not ('SeriesId' in item)) or (not (item['SeriesId'] == series_info['Id']))):
+                                            if (series_info):
+                                                item['SeriesId']=series_info['Id']
+
+                                        if not (item['SeriesId'] in episodeCounts_byUserId[user_key]):
+                                            RecursiveItemCount=int(series_info['RecursiveItemCount'])
+                                            UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
+                                            PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
+
+                                        if not ('TotalEpisodeCount' in episodeCounts_byUserId[user_key][item['SeriesId']]):
+                                            episodeCounts_byUserId[user_key][item['SeriesId']]['TotalEpisodeCount']=RecursiveItemCount
+                                        if not ('UnplayedEpisodeCount' in episodeCounts_byUserId[user_key][item['SeriesId']]):
+                                            episodeCounts_byUserId[user_key][item['SeriesId']]['UnplayedEpisodeCount']=UnplayedItemCount
+                                        if not ('PlayedEpisodeCount' in episodeCounts_byUserId[user_key][item['SeriesId']]):
+                                            episodeCounts_byUserId[user_key][item['SeriesId']]['PlayedEpisodeCount']=PlayedEpisodeCount
 
                                     if ('Played' in item['UserData']):
 
@@ -4894,12 +5158,11 @@ def get_media_items():
                                         else:
                                             item_matches_condition_day_filter=False
                                     elif ((audio_condition == 'created') and ('DateCreated' in item)):
-                                        if (cut_off_date_audio <= date_time_now):
+                                        if (cut_off_date_audio > parse(item['DateCreated'])):
                                             item_matches_condition_day_filter=True
                                         else:
                                             item_matches_condition_day_filter=False
                                     else:
-                                        #cut_off_date_audio=date_time_now + timedelta(1)
                                         item_matches_condition_day_filter=False
 
                                     itemisfav_AUDIO_Local=False
@@ -4964,9 +5227,9 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio == 0)):
                                             audio_whitelists.append(item['Id'])
 
-                                    #Decide if media item meets the filter criteria
+                                    #Decide if media item meets the play count filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audio_play_count_comparison,audio_play_count)
+                                        item_matches_play_count_filter=get_playedStatus(item,audio_condition,audio_play_count_comparison,audio_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
@@ -5353,12 +5616,11 @@ def get_media_items():
                                         else:
                                             item_matches_condition_day_filter=False
                                     elif ((audiobook_condition == 'created') and ('DateCreated' in item)):
-                                        if (cut_off_date_audiobook <= date_time_now):
+                                        if (cut_off_date_audiobook > parse(item['DateCreated'])):
                                             item_matches_condition_day_filter=True
                                         else:
                                             item_matches_condition_day_filter=False
                                     else:
-                                        #cut_off_date_audiobook=date_time_now + timedelta(1)
                                         item_matches_condition_day_filter=False
 
                                     itemisfav_AUDIOBOOK_Local=False
@@ -5423,9 +5685,9 @@ def get_media_items():
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook == 0)):
                                             audiobook_whitelists.append(item['Id'])
 
-                                    #Decide if media item meets the filter criteria
+                                    #Decide if media item meets the play count filter criteria
                                     if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-                                        item_matches_play_count_filter=get_playedStatus(item['UserData']['PlayCount'],audiobook_play_count_comparison,audiobook_play_count)
+                                        item_matches_play_count_filter=get_playedStatus(item,audiobook_condition,audiobook_play_count_comparison,audiobook_play_count)
                                     else:
                                         #itemPlayedStateIsDeletable=False
                                         item_matches_play_count_filter=False
@@ -5500,10 +5762,6 @@ def get_media_items():
         if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
-    if ((episode_condition_days >= 0) and (minimum_number_episodes >= 1)):
-        #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
-        deleteItems=get_minEpisodesToKeep(min_episodesToKeep, deleteItems)
-
     #When multiple users and multiuser_whitelist_xyz==0 Determine media items to keep and remove them from deletion list
     if ((movie_condition_days >= 0) and (multiuser_whitelist_movie == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(movie_whitelists, deleteItems)
@@ -5533,6 +5791,11 @@ def get_media_items():
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Audio, deleteItems)
     if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0) and (multiuser_play_count_audiobook == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
+
+    #When enabled; Keep a minimum number of episodes
+    if ((episode_condition_days >= 0) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
+        #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
+        deleteItems=get_minEpisodesToKeep(episodeCounts_byUserId, deleteItems)
 
     if (DEBUG):
         print('-----------------------------------------------------------')
@@ -5571,13 +5834,6 @@ def get_media_items():
         if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             print('isfav_AUDIOBOOK: ')
             print(audiobook_whitetag_list)
-            print('')
-
-        if ((episode_condition_days >= 0) and (minimum_number_episodes >= 1)):
-            print('-----------------------------------------------------------')
-            print('')
-            print('min_EPISODE_ToKeep: ')
-            print(min_episodesToKeep)
             print('')
 
         print('-----------------------------------------------------------')
@@ -5635,6 +5891,13 @@ def get_media_items():
         if ((server_brand == 'jellyfin') and (audiobook_condition_days >= 0)):
             print('isplaycountmet_AUDIOBOOK: ')
             print(isMeeting_PlayCountFilter_AudioBook)
+            print('')
+
+        if ((episode_condition_days >= 0) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
+            print('-----------------------------------------------------------')
+            print('')
+            print('episodeCounts_byUserId: ')
+            print(episodeCounts_byUserId)
             print('')
 
     print_byType('\n',print_common_delete_keep_info)
@@ -5885,6 +6148,27 @@ def cfgCheck():
         server_brand='invalid'
     error_found_in_mumc_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
+
+#######################################################################################################
+
+    if hasattr(cfg, 'user_keys'):
+        check=cfg.user_keys
+        check_list=json.loads(check)
+        check_user_keys_length=len(check_list)
+        username_check_list=[]
+        userid_check_list=[]
+        for user_info in check_list:
+            username_check_list.append(user_info.split(':',1)[0])
+            userid_check_list.append(user_info.split(':',1)[1])
+            for check_irt in userid_check_list:
+                if (
+                    not ((type(check_irt) is str) and
+                    (len(check_irt) == 32) and
+                    (str(check_irt).isalnum()))
+                ):
+                    error_found_in_mumc_config_py+='ValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
+    else:
+        error_found_in_mumc_config_py+='NameError: The user_keys variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6257,6 +6541,69 @@ def cfgCheck():
 
 #######################################################################################################
 
+    if hasattr(cfg, 'minimum_number_episodes'):
+        check=cfg.minimum_number_episodes
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 730500))
+        ):
+            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes must be an integer; valid range 0 thru 730500\n'
+    else:
+        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes variable is missing from mumc_config.py\n'
+
+    if hasattr(cfg, 'minimum_number_played_episodes'):
+        check=cfg.minimum_number_played_episodes
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 730500))
+        ):
+            error_found_in_mumc_config_py+='ValueError: minimum_number_played_episodes must be an integer; valid range 0 thru 730500\n'
+    else:
+        error_found_in_mumc_config_py+='NameError: The minimum_number_played_episodes variable is missing from mumc_config.py\n'
+
+    if hasattr(cfg, 'minimum_number_episodes_behavior'):
+        check=cfg.minimum_number_episodes_behavior
+        usersname_usersid_match=False
+        for usersname in username_check_list:
+            if (check == usersname):
+                usersname_usersid_match=True
+        for usersid in userid_check_list:
+            if (check == usersid):
+                usersname_usersid_match=True
+        if (usersname_usersid_match == False):
+            check = check.casefold().replace(' ','')
+        if (
+            not ((type(check) is str) and
+            ((usersname_usersid_match == True) or
+            (check == 'maxplayed') or
+            (check == 'maxplayedmaxplayed') or
+            (check == 'minplayed') or
+            (check == 'minplayedminplayed') or
+            (check == 'maxunplayed') or
+            (check == 'maxunplayedmaxunplayed') or
+            (check == 'minunplayed') or
+            (check == 'minunplayedminunplayed') or
+            (check == 'maxplayedmaxunplayed') or
+            (check == 'minplayedminunplayed') or
+            (check == 'maxplayedminunplayed') or
+            (check == 'minplayedmaxunplayed') or
+            (check == 'minunplayedminplayed') or
+            (check == 'minunplayedmaxunplayed') or
+            (check == 'minunplayedmaxplayed') or
+            (check == 'minplayedmaxplayed') or
+            (check == 'maxunplayedminunplayed') or
+            (check == 'maxunplayedminplayed') or
+            (check == 'maxunplayedmaxplayed') or
+            (check == 'maxplayedminplayed')))
+        ):
+            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes_behavior must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
+    else:
+        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes_behavior variable is missing from mumc_config.py\n'
+
+#######################################################################################################
+
     if hasattr(cfg, 'REMOVE_FILES'):
         check=cfg.REMOVE_FILES
         if (
@@ -6268,19 +6615,6 @@ def cfgCheck():
             error_found_in_mumc_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
     else:
         error_found_in_mumc_config_py+='NameError: The REMOVE_FILES variable is missing from mumc_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'minimum_number_episodes'):
-        check=cfg.minimum_number_episodes
-        if (
-            not ((type(check) is int) and
-            (check >= -1) and
-            (check <= 730500))
-        ):
-            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes must be an integer; valid range -1 thru 730500\n'
-    else:
-        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -6784,27 +7118,6 @@ def cfgCheck():
             error_found_in_mumc_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
     else:
         error_found_in_mumc_config_py+='NameError: The library_matching_behavior variable is missing from mumc_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'user_keys'):
-        check=cfg.user_keys
-        check_list=json.loads(check)
-        check_user_keys_length=len(check_list)
-        userid_check_list=[]
-        username_check_list=[]
-        for user_info in check_list:
-            username_check_list.append(user_info.split(':',1)[0])
-            userid_check_list.append(user_info.split(':',1)[1])
-        for check_irt in userid_check_list:
-            if (
-                not ((type(check_irt) is str) and
-                (len(check_irt) == 32) and
-                (str(check_irt).isalnum()))
-            ):
-                error_found_in_mumc_config_py+='ValueError: user_keys must be a single list with a comma separating multiple users\' keys; each user key must be a 32-character alphanumeric string\n'
-    else:
-        error_found_in_mumc_config_py+='NameError: The user_keys variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
