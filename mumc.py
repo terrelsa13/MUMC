@@ -1503,7 +1503,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  1-730500 - Episodes will be deleted based on the Filter Statement; unless\n"
     config_file += "#              the remaining played and unplayed episodes are less than or equal\n"
     config_file += "#              to the chosen value\n"
-    config_file += " (0 : default)\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "minimum_number_episodes=" + str(get_default_config_values('minimum_number_episodes')) + "\n"
@@ -1550,9 +1550,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# (Min Played Min Unplayed : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "minimum_number_episodes_behavior=" + str(get_default_config_values('minimum_number_episodes_behavior')) + "\n"
+        config_file += "minimum_number_episodes_behavior='" + str(get_default_config_values('minimum_number_episodes_behavior')) + "'\n"
     elif (updateConfig):
-        config_file += "minimum_number_episodes_behavior=" + str(cfg.minimum_number_episodes_behavior) + "\n"
+        config_file += "minimum_number_episodes_behavior='" + str(cfg.minimum_number_episodes_behavior) + "'\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
