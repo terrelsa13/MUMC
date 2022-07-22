@@ -321,7 +321,7 @@ delete_blacktagged_audiobook=0
 #----------------------------------------------------------#
 whitetag='white_tagname,white_tag name,white_tag-name'
 ```
-#### Set the minimum number of episodes to remain; Does not care about played or unplayed states:
+#### At least this many episodes will remain in each tv series; Does not care about played or unplayed states:
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
@@ -334,7 +334,7 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #----------------------------------------------------------#
 minimum_number_episodes=1
 ```
-#### Set the minimum number of played episodes to remain:
+#### At least this many played episodes will remain in each tv series:
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of played episodes to remain in all tv series'
@@ -350,17 +350,16 @@ minimum_number_episodes=1
 #----------------------------------------------------------#
 minimum_number_played_episodes=1
 ```
-#### Set the behavior of ```minimum_number_episodes``` and ```minimum_number_played_episodes```:
+#### Set the behavior of ```minimum_number_episodes``` and/or ```minimum_number_played_episodes```:
 ```python
 #----------------------------------------------------------#
 # Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave
-#  when there are multiple users monitored
 # The minimum number of played and unplayed episodes will vary for each user and for each
 #  series when multiple users are watching the same series at different paces.
 # The following option gives a mechanism to control this in different ways.
 # The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...
-#  'User's Name' - The UserName specified
-#  'User's Id' - The UserId specified
+#  'User's Name' - The UserName specified; If matching UserName not found script will assume default.
+#  'User's Id' - The UserId specified; If matching UserName not found script will assume default.
 #  'Max Played' - The first user with the highest number of played episodes to be deleted for each series.
 #  'Min Played' - The first user with the lowest number of played episodes to be deleted for each series.
 #  'Max Unplayed' - The first user with the highest number of unplayed episodes to be deleted for each series.
@@ -384,19 +383,6 @@ minimum_number_episodes_behavior='Min Played Min Unplayed'
 # (False : default)
 #----------------------------------------------------------#
 REMOVE_FILES=False
-```
-#### At least this many episodes will remain in each tv series:
-```python
-#----------------------------------------------------------#
-# Decide the minimum number of episodes to remain in all tv series'
-# Keeping one or more episodes for each series allows the "Next Up"m
-#  functionality to notify user(s) when a new episode for a series
-#  is ready to be watched
-#  0 - Episodes will be deleted as they are watched
-#  1-730500 - All but the latest "selected number" of episodes will be deleted as they are watched
-# (0 : default)
-#----------------------------------------------------------#
-minimum_number_episodes=0
 ```
 #### Keep movie if genre favorited:
 ```python

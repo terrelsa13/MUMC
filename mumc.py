@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.17-beta'
+    Version='3.0.18-beta'
 
     return(Version)
 
@@ -1530,14 +1530,13 @@ def build_configuration_file(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave\n"
-    config_file += "#  when there are multiple users monitored\n"
+    config_file += "# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave.\n"
     config_file += "# The minimum number of played and unplayed episodes will vary for each user and for each\n"
     config_file += "#  series when multiple users are watching the same series at different paces.\n"
     config_file += "# The following option gives a mechanism to control this in different ways.\n"
     config_file += "# The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...\n"
-    config_file += "#  'User's Name' - The UserName specified\n"
-    config_file += "#  'User's Id' - The UserId specified\n"
+    config_file += "#  'User's Name' - The UserName specified; If matching UserName not found script will assume default.\n"
+    config_file += "#  'User's Id' - The UserId specified; If matching UserName not found script will assume default.\n"
     config_file += "#  'Max Played' - The first user with the highest number of played episodes to be deleted for each series.\n"
     config_file += "#  'Min Played' - The first user with the lowest number of played episodes to be deleted for each series.\n"
     config_file += "#  'Max Unplayed' - The first user with the highest number of unplayed episodes to be deleted for each series.\n"
@@ -3047,7 +3046,7 @@ def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
     return(deleteItems)
 
 
-# Determine episodes to be removed from deletion list to keep mininum number
+# Determine episodes to be removed from deletion list to keep the mininum/minimum played episode numbers
 def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
 
     minimum_number_episodes = cfg.minimum_number_episodes
@@ -3169,11 +3168,12 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
     else:
         for userInfo in user_keys:
             userNames_userIds_List=userInfo.split(":")
-            if (userNames_userIds_List[0].casefold() == minimum_number_episodes_behavior.casefold()):
+            if (userNames_userIds_List[0] == minimum_number_episodes_behavior):
                 min_num_episode_behavior = 1
-            if (userNames_userIds_List[1].casefold() == minimum_number_episodes_behavior.casefold()):
+            if (userNames_userIds_List[1] == minimum_number_episodes_behavior):
                 min_num_episode_behavior = 2
         if (min_num_episode_behavior in range (1,(2+1))):
+            username_userid_match=False
             for seriesId in episodes_toBeDeletedOrRemain:
                 for userId in episodes_toBeDeletedOrRemain[seriesId]:
                     if (userId == userNames_userIds_List[1]):
@@ -3181,6 +3181,9 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                         episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = userNames_userIds_List[1]
                         episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['PlayedToBeDeleted']
                         episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['UnplayedToBeDeleted']
+                        username_userid_match=True
+            if (username_userid_match == False):
+                min_num_episode_behavior = 0
         if (min_num_episode_behavior == 0):
             min_num_episode_behavior = 8
 
