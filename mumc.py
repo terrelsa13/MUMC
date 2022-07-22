@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.18-beta'
+    Version='3.0.19-beta'
 
     return(Version)
 
@@ -3333,13 +3333,11 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 if (episodeId == delete_Items['Id']):
                     deleteIndexes.append(deleteItems.index(delete_Items))
 
-    deleteIndexes.sort(reverse = True)
+    #deleteIndexes.sort(reverse = True)
 
-    for deleteItem in reversed(range(len(deleteItems))):
-        if not (deleteItem in deleteIndexes):
-            deleteItems.pop(deleteItem)
-        else:
-            pass
+    for deleteItemIndex in reversed(range(len(deleteItems))):
+        if not (deleteItemIndex in deleteIndexes):
+            deleteItems.pop(deleteItemIndex)
 
     return(deleteItems)
 
