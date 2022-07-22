@@ -332,7 +332,7 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #              to the chosen value
 # (0 : default)
 #----------------------------------------------------------#
-minimum_number_episodes=1
+minimum_number_episodes=0
 ```
 #### At least this many played episodes will remain in each tv series:
 ```python
@@ -348,7 +348,7 @@ minimum_number_episodes=1
 #              chosen value
 # (0 : default)
 #----------------------------------------------------------#
-minimum_number_played_episodes=1
+minimum_number_played_episodes=0
 ```
 #### Set the behavior of ```minimum_number_episodes``` and/or ```minimum_number_played_episodes```:
 ```python
