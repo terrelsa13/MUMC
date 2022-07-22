@@ -3335,8 +3335,11 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
 
     deleteIndexes.sort(reverse = True)
 
-    for removeItem in deleteIndexes:
-        deleteItems.pop(removeItem)
+    for deleteItem in reversed(range(len(deleteItems))):
+        if not (deleteItem in deleteIndexes):
+            deleteItems.pop(deleteItem)
+        else:
+            pass
 
     return(deleteItems)
 
