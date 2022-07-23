@@ -186,9 +186,9 @@ To make a Filter Statement that deletes only "old" played media items; CAREFULLY
 #----------------------------------------------------------#
 # Condition: Delete media items based on when they were last played or
 #             based on when they were created.
-#   played - Filter will keep or delete media items based on last played date
-#   created - Filter will keep or delete media items based on creation date
-# (played : default)
+#   'played' - Filter will keep or delete media items based on last played date
+#   'created' - Filter will keep or delete media items based on creation date
+# ('played' : default)
 #----------------------------------------------------------#
 movie_condition='played'
 episode_condition='played'
@@ -370,7 +370,7 @@ minimum_number_played_episodes=0
 #                                specified series. The number of unplayed episodes to be deleted is
 #                                based off the user with the lowest number of played episoded to be
 #                                deleted for a specified series.
-# (Min Played Min Unplayed : default)
+# ('Min Played Min Unplayed' : default)
 #----------------------------------------------------------#
 minimum_number_episodes_behavior='Min Played Min Unplayed'
 ```
