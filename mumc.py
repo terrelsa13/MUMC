@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.20-beta'
+    Version='3.0.21-beta'
 
     return(Version)
 
@@ -1785,9 +1785,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "library_matching_behavior='" + library_matching_behavior + "'\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# User key(s) of monitored account(s); chosen during setup\n"
-    config_file += "# The order of the keys here must match the order of the keys\n"
-    config_file += "#  in user_bl_libs and user_wl_libs\n"
+    config_file += "# User UserName(s) and UserId(s) of monitored account(s); chosen during setup\n"
+    config_file += "# The order of the UserName(s):UserId(s) here must match the order of the\n"
+    config_file += "#  UserId(s)/UserNames(s) in user_bl_libs and user_wl_libs\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "user_keys='" + user_keys + "'\n"
     config_file += "\n"
@@ -3085,7 +3085,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 'maxunplayedmaxplayed':17,
                 'maxplayedminplayed':18
                 }
-    behaviorTypes_List=list(behaviorTypes.keys())
+    behaviorTypesKeys_List=list(behaviorTypes.keys())
 
     if (minimum_number_played_episodes > minimum_number_episodes):
         if not (minimum_number_episodes == 0):
@@ -3183,7 +3183,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 seasonNum=list(episodeTracker[seriesId][episodeId].keys())
                 episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum[0]][episodeTracker[seriesId][episodeId][seasonNum[0]]]=episodeId
 
-    if (minimum_number_episodes_behavior_modified in behaviorTypes_List):
+    if (minimum_number_episodes_behavior_modified in behaviorTypesKeys_List):
         min_num_episode_behavior = behaviorTypes[minimum_number_episodes_behavior_modified]
     else:
         for userInfo in user_keys:

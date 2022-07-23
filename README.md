@@ -110,7 +110,7 @@ Doing this WILL delete MOST if not ALL of your library.
 You get the point right?
 
 ## Step 5: Oh Yeah, Duh!
-### Objective - Here are some subtlies to keep in mind when building Filter Statements
+### Objective - Here are some subtleties to keep in mind when building Filter Statements
 
 Filter Statements which imply played media items with only negative play counts, like the ones below, will be evaluted as play_count=0 (i.e. unplayed).
 
@@ -559,9 +559,9 @@ library_matching_behavior='byAbc'
 #### UserId for each monitored user
 ```python
 #----------------------------------------------------------#
-# User name(s) and user key(s) of monitored account(s); chosen during setup
-# The order of the names:keys here must match the order of the names:keys
-#  in user_bl_libs and user_wl_libs
+# User UserName(s) and UserId(s) of monitored account(s); chosen during setup
+# The order of the UserName(s):UserId(s) here must match the order of the
+#  UserId(s)/UserNames(s) in user_bl_libs and user_wl_libs
 #----------------------------------------------------------#
 user_keys='["user1:abcdef0123456789abcdef0123456789", "user2:fedcba9876543210fedcba9876543210", "user3:9876543210fedcba9876543210fedcba", "etc..."]'
 ```
