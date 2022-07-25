@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.0.21-beta'
+    Version='3.0.23-beta'
 
     return(Version)
 
@@ -3061,6 +3061,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
     deleteIndexes=[]
     username_userid_match = False
 
+    #Define different behavior types
     behaviorTypes={
                 'username':1,
                 'userid':2,
@@ -3083,35 +3084,50 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 'maxunplayedminunplayed':15,
                 'maxunplayedminplayed':16,
                 'maxunplayedmaxplayed':17,
-                'maxplayedminplayed':18
+                'maxplayedminplayed':18,
+                'defaultbehavior':8
                 }
+    #Put behavior type keys into a list
     behaviorTypesKeys_List=list(behaviorTypes.keys())
 
+    #when minimum_number_episodes it must be > minimum_number_played_episodes
     if (minimum_number_played_episodes > minimum_number_episodes):
         if not (minimum_number_episodes == 0):
             minimum_number_episodes = minimum_number_played_episodes
 
+    #Build a dictionary to track episode information for each seriesId by userId
+    #loop thru userIds
     for userId in episodeCounts_byUserId:
+        #loop thru list of items to be deleted
         for episodeItem in deleteItems:
+            #check if the seriesId associated to the episode is was tracked for this user
             if (episodeItem['SeriesId'] in episodeCounts_byUserId[userId]):
+                #if seriesId has not already processed; add it so it can be
                 if not (episodeItem['SeriesId'] in episodes_toBeDeletedOrRemain):
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]={}
+                #if userId has not already been processed; add it so it can be
                 if not (userId in episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]):
+                    #gather information needed to determine how many played and unplayed episodes may be deleted
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]=defaultdict(dict)
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] = 0
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] = 0
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['TotalEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['TotalEpisodeCount']
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['PlayedEpisodeCount']
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['UnplayedEpisodeCount']
+                #increment for played or unplayed episode counts that may be deleted
                 if (get_ADDITIONAL_itemInfo(userId,episodeItem['Id'],'finding minEpisodesToKeep() play state')['UserData']['Played']):
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
                 else:
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
             else:
+                #manually build any missing season and episode information for user's who did meet the filter criteria
                 series_info = get_SERIES_itemInfo(episodeItem,userId)
+                #if seriesId has not already processed; add it so it can be
                 if not (series_info['Id'] in episodes_toBeDeletedOrRemain):
                     episodes_toBeDeletedOrRemain[series_info['Id']]={}
+                #if userId has not already been processed; add it so it can be
                 if not (userId in episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]):
+                    #gather information needed to determine how many played and unplayed episodes may be deleted
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]=defaultdict(dict)
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]['PlayedToBeDeleted'] = 0
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]['UnplayedToBeDeleted'] = 0
@@ -3121,48 +3137,75 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]['TotalEpisodeCount'] = RecursiveItemCount
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]['PlayedEpisodeCount'] = PlayedEpisodeCount
                     episodes_toBeDeletedOrRemain[series_info['Id']][userId]['UnplayedEpisodeCount'] = UnplayedItemCount
+                #increment for played or unplayed episode counts that may be deleted
                 if (get_ADDITIONAL_itemInfo(userId,episodeItem['Id'],'finding minEpisodesToKeep() play state')['UserData']['Played']):
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
                 else:
                     episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
 
+    #loop thru seriesIds we stored in the loop above
     for seriesId in episodes_toBeDeletedOrRemain:
+        #loop thru the userIds under each seriesId
         for userId in episodes_toBeDeletedOrRemain[seriesId]:
+            #determine the number of played and unplayed episodes for this series that will remain specifically for this user
             episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedEpisodeCount'] - episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
             episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] = episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedEpisodeCount'] - episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
 
+            #check if the number of remaining played episodes is less than or equal to the minimum_number_played_episodes
             if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] <= minimum_number_played_episodes):
+                #get the number of played episodes we will need to meet the requested minimum_number_played_episodes
                 episode_gap = minimum_number_played_episodes - episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain']
+                #check if the needed number of played episodes to meet the request minimum_number_played_episodes is available for this user
                 if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                    #we have enough to fill the gap; incresed number of played episodes to remain; decrease the number of played episodes to be deleted by the delta
                     episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episode_gap
                     episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episode_gap
+                #when there are not enough played episodes to meet the requested minimum_number_played_episodes
                 else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] < episode_gap):
+                    #take everything there is; to incresed number of played episodes to remain as much as possible and to decrease the number of played episodes to be deleted by the same amount
                     episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                     episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
 
+                #determine the total number of remaining episodes both played and unplayed
                 total_remaining = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] + episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain']
+                #check if total_remaining meets the requested minimum_number_episodes
                 if (total_remaining <= minimum_number_episodes):
+                    #determine the number of episodes needed to fill the gap
                     episode_gap = minimum_number_episodes - total_remaining
+                    #check if the needed number of unplayed episodes to meet the request minimum_number_episodes is available for this user
                     if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] >= episode_gap):
+                        #we have enough to fill the gap; incresed number of unplayed episodes to remain; decrease the number of unplayed episodes to be deleted by the delta
                         episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] += episode_gap
                         episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] -= episode_gap
+                    #when there are not enough unplayed episodes to meet the requested minimum_number_episodes
                     else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] < episode_gap):
+                        #take everything there is; to incresed number of unplayed episodes to remain as much as possible and to decrease the number of unplayed episodes to be deleted by the same amount
                         episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                         episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
 
+                    #determine the total number of remaining episodes both played and unplayed
                     total_remaining = episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] + episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain']
+                    #check if total_remaining meets the requested minimum_number_episodes
                     if (total_remaining < minimum_number_episodes):
+                        #determine the number of episodes needed to fill the gap
                         episode_gap = minimum_number_episodes - total_remaining
+                        #check if the needed number of played episodes to meet the request minimum_number_episodes is available for this user
                         if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                            #we have enough to fill the gap; incresed number of played episodes to remain; decrease the number of played episodes to be deleted by the delta
                             episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episode_gap
                             episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episode_gap
+                        #when there are not enough played episodes to meet the requested minimum_number_episodes
                         else: #(episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] >= episode_gap):
+                            #take everything there is; to incresed number of played episodes to remain as much as possible and to decrease the number of played episodes to be deleted by the same amount
                             episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] += episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                             episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] -= episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
 
+    #loop thru each item in the list of items that may be deleted
     for deleteItem in deleteItems:
+        #add serieid to epsiode tracker if it does not already exist
         if not (deleteItem['SeriesId'] in episodeTracker):
             episodeTracker[deleteItem['SeriesId']]={}
+        #gather information needed to build grid to determine season/episode order of each episode
         if not (deleteItem['Id'] in episodeTracker[deleteItem['SeriesId']]):
             if not ('MaxSeason' in episodeTracker[deleteItem['SeriesId']]):
                 episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = 0
@@ -3172,71 +3215,104 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = deleteItem['ParentIndexNumber']
             if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
                 episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
+            #create dictionary entry containg season and episode number for each episode
             episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
             episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
 
+    #loop thru each series in the episode tracker
     for seriesId in episodeTracker:
+        #create an season x episode grid for each series
         episodeTracker[seriesId]['SeasonEpisodeGrid'] = [[''] * (episodeTracker[seriesId]['MaxEpisode'] + 1) for x in range(episodeTracker[seriesId]['MaxSeason'] + 1)]
 
+        #loop thru each episode for the series
         for episodeId in episodeTracker[seriesId]:
+            #ignore non-essential data
             if not ((episodeId == 'MaxSeason') or (episodeId == 'MaxEpisode') or (episodeId == 'SeasonEpisodeGrid')):
+                #get the key for this entry which is the season number
                 seasonNum=list(episodeTracker[seriesId][episodeId].keys())
+                #user the season number and the value from the season number key (aka episode number) to save the episodeId in the correct grid position
                 episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum[0]][episodeTracker[seriesId][episodeId][seasonNum[0]]]=episodeId
 
+    #check if minimum_number_episodes_behavior is equal to any of the behaviorType keys
     if (minimum_number_episodes_behavior_modified in behaviorTypesKeys_List):
         min_num_episode_behavior = behaviorTypes[minimum_number_episodes_behavior_modified]
+    #check if minimum_number_episodes_behavior is a userName or userId
     else:
+        #loop thru userNames:userIds
         for userInfo in user_keys:
+            #check if match has already been made
             if (username_userid_match == False):
+                #split userName and userId into a list
                 userNames_userIds_List=userInfo.split(":")
+                #make possible userName strings ot be compared case insensitive
                 if (userNames_userIds_List[0].casefold() == minimum_number_episodes_behavior.casefold()):
+                    #userName match found
                     min_num_episode_behavior = behaviorTypes['username']
                     username_userid_match=True
+                #make possible userId strings ot be compared case insensitive
                 if (userNames_userIds_List[1].casefold() == minimum_number_episodes_behavior.casefold()):
+                    #userId match found
                     min_num_episode_behavior = behaviorTypes['userid']
                     username_userid_match=True
-        if (min_num_episode_behavior in range (1,(2+1))):
+        #check if behavior set to userName or userId
+        if (min_num_episode_behavior in range(behaviorTypes['username'],(behaviorTypes['userid']+1))):
+            #loop thru each series
             for seriesId in episodes_toBeDeletedOrRemain:
+                #determine played and unplayed numbers specifically for this user
                 episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = userNames_userIds_List[1]
                 episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = userNames_userIds_List[1]
                 episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['PlayedToBeDeleted']
                 episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['UnplayedToBeDeleted']
+            #make sure we got here without matching a userName or userId
             if (username_userid_match == False):
+                #if we did; prep for using the default behavior
                 min_num_episode_behavior = 0
+        #check if we made it this far without a match; if we did use the default behavior
         if (min_num_episode_behavior == 0):
-            min_num_episode_behavior = 8
+            min_num_episode_behavior = behaviorTypes['defaultbehavior']
 
-    if (min_num_episode_behavior in range(3,(18+1))):
+    #otherwise check if the desired behavior falls within the max/min played/unplyed ranges
+    if (min_num_episode_behavior in range(behaviorTypes['maxplayed'],(behaviorTypes['maxplayedminplayed']+1))):
+        #create lists to keep track of the user with the min/max played/unplayed number of episodes (first user with min/max value wins)
         maxPlayed_ToBeDeleted=['',-1]
         minPlayed_ToBeDeleted=['',-1]
         maxUnplayed_ToBeDeleted=['',-1]
         minUnplayed_ToBeDeleted=['',-1]
+        #loop thru each series
         for seriesId in episodes_toBeDeletedOrRemain:
+            #loop thru each user
             for userId in episodes_toBeDeletedOrRemain[seriesId]:
+                #store value if greater than last
                 if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxPlayed_ToBeDeleted[1]):
                     maxPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                     maxPlayed_ToBeDeleted[0]=userId
 
+                    #initialize minimum value as max
                     if (minPlayed_ToBeDeleted[1] == -1):
                         minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                         minPlayed_ToBeDeleted[0]=userId
 
+                #store value if greater than last
                 if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
                     maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                     maxUnplayed_ToBeDeleted[0]=userId
 
+                    #initialize minimum value as max
                     if (minUnplayed_ToBeDeleted[1] == -1):
                         minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                         minUnplayed_ToBeDeleted[0]=userId
 
+                #store value if less than last
                 if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] < minPlayed_ToBeDeleted[1]):
                     minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                     minPlayed_ToBeDeleted[0]=userId
 
+                #store value if less than last
                 if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] < minUnplayed_ToBeDeleted[1]):
                     minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                     minUnplayed_ToBeDeleted[0]=userId
 
+            #check for desired behaviorType; assign min/max played/unplayed valuse for each series depending on behaviorType
             if (min_num_episode_behavior == behaviorTypes['maxplayed']):
                 episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
                 episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
@@ -3318,41 +3394,65 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
                 episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
 
+    #loop thru each series
     for seriesId in episodeTracker:
+        #initialize loop check controls
         PlayedToBeDeleted_LoopControl=0
         UnplayedToBeDeleted_LoopControl=0
 
+        #initialize list of episodes to be kept for each series
         if not ('TargetedEpisodeIds' in episodeTracker[seriesId]):
             episodeTracker[seriesId]['TargetedEpisodeIds']=[]
 
+        #check if the number of played episodes to be deleted is greater than zero
         if (episodeTracker[seriesId]['PlayedToBeDeleted'] > 0):
+            #loop thru seasons of season/episode grid
             for seasonNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'])):
+                #loop thru episodes of season/episode grid
                 for episodeNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum])):
+                    #check if enough episodes have been removed to exhaust the number of played episodes to be deleted
                     if not (PlayedToBeDeleted_LoopControl >= episodeTracker[seriesId]['PlayedToBeDeleted']):
                         episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
+                        #skip empty grid positions
                         if not (episodeId ==  ''):
+                            #get played status for specified episodeId
                             if (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for played item')['UserData']['Played']):
+                                #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 PlayedToBeDeleted_LoopControl += 1
 
+        #check if the number of unplayed episodes to be deleted is greater than zero
         if (episodeTracker[seriesId]['UnplayedToBeDeleted'] > 0):
+            #loop thru seasons of season/episode grid
             for seasonNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'])):
+                #loop thru episodes of season/episode grid
                 for episodeNum in range(len(episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum])):
+                    #check if enough episodes have been removed to exhaust the number of played episodes to be deleted
                     if not (UnplayedToBeDeleted_LoopControl >= episodeTracker[seriesId]['UnplayedToBeDeleted']):
                         episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
+                        #skip empty grid positions
                         if not (episodeId ==  ''):
+                            #get played status for specified episodeId
                             if not (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for unplayed item')['UserData']['Played']):
+                                #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 UnplayedToBeDeleted_LoopControl += 1
 
+    #loop thru each series
     for seriesId in episodeTracker:
+        #loop thru each item that may be deleted
         for delete_Items in deleteItems:
+            #loop thru each episode in the series
             for episodeId in episodeTracker[seriesId]['TargetedEpisodeIds']:
+                #check if episodeId matches and is to be deleted
                 if (episodeId == delete_Items['Id']):
                     deleteIndexes.append(deleteItems.index(delete_Items))
 
+    #loop thru list of episodes that may be deleted
     for deleteItemIndex in reversed(range(len(deleteItems))):
+        #check if item does not match what was stored above and then remove it from the list of items to be deleted
         if not (deleteItemIndex in deleteIndexes):
+            #remove episode from delete list
             deleteItems.pop(deleteItemIndex)
 
     return(deleteItems)
