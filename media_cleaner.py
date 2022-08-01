@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.7'
+    Version='2.1.8'
 
     return(Version)
 
@@ -3699,8 +3699,10 @@ def get_media_items():
                                             movie_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_movie >= 0)):
+                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,item['UserData']['LastPlayedDate'],cfg.max_age_movie,max_cut_off_date_movie)
+                                    elif (cfg.max_age_movie >= 0):
+                                        itemIsPlayed=get_playedStatus(cfg.played_age_movie,item['UserData']['PlayCount'],cut_off_date_movie,'9999-12-31T23:59:59.9999999Z',cfg.max_age_movie,max_cut_off_date_movie)
                                     else:
                                         itemIsPlayed=False
 
@@ -4152,8 +4154,10 @@ def get_media_items():
                                             episode_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_episode >= 0)):
+                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,item['UserData']['LastPlayedDate'],cfg.max_age_episode,max_cut_off_date_episode)
+                                    elif (cfg.max_age_episode >= 0):
+                                        itemIsPlayed=get_playedStatus(cfg.played_age_episode,item['UserData']['PlayCount'],cut_off_date_episode,'9999-12-31T23:59:59.9999999Z',cfg.max_age_episode,max_cut_off_date_episode)
                                     else:
                                         itemIsPlayed=False
 
@@ -4596,8 +4600,10 @@ def get_media_items():
                                             audio_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_audio >= 0)):
+                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,item['UserData']['LastPlayedDate'],cfg.max_age_audio,max_cut_off_date_audio)
+                                    elif (cfg.max_age_audio >= 0):
+                                        itemIsPlayed=get_playedStatus(cfg.played_age_audio,item['UserData']['PlayCount'],cut_off_date_audio,'9999-12-31T23:59:59.9999999Z',cfg.max_age_audio,max_cut_off_date_audio)
                                     else:
                                         itemIsPlayed=False
 
@@ -5048,8 +5054,10 @@ def get_media_items():
                                             audiobook_whitelists.append(item['Id'])
 
                                     #Decide if media item is played and meets the cutoff date criteria or max cutoff date criteria
-                                    if ((('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])) or (cfg.max_age_audiobook >= 0)):
+                                    if (('PlayCount' in item['UserData']) and ('LastPlayedDate' in item['UserData'])):
                                         itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,item['UserData']['LastPlayedDate'],cfg.max_age_audiobook,max_cut_off_date_audiobook)
+                                    elif (cfg.max_age_audiobook >= 0):
+                                        itemIsPlayed=get_playedStatus(cfg.played_age_audiobook,item['UserData']['PlayCount'],cut_off_date_audiobook,'9999-12-31T23:59:59.9999999Z',cfg.max_age_audiobook,max_cut_off_date_audiobook)
                                     else:
                                         itemIsPlayed=False
 
