@@ -14,25 +14,41 @@ def get_default_config_values(config_value):
         #'example_string_config':'abc'
         #'example_boolean_config':True
 
-        'movie_condition':'played',
-        'episode_condition':'played',
-        'audio_condition':'played',
-        'audiobook_condition':'played',
+        'movie_played_days':-1,
+        'movie_created_days':-1,
+        
+        'episode_played_days':-1,
+        'episode_created_days':-1,
+        
+        'audio_played_days':-1,
+        'audio_created_days':-1,
+        
+        'audiobook_played_days':-1,
+        'audiobook_created_days':-1,
 
-        'movie_condition_days':-1,
-        'episode_condition_days':-1,
-        'audio_condition_days':-1,
-        'audiobook_condition_days':-1,
+        'movie_played_count_comparison':'>=',
+        'movie_created_played_count_comparison':'>=',
+        
+        'episode_played_count_comparison':'>=',
+        'episode_created_played_count_comparison':'>=',
+        
+        'audio_played_count_comparison':'>=',
+        'audio_created_played_count_comparison':'>=',
+        
+        'audiobook_played_count_comparison':'>=',
+        'audiobook_created_played_count_comparison':'>=',
 
-        'movie_play_count_comparison':'>=',
-        'episode_play_count_comparison':'>=',
-        'audio_play_count_comparison':'>=',
-        'audiobook_play_count_comparison':'>=',
-
-        'movie_play_count':1,
-        'episode_play_count':1,
-        'audio_play_count':1,
-        'audiobook_play_count':1,
+        'movie_played_count':1,
+        'movie_created_played_count':1,
+        
+        'episode_played_count':1,
+        'episode_created_played_count':1,
+        
+        'audio_played_count':1,
+        'audio_created_played_count':1,
+        
+        'audiobook_played_count':1,
+        'audiobook_created_played_count':1,
 
         'multiuser_play_count_movie':0,
         'multiuser_play_count_episode':0,
