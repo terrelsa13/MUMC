@@ -23,6 +23,11 @@ def get_script_version():
     return(Version)
 
 
+configFileName='mumc_config.py'
+DEBUGFileName='mumc_DEBUG.log'
+
+
+
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
     ezjson = json.dumps(rawjson, sort_keys=False, indent=4)
@@ -41,10 +46,10 @@ def does_index_exist(item, indexvalue):
         exists = item[indexvalue]
     except IndexError:
         if (cfg.DEBUG):
-            print(str(indexvalue) + 'does not exist in item')
+            print(str(indexvalue) + ' does not exist in item')
         return(False)
     if (cfg.DEBUG):
-        print(str(indexvalue) + 'does exist in item')
+        print(str(indexvalue) + ' does exist in item')
     return(True)
 
 
@@ -53,8 +58,10 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
 
     if (debugBool):
         #DEBUG
-        print(reqeustDebugMessage + ' - url request')
-        print(url)
+        print("\n" + reqeustDebugMessage + ' - url request:')
+        save_file("\n" + reqeustDebugMessage + ' - url request:',DEBUGFileName,"a")
+        print(url + "\n")
+        save_file(url + "\n",DEBUGFileName,"a")
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
@@ -75,34 +82,43 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                         getdata = False
                         if (debugBool):
                             #DEBUG
-                            print(reqeustDebugMessage + ' - data')
-                            print2json(data)
+                            print("\n" + reqeustDebugMessage + ' - data:')
+                            save_file("\n" + reqeustDebugMessage + ' - data:',DEBUGFileName,"a")
+                            print2json(data + "\n")
+                            save_file(data + "\n",DEBUGFileName,"a")
                         #return(data)
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
-                            print('\n' + str(err))
-                            raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
+                            print("\n" + str(err))
+                            save_file("\n" + str(err),DEBUGFileName,"a")
+                            save_file("\nAUTH_ERROR: User Not Authorized To Access Library",DEBUGFileName,"a")
+                            raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library")
                         else:
                             time.sleep(delay)
                             #delay value doubles each time the same API request is resent
                             delay += delay
                             if (delay >= (2**retryAttempts)):
-                                print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + reqeustDebugMessage + '\" lookup.')
+                                print("An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
+                                save_file("\n" + "An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",DEBUGFileName,"a")
                                 return(err)
                 else:
                     getdata = False
-                    print('An error occurred while attempting to retrieve data from the API.')
+                    print("An error occurred while attempting to retrieve data from the API.")
+                    save_file("\n" + "An error occurred while attempting to retrieve data from the API.",DEBUGFileName,"a")
                     return('Attempt to get data at: ' + reqeustDebugMessage + '. Server responded with code: ' + str(response.getcode()))
         except Exception as err:
             if (err.msg == 'Unauthorized'):
-                print('\n' + str(err))
-                raise RuntimeError('\nAUTH_ERROR: User Not Authorized To Access Library')
+                print("\n" + str(err))
+                save_file("\n" + str(err),DEBUGFileName,"a")
+                save_file("\nAUTH_ERROR: User Not Authorized To Access Library",DEBUGFileName,"a")
+                raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library")
             else:
                 time.sleep(delay)
                 #delay value doubles each time the same API request is resent
                 delay += delay
                 if (delay >= (2**retryAttempts)):
-                    print('An error occured, a maximum of ' + str(retryAttempts) + ' attempts met, and no data retrieved from the \"' + reqeustDebugMessage + '\" lookup.')
+                    print("An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
+                    save_file("An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",DEBUGFileName,"a")
                     return(err)
     return(data)
 
@@ -124,12 +140,10 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
 
     if (cfg.DEBUG):
         #DEBUG
-        print(APIDebugMsg + ' - API query handler')
-        print(url)
-        print('Starting at record index ' + str(StartIndex))
-        print('Asking for ' + str(QueryLimit) + ' records')
-        print('Total records for this query is ' + str(TotalItems))
-        print('There are records remaining: ' + str(QueryItemsRemaining))
+        print_byType("\nStarting at record index: " + str(StartIndex),True)
+        print_byType("Asking for " + str(QueryLimit) + " records",True)
+        print_byType("Total records for this query is: " + str(TotalItems),True)
+        print_byType("There are " + str(QueryItemsRemaining) + " records remaining",True)
 
     return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
 
@@ -1035,8 +1049,24 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     return(userId_bllib_dict, userId_wllib_dict)
 
 
+#Save file to the directory this script is running from
+def save_file(dataInput,fileName,fileCreateType):
+    #Create file next to the script even when cwd (Current Working Directory) is not the same
+    cwd = os.getcwd()
+    script_dir = os.path.dirname(__file__)
+    if (script_dir == ''):
+        #script was likely run from the cwd
+        #set script_dir to cwd (aka this directory) to prevent error when attempting to change to '' (aka a blank directory)
+        script_dir=cwd
+    os.chdir(script_dir)
+    f = open(fileName, fileCreateType)
+    f.write(dataInput)
+    f.close()
+    os.chdir(cwd)
+
+'''
 #Save the config file to the directory this script is running from
-def save_config_file(config_file):
+def save_file(config_file):
     #Create config file next to the script even when cwd (Current Working Directory) is not the same
     cwd = os.getcwd()
     script_dir = os.path.dirname(__file__)
@@ -1049,7 +1079,7 @@ def save_config_file(config_file):
     f.write(config_file)
     f.close()
     os.chdir(cwd)
-
+'''
 
 #get user input needed to build or edit the mumc_config.py file
 def build_configuration_file(cfg,updateConfig):
@@ -1753,7 +1783,8 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "DEBUG=" + str(cfg.DEBUG) + "\n"
 
     #Save the config file to the directory this script is running from
-    save_config_file(config_file)
+    #save_file(config_file)
+    save_file(config_file,configFileName,"w")
 
     #Check config edditing wasn't requested
     if not (updateConfig):
@@ -1959,6 +1990,9 @@ def get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
         #Play count comparison unknown
         isPlayed_Filter_Value=''
 
+    if (cfg.DEBUG):
+        save_file("IsPlayed IsCreated Filter Value:" + isPlayed_Filter_Value,DEBUGFileName,"a")
+
     return isPlayed_Filter_Value
 
 
@@ -1989,6 +2023,7 @@ def get_isPlayedCreated_FilterValue(isPlayed_Filter_Value,isCreated_Filter_Value
 def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count,APIDebugMsg,played_days,created_days):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
+    DEBUG=cfg.DEBUG
     child_list=[]
     StartIndex=0
 
@@ -2042,6 +2077,8 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                         children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit=0
                         QueriesRemaining=False
+                        if (DEBUG):
+                            save_file("No " + APIDebugMsg + " media items found",DEBUGFileName,"a")
 
                     #Loop thru the returned child items
                     for child_item in children_data['Items']:
@@ -2062,7 +2099,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                             child_list.append(child_item)
                             user_processed_itemsId.add(child_item['Id'])
 
-                            if (cfg.DEBUG):
+                            if (DEBUG):
                                 #DEBUG
                                 print('Child item with Id: ' + str(child_item['Id']) + 'marked as favorite')
 
@@ -2074,6 +2111,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
 def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count,tag_Type,played_days,created_days):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
+    DEBUG=cfg.DEBUG
     #parent_tag=[]
     child_list=[]
     child_list_Id=[]
@@ -2134,6 +2172,8 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                             children_data={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                             QueryLimit=0
                             QueriesRemaining=False
+                            if (DEBUG):
+                                save_file("No " + APIDebugMsg + " media items found",DEBUGFileName,"a")
 
                         #Loop thru the returned child items
                         for child_item in children_data['Items']:
@@ -2177,7 +2217,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                                 child_list.append(child_item)
                                 user_processed_itemsId.add(child_item['Id'])
 
-                                if (cfg.DEBUG):
+                                if (DEBUG):
                                     #DEBUG
                                     print('Child item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName))
 
@@ -3698,6 +3738,8 @@ def prepare_AUDIOBOOKoutput(item):
 def print_byType(string_to_print,ok_to_print):
     if (ok_to_print):
         print(string_to_print)
+    if (cfg.DEBUG):
+        save_file(string_to_print,DEBUGFileName,"a")
 
 
 # get played, favorited, and tagged media items
@@ -3925,10 +3967,14 @@ def get_media_items():
     if (bluser_keys_json_verify == wluser_keys_json_verify):
         user_keys_json = bluser_keys_json_verify
     else:
+        if (DEBUG):
+            save_file('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',DEBUGFileName,"a")
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     #verify userNames are in same order for both blacklist and whitelist libraries
     if (not (bluser_names_json_verify == wluser_names_json_verify)):
+        if (DEBUG):
+            save_file('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',DEBUGFileName,"a")
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     for user_key in user_keys_json:
@@ -3970,7 +4016,7 @@ def get_media_items():
 
         if (DEBUG):
             #DEBUG
-            print(url)
+            print_byType(url,True)
 
         user_data=requestURL(url, DEBUG, 'current_user', api_query_attempts)
 
@@ -4174,6 +4220,8 @@ def get_media_items():
                         data_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Blacklist=0
                         QueriesRemaining_Blacklist=False
+                        if (DEBUG):
+                            save_file("No watched media items are blacklisted",DEBUGFileName,"a")
 
                     if not (LibraryID_BlkLst == ''):
                         #Built query for Favorited from Blacklist media items
@@ -4190,6 +4238,8 @@ def get_media_items():
                         data_Favorited_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Blacklist=0
                         QueriesRemaining_Favorited_From_Blacklist=False
+                        if (DEBUG):
+                            save_file("No favorited media items are blacklisted",DEBUGFileName,"a")
 
                     if not (LibraryID_WhtLst == ''):
                         #Built query for Favorited From Whitelist media items
@@ -4206,6 +4256,8 @@ def get_media_items():
                         data_Favorited_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_Favorited_From_Whitelist=0
                         QueriesRemaining_Favorited_From_Whitelist=False
+                        if (DEBUG):
+                            save_file("No favorited media items are whitelisted",DEBUGFileName,"a")
 
                     #Check if blacktag or blacklist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4221,6 +4273,8 @@ def get_media_items():
                         data_Blacktagged_From_BlackList={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_BlackTagged_From_BlackList=0
                         QueriesRemaining_BlackTagged_From_BlackList=False
+                        if (DEBUG):
+                            save_file("No blacktagged media items are blacklisted",DEBUGFileName,"a")
 
                     #Check if blacktag or whitelist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4236,6 +4290,8 @@ def get_media_items():
                         data_Blacktagged_From_WhiteList={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_BlackTagged_From_WhiteList=0
                         QueriesRemaining_BlackTagged_From_WhiteList=False
+                        if (DEBUG):
+                            save_file("No blacktagged media items are whitelisted",DEBUGFileName,"a")
 
                     #Check if whitetag or blacklist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4251,6 +4307,8 @@ def get_media_items():
                         data_Whitetagged_From_Blacklist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_WhiteTagged_From_Blacklist=0
                         QueriesRemaining_WhiteTagged_From_Blacklist=False
+                        if (DEBUG):
+                            save_file("No whitetagged media items are blacklisted",DEBUGFileName,"a")
 
                     #Check if whitetag or whitelist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4266,6 +4324,8 @@ def get_media_items():
                         data_Whitetagged_From_Whitelist={'Items':[],'TotalRecordCount':0,'StartIndex':0}
                         QueryLimit_WhiteTagged_From_Whitelist=0
                         QueriesRemaining_WhiteTagged_From_Whitelist=False
+                        if (DEBUG):
+                            save_file("No whitetagged media items are whitelisted",DEBUGFileName,"a")
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
@@ -4331,15 +4391,23 @@ def get_media_items():
                             #Check if item was already processed for this user
                             if not (item['Id'] in user_processed_itemsId):
 
+                                if (DEBUG):
+                                    save_file("Inspecting Media Item: " + str(item['Id']),DEBUGFileName,"a")
+
                                 media_found=True
 
                                 itemIsMonitored=False
                                 if (item['Type'] == 'Movie'):
                                     for mediasource in item['MediaSources']:
                                         itemIsMonitored=get_isItemMonitored(mediasource)
+                                    if (DEBUG):
+                                        save_file("Inspecting Movie Item: " + str(item['Id']),DEBUGFileName,"a")
 
                                 #find media item is ready to delete
                                 if (itemIsMonitored):
+
+                                    if (DEBUG):
+                                        save_file("Processing Movie Item: " + str(item['Id']),DEBUGFileName,"a")
 
                                     #establish played cutoff date for media item
                                     if ((movie_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -6331,12 +6399,16 @@ def cfgCheck():
         server_brand='invalid'
     error_found_in_mumc_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
+    if (cfg.DEBUG):
+        save_file("server_brand='" + server_brand + "'",DEBUGFileName,"a")
 
 #######################################################################################################
 
     if hasattr(cfg, 'user_keys'):
         check=cfg.user_keys
         check_list=json.loads(check)
+        if (cfg.DEBUG):
+            save_file("user_keys='" + check_list + "'",DEBUGFileName,"a")
         check_user_keys_length=len(check_list)
         username_check_list=[]
         userid_check_list=[]
@@ -6357,6 +6429,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'movie_played_days'):
         check=cfg.movie_played_days
+        if (cfg.DEBUG):
+            save_file("movie_played_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6368,6 +6442,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'episode_played_days'):
         check=cfg.episode_played_days
+        if (cfg.DEBUG):
+            save_file("episode_played_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6379,6 +6455,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'audio_played_days'):
         check=cfg.audio_played_days
+        if (cfg.DEBUG):
+            save_file("audio_played_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6391,6 +6469,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_played_days'):
             check=cfg.audiobook_played_days
+            if (cfg.DEBUG):
+                save_file("audiobook_played_days='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
@@ -6404,6 +6484,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'movie_created_days'):
         check=cfg.movie_created_days
+        if (cfg.DEBUG):
+            save_file("movie_created_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6415,6 +6497,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'episode_created_days'):
         check=cfg.episode_created_days
+        if (cfg.DEBUG):
+            save_file("episode_created_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6426,6 +6510,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'audio_created_days'):
         check=cfg.audio_created_days
+        if (cfg.DEBUG):
+            save_file("audio_created_days='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6438,6 +6524,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_days'):
             check=cfg.audiobook_created_days
+            if (cfg.DEBUG):
+                save_file("audiobook_created_days='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
@@ -6451,6 +6539,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'movie_played_count_comparison'):
         check=cfg.movie_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("movie_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6466,6 +6556,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'episode_played_count_comparison'):
         check=cfg.episode_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("episode_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6481,6 +6573,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'audio_played_count_comparison'):
         check=cfg.audio_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("audio_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6497,6 +6591,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_played_count_comparison'):
             check=cfg.audiobook_played_count_comparison
+            if (cfg.DEBUG):
+                save_file("audiobook_played_count_comparison='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -6514,6 +6610,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'movie_created_played_count_comparison'):
         check=cfg.movie_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("movie_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6529,6 +6627,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'episode_created_played_count_comparison'):
         check=cfg.episode_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("episode_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6544,6 +6644,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'audio_created_played_count_comparison'):
         check=cfg.audio_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("audio_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6560,6 +6662,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_played_count_comparison'):
             check=cfg.audiobook_created_played_count_comparison
+            if (cfg.DEBUG):
+                save_file("audiobook_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -6577,6 +6681,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'movie_created_played_count_comparison'):
         check=cfg.movie_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("movie_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6592,6 +6698,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'episode_created_played_count_comparison'):
         check=cfg.episode_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("episode_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6607,6 +6715,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'audio_created_played_count_comparison'):
         check=cfg.audio_created_played_count_comparison
+        if (cfg.DEBUG):
+            save_file("audio_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6623,6 +6733,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_played_count_comparison'):
             check=cfg.audiobook_created_played_count_comparison
+            if (cfg.DEBUG):
+                save_file("audiobook_created_played_count_comparison='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -6640,6 +6752,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_play_count_movie'):
         check=cfg.multiuser_play_count_movie
+        if (cfg.DEBUG):
+            save_file("multiuser_play_count_movie='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6651,6 +6765,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_play_count_episode'):
         check=cfg.multiuser_play_count_episode
+        if (cfg.DEBUG):
+            save_file("multiuser_play_count_episode='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6662,6 +6778,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_play_count_audio'):
         check=cfg.multiuser_play_count_audio
+        if (cfg.DEBUG):
+            save_file("multiuser_play_count_audio='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6674,6 +6792,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_play_count_audiobook'):
             check=cfg.multiuser_play_count_audiobook
+            if (cfg.DEBUG):
+                save_file("multiuser_play_count_audiobook='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -6687,6 +6807,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_movie'):
         check=cfg.keep_favorites_movie
+        if (cfg.DEBUG):
+            save_file("keep_favorites_movie='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6698,6 +6820,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_episode'):
         check=cfg.keep_favorites_episode
+        if (cfg.DEBUG):
+            save_file("keep_favorites_episode='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6709,6 +6833,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_audio'):
         check=cfg.keep_favorites_audio
+        if (cfg.DEBUG):
+            save_file("keep_favorites_audio='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6721,6 +6847,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'keep_favorites_audiobook'):
             check=cfg.keep_favorites_audiobook
+            if (cfg.DEBUG):
+                save_file("keep_favorites_audiobook='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -6734,6 +6862,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_whitelist_movie'):
         check=cfg.multiuser_whitelist_movie
+        if (cfg.DEBUG):
+            save_file("multiuser_whitelist_movie='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6745,6 +6875,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_whitelist_episode'):
         check=cfg.multiuser_whitelist_episode
+        if (cfg.DEBUG):
+            save_file("multiuser_whitelist_episode='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6756,6 +6888,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'multiuser_whitelist_audio'):
         check=cfg.multiuser_whitelist_audio
+        if (cfg.DEBUG):
+            save_file("multiuser_whitelist_audio='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6768,6 +6902,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_whitelist_audiobook'):
             check=cfg.multiuser_whitelist_audiobook
+            if (cfg.DEBUG):
+                save_file("multiuser_whitelist_audiobook='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -6781,6 +6917,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'blacktag'):
         check=cfg.blacktag
+        if (cfg.DEBUG):
+            save_file("blacktag='" + check + "'",DEBUGFileName,"a")
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
@@ -6793,6 +6931,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'delete_blacktagged_movie'):
         check=cfg.delete_blacktagged_movie
+        if (cfg.DEBUG):
+            save_file("delete_blacktagged_movie='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6804,6 +6944,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'delete_blacktagged_episode'):
         check=cfg.delete_blacktagged_episode
+        if (cfg.DEBUG):
+            save_file("delete_blacktagged_episode='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6815,6 +6957,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'delete_blacktagged_audio'):
         check=cfg.delete_blacktagged_audio
+        if (cfg.DEBUG):
+            save_file("delete_blacktagged_audio='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6827,6 +6971,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'delete_blacktagged_audiobook'):
             check=cfg.delete_blacktagged_audiobook
+            if (cfg.DEBUG):
+                save_file("delete_blacktagged_audiobook='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -6840,6 +6986,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'whitetag'):
         check=cfg.whitetag
+        if (cfg.DEBUG):
+            save_file("whitetag='" + check + "'",DEBUGFileName,"a")
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
@@ -6852,6 +7000,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'minimum_number_episodes'):
         check=cfg.minimum_number_episodes
+        if (cfg.DEBUG):
+            save_file("minimum_number_episodes='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6863,6 +7013,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'minimum_number_played_episodes'):
         check=cfg.minimum_number_played_episodes
+        if (cfg.DEBUG):
+            save_file("minimum_number_played_episodes='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6874,6 +7026,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'minimum_number_episodes_behavior'):
         check=cfg.minimum_number_episodes_behavior
+        if (cfg.DEBUG):
+            save_file("minimum_number_episodes_behavior='" + check + "'",DEBUGFileName,"a")
         check=check.casefold()
         usersname_usersid_match=False
         for usersname in username_check_list:
@@ -6916,6 +7070,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'REMOVE_FILES'):
         check=cfg.REMOVE_FILES
+        if (cfg.DEBUG):
+            save_file("REMOVE_FILES='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             
@@ -6930,6 +7086,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_movie_genre'):
         check=cfg.keep_favorites_advanced_movie_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_movie_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6941,6 +7099,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_movie_library_genre'):
         check=cfg.keep_favorites_advanced_movie_library_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_movie_library_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6954,6 +7114,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_episode_genre'):
         check=cfg.keep_favorites_advanced_episode_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_episode_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6965,6 +7127,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_season_genre'):
         check=cfg.keep_favorites_advanced_season_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_season_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6976,6 +7140,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_series_genre'):
         check=cfg.keep_favorites_advanced_series_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_series_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6987,6 +7153,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_library_genre'):
         check=cfg.keep_favorites_advanced_tv_library_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_tv_library_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -6998,6 +7166,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network'):
         check=cfg.keep_favorites_advanced_tv_studio_network
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_tv_studio_network='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7009,6 +7179,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network_genre'):
         check=cfg.keep_favorites_advanced_tv_studio_network_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_tv_studio_network_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7022,6 +7194,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_track_genre'):
         check=cfg.keep_favorites_advanced_track_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_track_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7033,6 +7207,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_album_genre'):
         check=cfg.keep_favorites_advanced_album_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_album_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7044,6 +7220,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_music_library_genre'):
         check=cfg.keep_favorites_advanced_music_library_genre
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_music_library_genre='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7055,6 +7233,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_track_artist'):
         check=cfg.keep_favorites_advanced_track_artist
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_track_artist='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7066,6 +7246,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'keep_favorites_advanced_album_artist'):
         check=cfg.keep_favorites_advanced_album_artist
+        if (cfg.DEBUG):
+            save_file("keep_favorites_advanced_album_artist='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7080,6 +7262,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_track_genre
+                if (cfg.DEBUG):
+                    save_file("keep_favorites_advanced_audio_book_track_genre='" + check + "'",DEBUGFileName,"a")
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7091,6 +7275,8 @@ def cfgCheck():
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_genre
+                if (cfg.DEBUG):
+                    save_file("keep_favorites_advanced_audio_book_track_genre='" + check + "'",DEBUGFileName,"a")
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7102,6 +7288,8 @@ def cfgCheck():
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_library_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_library_genre
+                if (cfg.DEBUG):
+                    save_file("keep_favorites_advanced_audio_book_library_genre='" + check + "'",DEBUGFileName,"a")
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7113,6 +7301,8 @@ def cfgCheck():
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
+                if (cfg.DEBUG):
+                    save_file("keep_favorites_advanced_audio_book_track_author='" + check + "'",DEBUGFileName,"a")
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7124,6 +7314,8 @@ def cfgCheck():
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_author'):
                 check=cfg.keep_favorites_advanced_audio_book_author
+                if (cfg.DEBUG):
+                    save_file("keep_favorites_advanced_audio_book_author='" + check + "'",DEBUGFileName,"a")
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7137,6 +7329,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_script_header'):
         check=cfg.print_script_header
+        if (cfg.DEBUG):
+            save_file("print_script_header='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7148,6 +7342,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
+        if (cfg.DEBUG):
+            save_file("print_warnings='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7159,6 +7355,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
+        if (cfg.DEBUG):
+            save_file("print_user_header='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7170,6 +7368,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
+        if (cfg.DEBUG):
+            save_file("print_movie_delete_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7181,6 +7381,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
+        if (cfg.DEBUG):
+            save_file("print_movie_keep_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7192,6 +7394,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_movie_error_info'):
         check=cfg.print_movie_error_info
+        if (cfg.DEBUG):
+            save_file("print_movie_error_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7203,6 +7407,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
+        if (cfg.DEBUG):
+            save_file("print_episode_delete_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7214,6 +7420,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
+        if (cfg.DEBUG):
+            save_file("print_episode_keep_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7225,6 +7433,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_episode_error_info'):
         check=cfg.print_episode_error_info
+        if (cfg.DEBUG):
+            save_file("print_episode_error_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7236,6 +7446,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
+        if (cfg.DEBUG):
+            save_file("print_audio_delete_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7247,6 +7459,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
+        if (cfg.DEBUG):
+            save_file("print_audio_keep_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7258,6 +7472,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_audio_error_info'):
         check=cfg.print_audio_error_info
+        if (cfg.DEBUG):
+            save_file("print_audio_error_info='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7270,6 +7486,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_delete_info'):
             check=cfg.print_audiobook_delete_info
+            if (cfg.DEBUG):
+                save_file("print_audiobook_delete_info='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7281,6 +7499,8 @@ def cfgCheck():
 
         if hasattr(cfg, 'print_audiobook_keep_info'):
             check=cfg.print_audiobook_keep_info
+            if (cfg.DEBUG):
+                save_file("print_audiobook_keep_info='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7292,6 +7512,8 @@ def cfgCheck():
 
         if hasattr(cfg, 'print_audiobook_error_info'):
             check=cfg.print_audiobook_error_info
+            if (cfg.DEBUG):
+                save_file("print_audiobook_error_info='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7303,6 +7525,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
+        if (cfg.DEBUG):
+            save_file("print_summary_header='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7314,6 +7538,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
+        if (cfg.DEBUG):
+            save_file("print_movie_summary='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7325,6 +7551,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
+        if (cfg.DEBUG):
+            save_file("print_episode_summary='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7336,6 +7564,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
+        if (cfg.DEBUG):
+            save_file("print_audio_summary='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7348,6 +7578,8 @@ def cfgCheck():
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_summary'):
             check=cfg.print_audiobook_summary
+            if (cfg.DEBUG):
+                save_file("print_audiobook_summary='" + check + "'",DEBUGFileName,"a")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7361,6 +7593,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
+        if (cfg.DEBUG):
+            save_file("UPDATE_CONFIG='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7374,6 +7608,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
+        if (cfg.DEBUG):
+            save_file("server_brand='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             ((check == 'emby') or
@@ -7387,6 +7623,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'server_url'):
         check=cfg.server_url
+        if (cfg.DEBUG):
+            save_file("server_url='" + check + "'",DEBUGFileName,"a")
         if (
             not (type(check) is str)
         ):
@@ -7396,6 +7634,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
+        if (cfg.DEBUG):
+            save_file("auth_key='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is str) and
             (len(check) == 32) and
@@ -7409,6 +7649,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'library_setup_behavior'):
         check=cfg.library_setup_behavior
+        if (cfg.DEBUG):
+            save_file("library_setup_behavior='" + check + "'",DEBUGFileName,"a")
         if (
             not (type(check) is str) and
             ((check == 'blacklist') or (check == 'whitelist'))
@@ -7421,6 +7663,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'library_matching_behavior'):
         check=cfg.library_matching_behavior
+        if (cfg.DEBUG):
+            save_file("library_matching_behavior='" + check + "'",DEBUGFileName,"a")
         if (
             not (type(check) is str) and
             ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
@@ -7434,6 +7678,8 @@ def cfgCheck():
     if hasattr(cfg, 'user_bl_libs'):
         check=cfg.user_bl_libs
         check_list=json.loads(check)
+        if (cfg.DEBUG):
+            save_file("user_bl_libs='" + check_list + "'",DEBUGFileName,"a")
         check_user_bllibs_length=len(check_list)
         #Check number of users matches the number of blacklist entries
         if not (check_user_bllibs_length == check_user_keys_length):
@@ -7446,6 +7692,8 @@ def cfgCheck():
     if hasattr(cfg, 'user_wl_libs'):
         check=cfg.user_wl_libs
         check_list=json.loads(check)
+        if (cfg.DEBUG):
+            save_file("user_wl_libs='" + check_list + "'",DEBUGFileName,"a")
         check_user_wllibs_length=len(check_list)
         #Check number of users matches the number of whitelist entries
         if not (check_user_wllibs_length == check_user_keys_length):
@@ -7457,6 +7705,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'api_query_attempts'):
         check=cfg.api_query_attempts
+        if (cfg.DEBUG):
+            save_file("api_query_attempts='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7470,6 +7720,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'api_query_item_limit'):
         check=cfg.api_query_item_limit
+        if (cfg.DEBUG):
+            save_file("api_query_item_limit='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is int) and
             (check >= 1) and
@@ -7483,6 +7735,8 @@ def cfgCheck():
 
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
+        if (cfg.DEBUG):
+            save_file("DEBUG='" + check + "'",DEBUGFileName,"a")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7496,6 +7750,8 @@ def cfgCheck():
 
     #Bring all errors found to users attention
     if not (error_found_in_mumc_config_py == ''):
+        if (cfg.DEBUG):
+            save_file("\n" + error_found_in_mumc_config_py,DEBUGFileName,"a")
         raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
 #######################################################################################################
@@ -7513,10 +7769,7 @@ try:
     check=cfg.DEBUG
     #removing DEBUG from mumc_config.py file will allow the configuration to be reset
 
-    if (hasattr(cfg,'print_script_header')):
-        print_script_header=cfg.print_script_header
-    else:
-        print_script_header=True
+    print_script_header=cfg.print_script_header
     print_byType('-----------------------------------------------------------',print_script_header)
     print_byType('\n',print_script_header)
 
