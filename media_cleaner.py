@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.8'
+    Version='2.1.9'
 
     return(Version)
 
@@ -1400,29 +1400,29 @@ def generate_edit_config(cfg,updateConfig):
             config_file += "print_audiobook_summary=" + str(get_default_config_values('print_audiobook_summary')) + "\n"
     elif (updateConfig):
         config_file += "print_script_header=" + str(cfg.print_script_header) + "\n"
-        config_file += "print_warnings" + str(cfg.print_warnings) + "\n"
-        config_file += "print_user_header" + str(cfg.print_user_header) + "\n"
-        config_file += "print_movie_delete_info" + str(cfg.print_movie_delete_info) + "\n"
-        config_file += "print_movie_keep_info" + str(cfg.print_movie_keep_info) + "\n"
-        config_file += "print_movie_error_info" + str(cfg.print_movie_error_info) + "\n"
-        config_file += "print_episode_delete_info" + str(cfg.print_episode_delete_info) + "\n"
-        config_file += "print_episode_keep_info" + str(cfg.print_episode_keep_info) + "\n"
-        config_file += "print_episode_error_info" + str(cfg.print_episode_error_info) + "\n"
-        config_file += "print_audio_delete_info" + str(cfg.print_audio_delete_info) + "\n"
-        config_file += "print_audio_keep_info" + str(cfg.print_audio_keep_info) + "\n"
-        config_file += "print_audio_error_info" + str(cfg.print_audio_error_info) + "\n"
+        config_file += "print_warnings=" + str(cfg.print_warnings) + "\n"
+        config_file += "print_user_header=" + str(cfg.print_user_header) + "\n"
+        config_file += "print_movie_delete_info=" + str(cfg.print_movie_delete_info) + "\n"
+        config_file += "print_movie_keep_info=" + str(cfg.print_movie_keep_info) + "\n"
+        config_file += "print_movie_error_info=" + str(cfg.print_movie_error_info) + "\n"
+        config_file += "print_episode_delete_info=" + str(cfg.print_episode_delete_info) + "\n"
+        config_file += "print_episode_keep_info=" + str(cfg.print_episode_keep_info) + "\n"
+        config_file += "print_episode_error_info=" + str(cfg.print_episode_error_info) + "\n"
+        config_file += "print_audio_delete_info=" + str(cfg.print_audio_delete_info) + "\n"
+        config_file += "print_audio_keep_info=" + str(cfg.print_audio_keep_info) + "\n"
+        config_file += "print_audio_error_info=" + str(cfg.print_audio_error_info) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_delete_info'))):
-            config_file += "print_audiobook_delete_info" + str(cfg.print_audiobook_delete_info) + "\n"
+            config_file += "print_audiobook_delete_info=" + str(cfg.print_audiobook_delete_info) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_keep_info'))):
-            config_file += "print_audiobook_keep_info" + str(cfg.print_audiobook_keep_info) + "\n"
+            config_file += "print_audiobook_keep_info=" + str(cfg.print_audiobook_keep_info) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_error_info'))):
-            config_file += "print_audiobook_error_info" + str(cfg.print_audiobook_error_info) + "\n"
-        config_file += "print_summary_header" + str(cfg.print_summary_header) + "\n"
-        config_file += "print_movie_summary" + str(cfg.print_movie_summary) + "\n"
-        config_file += "print_episode_summary" + str(cfg.print_episode_summary) + "\n"
-        config_file += "print_audio_summary" + str(cfg.print_audio_summary) + "\n"
+            config_file += "print_audiobook_error_info=" + str(cfg.print_audiobook_error_info) + "\n"
+        config_file += "print_summary_header=" + str(cfg.print_summary_header) + "\n"
+        config_file += "print_movie_summary=" + str(cfg.print_movie_summary) + "\n"
+        config_file += "print_episode_summary=" + str(cfg.print_episode_summary) + "\n"
+        config_file += "print_audio_summary=" + str(cfg.print_audio_summary) + "\n"
         if ((cfg.server_brand == 'jellyfin') and (hasattr(cfg, 'print_audiobook_summary'))):
-            config_file += "print_audiobook_summary" + str(cfg.print_audiobook_summary) + "\n"
+            config_file += "print_audiobook_summary=" + str(cfg.print_audiobook_summary) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
