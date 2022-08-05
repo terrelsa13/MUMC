@@ -74,7 +74,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                         data = json.loads(source)
                         getdata = False
                         if (debugBool):
-                            print_byType("\nData Returned From The " + str(reqeustDebugMessage) + " Request: ...If Data Not Show Below; It Is Commented Out To Keep The DEBUG Log A Reasonable Size",False)
+                            print_byType("\nData Returned From The " + str(reqeustDebugMessage) + " Request: ...If Data Not Shown Below; It Is Commented Out To Keep The DEBUG Log A Reasonable Size",False)
                             #print_byType("\n" + convert2json(data),False)
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
@@ -2362,7 +2362,7 @@ def get_isItemTagged(usertags,tagged_items,item):
                     print_byType('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),False)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nIs Media Item: " + str(item['Id']) + " Tagged: " + str(itemIsTagged),False)
+        print_byType("\nIs Media Item " + str(item['Id']) + " Tagged: " + str(itemIsTagged),False)
 
     #parenthesis intentionally omitted to return tagged_items as a set
     return itemIsTagged,tagged_items
@@ -6469,30 +6469,58 @@ def output_itemsToDelete(deleteItems):
     print_common_summary = (print_movie_summary or print_episode_summary or print_audio_summary or print_audiobook_summary)
 
     #List items to be deleted
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('-----------------------------------------------------------',print_summary_header)
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('Summary Of Deleted Media:',print_summary_header)
     if not bool(cfg.REMOVE_FILES):
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* Trial Run Mode',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* REMOVE_FILES=\'False\'',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* No Media Deleted',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* Items = ' + str(len(deleteItems)),print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('-----------------------------------------------------------',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* To delete media open mumc_config.py in a text editor:',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('*    Set REMOVE_FILES=\'True\'',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
     else:
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('* Items Deleted = ' + str(len(deleteItems)) + '    *',print_summary_header)
+        if (GLOBAL_DEBUG):
+            print_byType("\n",False)
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
 
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
+                if (GLOBAL_DEBUG):
+                    print_byType("\n",False)
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
                 #Print output for deleted media item
                 print_byType(item_output_details,print_movie_summary)
             elif item['Type'] == 'Episode':
+                if (GLOBAL_DEBUG):
+                    print_byType("\n",False)
                 try:
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
@@ -6504,27 +6532,43 @@ def output_itemsToDelete(deleteItems):
                 #Print output for deleted media item
                 print_byType(item_output_details,print_episode_summary)
             elif item['Type'] == 'Audio':
+                if (GLOBAL_DEBUG):
+                    print_byType("\n",False)
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
                 #Print output for deleted media item
                 print_byType(item_output_details,print_audio_summary)
             elif item['Type'] == 'AudioBook':
+                if (GLOBAL_DEBUG):
+                    print_byType("\n",False)
                 item_output_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
                 #Print output for deleted media item
                 print_byType(item_output_details,print_audiobook_summary)
             else: # item['Type'] == 'Unknown':
+                if (GLOBAL_DEBUG):
+                    print_byType("\nNot Able To Delete Unknown Media Type",False)
                 pass
     else:
         print_byType('[NO ITEMS TO DELETE]',print_common_summary)
 
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('-----------------------------------------------------------',print_common_summary)
     print_byType('\n',print_common_summary)
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('-----------------------------------------------------------',print_common_summary)
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('Done.',print_common_summary)
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('-----------------------------------------------------------',print_common_summary)
+    if (GLOBAL_DEBUG):
+        print_byType("\n",False)
     print_byType('',print_common_summary)
 
 
