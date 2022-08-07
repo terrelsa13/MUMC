@@ -11,14 +11,14 @@ import uuid
 import os
 from dateutil.parser import parse
 from collections import defaultdict
-from datetime import datetime,date,timedelta,timezone
+from datetime import datetime,timedelta,timezone
 from mumc_config_defaults import get_default_config_values
 
 
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.2-beta'
+    Version='3.1.3-beta'
 
     return(Version)
 
@@ -40,10 +40,10 @@ def does_index_exist(item, indexvalue):
     try:
         exists = item[indexvalue]
         if (GLOBAL_DEBUG):
-            print_byType("\n" + str(indexvalue) + " exist in " + str(item),False)
+            appendTo_DEBUG_log("\n" + str(indexvalue) + " exist in " + str(item))
     except IndexError:
         if (GLOBAL_DEBUG):
-            print_byType("\n" + str(indexvalue) + " does NOT exist in " + str(item),False)
+            appendTo_DEBUG_log("\n" + str(indexvalue) + " does NOT exist in " + str(item))
         return(False)
     return(True)
 
@@ -53,8 +53,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
 
     if (debugBool):
         #Double newline for better debug file readablilty
-        print_byType("\n\n" + reqeustDebugMessage + ' - url request:',False)
-        print_byType("\n" + url,False)
+        appendTo_DEBUG_log("\n\n" + reqeustDebugMessage + ' - url request:')
+        appendTo_DEBUG_log("\n" + url)
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
@@ -74,12 +74,12 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                         data = json.loads(source)
                         getdata = False
                         if (debugBool):
-                            print_byType("\nData Returned From The " + str(reqeustDebugMessage) + " Request: ...If Data Not Shown Below; It Is Commented Out To Keep The DEBUG Log A Reasonable Size",False)
-                            #print_byType("\n" + convert2json(data),False)
+                            appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request: ...If Data Not Shown Below; It Is Commented Out To Keep The DEBUG Log A Reasonable Size")
+                            #appendTo_DEBUG_log("\n" + convert2json(data))
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
                             print_byType("\n" + str(err),True)
-                            print_byType("\nAUTH_ERROR: User Not Authorized To Access Library",GLOBAL_debugFileName,True)
+                            print_byType("\nAUTH_ERROR: User Not Authorized To Access Library",True)
                             raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library")
                         else:
                             time.sleep(delay)
@@ -125,11 +125,11 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
         QueryItemsRemaining=True
 
     if (GLOBAL_DEBUG):
-        print_byType("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg),False)
-        print_byType("\nStarting at record index: " + str(StartIndex),False)
-        print_byType("\nAsking for " + str(QueryLimit) + " records",False)
-        print_byType("\nTotal records for this query is: " + str(TotalItems),False)
-        print_byType("\nAre there records remaining: " + str(QueryItemsRemaining),False)
+        appendTo_DEBUG_log("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg))
+        appendTo_DEBUG_log("\nStarting at record index: " + str(StartIndex))
+        appendTo_DEBUG_log("\nAsking for " + str(QueryLimit) + " records")
+        appendTo_DEBUG_log("\nTotal records for this query is: " + str(TotalItems))
+        appendTo_DEBUG_log("\nAre there records remaining: " + str(QueryItemsRemaining))
 
     return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
 
@@ -423,11 +423,11 @@ def user_lib_builder(json_lib_entry):
             if (keySlots == 'userid'):
                 built_userid.append(currentUser[keySlots])
                 if (GLOBAL_DEBUG):
-                    print_byType('\nBuilding library for user with Id: ' + currentUser[keySlots],False)
+                    appendTo_DEBUG_log('\nBuilding library for user with Id: ' + currentUser[keySlots])
             elif (keySlots == 'username'):
                 built_username.append(currentUser[keySlots])
                 if (GLOBAL_DEBUG):
-                    print_byType("\nBuilding library for user with name: '" + currentUser[keySlots] + "'",False)
+                    appendTo_DEBUG_log("\nBuilding library for user with name: '" + currentUser[keySlots] + "'")
             #Store library data
             else:
                 #loop thru each library data item for this library
@@ -442,7 +442,7 @@ def user_lib_builder(json_lib_entry):
                             else:
                                 libid_append=libid_append + ',\'\''
                         if (GLOBAL_DEBUG):
-                            print_byType('\nLibrary Id: ' + currentUser[keySlots][keySlotLibData],False)
+                            appendTo_DEBUG_log('\nLibrary Id: ' + currentUser[keySlots][keySlotLibData])
                     #Store collectionType
                     elif (keySlotLibData == 'collectiontype'):
                         if (collectiontype_append == ''):
@@ -453,7 +453,7 @@ def user_lib_builder(json_lib_entry):
                             else:
                                 collectiontype_append=collectiontype_append + ',\'\''
                         if (GLOBAL_DEBUG):
-                            print_byType("\nCollection Type: '" + currentUser[keySlots][keySlotLibData] + "'",False)
+                            appendTo_DEBUG_log("\nCollection Type: '" + currentUser[keySlots][keySlotLibData] + "'")
                     #Store path
                     elif (keySlotLibData == 'path'):
                         if (path_append == ''):
@@ -464,7 +464,7 @@ def user_lib_builder(json_lib_entry):
                             else:
                                 path_append=path_append + ',\'\''
                         if (GLOBAL_DEBUG):
-                            print_byType("\nPath: '" + currentUser[keySlots][keySlotLibData] + "'",False)
+                            appendTo_DEBUG_log("\nPath: '" + currentUser[keySlots][keySlotLibData] + "'")
                     #Store networkPath
                     elif (keySlotLibData == 'networkpath'):
                         if (networkpath_append == ''):
@@ -475,7 +475,7 @@ def user_lib_builder(json_lib_entry):
                             else:
                                 networkpath_append=networkpath_append + ',\'\''
                         if (GLOBAL_DEBUG):
-                            print_byType("\nNetwork Path: '" + currentUser[keySlots][keySlotLibData] + "'",False)
+                            appendTo_DEBUG_log("\nNetwork Path: '" + currentUser[keySlots][keySlotLibData] + "'")
         built_libid.insert(datapos,libid_append)
         built_collectiontype.insert(datapos,collectiontype_append)
         built_path.insert(datapos,path_append)
@@ -537,7 +537,7 @@ def parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,
     return libraryTemp_dict
 
 
-#Parse library Paths
+#Parse library Paths For Back Slash; Replace With Forward Slash
 def cleanup_library_paths(libPath_str):
     libPath_str=libPath_str.replace('\\','/')
     return(libPath_str)
@@ -549,43 +549,24 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
 
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
     req_folders=(server_url + '/Library/VirtualFolders?api_key=' + auth_key)
-    #Request for channels (i.e. livetv, trailers, etc...)
-    #req_channels=(server_url + '/Channels?api_key=' + auth_key)
 
     #preConfigDebug = True
     preConfigDebug = False
 
     #api calls
     data_folders = requestURL(req_folders, preConfigDebug, 'get_media_folders', 3)
-    #data_channels = requestURL(req_channels, preConfigDebug, 'get_media_channels', 3)['Items']
 
     #define empty dictionaries
     libraryTemp_dict=defaultdict(dict)
     library_dict=defaultdict(dict)
     not_library_dict=defaultdict(dict)
-    #define empty sets
-    #libraryPath_set=set()
     library_tracker=[]
     enabledFolderIds_set=set()
-    #delete_channels=[]
-
-    #remove all channels that are not 'Trailers'
-    #for channel in data_channels:
-        #if not (channel['SortName'] == 'Trailers'):
-            #delete_channels.append(channel)
-    #reverse so we delete from the bottom up
-    #delete_channels.reverse()
-    #for delchan in range(len(delete_channels)):
-        #data_channels.pop(delchan)
 
     #Check if this user has permission to access to all libraries or only specific libraries
     if not (user_policy['EnableAllFolders']):
         for okFolders in range(len(user_policy['EnabledFolders'])):
             enabledFolderIds_set.add(user_policy['EnabledFolders'][okFolders])
-    #Check if this user has permission to access to all channels or only specific channels
-    #if not (user_policy['EnableAllChannels']):
-        #for okChannels in range(len(user_policy['EnabledChannels'])):
-            #enabledFolderIds_set.add(user_policy['EnabledChannels'][okChannels])
 
     i=0
     #Populate all libraries into a "not chosen" data structure
@@ -609,19 +590,6 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
                 else:
                     not_library_dict[i]['networkpath']=''
                 i += 1
-
-    #Populate all channels into a "not chosen" data structure
-    # i.e. if blacklist chosen all channels start out as whitelisted
-    # i.e. if whitelist chosen all channels start out as blacklisted
-    #for libChannel in data_channels:
-        #if (('Id' in libChannel) and ('Type' in libChannel) and ((enabledFolderIds_set == set()) or (libChannel['Id'] in enabledFolderIds_set))):
-            #if not ('userid' in not_library_dict):
-                #not_library_dict['userid']=user_id
-            #not_library_dict[i]['libid']=libChannel['Id']
-            #not_library_dict[i]['collectiontype']=libChannel['Type']
-            #not_library_dict[i]['path']=''
-            #not_library_dict[i]['networkpath']=''
-            #i += 1
 
     #Go thru libaries this user has permissions to access and show them on the screen
     stop_loop=False
@@ -685,22 +653,6 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
                 if ((library_matching_behavior == 'byId') and (libInfoPrinted)):
                     libInfoPrinted=False
                     j += 1
-
-        #Go thru channels this user has permissions to access and show them on the screen
-        #for libChannel in data_channels:
-            #if (('Id' in libChannel) and ('Type' in libChannel) and ((enabledFolderIds_set == set()) or (libChannel['Id'] in enabledFolderIds_set))):
-                #if not (libChannel['Id'] in library_tracker):
-                    #print(str(j) + ' - ' + libChannel['Name'] + ' - ' + libChannel['Type'] + ' - LibId: ' + libChannel['Id'])
-                #else:
-                    #show blank entry
-                    #print(str(j) + ' - ' + libChannel['Name'] + ' - ' )
-                #if not ('userid' in libraryTemp_dict):
-                    #libraryTemp_dict['userid']=user_id
-                #libraryTemp_dict[j]['libid']=libChannel['Id']
-                #libraryTemp_dict[j]['collectiontype']=libChannel['Type']
-                #libraryTemp_dict[j]['path']=''
-                #libraryTemp_dict[j]['networkpath']=''
-            #j += 1
 
         print('')
 
@@ -872,10 +824,7 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     #define empty userId set
     userId_set=set()
     userId_ReRun_set=set()
-
     user_keys_json=''
-    #user_bl_libs_json=''
-    #user_wl_libs_json=''
 
     #Check if not running for the first time
     if (updateConfig):
@@ -1028,7 +977,8 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
     return(userId_bllib_dict, userId_wllib_dict)
 
 
-def change_working_directory(cwd):
+# Change to script's directory; pass in current directory
+def change_to_script_directory(cwd):
     #Determine script directory
     script_dir = os.path.dirname(__file__)
 
@@ -1040,15 +990,11 @@ def change_working_directory(cwd):
     #Change to script's directory
     os.chdir(script_dir)
 
-    return script_dir
 
-#Save file to the directory this script is running from
+#Save file to the directory this script is running from; even when the GLOBAL_CWD is not the same
 def save_file(dataInput,fileName,fileCreateType):
-    #Create file next to the script even when cwd (Current Working Directory) is not the same
-    #Get CWD
-    cwd = os.getcwd()
-    #Get script's directory
-    script_dir = change_working_directory(cwd)
+    #Change to the script's directory
+    change_to_script_directory(GLOBAL_CWD)
     #Open file in script's directory
     f = open(fileName, fileCreateType)
     #Write to file
@@ -1056,7 +1002,8 @@ def save_file(dataInput,fileName,fileCreateType):
     #Close file
     f.close()
     #Change back to original working directory
-    os.chdir(cwd)
+    os.chdir(GLOBAL_CWD)
+
 
 #get user input needed to build or edit the mumc_config.py file
 def build_configuration_file(cfg,updateConfig):
@@ -1218,17 +1165,17 @@ def build_configuration_file(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Play Count Inequality: Delete media items within this range based off of the chosen *_played_count.\n"
-    config_file += "#   > - Filter media items last played or created with a play count greater than *_played_count days ago\n"
-    config_file += "#   < - Filter media items last played or created with a play count less than *_played_count days ago\n"
-    config_file += "#   >= - Filter media items last played or created with a play count greater than or equal to *_played_count days ago\n"
-    config_file += "#   <= - Filter media items last played or created with a play count less than or equal to *_played_count days ago\n"
-    config_file += "#   == - Filter media items last played or created with a play count equal to *_played_count days ago\n"
-    config_file += "#   not > - Filter media items last played or created with a play count not greater than *_played_count days ago\n"
-    config_file += "#   not < - Filter media items last played or created with a play count not less than *_played_count days ago\n"
-    config_file += "#   not >= - Filter media items last played or created with a play count not greater than or equal to *_played_count days ago\n"
-    config_file += "#   not <= - Filter media items last played or created with a play count not less than or equal to *_played_count days ago\n"
-    config_file += "#   not == - Filter media items last played or created with a play count not equal to *_played_count days ago\n"
+    config_file += "# Played Count Inequality: Delete media items within this range based off of the chosen *_played_count.\n"
+    config_file += "#   > - Filter media items with a played count greater than *_played_count days ago\n"
+    config_file += "#   < - Filter media items with a played count less than *_played_count days ago\n"
+    config_file += "#   >= - Filter media items with a played count greater than or equal to *_played_count days ago\n"
+    config_file += "#   <= - Filter media items with a played count less than or equal to *_played_count days ago\n"
+    config_file += "#   == - Filter media items with a played count equal to *_played_count days ago\n"
+    config_file += "#   not > - Filter media items with a played count not greater than *_played_count days ago\n"
+    config_file += "#   not < - Filter media items with a played count not less than *_played_count days ago\n"
+    config_file += "#   not >= - Filter media items with a played count not greater than or equal to *_played_count days ago\n"
+    config_file += "#   not <= - Filter media items with a played count not less than or equal to *_played_count days ago\n"
+    config_file += "#   not == - Filter media items with a played count not equal to *_played_count days ago\n"
     config_file += "# (>= : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1260,7 +1207,7 @@ def build_configuration_file(cfg,updateConfig):
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# Play Count: Delete media items with a play count relative to this number.\n"
+    config_file += "# Played Count: Delete media items with a played count relative to this number.\n"
     config_file += "#   0-730500 - Number of times a media item has been played\n"
     config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -1743,7 +1690,10 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Must be a boolean True or False value\n"
     config_file += "# False - Debug messages disabled\n"
-    config_file += "# True - Debug messages enabled\n"
+    config_file += "# True - Debug file logging enabled\n"
+    config_file += "#         Debug log file save to: /the/script/directory/mumc_DEBUG.log\n"
+    config_file += "#         The debug log file will be large (i.e. 10s to 100s of MBytes)\n"
+    config_file += "#         Recommend only setting DEBUG=True when necessary\n"
     config_file += "# (False : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -1772,23 +1722,23 @@ def build_configuration_file(cfg,updateConfig):
                 (((server_brand == 'jellyfin') and (get_default_config_values('audiobook_created_days') == -1)) or (server_brand == 'emby'))
                 ):
                     print('\n\n-----------------------------------------------------------')
-                    print('Config file is not setup to find media.')
+                    print('* Config file is not setup to find media.')
                     print('-----------------------------------------------------------')
                     print('To find media open mumc_config.py in a text editor:')
-                    print('    Set \'movie_played_days\' or \'movie_created_days\' to zero or a positive number')
-                    print('    Set \'episode_played_days\' or \'episode_created_days\' to zero or a positive number')
-                    print('    Set \'audio_played_days\' or \'audio_crated_days\' to zero or a positive number')
+                    print('* Set \'movie_played_days\' or \'movie_created_days\' to zero or a positive number')
+                    print('* Set \'episode_played_days\' or \'episode_created_days\' to zero or a positive number')
+                    print('* Set \'audio_played_days\' or \'audio_crated_days\' to zero or a positive number')
                     if (server_brand == 'jellyfin'):
-                        print('    Set \'audiobook_played_days\' or \'audiobook_created_days\' to zero or a positive number')
+                        print('* Set \'audiobook_played_days\' or \'audiobook_created_days\' to zero or a positive number')
             if not (REMOVE_FILES):
                 print('-----------------------------------------------------------')
-                print('Config file is not setup to delete media.')
-                print('Config file is in dry run mode to prevent deleting media.')
+                print('* Config file is not setup to delete media.')
+                print('* Config file is in dry run mode to prevent deleting media.')
                 print('-----------------------------------------------------------')
                 print('To delete media open mumc_config.py in a text editor:')
-                print('    Set REMOVE_FILES=\'True\'')
+                print('* Set REMOVE_FILES=\'True\'')
             print('-----------------------------------------------------------')
-            print('Edit the mumc_config.py file and try running again.')
+            print('*Edit the mumc_config.py file and try running again.')
             print('-----------------------------------------------------------')
 
         #the exception
@@ -1838,15 +1788,15 @@ def get_days_since_played(date_last_played):
 
         if (GLOBAL_DEBUG):
             #Double newline for DEBUG log formatting
-            print_byType('\n\nCaptured UTC time is: ' + str(date_time_now),False)
-            print_byType('\nDate last played or date created is: ' + str(date_last_played),False)
-            print_byType('\nFormatted date last played or date created is: ' + str(date_time_last_played),False)
-            print_byType('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago',False)
+            appendTo_DEBUG_log('\n\nCaptured UTC time is: ' + str(date_time_now))
+            appendTo_DEBUG_log('\nDate last played or date created is: ' + str(date_last_played))
+            appendTo_DEBUG_log('\nFormatted date last played or date created is: ' + str(date_time_last_played))
+            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago')
     else:
         days_since_played=date_last_played
 
         if (GLOBAL_DEBUG):
-            print_byType('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago',False)
+            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago')
 
     return(days_since_played)
 
@@ -1885,11 +1835,11 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
     formatted_season_episode = 's' + season_num_str + '.e' + episode_num_str
 
     if (GLOBAL_DEBUG):
-        print_byType('\nSeason # is: ' + str(ParentIndexNumber),False)
-        print_byType('\nEpisode # is: ' + str(IndexNumber),False)
-        print_byType('\nPadded Season #: ' + season_num_str,False)
-        print_byType('\nPadded Episode #: ' + episode_num_str,False)
-        print_byType('\nFormatted season#.episode# is: ' + str(formatted_season_episode),False)
+        appendTo_DEBUG_log('\nSeason # is: ' + str(ParentIndexNumber))
+        appendTo_DEBUG_log('\nEpisode # is: ' + str(IndexNumber))
+        appendTo_DEBUG_log('\nPadded Season #: ' + season_num_str)
+        appendTo_DEBUG_log('\nPadded Episode #: ' + episode_num_str)
+        appendTo_DEBUG_log('\nFormatted season#.episode# is: ' + str(formatted_season_episode))
 
     return(formatted_season_episode)
 
@@ -1960,7 +1910,7 @@ def get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
         isPlayed_Filter_Value=''
 
     if (GLOBAL_DEBUG):
-        print_byType("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value,False)
+        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value)
 
     return isPlayed_Filter_Value
 
@@ -1970,19 +1920,31 @@ def get_isCreated_FilterValue(filter_created_played_count_comparison,filter_crea
     return get_isPlayed_FilterValue(filter_created_played_count_comparison,filter_created_played_count)
 
 
-def get_isPlayedCreated_FilterValue(isPlayed_Filter_Value,isCreated_Filter_Value):
+
+# Combine isPlayed value with isCreated-Played value
+def get_isPlayedCreated_FilterValue(played_days,created_days,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count):
+
+    if (played_days >= 0):
+        isPlayed_Filter_Value=get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
+    else:
+        isPlayed_Filter_Value='disabled'
+
+    if (created_days >= 0):
+        isCreated_Filter_Value=get_isCreated_FilterValue(filter_created_played_count_comparison,filter_created_played_count)
+    else:
+        isCreated_Filter_Value='disabled'
 
     if ((isPlayed_Filter_Value == 'False') and (isCreated_Filter_Value == 'False')):
         return isPlayed_Filter_Value
     elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'True')):
         return isPlayed_Filter_Value
-    elif ((isPlayed_Filter_Value == 'disable') and (isCreated_Filter_Value == 'False')):
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'False')):
         return 'False'
-    elif ((isPlayed_Filter_Value == 'disable') and (isCreated_Filter_Value == 'True')):
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'True')):
         return 'True'
-    elif ((isPlayed_Filter_Value == 'False') and (isCreated_Filter_Value == 'disable')):
+    elif ((isPlayed_Filter_Value == 'False') and (isCreated_Filter_Value == 'disabled')):
         return 'False'
-    elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'disable')):
+    elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'disabled')):
         return 'True'
     else:
         return ''
@@ -2019,15 +1981,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                if (played_days >= 0):
-                    IsPlayedState=get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
-                else:
-                    IsPlayedState='disable'
-                if (created_days >= 0):
-                    IsCreatedState=get_isCreated_FilterValue(filter_created_played_count_comparison,filter_created_played_count)
-                else:
-                    IsCreatedState='disable'
-                IsPlayedState=get_isPlayedCreated_FilterValue(IsPlayedState,IsCreatedState)
+                IsPlayedState=get_isPlayedCreated_FilterValue(played_days,created_days,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count)
 
                 while (QueriesRemaining):
 
@@ -2046,7 +2000,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                         QueryLimit=0
                         QueriesRemaining=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo " + APIDebugMsg + " media items found",False)
+                            appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found")
                             
 
                     #Loop thru the returned child items
@@ -2069,7 +2023,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                             user_processed_itemsId.add(child_item['Id'])
 
                             if (GLOBAL_DEBUG):
-                                print_byType('\nChild item with Id: ' + str(child_item['Id']) + 'marked as favorite',False)
+                                appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + 'marked as favorite')
 
     #Return dictionary of child items along with TotalRecordCount
     return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
@@ -2112,15 +2066,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    if (played_days >= 0):
-                        IsPlayedState=get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
-                    else:
-                        IsPlayedState='disable'
-                    if (created_days >= 0):
-                        IsCreatedState=get_isCreated_FilterValue(filter_created_played_count_comparison,filter_created_played_count)
-                    else:
-                        IsCreatedState='disable'
-                    IsPlayedState=get_isPlayedCreated_FilterValue(IsPlayedState,IsCreatedState)
+                    IsPlayedState=get_isPlayedCreated_FilterValue(played_days,created_days,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count)
 
                     while (QueriesRemaining):
 
@@ -2140,7 +2086,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                             QueryLimit=0
                             QueriesRemaining=False
                             if (GLOBAL_DEBUG):
-                                print_byType("\n\nNo " + APIDebugMsg + " media items found",False)
+                                appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found")
 
                         #Loop thru the returned child items
                         for child_item in children_data['Items']:
@@ -2185,7 +2131,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                                 user_processed_itemsId.add(child_item['Id'])
 
                                 if (GLOBAL_DEBUG):
-                                    print_byType('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),False)
+                                    appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName))
 
     #Return dictionary of child items along with TotalRecordCount
     return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
@@ -2220,7 +2166,7 @@ def get_isItemMonitored(mediasource):
         itemIsMonitored=False
 
     if (GLOBAL_DEBUG):
-        print_byType('\nMedia Item Is Monitored: ' + str(itemIsMonitored),False)
+        appendTo_DEBUG_log('\nMedia Item Is Monitored: ' + str(itemIsMonitored))
 
     return(itemIsMonitored)
 
@@ -2240,14 +2186,14 @@ def get_isItemMatching(item_one, item_two):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
 
     #determine if media Id matches one of the other Ids
     for single_item_one in item_one_split:
             for single_item_two in item_two_split:
                 if (GLOBAL_DEBUG):
-                    print_byType('\nComparing the below two items',False)
-                    print_byType('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',False)
+                    appendTo_DEBUG_log('\nComparing the below two items')
+                    appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'')
                 if ((not (single_item_one == '')) and (not (single_item_two == '')) and
                     (not (single_item_one == "''")) and (not (single_item_two == "''")) and
                     (not (single_item_one == '""')) and (not (single_item_two == '""'))):
@@ -2275,7 +2221,7 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     #Store media item's local and remote whitelist state
     #Get if media item is whitelisted
@@ -2291,8 +2237,8 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
-                    print_byType('\nItem is whitelisted for this user: ' + str(itemIsWhiteListed_Local),False)
-                    print_byType('\nMatching whitelisted value for this user is: ' + itemWhiteListedValue_Local,False)
+                    appendTo_DEBUG_log('\nItem is whitelisted for this user: ' + str(itemIsWhiteListed_Local))
+                    appendTo_DEBUG_log('\nMatching whitelisted value for this user is: ' + itemWhiteListedValue_Local)
 
         #Looking in other users libraries
         else: #(wllib_pos == currentPosition)
@@ -2305,16 +2251,16 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
-                    print_byType('\nItem is whitelisted for another user: ' + str(itemIsWhiteListed_Remote),False)
-                    print_byType('\nMatching whitelisted value for another user is: ' + itemWhiteListedValue_Remote,False)
+                    appendTo_DEBUG_log('\nItem is whitelisted for another user: ' + str(itemIsWhiteListed_Remote))
+                    appendTo_DEBUG_log('\nMatching whitelisted value for another user is: ' + itemWhiteListedValue_Remote)
 
         if (GLOBAL_DEBUG):
-            print_byType('\nLibraryId is: ' + LibraryID,False)
-            print_byType('\nLibraryPath is: ' + LibraryPath,False)
-            print_byType('\nLibraryNetPath is: ' + LibraryNetPath,False)
-            print_byType('\nWhitelisted Keys are: ' + user_wllib_keys_json[wllib_pos],False)
-            print_byType('\nWhitelisted Paths are: ' + user_wllib_path_json[wllib_pos],False)
-            print_byType('\nWhitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos],False)
+            appendTo_DEBUG_log('\nLibraryId is: ' + LibraryID)
+            appendTo_DEBUG_log('\nLibraryPath is: ' + LibraryPath)
+            appendTo_DEBUG_log('\nLibraryNetPath is: ' + LibraryNetPath)
+            appendTo_DEBUG_log('\nWhitelisted Keys are: ' + user_wllib_keys_json[wllib_pos])
+            appendTo_DEBUG_log('\nWhitelisted Paths are: ' + user_wllib_path_json[wllib_pos])
+            appendTo_DEBUG_log('\nWhitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos])
 
     return itemIsWhiteListed_Local,itemIsWhiteListed_Remote
 
@@ -2325,7 +2271,7 @@ def get_isItemTagged(usertags,tagged_items,item):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     #Emby and jellyfin store tags differently
     if (cfg.server_brand == 'emby'):
@@ -2342,7 +2288,7 @@ def get_isItemTagged(usertags,tagged_items,item):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
                 if (GLOBAL_DEBUG):
-                    print_byType('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),False)
+                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue))
     #Emby and jellyfin store tags differently
     else: #(cfg.server_brand == 'jellyfin')
         #Jellyfin tags
@@ -2359,10 +2305,10 @@ def get_isItemTagged(usertags,tagged_items,item):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
                 if (GLOBAL_DEBUG):
-                    print_byType('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),False)
+                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue))
 
     if (GLOBAL_DEBUG):
-        print_byType("\nIs Media Item " + str(item['Id']) + " Tagged: " + str(itemIsTagged),False)
+        appendTo_DEBUG_log("\nIs Media Item " + str(item['Id']) + " Tagged: " + str(itemIsTagged))
 
     #parenthesis intentionally omitted to return tagged_items as a set
     return itemIsTagged,tagged_items
@@ -2407,7 +2353,7 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
 ### Movie #######################################################################################
 
@@ -2430,11 +2376,11 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
         for istagID in istag_MOVIE[istagkey]:
             if (istag_MOVIE[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    print_byType("\nMovie " + str(item['Id']) + " is tagged.",False)
+                    appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is tagged.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nMovie " + str(item['Id']) + " is NOT tagged.",False)
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT tagged.")
 
     return(False)
 
@@ -2449,7 +2395,7 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
 ### Episode #######################################################################################
 
@@ -2521,11 +2467,11 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
         for istagID in istag_EPISODE[istagkey]:
             if (istag_EPISODE[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    print_byType("\nEpisode " + str(item['Id']) + " is tagged.",False)
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is tagged.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nEpisode " + str(item['Id']) + " is NOT tagged.",False)
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT tagged.")
 
     return(False)
 
@@ -2539,7 +2485,7 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
 ### Track #########################################################################################
 
@@ -2585,11 +2531,11 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
         for istagID in istag_AUDIO[istagkey]:
             if (istag_AUDIO[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    print_byType("\nAudio/AudioBook " + str(item['Id']) + " is tagged.",False)
+                    appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is tagged.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.",False)
+        appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.")
 
     return(False)
 
@@ -2604,7 +2550,7 @@ def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookup
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     if (('GenreItems' in item) and (does_index_exist(item['GenreItems'],0))):
         #Check if bitmask for favorites by item genre is enabled
@@ -2635,7 +2581,7 @@ def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookup
                             isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre),False)
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre))
 
     return(isfav_ITEMgenre)
 
@@ -2645,7 +2591,7 @@ def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,look
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     if (('ArtistItems' in item) and (does_index_exist(item['ArtistItems'],0))):
         #Check if bitmask for favorites by artist is enabled
@@ -2676,7 +2622,7 @@ def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,look
                             isfav_ITEMartist[artist_item_info['Id']] = artist_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist),False)
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist))
 
     return(isfav_ITEMartist)
 
@@ -2686,7 +2632,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     if (('Studios' in  item) and (does_index_exist(item['Studios'],0))):
         #Check if bitmask for favorites by item genre is enabled
@@ -2738,7 +2684,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
                     isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk),False)
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk))
 
     return(isfav_ITEMstdo_ntwk)
 
@@ -2748,7 +2694,7 @@ def get_isMOVIE_AdvancedFav(item,user_key):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
     keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
@@ -2776,11 +2722,11 @@ def get_isMOVIE_AdvancedFav(item,user_key):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    print_byType("\nMovie Item " + str(item['Id']) + " is favorited.",False)
+                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nMovie " + str(item['Id']) + " is NOT favorited.",False)
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.")
 
     return(False)
 
@@ -2790,7 +2736,7 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     keep_favorites_advanced_episode_genre=cfg.keep_favorites_advanced_episode_genre
     keep_favorites_advanced_season_genre=cfg.keep_favorites_advanced_season_genre
@@ -2877,11 +2823,11 @@ def get_isEPISODE_AdvancedFav(item,user_key):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    print_byType("\nEpisode " + str(item['Id']) + " is favorited.",False)
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        print_byType("\nEpisode " + str(item['Id']) + " is NOT favorited.",False)
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
 
     return(False)
 
@@ -2891,7 +2837,7 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
 
     if (itemType == 'Audio'):
         lookupTopicTrack='track'
@@ -2964,20 +2910,20 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
                     if (itemType == 'Audio'):
-                        print_byType("\nEpisode " + str(item['Id']) + " is favorited.",False)
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
                     elif (itemType == 'AudioBook'):
-                        print_byType("\nEpisode " + str(item['Id']) + " is favorited.",False)
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
                     else:
-                        print_byType("\nUnknown Audio Type " + str(item['Id']) + " is favorited.",False)
+                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
         if (itemType == 'Audio'):
-            print_byType("\nEpisode " + str(item['Id']) + " is NOT favorited.",False)
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
         elif (itemType == 'AudioBook'):
-            print_byType("\nEpisode " + str(item['Id']) + " is NOT favorited.",False)
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
         else:
-            print_byType("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.",False)
+            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.")
 
     return(False)
 
@@ -3048,10 +2994,10 @@ def get_isfav_ByMultiUser(userkey, isfav_byUserId, deleteItems):
         try:
            deleteItems.pop(favItem)
         except IndexError as err:
-           print_byType("\n" + str(err),False)
-           print_byType("\n" + convert2json(favItem),False)
-           print_byType("\n" + convert2json(deleteIndexes),False)
-           print_byType("\n" + convert2json(deleteItems),False)
+           print_byType("\n" + str(err),True)
+           print_byType("\n" + convert2json(favItem),True)
+           print_byType("\n" + convert2json(deleteIndexes),True)
+           print_byType("\n" + convert2json(deleteItems),True)
            exit(0)
 
     deleteIndexes=[]
@@ -3543,10 +3489,10 @@ def get_iswhitelist_ByMultiUser(whitelists, deleteItems):
         try:
            deleteItems.pop(wlItem)
         except IndexError as err:
-           print_byType("\n" + str(err),False)
-           print_byType("\n" + convert2json(wlItem),False)
-           print_byType("\n" + convert2json(deleteIndexes),False)
-           print_byType("\n" + convert2json(deleteItems),False)
+           print_byType("\n" + str(err),True)
+           print_byType("\n" + convert2json(wlItem),True)
+           print_byType("\n" + convert2json(deleteIndexes),True)
+           print_byType("\n" + convert2json(deleteItems),True)
            exit(0)
 
     return(deleteItems)
@@ -3596,10 +3542,10 @@ def get_isblacktagged_watchedByAllUsers(blacktagged_and_watched, deleteItems):
         try:
            deleteItems.pop(delItem)
         except IndexError as err:
-           print_byType("\n" + str(err),False)
-           print_byType("\n" + convert2json(delItem),False)
-           print_byType("\n" + convert2json(pos_tracker),False)
-           print_byType("\n" + convert2json(deleteItems),False)
+           print_byType("\n" + str(err),True)
+           print_byType("\n" + convert2json(delItem),True)
+           print_byType("\n" + convert2json(pos_tracker),True)
+           print_byType("\n" + convert2json(deleteItems),True)
            exit(0)
 
     return (deleteItems)
@@ -3666,8 +3612,11 @@ def get_playedStatus(item,media_condition,filter_count_comparison,filter_count):
                 item_matches_played_count_filter=True
 
     if (GLOBAL_DEBUG):
-        print_byType("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",False)
-        print_byType("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter),False)
+        appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...")
+        if (((IsPlayed == 'True') and item_played) or ((IsPlayed == 'False') and not item_played) or (IsPlayed == '')):
+            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter))
+        else:
+            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed")
 
     return item_matches_played_count_filter
 
@@ -3696,17 +3645,17 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
         okToDelete=False
 
     if (GLOBAL_DEBUG):
-        print_byType("\nIs Media Item OK To Delete: " + str(okToDelete),False)
-        print_byType("\nIs Media Item Favorited For This User: " + str(itemisfav_Local),False)
-        print_byType("\nIs Media Item An Advanced Favorite: " + str(itemisfav_Advanced),False)
-        print_byType("\nIs Media Item WhiteTagged: " + str(itemIsWhiteTagged),False)
-        print_byType("\nIs Media Item BlackTagged: " + str(itemIsBlackTagged),False)
-        print_byType("\nDoes Media Item Match The Play Count Filter: " + str(item_matches_played_count_filter),False)
-        print_byType("\nDoes Media Item Meet Number Of Days Since Played: " + str(item_matches_played_condition_day_filter),False)
-        print_byType("\nDoes Media Item Match The Created Played Count Filter: " + str(item_matches_created_played_count_filter),False)
-        print_byType("\nDoes Media Item Meet Number Of Days Since Created-Played: " + str(item_matches_created_condition_day_filter),False)
-        print_byType("\nIs Media Item WhiteListed For This User: " + str(itemIsWhiteListed_Local),False)
-        print_byType("\nIs Media Item WhiteListed For Another User: " + str(itemIsWhiteListed_Remote),False)
+        appendTo_DEBUG_log("\nIs Media Item OK To Delete: " + str(okToDelete))
+        appendTo_DEBUG_log("\nIs Media Item Favorited For This User: " + str(itemisfav_Local))
+        appendTo_DEBUG_log("\nIs Media Item An Advanced Favorite: " + str(itemisfav_Advanced))
+        appendTo_DEBUG_log("\nIs Media Item WhiteTagged: " + str(itemIsWhiteTagged))
+        appendTo_DEBUG_log("\nIs Media Item BlackTagged: " + str(itemIsBlackTagged))
+        appendTo_DEBUG_log("\nDoes Media Item Match The Play Count Filter: " + str(item_matches_played_count_filter))
+        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Played: " + str(item_matches_played_condition_day_filter))
+        appendTo_DEBUG_log("\nDoes Media Item Match The Created Played Count Filter: " + str(item_matches_created_played_count_filter))
+        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Created-Played: " + str(item_matches_created_condition_day_filter))
+        appendTo_DEBUG_log("\nIs Media Item WhiteListed For This User: " + str(itemIsWhiteListed_Local))
+        appendTo_DEBUG_log("\nIs Media Item WhiteListed For Another User: " + str(itemIsWhiteListed_Remote))
 
     return okToDelete
 
@@ -3716,50 +3665,50 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
 def prepare_MOVIEoutput(item):
 
     if (GLOBAL_DEBUG):
-        print_byType("\n\nPreparing Movie " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output")
 
     if not ('Type' in item):
         item['Type']='Movie'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Type'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Name'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
     if not ('Studios' in item):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Studios'] or item['Studios'][0] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Studios'] or item['Studios'][0] Was Missing")
     if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Studios'][0] or item['Studios'][0]{'Name':'Unknown'} Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Studios'][0] or item['Studios'][0]{'Name':'Unknown'} Was Missing")
     if not ('Name' in item['Studios'][0]):
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing")
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
-                print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['DateCreated'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Id'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFinished Preparing Movie " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\nFinished Preparing Movie " + item['Id'] + " For Output")
 
     return item
 
@@ -3769,52 +3718,52 @@ def prepare_MOVIEoutput(item):
 def prepare_EPISODEoutput(item):
 
     if (GLOBAL_DEBUG):
-        print_byType("\n\nPreparing Episode " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\n\nPreparing Episode " + item['Id'] + " For Output")
 
     if not ('Type' in item):
         item['Type']='Episode'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Type'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
     if not ('SeriesName' in item):
         item['SeriesName']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['SeriesName'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['SeriesName'] Was Missing")
     if not ('ParentIndexNumber' in item):
         item['ParentIndexNumber']='??'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['ParentIndexNumber'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['ParentIndexNumber'] Was Missing")
     if not ('IndexNumber' in item):
         item['IndexNumber']='??'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['IndexNumber'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing")
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Name'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
     if not ('SeriesStudio' in item):
         item['SeriesStudio']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['SeriesStudio'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing")
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
-                print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['DateCreated'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Id'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFinished Preparing Episode " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\nFinished Preparing Episode " + item['Id'] + " For Output")
 
     return item
 
@@ -3824,56 +3773,56 @@ def prepare_EPISODEoutput(item):
 def prepare_AUDIOoutput(item):
 
     if (GLOBAL_DEBUG):
-        print_byType("\n\nPreparing Audio/AudioBook " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\n\nPreparing Audio/AudioBook " + item['Id'] + " For Output")
 
     if not ('Type' in item):
         item['Type']='Episode'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Type'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
     if not ('IndexNumber' in item):
         item['IndexNumber']=999
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['IndexNumber'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing")
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Name'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
     if not ('Album' in item):
         item['Album']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Album'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Album'] Was Missing")
     if not ('Artist' in item):
         item['Artist']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Artist'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Artist'] Was Missing")
     if not ('Studios' in item):
         item['Studios']=[{'Name':'Unknown'}]
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Studios'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Studios'] Was Missing")
     if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[{'Name':'Unknown'}]
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Studios']{'Name':'Unknown'} Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing")
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['UserData']['LastPlayedDate'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['DateCreated'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            print_byType("\nitem['Id'] Was Missing",False)
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
 
     if (GLOBAL_DEBUG):
-        print_byType("\nFinished Preparing Audio/AudioBook " + item['Id'] + " For Output",False)
+        appendTo_DEBUG_log("\nFinished Preparing Audio/AudioBook " + item['Id'] + " For Output")
 
     return item
 
@@ -3884,12 +3833,17 @@ def prepare_AUDIOBOOKoutput(item):
     return prepare_AUDIOoutput(item)
 
 
+#save to mumc_DEBUG.log when DEBUG is enabled
+def appendTo_DEBUG_log(string_to_print):
+    save_file(string_to_print,GLOBAL_debugFileName,"a")
+
+
 #determine if the requested console output line should be shown or hidden
 def print_byType(string_to_print,ok_to_print):
     if (ok_to_print):
         print(string_to_print)
     if (GLOBAL_DEBUG):
-        save_file(string_to_print,GLOBAL_debugFileName,"a")
+        appendTo_DEBUG_log(string_to_print)
 
 
 # get played, favorited, and tagged media items
@@ -4074,19 +4028,19 @@ def get_media_items():
     #Get list of all played items
     if (GLOBAL_DEBUG):
         #Double newline for debug log formatting
-        print_byType('\n\n',False)
+        appendTo_DEBUG_log('\n\n')
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('Start...',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('Cleaning media for server at: ' + server_url,print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('',print_script_header)
 
     all_media_disabled=False
@@ -4123,9 +4077,13 @@ def get_media_items():
     #list of items to be deleted
     deleteItems=[]
 
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\nBlacklisted Libraries...")
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,bluser_names_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
 
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\nWhitelisted Libraries...")
     #Build the library data from the data structures stored in the configuration file
     wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
 
@@ -4134,13 +4092,13 @@ def get_media_items():
         user_keys_json = bluser_keys_json_verify
     else:
         if (GLOBAL_DEBUG):
-            print_byType('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',False)
+            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     #verify userNames are in same order for both blacklist and whitelist libraries
     if (not (bluser_names_json_verify == wluser_names_json_verify)):
         if (GLOBAL_DEBUG):
-            print_byType('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',False)
+            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     for user_key in user_keys_json:
@@ -4183,19 +4141,19 @@ def get_media_items():
         user_data=requestURL(url, GLOBAL_DEBUG, 'current_user', api_query_attempts)
 
         if (GLOBAL_DEBUG):
-            print_byType('\n',False)
+            appendTo_DEBUG_log('\n')
         print_byType('',print_user_header)
         if (GLOBAL_DEBUG):
-            print_byType('\n',False)
+            appendTo_DEBUG_log('\n')
         print_byType('-----------------------------------------------------------',print_user_header)
         if (GLOBAL_DEBUG):
-            print_byType('\n',False)
+            appendTo_DEBUG_log('\n')
         print_byType('Get List Of Media For:',print_user_header)
         if (GLOBAL_DEBUG):
-            print_byType('\n',False)
+            appendTo_DEBUG_log('\n')
         print_byType(user_data['Name'] + ' - ' + user_data['Id'],print_user_header)
         if (GLOBAL_DEBUG):
-            print_byType('\n',False)
+            appendTo_DEBUG_log('\n')
         print_byType('-----------------------------------------------------------',print_user_header)
 
         user_bllib_keys_json_lensplit=user_bllib_keys_json[currentPosition].split(',')
@@ -4223,7 +4181,7 @@ def get_media_items():
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                print_byType("\n\nProcessing MOVIE Items For UserId: " + str(user_key),False)
+                appendTo_DEBUG_log("\n\nProcessing MOVIE Items For UserId: " + str(user_key))
 
             user_processed_itemsId=set()
 
@@ -4248,15 +4206,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if (movie_played_days >= 0):
-                        IsPlayed_Blacklist=get_isPlayed_FilterValue(movie_played_count_comparison,movie_played_count)
-                    else:
-                        IsPlayed_Blacklist='disable'
-                    if (movie_created_days >= 0):
-                        IsCreated_Blacklist=get_isCreated_FilterValue(movie_created_played_count_comparison,movie_created_played_count)
-                    else:
-                        IsCreated_Blacklist='disable'
-                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(IsPlayed_Blacklist,IsCreated_Blacklist)
+                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(movie_played_days,movie_created_days,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -4396,7 +4346,7 @@ def get_media_items():
                         QueryLimit_Blacklist=0
                         QueriesRemaining_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo watched media items are blacklisted",False)
+                            appendTo_DEBUG_log("\n\nNo watched media items are blacklisted")
 
                     if not (LibraryID_BlkLst == ''):
                         #Built query for Favorited from Blacklist media items
@@ -4414,7 +4364,7 @@ def get_media_items():
                         QueryLimit_Favorited_From_Blacklist=0
                         QueriesRemaining_Favorited_From_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo favorited media items are blacklisted",False)
+                            appendTo_DEBUG_log("\n\nNo favorited media items are blacklisted")
 
                     if not (LibraryID_WhtLst == ''):
                         #Built query for Favorited From Whitelist media items
@@ -4432,7 +4382,7 @@ def get_media_items():
                         QueryLimit_Favorited_From_Whitelist=0
                         QueriesRemaining_Favorited_From_Whitelist=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo favorited media items are whitelisted",False)
+                            appendTo_DEBUG_log("\n\nNo favorited media items are whitelisted")
 
                     #Check if blacktag or blacklist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4449,7 +4399,7 @@ def get_media_items():
                         QueryLimit_BlackTagged_From_BlackList=0
                         QueriesRemaining_BlackTagged_From_BlackList=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo blacktagged media items are blacklisted",False)
+                            appendTo_DEBUG_log("\n\nNo blacktagged media items are blacklisted")
 
                     #Check if blacktag or whitelist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4466,7 +4416,7 @@ def get_media_items():
                         QueryLimit_BlackTagged_From_WhiteList=0
                         QueriesRemaining_BlackTagged_From_WhiteList=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo blacktagged media items are whitelisted",False)
+                            appendTo_DEBUG_log("\n\nNo blacktagged media items are whitelisted")
 
                     #Check if whitetag or blacklist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4483,7 +4433,7 @@ def get_media_items():
                         QueryLimit_WhiteTagged_From_Blacklist=0
                         QueriesRemaining_WhiteTagged_From_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo whitetagged media items are blacklisted",False)
+                            appendTo_DEBUG_log("\n\nNo whitetagged media items are blacklisted")
 
                     #Check if whitetag or whitelist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4500,7 +4450,7 @@ def get_media_items():
                         QueryLimit_WhiteTagged_From_Whitelist=0
                         QueriesRemaining_WhiteTagged_From_Whitelist=False
                         if (GLOBAL_DEBUG):
-                            print_byType("\n\nNo whitetagged media items are whitelisted",False)
+                            appendTo_DEBUG_log("\n\nNo whitetagged media items are whitelisted")
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
@@ -4568,7 +4518,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    print_byType("\n\nInspecting Media Item: " + str(item['Id']),False)
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
 
                                 media_found=True
 
@@ -4581,7 +4531,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        print_byType("\nProcessing Movie Item: " + str(item['Id']),False)
+                                        appendTo_DEBUG_log("\nProcessing Movie Item: " + str(item['Id']))
 
                                     #establish played cutoff date for media item
                                     if ((movie_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -4697,23 +4647,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                print_byType('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item),False)
+                                                appendTo_DEBUG_log('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item))
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_movie_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':*[DELETE] - ' + item_output_details,print_movie_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_movie_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':[KEEPING] - ' + item_output_details,print_movie_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            print_byType("\n",False)
+                                            appendTo_DEBUG_log("\n")
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4727,7 +4677,7 @@ def get_media_items():
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                print_byType("\n\nProcessing EPISODE Items For UserId: " + str(user_key),False)
+                appendTo_DEBUG_log("\n\nProcessing EPISODE Items For UserId: " + str(user_key))
 
             user_processed_itemsId=set()
 
@@ -4752,15 +4702,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if(episode_played_days >= 0):
-                        IsPlayed_Blacklist=get_isPlayed_FilterValue(episode_played_count_comparison,episode_played_count)
-                    else:
-                        IsPlayed_Blacklist='disable'
-                    if(episode_created_days >= 0):
-                        IsCreated_Blacklist=get_isCreated_FilterValue(episode_created_played_count_comparison,episode_created_played_count)
-                    else:
-                        IsCreated_Blacklist='disable'
-                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(IsPlayed_Blacklist,IsCreated_Blacklist)
+                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(episode_played_days,episode_created_days,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -5058,7 +5000,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    print_byType("\n\nInspecting Media Item: " + str(item['Id']),False)
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
 
                                 media_found=True
 
@@ -5071,7 +5013,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        print_byType("\nProcessing Episode Item: " + str(item['Id']),False)
+                                        appendTo_DEBUG_log("\nProcessing Episode Item: " + str(item['Id']))
 
                                     #establish played cutoff date for media item
                                     if ((episode_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -5208,23 +5150,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                print_byType('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item),False)
+                                                appendTo_DEBUG_log('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item))
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_episode_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_episode_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':[KEEPING] - ' + item_output_details,print_episode_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            print_byType("\n",False)
+                                            appendTo_DEBUG_log("\n")
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -5238,7 +5180,7 @@ def get_media_items():
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                print_byType("\n\nProcessing AUDIO Items For UserId: " + str(user_key),False)
+                appendTo_DEBUG_log("\n\nProcessing AUDIO Items For UserId: " + str(user_key))
 
             user_processed_itemsId=set()
 
@@ -5263,15 +5205,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if(audio_played_days >= 0):
-                        IsPlayed_Blacklist=get_isPlayed_FilterValue(audio_played_count_comparison,audio_played_count)
-                    else:
-                        IsPlayed_Blacklist='disable'
-                    if(audio_created_days >= 0):
-                        IsCreated_Blacklist=get_isCreated_FilterValue(audio_created_played_count_comparison,audio_created_played_count)
-                    else:
-                        IsCreated_Blacklist='disable'
-                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(IsPlayed_Blacklist,IsCreated_Blacklist)
+                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(audio_played_days,audio_created_days,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -5569,7 +5503,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    print_byType("\n\nInspecting Media Item: " + str(item['Id']),False)
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
 
                                 media_found=True
 
@@ -5582,7 +5516,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        print_byType("\nProcessing Audio Item: " + str(item['Id']),False)
+                                        appendTo_DEBUG_log("\nProcessing Audio Item: " + str(item['Id']))
 
                                     #establish played cutoff date for media item
                                     if ((audio_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -5701,23 +5635,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                print_byType('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item),False)
+                                                appendTo_DEBUG_log('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item))
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_audio_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audio_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':[KEEPING] - ' + item_output_details,print_audio_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            print_byType("\n",False)
+                                            appendTo_DEBUG_log("\n")
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -5734,7 +5668,7 @@ def get_media_items():
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
 
             if (GLOBAL_DEBUG):
-                print_byType("\n\nProcessing AUDIOBOOK Items For UserId: " + str(user_key),False)
+                appendTo_DEBUG_log("\n\nProcessing AUDIOBOOK Items For UserId: " + str(user_key))
 
             user_processed_itemsId=set()
 
@@ -5759,15 +5693,7 @@ def get_media_items():
                     Recursive_Blacklist='True'
                     EnableImages_Blacklist='False'
                     CollapseBoxSetItems_Blacklist='False'
-                    if(audiobook_played_days >= 0):
-                        IsPlayed_Blacklist=get_isPlayed_FilterValue(audiobook_played_count_comparison,audiobook_played_count)
-                    else:
-                        IsPlayed_Blacklist='disable'
-                    if(audiobook_created_days >= 0):
-                        IsCreated_Blacklist=get_isCreated_FilterValue(audiobook_created_played_count_comparison,audiobook_created_played_count)
-                    else:
-                        IsCreated_Blacklist='disable'
-                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(IsPlayed_Blacklist,IsCreated_Blacklist)
+                    IsPlayedState_Blacklist=get_isPlayedCreated_FilterValue(audiobook_played_days,audiobook_created_days,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
 
                 #Initialize api_query_handler() variables for Favorited from Blacklist media items
                 StartIndex_Favorited_From_Blacklist=0
@@ -6065,7 +5991,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    print_byType("\n\nInspecting Media Item: " + str(item['Id']),False)
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
 
                                 media_found=True
 
@@ -6078,7 +6004,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        print_byType("\nProcessing AudioBook Item: " + str(item['Id']),False)
+                                        appendTo_DEBUG_log("\nProcessing AudioBook Item: " + str(item['Id']))
 
                                     #establish played cutoff date for media item
                                     if ((audiobook_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -6196,23 +6122,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                print_byType('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item),False)
+                                                appendTo_DEBUG_log('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_audiobook_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audiobook_delete_info=True
-                                                print_byType("\n\n",False)
+                                                appendTo_DEBUG_log("\n\n")
                                             print_byType(':[KEEPING] - ' + item_output_details,print_audiobook_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            print_byType("\n",False)
+                                            appendTo_DEBUG_log("\n")
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -6228,19 +6154,19 @@ def get_media_items():
             if not (media_found):
                 if (GLOBAL_DEBUG):
                     print_warnings=True
-                    print_byType("\n",False)
+                    appendTo_DEBUG_log("\n")
                 print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',print_warnings)
 
         if (GLOBAL_DEBUG):
             print_common_delete_keep_info=True
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('-----------------------------------------------------------',print_common_delete_keep_info)
         currentPosition+=1
 
     if (GLOBAL_DEBUG):
-        print_byType("\nPOST PROCESSING STARTED\n",False)
-        print_byType("\nList Of Possible Media Items To Be Deleted: " + str(len(deleteItems)),False)
-        print_byType("\n" + convert2json(deleteItems),False)
+        appendTo_DEBUG_log("\nPOST PROCESSING STARTED\n")
+        appendTo_DEBUG_log("\nList Of Possible Media Items To Be Deleted: " + str(len(deleteItems)))
+        appendTo_DEBUG_log("\n" + convert2json(deleteItems))
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
@@ -6254,24 +6180,24 @@ def get_media_items():
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('\n-----------------------------------------------------------',False)
-        print_byType("\n",False)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------')
+        appendTo_DEBUG_log("\n")
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            print_byType('\nisfav_MOVIE: ',False)
-            print_byType("\n" + convert2json(isfav_byUserId_Movie),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisfav_MOVIE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Movie))
+            appendTo_DEBUG_log("\n")
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            print_byType('\nisfav_EPISODE: ',False)
-            print_byType("\n" + convert2json(isfav_byUserId_Episode),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisfav_EPISODE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Episode))
+            appendTo_DEBUG_log("\n")
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            print_byType('\nisfav_AUDIO: ',False)
-            print_byType("\n" + convert2json(isfav_byUserId_Audio),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisfav_AUDIO: ')
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Audio))
+            appendTo_DEBUG_log("\n")
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            print_byType('\nisfav_AUDIOBOOK: ',False)
-            print_byType("\n" + convert2json(isfav_byUserId_AudioBook),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisfav_AUDIOBOOK: ')
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_AudioBook))
+            appendTo_DEBUG_log("\n")
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
     if (not (whitetags == '')):
@@ -6285,24 +6211,24 @@ def get_media_items():
             deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('\n-----------------------------------------------------------',False)
-        print_byType("\n",False)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------')
+        appendTo_DEBUG_log("\n")
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            print_byType('\niswhitetag_MOVIE: ',False)
-            print_byType("\n" + convert2json(movie_whitetag_list),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitetag_MOVIE: ')
+            appendTo_DEBUG_log("\n" + convert2json(movie_whitetag_list))
+            appendTo_DEBUG_log("\n")
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            print_byType('\niswhitetag_EPISODE: ',False)
-            print_byType("\n" + convert2json(episode_whitetag_list),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitetag_EPISODE: ')
+            appendTo_DEBUG_log("\n" + convert2json(episode_whitetag_list))
+            appendTo_DEBUG_log("\n")
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            print_byType('iswhitetag_AUDIO: ',False)
-            print_byType(convert2json(audio_whitetag_list),False)
-            print_byType('',False)
+            appendTo_DEBUG_log('iswhitetag_AUDIO: ')
+            appendTo_DEBUG_log(convert2json(audio_whitetag_list))
+            appendTo_DEBUG_log('')
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            print_byType('\niswhitetag_AUDIOBOOK: ',False)
-            print_byType("\n" + convert2json(audiobook_whitetag_list),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitetag_AUDIOBOOK: ')
+            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitetag_list))
+            appendTo_DEBUG_log("\n")
 
     #When multiple users and multiuser_whitelist_xyz==0 Determine media items to keep and remove them from deletion list
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (multiuser_whitelist_movie == 0)):
@@ -6315,24 +6241,24 @@ def get_media_items():
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('\n-----------------------------------------------------------',False)
-        print_byType("\n",False)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------')
+        appendTo_DEBUG_log("\n")
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            print_byType('\niswhitelist_MOVIE: ',False)
-            print_byType(convert2json(movie_whitelists),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitelist_MOVIE: ')
+            appendTo_DEBUG_log(convert2json(movie_whitelists))
+            appendTo_DEBUG_log("\n")
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            print_byType('\niswhitelist_EPISODE: ',False)
-            print_byType(convert2json(episode_whitelists),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitelist_EPISODE: ')
+            appendTo_DEBUG_log(convert2json(episode_whitelists))
+            appendTo_DEBUG_log("\n")
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            print_byType('\niswhitelist_AUDIO: ',False)
-            print_byType(convert2json(audio_whitelists),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitelist_AUDIO: ')
+            appendTo_DEBUG_log(convert2json(audio_whitelists))
+            appendTo_DEBUG_log("\n")
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            print_byType('\niswhitelist_AUDIOBOOK: ',False)
-            print_byType("\n" + convert2json(audiobook_whitelists),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\niswhitelist_AUDIOBOOK: ')
+            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitelists))
+            appendTo_DEBUG_log("\n")
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.delete_blacktagged_*
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (delete_blacktagged_movie == 1)):
@@ -6345,24 +6271,24 @@ def get_media_items():
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('\n-----------------------------------------------------------',False)
-        print_byType("\n",False)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------')
+        appendTo_DEBUG_log("\n")
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            print_byType('\nisblacktag_Played_MOVIE: ',False)
-            print_byType("\n" + convert2json(isblacktag_and_watched_byUserId_Movie),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisblacktag_Played_MOVIE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Movie))
+            appendTo_DEBUG_log("\n")
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            print_byType('\nisblacktag_Played_EPISODE: ',False)
-            print_byType("\n" + convert2json(isblacktag_and_watched_byUserId_Episode),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisblacktag_Played_EPISODE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Episode))
+            appendTo_DEBUG_log("\n")
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            print_byType('\nisblacktag_Played_AUDIO: ',False)
-            print_byType("\n" + convert2json(isblacktag_and_watched_byUserId_Audio),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisblacktag_Played_AUDIO: ')
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Audio))
+            appendTo_DEBUG_log("\n")
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            print_byType('\nisblacktag_Played_AUDIOBOOK: ',False)
-            print_byType("\n" + convert2json(isblacktag_and_watched_byUserId_AudioBook),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisblacktag_Played_AUDIOBOOK: ')
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_AudioBook))
+            appendTo_DEBUG_log("\n")
 
     #When filtered; Determine media items to remove them from deletion list depending on cfg.multiuser_play_count_*
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (multiuser_play_count_movie == 1)):
@@ -6375,24 +6301,24 @@ def get_media_items():
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('\n-----------------------------------------------------------',False)
-        print_byType("\n",False)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------')
+        appendTo_DEBUG_log("\n")
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            print_byType('\nisplaycountmet_MOVIE: ',False)
-            print_byType("\n" + convert2json(isMeeting_PlayCountFilter_Movie),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisplaycountmet_MOVIE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Movie))
+            appendTo_DEBUG_log("\n")
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            print_byType('\nisplaycountmet_EPISODE: ',False)
-            print_byType("\n" + convert2json(isMeeting_PlayCountFilter_Episode),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisplaycountmet_EPISODE: ')
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Episode))
+            appendTo_DEBUG_log("\n")
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            print_byType('\nisplaycountmet_AUDIO: ',False)
-            print_byType("\n" + convert2json(isMeeting_PlayCountFilter_Audio),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisplaycountmet_AUDIO: ')
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Audio))
+            appendTo_DEBUG_log("\n")
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            print_byType('\nisplaycountmet_AUDIOBOOK: ',False)
-            print_byType("\n" + convert2json(isMeeting_PlayCountFilter_AudioBook),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nisplaycountmet_AUDIOBOOK: ')
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_AudioBook))
+            appendTo_DEBUG_log("\n")
 
     #When enabled; Keep a minimum number of episodes
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
@@ -6400,17 +6326,17 @@ def get_media_items():
         deleteItems=get_minEpisodesToKeep(episodeCounts_byUserId, deleteItems)
 
     if (GLOBAL_DEBUG):
-        print_byType('-----------------------------------------------------------',False)
-        print_byType('',False)
+        appendTo_DEBUG_log('-----------------------------------------------------------')
+        appendTo_DEBUG_log('')
         if (((episode_played_days >= 0) or (episode_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
-            print_byType('\nepisodeCounts_byUserId: ',False)
-            print_byType("\n" + convert2json(episodeCounts_byUserId),False)
-            print_byType("\n",False)
+            appendTo_DEBUG_log('\nepisodeCounts_byUserId: ')
+            appendTo_DEBUG_log("\n" + convert2json(episodeCounts_byUserId))
+            appendTo_DEBUG_log("\n")
 
     if (GLOBAL_DEBUG):
-        print_byType("\nPOST PROCESSING FINISHED\n",False)
-        print_byType("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)),False)
-        print_byType("\n" + convert2json(deleteItems),False)
+        appendTo_DEBUG_log("\nPOST PROCESSING FINISHED\n")
+        appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)))
+        appendTo_DEBUG_log("\n" + convert2json(deleteItems))
 
     if (GLOBAL_DEBUG):
         print_common_delete_keep_info=True
@@ -6427,9 +6353,9 @@ def delete_media_item(itemID):
     req = request.Request(url,method='DELETE')
 
     if (GLOBAL_DEBUG):
-        print_byType("\nSending Delete Request For: " + itemID,False)
-        print_byType("\nURL:\n" + url,False)
-        print_byType("\nRequest:\n" + str(req),False)
+        appendTo_DEBUG_log("\nSending Delete Request For: " + itemID)
+        appendTo_DEBUG_log("\nURL:\n" + url)
+        appendTo_DEBUG_log("\nRequest:\n" + str(req))
 
     #check if in dry-run mode
     #if REMOVE_FILES='False'; exit this function
@@ -6470,49 +6396,49 @@ def output_itemsToDelete(deleteItems):
 
     #List items to be deleted
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('-----------------------------------------------------------',print_summary_header)
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('Summary Of Deleted Media:',print_summary_header)
     if not bool(cfg.REMOVE_FILES):
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('* Trial Run Mode',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('* REMOVE_FILES=\'False\'',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('* No Media Deleted',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('* Items = ' + str(len(deleteItems)),print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('-----------------------------------------------------------',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
-        print_byType('* To delete media open mumc_config.py in a text editor:',print_summary_header)
+            appendTo_DEBUG_log("\n")
+        print_byType('To delete media open mumc_config.py in a text editor:',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
-        print_byType('*    Set REMOVE_FILES=\'True\'',print_summary_header)
+            appendTo_DEBUG_log("\n")
+        print_byType('* Set REMOVE_FILES=\'True\'',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
     else:
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('* Items Deleted = ' + str(len(deleteItems)) + '    *',print_summary_header)
         if (GLOBAL_DEBUG):
-            print_byType("\n",False)
+            appendTo_DEBUG_log("\n")
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
 
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
                 if (GLOBAL_DEBUG):
-                    print_byType("\n",False)
+                    appendTo_DEBUG_log("\n")
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6520,20 +6446,20 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_movie_summary)
             elif item['Type'] == 'Episode':
                 if (GLOBAL_DEBUG):
-                    print_byType("\n",False)
+                    appendTo_DEBUG_log("\n")
                 try:
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if (GLOBAL_DEBUG):
-                        print_byType('Error encountered - Delete Episode: \n\n' + str(item),False)
+                        appendTo_DEBUG_log('Error encountered - Delete Episode: \n\n' + str(item))
                 #Delete media item
                 delete_media_item(item['Id'])
                 #Print output for deleted media item
                 print_byType(item_output_details,print_episode_summary)
             elif item['Type'] == 'Audio':
                 if (GLOBAL_DEBUG):
-                    print_byType("\n",False)
+                    appendTo_DEBUG_log("\n")
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6541,7 +6467,7 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_audio_summary)
             elif item['Type'] == 'AudioBook':
                 if (GLOBAL_DEBUG):
-                    print_byType("\n",False)
+                    appendTo_DEBUG_log("\n")
                 item_output_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6549,26 +6475,26 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_audiobook_summary)
             else: # item['Type'] == 'Unknown':
                 if (GLOBAL_DEBUG):
-                    print_byType("\nNot Able To Delete Unknown Media Type",False)
+                    appendTo_DEBUG_log("\nNot Able To Delete Unknown Media Type")
                 pass
     else:
         print_byType('[NO ITEMS TO DELETE]',print_common_summary)
 
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('-----------------------------------------------------------',print_common_summary)
     print_byType('\n',print_common_summary)
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('-----------------------------------------------------------',print_common_summary)
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('Done.',print_common_summary)
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('-----------------------------------------------------------',print_common_summary)
     if (GLOBAL_DEBUG):
-        print_byType("\n",False)
+        appendTo_DEBUG_log("\n")
     print_byType('',print_common_summary)
 
 
@@ -6717,7 +6643,7 @@ def cfgCheck():
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
     if (GLOBAL_DEBUG):
         #Double newline for debug log formatting
-        print_byType("\n\nserver_brand='" + server_brand + "'",False)
+        appendTo_DEBUG_log("\n\nserver_brand='" + server_brand + "'")
 
 #######################################################################################################
 
@@ -6725,7 +6651,7 @@ def cfgCheck():
         check=cfg.user_keys
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            print_byType("\nuser_keys=" + convert2json(check_list),False)
+            appendTo_DEBUG_log("\nuser_keys=" + convert2json(check_list))
         check_user_keys_length=len(check_list)
         username_check_list=[]
         userid_check_list=[]
@@ -6747,7 +6673,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_played_days'):
         check=cfg.movie_played_days
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_played_days=" + str(check),False)
+            appendTo_DEBUG_log("\nmovie_played_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6760,7 +6686,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_played_days'):
         check=cfg.episode_played_days
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_played_days=" + str(check),False)
+            appendTo_DEBUG_log("\nepisode_played_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6773,7 +6699,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_played_days'):
         check=cfg.audio_played_days
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_played_days=" + str(check),False)
+            appendTo_DEBUG_log("\naudio_played_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6787,7 +6713,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_played_days'):
             check=cfg.audiobook_played_days
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_played_days=" + str(check),False)
+                appendTo_DEBUG_log("\naudiobook_played_days=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
@@ -6802,7 +6728,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_created_days'):
         check=cfg.movie_created_days
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_created_days=" + str(check),False)
+            appendTo_DEBUG_log("\nmovie_created_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6815,7 +6741,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_created_days'):
         check=cfg.episode_created_days
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_created_days=" + str(check),False)
+            appendTo_DEBUG_log("\nepisode_created_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6828,7 +6754,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_created_days'):
         check=cfg.audio_created_days
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_created_days=" + str(check),False)
+            appendTo_DEBUG_log("\naudio_created_days=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= -1) and
@@ -6842,7 +6768,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_created_days'):
             check=cfg.audiobook_created_days
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_created_days=" + str(check),False)
+                appendTo_DEBUG_log("\naudiobook_created_days=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
@@ -6857,7 +6783,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_played_count_comparison'):
         check=cfg.movie_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nmovie_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6874,7 +6800,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_played_count_comparison'):
         check=cfg.episode_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nepisode_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6891,7 +6817,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_played_count_comparison'):
         check=cfg.audio_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\naudio_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6909,7 +6835,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_played_count_comparison'):
             check=cfg.audiobook_played_count_comparison
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_played_count_comparison='" + str(check) + "'",False)
+                appendTo_DEBUG_log("\naudiobook_played_count_comparison='" + str(check) + "'")
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -6928,7 +6854,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_created_played_count_comparison'):
         check=cfg.movie_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_created_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nmovie_created_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6945,7 +6871,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_created_played_count_comparison'):
         check=cfg.episode_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_created_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nepisode_created_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6962,7 +6888,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_created_played_count_comparison'):
         check=cfg.audio_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_created_played_count_comparison='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\naudio_created_played_count_comparison='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -6980,7 +6906,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_created_played_count_comparison'):
             check=cfg.audiobook_created_played_count_comparison
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_created_played_count_comparison='" + str(check) + "'",False)
+                appendTo_DEBUG_log("\naudiobook_created_played_count_comparison='" + str(check) + "'")
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -6999,7 +6925,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_played_count'):
         check=cfg.movie_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\nmovie_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7012,7 +6938,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_played_count'):
         check=cfg.episode_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\nepisode_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7025,7 +6951,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_played_count'):
         check=cfg.audio_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\naudio_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7039,7 +6965,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_played_count'):
             check=cfg.audiobook_played_count
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_played_count=" + str(check),False)
+                appendTo_DEBUG_log("\naudiobook_played_count=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7054,7 +6980,7 @@ def cfgCheck():
     if hasattr(cfg, 'movie_created_played_count'):
         check=cfg.movie_created_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\nmovie_created_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\nmovie_created_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7067,7 +6993,7 @@ def cfgCheck():
     if hasattr(cfg, 'episode_created_played_count'):
         check=cfg.episode_created_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\nepisode_created_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\nepisode_created_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7080,7 +7006,7 @@ def cfgCheck():
     if hasattr(cfg, 'audio_created_played_count'):
         check=cfg.audio_created_played_count
         if (GLOBAL_DEBUG):
-            print_byType("\naudio_created_played_count=" + str(check),False)
+            appendTo_DEBUG_log("\naudio_created_played_count=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7094,7 +7020,7 @@ def cfgCheck():
         if hasattr(cfg, 'audiobook_created_played_count'):
             check=cfg.audiobook_created_played_count
             if (GLOBAL_DEBUG):
-                print_byType("\naudiobook_created_played_count=" + str(check),False)
+                appendTo_DEBUG_log("\naudiobook_created_played_count=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7109,7 +7035,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_play_count_movie'):
         check=cfg.multiuser_play_count_movie
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_play_count_movie=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_play_count_movie=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7122,7 +7048,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_play_count_episode'):
         check=cfg.multiuser_play_count_episode
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_play_count_episode=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_play_count_episode=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7135,7 +7061,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_play_count_audio'):
         check=cfg.multiuser_play_count_audio
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_play_count_audio=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_play_count_audio=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7149,7 +7075,7 @@ def cfgCheck():
         if hasattr(cfg, 'multiuser_play_count_audiobook'):
             check=cfg.multiuser_play_count_audiobook
             if (GLOBAL_DEBUG):
-                print_byType("\nmultiuser_play_count_audiobook=" + str(check),False)
+                appendTo_DEBUG_log("\nmultiuser_play_count_audiobook=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7164,7 +7090,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_movie'):
         check=cfg.keep_favorites_movie
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_movie=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_movie=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7177,7 +7103,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_episode'):
         check=cfg.keep_favorites_episode
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_episode=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_episode=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7190,7 +7116,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_audio'):
         check=cfg.keep_favorites_audio
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_audio=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_audio=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7204,7 +7130,7 @@ def cfgCheck():
         if hasattr(cfg, 'keep_favorites_audiobook'):
             check=cfg.keep_favorites_audiobook
             if (GLOBAL_DEBUG):
-                print_byType("\nkeep_favorites_audiobook=" + str(check),False)
+                appendTo_DEBUG_log("\nkeep_favorites_audiobook=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7219,7 +7145,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_whitelist_movie'):
         check=cfg.multiuser_whitelist_movie
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_whitelist_movie=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_whitelist_movie=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7232,7 +7158,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_whitelist_episode'):
         check=cfg.multiuser_whitelist_episode
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_whitelist_episode=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_whitelist_episode=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7245,7 +7171,7 @@ def cfgCheck():
     if hasattr(cfg, 'multiuser_whitelist_audio'):
         check=cfg.multiuser_whitelist_audio
         if (GLOBAL_DEBUG):
-            print_byType("\nmultiuser_whitelist_audio=" + str(check),False)
+            appendTo_DEBUG_log("\nmultiuser_whitelist_audio=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7259,7 +7185,7 @@ def cfgCheck():
         if hasattr(cfg, 'multiuser_whitelist_audiobook'):
             check=cfg.multiuser_whitelist_audiobook
             if (GLOBAL_DEBUG):
-                print_byType("\nmultiuser_whitelist_audiobook=" + str(check),False)
+                appendTo_DEBUG_log("\nmultiuser_whitelist_audiobook=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7274,7 +7200,7 @@ def cfgCheck():
     if hasattr(cfg, 'blacktag'):
         check=cfg.blacktag
         if (GLOBAL_DEBUG):
-            print_byType("\nblacktag='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nblacktag='" + str(check) + "'")
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
@@ -7288,7 +7214,7 @@ def cfgCheck():
     if hasattr(cfg, 'delete_blacktagged_movie'):
         check=cfg.delete_blacktagged_movie
         if (GLOBAL_DEBUG):
-            print_byType("\ndelete_blacktagged_movie=" + str(check),False)
+            appendTo_DEBUG_log("\ndelete_blacktagged_movie=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7301,7 +7227,7 @@ def cfgCheck():
     if hasattr(cfg, 'delete_blacktagged_episode'):
         check=cfg.delete_blacktagged_episode
         if (GLOBAL_DEBUG):
-            print_byType("\ndelete_blacktagged_episode=" + str(check),False)
+            appendTo_DEBUG_log("\ndelete_blacktagged_episode=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7314,7 +7240,7 @@ def cfgCheck():
     if hasattr(cfg, 'delete_blacktagged_audio'):
         check=cfg.delete_blacktagged_audio
         if (GLOBAL_DEBUG):
-            print_byType("\ndelete_blacktagged_audio=" + str(check),False)
+            appendTo_DEBUG_log("\ndelete_blacktagged_audio=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7328,7 +7254,7 @@ def cfgCheck():
         if hasattr(cfg, 'delete_blacktagged_audiobook'):
             check=cfg.delete_blacktagged_audiobook
             if (GLOBAL_DEBUG):
-                print_byType("\ndelete_blacktagged_audiobook=" + str(check),False)
+                appendTo_DEBUG_log("\ndelete_blacktagged_audiobook=" + str(check))
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
@@ -7343,7 +7269,7 @@ def cfgCheck():
     if hasattr(cfg, 'whitetag'):
         check=cfg.whitetag
         if (GLOBAL_DEBUG):
-            print_byType("\nwhitetag='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nwhitetag='" + str(check) + "'")
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
@@ -7357,7 +7283,7 @@ def cfgCheck():
     if hasattr(cfg, 'minimum_number_episodes'):
         check=cfg.minimum_number_episodes
         if (GLOBAL_DEBUG):
-            print_byType("\nminimum_number_episodes=" + str(check),False)
+            appendTo_DEBUG_log("\nminimum_number_episodes=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7370,7 +7296,7 @@ def cfgCheck():
     if hasattr(cfg, 'minimum_number_played_episodes'):
         check=cfg.minimum_number_played_episodes
         if (GLOBAL_DEBUG):
-            print_byType("\nminimum_number_played_episodes=" + str(check),False)
+            appendTo_DEBUG_log("\nminimum_number_played_episodes=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7383,7 +7309,7 @@ def cfgCheck():
     if hasattr(cfg, 'minimum_number_episodes_behavior'):
         check=cfg.minimum_number_episodes_behavior
         if (GLOBAL_DEBUG):
-            print_byType("\nminimum_number_episodes_behavior='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nminimum_number_episodes_behavior='" + str(check) + "'")
         check=check.casefold()
         usersname_usersid_match=False
         for usersname in username_check_list:
@@ -7427,7 +7353,7 @@ def cfgCheck():
     if hasattr(cfg, 'REMOVE_FILES'):
         check=cfg.REMOVE_FILES
         if (GLOBAL_DEBUG):
-            print_byType("\nREMOVE_FILES='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nREMOVE_FILES='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             
@@ -7443,7 +7369,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_movie_genre'):
         check=cfg.keep_favorites_advanced_movie_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_movie_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7456,7 +7382,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_movie_library_genre'):
         check=cfg.keep_favorites_advanced_movie_library_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_movie_library_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_library_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7471,7 +7397,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_episode_genre'):
         check=cfg.keep_favorites_advanced_episode_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_episode_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_episode_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7484,7 +7410,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_season_genre'):
         check=cfg.keep_favorites_advanced_season_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_season_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_season_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7497,7 +7423,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_series_genre'):
         check=cfg.keep_favorites_advanced_series_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_series_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_series_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7510,7 +7436,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_tv_library_genre'):
         check=cfg.keep_favorites_advanced_tv_library_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_tv_library_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_library_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7523,7 +7449,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network'):
         check=cfg.keep_favorites_advanced_tv_studio_network
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_tv_studio_network=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7536,7 +7462,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network_genre'):
         check=cfg.keep_favorites_advanced_tv_studio_network_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_tv_studio_network_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7551,7 +7477,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_track_genre'):
         check=cfg.keep_favorites_advanced_track_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_track_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7564,7 +7490,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_album_genre'):
         check=cfg.keep_favorites_advanced_album_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_album_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7577,7 +7503,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_music_library_genre'):
         check=cfg.keep_favorites_advanced_music_library_genre
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_music_library_genre=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_music_library_genre=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7590,7 +7516,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_track_artist'):
         check=cfg.keep_favorites_advanced_track_artist
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_track_artist=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_artist=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7603,7 +7529,7 @@ def cfgCheck():
     if hasattr(cfg, 'keep_favorites_advanced_album_artist'):
         check=cfg.keep_favorites_advanced_album_artist
         if (GLOBAL_DEBUG):
-            print_byType("\nkeep_favorites_advanced_album_artist=" + str(check),False)
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_artist=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -7619,7 +7545,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_track_genre
                 if (GLOBAL_DEBUG):
-                    print_byType("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check),False)
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check))
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7632,7 +7558,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_genre
                 if (GLOBAL_DEBUG):
-                    print_byType("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check),False)
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check))
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7645,7 +7571,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_library_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_library_genre
                 if (GLOBAL_DEBUG):
-                    print_byType("\nkeep_favorites_advanced_audio_book_library_genre=" + str(check),False)
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_library_genre=" + str(check))
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7658,7 +7584,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
                 if (GLOBAL_DEBUG):
-                    print_byType("\nkeep_favorites_advanced_audio_book_track_author=" + str(check),False)
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_author=" + str(check))
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7671,7 +7597,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_author'):
                 check=cfg.keep_favorites_advanced_audio_book_author
                 if (GLOBAL_DEBUG):
-                    print_byType("\nkeep_favorites_advanced_audio_book_author=" + str(check),False)
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_author=" + str(check))
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
@@ -7686,7 +7612,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_script_header'):
         check=cfg.print_script_header
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_script_header='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_script_header='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7699,7 +7625,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_warnings='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_warnings='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7712,7 +7638,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_user_header='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_user_header='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7725,7 +7651,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_movie_delete_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_movie_delete_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7738,7 +7664,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_movie_keep_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_movie_keep_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7751,7 +7677,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_episode_delete_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_episode_delete_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7764,7 +7690,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_episode_keep_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_episode_keep_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7777,7 +7703,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_audio_delete_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_audio_delete_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7790,7 +7716,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_audio_keep_info='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_audio_keep_info='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7804,7 +7730,7 @@ def cfgCheck():
         if hasattr(cfg, 'print_audiobook_delete_info'):
             check=cfg.print_audiobook_delete_info
             if (GLOBAL_DEBUG):
-                print_byType("\nprint_audiobook_delete_info='" + str(check) + "'",False)
+                appendTo_DEBUG_log("\nprint_audiobook_delete_info='" + str(check) + "'")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7817,7 +7743,7 @@ def cfgCheck():
         if hasattr(cfg, 'print_audiobook_keep_info'):
             check=cfg.print_audiobook_keep_info
             if (GLOBAL_DEBUG):
-                print_byType("\nprint_audiobook_keep_info='" + str(check) + "'",False)
+                appendTo_DEBUG_log("\nprint_audiobook_keep_info='" + str(check) + "'")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7830,7 +7756,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_summary_header='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_summary_header='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7843,7 +7769,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_movie_summary='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_movie_summary='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7856,7 +7782,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_episode_summary='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_episode_summary='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7869,7 +7795,7 @@ def cfgCheck():
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
         if (GLOBAL_DEBUG):
-            print_byType("\nprint_audio_summary='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nprint_audio_summary='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7883,7 +7809,7 @@ def cfgCheck():
         if hasattr(cfg, 'print_audiobook_summary'):
             check=cfg.print_audiobook_summary
             if (GLOBAL_DEBUG):
-                print_byType("\nprint_audiobook_summary='" + str(check) + "'",False)
+                appendTo_DEBUG_log("\nprint_audiobook_summary='" + str(check) + "'")
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
@@ -7898,7 +7824,7 @@ def cfgCheck():
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
         if (GLOBAL_DEBUG):
-            print_byType("\nUPDATE_CONFIG='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nUPDATE_CONFIG='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -7913,7 +7839,7 @@ def cfgCheck():
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (GLOBAL_DEBUG):
-            print_byType("\nserver_brand='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             ((check == 'emby') or
@@ -7928,7 +7854,7 @@ def cfgCheck():
     if hasattr(cfg, 'server_url'):
         check=cfg.server_url
         if (GLOBAL_DEBUG):
-            print_byType("\nserver_url='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nserver_url='" + str(check) + "'")
         if (
             not (type(check) is str)
         ):
@@ -7939,7 +7865,7 @@ def cfgCheck():
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
         if (GLOBAL_DEBUG):
-            print_byType("\nauth_key='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nauth_key='" + str(check) + "'")
         if (
             not ((type(check) is str) and
             (len(check) == 32) and
@@ -7954,7 +7880,7 @@ def cfgCheck():
     if hasattr(cfg, 'library_setup_behavior'):
         check=cfg.library_setup_behavior
         if (GLOBAL_DEBUG):
-            print_byType("\nlibrary_setup_behavior='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nlibrary_setup_behavior='" + str(check) + "'")
         if (
             not (type(check) is str) and
             ((check == 'blacklist') or (check == 'whitelist'))
@@ -7968,7 +7894,7 @@ def cfgCheck():
     if hasattr(cfg, 'library_matching_behavior'):
         check=cfg.library_matching_behavior
         if (GLOBAL_DEBUG):
-            print_byType("\nlibrary_matching_behavior='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nlibrary_matching_behavior='" + str(check) + "'")
         if (
             not (type(check) is str) and
             ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
@@ -7983,7 +7909,7 @@ def cfgCheck():
         check=cfg.user_bl_libs
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            print_byType("\nuser_bl_libs=" + convert2json(check_list),False)
+            appendTo_DEBUG_log("\nuser_bl_libs=" + convert2json(check_list))
         check_user_bllibs_length=len(check_list)
         #Check number of users matches the number of blacklist entries
         if not (check_user_bllibs_length == check_user_keys_length):
@@ -7997,7 +7923,7 @@ def cfgCheck():
         check=cfg.user_wl_libs
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            print_byType("\nuser_wl_libs=" + convert2json(check_list),False)
+            appendTo_DEBUG_log("\nuser_wl_libs=" + convert2json(check_list))
         check_user_wllibs_length=len(check_list)
         #Check number of users matches the number of whitelist entries
         if not (check_user_wllibs_length == check_user_keys_length):
@@ -8010,7 +7936,7 @@ def cfgCheck():
     if hasattr(cfg, 'api_query_attempts'):
         check=cfg.api_query_attempts
         if (GLOBAL_DEBUG):
-            print_byType("\napi_query_attempts=" + str(check),False)
+            appendTo_DEBUG_log("\napi_query_attempts=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 0) and
@@ -8025,7 +7951,7 @@ def cfgCheck():
     if hasattr(cfg, 'api_query_item_limit'):
         check=cfg.api_query_item_limit
         if (GLOBAL_DEBUG):
-            print_byType("\napi_query_item_limit=" + str(check),False)
+            appendTo_DEBUG_log("\napi_query_item_limit=" + str(check))
         if (
             not ((type(check) is int) and
             (check >= 1) and
@@ -8040,7 +7966,7 @@ def cfgCheck():
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
         if (GLOBAL_DEBUG):
-            print_byType("\nDEBUG='" + str(check) + "'",False)
+            appendTo_DEBUG_log("\nDEBUG='" + str(check) + "'")
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -8055,7 +7981,7 @@ def cfgCheck():
     #Bring all errors found to users attention
     if not (error_found_in_mumc_config_py == ''):
         if (GLOBAL_DEBUG):
-            print_byType("\n" + error_found_in_mumc_config_py,GLOBAL_debugFileName,False)
+            appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py)
         raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
 #######################################################################################################
@@ -8066,16 +7992,16 @@ def cfgCheck():
 #Declare global variables
 GLOBAL_configFileName='mumc_config.py'
 GLOBAL_debugFileName='mumc_DEBUG.log'
-
 #get current working directory
-cwd = os.getcwd()
+GLOBAL_CWD = os.getcwd()
+
 #change to script's directory
-script_dir=change_working_directory(cwd)
+change_to_script_directory(GLOBAL_CWD)
 #remove old DEBUG if it exists
 if os.path.exists(GLOBAL_debugFileName):
     os.remove(GLOBAL_debugFileName)
 #change back to original working directory
-os.chdir(cwd)
+os.chdir(GLOBAL_CWD)
 
 try:
     #try importing the mumc_config.py file
@@ -8094,13 +8020,13 @@ try:
 
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        print_byType('\n',False)
+        appendTo_DEBUG_log('\n')
     print_byType('Script Version: ' + get_script_version(),print_script_header)
 
 #the exception
@@ -8117,7 +8043,7 @@ except (AttributeError, ModuleNotFoundError):
     update_config = False
     build_configuration_file(None,update_config)
 
-    #exit gracefully after setup
+    #exit gracefully after building config
     exit(0)
 
 #check config values are what we expect them to be
@@ -8128,10 +8054,10 @@ if (cfg.UPDATE_CONFIG):
     #check if user intentionally wants to update the config but does not have the script_behavor variable in their config
     edit_configuration_file(cfg,cfg.UPDATE_CONFIG)
 
-    #exit gracefully after conifig update
+    #exit gracefully after updating config
     exit(0)
 
-#now we can get media items that are ready to be deleted;
+#now we can query the server API for media items
 deleteItems=get_media_items()
 
 #show and delete media items
