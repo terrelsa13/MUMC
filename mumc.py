@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.4-beta'
+    Version='3.1.5-beta'
 
     return(Version)
 
@@ -445,7 +445,7 @@ def user_lib_builder(json_lib_entry):
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 libid_append=libid_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                libid_append=libid_append + ',\'\''
+                                libid_append=libid_append + ','
                             libid_init=False
                         if (GLOBAL_DEBUG):
                             appendTo_DEBUG_log('\nLibrary Id: ' + currentUser[keySlots][keySlotLibData])
@@ -458,7 +458,7 @@ def user_lib_builder(json_lib_entry):
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 collectiontype_append=collectiontype_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                collectiontype_append=collectiontype_append + ',\'\''
+                                collectiontype_append=collectiontype_append + ','
                             collectiontype_init=False
                         if (GLOBAL_DEBUG):
                             appendTo_DEBUG_log("\nCollection Type: '" + currentUser[keySlots][keySlotLibData] + "'")
@@ -471,7 +471,7 @@ def user_lib_builder(json_lib_entry):
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 path_append=path_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                path_append=path_append + ',\'\''
+                                path_append=path_append + ','
                             path_init=False
                         if (GLOBAL_DEBUG):
                             appendTo_DEBUG_log("\nPath: '" + currentUser[keySlots][keySlotLibData] + "'")
