@@ -16,7 +16,7 @@ from media_cleaner_config_defaults import get_default_config_values
 
 def get_script_version():
 
-    Version='2.1.11'
+    Version='2.1.12'
 
     return(Version)
 
@@ -414,6 +414,10 @@ def user_lib_builder(json_lib_entry):
         collectiontype_append=''
         networkpath_append=''
         path_append=''
+        libid_init=True
+        collectiontype_init=True
+        networkpath_init=True
+        path_init=True
         #loop thru each key for this user
         for keySlots in currentUser:
             #Store userId
@@ -428,49 +432,57 @@ def user_lib_builder(json_lib_entry):
                 for keySlotLibData in currentUser[keySlots]:
                     #Store libId
                     if (keySlotLibData == 'libid'):
-                        if (libid_append == ''):
+                        if ((libid_append == '') and (libid_init)):
                             libid_append=currentUser[keySlots][keySlotLibData]
+                            libid_init=False
                         else:
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 libid_append=libid_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                libid_append=libid_append + ',\'\''
+                                libid_append=libid_append + ','
+                            libid_init=False
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Library Id: ' + currentUser[keySlots][keySlotLibData])
                     #Store collectionType
                     elif (keySlotLibData == 'collectiontype'):
-                        if (collectiontype_append == ''):
+                        if ((collectiontype_append == '') and (collectiontype_init)):
                             collectiontype_append=currentUser[keySlots][keySlotLibData]
+                            collectiontype_init=False
                         else:
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 collectiontype_append=collectiontype_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                collectiontype_append=collectiontype_append + ',\'\''
+                                collectiontype_append=collectiontype_append + ','
+                            collectiontype_init=False
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Collection Type: ' + currentUser[keySlots][keySlotLibData])
                     #Store path
                     elif (keySlotLibData == 'path'):
-                        if (path_append == ''):
+                        if ((path_append == '') and (path_init)):
                             path_append=currentUser[keySlots][keySlotLibData]
+                            path_init=False
                         else:
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 path_append=path_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                path_append=path_append + ',\'\''
+                                path_append=path_append + ','
+                            path_init=False
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Path: ' + currentUser[keySlots][keySlotLibData])
                     #Store networkPath
                     elif (keySlotLibData == 'networkpath'):
-                        if (networkpath_append == ''):
+                        if ((networkpath_append == '') and (networkpath_init)):
                             networkpath_append=currentUser[keySlots][keySlotLibData]
+                            networkpath_init=False
                         else:
                             if not (currentUser[keySlots][keySlotLibData] == ''):
                                 networkpath_append=networkpath_append + ',' + currentUser[keySlots][keySlotLibData]
                             else:
-                                networkpath_append=networkpath_append + ',\'\''
+                                networkpath_append=networkpath_append + ','
+                            networkpath_init=False
                         if (cfg.DEBUG):
                             #DEBUG
                             print('Network Path: ' + currentUser[keySlots][keySlotLibData])
