@@ -8028,6 +8028,9 @@ try:
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n')
     print_byType('Script Version: ' + get_script_version(),print_script_header)
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n')
+    print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
