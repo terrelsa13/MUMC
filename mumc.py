@@ -4156,6 +4156,7 @@ def get_media_items():
             appendTo_DEBUG_log('\n')
         print_byType('-----------------------------------------------------------',print_user_header)
 
+        #get library attributes for user in this position
         user_bllib_keys_json_lensplit=user_bllib_keys_json[currentPosition].split(',')
         user_wllib_keys_json_lensplit=user_wllib_keys_json[currentPosition].split(',')
         user_bllib_netpath_json_lensplit=user_bllib_netpath_json[currentPosition].split(',')
@@ -4163,16 +4164,47 @@ def get_media_items():
         user_bllib_path_json_lensplit=user_bllib_path_json[currentPosition].split(',')
         user_wllib_path_json_lensplit=user_wllib_path_json[currentPosition].split(',')
 
+        #get length of library attributes
+        len_user_bllib_keys_json_lensplit=len(user_bllib_keys_json_lensplit)
+        len_user_wllib_keys_json_lensplit=len(user_wllib_keys_json_lensplit)
+        len_user_bllib_netpath_json_lensplit=len(user_bllib_netpath_json_lensplit)
+        len_user_wllib_netpath_json_lensplit=len(user_wllib_netpath_json_lensplit)
+        len_user_bllib_path_json_lensplit=len(user_bllib_path_json_lensplit)
+        len_user_wllib_path_json_lensplit=len(user_wllib_path_json_lensplit)
+
+        #find min length of library attributes
+        min_attribute_length=min(len_user_bllib_keys_json_lensplit,len_user_wllib_keys_json_lensplit,
+                                 len_user_bllib_netpath_json_lensplit,len_user_wllib_netpath_json_lensplit,
+                                 len_user_bllib_path_json_lensplit,len_user_wllib_path_json_lensplit)
+
+        #find max length of library attributes
+        max_attribute_length=max(len_user_bllib_keys_json_lensplit,len_user_wllib_keys_json_lensplit,
+                                 len_user_bllib_netpath_json_lensplit,len_user_wllib_netpath_json_lensplit,
+                                 len_user_bllib_path_json_lensplit,len_user_wllib_path_json_lensplit)
+
         #make all list attributes the same length
-        while not (len(user_bllib_keys_json_lensplit) == len(user_wllib_keys_json_lensplit)):
-            if (len(user_bllib_keys_json_lensplit) > len(user_wllib_keys_json_lensplit)):
-                user_wllib_keys_json_lensplit.append('')
-                user_wllib_netpath_json_lensplit.append('')
-                user_wllib_path_json_lensplit.append('')
-            elif (len(user_bllib_keys_json_lensplit) < len(user_wllib_keys_json_lensplit)):
+        while not (min_attribute_length == max_attribute_length):
+            if (len_user_bllib_keys_json_lensplit < max_attribute_length):
                 user_bllib_keys_json_lensplit.append('')
+                len_user_bllib_keys_json_lensplit += 1
+            if (len_user_wllib_keys_json_lensplit < max_attribute_length):
+                user_wllib_keys_json_lensplit.append('')
+                len_user_wllib_keys_json_lensplit += 1
+
+            if (len_user_bllib_netpath_json_lensplit < max_attribute_length):
                 user_bllib_netpath_json_lensplit.append('')
+                len_user_bllib_netpath_json_lensplit += 1
+            if (len_user_wllib_netpath_json_lensplit < max_attribute_length):
+                user_wllib_netpath_json_lensplit.append('')
+                len_user_wllib_netpath_json_lensplit += 1
+
+            if (len_user_bllib_path_json_lensplit < max_attribute_length):
                 user_bllib_path_json_lensplit.append('')
+                len_user_bllib_path_json_lensplit += 1
+            if (len_user_wllib_path_json_lensplit < max_attribute_length):
+                user_wllib_path_json_lensplit.append('')
+                len_user_wllib_path_json_lensplit += 1
+            min_attribute_length += 1
 
         media_found=False
 
