@@ -3146,6 +3146,7 @@ def get_media_items():
     print_byType('',print_script_header)
     print_byType('-----------------------------------------------------------',print_script_header)
     print_byType('Script Verion: ' + get_script_version(),print_script_header)
+    print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
     print_byType('-----------------------------------------------------------',print_script_header)
     print_byType('Start...',print_script_header)
     print_byType('Cleaning media for server at: ' + server_url,print_script_header)
