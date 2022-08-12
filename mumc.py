@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.5-beta'
+    Version='3.1.6-beta'
 
     return(Version)
 
@@ -2701,6 +2701,37 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
     return(isfav_ITEMstdo_ntwk)
 
 
+#determine if movie set to favorite
+def get_isMOVIE_Fav(item,user_key):
+
+    #DEBUG log formatting
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\n")
+
+    user_key=user_key
+
+    isfav_MOVIE={'movie':{}}
+
+### Movie #######################################################################################
+
+    if (('UserData'in item) and ('IsFavorite' in item['UserData'])):
+        isfav_MOVIE['movie'][item['Id']]=item['UserData']['IsFavorite']
+
+### End Movie ###################################################################################
+
+    for isfavkey in isfav_MOVIE:
+        for isfavID in isfav_MOVIE[isfavkey]:
+            if (isfav_MOVIE[isfavkey][isfavID]):
+                if (GLOBAL_DEBUG):
+                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.")
+                return(True)
+
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.")
+
+    return(False)
+
+
 #determine if genres for movie or library are set to favorite
 def get_isMOVIE_AdvancedFav(item,user_key):
 
@@ -2711,7 +2742,7 @@ def get_isMOVIE_AdvancedFav(item,user_key):
     keep_favorites_advanced_movie_genre=cfg.keep_favorites_advanced_movie_genre
     keep_favorites_advanced_movie_library_genre=cfg.keep_favorites_advanced_movie_library_genre
     #define empty dictionary for favorited Movies
-    isfav_MOVIE={'movie':{},'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
+    isfav_MOVIE={'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
 
 ### Movie #######################################################################################
 
@@ -2734,11 +2765,73 @@ def get_isMOVIE_AdvancedFav(item,user_key):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.")
+                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is advanced favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.")
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT advanced favorited.")
+
+    return(False)
+
+
+#determine if episode, season, or series are set to favorite
+def get_isEPISODE_Fav(item,user_key):
+
+    #DEBUG log formatting
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\n")
+
+    isfav_EPISODE={'episode':{},'season':{},'series':{}}
+
+### Episode #######################################################################################
+
+    if (('UserData'in item) and ('IsFavorite' in item['UserData'])):
+        isfav_EPISODE['episode'][item['Id']]=item['UserData']['IsFavorite']
+
+### End Episode ###################################################################################
+
+### Season ########################################################################################
+
+    if ('SeasonId' in item):
+        season_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeasonId'],'season_info')
+
+        isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
+
+    elif ('ParentId' in item):
+        season_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'season_info')
+
+        isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
+
+### End Season ####################################################################################
+
+### Series ########################################################################################
+
+    if ('SeriesId' in item):
+        series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
+
+        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+
+    elif ('SeriesId' in season_item_info):
+        series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['SeriesId'],'series_info')
+
+        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+
+    elif ('ParentId' in season_item_info):
+        series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
+
+        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+
+### End Series ####################################################################################
+
+    for isfavkey in isfav_EPISODE:
+        for isfavID in isfav_EPISODE[isfavkey]:
+            if (isfav_EPISODE[isfavkey][isfavID]):
+                if (GLOBAL_DEBUG):
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                return(True)
+
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
 
     return(False)
 
@@ -2757,7 +2850,7 @@ def get_isEPISODE_AdvancedFav(item,user_key):
     keep_favorites_advanced_tv_studio_network=cfg.keep_favorites_advanced_tv_studio_network
     keep_favorites_advanced_tv_studio_network_genre=cfg.keep_favorites_advanced_tv_studio_network_genre
     #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
-    isfav_EPISODE={'episode':{},'season':{},'series':{},'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
+    isfav_EPISODE={'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
 
 ### Episode #######################################################################################
 
@@ -2791,7 +2884,7 @@ def get_isEPISODE_AdvancedFav(item,user_key):
         isfav_EPISODE['seriesstudionetwork']=get_isSTUDIONETWORK_Fav(user_key,series_item_info,isfav_EPISODE['seriesstudionetwork'],keep_favorites_advanced_tv_studio_network,'studio_network')
 
     elif ('SeriesId' in season_item_info):
-        series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
+        series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['SeriesId'],'series_info')
 
         isfav_EPISODE['seriesgenre']=get_isGENRE_Fav(user_key,series_item_info,isfav_EPISODE['seriesgenre'],keep_favorites_advanced_series_genre,'series_genre')
 
@@ -2835,11 +2928,75 @@ def get_isEPISODE_AdvancedFav(item,user_key):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
+
+    return(False)
+
+
+#determine if music track or album are set to favorite
+def get_isAUDIO_Fav(item,user_key,itemType):
+
+    #DEBUG log formatting
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\n")
+
+    if (itemType == 'Audio'):
+        lookupTopicAlbum='album'
+
+    elif (itemType == 'AudioBook'):
+        lookupTopicAlbum='book'
+
+    else:
+        raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
+
+    #define empty dictionary for favorited Tracks and Albums
+    isfav_AUDIO={'track':{},'album':{}}
+
+### Track #########################################################################################
+
+    if (('UserData'in item) and ('IsFavorite' in item['UserData']) and ()):
+        isfav_AUDIO['track'][item['Id']]=item['UserData']['IsFavorite']
+
+### End Track #####################################################################################
+
+### Album/Book #########################################################################################
+
+    #Albums for music
+    if ('ParentId' in item):
+        album_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],lookupTopicAlbum + '_info')
+
+        isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
+
+    elif ('AlbumId' in item):
+        album_item_info = get_ADDITIONAL_itemInfo(user_key,item['AlbumId'],lookupTopicAlbum + '_info')
+
+        isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
+
+### End Album/Book #####################################################################################
+
+    for isfavkey in isfav_AUDIO:
+        for isfavID in isfav_AUDIO[isfavkey]:
+            if (isfav_AUDIO[isfavkey][isfavID]):
+                if (GLOBAL_DEBUG):
+                    if (itemType == 'Audio'):
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                    elif (itemType == 'AudioBook'):
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                    else:
+                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.")
+                return(True)
+
+    if (GLOBAL_DEBUG):
+        if (itemType == 'Audio'):
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+        elif (itemType == 'AudioBook'):
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+        else:
+            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.")
 
     return(False)
 
@@ -2922,25 +3079,30 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
                     if (itemType == 'Audio'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
                     elif (itemType == 'AudioBook'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
                     else:
-                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is advanced favorited.")
                 return(True)
 
     if (GLOBAL_DEBUG):
         if (itemType == 'Audio'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
         elif (itemType == 'AudioBook'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
         else:
-            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT advanced favorited.")
 
     return(False)
 
 
-#determine if genres for audiobok track, book, or author are set to favorite
+#determine if audiobook track or book are set to favorite
+def get_isAUDIOBOOK_Fav(item,user_key,itemType):
+    return get_isAUDIO_Fav(item,user_key,itemType)
+
+
+#determine if genres for audiobook track, book, or author are set to favorite
 def get_isAUDIOBOOK_AdvancedFav(item,user_key,itemType):
     return get_isAUDIO_AdvancedFav(item,user_key,itemType)
 
@@ -4595,23 +4757,23 @@ def get_media_items():
                                     else:
                                         item_matches_created_condition_day_filter=False
 
-                                    itemisfav_MOVIE_Local=False
+                                    itemisfav_MOVIE=False
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
-                                        itemisfav_MOVIE_Local=True
-                                    elif ((keep_favorites_movie) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
-                                        itemisfav_MOVIE_Local=True
+                                        itemisfav_MOVIE=True
+                                    elif (keep_favorites_movie):
+                                        itemisfav_MOVIE=get_isMOVIE_Fav(item,user_key)
 
                                     itemisfav_MOVIE_Advanced=False
                                     if ((keep_favorites_movie) and (keep_favorites_advanced_movie_genre or keep_favorites_advanced_movie_library_genre)):
                                         itemisfav_MOVIE_Advanced=get_isMOVIE_AdvancedFav(item,user_key)
 
                                     itemisfav_MOVIE_Display=False
-                                    if (itemisfav_MOVIE_Local or itemisfav_MOVIE_Advanced):
+                                    if (itemisfav_MOVIE or itemisfav_MOVIE_Advanced):
                                         itemisfav_MOVIE_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((keep_favorites_movie == 2) and (itemisfav_MOVIE_Local or itemisfav_MOVIE_Advanced)):
+                                    if ((keep_favorites_movie == 2) and (itemisfav_MOVIE or itemisfav_MOVIE_Advanced)):
                                         isfav_byUserId_Movie[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
@@ -4673,7 +4835,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE_Local,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']]=True
@@ -5077,12 +5239,12 @@ def get_media_items():
                                     else:
                                         item_matches_created_condition_day_filter=False
 
-                                    itemisfav_EPISODE_Local=False
+                                    itemisfav_EPISODE=False
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
-                                        itemisfav_EPISODE_Local=True
-                                    elif ((keep_favorites_episode) and ('UserData'in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
-                                        itemisfav_EPISODE_Local=True
+                                        itemisfav_EPISODE=True
+                                    elif (keep_favorites_episode):
+                                        itemisfav_EPISODE=get_isEPISODE_Fav(item,user_key)
 
                                     itemisfav_EPISODE_Advanced=False
                                     if ((keep_favorites_episode) and (keep_favorites_advanced_episode_genre or keep_favorites_advanced_season_genre or
@@ -5091,11 +5253,11 @@ def get_media_items():
                                         itemisfav_EPISODE_Advanced=get_isEPISODE_AdvancedFav(item,user_key)
 
                                     itemisfav_EPISODE_Display=False
-                                    if (itemisfav_EPISODE_Local or itemisfav_EPISODE_Advanced):
+                                    if (itemisfav_EPISODE or itemisfav_EPISODE_Advanced):
                                         itemisfav_EPISODE_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((keep_favorites_episode == 2) and (itemisfav_EPISODE_Local or itemisfav_EPISODE_Advanced)):
+                                    if ((keep_favorites_episode == 2) and (itemisfav_EPISODE or itemisfav_EPISODE_Advanced)):
                                         isfav_byUserId_Episode[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
@@ -5157,7 +5319,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE_Local,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']]=True
@@ -5580,12 +5742,12 @@ def get_media_items():
                                     else:
                                         item_matches_created_condition_day_filter=False
 
-                                    itemisfav_AUDIO_Local=False
+                                    itemisfav_AUDIO=False
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
-                                        itemisfav_AUDIO_Local=True
-                                    elif ((keep_favorites_audio) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
-                                        itemisfav_AUDIO_Local=True
+                                        itemisfav_AUDIO=True
+                                    elif (keep_favorites_audio):
+                                        itemisfav_AUDIO=get_isAUDIO_Fav(item,user_key,'Audio')
 
                                     itemisfav_AUDIO_Advanced=False
                                     if ((keep_favorites_audio) and (keep_favorites_advanced_track_genre or keep_favorites_advanced_album_genre or
@@ -5594,11 +5756,11 @@ def get_media_items():
                                         itemisfav_AUDIO_Advanced=get_isAUDIO_AdvancedFav(item,user_key,'Audio')
 
                                     itemisfav_AUDIO_Display=False
-                                    if (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced):
+                                    if (itemisfav_AUDIO or itemisfav_AUDIO_Advanced):
                                         itemisfav_AUDIO_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((keep_favorites_audio == 2) and (itemisfav_AUDIO_Local or itemisfav_AUDIO_Advanced)):
+                                    if ((keep_favorites_audio == 2) and (itemisfav_AUDIO or itemisfav_AUDIO_Advanced)):
                                         isfav_byUserId_Audio[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
@@ -5660,7 +5822,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO_Local,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']]=True
@@ -6068,12 +6230,12 @@ def get_media_items():
                                     else:
                                         item_matches_created_condition_day_filter=False
 
-                                    itemisfav_AUDIOBOOK_Local=False
+                                    itemisfav_AUDIOBOOK=False
                                     #Get if media item is set as favorite
                                     if (data_list_pos in data_from_favorited_queries):
-                                        itemisfav_AUDIOBOOK_Local=True
-                                    elif ((keep_favorites_audiobook) and ('UserData' in item) and ('IsFavorite' in item['UserData']) and (item['UserData']['IsFavorite'])):
-                                        itemisfav_AUDIOBOOK_Local=True
+                                        itemisfav_AUDIOBOOK=True
+                                    elif (keep_favorites_audiobook):
+                                        itemisfav_AUDIOBOOK=get_isAUDIOBOOK_Fav(item,user_key,'AudioBook')
 
                                     itemisfav_AUDIOBOOK_Advanced=False
                                     if ((keep_favorites_audiobook) and (keep_favorites_advanced_audio_book_track_genre or keep_favorites_advanced_audio_book_genre or
@@ -6082,11 +6244,11 @@ def get_media_items():
                                         itemisfav_AUDIOBOOK_Advanced=get_isAUDIOBOOK_AdvancedFav(item,user_key,'AudioBook')
 
                                     itemisfav_AUDIOBOOK_Display=False
-                                    if (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced):
+                                    if (itemisfav_AUDIOBOOK or itemisfav_AUDIOBOOK_Advanced):
                                         itemisfav_AUDIOBOOK_Display=True
 
                                     #Store media item's favorite state when multiple users are monitored and we want to keep media items based on any user favoriting the media item
-                                    if ((keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK_Local or itemisfav_AUDIOBOOK_Advanced)):
+                                    if ((keep_favorites_audiobook == 2) and (itemisfav_AUDIOBOOK or itemisfav_AUDIOBOOK_Advanced)):
                                         isfav_byUserId_AudioBook[user_key][item['Id']]=True
 
                                     itemIsWhiteTagged=False
@@ -6148,7 +6310,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK_Local,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']]=True
