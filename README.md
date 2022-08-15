@@ -1,3 +1,6 @@
+# Please Update To [The Lastest Version](https://github.com/terrelsa13/MUMC) Of MUMC.
+* Only the default branch will receive updates.
+* This branch is available for reference, but is no longer maintained.
 # Version 2.1.0 And Later Are Not Backwards Compatible
 * media_cleaner.py [Version 2.1.0 updates and changes](https://github.com/terrelsa13/media_cleaner/issues/23#issue-1260958344)
 * Previous versions of the config are not compatible with this latest version of the script.
