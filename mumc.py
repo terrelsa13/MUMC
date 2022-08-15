@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.6-beta'
+    Version='3.1.7-beta'
 
     return(Version)
 
@@ -2035,7 +2035,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                             user_processed_itemsId.add(child_item['Id'])
 
                             if (GLOBAL_DEBUG):
-                                appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + 'marked as favorite')
+                                appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' marked as favorite')
 
     #Return dictionary of child items along with TotalRecordCount
     return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
