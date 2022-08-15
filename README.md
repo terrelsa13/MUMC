@@ -168,8 +168,8 @@ Filter Statements overlapping zero and postive numbered played counts will only 
 
 * Delete movies created at least **180** days ago with a played count **==** **0**.
   - movie_created_days=180
-  - movie_created_play_count_comparison='=='
-  - movie_created_play_count=0
+  - movie_created_played_count_comparison='=='
+  - movie_created_played_count=0
 
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
