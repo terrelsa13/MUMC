@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.8-beta'
+    Version='3.2.0'
 
     return(Version)
 
