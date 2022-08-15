@@ -162,9 +162,9 @@ Filter Statements overlapping zero and postive numbered played counts will only 
 #### Filter Statement to delete unplayed movies created 180 or more days ago.
 
 * Delete movies played at least **60** days ago with a played count **==** **1**.
-  - movie_created_days=60
-  - movie_created_play_count_comparison='=='
-  - movie_created_play_count=1
+  - movie_played_days=60
+  - movie_played_count_comparison='=='
+  - movie_played_count=1
 
 * Delete movies created at least **180** days ago with a played count **==** **0**.
   - movie_created_days=180
