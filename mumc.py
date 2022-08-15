@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.1.7-beta'
+    Version='3.1.8-beta'
 
     return(Version)
 
@@ -2775,7 +2775,18 @@ def get_isMOVIE_AdvancedFav(item,user_key):
 
 
 #determine if episode, season, or series are set to favorite
-def get_isEPISODE_Fav(item,user_key):
+def get_isEPISODE_Fav(item,user_key,user_keys_json):
+
+    userKey_list=[]
+    keep_favorites_episode=cfg.keep_favorites_episode
+
+    if (keep_favorites_episode == 2):
+        #loop thru all user keys and use each
+        for userKey in user_keys_json:
+            userKey_list.append(userKey)
+    else:
+        #only use currently processing user key
+        userKey_list.append(user_key)
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
@@ -2792,34 +2803,41 @@ def get_isEPISODE_Fav(item,user_key):
 
 ### Season ########################################################################################
 
-    if ('SeasonId' in item):
-        season_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeasonId'],'season_info')
+    for user_keys in userKey_list:
 
-        isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
+        if ('SeasonId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_keys,item['SeasonId'],'season_info')
 
-    elif ('ParentId' in item):
-        season_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'season_info')
+            if ((not (season_item_info['Id'] in isfav_EPISODE['season'])) or  (isfav_EPISODE['season'][season_item_info['Id']] == False)):
+                isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
 
-        isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
+        elif ('ParentId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_keys,item['ParentId'],'season_info')
+
+            if ((not (season_item_info['Id'] in isfav_EPISODE['season'])) or  (isfav_EPISODE['season'][season_item_info['Id']] == False)):
+                isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
 
 ### End Season ####################################################################################
 
 ### Series ########################################################################################
 
-    if ('SeriesId' in item):
-        series_item_info = get_ADDITIONAL_itemInfo(user_key,item['SeriesId'],'series_info')
+        if ('SeriesId' in item):
+            series_item_info = get_ADDITIONAL_itemInfo(user_keys,item['SeriesId'],'series_info')
 
-        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+            if ((not (series_item_info['Id'] in isfav_EPISODE['season'])) or  (isfav_EPISODE['season'][series_item_info['Id']] == False)):
+                isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
 
-    elif ('SeriesId' in season_item_info):
-        series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['SeriesId'],'series_info')
+        elif ('SeriesId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_keys,season_item_info['SeriesId'],'series_info')
 
-        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+            if ((not (series_item_info['Id'] in isfav_EPISODE['season'])) or  (isfav_EPISODE['season'][series_item_info['Id']] == False)):
+                isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
 
-    elif ('ParentId' in season_item_info):
-        series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
+        elif ('ParentId' in season_item_info):
+            series_item_info = get_ADDITIONAL_itemInfo(user_keys,season_item_info['ParentId'],'series_info')
 
-        isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
+            if ((not (series_item_info['Id'] in isfav_EPISODE['season'])) or  (isfav_EPISODE['season'][series_item_info['Id']] == False)):
+                isfav_EPISODE['series'][series_item_info['Id']]=series_item_info['UserData']['IsFavorite']
 
 ### End Series ####################################################################################
 
@@ -2938,20 +2956,40 @@ def get_isEPISODE_AdvancedFav(item,user_key):
 
 
 #determine if music track or album are set to favorite
-def get_isAUDIO_Fav(item,user_key,itemType):
+def get_isAUDIO_Fav(item,user_key,user_keys_json,itemType):
+
+    userKey_list=[]
+
+    if (itemType == 'Audio'):
+        keep_favorites_audio=cfg.keep_favorites_audio
+        lookupTopicAlbum='album'
+
+        if (keep_favorites_audio == 2):
+            #loop thru all user keys and use each
+            for userKey in user_keys_json:
+                userKey_list.append(userKey)
+        else:
+            #only use currently processing user key
+            userKey_list.append(user_key)
+
+    elif (itemType == 'AudioBook'):
+        keep_favorites_audiobook=cfg.keep_favorites_audiobook
+        lookupTopicAlbum='book'
+
+        if (keep_favorites_audiobook == 2):
+            #loop thru all user keys and use each
+            for userKey in user_keys_json:
+                userKey_list.append(userKey)
+        else:
+            #only use currently processing user key
+            userKey_list.append(user_key)
+
+    else:
+        raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\n")
-
-    if (itemType == 'Audio'):
-        lookupTopicAlbum='album'
-
-    elif (itemType == 'AudioBook'):
-        lookupTopicAlbum='book'
-
-    else:
-        raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
 
     #define empty dictionary for favorited Tracks and Albums
     isfav_AUDIO={'track':{},'album':{}}
@@ -2965,16 +3003,20 @@ def get_isAUDIO_Fav(item,user_key,itemType):
 
 ### Album/Book #########################################################################################
 
-    #Albums for music
-    if ('ParentId' in item):
-        album_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],lookupTopicAlbum + '_info')
+    for user_keys in userKey_list:
 
-        isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
+        #Albums for music
+        if ('ParentId' in item):
+            album_item_info = get_ADDITIONAL_itemInfo(user_keys,item['ParentId'],lookupTopicAlbum + '_info')
 
-    elif ('AlbumId' in item):
-        album_item_info = get_ADDITIONAL_itemInfo(user_key,item['AlbumId'],lookupTopicAlbum + '_info')
+            if ((not (album_item_info['Id'] in isfav_AUDIO['season'])) or  (isfav_AUDIO['season'][album_item_info['Id']] == False)):
+                isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
 
-        isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
+        elif ('AlbumId' in item):
+            album_item_info = get_ADDITIONAL_itemInfo(user_keys,item['AlbumId'],lookupTopicAlbum + '_info')
+
+            if ((not (album_item_info['Id'] in isfav_AUDIO['season'])) or  (isfav_AUDIO['season'][album_item_info['Id']] == False)):
+                isfav_AUDIO['album'][album_item_info['Id']]=album_item_info['UserData']['IsFavorite']
 
 ### End Album/Book #####################################################################################
 
@@ -3098,8 +3140,8 @@ def get_isAUDIO_AdvancedFav(item,user_key,itemType):
 
 
 #determine if audiobook track or book are set to favorite
-def get_isAUDIOBOOK_Fav(item,user_key,itemType):
-    return get_isAUDIO_Fav(item,user_key,itemType)
+def get_isAUDIOBOOK_Fav(item,user_key,user_keys_json,itemType):
+    return get_isAUDIO_Fav(item,user_key,user_keys_json,itemType)
 
 
 #determine if genres for audiobook track, book, or author are set to favorite
@@ -5244,7 +5286,7 @@ def get_media_items():
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_EPISODE=True
                                     elif (keep_favorites_episode):
-                                        itemisfav_EPISODE=get_isEPISODE_Fav(item,user_key)
+                                        itemisfav_EPISODE=get_isEPISODE_Fav(item,user_key,user_keys_json)
 
                                     itemisfav_EPISODE_Advanced=False
                                     if ((keep_favorites_episode) and (keep_favorites_advanced_episode_genre or keep_favorites_advanced_season_genre or
@@ -5747,7 +5789,7 @@ def get_media_items():
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIO=True
                                     elif (keep_favorites_audio):
-                                        itemisfav_AUDIO=get_isAUDIO_Fav(item,user_key,'Audio')
+                                        itemisfav_AUDIO=get_isAUDIO_Fav(item,user_key,user_keys_json,'Audio')
 
                                     itemisfav_AUDIO_Advanced=False
                                     if ((keep_favorites_audio) and (keep_favorites_advanced_track_genre or keep_favorites_advanced_album_genre or
@@ -6235,7 +6277,7 @@ def get_media_items():
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_AUDIOBOOK=True
                                     elif (keep_favorites_audiobook):
-                                        itemisfav_AUDIOBOOK=get_isAUDIOBOOK_Fav(item,user_key,'AudioBook')
+                                        itemisfav_AUDIOBOOK=get_isAUDIOBOOK_Fav(item,user_key,user_keys_json,'AudioBook')
 
                                     itemisfav_AUDIOBOOK_Advanced=False
                                     if ((keep_favorites_audiobook) and (keep_favorites_advanced_audio_book_track_genre or keep_favorites_advanced_audio_book_genre or
