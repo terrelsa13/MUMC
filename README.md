@@ -23,17 +23,17 @@ Generic Filter Statement Parts (each media type has their own Filter Statement P
 Start with a generic Filter Statement:
 * Delete media items Played/Created at least Part #1 days ago with a played count Part #2 Part #3.
 
-  - Example #1: Filling in the blanks for a generic media items _played_ Filter Statement:
+  - Example A: Filling in the blanks for a generic media items _played_ Filter Statement:
     - Part #1 - 60
     - Part #2 - >=
     - Part #3 - 1
       - Delete media items _played_ at least **60** days ago with a played count **>=** **1**.
 
-  - Example #2: Filling in the blanks for a generic media items _created_ Filter Statement:
+  - Example B: Filling in the blanks for a generic media items _created_ Filter Statement:
     - Part #1 - 3650
     - Part #2 - <
-    - Part #3 - 0
-      - Delete media items _created_ at least **3650** days ago with a played count **<** **0**.
+    - Part #3 - 2
+      - Delete media items _created_ at least **3650** days ago with a played count **<** **2**.
 ## Step 3: Building Filter Statements for specific media types.
 
 * Delete movies played at least **22** days ago with a played count **>=** **1**.
@@ -95,7 +95,7 @@ You get the point right?
 
 ## Step 5: A couple things to remember when building Filter Statements
 
-Filter Statements implying negative played counts will be evaluted as _```*_played_count=0``` (i.e. unplayed media items).
+Filter Statements implying negative played counts will be evaluted as ```*_played_count=0``` (i.e. unplayed media items).
 
 * ...with a played count **<** **0**.
   - ...
@@ -107,7 +107,7 @@ Filter Statements implying negative played counts will be evaluted as _```*_play
   - movie_created_played_count_comparison='not >='
   - movie_created_played_count=0
 
-Filter Statements overlapping zero and postive numbered played counts will only delete the media items with postive numbered played counts (i.e. the played media items).
+_Played_ Filter Statements overlapping zero and postive numbered played counts will only delete the media items with postive numbered played counts (i.e. the played media items).
 
 * Delete episodes played at least # days ago with a played count **<=** **1**.
   - ...
@@ -116,31 +116,31 @@ Filter Statements overlapping zero and postive numbered played counts will only 
 
 * Delete movies played at least # days ago with a played count **>=** **0**.
   - ...
-  - movie_created_play_count_comparison='>='
-  - movie_created_play_count=0
+  - movie_played_count_comparison='>='
+  - movie_played_count=0
 
 ## Step 6: Example Filter Statements
 
 #### Filter Statement to delete movies played 90 or more days ago.
 
 * Delete movies played at least **90** days ago with a played count **>=** **1**.
-  - movie_created_days=90
-  - movie_created_play_count_comparison='>='
-  - movie_created_play_count=1
+  - movie_played_days=90
+  - movie_played_count_comparison='>='
+  - movie_played_count=1
 
 #### Filter Statement to delete episodes played less than twice, 30 or more days ago.
 
 * Delete episodes played at least **30** days ago with a played count **<** **2**.
-  - episode_created_days=30
-  - episode_created_played_count_comparison='<'
-  - episode_created_played_count=2
+  - episode_playeded_days=30
+  - episode_playeded_count_comparison='<'
+  - episode_played_count=2
 
 #### Filter Statement to delete "old" played and unplayed movies.
 
 * Delete movies created at least **365** days ago with a played count **>=** **0**.
   - movie_created_days=365
-  - movie_created_play_count_comparison='>='
-  - movie_created_play_count=0
+  - movie_created_played_count_comparison='>='
+  - movie_created_played_count=0
 
 #### Filter Statement to delete "old" unplayed episodes.
 
