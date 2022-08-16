@@ -153,7 +153,7 @@ _Played_ Filter Statements overlapping zero and postive numbered played counts w
 
 * Delete episodes created at least **365** days ago with a played count **not ==** **0**.
   - episode_created_days=365
-  - episode_create_played_count_comparison='not =='
+  - episode_created_played_count_comparison='not =='
   - episode_created_played_count=0
 
 ### Using Both Played And Created Filter Statements Together:
