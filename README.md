@@ -610,15 +610,20 @@ api_query_item_limit=25
 #### DEBUG
 ```python
 #----------------------------------------------------------#
-# Must be a boolean True or False value
-# False - Debug file logging disabled
-# True - Debug file logging enabled
-#         Debug log file save to: /the/script/directory/mumc_DEBUG.log
-#         The debug log file will be large (i.e. 10s to 100s of MBytes)
-#         Recommend only setting DEBUG=True when necessary
-# (False : default)
+# Must be a boolean True or False value or an integer 0 thru 4
+#  Debug log file save to: /the/script/directory/mumc_DEBUG.log
+#  The debug log file can be large (i.e. 10s to 100s of MBytes)
+#  Recommend only enabling DEBUG when necessary
+#  False - Debug messages disabled
+#   0 - Debug messages disabled
+#  True - Level 1 debug messages enabled
+#   1 - Level 1 debug messaging enabled
+#   2 - Level 2 debug messaging enabled
+#   3 - Level 3 debug messaging enabled
+#   4 - Level 4 debug messaging enabled
+# (0 : default)
 #----------------------------------------------------------#
-DEBUG=False
+DEBUG=0
 ```
 
 # Delete Or Keep Priorities Of A Media Item

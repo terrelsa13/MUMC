@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.1'
+    Version='3.2.2'
 
     return(Version)
 
@@ -40,10 +40,10 @@ def does_index_exist(item, indexvalue):
     try:
         exists = item[indexvalue]
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n" + str(indexvalue) + " exist in " + str(item))
+            appendTo_DEBUG_log("\n" + str(indexvalue) + " exist in " + str(item),2)
     except IndexError:
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n" + str(indexvalue) + " does NOT exist in " + str(item))
+            appendTo_DEBUG_log("\n" + str(indexvalue) + " does NOT exist in " + str(item),2)
         return(False)
     return(True)
 
@@ -53,8 +53,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
 
     if (debugBool):
         #Double newline for better debug file readablilty
-        appendTo_DEBUG_log("\n\n" + reqeustDebugMessage + ' - url request:')
-        appendTo_DEBUG_log("\n" + url)
+        appendTo_DEBUG_log("\n\n" + reqeustDebugMessage + ' - url request:',2)
+        appendTo_DEBUG_log("\n" + url,3)
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
@@ -74,8 +74,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                         data = json.loads(source)
                         getdata = False
                         if (debugBool):
-                            appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request: ...If Data Not Shown Below; It Is Commented Out To Keep The DEBUG Log A Reasonable Size")
-                            #appendTo_DEBUG_log("\n" + convert2json(data))
+                            appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:",2)
+                            appendTo_DEBUG_log("\n" + convert2json(data),4)
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
                             print_byType("\n" + str(err),True)
@@ -125,11 +125,11 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
         QueryItemsRemaining=True
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg))
-        appendTo_DEBUG_log("\nStarting at record index: " + str(StartIndex))
-        appendTo_DEBUG_log("\nAsking for " + str(QueryLimit) + " records")
-        appendTo_DEBUG_log("\nTotal records for this query is: " + str(TotalItems))
-        appendTo_DEBUG_log("\nAre there records remaining: " + str(QueryItemsRemaining))
+        appendTo_DEBUG_log("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg),2)
+        appendTo_DEBUG_log("\nStarting at record index: " + str(StartIndex),2)
+        appendTo_DEBUG_log("\nAsking for " + str(QueryLimit) + " records",2)
+        appendTo_DEBUG_log("\nTotal records for this query is: " + str(TotalItems),2)
+        appendTo_DEBUG_log("\nAre there records remaining: " + str(QueryItemsRemaining),2)
 
     return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
 
@@ -427,11 +427,11 @@ def user_lib_builder(json_lib_entry):
             if (keySlots == 'userid'):
                 built_userid.append(currentUser[keySlots])
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nBuilding library for user with Id: ' + currentUser[keySlots])
+                    appendTo_DEBUG_log('\nBuilding library for user with Id: ' + currentUser[keySlots],3)
             elif (keySlots == 'username'):
                 built_username.append(currentUser[keySlots])
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nBuilding library for user with name: '" + currentUser[keySlots] + "'")
+                    appendTo_DEBUG_log("\nBuilding library for user with name: '" + currentUser[keySlots] + "'",3)
             #Store library data
             else:
                 #loop thru each library data item for this library
@@ -448,7 +448,7 @@ def user_lib_builder(json_lib_entry):
                                 libid_append=libid_append + ','
                             libid_init=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log('\nLibrary Id: ' + currentUser[keySlots][keySlotLibData])
+                            appendTo_DEBUG_log('\nLibrary Id: ' + currentUser[keySlots][keySlotLibData],3)
                     #Store collectionType
                     elif (keySlotLibData == 'collectiontype'):
                         if ((collectiontype_append == '') and (collectiontype_init)):
@@ -461,7 +461,7 @@ def user_lib_builder(json_lib_entry):
                                 collectiontype_append=collectiontype_append + ','
                             collectiontype_init=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\nCollection Type: '" + currentUser[keySlots][keySlotLibData] + "'")
+                            appendTo_DEBUG_log("\nCollection Type: '" + currentUser[keySlots][keySlotLibData] + "'",3)
                     #Store path
                     elif (keySlotLibData == 'path'):
                         if ((path_append == '') and (path_init)):
@@ -474,7 +474,7 @@ def user_lib_builder(json_lib_entry):
                                 path_append=path_append + ','
                             path_init=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\nPath: '" + currentUser[keySlots][keySlotLibData] + "'")
+                            appendTo_DEBUG_log("\nPath: '" + currentUser[keySlots][keySlotLibData] + "'",3)
                     #Store networkPath
                     elif (keySlotLibData == 'networkpath'):
                         if ((networkpath_append == '') and (networkpath_init)):
@@ -487,7 +487,7 @@ def user_lib_builder(json_lib_entry):
                                 networkpath_append=networkpath_append + ','
                             networkpath_init=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\nNetwork Path: '" + currentUser[keySlots][keySlotLibData] + "'")
+                            appendTo_DEBUG_log("\nNetwork Path: '" + currentUser[keySlots][keySlotLibData] + "'",3)
         built_libid.insert(datapos,libid_append)
         built_collectiontype.insert(datapos,collectiontype_append)
         built_path.insert(datapos,path_append)
@@ -1701,17 +1701,22 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Must be a boolean True or False value\n"
-    config_file += "# False - Debug messages disabled\n"
-    config_file += "# True - Debug file logging enabled\n"
-    config_file += "#         Debug log file save to: /the/script/directory/mumc_DEBUG.log\n"
-    config_file += "#         The debug log file will be large (i.e. 10s to 100s of MBytes)\n"
-    config_file += "#         Recommend only setting DEBUG=True when necessary\n"
-    config_file += "# (False : default)\n"
+    config_file += "#  Debug log file save to: /the/script/directory/mumc_DEBUG.log\n"
+    config_file += "#  The debug log file can be large (i.e. 10s to 100s of MBytes)\n"
+    config_file += "#  Recommend only enabling DEBUG when necessary\n"
+    config_file += "#  False - Debug messages disabled\n"
+    config_file += "#   0 - Debug messages disabled\n"
+    config_file += "#  True - Level 1 debug messages enabled\n"
+    config_file += "#   1 - Level 1 debug messaging enabled\n"
+    config_file += "#   2 - Level 2 debug messaging enabled\n"
+    config_file += "#   3 - Level 3 debug messaging enabled\n"
+    config_file += "#   4 - Level 4 debug messaging enabled\n"
+    config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "DEBUG=False\n"
+        config_file += "DEBUG=0\n"
     elif (updateConfig):
-        config_file += "DEBUG=" + str(cfg.DEBUG) + "\n"
+        config_file += "DEBUG=" + str(GLOBAL_DEBUG) + "\n"
     config_file += "\n"
     config_file += "#-------------End Config Options----------------------------#"
 
@@ -1800,15 +1805,15 @@ def get_days_since_played(date_last_played):
 
         if (GLOBAL_DEBUG):
             #Double newline for DEBUG log formatting
-            appendTo_DEBUG_log('\n\nCaptured UTC time is: ' + str(date_time_now))
-            appendTo_DEBUG_log('\nDate last played or date created is: ' + str(date_last_played))
-            appendTo_DEBUG_log('\nFormatted date last played or date created is: ' + str(date_time_last_played))
-            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago')
+            appendTo_DEBUG_log('\n\nCaptured UTC time is: ' + str(date_time_now),3)
+            appendTo_DEBUG_log('\nDate last played or date created is: ' + str(date_last_played),2)
+            appendTo_DEBUG_log('\nFormatted date last played or date created is: ' + str(date_time_last_played),3)
+            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago',2)
     else:
         days_since_played=date_last_played
 
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago')
+            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago',2)
 
     return(days_since_played)
 
@@ -1847,11 +1852,11 @@ def get_season_episode(ParentIndexNumber,IndexNumber):
     formatted_season_episode = 's' + season_num_str + '.e' + episode_num_str
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\nSeason # is: ' + str(ParentIndexNumber))
-        appendTo_DEBUG_log('\nEpisode # is: ' + str(IndexNumber))
-        appendTo_DEBUG_log('\nPadded Season #: ' + season_num_str)
-        appendTo_DEBUG_log('\nPadded Episode #: ' + episode_num_str)
-        appendTo_DEBUG_log('\nFormatted season#.episode# is: ' + str(formatted_season_episode))
+        appendTo_DEBUG_log('\nSeason # is: ' + str(ParentIndexNumber),2)
+        appendTo_DEBUG_log('\nEpisode # is: ' + str(IndexNumber),2)
+        appendTo_DEBUG_log('\nPadded Season #: ' + season_num_str,2)
+        appendTo_DEBUG_log('\nPadded Episode #: ' + episode_num_str,2)
+        appendTo_DEBUG_log('\nFormatted season#.episode# is: ' + str(formatted_season_episode),2)
 
     return(formatted_season_episode)
 
@@ -1922,7 +1927,7 @@ def get_isPlayed_FilterValue(filter_played_count_comparison,filter_played_count)
         isPlayed_Filter_Value=''
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value)
+        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value,2)
 
     return isPlayed_Filter_Value
 
@@ -2012,7 +2017,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                         QueryLimit=0
                         QueriesRemaining=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found")
+                            appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found",2)
                             
 
                     #Loop thru the returned child items
@@ -2035,7 +2040,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                             user_processed_itemsId.add(child_item['Id'])
 
                             if (GLOBAL_DEBUG):
-                                appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' marked as favorite')
+                                appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' marked as favorite',2)
 
     #Return dictionary of child items along with TotalRecordCount
     return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
@@ -2098,7 +2103,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                             QueryLimit=0
                             QueriesRemaining=False
                             if (GLOBAL_DEBUG):
-                                appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found")
+                                appendTo_DEBUG_log("\n\nNo " + APIDebugMsg + " media items found",2)
 
                         #Loop thru the returned child items
                         for child_item in children_data['Items']:
@@ -2143,7 +2148,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                                 user_processed_itemsId.add(child_item['Id'])
 
                                 if (GLOBAL_DEBUG):
-                                    appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName))
+                                    appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),2)
 
     #Return dictionary of child items along with TotalRecordCount
     return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
@@ -2178,7 +2183,7 @@ def get_isItemMonitored(mediasource):
         itemIsMonitored=False
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\nMedia Item Is Monitored: ' + str(itemIsMonitored))
+        appendTo_DEBUG_log('\nMedia Item Is Monitored: ' + str(itemIsMonitored),2)
 
     return(itemIsMonitored)
 
@@ -2198,14 +2203,14 @@ def get_isItemMatching(item_one, item_two):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
 
     #determine if media Id matches one of the other Ids
     for single_item_one in item_one_split:
             for single_item_two in item_two_split:
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nComparing the below two items')
-                    appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'')
+                    appendTo_DEBUG_log('\nComparing the below two items',3)
+                    appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3)
                 if ((not (single_item_one == '')) and (not (single_item_two == '')) and
                     (not (single_item_one == "''")) and (not (single_item_two == "''")) and
                     (not (single_item_one == '""')) and (not (single_item_two == '""'))):
@@ -2233,7 +2238,7 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #Store media item's local and remote whitelist state
     #Get if media item is whitelisted
@@ -2249,8 +2254,8 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nItem is whitelisted for this user: ' + str(itemIsWhiteListed_Local))
-                    appendTo_DEBUG_log('\nMatching whitelisted value for this user is: ' + itemWhiteListedValue_Local)
+                    appendTo_DEBUG_log('\nItem is whitelisted for this user: ' + str(itemIsWhiteListed_Local),2)
+                    appendTo_DEBUG_log('\nMatching whitelisted value for this user is: ' + str(itemWhiteListedValue_Local),2)
 
         #Looking in other users libraries
         else: #(wllib_pos == currentPosition)
@@ -2263,16 +2268,16 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
                     itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nItem is whitelisted for another user: ' + str(itemIsWhiteListed_Remote))
-                    appendTo_DEBUG_log('\nMatching whitelisted value for another user is: ' + itemWhiteListedValue_Remote)
+                    appendTo_DEBUG_log('\nItem is whitelisted for another user: ' + str(itemIsWhiteListed_Remote),2)
+                    appendTo_DEBUG_log('\nMatching whitelisted value for another user is: ' + str(itemWhiteListedValue_Remote),2)
 
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\nLibraryId is: ' + LibraryID)
-            appendTo_DEBUG_log('\nLibraryPath is: ' + LibraryPath)
-            appendTo_DEBUG_log('\nLibraryNetPath is: ' + LibraryNetPath)
-            appendTo_DEBUG_log('\nWhitelisted Keys are: ' + user_wllib_keys_json[wllib_pos])
-            appendTo_DEBUG_log('\nWhitelisted Paths are: ' + user_wllib_path_json[wllib_pos])
-            appendTo_DEBUG_log('\nWhitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos])
+            appendTo_DEBUG_log('\nLibraryId is: ' + LibraryID,2)
+            appendTo_DEBUG_log('\nLibraryPath is: ' + LibraryPath,2)
+            appendTo_DEBUG_log('\nLibraryNetPath is: ' + LibraryNetPath,2)
+            appendTo_DEBUG_log('\nWhitelisted Keys are: ' + user_wllib_keys_json[wllib_pos],2)
+            appendTo_DEBUG_log('\nWhitelisted Paths are: ' + user_wllib_path_json[wllib_pos],2)
+            appendTo_DEBUG_log('\nWhitelisted NetworkPaths are: ' + user_wllib_netpath_json[wllib_pos],2)
 
     return itemIsWhiteListed_Local,itemIsWhiteListed_Remote
 
@@ -2283,7 +2288,7 @@ def get_isItemTagged(usertags,tagged_items,item):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #Emby and jellyfin store tags differently
     if (cfg.server_brand == 'emby'):
@@ -2300,7 +2305,7 @@ def get_isItemTagged(usertags,tagged_items,item):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue))
+                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),2)
     #Emby and jellyfin store tags differently
     else: #(cfg.server_brand == 'jellyfin')
         #Jellyfin tags
@@ -2317,10 +2322,10 @@ def get_isItemTagged(usertags,tagged_items,item):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue))
+                    appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),2)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nIs Media Item " + str(item['Id']) + " Tagged: " + str(itemIsTagged))
+        appendTo_DEBUG_log("\nIs Media Item " + str(item['Id']) + " Tagged: " + str(itemIsTagged),2)
 
     #parenthesis intentionally omitted to return tagged_items as a set
     return itemIsTagged,tagged_items
@@ -2335,7 +2340,7 @@ def get_ADDITIONAL_itemInfo(user_key,itemId,lookupTopic):
     url=(server_url + '/Users/' + user_key  + '/Items/' + str(itemId) +
         '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags&api_key=' + auth_key)
 
-    itemInfo=requestURL(url, cfg.DEBUG, lookupTopic, cfg.api_query_attempts)
+    itemInfo=requestURL(url, GLOBAL_DEBUG, lookupTopic, cfg.api_query_attempts)
 
     return(itemInfo)
 
@@ -2350,7 +2355,7 @@ def get_STUDIO_itemInfo(user_key,studioNetworkName):
     #Get studio item information
     url=server_url + '/Studios/' + studio_network + '&enableImages=False&enableUserData=True&api_key=' + auth_key
 
-    itemInfo=requestURL(url, cfg.DEBUG, 'studio_network_info', cfg.api_query_attempts)
+    itemInfo=requestURL(url, GLOBAL_DEBUG, 'studio_network_info', cfg.api_query_attempts)
 
     return(itemInfo)
 
@@ -2365,7 +2370,7 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
 ### Movie #######################################################################################
 
@@ -2388,11 +2393,11 @@ def get_isMOVIE_Tagged(item,user_key,usertags):
         for istagID in istag_MOVIE[istagkey]:
             if (istag_MOVIE[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is tagged.")
+                    appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is tagged.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT tagged.")
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT tagged.",2)
 
     return(False)
 
@@ -2407,7 +2412,7 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
 ### Episode #######################################################################################
 
@@ -2479,11 +2484,11 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
         for istagID in istag_EPISODE[istagkey]:
             if (istag_EPISODE[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is tagged.")
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is tagged.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT tagged.")
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT tagged.",2)
 
     return(False)
 
@@ -2497,7 +2502,7 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
 ### Track #########################################################################################
 
@@ -2543,11 +2548,11 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
         for istagID in istag_AUDIO[istagkey]:
             if (istag_AUDIO[istagkey][istagID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is tagged.")
+                    appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is tagged.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.")
+        appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.",2)
 
     return(False)
 
@@ -2562,7 +2567,7 @@ def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookup
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     if (('GenreItems' in item) and (does_index_exist(item['GenreItems'],0))):
         #Check if bitmask for favorites by item genre is enabled
@@ -2593,7 +2598,7 @@ def get_isGENRE_Fav(user_key,item,isfav_ITEMgenre,keep_favorites_advanced,lookup
                             isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre))
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre),2)
 
     return(isfav_ITEMgenre)
 
@@ -2603,7 +2608,7 @@ def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,look
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     if (('ArtistItems' in item) and (does_index_exist(item['ArtistItems'],0))):
         #Check if bitmask for favorites by artist is enabled
@@ -2634,7 +2639,7 @@ def get_isARTIST_Fav(user_key,item,isfav_ITEMartist,keep_favorites_advanced,look
                             isfav_ITEMartist[artist_item_info['Id']] = artist_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist))
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist),2)
 
     return(isfav_ITEMartist)
 
@@ -2644,7 +2649,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     if (('Studios' in  item) and (does_index_exist(item['Studios'],0))):
         #Check if bitmask for favorites by item genre is enabled
@@ -2696,7 +2701,7 @@ def get_isSTUDIONETWORK_Fav(user_key,item,isfav_ITEMstdo_ntwk,keep_favorites_adv
                     isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk))
+        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk),2)
 
     return(isfav_ITEMstdo_ntwk)
 
@@ -2706,7 +2711,7 @@ def get_isMOVIE_Fav(item,user_key,user_keys_json):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     user_key=user_key
     user_keys_json=user_keys_json
@@ -2724,11 +2729,11 @@ def get_isMOVIE_Fav(item,user_key,user_keys_json):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.")
+                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.")
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.",2)
 
     return(False)
 
@@ -2751,7 +2756,7 @@ def get_isMOVIE_AdvancedFav(item,user_key,user_keys_json):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #define empty dictionary for favorited Movies
     isfav_MOVIE={'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
@@ -2780,11 +2785,11 @@ def get_isMOVIE_AdvancedFav(item,user_key,user_keys_json):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is advanced favorited.")
+                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is advanced favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT advanced favorited.")
+        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT advanced favorited.",2)
 
     return(False)
 
@@ -2805,7 +2810,7 @@ def get_isEPISODE_Fav(item,user_key,user_keys_json):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     isfav_EPISODE={'episode':{},'season':{},'series':{}}
 
@@ -2860,11 +2865,11 @@ def get_isEPISODE_Fav(item,user_key,user_keys_json):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2)
 
     return(False)
 
@@ -2891,7 +2896,7 @@ def get_isEPISODE_AdvancedFav(item,user_key,user_keys_json):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
     isfav_EPISODE={'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
@@ -2986,11 +2991,11 @@ def get_isEPISODE_AdvancedFav(item,user_key,user_keys_json):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
+                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
+        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2)
 
     return(False)
 
@@ -3029,7 +3034,7 @@ def get_isAUDIO_Fav(item,user_key,user_keys_json,itemType):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #define empty dictionary for favorited Tracks and Albums
     isfav_AUDIO={'track':{},'album':{}}
@@ -3065,20 +3070,20 @@ def get_isAUDIO_Fav(item,user_key,user_keys_json,itemType):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
                     if (itemType == 'Audio'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2)
                     elif (itemType == 'AudioBook'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2)
                     else:
-                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.")
+                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
         if (itemType == 'Audio'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2)
         elif (itemType == 'AudioBook'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2)
         else:
-            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.")
+            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.",2)
 
     return(False)
 
@@ -3135,7 +3140,7 @@ def get_isAUDIO_AdvancedFav(item,user_key,user_keys_json,itemType):
 
     #DEBUG log formatting
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
 
     #define empty dictionary for favorited Tracks, Albums, Artists
     isfav_AUDIO={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'trackartist':{},'albumartist':{},'audiolibraryartist':{},'composergenre':{},'audiolibrarygenre':{}}
@@ -3192,20 +3197,20 @@ def get_isAUDIO_AdvancedFav(item,user_key,user_keys_json,itemType):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (GLOBAL_DEBUG):
                     if (itemType == 'Audio'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2)
                     elif (itemType == 'AudioBook'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.")
+                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2)
                     else:
-                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is advanced favorited.")
+                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is advanced favorited.",2)
                 return(True)
 
     if (GLOBAL_DEBUG):
         if (itemType == 'Audio'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2)
         elif (itemType == 'AudioBook'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.")
+            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2)
         else:
-            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT advanced favorited.")
+            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT advanced favorited.",2)
 
     return(False)
 
@@ -3899,11 +3904,11 @@ def get_playedStatus(item,media_condition,filter_count_comparison,filter_count):
                 item_matches_played_count_filter=True
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...")
+        appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",2)
         if (((IsPlayed == 'True') and item_played) or ((IsPlayed == 'False') and not item_played) or (IsPlayed == '')):
-            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter))
+            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter),2)
         else:
-            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed")
+            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed",2)
 
     return item_matches_played_count_filter
 
@@ -3932,17 +3937,17 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
         okToDelete=False
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nIs Media Item OK To Delete: " + str(okToDelete))
-        appendTo_DEBUG_log("\nIs Media Item Favorited For This User: " + str(itemisfav_Local))
-        appendTo_DEBUG_log("\nIs Media Item An Advanced Favorite: " + str(itemisfav_Advanced))
-        appendTo_DEBUG_log("\nIs Media Item WhiteTagged: " + str(itemIsWhiteTagged))
-        appendTo_DEBUG_log("\nIs Media Item BlackTagged: " + str(itemIsBlackTagged))
-        appendTo_DEBUG_log("\nDoes Media Item Match The Play Count Filter: " + str(item_matches_played_count_filter))
-        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Played: " + str(item_matches_played_condition_day_filter))
-        appendTo_DEBUG_log("\nDoes Media Item Match The Created Played Count Filter: " + str(item_matches_created_played_count_filter))
-        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Created-Played: " + str(item_matches_created_condition_day_filter))
-        appendTo_DEBUG_log("\nIs Media Item WhiteListed For This User: " + str(itemIsWhiteListed_Local))
-        appendTo_DEBUG_log("\nIs Media Item WhiteListed For Another User: " + str(itemIsWhiteListed_Remote))
+        appendTo_DEBUG_log("\nIs Media Item OK To Delete: " + str(okToDelete),2)
+        appendTo_DEBUG_log("\nIs Media Item Favorited For This User: " + str(itemisfav_Local),2)
+        appendTo_DEBUG_log("\nIs Media Item An Advanced Favorite: " + str(itemisfav_Advanced),2)
+        appendTo_DEBUG_log("\nIs Media Item WhiteTagged: " + str(itemIsWhiteTagged),2)
+        appendTo_DEBUG_log("\nIs Media Item BlackTagged: " + str(itemIsBlackTagged),2)
+        appendTo_DEBUG_log("\nDoes Media Item Match The Play Count Filter: " + str(item_matches_played_count_filter),2)
+        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Played: " + str(item_matches_played_condition_day_filter),2)
+        appendTo_DEBUG_log("\nDoes Media Item Match The Created Played Count Filter: " + str(item_matches_created_played_count_filter),2)
+        appendTo_DEBUG_log("\nDoes Media Item Meet Number Of Days Since Created-Played: " + str(item_matches_created_condition_day_filter),2)
+        appendTo_DEBUG_log("\nIs Media Item WhiteListed For This User: " + str(itemIsWhiteListed_Local),2)
+        appendTo_DEBUG_log("\nIs Media Item WhiteListed For Another User: " + str(itemIsWhiteListed_Remote),2)
 
     return okToDelete
 
@@ -3952,50 +3957,50 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
 def prepare_MOVIEoutput(item):
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output",2)
 
     if not ('Type' in item):
         item['Type']='Movie'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing",3)
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing",3)
     if not ('Studios' in item):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Studios'] or item['Studios'][0] Was Missing")
+            appendTo_DEBUG_log("\nitem['Studios'] or item['Studios'][0] Was Missing",3)
     if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[0]
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Studios'][0] or item['Studios'][0]{'Name':'Unknown'} Was Missing")
+            appendTo_DEBUG_log("\nitem['Studios'][0] or item['Studios'][0]{'Name':'Unknown'} Was Missing",3)
     if not ('Name' in item['Studios'][0]):
         item['Studios'][0]={'Name':'Unknown'}
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing")
+            appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing",3)
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing",3)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFinished Preparing Movie " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\nFinished Preparing Movie " + item['Id'] + " For Output",2)
 
     return item
 
@@ -4005,52 +4010,52 @@ def prepare_MOVIEoutput(item):
 def prepare_EPISODEoutput(item):
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n\nPreparing Episode " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\n\nPreparing Episode " + item['Id'] + " For Output",2)
 
     if not ('Type' in item):
         item['Type']='Episode'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing",3)
     if not ('SeriesName' in item):
         item['SeriesName']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['SeriesName'] Was Missing")
+            appendTo_DEBUG_log("\nitem['SeriesName'] Was Missing",3)
     if not ('ParentIndexNumber' in item):
         item['ParentIndexNumber']='??'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['ParentIndexNumber'] Was Missing")
+            appendTo_DEBUG_log("\nitem['ParentIndexNumber'] Was Missing",3)
     if not ('IndexNumber' in item):
         item['IndexNumber']='??'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing")
+            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing",3)
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing",3)
     if not ('SeriesStudio' in item):
         item['SeriesStudio']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing")
+            appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+                appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing",3)
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing",3)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFinished Preparing Episode " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\nFinished Preparing Episode " + item['Id'] + " For Output",2)
 
     return item
 
@@ -4060,56 +4065,56 @@ def prepare_EPISODEoutput(item):
 def prepare_AUDIOoutput(item):
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n\nPreparing Audio/AudioBook " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\n\nPreparing Audio/AudioBook " + item['Id'] + " For Output",2)
 
     if not ('Type' in item):
         item['Type']='Episode'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Type'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Type'] Was Missing",3)
     if not ('IndexNumber' in item):
         item['IndexNumber']=999
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing")
+            appendTo_DEBUG_log("\nitem['IndexNumber'] Was Missing",3)
     if not ('Name' in item):
         item['Name']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Name'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Name'] Was Missing",3)
     if not ('Album' in item):
         item['Album']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Album'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Album'] Was Missing",3)
     if not ('Artist' in item):
         item['Artist']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Artist'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Artist'] Was Missing",3)
     if not ('Studios' in item):
         item['Studios']=[{'Name':'Unknown'}]
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Studios'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Studios'] Was Missing",3)
     if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[{'Name':'Unknown'}]
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing")
+            appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
         item['UserData']['LastPlayedDate']='Unplayed'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing")
+            appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     if not ('DateCreated' in item):
         item['DateCreated']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing")
+            appendTo_DEBUG_log("\nitem['DateCreated'] Was Missing",3)
     if not ('Id' in item):
         item['Id']='Unknown'
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nitem['Id'] Was Missing")
+            appendTo_DEBUG_log("\nitem['Id'] Was Missing",3)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFinished Preparing Audio/AudioBook " + item['Id'] + " For Output")
+        appendTo_DEBUG_log("\nFinished Preparing Audio/AudioBook " + item['Id'] + " For Output",2)
 
     return item
 
@@ -4121,8 +4126,9 @@ def prepare_AUDIOBOOKoutput(item):
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
-def appendTo_DEBUG_log(string_to_print):
-    save_file(string_to_print,GLOBAL_debugFileName,"a")
+def appendTo_DEBUG_log(string_to_print,debugLevel):
+    if (GLOBAL_DEBUG >= debugLevel):
+        save_file(string_to_print,GLOBAL_debugFileName,"a")
 
 
 #determine if the requested console output line should be shown or hidden
@@ -4130,7 +4136,7 @@ def print_byType(string_to_print,ok_to_print):
     if (ok_to_print):
         print(string_to_print)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log(string_to_print)
+        appendTo_DEBUG_log(string_to_print,1)
 
 
 # get played, favorited, and tagged media items
@@ -4315,19 +4321,19 @@ def get_media_items():
     #Get list of all played items
     if (GLOBAL_DEBUG):
         #Double newline for debug log formatting
-        appendTo_DEBUG_log('\n\n')
+        appendTo_DEBUG_log('\n\n',1)
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('Start...',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('Cleaning media for server at: ' + server_url,print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('',print_script_header)
 
     all_media_disabled=False
@@ -4342,22 +4348,37 @@ def get_media_items():
        (audio_created_days == -1) and
        ((hasattr(cfg, 'audiobook_created_days') and (audiobook_created_days == -1)) or (not hasattr(cfg, 'audiobook_created_days')))
        ):
+        appendTo_DEBUG_log("\n",1)
         print_byType('* ATTENTION!!!                                            *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* No media types are being monitored.                     *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* Open the mumc_config.py file in a text editor.          *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* Set at least one media type to >=0.                     *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('*                                                         *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* movie_played_days=-1                                    *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* episode_played_days=-1                                  *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* audio_played_days=-1                                    *',print_warnings)
         if (server_brand == 'jellyfin'):
+            appendTo_DEBUG_log("\n",1)
             print_byType('* audiobook_played_days=-1                            *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('*                                                         *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* movie_created_days=-1                                   *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* episode_created_days=-1                                 *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('* audio_created_days=-1                                   *',print_warnings)
         if (server_brand == 'jellyfin'):
+            appendTo_DEBUG_log("\n",1)
             print_byType('* audiobook_created_days=-1                           *',print_warnings)
+        appendTo_DEBUG_log("\n",1)
         print_byType('-----------------------------------------------------------',print_warnings)
         all_media_disabled=True
 
@@ -4365,12 +4386,12 @@ def get_media_items():
     deleteItems=[]
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nBlacklisted Libraries...")
+        appendTo_DEBUG_log("\nBuilding Blacklisted Libraries...",2)
     #Build the library data from the data structures stored in the configuration file
     bluser_keys_json_verify,bluser_names_json_verify,user_bllib_keys_json,user_bllib_collectiontype_json,user_bllib_netpath_json,user_bllib_path_json=user_lib_builder(cfg.user_bl_libs)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nWhitelisted Libraries...")
+        appendTo_DEBUG_log("\nBuilding Whitelisted Libraries...",2)
     #Build the library data from the data structures stored in the configuration file
     wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_netpath_json,user_wllib_path_json=user_lib_builder(cfg.user_wl_libs)
 
@@ -4379,13 +4400,13 @@ def get_media_items():
         user_keys_json = bluser_keys_json_verify
     else:
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
+            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',2)
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     #verify userNames are in same order for both blacklist and whitelist libraries
     if (not (bluser_names_json_verify == wluser_names_json_verify)):
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
+            appendTo_DEBUG_log('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both',2)
         raise RuntimeError('\nUSERID_ERROR: cfg.user_bl_libs or cfg.user_wl_libs has been modified in mumc_config.py; userIds need to be in the same order for both')
 
     for user_key in user_keys_json:
@@ -4428,19 +4449,19 @@ def get_media_items():
         user_data=requestURL(url, GLOBAL_DEBUG, 'current_user', api_query_attempts)
 
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\n')
+            appendTo_DEBUG_log('\n',1)
         print_byType('',print_user_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\n')
+            appendTo_DEBUG_log('\n',1)
         print_byType('-----------------------------------------------------------',print_user_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\n')
+            appendTo_DEBUG_log('\n',1)
         print_byType('Get List Of Media For:',print_user_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\n')
+            appendTo_DEBUG_log('\n',1)
         print_byType(user_data['Name'] + ' - ' + user_data['Id'],print_user_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log('\n')
+            appendTo_DEBUG_log('\n',1)
         print_byType('-----------------------------------------------------------',print_user_header)
 
         #get library attributes for user in this position
@@ -4500,7 +4521,7 @@ def get_media_items():
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\n\nProcessing MOVIE Items For UserId: " + str(user_key))
+                appendTo_DEBUG_log("\n\nProcessing MOVIE Items For UserId: " + str(user_key),2)
 
             user_processed_itemsId=set()
 
@@ -4665,7 +4686,7 @@ def get_media_items():
                         QueryLimit_Blacklist=0
                         QueriesRemaining_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo watched media items are blacklisted")
+                            appendTo_DEBUG_log("\n\nNo watched media items are blacklisted",2)
 
                     if not (LibraryID_BlkLst == ''):
                         #Built query for Favorited from Blacklist media items
@@ -4683,7 +4704,7 @@ def get_media_items():
                         QueryLimit_Favorited_From_Blacklist=0
                         QueriesRemaining_Favorited_From_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo favorited media items are blacklisted")
+                            appendTo_DEBUG_log("\n\nNo favorited media items are blacklisted",2)
 
                     if not (LibraryID_WhtLst == ''):
                         #Built query for Favorited From Whitelist media items
@@ -4701,7 +4722,7 @@ def get_media_items():
                         QueryLimit_Favorited_From_Whitelist=0
                         QueriesRemaining_Favorited_From_Whitelist=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo favorited media items are whitelisted")
+                            appendTo_DEBUG_log("\n\nNo favorited media items are whitelisted",2)
 
                     #Check if blacktag or blacklist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4718,7 +4739,7 @@ def get_media_items():
                         QueryLimit_BlackTagged_From_BlackList=0
                         QueriesRemaining_BlackTagged_From_BlackList=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo blacktagged media items are blacklisted")
+                            appendTo_DEBUG_log("\n\nNo blacktagged media items are blacklisted",2)
 
                     #Check if blacktag or whitelist are not an empty strings
                     if (( not (BlackTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4735,7 +4756,7 @@ def get_media_items():
                         QueryLimit_BlackTagged_From_WhiteList=0
                         QueriesRemaining_BlackTagged_From_WhiteList=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo blacktagged media items are whitelisted")
+                            appendTo_DEBUG_log("\n\nNo blacktagged media items are whitelisted",2)
 
                     #Check if whitetag or blacklist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_BlkLst == ''))):
@@ -4752,7 +4773,7 @@ def get_media_items():
                         QueryLimit_WhiteTagged_From_Blacklist=0
                         QueriesRemaining_WhiteTagged_From_Blacklist=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo whitetagged media items are blacklisted")
+                            appendTo_DEBUG_log("\n\nNo whitetagged media items are blacklisted",2)
 
                     #Check if whitetag or whitelist are not an empty strings
                     if (( not (WhiteTags_Tagged == '')) and ( not (LibraryID_WhtLst == ''))):
@@ -4769,7 +4790,7 @@ def get_media_items():
                         QueryLimit_WhiteTagged_From_Whitelist=0
                         QueriesRemaining_WhiteTagged_From_Whitelist=False
                         if (GLOBAL_DEBUG):
-                            appendTo_DEBUG_log("\n\nNo whitetagged media items are whitelisted")
+                            appendTo_DEBUG_log("\n\nNo whitetagged media items are whitelisted",2)
 
                     #Define reasoning for lookup
                     APIDebugMsg_Favorited_From_Blacklist_Child='favorited_From_Blacklist_from_blacklist_child'
@@ -4837,7 +4858,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']),2)
 
                                 media_found=True
 
@@ -4850,7 +4871,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        appendTo_DEBUG_log("\nProcessing Movie Item: " + str(item['Id']))
+                                        appendTo_DEBUG_log("\nProcessing Movie Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
                                     if ((movie_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -4875,7 +4896,7 @@ def get_media_items():
                                     if (data_list_pos in data_from_favorited_queries):
                                         itemisfav_MOVIE=True
                                     elif (keep_favorites_movie):
-                                        itemisfav_MOVIE=get_isMOVIE_Fav(item,user_key)
+                                        itemisfav_MOVIE=get_isMOVIE_Fav(item,user_key,user_keys_json)
 
                                     itemisfav_MOVIE_Advanced=False
                                     if ((keep_favorites_movie) and (keep_favorites_advanced_movie_genre or keep_favorites_advanced_movie_library_genre)):
@@ -4966,23 +4987,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                appendTo_DEBUG_log('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                appendTo_DEBUG_log('\nError encountered - Movie: \nitem: ' + str(item) + '\nitem' + str(item),2)
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_movie_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_movie_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_movie_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':[KEEPING] - ' + item_output_details,print_movie_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            appendTo_DEBUG_log("\n")
+                                            appendTo_DEBUG_log("\n",1)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -4996,7 +5017,7 @@ def get_media_items():
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\n\nProcessing EPISODE Items For UserId: " + str(user_key))
+                appendTo_DEBUG_log("\n\nProcessing EPISODE Items For UserId: " + str(user_key),2)
 
             user_processed_itemsId=set()
 
@@ -5319,7 +5340,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']),2)
 
                                 media_found=True
 
@@ -5332,7 +5353,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        appendTo_DEBUG_log("\nProcessing Episode Item: " + str(item['Id']))
+                                        appendTo_DEBUG_log("\nProcessing Episode Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
                                     if ((episode_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -5469,23 +5490,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                appendTo_DEBUG_log('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                appendTo_DEBUG_log('\nError encountered - Episode: \nitem: ' + str(item) + '\nitem' + str(item),2)
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_episode_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_episode_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':[KEEPING] - ' + item_output_details,print_episode_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            appendTo_DEBUG_log("\n")
+                                            appendTo_DEBUG_log("\n",1)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -5499,7 +5520,7 @@ def get_media_items():
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
 
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\n\nProcessing AUDIO Items For UserId: " + str(user_key))
+                appendTo_DEBUG_log("\n\nProcessing AUDIO Items For UserId: " + str(user_key),2)
 
             user_processed_itemsId=set()
 
@@ -5822,7 +5843,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']),2)
 
                                 media_found=True
 
@@ -5835,7 +5856,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        appendTo_DEBUG_log("\nProcessing Audio Item: " + str(item['Id']))
+                                        appendTo_DEBUG_log("\nProcessing Audio Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
                                     if ((audio_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -5954,23 +5975,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                appendTo_DEBUG_log('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                appendTo_DEBUG_log('\nError encountered - Audio: \nitem: ' + str(item) + '\nitem' + str(item),2)
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_audio_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audio_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':[KEEPING] - ' + item_output_details,print_audio_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            appendTo_DEBUG_log("\n")
+                                            appendTo_DEBUG_log("\n",1)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -5987,7 +6008,7 @@ def get_media_items():
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
 
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\n\nProcessing AUDIOBOOK Items For UserId: " + str(user_key))
+                appendTo_DEBUG_log("\n\nProcessing AUDIOBOOK Items For UserId: " + str(user_key),2)
 
             user_processed_itemsId=set()
 
@@ -6310,7 +6331,7 @@ def get_media_items():
 
                                 if (GLOBAL_DEBUG):
                                     #Double newline for DEBUG log formatting
-                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']))
+                                    appendTo_DEBUG_log("\n\nInspecting Media Item: " + str(item['Id']),2)
 
                                 media_found=True
 
@@ -6323,7 +6344,7 @@ def get_media_items():
                                 if (itemIsMonitored):
 
                                     if (GLOBAL_DEBUG):
-                                        appendTo_DEBUG_log("\nProcessing AudioBook Item: " + str(item['Id']))
+                                        appendTo_DEBUG_log("\nProcessing AudioBook Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
                                     if ((audiobook_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
@@ -6441,23 +6462,23 @@ def get_media_items():
                                         except (KeyError, IndexError):
                                             item_output_details=item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                                             if (GLOBAL_DEBUG):
-                                                appendTo_DEBUG_log('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item))
+                                                appendTo_DEBUG_log('\nError encountered - AudioBook: \nitem: ' + str(item) + '\nitem' + str(item),2)
 
                                         if (itemIsOKToDelete):
                                             if (GLOBAL_DEBUG):
                                                 print_audiobook_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
                                             deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audiobook_delete_info=True
-                                                appendTo_DEBUG_log("\n\n")
+                                                appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':[KEEPING] - ' + item_output_details,print_audiobook_keep_info)
 
                                         if (GLOBAL_DEBUG):
                                             #Spacing for debug file
-                                            appendTo_DEBUG_log("\n")
+                                            appendTo_DEBUG_log("\n",1)
 
                                 #Add media item Id to tracking list so it is not processed more than once
                                 user_processed_itemsId.add(item['Id'])
@@ -6473,19 +6494,19 @@ def get_media_items():
             if not (media_found):
                 if (GLOBAL_DEBUG):
                     print_warnings=True
-                    appendTo_DEBUG_log("\n")
+                    appendTo_DEBUG_log("\n",1)
                 print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',print_warnings)
 
         if (GLOBAL_DEBUG):
             print_common_delete_keep_info=True
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('-----------------------------------------------------------',print_common_delete_keep_info)
         currentPosition+=1
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nPOST PROCESSING STARTED\n")
-        appendTo_DEBUG_log("\nList Of Possible Media Items To Be Deleted: " + str(len(deleteItems)))
-        appendTo_DEBUG_log("\n" + convert2json(deleteItems))
+        appendTo_DEBUG_log("\nPOST PROCESSING STARTED\n",2)
+        appendTo_DEBUG_log("\nList Of Possible Media Items To Be Deleted: " + str(len(deleteItems)),3)
+        appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
 
     #When multiple users and keep_favorite_xyz==2 Determine media items to keep and remove them from deletion list
     #When not multiple users this will just clean up the deletion list
@@ -6499,24 +6520,24 @@ def get_media_items():
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n-----------------------------------------------------------')
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',2)
+        appendTo_DEBUG_log("\n",1)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            appendTo_DEBUG_log('\nisfav_MOVIE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Movie))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisfav_MOVIE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Movie),3)
+            appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            appendTo_DEBUG_log('\nisfav_EPISODE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Episode))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisfav_EPISODE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Episode),3)
+            appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            appendTo_DEBUG_log('\nisfav_AUDIO: ')
-            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Audio))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisfav_AUDIO: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Audio),3)
+            appendTo_DEBUG_log("\n",3)
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            appendTo_DEBUG_log('\nisfav_AUDIOBOOK: ')
-            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_AudioBook))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisfav_AUDIOBOOK: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_AudioBook),3)
+            appendTo_DEBUG_log("\n",3)
 
     #When whitetagged; Determine media items to keep and remove them from deletion list
     if (not (whitetags == '')):
@@ -6530,24 +6551,24 @@ def get_media_items():
             deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n-----------------------------------------------------------')
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
+        appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            appendTo_DEBUG_log('\niswhitetag_MOVIE: ')
-            appendTo_DEBUG_log("\n" + convert2json(movie_whitetag_list))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitetag_MOVIE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(movie_whitetag_list),3)
+            appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            appendTo_DEBUG_log('\niswhitetag_EPISODE: ')
-            appendTo_DEBUG_log("\n" + convert2json(episode_whitetag_list))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitetag_EPISODE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(episode_whitetag_list),3)
+            appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            appendTo_DEBUG_log('iswhitetag_AUDIO: ')
-            appendTo_DEBUG_log(convert2json(audio_whitetag_list))
-            appendTo_DEBUG_log('')
+            appendTo_DEBUG_log('iswhitetag_AUDIO: ',3)
+            appendTo_DEBUG_log(convert2json(audio_whitetag_list),3)
+            appendTo_DEBUG_log("\n",3)
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            appendTo_DEBUG_log('\niswhitetag_AUDIOBOOK: ')
-            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitetag_list))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitetag_AUDIOBOOK: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitetag_list),3)
+            appendTo_DEBUG_log("\n",3)
 
     #When multiple users and multiuser_whitelist_xyz==0 Determine media items to keep and remove them from deletion list
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (multiuser_whitelist_movie == 0)):
@@ -6560,24 +6581,24 @@ def get_media_items():
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n-----------------------------------------------------------')
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
+        appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            appendTo_DEBUG_log('\niswhitelist_MOVIE: ')
-            appendTo_DEBUG_log(convert2json(movie_whitelists))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitelist_MOVIE: ',3)
+            appendTo_DEBUG_log(convert2json(movie_whitelists),3)
+            appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            appendTo_DEBUG_log('\niswhitelist_EPISODE: ')
-            appendTo_DEBUG_log(convert2json(episode_whitelists))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitelist_EPISODE: ',3)
+            appendTo_DEBUG_log(convert2json(episode_whitelists),3)
+            appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            appendTo_DEBUG_log('\niswhitelist_AUDIO: ')
-            appendTo_DEBUG_log(convert2json(audio_whitelists))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitelist_AUDIO: ',3)
+            appendTo_DEBUG_log(convert2json(audio_whitelists),3)
+            appendTo_DEBUG_log("\n",3)
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            appendTo_DEBUG_log('\niswhitelist_AUDIOBOOK: ')
-            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitelists))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\niswhitelist_AUDIOBOOK: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(audiobook_whitelists),3)
+            appendTo_DEBUG_log("\n",3)
 
     #When blacktagged; Determine media items to remove them from deletion list depending on cfg.delete_blacktagged_*
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (delete_blacktagged_movie == 1)):
@@ -6590,24 +6611,24 @@ def get_media_items():
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n-----------------------------------------------------------')
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
+        appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            appendTo_DEBUG_log('\nisblacktag_Played_MOVIE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Movie))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisblacktag_Played_MOVIE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Movie),3)
+            appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            appendTo_DEBUG_log('\nisblacktag_Played_EPISODE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Episode))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisblacktag_Played_EPISODE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Episode),3)
+            appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            appendTo_DEBUG_log('\nisblacktag_Played_AUDIO: ')
-            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Audio))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisblacktag_Played_AUDIO: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Audio),3)
+            appendTo_DEBUG_log("\n",3)
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            appendTo_DEBUG_log('\nisblacktag_Played_AUDIOBOOK: ')
-            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_AudioBook))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisblacktag_Played_AUDIOBOOK: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_AudioBook),3)
+            appendTo_DEBUG_log("\n",3)
 
     #When filtered; Determine media items to remove them from deletion list depending on cfg.multiuser_play_count_*
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (multiuser_play_count_movie == 1)):
@@ -6620,24 +6641,24 @@ def get_media_items():
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n-----------------------------------------------------------')
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
+        appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
-            appendTo_DEBUG_log('\nisplaycountmet_MOVIE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Movie))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisplaycountmet_MOVIE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Movie),3)
+            appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
-            appendTo_DEBUG_log('\nisplaycountmet_EPISODE: ')
-            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Episode))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisplaycountmet_EPISODE: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Episode),3)
+            appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
-            appendTo_DEBUG_log('\nisplaycountmet_AUDIO: ')
-            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Audio))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisplaycountmet_AUDIO: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Audio),3)
+            appendTo_DEBUG_log("\n",3)
         if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
-            appendTo_DEBUG_log('\nisplaycountmet_AUDIOBOOK: ')
-            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_AudioBook))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nisplaycountmet_AUDIOBOOK: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_AudioBook),3)
+            appendTo_DEBUG_log("\n",3)
 
     #When enabled; Keep a minimum number of episodes
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
@@ -6645,17 +6666,17 @@ def get_media_items():
         deleteItems=get_minEpisodesToKeep(episodeCounts_byUserId, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('-----------------------------------------------------------')
-        appendTo_DEBUG_log('')
+        appendTo_DEBUG_log('-----------------------------------------------------------',2)
+        appendTo_DEBUG_log('',2)
         if (((episode_played_days >= 0) or (episode_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
-            appendTo_DEBUG_log('\nepisodeCounts_byUserId: ')
-            appendTo_DEBUG_log("\n" + convert2json(episodeCounts_byUserId))
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log('\nepisodeCounts_byUserId: ',3)
+            appendTo_DEBUG_log("\n" + convert2json(episodeCounts_byUserId),3)
+            appendTo_DEBUG_log("\n",3)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nPOST PROCESSING FINISHED\n")
-        appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)))
-        appendTo_DEBUG_log("\n" + convert2json(deleteItems))
+        appendTo_DEBUG_log("\nPOST PROCESSING FINISHED\n",2)
+        appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)),3)
+        appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
 
     if (GLOBAL_DEBUG):
         print_common_delete_keep_info=True
@@ -6672,9 +6693,9 @@ def delete_media_item(itemID):
     req = request.Request(url,method='DELETE')
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nSending Delete Request For: " + itemID)
-        appendTo_DEBUG_log("\nURL:\n" + url)
-        appendTo_DEBUG_log("\nRequest:\n" + str(req))
+        appendTo_DEBUG_log("\nSending Delete Request For: " + itemID,3)
+        appendTo_DEBUG_log("\nURL:\n" + url,3)
+        appendTo_DEBUG_log("\nRequest:\n" + str(req),4)
 
     #check if in dry-run mode
     #if REMOVE_FILES='False'; exit this function
@@ -6715,49 +6736,49 @@ def output_itemsToDelete(deleteItems):
 
     #List items to be deleted
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('-----------------------------------------------------------',print_summary_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('Summary Of Deleted Media:',print_summary_header)
     if not bool(cfg.REMOVE_FILES):
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* Trial Run Mode',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* REMOVE_FILES=\'False\'',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* No Media Deleted',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* Items = ' + str(len(deleteItems)),print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('-----------------------------------------------------------',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('To delete media open mumc_config.py in a text editor:',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* Set REMOVE_FILES=\'True\'',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
     else:
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('* Items Deleted = ' + str(len(deleteItems)) + '    *',print_summary_header)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n")
+            appendTo_DEBUG_log("\n",1)
         print_byType('-----------------------------------------------------------',(print_summary_header or print_common_summary))
 
     if len(deleteItems) > 0:
         for item in deleteItems:
             if item['Type'] == 'Movie':
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\n")
+                    appendTo_DEBUG_log("\n",1)
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6765,20 +6786,20 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_movie_summary)
             elif item['Type'] == 'Episode':
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\n")
+                    appendTo_DEBUG_log("\n",1)
                 try:
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
                 except (KeyError, IndexError):
                     item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                     if (GLOBAL_DEBUG):
-                        appendTo_DEBUG_log('Error encountered - Delete Episode: \n\n' + str(item))
+                        appendTo_DEBUG_log('Error encountered - Delete Episode: \n\n' + str(item),2)
                 #Delete media item
                 delete_media_item(item['Id'])
                 #Print output for deleted media item
                 print_byType(item_output_details,print_episode_summary)
             elif item['Type'] == 'Audio':
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\n")
+                    appendTo_DEBUG_log("\n",1)
                 item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6786,7 +6807,7 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_audio_summary)
             elif item['Type'] == 'AudioBook':
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\n")
+                    appendTo_DEBUG_log("\n",1)
                 item_output_details='[DELETED] ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                 #Delete media item
                 delete_media_item(item['Id'])
@@ -6794,26 +6815,27 @@ def output_itemsToDelete(deleteItems):
                 print_byType(item_output_details,print_audiobook_summary)
             else: # item['Type'] == 'Unknown':
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nNot Able To Delete Unknown Media Type")
+                    appendTo_DEBUG_log("\nNot Able To Delete Unknown Media Type",2)
                 pass
     else:
+        appendTo_DEBUG_log("\n",1)
         print_byType('[NO ITEMS TO DELETE]',print_common_summary)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('-----------------------------------------------------------',print_common_summary)
     print_byType('\n',print_common_summary)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('-----------------------------------------------------------',print_common_summary)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('Done.',print_common_summary)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('-----------------------------------------------------------',print_common_summary)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n")
+        appendTo_DEBUG_log("\n",1)
     print_byType('',print_common_summary)
 
 
@@ -6962,7 +6984,7 @@ def cfgCheck():
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
     if (GLOBAL_DEBUG):
         #Double newline for debug log formatting
-        appendTo_DEBUG_log("\n\nserver_brand='" + server_brand + "'")
+        appendTo_DEBUG_log("\n\nserver_brand='" + server_brand + "'",2)
 
 #######################################################################################################
 
@@ -6970,7 +6992,7 @@ def cfgCheck():
         check=cfg.user_keys
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nuser_keys=" + convert2json(check_list))
+            appendTo_DEBUG_log("\nuser_keys=" + convert2json(check_list),2)
         check_user_keys_length=len(check_list)
         username_check_list=[]
         userid_check_list=[]
@@ -6983,126 +7005,126 @@ def cfgCheck():
                     (len(check_irt) == 32) and
                     (str(check_irt).isalnum()))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The user_keys variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The user_keys variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_played_days'):
         check=cfg.movie_played_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_played_days=" + str(check))
+            appendTo_DEBUG_log("\nmovie_played_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_played_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_played_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_played_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_played_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_played_days'):
         check=cfg.episode_played_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_played_days=" + str(check))
+            appendTo_DEBUG_log("\nepisode_played_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_played_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_played_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_played_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_played_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_played_days'):
         check=cfg.audio_played_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_played_days=" + str(check))
+            appendTo_DEBUG_log("\naudio_played_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_played_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_played_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_played_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_played_days variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_played_days'):
             check=cfg.audiobook_played_days
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_played_days=" + str(check))
+                appendTo_DEBUG_log("\naudiobook_played_days=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
                 (check <= 730500))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_played_days must be an integer; valid range -1 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_played_days must be an integer; valid range -1 thru 730500\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_played_days variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_played_days variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_created_days'):
         check=cfg.movie_created_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_created_days=" + str(check))
+            appendTo_DEBUG_log("\nmovie_created_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_created_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_created_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_created_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_created_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_created_days'):
         check=cfg.episode_created_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_created_days=" + str(check))
+            appendTo_DEBUG_log("\nepisode_created_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_created_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_created_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_created_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_created_days variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_created_days'):
         check=cfg.audio_created_days
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_created_days=" + str(check))
+            appendTo_DEBUG_log("\naudio_created_days=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= -1) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_created_days must be an integer; valid range -1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_created_days must be an integer; valid range -1 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_created_days variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_created_days variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_days'):
             check=cfg.audiobook_created_days
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_created_days=" + str(check))
+                appendTo_DEBUG_log("\naudiobook_created_days=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= -1) and
                 (check <= 730500))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_created_days must be an integer; valid range -1 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_created_days must be an integer; valid range -1 thru 730500\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_created_days variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_created_days variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_played_count_comparison'):
         check=cfg.movie_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\nmovie_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7112,14 +7134,14 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_played_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_played_count_comparison'):
         check=cfg.episode_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\nepisode_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7129,14 +7151,14 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_played_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_played_count_comparison'):
         check=cfg.audio_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\naudio_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7146,15 +7168,15 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_played_count_comparison variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_played_count_comparison'):
             check=cfg.audiobook_played_count_comparison
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_played_count_comparison='" + str(check) + "'")
+                appendTo_DEBUG_log("\naudiobook_played_count_comparison='" + str(check) + "'",2)
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -7164,16 +7186,16 @@ def cfgCheck():
                 (check == 'not >=') or (check == 'not <=') or
                 (check == 'not ==')))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_played_count_comparison variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_played_count_comparison variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_created_played_count_comparison'):
         check=cfg.movie_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_created_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\nmovie_created_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7183,14 +7205,14 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_created_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_created_played_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_created_played_count_comparison'):
         check=cfg.episode_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_created_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\nepisode_created_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7200,14 +7222,14 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_created_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_created_played_count_comparison variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_created_played_count_comparison'):
         check=cfg.audio_created_played_count_comparison
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_created_played_count_comparison='" + str(check) + "'")
+            appendTo_DEBUG_log("\naudio_created_played_count_comparison='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == '>') or (check == '<') or
@@ -7217,15 +7239,15 @@ def cfgCheck():
             (check == 'not >=') or (check == 'not <=') or
             (check == 'not ==')))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_created_played_count_comparison variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_created_played_count_comparison variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_played_count_comparison'):
             check=cfg.audiobook_created_played_count_comparison
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_created_played_count_comparison='" + str(check) + "'")
+                appendTo_DEBUG_log("\naudiobook_created_played_count_comparison='" + str(check) + "'",2)
             if (
                 not ((type(check) is str) and
                 ((check == '>') or (check == '<') or
@@ -7235,400 +7257,400 @@ def cfgCheck():
                 (check == 'not >=') or (check == 'not <=') or
                 (check == 'not ==')))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_created_played_count_comparison must be string; any \'nots\' must be all lower case; valid values \'>\', \'<\', \'>=\', \'<=\, \'==\', \'not >\', \'not <\', \'not >=\', \'not <=\', and \'not ==\'\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_created_played_count_comparison variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_created_played_count_comparison variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_played_count'):
         check=cfg.movie_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_played_count=" + str(check))
+            appendTo_DEBUG_log("\nmovie_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_played_count variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_played_count'):
         check=cfg.episode_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_played_count=" + str(check))
+            appendTo_DEBUG_log("\nepisode_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_played_count variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_played_count'):
         check=cfg.audio_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_played_count=" + str(check))
+            appendTo_DEBUG_log("\naudio_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_played_count variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_played_count'):
             check=cfg.audiobook_played_count
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_played_count=" + str(check))
+                appendTo_DEBUG_log("\naudiobook_played_count=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 730500))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_played_count must be an integer; valid range 0 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_played_count must be an integer; valid range 0 thru 730500\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_played_count variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_played_count variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'movie_created_played_count'):
         check=cfg.movie_created_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmovie_created_played_count=" + str(check))
+            appendTo_DEBUG_log("\nmovie_created_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: movie_created_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: movie_created_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The movie_created_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_created_played_count variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'episode_created_played_count'):
         check=cfg.episode_created_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nepisode_created_played_count=" + str(check))
+            appendTo_DEBUG_log("\nepisode_created_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: episode_created_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: episode_created_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The episode_created_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_created_played_count variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'audio_created_played_count'):
         check=cfg.audio_created_played_count
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\naudio_created_played_count=" + str(check))
+            appendTo_DEBUG_log("\naudio_created_played_count=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: audio_created_played_count must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: audio_created_played_count must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The audio_created_played_count variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_created_played_count variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'audiobook_created_played_count'):
             check=cfg.audiobook_created_played_count
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\naudiobook_created_played_count=" + str(check))
+                appendTo_DEBUG_log("\naudiobook_created_played_count=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 730500))
             ):
-                error_found_in_mumc_config_py+='ValueError: audiobook_created_played_count must be an integer; valid range 0 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_created_played_count must be an integer; valid range 0 thru 730500\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The audiobook_created_played_count variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_created_played_count variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'multiuser_play_count_movie'):
         check=cfg.multiuser_play_count_movie
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_play_count_movie=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_play_count_movie=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_movie must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_play_count_movie must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_movie variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_play_count_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_play_count_episode'):
         check=cfg.multiuser_play_count_episode
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_play_count_episode=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_play_count_episode=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_episode must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_play_count_episode must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_episode variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_play_count_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_play_count_audio'):
         check=cfg.multiuser_play_count_audio
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_play_count_audio=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_play_count_audio=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_play_count_audio must be an integer; valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_play_count_audio must be an integer; valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_play_count_audio variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_play_count_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_play_count_audiobook'):
             check=cfg.multiuser_play_count_audiobook
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nmultiuser_play_count_audiobook=" + str(check))
+                appendTo_DEBUG_log("\nmultiuser_play_count_audiobook=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_mumc_config_py+='ValueError: multiuser_play_count_audiobook must be an integer; valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ConfigValueError: multiuser_play_count_audiobook must be an integer; valid values 0 and 1\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The multiuser_play_count_audiobook variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The multiuser_play_count_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'keep_favorites_movie'):
         check=cfg.keep_favorites_movie
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_movie=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_movie=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_movie must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_movie variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_episode'):
         check=cfg.keep_favorites_episode
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_episode=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_episode=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_episode must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_episode variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_audio'):
         check=cfg.keep_favorites_audio
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_audio=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_audio=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_audio must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_audio variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'keep_favorites_audiobook'):
             check=cfg.keep_favorites_audiobook
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nkeep_favorites_audiobook=" + str(check))
+                appendTo_DEBUG_log("\nkeep_favorites_audiobook=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 2))
             ):
-                error_found_in_mumc_config_py+='ValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
+                error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_audiobook must be an integer; valid range 0 thru 2\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The keep_favorites_audiobook variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'multiuser_whitelist_movie'):
         check=cfg.multiuser_whitelist_movie
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_whitelist_movie=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_whitelist_movie=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_movie must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_whitelist_movie must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_movie variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_whitelist_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_whitelist_episode'):
         check=cfg.multiuser_whitelist_episode
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_whitelist_episode=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_whitelist_episode=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_episode must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_whitelist_episode must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_episode variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_whitelist_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'multiuser_whitelist_audio'):
         check=cfg.multiuser_whitelist_audio
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nmultiuser_whitelist_audio=" + str(check))
+            appendTo_DEBUG_log("\nmultiuser_whitelist_audio=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_audio must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: multiuser_whitelist_audio must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_audio variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The multiuser_whitelist_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'multiuser_whitelist_audiobook'):
             check=cfg.multiuser_whitelist_audiobook
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nmultiuser_whitelist_audiobook=" + str(check))
+                appendTo_DEBUG_log("\nmultiuser_whitelist_audiobook=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_mumc_config_py+='ValueError: multiuser_whitelist_audiobook must be an integer;valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ConfigValueError: multiuser_whitelist_audiobook must be an integer;valid values 0 and 1\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The multiuser_whitelist_audiobook variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The multiuser_whitelist_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'blacktag'):
         check=cfg.blacktag
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nblacktag='" + str(check) + "'")
+            appendTo_DEBUG_log("\nblacktag='" + str(check) + "'",2)
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_mumc_config_py+='ValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='ConfigValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The blacktag variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The blacktag variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'delete_blacktagged_movie'):
         check=cfg.delete_blacktagged_movie
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\ndelete_blacktagged_movie=" + str(check))
+            appendTo_DEBUG_log("\ndelete_blacktagged_movie=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_movie must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: delete_blacktagged_movie must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_movie variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The delete_blacktagged_movie variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'delete_blacktagged_episode'):
         check=cfg.delete_blacktagged_episode
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\ndelete_blacktagged_episode=" + str(check))
+            appendTo_DEBUG_log("\ndelete_blacktagged_episode=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_episode must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: delete_blacktagged_episode must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_episode variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The delete_blacktagged_episode variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'delete_blacktagged_audio'):
         check=cfg.delete_blacktagged_audio
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\ndelete_blacktagged_audio=" + str(check))
+            appendTo_DEBUG_log("\ndelete_blacktagged_audio=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 1))
         ):
-            error_found_in_mumc_config_py+='ValueError: delete_blacktagged_audio must be an integer;valid values 0 and 1\n'
+            error_found_in_mumc_config_py+='ConfigValueError: delete_blacktagged_audio must be an integer;valid values 0 and 1\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The delete_blacktagged_audio variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The delete_blacktagged_audio variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'delete_blacktagged_audiobook'):
             check=cfg.delete_blacktagged_audiobook
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\ndelete_blacktagged_audiobook=" + str(check))
+                appendTo_DEBUG_log("\ndelete_blacktagged_audiobook=" + str(check),2)
             if (
                 not ((type(check) is int) and
                 (check >= 0) and
                 (check <= 1))
             ):
-                error_found_in_mumc_config_py+='ValueError: delete_blacktagged_audiobook must be an integer;valid values 0 and 1\n'
+                error_found_in_mumc_config_py+='ConfigValueError: delete_blacktagged_audiobook must be an integer;valid values 0 and 1\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The delete_blacktagged_audiobook variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The delete_blacktagged_audiobook variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'whitetag'):
         check=cfg.whitetag
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nwhitetag='" + str(check) + "'")
+            appendTo_DEBUG_log("\nwhitetag='" + str(check) + "'",2)
         if not (
             (type(check) is str) and
             (check.find('\\') < 0)
         ):
-            error_found_in_mumc_config_py+='ValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='ConfigValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The whitetag variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The whitetag variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'minimum_number_episodes'):
         check=cfg.minimum_number_episodes
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nminimum_number_episodes=" + str(check))
+            appendTo_DEBUG_log("\nminimum_number_episodes=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: minimum_number_episodes must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The minimum_number_episodes variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'minimum_number_played_episodes'):
         check=cfg.minimum_number_played_episodes
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nminimum_number_played_episodes=" + str(check))
+            appendTo_DEBUG_log("\nminimum_number_played_episodes=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='ValueError: minimum_number_played_episodes must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: minimum_number_played_episodes must be an integer; valid range 0 thru 730500\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The minimum_number_played_episodes variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The minimum_number_played_episodes variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'minimum_number_episodes_behavior'):
         check=cfg.minimum_number_episodes_behavior
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nminimum_number_episodes_behavior='" + str(check) + "'")
+            appendTo_DEBUG_log("\nminimum_number_episodes_behavior='" + str(check) + "'",2)
         check=check.casefold()
         usersname_usersid_match=False
         for usersname in username_check_list:
@@ -7663,200 +7685,200 @@ def cfgCheck():
             (check == 'maxunplayedmaxplayed') or
             (check == 'maxplayedminplayed')))
         ):
-            error_found_in_mumc_config_py+='ValueError: minimum_number_episodes_behavior must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: minimum_number_episodes_behavior must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The minimum_number_episodes_behavior variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The minimum_number_episodes_behavior variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'REMOVE_FILES'):
         check=cfg.REMOVE_FILES
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nREMOVE_FILES='" + str(check) + "'")
+            appendTo_DEBUG_log("\nREMOVE_FILES='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The REMOVE_FILES variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The REMOVE_FILES variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'keep_favorites_advanced_movie_genre'):
         check=cfg.keep_favorites_advanced_movie_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_movie_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_movie_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_movie_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_movie_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_movie_library_genre'):
         check=cfg.keep_favorites_advanced_movie_library_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_library_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_movie_library_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_movie_library_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_movie_library_genre variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'keep_favorites_advanced_episode_genre'):
         check=cfg.keep_favorites_advanced_episode_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_episode_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_episode_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_episode_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_episode_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_episode_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_episode_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_season_genre'):
         check=cfg.keep_favorites_advanced_season_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_season_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_season_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_season_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_season_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_season_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_season_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_series_genre'):
         check=cfg.keep_favorites_advanced_series_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_series_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_series_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_series_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_series_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_series_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_series_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_library_genre'):
         check=cfg.keep_favorites_advanced_tv_library_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_library_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_library_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_tv_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_library_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_tv_library_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network'):
         check=cfg.keep_favorites_advanced_tv_studio_network
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_studio_network must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_tv_studio_network must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_studio_network variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_tv_studio_network variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_tv_studio_network_genre'):
         check=cfg.keep_favorites_advanced_tv_studio_network_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_tv_studio_network_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_tv_studio_network_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_tv_studio_network_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_tv_studio_network_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_tv_studio_network_genre variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'keep_favorites_advanced_track_genre'):
         check=cfg.keep_favorites_advanced_track_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_track_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_track_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_track_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_track_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_album_genre'):
         check=cfg.keep_favorites_advanced_album_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_album_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_album_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_album_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_album_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_music_library_genre'):
         check=cfg.keep_favorites_advanced_music_library_genre
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_music_library_genre=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_music_library_genre=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_music_library_genre must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_music_library_genre must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_music_library_genre variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_music_library_genre variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_track_artist'):
         check=cfg.keep_favorites_advanced_track_artist
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_artist=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_track_artist=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_track_artist must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_track_artist must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_track_artist variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_track_artist variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'keep_favorites_advanced_album_artist'):
         check=cfg.keep_favorites_advanced_album_artist
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_artist=" + str(check))
+            appendTo_DEBUG_log("\nkeep_favorites_advanced_album_artist=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 2))
         ):
-            error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_album_artist must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_album_artist must be an integer; valid range 0 thru 2\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_album_artist variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_album_artist variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -7864,41 +7886,41 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_track_genre
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check))
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check),2)
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_track_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_audio_book_track_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_track_genre variable is missing from mumc_config.py\n'
+                error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_audio_book_track_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_genre
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check))
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_genre=" + str(check),2)
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_audio_book_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_genre variable is missing from mumc_config.py\n'
+                error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_audio_book_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_library_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_library_genre
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_library_genre=" + str(check))
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_library_genre=" + str(check),2)
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_library_genre must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_audio_book_library_genre must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_library_genre variable is missing from mumc_config.py\n'
+                error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_audio_book_library_genre variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
@@ -7909,318 +7931,318 @@ def cfgCheck():
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_track_author must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_audio_book_track_author must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_track_author variable is missing from mumc_config.py\n'
+                error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_audio_book_track_author variable is missing from mumc_config.py\n'
 
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_author'):
                 check=cfg.keep_favorites_advanced_audio_book_author
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_author=" + str(check))
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_author=" + str(check),2)
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
                     (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='ValueError: keep_favorites_advanced_audio_book_author must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='ConfigValueError: keep_favorites_advanced_audio_book_author must be an integer; valid range 0 thru 2\n'
             else:
-                error_found_in_mumc_config_py+='NameError: The keep_favorites_advanced_audio_book_author variable is missing from mumc_config.py\n'
+                error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_advanced_audio_book_author variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'print_script_header'):
         check=cfg.print_script_header
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_script_header='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_script_header='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_script_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_script_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_script_header variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_script_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_warnings='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_warnings='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_warnings must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_warnings must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_warnings variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_warnings variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_user_header='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_user_header='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_user_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_user_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_user_header variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_user_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_movie_delete_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_movie_delete_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_movie_delete_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_movie_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_movie_keep_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_movie_keep_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_movie_keep_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_movie_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_episode_delete_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_episode_delete_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_episode_delete_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_episode_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_episode_keep_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_episode_keep_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_episode_keep_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_episode_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_audio_delete_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_audio_delete_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_audio_delete_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_audio_delete_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_audio_keep_info='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_audio_keep_info='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_audio_keep_info variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_audio_keep_info variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_delete_info'):
             check=cfg.print_audiobook_delete_info
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nprint_audiobook_delete_info='" + str(check) + "'")
+                appendTo_DEBUG_log("\nprint_audiobook_delete_info='" + str(check) + "'",2)
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_mumc_config_py+='ValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The print_audiobook_delete_info variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The print_audiobook_delete_info variable is missing from mumc_config.py\n'
 
         if hasattr(cfg, 'print_audiobook_keep_info'):
             check=cfg.print_audiobook_keep_info
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nprint_audiobook_keep_info='" + str(check) + "'")
+                appendTo_DEBUG_log("\nprint_audiobook_keep_info='" + str(check) + "'",2)
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_mumc_config_py+='ValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The print_audiobook_keep_info variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The print_audiobook_keep_info variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_summary_header='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_summary_header='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_summary_header must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_summary_header must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_summary_header variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_summary_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_movie_summary='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_movie_summary='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_movie_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_movie_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_movie_summary variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_movie_summary variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_episode_summary='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_episode_summary='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_episode_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_episode_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_episode_summary variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_episode_summary variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nprint_audio_summary='" + str(check) + "'")
+            appendTo_DEBUG_log("\nprint_audio_summary='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: print_audio_summary must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: print_audio_summary must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The print_audio_summary variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The print_audio_summary variable is missing from mumc_config.py\n'
 
     if (server_brand == 'jellyfin'):
         if hasattr(cfg, 'print_audiobook_summary'):
             check=cfg.print_audiobook_summary
             if (GLOBAL_DEBUG):
-                appendTo_DEBUG_log("\nprint_audiobook_summary='" + str(check) + "'")
+                appendTo_DEBUG_log("\nprint_audiobook_summary='" + str(check) + "'",2)
             if (
                 not ((type(check) is bool) and
                 ((check == True) or
                 (check == False)))
             ):
-                error_found_in_mumc_config_py+='ValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
         else:
-            error_found_in_mumc_config_py+='NameError: The print_audiobook_summary variable is missing from mumc_config.py\n'
+            error_found_in_mumc_config_py+='ConfigNameError: The print_audiobook_summary variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'UPDATE_CONFIG'):
         check=cfg.UPDATE_CONFIG
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nUPDATE_CONFIG='" + str(check) + "'")
+            appendTo_DEBUG_log("\nUPDATE_CONFIG='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
             (check == False)))
         ):
-            error_found_in_mumc_config_py+='ValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The UPDATE_CONFIG variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The UPDATE_CONFIG variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'")
+            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == 'emby') or
             (check == 'jellyfin')))
         ):
-            error_found_in_mumc_config_py+='ValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The server_brand variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The server_brand variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'server_url'):
         check=cfg.server_url
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nserver_url='" + str(check) + "'")
+            appendTo_DEBUG_log("\nserver_url='" + str(check) + "'",2)
         if (
             not (type(check) is str)
         ):
-            error_found_in_mumc_config_py+='ValueError: server_url must be a string\n'
+            error_found_in_mumc_config_py+='ConfigValueError: server_url must be a string\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The server_url variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The server_url variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'auth_key'):
         check=cfg.auth_key
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nauth_key='" + str(check) + "'")
+            appendTo_DEBUG_log("\nauth_key='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             (len(check) == 32) and
             (str(check).isalnum()))
         ):
-            error_found_in_mumc_config_py+='ValueError: auth_key must be a 32-character alphanumeric string\n'
+            error_found_in_mumc_config_py+='ConfigValueError: auth_key must be a 32-character alphanumeric string\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The auth_key variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The auth_key variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'library_setup_behavior'):
         check=cfg.library_setup_behavior
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nlibrary_setup_behavior='" + str(check) + "'")
+            appendTo_DEBUG_log("\nlibrary_setup_behavior='" + str(check) + "'",2)
         if (
             not (type(check) is str) and
             ((check == 'blacklist') or (check == 'whitelist'))
         ):
-            error_found_in_mumc_config_py+='ValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
+            error_found_in_mumc_config_py+='ConfigValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The library_setup_behavior variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The library_setup_behavior variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'library_matching_behavior'):
         check=cfg.library_matching_behavior
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nlibrary_matching_behavior='" + str(check) + "'")
+            appendTo_DEBUG_log("\nlibrary_matching_behavior='" + str(check) + "'",2)
         if (
             not (type(check) is str) and
             ((check == 'byId') or (check == 'byPath') or (check == 'byNetworkPath'))
         ):
-            error_found_in_mumc_config_py+='ValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
+            error_found_in_mumc_config_py+='ConfigValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'; I, P, and/or N must be uppercase letters\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The library_matching_behavior variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The library_matching_behavior variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -8228,11 +8250,11 @@ def cfgCheck():
         check=cfg.user_bl_libs
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nuser_bl_libs=" + convert2json(check_list))
+            appendTo_DEBUG_log("\nuser_bl_libs=" + convert2json(check_list),2)
         check_user_bllibs_length=len(check_list)
         #Check number of users matches the number of blacklist entries
         if not (check_user_bllibs_length == check_user_keys_length):
-            error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured blacklists\n'
+            error_found_in_mumc_config_py+='ConfigValueError: Number of configured users does not match the number of configured blacklists\n'
         else:
             error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
 
@@ -8242,11 +8264,11 @@ def cfgCheck():
         check=cfg.user_wl_libs
         check_list=json.loads(check)
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nuser_wl_libs=" + convert2json(check_list))
+            appendTo_DEBUG_log("\nuser_wl_libs=" + convert2json(check_list),2)
         check_user_wllibs_length=len(check_list)
         #Check number of users matches the number of whitelist entries
         if not (check_user_wllibs_length == check_user_keys_length):
-            error_found_in_mumc_config_py+='ValueError: Number of configured users does not match the number of configured whitelists\n'
+            error_found_in_mumc_config_py+='ConfigValueError: Number of configured users does not match the number of configured whitelists\n'
         else:
             error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
 
@@ -8255,52 +8277,56 @@ def cfgCheck():
     if hasattr(cfg, 'api_query_attempts'):
         check=cfg.api_query_attempts
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\napi_query_attempts=" + str(check))
+            appendTo_DEBUG_log("\napi_query_attempts=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 0) and
             (check <= 16))
         ):
-            error_found_in_mumc_config_py+='ValueError: api_query_attempts must be an integer; valid range 0 thru 16\n'
+            error_found_in_mumc_config_py+='ConfigValueError: api_query_attempts must be an integer; valid range 0 thru 16\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The api_query_attempts variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The api_query_attempts variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'api_query_item_limit'):
         check=cfg.api_query_item_limit
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\napi_query_item_limit=" + str(check))
+            appendTo_DEBUG_log("\napi_query_item_limit=" + str(check),2)
         if (
             not ((type(check) is int) and
             (check >= 1) and
             (check <= 10000))
         ):
-            error_found_in_mumc_config_py+='ValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
+            error_found_in_mumc_config_py+='ConfigValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The api_query_item_limit variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The api_query_item_limit variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nDEBUG='" + str(check) + "'")
+            appendTo_DEBUG_log("\nDEBUG='" + str(check) + "'",2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
-            (check == False)))
+            (check == False))
+            or
+            (type(check) is int) and
+            ((check >= 0) and
+            (check <= 4)))
         ):
-            error_found_in_mumc_config_py+='ValueError: DEBUG must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='ConfigValueError: DEBUG must be a boolean; valid range 0 thru 4\n'
     else:
-        error_found_in_mumc_config_py+='NameError: The DEBUG variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='ConfigNameError: The DEBUG variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
     #Bring all errors found to users attention
     if not (error_found_in_mumc_config_py == ''):
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py)
+            appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2)
         raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
 #######################################################################################################
@@ -8332,6 +8358,12 @@ try:
     GLOBAL_DEBUG=cfg.DEBUG
     #removing DEBUG from mumc_config.py file will allow the configuration to be reset
 
+    #Convert old True/False cfg.DEBUG into equivalent levels
+    if (GLOBAL_DEBUG == True):
+        GLOBAL_DEBUG = 1
+    elif (GLOBAL_DEBUG == False):
+        GLOBAL_DEBUG = 0
+
     print_script_header=cfg.print_script_header
 
     if (GLOBAL_DEBUG):
@@ -8339,16 +8371,16 @@ try:
 
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('Script Version: ' + get_script_version(),print_script_header)
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('\n')
+        appendTo_DEBUG_log('\n',1)
     print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
 
 #the exception
