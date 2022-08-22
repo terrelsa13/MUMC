@@ -5,10 +5,8 @@
 #Configuration values outside of the valid range will throw an error
 #See https://github.com/terrelsa13/MUMC for a description of each configuration value
 
-#get default configuration values
-def get_default_config_values(config_value):
-    
-    defaultConfigValues={
+
+defaultConfigValues={
 
         #'example_number_config':0
         #'example_string_config':'abc'
@@ -123,6 +121,10 @@ def get_default_config_values(config_value):
         'print_audiobook_summary':True
 
     }
+
+
+#get default configuration values
+def get_default_config_values(config_value):
 
     #preConfigDebug = True
     preConfigDebug = False

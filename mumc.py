@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.2'
+    Version='3.2.3'
 
     return(Version)
 
