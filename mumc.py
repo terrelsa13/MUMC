@@ -7925,7 +7925,7 @@ def cfgCheck():
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_author'):
                 check=cfg.keep_favorites_advanced_audio_book_track_author
                 if (GLOBAL_DEBUG):
-                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_author=" + str(check))
+                    appendTo_DEBUG_log("\nkeep_favorites_advanced_audio_book_track_author=" + str(check),2)
                 if (
                     not ((type(check) is int) and
                     (check >= 0) and
