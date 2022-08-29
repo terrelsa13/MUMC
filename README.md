@@ -131,8 +131,8 @@ _Played_ Filter Statements overlapping zero and postive numbered played counts w
 #### Filter Statement to delete episodes played less than twice, 30 or more days ago.
 
 * Delete episodes played at least **30** days ago with a played count **<** **2**.
-  - episode_playeded_days=30
-  - episode_playeded_count_comparison='<'
+  - episode_played_days=30
+  - episode_played_count_comparison='<'
   - episode_played_count=2
 
 #### Filter Statement to delete "old" played and unplayed movies.
