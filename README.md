@@ -12,7 +12,7 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## Step 1: What Is A Filter Statement?
 
 * A Filter Statement is a simple way to tell the script how to find and delete media items taking up your disk space.
-  - This also means the media items **not matching** the Filter Statement are kept safe for watching at a later time.
+  - This also means the media items **not matching** the Filter Statement are kept safe for watching later.
 ## Step 2: The basics of building a generic Filter Statement.
 
 Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
@@ -278,7 +278,7 @@ multiuser_whitelist_episode=0
 multiuser_whitelist_audio=0
 multiuser_whitelist_audiobook=0
 ```
-#### Blacktag a media item to be deleted after it is watched:
+#### Blacktag a media item to be deleted after it is played:
 ```python
 #----------------------------------------------------------#
 # User entered blacktag name; chosen during setup
@@ -288,12 +288,12 @@ multiuser_whitelist_audiobook=0
 #----------------------------------------------------------#
 blacktag='black_tagname,black_tag name,black_tag-name'
 ```
-#### When enabled, blacktagged media will not be deleted until ALL users have watched it:
+#### When enabled, blacktagged media will not be deleted until ALL users have played it:
 ```python
 #----------------------------------------------------------#
 # Decide when blacktagged media items are deleted
-#  0 - ok to delete blacktagged media item after ANY monitored user has watched it
-#  1 - ok to delete blacktagged media item after ALL monitored users have watched it
+#  0 - ok to delete blacktagged media item after ANY monitored user has played it
+#  1 - ok to delete blacktagged media item after ALL monitored users have played it
 # (0 : default)
 #----------------------------------------------------------#
 delete_blacktagged_movie=0
@@ -301,7 +301,7 @@ delete_blacktagged_episode=0
 delete_blacktagged_audio=0
 delete_blacktagged_audiobook=0
 ```
-#### Whitetag a media item to be kept after it is watched:
+#### Whitetag a media item to be kept after it is played:
 ```python
 #----------------------------------------------------------#
 # User entered whitetag name; chosen during setup
@@ -345,7 +345,7 @@ minimum_number_played_episodes=0
 #----------------------------------------------------------#
 # Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave
 # The minimum number of played and unplayed episodes will vary for each user and for each
-#  series when multiple users are watching the same series at different paces.
+#  series when multiple users are playing the same series at different paces.
 # The following option gives a mechanism to control this in different ways.
 # The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...
 #  'User's Name' - The UserName specified; If matching UserName not found script will assume default.
@@ -654,6 +654,11 @@ DEBUG=0
 
 # Library Matching By Id, By Path, or By Network Path
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/18#issue-1217953189)
+
+# Known Limitations
+* When importing played states from Trakt the ```days since played``` shown in the console output will not show the correct value.
+  - This is an issue with the ```last played date``` Trakt sends to your Emby/Jellyfin API for each played media item.
+  - Fixing this is outside of the scope of this script.
 
 # Requirements
 * Linux, Windows, or MAC?

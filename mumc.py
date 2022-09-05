@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.3'
+    Version='3.2.4'
 
     return(Version)
 
@@ -371,6 +371,22 @@ def get_condition_days(mediaType):
 #print('Hash:'+ cfg.admin_password_sha1)
 
 
+#Determine if server is Jellyfin
+def isJellyfinServer():
+    if (GLOBAL_server_brand == "jellyfin".casefold()):
+        return True
+    else:
+        return False
+
+
+#Determine if server is Emby
+def isEmbyServer():
+    if (isJellyfinServer()):
+        return False
+    else:
+        return True
+
+
 #api call to get admin account authentication token
 def get_authentication_key(server_url, username, password, server_brand):
     #login info
@@ -382,9 +398,9 @@ def get_authentication_key(server_url, username, password, server_brand):
 
     xAuth = 'X-Emby-Authorization'
     #assuming jellyfin will eventually change to this
-    #if (server_brand == 'emby'):
+    #if (isEmbyServer()):
         #xAuth = 'X-Emby-Authorization'
-    #else:
+    #else #(isJellyfinServer()):
         #xAuth = 'X-Jellyfin-Authorization'
 
     headers = {xAuth : 'Emby UserId="' + username  + '", Client="mumc.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
@@ -1027,7 +1043,8 @@ def build_configuration_file(cfg,updateConfig):
     if not (updateConfig):
         print('-----------------------------------------------------------')
         #ask user for server brand (i.e. emby or jellyfin)
-        server_brand=get_brand()
+        global GLOBAL_server_brand
+        GLOBAL_server_brand=get_brand()
 
         print('-----------------------------------------------------------')
         #ask user for server's url
@@ -1037,7 +1054,7 @@ def build_configuration_file(cfg,updateConfig):
         port=get_port()
         print('-----------------------------------------------------------')
         #ask user for url-base
-        server_base=get_base(server_brand)
+        server_base=get_base(GLOBAL_server_brand)
         if (len(port)):
             server_url=server + ':' + port + '/' + server_base
         else:
@@ -1051,7 +1068,7 @@ def build_configuration_file(cfg,updateConfig):
         password=get_admin_password()
         print('-----------------------------------------------------------')
         #ask server for authentication key using administrator username and password
-        auth_key=get_authentication_key(server_url, username, password, server_brand)
+        auth_key=get_authentication_key(server_url, username, password, GLOBAL_server_brand)
 
         #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(None)
@@ -1085,7 +1102,7 @@ def build_configuration_file(cfg,updateConfig):
         #print('-----------------------------------------------------------')
         #ask user for number of days to wait before attempting to delete audio track
         #audio_played_days = get_condition_days('audio')
-        #if (server_brand == 'jellyfin'):
+        #if (isJellyfinServer()):
             #print('-----------------------------------------------------------')
             #ask user for number of days to wait before attempting to delete audiobook track
             #audiobook_played_days = get_condition_days('audiobook')
@@ -1106,9 +1123,6 @@ def build_configuration_file(cfg,updateConfig):
         auth_key=cfg.auth_key
         #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(cfg.server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior)
-
-        #get the server brand so it can be used when updating the config to exculed audiobook type when server_brand == 'emby'
-        server_brand=cfg.server_brand
 
     userkeys_bllibs_list=[]
     userbllibs_list=[]
@@ -1157,7 +1171,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_days=" + str(get_default_config_values('audio_played_days')) + "\n"
         config_file += "audio_created_days=" + str(get_default_config_values('audio_created_days')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_days=" + str(get_default_config_values('audiobook_played_days')) + "\n"
             config_file += "audiobook_created_days=" + str(get_default_config_values('audiobook_created_days')) + "\n"
@@ -1170,7 +1184,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_days=" + str(cfg.audio_played_days) + "\n"
         config_file += "audio_created_days=" + str(cfg.audio_created_days) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_days=" + str(cfg.audiobook_played_days) + "\n"
             config_file += "audiobook_created_days=" + str(cfg.audiobook_created_days) + "\n"
@@ -1199,7 +1213,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_count_comparison='" + get_default_config_values('audio_played_count_comparison') + "'\n"
         config_file += "audio_created_played_count_comparison='" + get_default_config_values('audio_created_played_count_comparison') + "'\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_count_comparison='" + get_default_config_values('audiobook_played_count_comparison') + "'\n"
             config_file += "audiobook_created_played_count_comparison='" + get_default_config_values('audiobook_created_played_count_comparison') + "'\n"
@@ -1212,7 +1226,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_count_comparison='" + cfg.audio_played_count_comparison + "'\n"
         config_file += "audio_created_played_count_comparison='" + cfg.audio_created_played_count_comparison + "'\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_count_comparison='" + cfg.audiobook_played_count_comparison + "'\n"
             config_file += "audiobook_created_played_count_comparison='" + cfg.audiobook_created_played_count_comparison + "'\n"
@@ -1232,7 +1246,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_count=" + str(get_default_config_values('audio_played_count')) + "\n"
         config_file += "audio_created_played_count=" + str(get_default_config_values('audio_created_played_count')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_count=" + str(get_default_config_values('audiobook_played_count')) + "\n"
             config_file += "audiobook_created_played_count=" + str(get_default_config_values('audiobook_created_played_count')) + "\n"
@@ -1245,7 +1259,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "\n"
         config_file += "audio_played_count=" + str(cfg.audio_played_count) + "\n"
         config_file += "audio_created_played_count=" + str(cfg.audio_created_played_count) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "\n"
             config_file += "audiobook_played_count=" + str(cfg.audiobook_played_count) + "\n"
             config_file += "audiobook_created_played_count=" + str(cfg.audiobook_created_played_count) + "\n"
@@ -1264,13 +1278,13 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "multiuser_play_count_movie=" + str(get_default_config_values('multiuser_play_count_movie')) + "\n"
         config_file += "multiuser_play_count_episode=" + str(get_default_config_values('multiuser_play_count_episode')) + "\n"
         config_file += "multiuser_play_count_audio=" + str(get_default_config_values('multiuser_play_count_audio')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "multiuser_play_count_audiobook=" + str(get_default_config_values('multiuser_play_count_audiobook')) + "\n"
     elif (updateConfig):
         config_file += "multiuser_play_count_movie=" + str(cfg.multiuser_play_count_movie) + "\n"
         config_file += "multiuser_play_count_episode=" + str(cfg.multiuser_play_count_episode) + "\n"
         config_file += "multiuser_play_count_audio=" + str(cfg.multiuser_play_count_audio) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "multiuser_play_count_audiobook=" + str(cfg.multiuser_play_count_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1288,13 +1302,13 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "keep_favorites_movie=" + str(get_default_config_values('keep_favorites_movie')) + "\n"
         config_file += "keep_favorites_episode=" + str(get_default_config_values('keep_favorites_episode')) + "\n"
         config_file += "keep_favorites_audio=" + str(get_default_config_values('keep_favorites_audio')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "keep_favorites_audiobook=" + str(get_default_config_values('keep_favorites_audiobook')) + "\n"
     elif (updateConfig):
         config_file += "keep_favorites_movie=" + str(cfg.keep_favorites_movie) + "\n"
         config_file += "keep_favorites_episode=" + str(cfg.keep_favorites_episode) + "\n"
         config_file += "keep_favorites_audio=" + str(cfg.keep_favorites_audio) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "keep_favorites_audiobook=" + str(cfg.keep_favorites_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1308,13 +1322,13 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(get_default_config_values('multiuser_whitelist_movie')) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(get_default_config_values('multiuser_whitelist_episode')) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(get_default_config_values('multiuser_whitelist_audio')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "multiuser_whitelist_audiobook=" + str(get_default_config_values('multiuser_whitelist_audiobook')) + "\n"
     elif (updateConfig):
         config_file += "multiuser_whitelist_movie=" + str(cfg.multiuser_whitelist_movie) + "\n"
         config_file += "multiuser_whitelist_episode=" + str(cfg.multiuser_whitelist_episode) + "\n"
         config_file += "multiuser_whitelist_audio=" + str(cfg.multiuser_whitelist_audio) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "multiuser_whitelist_audiobook=" + str(cfg.multiuser_whitelist_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1340,13 +1354,13 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "delete_blacktagged_movie=" + str(get_default_config_values('delete_blacktagged_movie')) + "\n"
         config_file += "delete_blacktagged_episode=" + str(get_default_config_values('delete_blacktagged_episode')) + "\n"
         config_file += "delete_blacktagged_audio=" + str(get_default_config_values('delete_blacktagged_audio')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "delete_blacktagged_audiobook=" + str(get_default_config_values('delete_blacktagged_audiobook')) + "\n"
     elif (updateConfig):
         config_file += "delete_blacktagged_movie=" + str(cfg.delete_blacktagged_movie) + "\n"
         config_file += "delete_blacktagged_episode=" + str(cfg.delete_blacktagged_episode) + "\n"
         config_file += "delete_blacktagged_audio=" + str(cfg.delete_blacktagged_audio) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "delete_blacktagged_audiobook=" + str(cfg.delete_blacktagged_audiobook) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1497,7 +1511,7 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "keep_favorites_advanced_track_artist=" + str(cfg.keep_favorites_advanced_track_artist) + "\n"
         config_file += "keep_favorites_advanced_album_artist=" + str(cfg.keep_favorites_advanced_album_artist) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         config_file += "\n"
         config_file += "#----------------------------------------------------------#\n"
         config_file += "# Advanced audio book track genre/author configurations\n"
@@ -1541,14 +1555,14 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "print_episode_keep_info=" + str(get_default_config_values('print_episode_keep_info')) + "\n"
         config_file += "print_audio_delete_info=" + str(get_default_config_values('print_audio_delete_info')) + "\n"
         config_file += "print_audio_keep_info=" + str(get_default_config_values('print_audio_keep_info')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "print_audiobook_delete_info=" + str(get_default_config_values('print_audiobook_delete_info')) + "\n"
             config_file += "print_audiobook_keep_info=" + str(get_default_config_values('print_audiobook_keep_info')) + "\n"
         config_file += "print_summary_header=" + str(get_default_config_values('print_summary_header')) + "\n"
         config_file += "print_movie_summary=" + str(get_default_config_values('print_movie_summary')) + "\n"
         config_file += "print_episode_summary=" + str(get_default_config_values('print_episode_summary')) + "\n"
         config_file += "print_audio_summary=" + str(get_default_config_values('print_audio_summary')) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "print_audiobook_summary=" + str(get_default_config_values('print_audiobook_summary')) + "\n"
     elif (updateConfig):
         config_file += "print_script_header=" + str(cfg.print_script_header) + "\n"
@@ -1560,14 +1574,14 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "print_episode_keep_info=" + str(cfg.print_episode_keep_info) + "\n"
         config_file += "print_audio_delete_info=" + str(cfg.print_audio_delete_info) + "\n"
         config_file += "print_audio_keep_info=" + str(cfg.print_audio_keep_info) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "print_audiobook_delete_info=" + str(cfg.print_audiobook_delete_info) + "\n"
             config_file += "print_audiobook_keep_info=" + str(cfg.print_audiobook_keep_info) + "\n"
         config_file += "print_summary_header=" + str(cfg.print_summary_header) + "\n"
         config_file += "print_movie_summary=" + str(cfg.print_movie_summary) + "\n"
         config_file += "print_episode_summary=" + str(cfg.print_episode_summary) + "\n"
         config_file += "print_audio_summary=" + str(cfg.print_audio_summary) + "\n"
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             config_file += "print_audiobook_summary=" + str(cfg.print_audiobook_summary) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
@@ -1600,7 +1614,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  1 - 'jellyfin'\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "server_brand='" + server_brand + "'\n"
+        config_file += "server_brand='" + GLOBAL_server_brand + "'\n"
     elif (updateConfig):
         config_file += "server_brand='" + cfg.server_brand + "'\n"
     config_file += "\n"
@@ -1735,8 +1749,8 @@ def build_configuration_file(cfg,updateConfig):
                 (get_default_config_values('episode_created_days') == -1) and
                 (get_default_config_values('audio_played_days') == -1) and
                 (get_default_config_values('audio_created_days') == -1) and
-                (((server_brand == 'jellyfin') and (get_default_config_values('audiobook_played_days') == -1)) or (server_brand == 'emby')) and
-                (((server_brand == 'jellyfin') and (get_default_config_values('audiobook_created_days') == -1)) or (server_brand == 'emby'))
+                (((isJellyfinServer()) and (get_default_config_values('audiobook_played_days') == -1)) or (isEmbyServer())) and
+                (((isJellyfinServer()) and (get_default_config_values('audiobook_created_days') == -1)) or (isEmbyServer()))
                 ):
                     print('\n\n-----------------------------------------------------------')
                     print('* Config file is not setup to find media.')
@@ -1745,7 +1759,7 @@ def build_configuration_file(cfg,updateConfig):
                     print('* Set \'movie_played_days\' or \'movie_created_days\' to zero or a positive number')
                     print('* Set \'episode_played_days\' or \'episode_created_days\' to zero or a positive number')
                     print('* Set \'audio_played_days\' or \'audio_crated_days\' to zero or a positive number')
-                    if (server_brand == 'jellyfin'):
+                    if (isJellyfinServer()):
                         print('* Set \'audiobook_played_days\' or \'audiobook_created_days\' to zero or a positive number')
             if not (REMOVE_FILES):
                 print('-----------------------------------------------------------')
@@ -1771,7 +1785,7 @@ def build_configuration_file(cfg,updateConfig):
 
 #get user input needed to edit the mumc_config.py file
 def edit_configuration_file(cfg,updateConfig):
-    return build_configuration_file(cfg,updateConfig)
+    build_configuration_file(cfg,updateConfig)
 
 
 #Get count of days since last played
@@ -1955,14 +1969,10 @@ def get_isPlayedCreated_FilterValue(played_days,created_days,filter_played_count
         return isPlayed_Filter_Value
     elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'True')):
         return isPlayed_Filter_Value
-    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'False')):
-        return 'False'
-    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'True')):
-        return 'True'
-    elif ((isPlayed_Filter_Value == 'False') and (isCreated_Filter_Value == 'disabled')):
-        return 'False'
-    elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'disabled')):
-        return 'True'
+    elif ((isPlayed_Filter_Value == 'disabled') and ((isCreated_Filter_Value == 'False') or (isCreated_Filter_Value == 'True'))):
+        return isCreated_Filter_Value
+    elif (((isPlayed_Filter_Value == 'False') or (isPlayed_Filter_Value == 'True')) and (isCreated_Filter_Value == 'disabled')):
+        return isPlayed_Filter_Value
     else:
         return ''
 
@@ -2112,7 +2122,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                             #Check if child item has already been processed
                             if not (child_item['Id'] in user_processed_itemsId):
                                 #Emby and jellyfin store tags differently
-                                if (cfg.server_brand == 'emby'):
+                                if (isEmbyServer()):
                                     #Does 'TagItems' exist
                                     if not ('TagItems' in child_item):
                                         #if it does not; add desired tag to metadata
@@ -2128,7 +2138,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                                         if not (child_itemIsTagged):
                                             child_item['TagItems'].append({'Name':insert_tagName,'Id':insert_tagId})
                                 #Emby and jellyfin store tags differently
-                                else: #(cfg.server_brand == 'jellyfin')
+                                else: #(isJellyfinServer())
                                     #Does 'TagItems' exist
                                     if not ('Tag' in child_item):
                                         #if it does not; add desired tag to metadata
@@ -2291,7 +2301,7 @@ def get_isItemTagged(usertags,tagged_items,item):
         appendTo_DEBUG_log("\n",1)
 
     #Emby and jellyfin store tags differently
-    if (cfg.server_brand == 'emby'):
+    if (isEmbyServer()):
         #Check if media item is tagged
         if ((not (usertags == '')) and ('TagItems' in item)):
             #Check if media item is tagged
@@ -2307,7 +2317,7 @@ def get_isItemTagged(usertags,tagged_items,item):
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log('\nitem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),2)
     #Emby and jellyfin store tags differently
-    else: #(cfg.server_brand == 'jellyfin')
+    else: #(isJellyfinServer())
         #Jellyfin tags
         #Check if media item is tagged
         if ((not (usertags == '')) and ('Tags' in item)):
@@ -4153,7 +4163,7 @@ def get_media_items():
     episode_created_days=cfg.episode_created_days
     audio_played_days=cfg.audio_played_days
     audio_created_days=cfg.audio_created_days
-    if (cfg.server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         audiobook_played_days=cfg.audiobook_played_days
         audiobook_created_days=cfg.audiobook_created_days
     else:
@@ -4170,7 +4180,7 @@ def get_media_items():
     print_episode_keep_info=cfg.print_episode_keep_info
     print_audio_delete_info=cfg.print_audio_delete_info
     print_audio_keep_info=cfg.print_audio_keep_info
-    if (cfg.server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         print_audiobook_delete_info=cfg.print_audiobook_delete_info
         print_audiobook_keep_info=cfg.print_audiobook_keep_info
     else:
@@ -4364,7 +4374,7 @@ def get_media_items():
         print_byType('* episode_played_days=-1                                  *',print_warnings)
         appendTo_DEBUG_log("\n",1)
         print_byType('* audio_played_days=-1                                    *',print_warnings)
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             appendTo_DEBUG_log("\n",1)
             print_byType('* audiobook_played_days=-1                            *',print_warnings)
         appendTo_DEBUG_log("\n",1)
@@ -4375,7 +4385,7 @@ def get_media_items():
         print_byType('* episode_created_days=-1                                 *',print_warnings)
         appendTo_DEBUG_log("\n",1)
         print_byType('* audio_created_days=-1                                   *',print_warnings)
-        if (server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             appendTo_DEBUG_log("\n",1)
             print_byType('* audiobook_created_days=-1                           *',print_warnings)
         appendTo_DEBUG_log("\n",1)
@@ -6005,7 +6015,7 @@ def get_media_items():
         #audioBook meida type only applies to jellyfin
         #Jellyfin sets audio books to a media type of audioBook
         #Emby sets audio books to a media type of audio (see audio section)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
 
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\n\nProcessing AUDIOBOOK Items For UserId: " + str(user_key),2)
@@ -6516,7 +6526,7 @@ def get_media_items():
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Episode, deleteItems)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (keep_favorites_audio == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (movie_created_days >= 0)) and (keep_favorites_audiobook == 2)):
+    if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (keep_favorites_audiobook == 2)):
         deleteItems=get_isfav_ByMultiUser(user_keys_json, isfav_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
@@ -6534,7 +6544,7 @@ def get_media_items():
             appendTo_DEBUG_log('\nisfav_AUDIO: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisfav_AUDIOBOOK: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isfav_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
@@ -6547,7 +6557,7 @@ def get_media_items():
             deleteItems=get_iswhitetagged_ByMultiUser(episode_whitetag_list, deleteItems)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             deleteItems=get_iswhitetagged_ByMultiUser(audio_whitetag_list, deleteItems)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             deleteItems=get_iswhitetagged_ByMultiUser(audiobook_whitetag_list, deleteItems)
 
     if (GLOBAL_DEBUG):
@@ -6565,7 +6575,7 @@ def get_media_items():
             appendTo_DEBUG_log('iswhitetag_AUDIO: ',3)
             appendTo_DEBUG_log(convert2json(audio_whitetag_list),3)
             appendTo_DEBUG_log("\n",3)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitetag_AUDIOBOOK: ',3)
             appendTo_DEBUG_log("\n" + convert2json(audiobook_whitetag_list),3)
             appendTo_DEBUG_log("\n",3)
@@ -6577,7 +6587,7 @@ def get_media_items():
         deleteItems=get_iswhitelist_ByMultiUser(episode_whitelists, deleteItems)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (multiuser_whitelist_audio == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(audio_whitelists, deleteItems)
-    if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (multiuser_whitelist_audiobook == 0)):
+    if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (multiuser_whitelist_audiobook == 0)):
         deleteItems=get_iswhitelist_ByMultiUser(audiobook_whitelists, deleteItems)
 
     if (GLOBAL_DEBUG):
@@ -6595,7 +6605,7 @@ def get_media_items():
             appendTo_DEBUG_log('\niswhitelist_AUDIO: ',3)
             appendTo_DEBUG_log(convert2json(audio_whitelists),3)
             appendTo_DEBUG_log("\n",3)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitelist_AUDIOBOOK: ',3)
             appendTo_DEBUG_log("\n" + convert2json(audiobook_whitelists),3)
             appendTo_DEBUG_log("\n",3)
@@ -6607,7 +6617,7 @@ def get_media_items():
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Episode, deleteItems)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (delete_blacktagged_audio == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (delete_blacktagged_audiobook == 1)):
+    if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (delete_blacktagged_audiobook == 1)):
         deleteItems=get_isblacktagged_watchedByAllUsers(isblacktag_and_watched_byUserId_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
@@ -6625,7 +6635,7 @@ def get_media_items():
             appendTo_DEBUG_log('\nisblacktag_Played_AUDIO: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacktag_Played_AUDIOBOOK: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isblacktag_and_watched_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
@@ -6637,7 +6647,7 @@ def get_media_items():
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Episode, deleteItems)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (multiuser_play_count_audio == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_Audio, deleteItems)
-    if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (multiuser_play_count_audiobook == 1)):
+    if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (multiuser_play_count_audiobook == 1)):
         deleteItems=get_isplaycount_MetByAllUsers(isMeeting_PlayCountFilter_AudioBook, deleteItems)
 
     if (GLOBAL_DEBUG):
@@ -6655,7 +6665,7 @@ def get_media_items():
             appendTo_DEBUG_log('\nisplaycountmet_AUDIO: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_Audio),3)
             appendTo_DEBUG_log("\n",3)
-        if ((server_brand == 'jellyfin') and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
+        if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisplaycountmet_AUDIOBOOK: ',3)
             appendTo_DEBUG_log("\n" + convert2json(isMeeting_PlayCountFilter_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
@@ -6717,7 +6727,7 @@ def output_itemsToDelete(deleteItems):
     print_movie_summary=cfg.print_movie_summary
     print_episode_summary=cfg.print_episode_summary
     print_audio_summary=cfg.print_audio_summary
-    if (cfg.server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         print_audiobook_summary=cfg.print_audiobook_summary
     else:
         print_audiobook_summary=False
@@ -6727,7 +6737,7 @@ def output_itemsToDelete(deleteItems):
         print_movie_summary=True
         print_episode_summary=True
         print_audio_summary=True
-        if (cfg.server_brand == 'jellyfin'):
+        if (isJellyfinServer()):
             print_audiobook_summary=True
         else:
             print_audiobook_summary=False
@@ -6977,9 +6987,23 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
 def cfgCheck():
 
     if hasattr(cfg, 'server_brand'):
-        server_brand=cfg.server_brand
+        check=cfg.server_brand.lower()
+        server_brand=check
+        if (GLOBAL_DEBUG):
+            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'",2)
+        if (
+            not ((type(check) is str) and
+            ((check == 'emby') or
+            (check == 'jellyfin')))
+        ):
+            error_found_in_mumc_config_py+='ConfigValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            server_brand='invalid'
     else:
+        error_found_in_mumc_config_py+='ConfigNameError: The server_brand variable is missing from mumc_config.py\n'
         server_brand='invalid'
+
+#######################################################################################################
+
     error_found_in_mumc_config_py=''
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
     if (GLOBAL_DEBUG):
@@ -7050,7 +7074,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_played_days variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_played_days'):
             check=cfg.audiobook_played_days
             if (GLOBAL_DEBUG):
@@ -7105,7 +7129,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_created_days variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_created_days'):
             check=cfg.audiobook_created_days
             if (GLOBAL_DEBUG):
@@ -7172,7 +7196,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_played_count_comparison variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_played_count_comparison'):
             check=cfg.audiobook_played_count_comparison
             if (GLOBAL_DEBUG):
@@ -7243,7 +7267,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_created_played_count_comparison variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_created_played_count_comparison'):
             check=cfg.audiobook_created_played_count_comparison
             if (GLOBAL_DEBUG):
@@ -7302,7 +7326,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_played_count variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_played_count'):
             check=cfg.audiobook_played_count
             if (GLOBAL_DEBUG):
@@ -7357,7 +7381,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The audio_created_played_count variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'audiobook_created_played_count'):
             check=cfg.audiobook_created_played_count
             if (GLOBAL_DEBUG):
@@ -7412,7 +7436,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The multiuser_play_count_audio variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'multiuser_play_count_audiobook'):
             check=cfg.multiuser_play_count_audiobook
             if (GLOBAL_DEBUG):
@@ -7467,7 +7491,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The keep_favorites_audio variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'keep_favorites_audiobook'):
             check=cfg.keep_favorites_audiobook
             if (GLOBAL_DEBUG):
@@ -7522,7 +7546,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The multiuser_whitelist_audio variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'multiuser_whitelist_audiobook'):
             check=cfg.multiuser_whitelist_audiobook
             if (GLOBAL_DEBUG):
@@ -7591,7 +7615,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The delete_blacktagged_audio variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'delete_blacktagged_audiobook'):
             check=cfg.delete_blacktagged_audiobook
             if (GLOBAL_DEBUG):
@@ -7882,7 +7906,7 @@ def cfgCheck():
 
 #######################################################################################################
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
             if hasattr(cfg, 'keep_favorites_advanced_audio_book_track_genre'):
                 check=cfg.keep_favorites_advanced_audio_book_track_genre
                 if (GLOBAL_DEBUG):
@@ -8067,7 +8091,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The print_audio_keep_info variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'print_audiobook_delete_info'):
             check=cfg.print_audiobook_delete_info
             if (GLOBAL_DEBUG):
@@ -8146,7 +8170,7 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The print_audio_summary variable is missing from mumc_config.py\n'
 
-    if (server_brand == 'jellyfin'):
+    if (isJellyfinServer()):
         if hasattr(cfg, 'print_audiobook_summary'):
             check=cfg.print_audiobook_summary
             if (GLOBAL_DEBUG):
@@ -8174,21 +8198,6 @@ def cfgCheck():
             error_found_in_mumc_config_py+='ConfigValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The UPDATE_CONFIG variable is missing from mumc_config.py\n'
-
-#######################################################################################################
-
-    if hasattr(cfg, 'server_brand'):
-        check=cfg.server_brand
-        if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'",2)
-        if (
-            not ((type(check) is str) and
-            ((check == 'emby') or
-            (check == 'jellyfin')))
-        ):
-            error_found_in_mumc_config_py+='ConfigValueError: server_brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
-    else:
-        error_found_in_mumc_config_py+='ConfigNameError: The server_brand variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 
@@ -8364,6 +8373,7 @@ try:
     elif (GLOBAL_DEBUG == False):
         GLOBAL_DEBUG = 0
 
+    GLOBAL_server_brand=cfg.server_brand.lower
     print_script_header=cfg.print_script_header
 
     if (GLOBAL_DEBUG):
