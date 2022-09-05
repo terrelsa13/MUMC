@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.4'
+    Version='3.2.5'
 
     return(Version)
 
@@ -6986,11 +6986,18 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
 #Check select config variables are as expected
 def cfgCheck():
 
+    #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
+
+    error_found_in_mumc_config_py=''
+
+#######################################################################################################
+
     if hasattr(cfg, 'server_brand'):
         check=cfg.server_brand.lower()
         server_brand=check
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nserver_brand='" + str(check) + "'",2)
+            #Double newline for debug log formatting
+            appendTo_DEBUG_log("\n\nserver_brand='" + str(check) + "'",2)
         if (
             not ((type(check) is str) and
             ((check == 'emby') or
@@ -7001,14 +7008,6 @@ def cfgCheck():
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The server_brand variable is missing from mumc_config.py\n'
         server_brand='invalid'
-
-#######################################################################################################
-
-    error_found_in_mumc_config_py=''
-    #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
-    if (GLOBAL_DEBUG):
-        #Double newline for debug log formatting
-        appendTo_DEBUG_log("\n\nserver_brand='" + server_brand + "'",2)
 
 #######################################################################################################
 
