@@ -267,6 +267,9 @@ def get_library_matching_behavior(library_matching_behavior):
         print('0 - byId - Media items will be matched to libraries using \'LibraryIds\'.')
         print('1 - byPath - Media items will be matched to libraries using \'Paths\'.')
         print('2 - byNetworkPath - Media items will be matched to libraries using \'NetworkPaths\'.')
+        print('   Filtering byId does not apply to the rules below.')
+        print('   If your libraries do not have a \'Shared Network Folder\' you must filter byPath.')
+        print('   If your libraries have a \'Shared Network Folder\' you must filter byNetworkPath.')
         if ((library_matching_behavior == 'byId') or (library_matching_behavior == 'byPath') or (library_matching_behavior == 'byNetworkPath')):
             print('')
             print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
@@ -1652,6 +1655,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  0 - byId - Media items will be matched to libraries using \'LibraryIds\'\n"
     config_file += "#  1 - byPath - Media items will be matched to libraries using \'Paths\'\n"
     config_file += "#  2 - byNetwork Path - Media items will be matched to libraries using \'NetworkPaths\'\n"
+    config_file += "# Filtering byId does not apply to the rules below.\n"
+    config_file += "# Filtering byPath requires no shared network folders are configured.\n"
+    config_file += "# Filtering byNetworkPath requires shared network folders are configured.\n"
     config_file += "# (byId : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "library_matching_behavior='" + library_matching_behavior + "'\n"
@@ -1822,7 +1828,7 @@ def get_days_since_played(date_last_played):
             appendTo_DEBUG_log('\n\nCaptured UTC time is: ' + str(date_time_now),3)
             appendTo_DEBUG_log('\nDate last played or date created is: ' + str(date_last_played),2)
             appendTo_DEBUG_log('\nFormatted date last played or date created is: ' + str(date_time_last_played),3)
-            appendTo_DEBUG_log('\nMedia item was played or created \'' + days_since_played + '\' day(s) ago',2)
+            appendTo_DEBUG_log('\nMedia item was last \'' + days_since_played + '\'',2)
     else:
         days_since_played=date_last_played
 
@@ -2226,6 +2232,44 @@ def get_isItemMatching(item_one, item_two):
                     (not (single_item_one == '""')) and (not (single_item_two == '""'))):
                     if (single_item_one == single_item_two):
                         items_match=True
+                    elif (single_item_two.startswith(single_item_one)):
+                        items_match=True
+
+                        #found a match; return true and the matching value
+                        return(items_match, single_item_one)
+
+    #nothing matched; return false and empty string
+    return(items_match,'')
+
+
+#Determine if there is a matching item
+def get_doesItemStartWith(item_one, item_two):
+
+    #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
+    item_one = item_one.replace('\\','/')
+    item_two = item_two.replace('\\','/')
+
+    #read and split Ids to compare to
+    item_one_split=item_one.split(',')
+    item_two_split=item_two.split(',')
+
+    items_match=False
+
+    #DEBUG log formatting
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n',1)
+
+    #determine if media Id matches one of the other Ids
+    for single_item_one in item_one_split:
+            for single_item_two in item_two_split:
+                if (GLOBAL_DEBUG):
+                    appendTo_DEBUG_log('\nComparing the below two items',3)
+                    appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3)
+                if ((not (single_item_one == '')) and (not (single_item_two == '')) and
+                    (not (single_item_one == "''")) and (not (single_item_two == "''")) and
+                    (not (single_item_one == '""')) and (not (single_item_two == '""'))):
+                    if (single_item_one.startswith(single_item_two)):
+                        items_match=True
 
                         #found a match; return true and the matching value
                         return(items_match, single_item_one)
@@ -2235,8 +2279,8 @@ def get_isItemMatching(item_one, item_two):
 
 
 #Determine if media item whitelisted for the current user or for another user
-def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
-                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json):
+def get_isItemWhitelisted(item,LibraryID,LibraryNetPath,LibraryPath,currentPosition,
+                                user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist):
 
     library_matching_behavior=cfg.library_matching_behavior
 
@@ -2250,6 +2294,21 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\n",1)
 
+    if (library_matching_behavior == 'byPath'):
+        if ("Path" in item):
+            ItemPath = item["Path"]
+        elif (("MediaSources" in item) and ("Path" in item["MediaSources"])):
+            ItemPath = item["MediaSources"]["Path"]
+        else:
+            ItemPath = LibraryPath
+    elif (library_matching_behavior == 'byNetworkPath'):
+        if ("Path" in item):
+            ItemNetPath = item["Path"]
+        elif (("MediaSources" in item) and ("Path" in item["MediaSources"])):
+            ItemNetPath = item["MediaSources"]["Path"]
+        else:
+            ItemNetPath = LibraryNetPath
+
     #Store media item's local and remote whitelist state
     #Get if media item is whitelisted
     for wllib_pos in range(len(user_wllib_keys_json)):
@@ -2257,11 +2316,11 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
         if (wllib_pos == currentPosition):
             if not (itemIsWhiteListed_Local):
                 if (library_matching_behavior == 'byId'):
-                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_doesItemStartWith(LibraryID, user_wllib_keys_json[wllib_pos])
                 elif (library_matching_behavior == 'byPath'):
-                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_doesItemStartWith(ItemPath, user_wllib_path_json[wllib_pos])
                 elif (library_matching_behavior == 'byNetworkPath'):
-                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
+                    itemIsWhiteListed_Local, itemWhiteListedValue_Local=get_doesItemStartWith(ItemNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log('\nItem is whitelisted for this user: ' + str(itemIsWhiteListed_Local),2)
@@ -2269,13 +2328,13 @@ def get_isItemWhitelisted(LibraryID,LibraryNetPath,LibraryPath,currentPosition,
 
         #Looking in other users libraries
         else: #(wllib_pos == currentPosition)
-            if not (itemIsWhiteListed_Remote):
+            if ((not (itemIsWhiteListed_Remote)) and (multiuser_whitelist == 0)):
                 if (library_matching_behavior == 'byId'):
-                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryID, user_wllib_keys_json[wllib_pos])
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_doesItemStartWith(LibraryID, user_wllib_keys_json[wllib_pos])
                 elif (library_matching_behavior == 'byPath'):
-                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryPath, user_wllib_path_json[wllib_pos])
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_doesItemStartWith(ItemPath, user_wllib_path_json[wllib_pos])
                 elif (library_matching_behavior == 'byNetworkPath'):
-                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_isItemMatching(LibraryNetPath, user_wllib_netpath_json[wllib_pos])
+                    itemIsWhiteListed_Remote, itemWhiteListedValue_Remote=get_doesItemStartWith(ItemNetPath, user_wllib_netpath_json[wllib_pos])
 
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log('\nItem is whitelisted for another user: ' + str(itemIsWhiteListed_Remote),2)
@@ -3929,7 +3988,7 @@ def get_createdStatus(item,media_condition,filter_count_comparison,filter_count)
 
 
 #decide if this item is ok to be deleted; still has to meet other criteria
-def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote):
+def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist):
 
     #when item is favorited or whitetagged do not allow it to be deleted
     if (itemisfav_Local or itemisfav_Advanced or itemIsWhiteTagged):
@@ -3938,7 +3997,8 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     elif (itemIsBlackTagged and ((item_matches_played_count_filter and item_matches_played_condition_day_filter) or (item_matches_created_played_count_filter and item_matches_created_condition_day_filter))):
         okToDelete=True
     #when item is whitelisted do not allow it to be deleted
-    elif (itemIsWhiteListed_Local or itemIsWhiteListed_Remote):
+    #elif (((multiuser_whitelist == 0) and (itemIsWhiteListed_Local or itemIsWhiteListed_Remote)) or ((multiuser_whitelist == 1) and (itemIsWhiteListed_Local))):
+    elif ((itemIsWhiteListed_Local or itemIsWhiteListed_Remote)):
         okToDelete=False
     #when item is blacklisted allow it to be deleted
     elif ((item_matches_played_count_filter and item_matches_played_condition_day_filter) or (item_matches_created_played_count_filter and item_matches_created_condition_day_filter)):
@@ -4941,21 +5001,27 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_movie)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_movie == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie == 0)):
                                             movie_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_movie)
  
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_movie == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_movie == 0)):
@@ -4979,7 +5045,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_movie)
 
                                     if ((delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']]=True
@@ -5425,21 +5491,27 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_episode)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_episode == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode == 0)):
                                             episode_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_episode)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_episode == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_episode == 0)):
@@ -5463,7 +5535,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_episode)
 
                                     if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']]=True
@@ -5928,21 +6000,27 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_audio)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_audio == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio == 0)):
                                             audio_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_audio)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_audio == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audio == 0)):
@@ -5966,7 +6044,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_audio)
 
                                     if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']]=True
@@ -6416,21 +6494,27 @@ def get_media_items():
                                     itemIsWhiteListed_Display=False
                                     #check if we are at a whitelist queried data_list_pos
                                     if (data_list_pos in data_from_whitelist_queries):
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_audiobook)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_audiobook == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook == 0)):
                                             audiobook_whitelists.append(item['Id'])
                                     else: #check if we are at a blacklist queried data_list_pos
-                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
-                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+                                        itemIsWhiteListed_Local,itemIsWhiteListed_Remote=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,currentPosition,
+                                                                                                               user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json,multiuser_whitelist_audiobook)
 
                                         #Display True if media item is locally or remotely whitelisted
-                                        itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        if (multiuser_whitelist_audiobook == 0):
+                                            itemIsWhiteListed_Display=(itemIsWhiteListed_Local or itemIsWhiteListed_Remote)
+                                        else:
+                                            itemIsWhiteListed_Display=itemIsWhiteListed_Local
 
                                         #Save media item's whitelist state when multiple users are monitored and we want to keep media items based on any user whitelisting the parent library
                                         if ((itemIsWhiteListed_Local) and (multiuser_whitelist_audiobook == 0)):
@@ -6454,7 +6538,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_audiobook)
 
                                     if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']]=True

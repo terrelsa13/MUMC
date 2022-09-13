@@ -542,6 +542,11 @@ script_behavior='abclist'
 #  0 - byId - Media items will be matched to libraries using 'LibraryIds'
 #  1 - byPath - Media items will be matched to libraries using 'Paths'
 #  2 - byNetworkPath - Media items will be matched to libraries using 'NetworkPaths'
+# Filtering byId does not apply to the rules below.
+# Filtering byPath requires no shared network folders are configured.
+#  When this is true Emby/Jellyfin return a path for each media item.
+# Filtering byNetworkPath requires shared network folders are configured.
+#  When this is true Emby/Jellyfin return a newtork path for each media item.
 # (byId : default)
 #----------------------------------------------------------#
 library_matching_behavior='byAbc'
@@ -657,7 +662,7 @@ DEBUG=0
 
 # Known Limitations
 * When importing played states from Trakt the ```days since played``` shown in the console output will not show the correct value.
-  - This is an issue with the ```last played date``` Trakt sends to your Emby/Jellyfin API for each played media item.
+  - This is an issue with the ```last played date``` not being filled in when Trakt sends played to your Emby/Jellyfin API for each played media item.
   - Fixing this is outside of the scope of this script.
 
 # Requirements
