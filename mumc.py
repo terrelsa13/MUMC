@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.5'
+    Version='3.2.6'
 
     return(Version)
 
@@ -68,7 +68,11 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     while(getdata):
         try:
             with request.urlopen(url) as response:
-                if response.getcode() == 200:
+                #request recieved; but taking long time to return data
+                while (response.getcode() == 202):
+                    #wait 200ms
+                    time.sleep(0.2)
+                if (response.getcode() == 200):
                     try:
                         source = response.read()
                         data = json.loads(source)
@@ -89,6 +93,11 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                                 print_byType("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",True)
                                 print_byType("\n" + "An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",True)
                                 return(err)
+                elif (response.getcode() == 204):
+                    source = response.read()
+                    #data = json.loads(source)
+                    data = source
+                    getdata = False
                 else:
                     getdata = False
                     print_byType("\n" + "An error occurred while attempting to retrieve data from the API.",True)
@@ -1586,6 +1595,34 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "print_audio_summary=" + str(cfg.print_audio_summary) + "\n"
         if (isJellyfinServer()):
             config_file += "print_audiobook_summary=" + str(cfg.print_audiobook_summary) + "\n"
+    #config_file += "#----------------------------------------------------------#\n"
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# Add last played date for items missing the LastPlayedDate data\n"
+    config_file += "# When played state is imported from Trakt the LastPlayedDate is\n"
+    config_file += "#  not populated. To allow the script to maintain functionality\n"
+    config_file += "#  the current date and time the script is run can be used as the\n"
+    config_file += "#  LastPlayedDate value.\n"
+    config_file += "#  0 - Do not set the LastPlayedDate; days since played will show as\n"
+    config_file += "#        the number of days since 1970-Jan-01 00:00:00hrs\n"
+    config_file += "#  1 - Set the LastPlayedDate; the current date-time the script is\n"
+    config_file += "#        run will be saved as the LastPlayedDate for any media items\n"
+    config_file += "#        missing the LastPlayedDate data. Only media items missing the\n"
+    config_file += "#        LastPlayedDate data are modified\n"
+    config_file += "# (0 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "movie_set_missing_last_played_date=" + str(get_default_config_values('movie_set_missing_last_played_date')) + "\n"
+        config_file += "episode_set_missing_last_played_date=" + str(get_default_config_values('episode_set_missing_last_played_date')) + "\n"
+        config_file += "audio_set_missing_last_played_date=" + str(get_default_config_values('audio_set_missing_last_played_date')) + "\n"
+        if (isJellyfinServer()):
+            config_file += "audiobook_set_missing_last_played_date=" + str(get_default_config_values('audiobook_set_missing_last_played_date')) + "\n"
+    elif (updateConfig):
+        config_file += "movie_set_missing_last_played_date=" + str(cfg.movie_set_missing_last_played_date) + "\n"
+        config_file += "episode_set_missing_last_played_date=" + str(cfg.episode_set_missing_last_played_date) + "\n"
+        config_file += "audio_set_missing_last_played_date=" + str(cfg.audio_set_missing_last_played_date) + "\n"
+        if (isJellyfinServer()):
+            config_file += "audiobook_set_missing_last_played_date=" + str(cfg.audiobook_set_missing_last_played_date) + "\n"
     #config_file += "#----------------------------------------------------------#\n"
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -4022,9 +4059,38 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     return okToDelete
 
 
+#add item["UserData"]["LastPlayedDate"] with current date for media item
+def modify_lastPlayedDate(item,userKey):
+
+    serverURL=cfg.server_url
+    authKey=cfg.auth_key
+
+    #save current date-time to item["UserData"]["LastPlayedDate"]
+    item["UserData"]["LastPlayedDate"]=str(datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"))
+
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log("\nAdd missing LastPlayedDate of " + str(item["UserData"]["LastPlayedDate"]) + " to media item with Id: " + str(item["Id"]),3)
+
+    #convert item to json element
+    DATA = convert2json(item["UserData"])
+    #encode json element
+    DATA = DATA.encode('utf-8')
+
+    #specify json in header
+    headers = {'Content-Type' : 'application/json'}
+
+    #build full POST request
+    req = request.Request(url=serverURL + '/Users/' + userKey + '/Items/' + item["Id"] + '/UserData?api_key=' + authKey, data=DATA, method='POST', headers=headers)
+
+    #API POST for UserData modification
+    requestURL(req, GLOBAL_DEBUG, 'add_missing_LastPlayedDate', 3)
+
+
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_MOVIEoutput(item):
+def prepare_MOVIEoutput(item,user_key):
+
+    movie_set_missing_last_played_date=cfg.movie_set_missing_last_played_date
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output",2)
@@ -4053,7 +4119,10 @@ def prepare_MOVIEoutput(item):
             appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            if (movie_set_missing_last_played_date == 0):
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            else:
+                modify_lastPlayedDate(item,user_key)
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
@@ -4077,7 +4146,9 @@ def prepare_MOVIEoutput(item):
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_EPISODEoutput(item):
+def prepare_EPISODEoutput(item,user_key):
+
+    episode_set_missing_last_played_date=cfg.episode_set_missing_last_played_date
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\n\nPreparing Episode " + item['Id'] + " For Output",2)
@@ -4108,7 +4179,10 @@ def prepare_EPISODEoutput(item):
             appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            if (episode_set_missing_last_played_date == 0):
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            else:
+                modify_lastPlayedDate(item,user_key)
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
@@ -4132,13 +4206,26 @@ def prepare_EPISODEoutput(item):
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_AUDIOoutput(item):
+def prepare_AUDIOoutput(item,user_key,mediaType):
+
+    if (mediaType == "audio"):
+        audio_set_missing_last_played_date=cfg.audio_set_missing_last_played_date
+    else:
+        audio_set_missing_last_played_date=0
+
+    if ((isJellyfinServer()) and (mediaType == "audiobook")):
+        audiobook_set_missing_last_played_date=cfg.audiobook_set_missing_last_played_date
+    else:
+        audiobook_set_missing_last_played_date=0
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\n\nPreparing Audio/AudioBook " + item['Id'] + " For Output",2)
+        if (mediaType == "audio"):
+            appendTo_DEBUG_log("\n\nPreparing Audio " + item['Id'] + " For Output",2)
+        elif (mediaType == "audiobook"):
+            appendTo_DEBUG_log("\n\nPreparing AudioBook " + item['Id'] + " For Output",2)
 
     if not ('Type' in item):
-        item['Type']='Episode'
+        item['Type']='Audio'
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nitem['Type'] Was Missing",3)
     if not ('IndexNumber' in item):
@@ -4167,7 +4254,11 @@ def prepare_AUDIOoutput(item):
             appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            if (((mediaType == "audio") and (audio_set_missing_last_played_date == 0)) or
+               ((isJellyfinServer()) and (mediaType == "audiobook") and (audiobook_set_missing_last_played_date == 0))):
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
+            else:
+                modify_lastPlayedDate(item,user_key)
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
@@ -4184,15 +4275,18 @@ def prepare_AUDIOoutput(item):
             appendTo_DEBUG_log("\nitem['Id'] Was Missing",3)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log("\nFinished Preparing Audio/AudioBook " + item['Id'] + " For Output",2)
+        if (mediaType == "audio"):
+            appendTo_DEBUG_log("\nFinished Preparing Audio " + item['Id'] + " For Output",2)
+        elif (mediaType == "audiobook"):
+            appendTo_DEBUG_log("\nFinished Preparing AudioBook " + item['Id'] + " For Output",2)
 
     return item
 
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_AUDIOBOOKoutput(item):
-    return prepare_AUDIOoutput(item)
+def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
+    return prepare_AUDIOoutput(item,user_key,mediaType)
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
@@ -4944,7 +5038,8 @@ def get_media_items():
                                         appendTo_DEBUG_log("\nProcessing Movie Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
-                                    if ((movie_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((movie_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
+                                        and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
                                         if ((cut_off_date_played_movie) > (parse(item['UserData']['LastPlayedDate']))):
                                             item_matches_played_condition_day_filter=True
                                         else:
@@ -5054,7 +5149,7 @@ def get_media_items():
 
                                         try:
                                             #Fill in the blanks
-                                            item=prepare_MOVIEoutput(item)
+                                            item=prepare_MOVIEoutput(item,user_key)
 
                                             item_output_details=(item['Type'] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
                                                         ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + get_days_since_created(item['DateCreated']) + ' - Favorite: ' + str(itemisfav_MOVIE_Display) +
@@ -5432,7 +5527,8 @@ def get_media_items():
                                         appendTo_DEBUG_log("\nProcessing Episode Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
-                                    if ((episode_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((episode_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
+                                        and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
                                         if ((cut_off_date_played_episode) > (parse(item['UserData']['LastPlayedDate']))):
                                             item_matches_played_condition_day_filter=True
                                         else:
@@ -5563,7 +5659,7 @@ def get_media_items():
 
                                         try:
                                             #Fill in the blanks
-                                            item=prepare_EPISODEoutput(item)
+                                            item=prepare_EPISODEoutput(item,user_key)
 
                                             item_output_details=(item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['SeriesStudio'] +
                                                         ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + get_days_since_created(item['DateCreated']) +
@@ -5941,7 +6037,8 @@ def get_media_items():
                                         appendTo_DEBUG_log("\nProcessing Audio Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
-                                    if ((audio_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((audio_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
+                                        and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
                                         if ((cut_off_date_played_audio) > (parse(item['UserData']['LastPlayedDate']))):
                                             item_matches_played_condition_day_filter=True
                                         else:
@@ -6053,7 +6150,7 @@ def get_media_items():
 
                                         try:
                                             #Fill in the blanks
-                                            item=prepare_AUDIOoutput(item)
+                                            item=prepare_AUDIOoutput(item,user_key,"audio")
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] +
                                                           ' - Record Label: ' + item['Studios'][0]['Name'] + ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) +
@@ -6435,7 +6532,8 @@ def get_media_items():
                                         appendTo_DEBUG_log("\nProcessing AudioBook Item: " + str(item['Id']),2)
 
                                     #establish played cutoff date for media item
-                                    if ((audiobook_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+                                    if ((audiobook_played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
+                                        and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
                                         if ((cut_off_date_played_audiobook) > (parse(item['UserData']['LastPlayedDate']))):
                                             item_matches_played_condition_day_filter=True
                                         else:
@@ -6547,7 +6645,7 @@ def get_media_items():
 
                                         try:
                                             #Fill in the blanks
-                                            item=prepare_AUDIOBOOKoutput(item)
+                                            item=prepare_AUDIOBOOKoutput(item,user_key,"audiobook")
 
                                             item_output_details=(item['Type'] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' + item['Artists'][0] +
                                                           ' - ' + get_days_since_played(item['UserData']['LastPlayedDate']) + ' - Play Count: ' + str(item['UserData']['PlayCount']) +
@@ -8266,6 +8364,61 @@ def cfgCheck():
                 error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The print_audiobook_summary variable is missing from mumc_config.py\n'
+
+#######################################################################################################
+
+    if hasattr(cfg, 'movie_set_missing_last_played_date'):
+        check=cfg.movie_set_missing_last_played_date
+        if (GLOBAL_DEBUG):
+            appendTo_DEBUG_log("\nmovie_set_missing_last_played_date=" + str(check),2)
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_mumc_config_py+='ConfigValueError: movie_set_missing_last_played_date must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_mumc_config_py+='ConfigNameError: The movie_set_missing_last_played_date variable is missing from mumc_config.py\n'
+
+    if hasattr(cfg, 'episode_set_missing_last_played_date'):
+        check=cfg.episode_set_missing_last_played_date
+        if (GLOBAL_DEBUG):
+            appendTo_DEBUG_log("\nepisode_set_missing_last_played_date=" + str(check),2)
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_mumc_config_py+='ConfigValueError: episode_set_missing_last_played_date must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_mumc_config_py+='ConfigNameError: The episode_set_missing_last_played_date variable is missing from mumc_config.py\n'
+
+    if hasattr(cfg, 'audio_set_missing_last_played_date'):
+        check=cfg.audio_set_missing_last_played_date
+        if (GLOBAL_DEBUG):
+            appendTo_DEBUG_log("\naudio_set_missing_last_played_date=" + str(check),2)
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 1))
+        ):
+            error_found_in_mumc_config_py+='ConfigValueError: audio_set_missing_last_played_date must be an integer; valid values 0 and 1\n'
+    else:
+        error_found_in_mumc_config_py+='ConfigNameError: The audio_set_missing_last_played_date variable is missing from mumc_config.py\n'
+
+    if (isJellyfinServer()):
+        if hasattr(cfg, 'audiobook_set_missing_last_played_date'):
+            check=cfg.audiobook_set_missing_last_played_date
+            if (GLOBAL_DEBUG):
+                appendTo_DEBUG_log("\naudiobook_set_missing_last_played_date=" + str(check),2)
+            if (
+                not ((type(check) is int) and
+                (check >= 0) and
+                (check <= 1))
+            ):
+                error_found_in_mumc_config_py+='ConfigValueError: audiobook_set_missing_last_played_date must be an integer; valid values 0 and 1\n'
+        else:
+            error_found_in_mumc_config_py+='ConfigNameError: The audiobook_set_missing_last_played_date variable is missing from mumc_config.py\n'
 
 #######################################################################################################
 

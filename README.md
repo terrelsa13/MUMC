@@ -475,6 +475,27 @@ print_episode_summary=True
 print_audio_summary=True
 print_audiobook_summary=True
 ```
+#### Add LastPlayedDate for media items without it
+```python
+#----------------------------------------------------------#
+# Add last played date for items missing the LastPlayedDate data
+# When played state is imported from Trakt the LastPlayedDate is
+#  not populated. To allow the script to maintain functionality
+#  the current date and time the script is run can be used as the
+#  LastPlayedDate value.
+#  0 - Do not set the LastPlayedDate; days since played will show as
+#        the number of days since 1970-Jan-01 00:00:00hrs
+#  1 - Set the LastPlayedDate; the current date-time the script is
+#        run will be saved as the LastPlayedDate for any media items
+#        missing the LastPlayedDate data. Only media items missing the
+#        LastPlayedDate data are modified
+# (0 : default)
+#----------------------------------------------------------#
+movie_set_missing_last_played_date=0
+episode_set_missing_last_played_date=0
+audio_set_missing_last_played_date=0
+audiobook_set_missing_last_played_date=0
+```
 #### Edit user to library assocations using current config
 ```python
 #----------------------------------------------------------#

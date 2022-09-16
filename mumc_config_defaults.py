@@ -118,7 +118,12 @@ defaultConfigValues={
         'print_movie_summary':True,
         'print_episode_summary':True,
         'print_audio_summary':True,
-        'print_audiobook_summary':True
+        'print_audiobook_summary':True,
+
+        'movie_set_missing_last_played_date':0,
+        'episode_set_missing_last_played_date':0,
+        'audio_set_missing_last_played_date':0,
+        'audiobook_set_missing_last_played_date':0
 
     }
 
