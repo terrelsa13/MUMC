@@ -18,7 +18,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.6'
+    Version='3.2.7'
 
     return(Version)
 
@@ -400,7 +400,7 @@ def isEmbyServer():
 
 
 #api call to get admin account authentication token
-def get_authentication_key(server_url, username, password, server_brand):
+def get_authentication_key(server_url, username, password):
     #login info
     values = {'Username' : username, 'Pw' : password}
     #DATA = urllib.parse.urlencode(values)
@@ -408,7 +408,8 @@ def get_authentication_key(server_url, username, password, server_brand):
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
 
-    xAuth = 'X-Emby-Authorization'
+    #works for both Emby and Jellyfin
+    xAuth = 'Authorization'
     #assuming jellyfin will eventually change to this
     #if (isEmbyServer()):
         #xAuth = 'X-Emby-Authorization'
@@ -1080,7 +1081,7 @@ def build_configuration_file(cfg,updateConfig):
         password=get_admin_password()
         print('-----------------------------------------------------------')
         #ask server for authentication key using administrator username and password
-        auth_key=get_authentication_key(server_url, username, password, GLOBAL_server_brand)
+        auth_key=get_authentication_key(server_url, username, password)
 
         #ask user how they want to choose libraries/folders
         library_setup_behavior=get_library_setup_behavior(None)
@@ -4025,7 +4026,7 @@ def get_createdStatus(item,media_condition,filter_count_comparison,filter_count)
 
 
 #decide if this item is ok to be deleted; still has to meet other criteria
-def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist):
+def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_Local,itemisfav_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote):
 
     #when item is favorited or whitetagged do not allow it to be deleted
     if (itemisfav_Local or itemisfav_Advanced or itemIsWhiteTagged):
@@ -4034,7 +4035,6 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     elif (itemIsBlackTagged and ((item_matches_played_count_filter and item_matches_played_condition_day_filter) or (item_matches_created_played_count_filter and item_matches_created_condition_day_filter))):
         okToDelete=True
     #when item is whitelisted do not allow it to be deleted
-    #elif (((multiuser_whitelist == 0) and (itemIsWhiteListed_Local or itemIsWhiteListed_Remote)) or ((multiuser_whitelist == 1) and (itemIsWhiteListed_Local))):
     elif ((itemIsWhiteListed_Local or itemIsWhiteListed_Remote)):
         okToDelete=False
     #when item is blacklisted allow it to be deleted
@@ -4059,13 +4059,13 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     return okToDelete
 
 
-#add item["UserData"]["LastPlayedDate"] with current date for media item
+#add item["UserData"]["LastPlayedDate"] with current date for played media item
 def modify_lastPlayedDate(item,userKey):
 
     serverURL=cfg.server_url
     authKey=cfg.auth_key
 
-    #save current date-time to item["UserData"]["LastPlayedDate"]
+    #save current date-time with specified format to item["UserData"]["LastPlayedDate"]
     item["UserData"]["LastPlayedDate"]=str(datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"))
 
     if (GLOBAL_DEBUG):
@@ -5140,7 +5140,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_movie)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_MOVIE,itemisfav_MOVIE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_movie == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Movie[user_key][item['Id']]=True
@@ -5631,7 +5631,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_episode)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_EPISODE,itemisfav_EPISODE_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_episode == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Episode[user_key][item['Id']]=True
@@ -6141,7 +6141,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_audio)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIO,itemisfav_AUDIO_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audio == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_Audio[user_key][item['Id']]=True
@@ -6636,7 +6636,7 @@ def get_media_items():
                                         item_matches_created_played_count_filter=False
 
                                     #Decide how to handle the fav_local, fav_adv, whitetag, blacktag, whitelist_local, and whitelist_remote flags
-                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote,multiuser_whitelist_audiobook)
+                                    itemIsOKToDelete=get_deleteStatus(item_matches_played_count_filter,item_matches_played_condition_day_filter,item_matches_created_played_count_filter,item_matches_created_condition_day_filter,itemisfav_AUDIOBOOK,itemisfav_AUDIOBOOK_Advanced,itemIsWhiteTagged,itemIsBlackTagged,itemIsWhiteListed_Local,itemIsWhiteListed_Remote)
 
                                     if ((delete_blacktagged_audiobook == 1) and itemIsBlackTagged and itemIsOKToDelete):
                                         isblacktag_and_watched_byUserId_AudioBook[user_key][item['Id']]=True
