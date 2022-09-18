@@ -68,10 +68,14 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     while(getdata):
         try:
             with request.urlopen(url) as response:
+                if (debugBool):
+                    appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2)
                 #request recieved; but taking long time to return data
                 while (response.getcode() == 202):
                     #wait 200ms
                     time.sleep(0.2)
+                    if (debugBool):
+                        appendTo_DEBUG_log("\nWaiting for server to return data from the " + str(reqeustDebugMessage) + " Request; then trying again...",2)
                 if (response.getcode() == 200):
                     try:
                         source = response.read()
@@ -95,9 +99,11 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                                 return(err)
                 elif (response.getcode() == 204):
                     source = response.read()
-                    #data = json.loads(source)
                     data = source
                     getdata = False
+                    if (debugBool):
+                        appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
+                        appendTo_DEBUG_log("\n" + convert2json(data),4)
                 else:
                     getdata = False
                     print_byType("\n" + "An error occurred while attempting to retrieve data from the API.",True)
@@ -6896,7 +6902,8 @@ def delete_media_item(itemID):
     #else REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
     else:
         try:
-            request.urlopen(req)
+            #request.urlopen(req)
+            requestURL(req, GLOBAL_DEBUG, 'delete_media_item_request', 3)
         except Exception:
             print_byType('\ngeneric exception: ' + str(traceback.format_exc()),True)
         return
