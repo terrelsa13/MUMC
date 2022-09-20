@@ -1617,7 +1617,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#        run will be saved as the LastPlayedDate for any media items\n"
     config_file += "#        missing the LastPlayedDate data. Only media items missing the\n"
     config_file += "#        LastPlayedDate data are modified\n"
-    config_file += "# (0 : default)\n"
+    config_file += "# (1 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "movie_set_missing_last_played_date=" + str(get_default_config_values('movie_set_missing_last_played_date')) + "\n"

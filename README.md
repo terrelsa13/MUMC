@@ -490,12 +490,12 @@ print_audiobook_summary=True
 #        run will be saved as the LastPlayedDate for any media items
 #        missing the LastPlayedDate data. Only media items missing the
 #        LastPlayedDate data are modified
-# (0 : default)
+# (1 : default)
 #----------------------------------------------------------#
-movie_set_missing_last_played_date=0
-episode_set_missing_last_played_date=0
-audio_set_missing_last_played_date=0
-audiobook_set_missing_last_played_date=0
+movie_set_missing_last_played_date=1
+episode_set_missing_last_played_date=1
+audio_set_missing_last_played_date=1
+audiobook_set_missing_last_played_date=1
 ```
 #### Edit user to library assocations using current config
 ```python
