@@ -4066,7 +4066,7 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     return okToDelete
 
 
-#add item["UserData"]["LastPlayedDate"] with current date for played media item
+#when played media item is missing the LastPlayedDate, add send the current date-time to the server as a starting point
 def modify_lastPlayedDate(item,userKey):
 
     serverURL=cfg.server_url
@@ -4126,10 +4126,10 @@ def prepare_MOVIEoutput(item,user_key):
             appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            if (movie_set_missing_last_played_date == 0):
-                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
-            else:
+            if (movie_set_missing_last_played_date == 1):
                 modify_lastPlayedDate(item,user_key)
+            else:
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
@@ -4186,10 +4186,10 @@ def prepare_EPISODEoutput(item,user_key):
             appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            if (episode_set_missing_last_played_date == 0):
-                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
-            else:
+            if (episode_set_missing_last_played_date == 1):
                 modify_lastPlayedDate(item,user_key)
+            else:
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
@@ -4261,11 +4261,11 @@ def prepare_AUDIOoutput(item,user_key,mediaType):
             appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing",3)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
-            if (((mediaType == "audio") and (audio_set_missing_last_played_date == 0)) or
-               ((isJellyfinServer()) and (mediaType == "audiobook") and (audiobook_set_missing_last_played_date == 0))):
-                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
-            else:
+            if (((mediaType == "audio") and (audio_set_missing_last_played_date == 1)) or
+               ((isJellyfinServer()) and (mediaType == "audiobook") and (audiobook_set_missing_last_played_date == 1))):
                 modify_lastPlayedDate(item,user_key)
+            else:
+                item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nitem['UserData']['LastPlayedDate'] Was Missing",3)
     else:
