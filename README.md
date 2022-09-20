@@ -484,7 +484,8 @@ print_audiobook_summary=True
 #  the current date and time the script is run can be used as the
 #  LastPlayedDate value.
 #  0 - Do not set the LastPlayedDate; days since played will show as
-#        the number of days since 1970-Jan-01 00:00:00hrs
+#        the number of days since 1970-Jan-01 00:00:00hrs for any media
+#        items missng the LastPlayedDate data.
 #  1 - Set the LastPlayedDate; the current date-time the script is
 #        run will be saved as the LastPlayedDate for any media items
 #        missing the LastPlayedDate data. Only media items missing the
@@ -683,8 +684,8 @@ DEBUG=0
 
 # Known Limitations
 * When importing played states from Trakt the ```days since played``` shown in the console output will not show the correct value.
-  - This is an issue with the ```last played date``` not being filled in when Trakt sends played to your Emby/Jellyfin API for each played media item.
-  - Fixing this is outside of the scope of this script.
+  - This is an issue with the ```last played date``` not being filled in when played states are imported from Trakt to Emby/Jellyfin.
+  - The script is able to compensate for this using the [```*_set_missing_last_played_date```](https://github.com/terrelsa13/MUMC/#add-lastplayeddate-for-media-items-without-it) options
 
 # Requirements
 * Linux, Windows, or MAC?
