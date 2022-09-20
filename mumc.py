@@ -152,17 +152,21 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg):
 #emby or jellyfin?
 def get_brand():
     defaultbrand='emby'
-    print('0:emby\n1:jellyfin')
-    brand=input('Enter number for server branding (default ' + defaultbrand + '): ')
-    if (brand == ''):
-        return(defaultbrand)
-    elif (brand == '0'):
-        return(defaultbrand)
-    elif (brand == '1'):
-        return('jellyfin')
-    else:
-        print('Invalid choice. Default to emby.')
-        return(defaultbrand)
+    valid_brand=False
+    selected_brand=defaultbrand
+    while (valid_brand == False):
+        print('0:emby\n1:jellyfin')
+        brand=input('Enter number for server branding (default ' + defaultbrand + '): ')
+        if (brand == ''):
+            valid_brand = True
+        elif (brand == '0'):
+            valid_brand = True
+        elif (brand == '1'):
+            valid_brand = True
+            selected_brand='jellyfin'
+        else:
+            print('\nInvalid choice. Try again.\n')
+    return(selected_brand)
 
 
 #ip address or url?
@@ -391,7 +395,7 @@ def get_condition_days(mediaType):
 
 #Determine if server is Jellyfin
 def isJellyfinServer():
-    if (GLOBAL_server_brand == "jellyfin".casefold()):
+    if (GLOBAL_SERVER_BRAND == "jellyfin".casefold()):
         return True
     else:
         return False
@@ -1062,8 +1066,8 @@ def build_configuration_file(cfg,updateConfig):
     if not (updateConfig):
         print('-----------------------------------------------------------')
         #ask user for server brand (i.e. emby or jellyfin)
-        global GLOBAL_server_brand
-        GLOBAL_server_brand=get_brand()
+        global GLOBAL_SERVER_BRAND
+        GLOBAL_SERVER_BRAND=get_brand()
 
         print('-----------------------------------------------------------')
         #ask user for server's url
@@ -1073,7 +1077,7 @@ def build_configuration_file(cfg,updateConfig):
         port=get_port()
         print('-----------------------------------------------------------')
         #ask user for url-base
-        server_base=get_base(GLOBAL_server_brand)
+        server_base=get_base(GLOBAL_SERVER_BRAND)
         if (len(port)):
             server_url=server + ':' + port + '/' + server_base
         else:
@@ -1662,7 +1666,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  1 - 'jellyfin'\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
-        config_file += "server_brand='" + GLOBAL_server_brand + "'\n"
+        config_file += "server_brand='" + GLOBAL_SERVER_BRAND + "'\n"
     elif (updateConfig):
         config_file += "server_brand='" + cfg.server_brand + "'\n"
     config_file += "\n"
@@ -1787,7 +1791,7 @@ def build_configuration_file(cfg,updateConfig):
 
     #Save the config file to the directory this script is running from
     #save_file(config_file)
-    save_file(config_file,GLOBAL_configFileName,"w")
+    save_file(config_file,GLOBAL_CONFIG_FILE_NAME,"w")
 
     #Check config edditing wasn't requested
     if not (updateConfig):
@@ -4299,7 +4303,7 @@ def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
 #save to mumc_DEBUG.log when DEBUG is enabled
 def appendTo_DEBUG_log(string_to_print,debugLevel):
     if (GLOBAL_DEBUG >= debugLevel):
-        save_file(string_to_print,GLOBAL_debugFileName,"a")
+        save_file(string_to_print,GLOBAL_DEBUG_FILE_NAME,"a")
 
 
 #determine if the requested console output line should be shown or hidden
@@ -4314,7 +4318,6 @@ def print_byType(string_to_print,ok_to_print):
 # save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
 def get_media_items():
-    server_brand=cfg.server_brand
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     api_query_attempts=cfg.api_query_attempts
@@ -8588,16 +8591,16 @@ def cfgCheck():
 ############# START OF SCRIPT #############
 
 #Declare global variables
-GLOBAL_configFileName='mumc_config.py'
-GLOBAL_debugFileName='mumc_DEBUG.log'
+GLOBAL_CONFIG_FILE_NAME='mumc_config.py'
+GLOBAL_DEBUG_FILE_NAME='mumc_DEBUG.log'
 #get current working directory
 GLOBAL_CWD = os.getcwd()
 
 #change to script's directory
 change_to_script_directory(GLOBAL_CWD)
 #remove old DEBUG if it exists
-if os.path.exists(GLOBAL_debugFileName):
-    os.remove(GLOBAL_debugFileName)
+if os.path.exists(GLOBAL_DEBUG_FILE_NAME):
+    os.remove(GLOBAL_DEBUG_FILE_NAME)
 #change back to original working directory
 os.chdir(GLOBAL_CWD)
 
@@ -8617,11 +8620,12 @@ try:
     elif (GLOBAL_DEBUG == False):
         GLOBAL_DEBUG = 0
 
-    GLOBAL_server_brand=cfg.server_brand.lower
-    print_script_header=cfg.print_script_header
+    GLOBAL_SERVER_BRAND=cfg.server_brand.lower
 
     if (GLOBAL_DEBUG):
         print_script_header=True
+    else:
+        print_script_header=cfg.print_script_header
 
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
