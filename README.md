@@ -685,7 +685,7 @@ DEBUG=0
 # Known Limitations
 * When importing played states from Trakt the ```days since played``` shown in the console output will not show the correct value.
   - This is an issue with the ```last played date``` not being filled in when played states are imported from Trakt to Emby/Jellyfin.
-  - The script is able to compensate for this using the [```*_set_missing_last_played_date```](https://github.com/terrelsa13/MUMC/#add-lastplayeddate-for-media-items-without-it) options
+  - The script is able to compensate for this using the [```*_set_missing_last_played_date```](https://github.com/terrelsa13/MUMC/#add-lastplayeddate-for-media-items-without-it) options.
 
 # Requirements
 * Linux, Windows, or MAC?
