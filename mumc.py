@@ -2,7 +2,9 @@
 
 #from pickle import TRUE
 import urllib.request as request
-import json, urllib
+import urllib.parse as urlparse
+import json
+#import urllib
 import traceback
 #import hashlib
 import time
@@ -413,7 +415,7 @@ def isEmbyServer():
 def get_authentication_key(server_url, username, password):
     #login info
     values = {'Username' : username, 'Pw' : password}
-    #DATA = urllib.parse.urlencode(values)
+    #DATA = urlparse.urlencode(values)
     #DATA = DATA.encode('ascii')
     DATA = convert2json(values)
     DATA = DATA.encode('utf-8')
@@ -2469,7 +2471,7 @@ def get_STUDIO_itemInfo(user_key,studioNetworkName):
     server_url=cfg.server_url
     auth_key=cfg.auth_key
     #Encode studio name
-    studio_network=urllib.parse.quote(studioNetworkName)
+    studio_network=urlparse.quote(studioNetworkName)
 
     #Get studio item information
     url=server_url + '/Studios/' + studio_network + '&enableImages=False&enableUserData=True&api_key=' + auth_key
@@ -4781,7 +4783,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_BlackList='False'
                     CollapseBoxSetItems_Blacktagged_From_BlackList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged_From_WhiteList=0
@@ -4801,7 +4803,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_WhiteList='False'
                     CollapseBoxSetItems_Blacktagged_From_WhiteList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Blacklist=0
@@ -4821,7 +4823,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Blacklist='False'
                     CollapseBoxSetItems_Whitetagged_From_Blacklist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Whitelist=0
@@ -4841,7 +4843,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Whitelist='False'
                     CollapseBoxSetItems_Whitetagged_From_Whitelist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 QueryItemsRemaining_All=True
 
@@ -5284,7 +5286,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_BlackList='False'
                     CollapseBoxSetItems_Blacktagged_From_BlackList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged_From_WhiteList=0
@@ -5304,7 +5306,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_WhiteList='False'
                     CollapseBoxSetItems_Blacktagged_From_WhiteList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Blacklist=0
@@ -5324,7 +5326,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Blacklist='False'
                     CollapseBoxSetItems_Whitetagged_From_Blacklist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Whitelist=0
@@ -5344,7 +5346,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Whitelist='False'
                     CollapseBoxSetItems_Whitetagged_From_Whitelist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 QueryItemsRemaining_All=True
 
@@ -5794,7 +5796,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_BlackList='False'
                     CollapseBoxSetItems_Blacktagged_From_BlackList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged_From_WhiteList=0
@@ -5814,7 +5816,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_WhiteList='False'
                     CollapseBoxSetItems_Blacktagged_From_WhiteList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Blacklist=0
@@ -5834,7 +5836,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Blacklist='False'
                     CollapseBoxSetItems_Whitetagged_From_Blacklist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Whitelist=0
@@ -5854,7 +5856,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Whitelist='False'
                     CollapseBoxSetItems_Whitetagged_From_Whitelist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 QueryItemsRemaining_All=True
 
@@ -6289,7 +6291,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_BlackList='False'
                     CollapseBoxSetItems_Blacktagged_From_BlackList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_BlackTagged_From_WhiteList=0
@@ -6309,7 +6311,7 @@ def get_media_items():
                     EnableImages_Blacktagged_From_WhiteList='False'
                     CollapseBoxSetItems_Blacktagged_From_WhiteList='False'
                     #Encode blacktags so they are url acceptable
-                    BlackTags_Tagged=urllib.parse.quote(blacktags.replace(',','|'))
+                    BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Blacklist=0
@@ -6329,7 +6331,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Blacklist='False'
                     CollapseBoxSetItems_Whitetagged_From_Blacklist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 #Initialize api_query_handler() variables for tagged media items
                 StartIndex_WhiteTagged_From_Whitelist=0
@@ -6349,7 +6351,7 @@ def get_media_items():
                     EnableImages_Whitetagged_From_Whitelist='False'
                     CollapseBoxSetItems_Whitetagged_From_Whitelist='False'
                     #Encode whitetags so they are url acceptable
-                    WhiteTags_Tagged=urllib.parse.quote(whitetags.replace(',','|'))
+                    WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
 
                 QueryItemsRemaining_All=True
 
