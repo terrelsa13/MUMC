@@ -1849,7 +1849,8 @@ def get_days_since_played(date_last_played):
     if not ((date_last_played == 'Unplayed') or (date_last_played == 'Unknown')):
 
         #Get current time
-        date_time_now = datetime.utcnow()
+        #date_time_now = datetime.utcnow()
+        date_time_now=GLOBAL_DATE_TIME_UTC_NOW
 
         #Keep the year, month, day, hour, minute, and seconds
         #split date_last_played after seconds
@@ -4077,7 +4078,8 @@ def modify_lastPlayedDate(item,userKey):
     authKey=cfg.auth_key
 
     #save current date-time with specified format to item["UserData"]["LastPlayedDate"]
-    item["UserData"]["LastPlayedDate"]=str(datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"))
+    #item["UserData"]["LastPlayedDate"]=str(datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"))
+    item["UserData"]["LastPlayedDate"]=str(datetime.strftime(GLOBAL_DATE_TIME_NOW, "%Y-%m-%dT%H:%M:%S.000Z"))
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\nAdd missing LastPlayedDate of " + str(item["UserData"]["LastPlayedDate"]) + " to media item with Id: " + str(item["Id"]),3)
@@ -4352,7 +4354,8 @@ def get_media_items():
         print_audiobook_keep_info=False
 
     #establish deletion date for played media items
-    date_time_now=datetime.now(timezone.utc)
+    #date_time_now=datetime.now(timezone.utc)
+    date_time_now=GLOBAL_DATE_TIME_NOW_TZ_UTC
 
     if ((movie_played_days >= 0) or (movie_created_days >= 0)):
         #movie_played_days=cfg.movie_played_days
@@ -8621,6 +8624,10 @@ try:
         GLOBAL_DEBUG = 0
 
     GLOBAL_SERVER_BRAND=cfg.server_brand.lower
+    
+    GLOBAL_DATE_TIME_NOW=datetime.now()
+    GLOBAL_DATE_TIME_UTC_NOW=datetime.utcnow()
+    GLOBAL_DATE_TIME_NOW_TZ_UTC=datetime.now(timezone.utc)
 
     if (GLOBAL_DEBUG):
         print_script_header=True
@@ -8639,7 +8646,8 @@ try:
     print_byType('Script Version: ' + get_script_version(),print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
-    print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
+    #print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
+    print_byType('Time Stamp: ' + GLOBAL_DATE_TIME_NOW.strftime('%Y%m%d%H%M%S'),print_script_header)
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
