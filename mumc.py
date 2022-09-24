@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #from pickle import TRUE
-import urllib.request as request
+import urllib.request as urlrequest
 import urllib.parse as urlparse
 import json
 #import urllib
@@ -69,7 +69,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
         #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
         try:
-            with request.urlopen(url) as response:
+            with urlrequest.urlopen(url) as response:
                 if (debugBool):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2)
                 #request recieved; but taking long time to return data
@@ -430,7 +430,7 @@ def get_authentication_key(server_url, username, password):
 
     headers = {xAuth : 'Emby UserId="' + username  + '", Client="mumc.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
 
-    req = request.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
+    req = urlrequest.Request(url=server_url + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
 
     #preConfigDebug = True
     preConfigDebug = False
@@ -4095,7 +4095,7 @@ def modify_lastPlayedDate(item,userKey):
     headers = {'Content-Type' : 'application/json'}
 
     #build full POST request
-    req = request.Request(url=serverURL + '/Users/' + userKey + '/Items/' + item["Id"] + '/UserData?api_key=' + authKey, data=DATA, method='POST', headers=headers)
+    req = urlrequest.Request(url=serverURL + '/Users/' + userKey + '/Items/' + item["Id"] + '/UserData?api_key=' + authKey, data=DATA, method='POST', headers=headers)
 
     #API POST for UserData modification
     requestURL(req, GLOBAL_DEBUG, 'add_missing_LastPlayedDate', 3)
@@ -6897,7 +6897,7 @@ def delete_media_item(itemID):
     #build API delete request for specified media item
     url=cfg.server_url + '/Items/' + itemID + '?api_key=' + cfg.auth_key
 
-    req = request.Request(url,method='DELETE')
+    req = urlrequest.Request(url,method='DELETE')
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\nSending Delete Request For: " + itemID,3)
@@ -6911,7 +6911,7 @@ def delete_media_item(itemID):
     #else REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
     else:
         try:
-            #request.urlopen(req)
+            #urlrequest.urlopen(req)
             requestURL(req, GLOBAL_DEBUG, 'delete_media_item_request', 3)
         except Exception:
             print_byType('\ngeneric exception: ' + str(traceback.format_exc()),True)
