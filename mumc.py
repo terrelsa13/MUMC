@@ -10,6 +10,7 @@ import traceback
 import time
 import uuid
 #import sys
+import platform
 import os
 from dateutil.parser import parse
 from collections import defaultdict
@@ -20,9 +21,29 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.7'
+    Version='3.2.8'
 
     return(Version)
+
+
+#Get the current Emby/Jellyfin server version
+def get_server_version():
+
+    server_url=cfg.server_url
+    auth_key=cfg.auth_key
+    lookupTopic="get_server_version"
+
+    #Get additonal item information
+    url=(server_url + '/System/Info?api_key=' + auth_key)
+
+    ServerInfo=requestURL(url, GLOBAL_DEBUG, lookupTopic, cfg.api_query_attempts)
+
+    return(ServerInfo['Version'])
+
+
+#Get the current Python verison
+def get_python_version():
+    return(platform.python_version())
 
 
 def convert2json(rawjson):
@@ -84,8 +105,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                         data = json.loads(source)
                         getdata = False
                         if (debugBool):
-                            appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:",2)
-                            appendTo_DEBUG_log("\n" + convert2json(data),4)
+                            appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:\n",2)
+                            appendTo_DEBUG_log(convert2json(data) + "\n",4)
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
                             print_byType("\n" + str(err),True)
@@ -4313,7 +4334,7 @@ def appendTo_DEBUG_log(string_to_print,debugLevel):
 #determine if the requested console output line should be shown or hidden
 def print_byType(string_to_print,ok_to_print):
     if (ok_to_print):
-        print(string_to_print)
+        print(str(string_to_print))
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log(string_to_print,1)
 
@@ -4500,7 +4521,7 @@ def get_media_items():
     #Get list of all played items
     if (GLOBAL_DEBUG):
         #Double newline for debug log formatting
-        appendTo_DEBUG_log('\n\n',1)
+        appendTo_DEBUG_log('\n',1)
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
@@ -8625,7 +8646,7 @@ try:
     elif (GLOBAL_DEBUG == False):
         GLOBAL_DEBUG = 0
 
-    GLOBAL_SERVER_BRAND=cfg.server_brand.lower
+    GLOBAL_SERVER_BRAND=cfg.server_brand.lower()
     
     GLOBAL_DATE_TIME_NOW=datetime.now()
     GLOBAL_DATE_TIME_UTC_NOW=datetime.utcnow()
@@ -8648,8 +8669,17 @@ try:
     print_byType('Script Version: ' + get_script_version(),print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
+    print_byType(GLOBAL_SERVER_BRAND.capitalize() + ' Version: ' + get_server_version(),print_script_header)
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n',1)
+    print_byType('Python Version: ' + get_python_version(),print_script_header)
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n',1)
     #print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
     print_byType('Time Stamp: ' + GLOBAL_DATE_TIME_NOW.strftime('%Y%m%d%H%M%S'),print_script_header)
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n',1)
+    print_byType('-----------------------------------------------------------\n',print_script_header)
 
 #the exception
 except (AttributeError, ModuleNotFoundError):

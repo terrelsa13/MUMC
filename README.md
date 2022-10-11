@@ -1,5 +1,5 @@
 # Multi-User Media Cleaner
-Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your libraries and delete media items you no longer want taking up disk space.
+Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want taking up disk space.
 # What Files Are Included?
 ## mumc.py
 This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
@@ -688,7 +688,7 @@ DEBUG=0
   - The script is able to compensate for this using the [```*_set_missing_last_played_date```](https://github.com/terrelsa13/MUMC/#add-lastplayeddate-for-media-items-without-it) options.
 
 # Requirements
-* Linux, Windows, or MAC?
+* Linux, Windows, or MAC
    - I do not have a Mac to confirm; but should be similiar to Linux
 * Python 3.10
    - Older versions of python 3.x will likely work; but are not supported
@@ -718,6 +718,31 @@ DEBUG=0
 * If you get the below python error the python-dateutil module was not properly installed
    - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
 
+# First Run (Windows)
+* Download the latest [MUMC.zip](https://github.com/terrelsa13/MUMC/releases/latest)
+* Move the MUMC.zip to your user's directory (below path assumes your username is Zoomies)
+  - ```C:\Users\Zoomies```
+* Extract MUMC.zip
+  - There should now be a MUMC folder
+  - ```C:\Users\Zoomies\MUMC```
+* Next go to https://www.python.org/ and install the python version shown in the [Requirements section](https://github.com/terrelsa13/MUMC#requirements)
+* After python is installed; open a command window
+  - Select: The Start Menu
+  - Type: ```cmd```
+  - Press: ```Enter``` key
+* Using the command window, install the python-dateutil module
+  - Type: ```pip install python-dateutil```
+* After the python-dateutil module is installed keep the command window open
+* Change current working directory of the command window to the ```C:\Users\Zoomies\MUMC``` folder using the command below
+  - Type: cd ```C:\Users\Zoomies\MUMC```
+* Now run the script in the command window using the command below
+  - Type: ```python mumc.py```
+  - Follow the script prompts
+    - First time the script is run, it will walk through creating the ```mumc_config.py``` file in ```C:\Users\Zoomies\MUMC``` folder
+* After the ```mumc_config.py``` file is created it can be edited in a text editor (e.g. Notepad, Notepad++, Visual Studio, UltraEdit, etc...)
+* Once ```mumc_config.py``` is configured as desired, run the script again using the same command from above
+  - Type: ```python mumc.py```
+
 # First Run (Other Operating Systems)
 * Please consult your favorite search engine
 
@@ -726,6 +751,9 @@ DEBUG=0
    - $```0 0 * * * /usr/local/bin/python3.10 /opt/mumc/mumc.py```
 * Below cron entry runs ```mumc.py``` every Monday at 01:23hrs (aka 1:23)am and saves the output to a file called mumc.log in the /var/log/ directory
    - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
+
+# Schedule To Run (Windows)
+* Please consult your favorite search engine for a Windows task scheduler
 
 # Schedule To Run (Other Operating Systems)
 * Please consult your favorite search engine
