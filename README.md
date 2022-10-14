@@ -20,7 +20,7 @@ Generic Filter Statement Parts (each media type has their own Filter Statement P
 * Part #2 - Played Count Inequality
 * Part #3 - Played Count
 
-Start with a generic Filter Statement:
+Starting with a generic Filter Statement:
 * Delete media items Played/Created at least Part #1 days ago with a played count Part #2 Part #3.
 
   - Example A: Filling in the blanks for a generic media items _played_ Filter Statement:
@@ -358,7 +358,7 @@ minimum_number_played_episodes=0
 #  'Max Unplayed Min Played' - The number played episodes to be deleted is based off the user
 #                                with the highest number of unplayed episodes to be deleted for a
 #                                specified series. The number of unplayed episodes to be deleted is
-#                                based off the user with the lowest number of played episoded to be
+#                                based off the user with the lowest number of played episodes to be
 #                                deleted for a specified series.
 # ('Min Played Min Unplayed' : default)
 #----------------------------------------------------------#

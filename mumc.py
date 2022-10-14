@@ -21,7 +21,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.8'
+    Version='3.2.9'
 
     return(Version)
 
@@ -1471,7 +1471,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  'Max Unplayed Min Played' - The number played episodes to be deleted is based off the user\n"
     config_file += "#                                with the highest number of unplayed episodes to be deleted for a\n"
     config_file += "#                                specified series. The number of unplayed episodes to be deleted is\n"
-    config_file += "#                                based off the user with the lowest number of played episoded to be\n"
+    config_file += "#                                based off the user with the lowest number of played episodes to be\n"
     config_file += "#                                deleted for a specified series.\n"
     config_file += "# ('Min Played Min Unplayed' : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -3627,7 +3627,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
         #verify media item is an episode
         #if (episodeItem['Type'] == 'Episode'):
         if (deleteItem['Type'] == 'Episode'):
-            #add serieid to episode tracker if it does not already exist
+            #add seriesid to episode tracker if it does not already exist
             if not (deleteItem['SeriesId'] in episodeTracker):
                 episodeTracker[deleteItem['SeriesId']]={}
             #gather information needed to build grid to determine season/episode order of each episode
@@ -3636,13 +3636,61 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                     episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = 0
                 if not ('MaxEpisode' in episodeTracker[deleteItem['SeriesId']]):
                     episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = 0
-                if (deleteItem['ParentIndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxSeason']):
-                    episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = deleteItem['ParentIndexNumber']
-                if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
-                    episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
-                #create dictionary entry containg season and episode number for each episode
-                episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
-                episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
+
+                if (GLOBAL_DEBUG):
+                    appendTo_DEBUG_log('\n',3)
+                    #Check if string or integer
+                    if (type(deleteItem['Id']) is str):
+                        appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is String',3)
+                    elif (type(deleteItem['Id']) is int):
+                        appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is Integer',3)
+                    appendTo_DEBUG_log('\ndeleteItem[\'Id\'] = ' + str(deleteItem['Id']),3)
+
+                    #Check if string or integer
+                    if (type(deleteItem['ParentIndexNumber']) is str):
+                        appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] : Is String',3)
+                        try:
+                            deleteItem['ParentIndexNumber'] = int(deleteItem['ParentIndexNumber'])
+                            appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] Converted : Is Now Integer',3)
+                        except:
+                            appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] Not Coverted : Skipping This Item',3)
+                    elif (type(deleteItem['ParentIndexNumber']) is int):
+                        appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] : Is Integer',3)
+                    appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] = ' + str(deleteItem['ParentIndexNumber']),3)
+
+                    #Check if string or integer
+                    if (type(deleteItem['SeriesId']) is str):
+                        appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] : Is String',3)
+                    elif (type(deleteItem['SeriesId']) is int):
+                        appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] : Is Integer',3)
+                    appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] = ' + str(deleteItem['SeriesId']),3)
+
+                    #Check if string or integer
+                    if (type(episodeTracker[deleteItem['SeriesId']]['MaxSeason']) is str):
+                        appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] : Is String',3)
+                    elif (type(episodeTracker[deleteItem['SeriesId']]['MaxSeason']) is int):
+                        appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] : Is Integer',3)
+                    appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] = ' + str(episodeTracker[deleteItem['SeriesId']]['MaxSeason']),3)
+
+                try:
+                    #Check if string or integer
+                    if (type(deleteItem['ParentIndexNumber']) is str):
+                        deleteItem['ParentIndexNumber'] = int(deleteItem['ParentIndexNumber'])
+                    if (deleteItem['ParentIndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxSeason']):
+                        episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = deleteItem['ParentIndexNumber']
+
+                    #Check if string or integer
+                    if (type(deleteItem['IndexNumber']) is str):
+                        deleteItem['IndexNumber'] = int(deleteItem['IndexNumber'])
+                    if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
+                        episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
+
+                    #create dictionary entry containg season and episode number for each episode
+                    episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
+                    episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
+                except:
+                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to ParentIndexNumber ' + deleteItem['ParentIndexNumber'] + ' Not Being An Integer.',3)
+                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to IndexNumber ' + deleteItem['IndexNumber'] + ' Not Being An Integer.',3)
 
     #loop thru each series in the episode tracker
     for seriesId in episodeTracker:
@@ -8589,7 +8637,7 @@ def cfgCheck():
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
         if (GLOBAL_DEBUG):
-            appendTo_DEBUG_log("\nDEBUG='" + str(check) + "'",2)
+            appendTo_DEBUG_log("\nDEBUG=" + str(check),2)
         if (
             not ((type(check) is bool) and
             ((check == True) or
@@ -8666,7 +8714,7 @@ try:
     print_byType('-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
-    print_byType('Script Version: ' + get_script_version(),print_script_header)
+    print_byType('MUMC Version: ' + get_script_version(),print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
     print_byType(GLOBAL_SERVER_BRAND.capitalize() + ' Version: ' + get_server_version(),print_script_header)
@@ -8683,8 +8731,11 @@ try:
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
-    GLOBAL_DEBUG=False
-    #GLOBAL_DEBUG=True
+    GLOBAL_DEBUG=0
+    #GLOBAL_DEBUG=1
+    #GLOBAL_DEBUG=2
+    #GLOBAL_DEBUG=3
+    #GLOBAL_DEBUG=4
 
     #we are here because the mumc_config.py file does not exist
     #this is either the first time the script is running or mumc_config.py file was deleted
