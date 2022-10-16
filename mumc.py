@@ -21,7 +21,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.9'
+    Version='3.2.11'
 
     return(Version)
 
@@ -45,6 +45,9 @@ def get_server_version():
 def get_python_version():
     return(platform.python_version())
 
+#Get the operating system information
+def get_operating_system_info():
+    return(platform.platform())
 
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
@@ -77,7 +80,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     if (debugBool):
         #Double newline for better debug file readablilty
         appendTo_DEBUG_log("\n\n" + reqeustDebugMessage + ' - url request:',2)
-        appendTo_DEBUG_log("\n" + url,3)
+        appendTo_DEBUG_log("\n" + str(url),3)
 
     #first delay if needed
         #delay value doubles each time the same API request is resent
@@ -4142,7 +4145,7 @@ def get_deleteStatus(item_matches_played_count_filter,item_matches_played_condit
     return okToDelete
 
 
-#when played media item is missing the LastPlayedDate, add send the current date-time to the server as a starting point
+#when played media item is missing the LastPlayedDate, send the current date-time to the server as a starting point
 def modify_lastPlayedDate(item,userKey):
 
     serverURL=cfg.server_url
@@ -4374,9 +4377,9 @@ def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
-def appendTo_DEBUG_log(string_to_print,debugLevel):
+def appendTo_DEBUG_log(string_to_save,debugLevel):
     if (GLOBAL_DEBUG >= debugLevel):
-        save_file(string_to_print,GLOBAL_DEBUG_FILE_NAME,"a")
+        save_file(str(string_to_save),GLOBAL_DEBUG_FILE_NAME,"a")
 
 
 #determine if the requested console output line should be shown or hidden
@@ -7190,20 +7193,20 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
                                     #Check libid is 32 character long alphanumeric
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].isalnum()) and
-                                        (len(check_irt[str(num_elements)][libinfo]) == 32)
+                                        (len(check_irt[str(num_elements)][libinfo]) >= 1)
                                     ):
-                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not an alphanumeric string\n'
                             elif (libinfo == 'collectiontype'):
                                 collectiontype_found += 1
                                 #Check collectiontype is string
                                 if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
                                     error_found_in_mumc_config_py+='TypeError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a string\n'
                                 else:
-                                    #Check collectiontype is all alpha characters
+                                    #Check collectiontype is all alphabet characters
                                     if not (
                                         (check_irt[str(num_elements)][libinfo].isalpha())
                                     ):
-                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a 32 character alphanumeric string\n'
+                                        error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not an alphabetic string\n'
                                     else:
                                         #TODO verify we only see specific collection types (i.e. tvshows, movies, music, books, etc...)
                                         pass
@@ -8723,7 +8726,9 @@ try:
     print_byType('Python Version: ' + get_python_version(),print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
-    #print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
+    appendTo_DEBUG_log('OS Info: ' + get_operating_system_info(),1)
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log('\n',1)
     print_byType('Time Stamp: ' + GLOBAL_DATE_TIME_NOW.strftime('%Y%m%d%H%M%S'),print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
