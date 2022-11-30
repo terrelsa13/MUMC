@@ -17,6 +17,7 @@ from collections import defaultdict
 from datetime import datetime,timedelta,timezone
 from mumc_config_defaults import get_default_config_values
 
+cache = dict()
 
 #Get the current script version
 def get_script_version():
@@ -74,8 +75,14 @@ def does_index_exist(item, indexvalue):
     return(True)
 
 
-#send url request
 def requestURL(url, debugBool, reqeustDebugMessage, retries):
+    if (url not in cache):
+        cache[url] = requestURLNotCached(url, debugBool, reqeustDebugMessage, retries)
+
+    return (cache[url])
+
+#send url request
+def requestURLNotCached(url, debugBool, reqeustDebugMessage, retries):
 
     if (debugBool):
         #Double newline for better debug file readablilty
