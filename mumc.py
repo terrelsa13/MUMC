@@ -21,7 +21,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.11'
+    Version='3.2.12'
 
     return(Version)
 
@@ -45,9 +45,25 @@ def get_server_version():
 def get_python_version():
     return(platform.python_version())
 
+
 #Get the operating system information
 def get_operating_system_info():
     return(platform.platform())
+
+
+#save to mumc_DEBUG.log when DEBUG is enabled
+def appendTo_DEBUG_log(string_to_save,debugLevel):
+    if (GLOBAL_DEBUG >= debugLevel):
+        save_file(str(string_to_save),GLOBAL_DEBUG_FILE_NAME,"a")
+
+
+#determine if the requested console output line should be shown or hidden
+def print_byType(string_to_print,ok_to_print):
+    if (ok_to_print):
+        print(str(string_to_print))
+    if (GLOBAL_DEBUG):
+        appendTo_DEBUG_log(string_to_print,1)
+
 
 def convert2json(rawjson):
     #return a formatted string of the python JSON object
@@ -58,7 +74,7 @@ def convert2json(rawjson):
 def print2json(rawjson):
     #create a formatted string of the python JSON object
     ezjson = convert2json(rawjson)
-    print(ezjson)
+    print_byType(ezjson,True)
 
 
 #Check if json index exists
@@ -2085,7 +2101,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                 #include all item types; filter applied in first API calls for each media type in get_media_items()
                 IncludeItemTypes=''
                 FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                SortBy='SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                 SortOrder='Ascending'
                 Recursive='True'
                 EnableImages='False'
@@ -2170,7 +2186,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                     #include all item types; filter applied in first API calls for each media type in get_media_items()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                    SortBy='SeriesName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                    SortBy='SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                     SortOrder='Ascending'
                     Recursive='True'
                     EnableImages='False'
@@ -4376,20 +4392,6 @@ def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
     return prepare_AUDIOoutput(item,user_key,mediaType)
 
 
-#save to mumc_DEBUG.log when DEBUG is enabled
-def appendTo_DEBUG_log(string_to_save,debugLevel):
-    if (GLOBAL_DEBUG >= debugLevel):
-        save_file(str(string_to_save),GLOBAL_DEBUG_FILE_NAME,"a")
-
-
-#determine if the requested console output line should be shown or hidden
-def print_byType(string_to_print,ok_to_print):
-    if (ok_to_print):
-        print(str(string_to_print))
-    if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log(string_to_print,1)
-
-
 # get played, favorited, and tagged media items
 # save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
@@ -4635,6 +4637,7 @@ def get_media_items():
 
     #list of items to be deleted
     deleteItems=[]
+    deleteItemsTracker=[]
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\nBuilding Blacklisted Libraries...",2)
@@ -5252,7 +5255,9 @@ def get_media_items():
                                                 print_movie_delete_info=True
                                                 appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_movie_delete_info)
-                                            deleteItems.append(item)
+                                            if (not (item['Id'] in deleteItemsTracker)):
+                                                deleteItemsTracker.append(item['Id'])
+                                                deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_movie_delete_info=True
@@ -5294,7 +5299,7 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Episode'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -5313,7 +5318,7 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Episode,Season,Series,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Favorited_From_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -5332,7 +5337,7 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Episode,Season,Series,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Favorited_From_Whitelist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -5762,7 +5767,9 @@ def get_media_items():
                                                 print_episode_delete_info=True
                                                 appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_episode_delete_info)
-                                            deleteItems.append(item)
+                                            if (not (item['Id'] in deleteItemsTracker)):
+                                                deleteItemsTracker.append(item['Id'])
+                                                deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_episode_delete_info=True
@@ -5804,7 +5811,7 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Audio'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -5823,7 +5830,7 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Audio,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -5842,7 +5849,7 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Audio,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Whitelist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -6254,7 +6261,9 @@ def get_media_items():
                                                 print_audio_delete_info=True
                                                 appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audio_delete_info)
-                                            deleteItems.append(item)
+                                            if (not (item['Id'] in deleteItemsTracker)):
+                                                deleteItemsTracker.append(item['Id'])
+                                                deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audio_delete_info=True
@@ -6299,7 +6308,7 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Audio'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -6318,7 +6327,7 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Blacklist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -6337,7 +6346,7 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Whitelist='SeriesName,ParentIndexNumber,IndexNumber,Name'
+                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -6748,7 +6757,9 @@ def get_media_items():
                                                 print_audiobook_delete_info=True
                                                 appendTo_DEBUG_log("\n\n",1)
                                             print_byType(':*[DELETE] - ' + item_output_details,print_audiobook_delete_info)
-                                            deleteItems.append(item)
+                                            if (not (item['Id'] in deleteItemsTracker)):
+                                                deleteItemsTracker.append(item['Id'])
+                                                deleteItems.append(item)
                                         else:
                                             if (GLOBAL_DEBUG):
                                                 print_audiobook_delete_info=True

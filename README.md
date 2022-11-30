@@ -9,30 +9,30 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## mumc_config.py
 ```mumc_config.py```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
-## Step 1: What Is A Filter Statement?
+## Step 1: What is a Filter Statement?
 
 * A Filter Statement is a simple way to tell the script how to find and delete media items taking up your disk space.
   - This also means the media items **not matching** the Filter Statement are kept safe for watching later.
 ## Step 2: The basics of building a generic Filter Statement.
 
 Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
-* Part #1 - Condition Days
-* Part #2 - Played Count Inequality
-* Part #3 - Played Count
+* **Part #1** - Condition Days
+* **Part #2** - Played Count Inequality
+* **Part #3** - Played Count
 
 Starting with a generic Filter Statement:
-* Delete media items Played/Created at least Part #1 days ago with a played count Part #2 Part #3.
+* Delete media items Played/Created at least **Part #1** days ago with a played count **Part #2** **Part #3**.
 
   - Example A: Filling in the blanks for a generic media items _played_ Filter Statement:
-    - Part #1 - 60
-    - Part #2 - >=
-    - Part #3 - 1
+    - Part #1** - **60**
+    - Part #2** - **>=**
+    - Part #3** - **1**
       - Delete media items _played_ at least **60** days ago with a played count **>=** **1**.
 
   - Example B: Filling in the blanks for a generic media items _created_ Filter Statement:
-    - Part #1 - 3650
-    - Part #2 - <
-    - Part #3 - 2
+    - Part #1 - **3650**
+    - Part #2 - **<**
+    - Part #3 - **2**
       - Delete media items _created_ at least **3650** days ago with a played count **<** **2**.
 ## Step 3: Building Filter Statements for specific media types.
 
