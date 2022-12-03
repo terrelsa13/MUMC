@@ -2969,18 +2969,14 @@ def get_isEPISODE_Fav(item,user_key,user_keys_json):
 ### Season ########################################################################################
 
     for user_keys in userKey_list:
-
         if ('SeasonId' in item):
-            season_item_info = get_ADDITIONAL_itemInfo(user_keys,item['SeasonId'],'season_info')
-
-            if ((not (season_item_info['Id'] in isfav_EPISODE['season'])) or (isfav_EPISODE['season'][season_item_info['Id']] == False)):
-                isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
-
+            season_item_key = 'SeasonId'
         elif ('ParentId' in item):
-            season_item_info = get_ADDITIONAL_itemInfo(user_keys,item['ParentId'],'season_info')
+            season_item_key = 'ParentId'
 
-            if ((not (season_item_info['Id'] in isfav_EPISODE['season'])) or (isfav_EPISODE['season'][season_item_info['Id']] == False)):
-                isfav_EPISODE['season'][season_item_info['Id']]=season_item_info['UserData']['IsFavorite']
+        if (season_item_key):
+            season_item_info = get_ADDITIONAL_itemInfo(user_keys,item[season_item_key],'season_info')
+            isfav_EPISODE['season'][season_item_info['Id']] = isfav_EPISODE['season'].get(season_item_info['Id'],False) or season_item_info['UserData']['IsFavorite']
 
 ### End Season ####################################################################################
 
