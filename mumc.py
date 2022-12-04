@@ -21,7 +21,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.12'
+    Version='3.2.13'
 
     return(Version)
 
@@ -90,6 +90,41 @@ def does_index_exist(item, indexvalue):
     return(True)
 
 
+#Cached URL request controls
+class url_cache_handler:
+
+    #Define cache dictionary
+    def __init__(self):
+        self.cached_data={}
+        #self.cached_data=dict()
+
+    #Check if query already exists in cache
+    def queryData(self,url):
+        if (url in self.cached_data):
+            return True
+        else:
+            return False
+
+    #Add new query data to cache
+    def saveData(self,url,data):
+        self.cached_data[url]=data
+
+    #Get existing query data if it exists
+    def retrieveData(self,url):
+        if (self.queryData(url)):
+            return self.cached_data[url]
+        else:
+            return None
+
+    #Delete queried data from dictionary
+    def removeData(self,url):
+        if (self.queryData(url)):
+            self.cached_data.pop(url)
+            return True
+        else:
+            return None
+
+
 #send url request
 def requestURL(url, debugBool, reqeustDebugMessage, retries):
 
@@ -104,7 +139,12 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    getdata = True
+    data = GLOBAL_CACHED_DATA.retrieveData(url)
+    if (data):
+        getdata = False
+    else:
+        getdata = True
+
     #try sending url request specified number of times
         #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
@@ -122,6 +162,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                     try:
                         source = response.read()
                         data = json.loads(source)
+                        GLOBAL_CACHED_DATA.saveData(url,data)
                         getdata = False
                         if (debugBool):
                             appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:\n",2)
@@ -142,6 +183,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
+                    GLOBAL_CACHED_DATA.saveData(url,data)
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
@@ -8713,6 +8755,8 @@ try:
     GLOBAL_DATE_TIME_NOW=datetime.now()
     GLOBAL_DATE_TIME_UTC_NOW=datetime.utcnow()
     GLOBAL_DATE_TIME_NOW_TZ_UTC=datetime.now(timezone.utc)
+
+    GLOBAL_CACHED_DATA=url_cache_handler()
 
     if (GLOBAL_DEBUG):
         print_script_header=True
