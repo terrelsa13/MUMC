@@ -650,7 +650,7 @@ api_query_item_limit=25
 #### Amount of RAM used for caching API requests
 ```python
 #----------------------------------------------------------#
-# API cache maximum size (interger)
+# API cache maximum size
 # This is a crude FIFO RAM cache
 # To keep the script running efficiently we do not want to send the
 #  same requests to the server repeatedly

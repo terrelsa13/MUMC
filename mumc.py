@@ -95,7 +95,7 @@ def does_index_exist(item, indexvalue):
 
 
 #Cached URL request controls
-class url_cache_handler:
+class cached_data_handler:
 
     #Define cache dictionary
     def __init__(self):
@@ -199,7 +199,7 @@ class url_cache_handler:
                 self.incrementOldestCachedDataEntry()
             return True
         else:
-            return None
+            return False
 
     #Delete oldest data from cache
     def removeOldestCachedData(self,url):
@@ -225,7 +225,7 @@ class url_cache_handler:
                     if (oldestCachedDataEntryUpdated):
                         return self.removeCachedData(url)
         else:
-            return None
+            return False
 
     def getOldestCachedDataKey(self):
         for cachedDataKey in self.cached_data:
@@ -2048,7 +2048,7 @@ def build_configuration_file(cfg,updateConfig):
 
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
-    config_file += "# API cache maximum size (interger)\n"
+    config_file += "# API cache maximum size\n"
     config_file += "# This is a crude FIFO RAM cache\n"
     config_file += "# To keep the script running efficiently we do not want to send the\n"
     config_file += "#  same requests to the server repeatedly\n"
@@ -9085,11 +9085,11 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_cache_size=" + str(check),2)
         if (
-            not ((type(check) is int) and
+            not ((type(check) is int) or (type(check) is float) and
             (check >= 0) and
             (check <= 10000))
         ):
-            error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be an integer; valid range 1 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be a number; valid range 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The api_query_cache_size variable is missing from mumc_config.py\n'
 
@@ -9120,6 +9120,7 @@ def cfgCheck():
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2)
         raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
+#######################################################################################################
 
 def defaultHelper():
     #print_byType('\nUse -h or -help for command line option(s)',True)
@@ -9138,7 +9139,7 @@ GLOBAL_CONFIG_FILE_NAME='mumc_config.py'
 GLOBAL_DEBUG_FILE_NAME='mumc_DEBUG.log'
 
 GLOBAL_BYTES_IN_MEGABYTES=1048576
-GLOBAL_CACHED_DATA=url_cache_handler()
+GLOBAL_CACHED_DATA=cached_data_handler()
 
 #get current working directory
 GLOBAL_CWD = os.getcwd()
@@ -9222,7 +9223,7 @@ try:
     elif (GLOBAL_DEBUG == False):
         GLOBAL_DEBUG = 0
 
-    GLOBAL_CACHED_DATA=url_cache_handler()
+    GLOBAL_CACHED_DATA=cached_data_handler()
 
     GLOBAL_SERVER_BRAND=cfg.server_brand.lower()
 
