@@ -57,6 +57,11 @@ defaultConfigValues={
         'multiuser_play_count_audio':0,
         'multiuser_play_count_audiobook':0,
 
+        'multiuser_play_days_movie':0,
+        'multiuser_play_days_episode':0,
+        'multiuser_play_days_audio':0,
+        'multiuser_play_days_audiobook':0,
+
         'keep_favorites_movie':1,
         'keep_favorites_episode':1,
         'keep_favorites_audio':1,

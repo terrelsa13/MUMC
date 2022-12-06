@@ -248,6 +248,19 @@ multiuser_play_count_episode=0
 multiuser_play_count_audio=0
 multiuser_play_count_audiobook=0
 ```
+#### Option for determining if a media item should be deleted or kept based on individual users' or all users' played days:
+```python
+#----------------------------------------------------------#
+# Decide how play state with multiple users will behave
+#  0 - ok to delete media item when ANY monitored users meet the *_played_days
+#  1 - ok to delete media item when ALL monitored users meet the *_played_days
+# (0 : default)
+#----------------------------------------------------------#
+multiuser_play_days_movie=0
+multiuser_play_days_episode=1
+multiuser_play_days_audio=0
+multiuser_play_days_audiobook=0
+```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
 #----------------------------------------------------------#
