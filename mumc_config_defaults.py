@@ -12,6 +12,8 @@ defaultConfigValues={
         #'example_string_config':'abc'
         #'example_boolean_config':True
 
+        #-------------Basic Config Options Start Here---------------#
+
         'movie_played_days':-1,
         'movie_created_days':-1,
         
@@ -47,6 +49,8 @@ defaultConfigValues={
         
         'audiobook_played_count':1,
         'audiobook_created_played_count':1,
+
+        #------------Advanced Config Options Start Here-------------#
 
         'multiuser_play_count_movie':0,
         'multiuser_play_count_episode':0,
@@ -123,8 +127,11 @@ defaultConfigValues={
         'movie_set_missing_last_played_date':1,
         'episode_set_missing_last_played_date':1,
         'audio_set_missing_last_played_date':1,
-        'audiobook_set_missing_last_played_date':1
+        'audiobook_set_missing_last_played_date':1,
 
+        #------------API Cache Maximum Size-------------#
+
+        'api_query_cache_size':20
     }
 
 

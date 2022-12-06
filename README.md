@@ -634,6 +634,34 @@ api_query_attempts=4
 #----------------------------------------------------------#
 api_query_item_limit=25
 ```
+#### Amount of RAM used for caching API requests
+```python
+#----------------------------------------------------------#
+# API cache maximum size (interger)
+# This is a crude FIFO RAM cache
+# To keep the script running efficiently we do not want to send the
+#  same requests to the server repeatedly
+# If the script is running slowly during media item collection for each user try
+#  increasing the cache size
+# Recommend NOT to exceed more than 20% of the server's total RAM
+# If the cache is smaller than any single reponse, that response will
+#  not be cached
+# During testing on the developlment server, 1MB of cache is better
+#  than 0MB of cache
+# It is recommened to disable the cache if the server is not able to
+#  spare an extra 1MB of RAM
+#
+# MegaByte Sizing Reference
+#  1MB = 1048576 Bytes
+#  1000MB = 1GB
+#  10000MB = 10GB
+#
+#  0 - Disable cache
+#  1-10000 - Size of cache in megabytes (MB)
+#  (20 : default)
+#----------------------------------------------------------#
+api_query_cache_size=20
+```
 #### DEBUG
 ```python
 #----------------------------------------------------------#

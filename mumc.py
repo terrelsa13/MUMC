@@ -15,13 +15,17 @@ import os
 from dateutil.parser import parse
 from collections import defaultdict
 from datetime import datetime,timedelta,timezone
+from sys import getsizeof
+from sys import argv
+from sys import path
+import importlib
 from mumc_config_defaults import get_default_config_values
 
 
 #Get the current script version
 def get_script_version():
 
-    Version='3.2.13'
+    Version='3.2.14'
 
     return(Version)
 
@@ -96,33 +100,173 @@ class url_cache_handler:
     #Define cache dictionary
     def __init__(self):
         self.cached_data={}
-        #self.cached_data=dict()
+        self.total_cached_data_entries=0
+        self.oldest_cached_data_entry=0
+        self.newest_cached_data_entry=0
+        self.cached_data_size_limit=cfg.api_query_cache_size * GLOBAL_BYTES_IN_MEGABYTES
+        self.cached_data_size=0
+
+    #Get number of cached data entries
+    def getTotalCachedDataEntries(self):
+        return self.total_cached_data_entries
+
+    #Get oldest cached data entry position
+    def getOldestCachedDataEntry(self):
+        return self.oldest_cached_data_entry
+
+    #Increment oldest cached data entry position
+    def incrementOldestCachedDataEntry(self):
+        self.oldest_cached_data_entry+=1
+
+    #Get newest cached data entry position
+    def getNewestCachedDataEntry(self):
+        return self.newest_cached_data_entry
+
+    #Increment newest cached data entry position
+    def incrementNewestCachedDataEntry(self):
+        self.newest_cached_data_entry+=1
+
+    #Get maximum cache size
+    def getCachedDataSizeLimit(self):
+        return self.cached_data_size_limit
+
+    #Get tracked size of data cache
+    def getCachedDataSize(self):
+        return self.cached_data_size
+
+    #Reset size of data cache to zero
+    def resetCachedDataSize(self):
+        self.cached_data_size=0
 
     #Check if query already exists in cache
-    def queryData(self,url):
+    def queryCache(self,url):
         if (url in self.cached_data):
             return True
         else:
             return False
 
-    #Add new query data to cache
-    def saveData(self,url,data):
-        self.cached_data[url]=data
-
     #Get existing query data if it exists
-    def retrieveData(self,url):
-        if (self.queryData(url)):
-            return self.cached_data[url]
+    def retrieveCachedData(self,url):
+        if (self.queryCache(url)):
+            return self.cached_data[url][0]
         else:
             return None
 
-    #Delete queried data from dictionary
-    def removeData(self,url):
-        if (self.queryData(url)):
+    #Increase tracker for number of cached items
+    def incrementEntryTracker(self):
+        self.total_cached_data_entries += 1
+
+    #Decrease tracher for number of cached items
+    def decrementEntryTracker(self):
+        if (self.getTotalCachedDataEntries() > 0):
+            self.total_cached_data_entries -= 1
+
+    #Increase tracked size of data cache
+    def increaseCachedDataSize(self,increasedSize):
+        self.cached_data_size += increasedSize
+
+    #Decrease tracked size of data cache
+    def decreaseCachedDataSize(self,decreasedSize):
+        if (self.getCachedDataSize() > 0):
+            self.cached_data_size -= decreasedSize
+
+    #Delete matching data from cache
+    def removeCachedData(self,url):
+        if (self.queryCache(url)):
+            self.decreaseCachedDataSize(self.getDataSize(self.cached_data[url]))
             self.cached_data.pop(url)
+            self.decrementEntryTracker()
+            if (not (self.getTotalCachedDataEntries())):
+                self.resetCachedDataSize()
+                self.incrementOldestCachedDataEntry()
             return True
         else:
             return None
+
+    #Delete oldest data from cache
+    def removeOldestCachedData(self,url):
+        if (self.queryCache(url)):
+            if (self.cached_data[url][1] == self.getOldestCachedDataEntry()):
+                oldestCachedDataEntryUpdated=False
+                #Prep the second oldest cache entry to become the oldest cache entry
+                if ((self.getOldestCachedDataEntry() + 1) < self.getNewestCachedDataEntry()):
+                    start=self.getOldestCachedDataEntry() + 1
+                    finish=self.getNewestCachedDataEntry() + 1
+                elif ((self.getOldestCachedDataEntry() + 1) == self.getNewestCachedDataEntry()):
+                    start=self.getOldestCachedDataEntry() + 1
+                    finish=self.getNewestCachedDataEntry() + 1
+                elif ((self.getOldestCachedDataEntry() + 1) > self.getNewestCachedDataEntry()):
+                    start=self.getOldestCachedDataEntry()
+                    finish=self.getNewestCachedDataEntry() + 1
+                for cachedDataEntry in range(start,finish):
+                    for cachedDataKey in self.cached_data:
+                        if (self.cached_data[cachedDataKey][1] == cachedDataEntry):
+                            self.oldest_cached_data_entry = self.cached_data[cachedDataKey][1]
+                            oldestCachedDataEntryUpdated=True
+                            break
+                    if (oldestCachedDataEntryUpdated):
+                        return self.removeCachedData(url)
+        else:
+            return None
+
+    def getOldestCachedDataKey(self):
+        for cachedDataKey in self.cached_data:
+            if (self.cached_data[cachedDataKey][1] == self.getOldestCachedDataEntry()):
+                return cachedDataKey
+
+    #Recursively find size of data objects
+    #Credit to https://goshippo.com/blog/measure-real-size-any-python-object/
+    def getDataSize(self,obj,seen=None):
+        size = getsizeof(obj)
+        if seen is None:
+            seen = set()
+        obj_id = id(obj)
+        if obj_id in seen:
+            return 0
+        # Important mark as seen *before* entering recursion to gracefully handle
+        # self-referential objects
+        seen.add(obj_id)
+        if isinstance(obj, dict):
+            size += sum([self.getDataSize(v, seen) for v in obj.values()])
+            size += sum([self.getDataSize(k, seen) for k in obj.keys()])
+        elif hasattr(obj, '__dict__'):
+            size += (obj.__dict__, seen)
+        elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+            size += sum([self.getDataSize(i, seen) for i in obj])
+        return size
+
+    #Keep cache size at or below cfg.api_query_cache_size
+    def limitDataSize(self,newDataSize):
+        while (self.getCachedDataSize() + newDataSize) > self.getCachedDataSizeLimit():
+            url=self.getOldestCachedDataKey()
+            self.removeOldestCachedData(url)
+
+    #Add new query data to cache
+    def saveDataToCache(self,url,data):
+        if (self.getCachedDataSizeLimit()):
+            if (self.getTotalCachedDataEntries() == 0):
+                newDataSize=self.getDataSize(url) + self.getDataSize(data) + self.getDataSize(0)
+                if (newDataSize <= self.getCachedDataSizeLimit()):
+                    self.limitDataSize(newDataSize)
+                    self.increaseCachedDataSize(newDataSize)
+                    self.cached_data[url]=[]
+                    self.cached_data[url].append(data)
+                    self.cached_data[url].append(0)
+                    self.incrementEntryTracker()
+                else:
+                    pass
+            else:
+                newDataSize=self.getDataSize(url) + self.getDataSize(data) + self.getDataSize(self.getNewestCachedDataEntry() + 1)
+                if (newDataSize <= self.getCachedDataSizeLimit()):
+                    self.limitDataSize(newDataSize)
+                    self.increaseCachedDataSize(newDataSize)
+                    self.cached_data[url]=[]
+                    self.cached_data[url].append(data)
+                    self.incrementNewestCachedDataEntry()
+                    self.cached_data[url].append(self.getNewestCachedDataEntry())
+                    self.incrementEntryTracker()
+                else:
+                    pass
 
 
 #send url request
@@ -139,7 +283,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    data = GLOBAL_CACHED_DATA.retrieveData(url)
+    data = GLOBAL_CACHED_DATA.retrieveCachedData(url)
     if (data):
         getdata = False
     else:
@@ -162,7 +306,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                     try:
                         source = response.read()
                         data = json.loads(source)
-                        GLOBAL_CACHED_DATA.saveData(url,data)
+                        GLOBAL_CACHED_DATA.saveDataToCache(url,data)
                         getdata = False
                         if (debugBool):
                             appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:\n",2)
@@ -183,7 +327,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
-                    GLOBAL_CACHED_DATA.saveData(url,data)
+                    GLOBAL_CACHED_DATA.saveDataToCache(url,data)
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
@@ -1851,6 +1995,37 @@ def build_configuration_file(cfg,updateConfig):
         config_file += "api_query_item_limit=25\n"
     elif (updateConfig):
         config_file += "api_query_item_limit=" + str(cfg.api_query_item_limit) + "\n"
+
+    config_file += "\n"
+    config_file += "#----------------------------------------------------------#\n"
+    config_file += "# API cache maximum size (interger)\n"
+    config_file += "# This is a crude FIFO RAM cache\n"
+    config_file += "# To keep the script running efficiently we do not want to send the\n"
+    config_file += "#  same requests to the server repeatedly\n"
+    config_file += "# If the script is running slowly during media item collection for each user try\n"
+    config_file += "#  increasing the cache size\n"
+    config_file += "# Recommend NOT to exceed more than 20% of the server's total RAM\n"
+    config_file += "# If the cache is smaller than any single reponse, that response will\n"
+    config_file += "#  not be cached\n"
+    config_file += "# During testing on the developlment server, 1MB of cache is better\n"
+    config_file += "#  than 0MB of cache\n"
+    config_file += "# It is recommened to disable the cache if the server is not able to\n"
+    config_file += "#  spare an extra 1MB of RAM\n"
+    config_file += "#\n"
+    config_file += "# MegaByte Sizing Reference\n"
+    config_file += "#  1MB = 1048576 Bytes\n"
+    config_file += "#  1000MB = 1GB\n"
+    config_file += "#  10000MB = 10GB\n"
+    config_file += "#\n"
+    config_file += "#  0 - Disable cache\n"
+    config_file += "#  1-1000 - Size of cache in megabytes (MB)\n"
+    config_file += "#  (20 : default)\n"
+    config_file += "#----------------------------------------------------------#\n"
+    if not (updateConfig):
+        config_file += "api_query_cache_size='" + str(get_default_config_values('api_query_cache_size')) + "'\n"
+    elif (updateConfig):
+        config_file += "api_query_cache_size='" + str(cfg.api_query_cache_size) + "'\n"
+
     config_file += "\n"
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Must be a boolean True or False value\n"
@@ -2143,7 +2318,11 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                 #include all item types; filter applied in first API calls for each media type in get_media_items()
                 IncludeItemTypes=''
                 FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                SortBy='SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                if (isJellyfinServer):
+                    SortBy='SeriesSortName'
+                else:
+                    SortBy='SeriesName'
+                SortBy=SortBy + ',AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                 SortOrder='Ascending'
                 Recursive='True'
                 EnableImages='False'
@@ -2228,7 +2407,11 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                     #include all item types; filter applied in first API calls for each media type in get_media_items()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                    SortBy='SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy='SeriesSortName'
+                    else:
+                        SortBy='SeriesName'
+                    SortBy=SortBy + ',AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                     SortOrder='Ascending'
                     Recursive='True'
                     EnableImages='False'
@@ -5341,7 +5524,11 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Episode'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Blacklist='SeriesName'
+                    SortBy_Blacklist=SortBy_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -5360,7 +5547,11 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Episode,Season,Series,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Blacklist='SeriesName'
+                    SortBy_Favorited_From_Blacklist=SortBy_Favorited_From_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -5379,7 +5570,11 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Episode,Season,Series,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,seriesStatus'
-                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Whitelist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Whitelist='SeriesName'
+                    SortBy_Favorited_From_Whitelist=SortBy_Favorited_From_Whitelist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -5853,7 +6048,11 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Audio'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Blacklist='SeriesName'
+                    SortBy_Blacklist=SortBy_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -5872,7 +6071,11 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Audio,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Blacklist='SeriesName'
+                    SortBy_Favorited_From_Blacklist=SortBy_Favorited_From_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -5891,7 +6094,11 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Audio,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Whitelist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Whitelist='SeriesName'
+                    SortBy_Favorited_From_Whitelist=SortBy_Favorited_From_Whitelist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -6350,7 +6557,11 @@ def get_media_items():
                     #Build query for watched media items in blacklists
                     IncludeItemTypes_Blacklist='Audio'
                     FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Blacklist='SeriesName'
+                    SortBy_Blacklist=SortBy_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Blacklist='Ascending'
                     EnableUserData_Blacklist='True'
                     Recursive_Blacklist='True'
@@ -6369,7 +6580,11 @@ def get_media_items():
                     #Build query for Favorited_From_Blacklist media items
                     IncludeItemTypes_Favorited_From_Blacklist='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Blacklist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Blacklist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Blacklist='SeriesName'
+                    SortBy_Favorited_From_Blacklist=SortBy_Favorited_From_Blacklist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Blacklist='Ascending'
                     EnableUserData_Favorited_From_Blacklist='True'
                     Recursive_Favorited_From_Blacklist='True'
@@ -6388,7 +6603,11 @@ def get_media_items():
                     #Build query for Favorited_From_Whitelist media items
                     IncludeItemTypes_Favorited_From_Whitelist='Audio,Book,MusicAlbum,Playlist,CollectionFolder'
                     FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ArtistItems,AlbumId,AlbumArtists'
-                    SortBy_Favorited_From_Whitelist='SeriesSortName,ParentIndexNumber,IndexNumber,Name'
+                    if (isJellyfinServer):
+                        SortBy_Favorited_From_Whitelist='SeriesSortName'
+                    else:
+                        SortBy_Favorited_From_Whitelist='SeriesName'
+                    SortBy_Favorited_From_Whitelist=SortBy_Favorited_From_Whitelist + ',ParentIndexNumber,IndexNumber,Name'
                     SortOrder_Favorited_From_Whitelist='Ascending'
                     EnableUserData_Favorited_From_Whitelist='True'
                     Recursive_Favorited_From_Whitelist='True'
@@ -8690,6 +8909,21 @@ def cfgCheck():
 
 #######################################################################################################
 
+    if hasattr(cfg, 'api_query_cache_size'):
+        check=cfg.api_query_cache_size
+        if (GLOBAL_DEBUG):
+            appendTo_DEBUG_log("\napi_query_cache_size=" + str(check),2)
+        if (
+            not ((type(check) is int) and
+            (check >= 0) and
+            (check <= 10000))
+        ):
+            error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be an integer; valid range 1 thru 730500\n'
+    else:
+        error_found_in_mumc_config_py+='ConfigNameError: The api_query_cache_size variable is missing from mumc_config.py\n'
+
+#######################################################################################################
+
     if hasattr(cfg, 'DEBUG'):
         check=cfg.DEBUG
         if (GLOBAL_DEBUG):
@@ -8715,12 +8949,20 @@ def cfgCheck():
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2)
         raise RuntimeError('\n' + error_found_in_mumc_config_py)
 
+
+def defaultHelper():
+    #print_byType('\nUse -h or -help for command line option(s)',True)
+    print_byType('\nFor help use -h or -help',True)
+    print_byType('\n/path/to/python3.x /path/to/mumc.py -help',True)
+    print_byType('',True)
+    exit(0)
 #######################################################################################################
 
 
 ############# START OF SCRIPT #############
 
 #Declare global variables
+GLOBAL_DEBUG=0
 GLOBAL_CONFIG_FILE_NAME='mumc_config.py'
 GLOBAL_DEBUG_FILE_NAME='mumc_DEBUG.log'
 #get current working directory
@@ -8734,10 +8976,65 @@ if os.path.exists(GLOBAL_DEBUG_FILE_NAME):
 #change back to original working directory
 os.chdir(GLOBAL_CWD)
 
+GLOBAL_TRIED_ALT_CONFIG=False
+
 try:
-    #try importing the mumc_config.py file
-    #if mumc_config.py file does not exsit go to except and create one
-    import mumc_config as cfg
+
+    if (len(argv) == 1):
+        #try importing the mumc_config.py file
+        #if mumc_config.py file does not exist go to except and create one
+        import mumc_config as cfg
+    else:
+        for cmdOption in argv:
+            if (cmdOption == '-h') or ((cmdOption == '-help')):
+                print_byType('\nMUMC Version: ' + get_script_version(),True)
+                print_byType('Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.',True)
+                print_byType('',True)
+                print_byType('Usage:',True)
+                print_byType('/path/to/python3.x /path/to/mumc.py [-option] [arg]',True)
+                print_byType('',True)
+                print_byType('Options:',True)
+                print_byType('-c, -config          Specify alternate *.py configuration file',True)
+                print_byType('-h, -help            Show this help menu',True)
+                print_byType('',True)
+                print_byType('Latest Release:',True)
+                print_byType('https://github.com/terrelsa13/MUMC/releases',True)
+                print_byType('',True)
+                exit(0)
+        if ((argv[1] == '-c') and (len(argv) == 3)):
+            GLOBAL_TRIED_ALT_CONFIG=True
+            #Attempt to import the alternate config file as cfg
+            #Check for the .py extension and no spaces or periods in the module name
+            if ((os.path.splitext(argv[2])[1] == '.py') and
+                ((os.path.basename(os.path.splitext(argv[2])[0])).count(".") == 0) and
+                ((os.path.basename(os.path.splitext(argv[2])[0])).count(" ") == 0)):
+                #Get path without file.name
+                altConfigPath=os.path.dirname(argv[2])
+                #Get file without extension
+                altConfigFileNoExt=os.path.basename(os.path.splitext(argv[2])[0])
+                #Add directory of alternate config to path so it can be imported
+                path.append(altConfigPath)
+                #Cannot do a direct import using a variable; use the importlib.import_module instead
+                cfg = importlib.import_module(altConfigFileNoExt)
+            else:
+                print_byType('',True)
+                print_byType('Alternate configuration file must have a .py extension and follow the Python module naming convention',True)
+                print_byType('',True)
+                print_byType('These are NOT valid module names:',True)
+                print_byType('',True)
+                print_byType('\t/path/to/alternate.module.py',True)
+                print_byType('\t/path/to/alternate module.py',True)
+                print_byType('\tc:\\path\\to\\alternate.module.py',True)
+                print_byType('\tc:\\path\\to\\alternate module.py',True)
+                print_byType('',True)
+                print_byType('These are valid module names:',True)
+                print_byType('',True)
+                print_byType('\t/path/to/alternate_module.py',True)
+                print_byType('\tc:\\path\\to\\alternate_module.py',True)
+                print_byType('',True)
+                exit(0)
+        else:
+            defaultHelper()
 
     #try assigning the DEBUG variable from mumc_config.py file
     #if DEBUG does not exsit go to except and completely rebuild the mumc_config.py file
@@ -8756,6 +9053,7 @@ try:
     GLOBAL_DATE_TIME_UTC_NOW=datetime.utcnow()
     GLOBAL_DATE_TIME_NOW_TZ_UTC=datetime.now(timezone.utc)
 
+    GLOBAL_BYTES_IN_MEGABYTES=1048576
     GLOBAL_CACHED_DATA=url_cache_handler()
 
     if (GLOBAL_DEBUG):
@@ -8791,20 +9089,23 @@ try:
 
 #the exception
 except (AttributeError, ModuleNotFoundError):
-    GLOBAL_DEBUG=0
-    #GLOBAL_DEBUG=1
-    #GLOBAL_DEBUG=2
-    #GLOBAL_DEBUG=3
-    #GLOBAL_DEBUG=4
+    if (not (GLOBAL_TRIED_ALT_CONFIG)):
+        GLOBAL_DEBUG=0
+        #GLOBAL_DEBUG=1
+        #GLOBAL_DEBUG=2
+        #GLOBAL_DEBUG=3
+        #GLOBAL_DEBUG=4
 
-    #we are here because the mumc_config.py file does not exist
-    #this is either the first time the script is running or mumc_config.py file was deleted
-    #when this happens create a new mumc_config.py file
-    #another possible reason we are here...
-    #the above attempt to set GLOBAL_DEBUG=cfg.DEBUG failed likely because DEBUG is missing from the mumc_config.py file
-    #when this happens create a new mumc_config.py file
-    update_config = False
-    build_configuration_file(None,update_config)
+        #we are here because the mumc_config.py file does not exist
+        #this is either the first time the script is running or mumc_config.py file was deleted
+        #when this happens create a new mumc_config.py file
+        #another possible reason we are here...
+        #the above attempt to set GLOBAL_DEBUG=cfg.DEBUG failed likely because DEBUG is missing from the mumc_config.py file
+        #when this happens create a new mumc_config.py file
+        update_config = False
+        build_configuration_file(None,update_config)
+    else:
+        defaultHelper()
 
     #exit gracefully after building config
     exit(0)
@@ -8825,5 +9126,17 @@ deleteItems=get_media_items()
 
 #show and delete media items
 output_itemsToDelete(deleteItems)
+
+if (GLOBAL_DEBUG):
+    appendTo_DEBUG_log('\n',3)
+    appendTo_DEBUG_log('Cached Data Info',3)
+    appendTo_DEBUG_log('Total number of cached items: ' + str(GLOBAL_CACHED_DATA.getTotalCachedDataEntries()),print_script_header,3)
+    appendTo_DEBUG_log('Oldest remaining cached item number: ' + str(GLOBAL_CACHED_DATA.getOldestCachedDataEntry()),print_script_header,3)
+    appendTo_DEBUG_log('Newest cached item number: ' + str(GLOBAL_CACHED_DATA.getNewestCachedDataEntry()),print_script_header,3)
+    appendTo_DEBUG_log('Configured max cache size: ' + str(GLOBAL_CACHED_DATA.getCachedDataSizeLimit()),print_script_header,3)
+    appendTo_DEBUG_log('Size of remaining cached items: ' + str(GLOBAL_CACHED_DATA.getCachedDataSize()),print_script_header,3)
+
+appendTo_DEBUG_log('\n',1)
+print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
 
 ############# END OF SCRIPT #############
