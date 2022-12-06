@@ -25,7 +25,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.3.1'
+    Version='3.3.2'
 
     return(Version)
 
@@ -189,20 +189,17 @@ class cached_data_handler:
             self.total_cached_data_entries_removed+=decreasedSize
 
     #Delete matching data from cache
-    def removeCachedData(self,url):
+    def removeEntryFromCache(self,url):
         if (self.queryCache(url)):
             self.decreaseCachedDataSize(self.getDataSize(self.cached_data[url]))
             self.cached_data.pop(url)
             self.decrementEntryTracker()
-            if (not (self.getTotalCachedDataEntries())):
-                self.resetCachedDataSize()
-                self.incrementOldestCachedDataEntry()
             return True
         else:
             return False
 
     #Delete oldest data from cache
-    def removeOldestCachedData(self,url):
+    def safeRemoveEntryFromCache(self,url):
         if (self.queryCache(url)):
             if (self.cached_data[url][1] == self.getOldestCachedDataEntry()):
                 oldestCachedDataEntryUpdated=False
@@ -223,7 +220,15 @@ class cached_data_handler:
                             oldestCachedDataEntryUpdated=True
                             break
                     if (oldestCachedDataEntryUpdated):
-                        return self.removeCachedData(url)
+                        if (self.removeEntryFromCache(url)):
+                            if (not (self.getTotalCachedDataEntries())):
+                                self.resetCachedDataSize()
+                                self.incrementOldestCachedDataEntry()
+                            return True
+                        else:
+                            return False
+            else:
+                return self.removeEntryFromCache(url)
         else:
             return False
 
@@ -254,18 +259,19 @@ class cached_data_handler:
         return size
 
     #Keep cache size at or below cfg.api_query_cache_size
-    def limitDataSize(self,newDataSize):
+    def limitCacheSize(self,newDataSize):
         while (self.getCachedDataSize() + newDataSize) > self.getCachedDataSizeLimit():
-            url=self.getOldestCachedDataKey()
-            self.removeOldestCachedData(url)
+            #url=self.getOldestCachedDataKey()
+            #self.safeRemoveEntryFromCache(url)
+            self.safeRemoveEntryFromCache(self.getOldestCachedDataKey())
 
     #Add new query data to cache
-    def saveDataToCache(self,url,data):
+    def saveEntryToCache(self,url,data):
         if (self.getCachedDataSizeLimit()):
             if (self.getTotalCachedDataEntries() == 0):
                 newDataSize=self.getDataSize(url) + self.getDataSize(data) + self.getDataSize(0)
                 if (newDataSize <= self.getCachedDataSizeLimit()):
-                    self.limitDataSize(newDataSize)
+                    self.limitCacheSize(newDataSize)
                     self.increaseCachedDataSize(newDataSize)
                     self.cached_data[url]=[]
                     self.cached_data[url].append(data)
@@ -275,7 +281,7 @@ class cached_data_handler:
             else:
                 newDataSize=self.getDataSize(url) + self.getDataSize(data) + self.getDataSize(self.getNewestCachedDataEntry() + 1)
                 if (newDataSize <= self.getCachedDataSizeLimit()):
-                    self.limitDataSize(newDataSize)
+                    self.limitCacheSize(newDataSize)
                     self.increaseCachedDataSize(newDataSize)
                     self.cached_data[url]=[]
                     self.cached_data[url].append(data)
@@ -322,7 +328,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                     try:
                         source = response.read()
                         data = json.loads(source)
-                        GLOBAL_CACHED_DATA.saveDataToCache(url,data)
+                        GLOBAL_CACHED_DATA.saveEntryToCache(url,data)
                         getdata = False
                         if (debugBool):
                             appendTo_DEBUG_log("\nData Returned From The " + str(reqeustDebugMessage) + " Request:\n",2)
@@ -343,7 +349,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
-                    GLOBAL_CACHED_DATA.saveDataToCache(url,data)
+                    GLOBAL_CACHED_DATA.saveEntryToCache(url,data)
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
