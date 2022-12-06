@@ -25,7 +25,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.3.0'
+    Version='3.3.1'
 
     return(Version)
 
@@ -101,6 +101,8 @@ class url_cache_handler:
     def __init__(self):
         self.cached_data={}
         self.total_cached_data_entries=0
+        self.total_cached_data_entries_removed=0
+        self.total_data_thru_cache=0
         self.oldest_cached_data_entry=0
         self.newest_cached_data_entry=0
         try:
@@ -112,6 +114,18 @@ class url_cache_handler:
     #Get number of cached data entries
     def getTotalCachedDataEntries(self):
         return self.total_cached_data_entries
+
+    #Update total cache data tracker
+    def updatedTotalDataThruCache(self,size):
+        self.total_data_thru_cache+=size
+
+    #Get total cache data tracker
+    def getTotalDataThruCache(self):
+        return self.total_data_thru_cache
+
+    #Get total data removed from cache
+    def getTotalCacheDataRemoved(self):
+        return self.total_cached_data_entries_removed
 
     #Get oldest cached data entry position
     def getOldestCachedDataEntry(self):
@@ -157,21 +171,22 @@ class url_cache_handler:
 
     #Increase tracker for number of cached items
     def incrementEntryTracker(self):
-        self.total_cached_data_entries += 1
+        self.total_cached_data_entries+=1
 
     #Decrease tracher for number of cached items
     def decrementEntryTracker(self):
         if (self.getTotalCachedDataEntries() > 0):
-            self.total_cached_data_entries -= 1
+            self.total_cached_data_entries-=1
 
     #Increase tracked size of data cache
     def increaseCachedDataSize(self,increasedSize):
-        self.cached_data_size += increasedSize
+        self.cached_data_size+=increasedSize
 
     #Decrease tracked size of data cache
     def decreaseCachedDataSize(self,decreasedSize):
         if (self.getCachedDataSize() > 0):
-            self.cached_data_size -= decreasedSize
+            self.cached_data_size-=decreasedSize
+            self.total_cached_data_entries_removed+=decreasedSize
 
     #Delete matching data from cache
     def removeCachedData(self,url):
@@ -230,12 +245,12 @@ class url_cache_handler:
         # self-referential objects
         seen.add(obj_id)
         if isinstance(obj, dict):
-            size += sum([self.getDataSize(v, seen) for v in obj.values()])
-            size += sum([self.getDataSize(k, seen) for k in obj.keys()])
+            size+=sum([self.getDataSize(v, seen) for v in obj.values()])
+            size+=sum([self.getDataSize(k, seen) for k in obj.keys()])
         elif hasattr(obj, '__dict__'):
-            size += (obj.__dict__, seen)
+            size+=(obj.__dict__, seen)
         elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
-            size += sum([self.getDataSize(i, seen) for i in obj])
+            size+=sum([self.getDataSize(i, seen) for i in obj])
         return size
 
     #Keep cache size at or below cfg.api_query_cache_size
@@ -256,6 +271,7 @@ class url_cache_handler:
                     self.cached_data[url].append(data)
                     self.cached_data[url].append(0)
                     self.incrementEntryTracker()
+                    self.updatedTotalDataThruCache(newDataSize)
             else:
                 newDataSize=self.getDataSize(url) + self.getDataSize(data) + self.getDataSize(self.getNewestCachedDataEntry() + 1)
                 if (newDataSize <= self.getCachedDataSizeLimit()):
@@ -266,6 +282,7 @@ class url_cache_handler:
                     self.incrementNewestCachedDataEntry()
                     self.cached_data[url].append(self.getNewestCachedDataEntry())
                     self.incrementEntryTracker()
+                    self.updatedTotalDataThruCache(newDataSize)
 
 
 #send url request
@@ -765,6 +782,11 @@ def user_lib_builder(json_lib_entry):
 #Create output string to show library information to user for them to choose
 def parse_library_data_for_display(libFolder,subLibPath):
 
+    if (isJellyfinServer()):
+        libraryGuid='ItemId'
+    else:
+        libraryGuid='Guid'
+
     libDisplayString=' - ' + libFolder['Name']
 
     if ('LibraryOptions' in libFolder):
@@ -775,8 +797,8 @@ def parse_library_data_for_display(libFolder,subLibPath):
                 if ('NetworkPath' in libFolder['LibraryOptions']['PathInfos'][subLibPath]):
                     libDisplayString+=' - ' + libFolder['LibraryOptions']['PathInfos'][subLibPath]['NetworkPath']
 
-    if ('ItemId' in libFolder):
-        libDisplayString+=' - LibId: ' + libFolder['ItemId']
+    if (libraryGuid in libFolder):
+        libDisplayString+=' - LibId: ' + libFolder[libraryGuid]
 
     return libDisplayString
 
@@ -784,7 +806,12 @@ def parse_library_data_for_display(libFolder,subLibPath):
 #Store the chosen library's data in temporary location for use when building blacklist and whitelist
 def parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,pos):
 
-    libraryTemp_dict[pos]['libid']=libFolder['ItemId']
+    if (isJellyfinServer()):
+        libraryGuid='ItemId'
+    else:
+        libraryGuid='Guid'
+
+    libraryTemp_dict[pos]['libid']=libFolder[libraryGuid]
 
     if ('CollectionType' in libFolder):
         libraryTemp_dict[pos]['collectiontype']=libFolder['CollectionType']
@@ -847,17 +874,21 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
             enabledFolderIds_set.add(user_policy['EnabledFolders'][okFolders])
 
     i=0
+    if (isJellyfinServer()):
+        libraryGuid='ItemId'
+    else:
+        libraryGuid='Guid'
     #Populate all libraries into a "not chosen" data structure
     # i.e. if blacklist chosen all libraries start out as whitelisted
     # i.e. if whitelist chosen all libraries start out as blacklisted
     for libFolder in data_folders:
-        if (('ItemId' in libFolder) and ('CollectionType' in libFolder) and ((enabledFolderIds_set == set()) or (libFolder['ItemId'] in enabledFolderIds_set))):
+        if ((libraryGuid in libFolder) and ('CollectionType' in libFolder) and ((enabledFolderIds_set == set()) or (libFolder[libraryGuid] in enabledFolderIds_set))):
             for subLibPath in range(len(libFolder['LibraryOptions']['PathInfos'])):
                 if not ('userid' in not_library_dict):
                     not_library_dict['userid']=user_id
                 if not ('username' in not_library_dict):
                     not_library_dict['username']=user_name
-                not_library_dict[i]['libid']=libFolder['ItemId']
+                not_library_dict[i]['libid']=libFolder[libraryGuid]
                 not_library_dict[i]['collectiontype']=libFolder['CollectionType']
                 if (('Path' in libFolder['LibraryOptions']['PathInfos'][subLibPath])):
                     not_library_dict[i]['path']=libFolder['LibraryOptions']['PathInfos'][subLibPath]['Path']
@@ -878,13 +909,13 @@ def get_library_folders(server_url, auth_key, infotext, user_policy, user_id, us
         k=0
         showpos_correlation={}
         for libFolder in data_folders:
-            if (('ItemId' in libFolder) and ('CollectionType' in libFolder) and ((enabledFolderIds_set == set()) or (libFolder['ItemId'] in enabledFolderIds_set))):
+            if ((libraryGuid in libFolder) and ('CollectionType' in libFolder) and ((enabledFolderIds_set == set()) or (libFolder[libraryGuid] in enabledFolderIds_set))):
                 for subLibPath in range(len(libFolder['LibraryOptions']['PathInfos'])):
-                    if ((library_matching_behavior == 'byId') and ('ItemId' in libFolder)):
+                    if ((library_matching_behavior == 'byId') and (libraryGuid in libFolder)):
                         #option made here to check for either ItemId or Path when deciding what to show
                         # when ItemId libraries with multiple folders but same libId will be removed together
                         # when Path libraries with multiple folders but the same libId will be removed individually
-                        if ((library_matching_behavior == 'byId') and ( not (libFolder['ItemId'] in library_tracker))):
+                        if ((library_matching_behavior == 'byId') and ( not (libFolder[libraryGuid] in library_tracker))):
                             print(str(j) + parse_library_data_for_display(libFolder,subLibPath))
                             libInfoPrinted=True
                         else:
@@ -9271,15 +9302,18 @@ deleteItems=get_media_items()
 output_itemsToDelete(deleteItems)
 
 if (GLOBAL_DEBUG):
-    appendTo_DEBUG_log('\n',3)
-    appendTo_DEBUG_log('Cached Data Info',3)
-    appendTo_DEBUG_log('Total number of cached items: ' + str(GLOBAL_CACHED_DATA.getTotalCachedDataEntries()),print_script_header,3)
-    appendTo_DEBUG_log('Oldest remaining cached item number: ' + str(GLOBAL_CACHED_DATA.getOldestCachedDataEntry()),print_script_header,3)
-    appendTo_DEBUG_log('Newest cached item number: ' + str(GLOBAL_CACHED_DATA.getNewestCachedDataEntry()),print_script_header,3)
-    appendTo_DEBUG_log('Configured max cache size: ' + str(GLOBAL_CACHED_DATA.getCachedDataSizeLimit()),print_script_header,3)
-    appendTo_DEBUG_log('Size of remaining cached items: ' + str(GLOBAL_CACHED_DATA.getCachedDataSize()),print_script_header,3)
+    appendTo_DEBUG_log('\n',print_script_header)
+    print_byType('--Cached Data Info--',print_script_header)
+    print_byType('Total number of cached items: ' + str(GLOBAL_CACHED_DATA.getTotalCachedDataEntries()),print_script_header)
+    print_byType('Oldest remaining cached item number: ' + str(GLOBAL_CACHED_DATA.getOldestCachedDataEntry()),print_script_header)
+    print_byType('Newest cached item number: ' + str(GLOBAL_CACHED_DATA.getNewestCachedDataEntry()),print_script_header)
+    print_byType('Configured max cache size: ' + str(GLOBAL_CACHED_DATA.getCachedDataSizeLimit()),print_script_header)
+    print_byType('Size of remaining items in cache: ' + str(GLOBAL_CACHED_DATA.getCachedDataSize()),print_script_header)
+    print_byType('Total amount of all cached data: ' + str(GLOBAL_CACHED_DATA.getTotalDataThruCache()),print_script_header)
+    print_byType('Total amout of data removed from cache: ' + str(GLOBAL_CACHED_DATA.getTotalCacheDataRemoved()),print_script_header)
+    print_byType('',print_script_header)
 
-appendTo_DEBUG_log('\n',1)
+appendTo_DEBUG_log('\n',print_script_header)
 print_byType('Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'),print_script_header)
 
 ############# END OF SCRIPT #############
