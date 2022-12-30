@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.0-beta'
+    Version='4.0.1-beta'
 
     return(Version)
 
@@ -357,7 +357,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
-                    GLOBAL_CACHED_DATA.addEntryToCache(url,data)
+                    if (not((response._method == 'DELETE') or (response._method == 'POST'))):
+                        GLOBAL_CACHED_DATA.addEntryToCache(url,data)
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
