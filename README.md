@@ -9,10 +9,11 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## mumc_config.py
 ```mumc_config.py```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
-## Step 1: What is a Filter Statement?
+## Step 1: What is a Filter Statement and a Behavioral Statement?
 
-* A Filter Statement is a simple way to tell the script how to find and delete media items taking up your disk space.
-  - This also means the media items **not matching** the Filter Statement are kept safe for watching later.
+* A Filter Statement is a simple way to tell the script how to find media items taking up your disk space.
+* A Behavioral Statement is a simple way to tell the script how to delete media items found with the Filter Statment.
+  - This also means the media items **not matching** the Filter Statement and Behavioral Statement are kept safe for watching later.
 ## Step 2: The basics of building a generic Filter Statement.
 
 Generic Filter Statement Parts (each media type has their own Filter Statement Parts):
@@ -21,47 +22,41 @@ Generic Filter Statement Parts (each media type has their own Filter Statement P
 * **Part #3** - Played Count
 
 Starting with a generic Filter Statement:
-* Delete media items Played/Created at least **Part #1** days ago with a played count **Part #2** **Part #3**.
+* Find media items Played/Created at least **Part #1** days ago with a played count **Part #2** **Part #3**.
 
   - Example A: Filling in the blanks for a generic media items _played_ Filter Statement:
     - Part #1** - **60**
     - Part #2** - **>=**
     - Part #3** - **1**
-      - Delete media items _played_ at least **60** days ago with a played count **>=** **1**.
+      - Find media items _played_ at least **60** days ago with a played count **>=** **1**.
 
   - Example B: Filling in the blanks for a generic media items _created_ Filter Statement:
     - Part #1 - **3650**
     - Part #2 - **<**
     - Part #3 - **2**
-      - Delete media items _created_ at least **3650** days ago with a played count **<** **2**.
+      - Find media items _created_ at least **3650** days ago with a played count **<** **2**.
 ## Step 3: Building Filter Statements for specific media types.
 
-* Delete movies played at least **22** days ago with a played count **>=** **1**.
-  - movie_played_days=22
-  - movie_played_count_comparison='>='
-  - movie_played_count=1
+* Find movies played at least **22** days ago with a played count **>=** **1**.
+  - played_filter_movie=[22,'>=',1]
 
-* Delete episodes played at least **55** days ago with a played count **not <=** **0**.
-  - episode_played_days=55
-  - episode_played_count_comparison='not <='
-  - episode_played_count=0
+* Find episodes played at least **55** days ago with a played count **not <=** **0**.
+- played_filter_episode=[55,'not <=',0]
 
-* Delete audio tracks played at least **123** days ago with a played count **==** **4**.
-  - audio_played_days=123
-  - audio_played_count_comparison='=='
-  - audio_played_count=4
+* Find audio tracks played at least **123** days ago with a played count **==** **4**.
+  - played_filter_audio=[123,'==',4]
 
-* Delete episodes created at least **3456** days ago with a played count **>** **0**.
+* Find episodes created at least **3456** days ago with a played count **>** **0**.
   - episode_created_days=3456
   - episode_created_played_count_comparison='>'
   - episode_created_played_count=0
 
-* Delete movies created at least **4567** days ago with a played count **not ==** **0**.
+* Find movies created at least **4567** days ago with a played count **not ==** **0**.
   - movie_created_days=4567
   - movie_created_played_count_comparison='not =='
   - movie_created_played_count=0
 
-* Delete audio tracks created at least **5678** days ago with a played count **not >=** **11**.
+* Find audio tracks created at least **5678** days ago with a played count **not >=** **11**.
   - audio_created_days=5678
   - audio_created_played_count_comparison='not >='
   - audio_created_played_count=11
@@ -75,19 +70,19 @@ What you **_NEVER_** want to do is to set ```*_created_days=TO_SOME_LOW_NUMBER``
 Doing this WILL delete MOST if not ALL of your library.
 
 ##### Never do this unless you are 1000% confident it is doing exactly what you expect:
-* Delete movies created at least **0** days ago...
+* Find movies created at least **0** days ago...
   - movie_created_days=0
   - ...
 
-* Delete episodes created at least **1** day ago...
+* Find episodes created at least **1** day ago...
   - episode_created_days=1
   - ...
 
-* Delete audio track created at least **2** days ago...
+* Find audio track created at least **2** days ago...
   - audio_created_days=2
   - ...
 
-* Delete movie created at least **3** days ago...
+* Find movie created at least **3** days ago...
   - movie_created_days=3
   - ...
 
@@ -109,12 +104,12 @@ Filter Statements implying negative played counts will be evaluted as ```*_playe
 
 _Played_ Filter Statements overlapping zero and postive numbered played counts will only delete the media items with postive numbered played counts (i.e. the played media items).
 
-* Delete episodes played at least # days ago with a played count **<=** **1**.
+* Find episodes played at least # days ago with a played count **<=** **1**.
   - ...
   - episode_played_count_comparison='<='
   - episode_played_count=1
 
-* Delete movies played at least # days ago with a played count **>=** **0**.
+* Find movies played at least # days ago with a played count **>=** **0**.
   - ...
   - movie_played_count_comparison='>='
   - movie_played_count=0
@@ -123,35 +118,35 @@ _Played_ Filter Statements overlapping zero and postive numbered played counts w
 
 #### Filter Statement to delete movies played 90 or more days ago.
 
-* Delete movies played at least **90** days ago with a played count **>=** **1**.
+* Find movies played at least **90** days ago with a played count **>=** **1**.
   - movie_played_days=90
   - movie_played_count_comparison='>='
   - movie_played_count=1
 
 #### Filter Statement to delete episodes played less than twice, 30 or more days ago.
 
-* Delete episodes played at least **30** days ago with a played count **<** **2**.
+* Find episodes played at least **30** days ago with a played count **<** **2**.
   - episode_played_days=30
   - episode_played_count_comparison='<'
   - episode_played_count=2
 
 #### Filter Statement to delete "old" played and unplayed movies.
 
-* Delete movies created at least **365** days ago with a played count **>=** **0**.
+* Find movies created at least **365** days ago with a played count **>=** **0**.
   - movie_created_days=365
   - movie_created_played_count_comparison='>='
   - movie_created_played_count=0
 
 #### Filter Statement to delete "old" unplayed episodes.
 
-* Delete episodes created at least **365** days ago with a played count **==** **0**.
+* Find episodes created at least **365** days ago with a played count **==** **0**.
   - episode_created_days=365
   - episode_created_played_count_comparison='=='
   - episode_created_played_count=0
 
 #### Filter Statement to delete "old" played episodes.
 
-* Delete episodes created at least **365** days ago with a played count **not ==** **0**.
+* Find episodes created at least **365** days ago with a played count **not ==** **0**.
   - episode_created_days=365
   - episode_created_played_count_comparison='not =='
   - episode_created_played_count=0
@@ -161,15 +156,118 @@ _Played_ Filter Statements overlapping zero and postive numbered played counts w
 #### Combined with...
 #### Filter Statement to delete unplayed movies created 180 or more days ago.
 
-* Delete movies played at least **60** days ago with a played count **==** **1**.
+* Find movies played at least **60** days ago with a played count **==** **1**.
   - movie_played_days=60
   - movie_played_count_comparison='=='
   - movie_played_count=1
 
-* Delete movies created at least **180** days ago with a played count **==** **0**.
+* Find movies created at least **180** days ago with a played count **==** **0**.
   - movie_created_days=180
   - movie_created_played_count_comparison='=='
   - movie_created_played_count=0
+
+## Step 7: The basics of building a generic Behavioral Statement.
+
+__Behavioral Statements apply to:__
+* Favorites
+* Whitetags
+* Blacktags
+* Whitelists
+* Blacklists
+
+#### [X, Y, Z, #]
+
+Generic Behavioral Statement Parts (each media type has their own Behavioral Statement Parts):
+* **Part #1** - Action (X : Keep or Delete)
+* **Part #2** - User Conditional (Y : All or Any)
+* **Part #3** - Played Conditional (Z : All or Any)
+* **Part #4** - Action Control (# : 0 thru 8)
+
+* The Behavior Statement is processed as follows:
+  *  **Step #1** - Determine (Y) if the media item is Favorited/Whitetagged/Blacktagged/Whitelisted/Blacklisted for ALL monitored users or ANY monitored users; True or False is the result
+  *  **Step #2** - Determine (Z) if the media item meets played days and played count for ALL monitored users or ANY monitored users; True or False is the result
+  *  **Step #3** - 'and' the True/False results from **Step #1** and **Step #2**
+  *  **Step #4** - Look up the desired Action Control (#)
+  *  **Step #5** - If the Action Control from **Step #4** allows; Take the result from Step3 and perform the Action (X); i.e. keep media item or delete media item
+
+Starting with generic Behavioral Statements:
+
+* **Part #1** favorited media item when **Part #2** monitored user(s) have it favorited and after **Part #3** monitored user(s) meet *_played_days and *_played_count
+
+  - Example A: Filling in the blanks for a generic Behavioral Statement:
+    - Part #1** - **Delete**
+    - Part #2** - **Any**
+    - Part #3** - **All**
+      - Delete favorited media item when Any monitored user(s) have it favorited and after All monitored user(s) meet *_played_days and *_played_count.
+
+* **Part #1** blacktagged media item when **Part #2** monitored user(s) have it blacktagged and after **Part #3** monitored user(s) meet *_played_days and *_played_count
+
+  - Example B: Filling in the blanks for a generic Behavioral Statement:
+    - Part #1** - **Delete**
+    - Part #2** - **All**
+    - Part #3** - **Any**
+      - Delete blacktagged media item when All monitored user(s) have it blacktagged and after Any monitored user(s) meet *_played_days and *_played_count.
+
+* **Part #1** whitelisted media item when **Part #2** monitored user(s) have it favorited
+
+  - Example C: Filling in the blanks for a generic Behavioral Statement:
+    - Part #1** - **Keep**
+    - Part #2** - **Any**
+    - Part #3** - **Ignore**
+      - Keep whitelisted media item when Any monitored user(s) have it whitelisted.
+
+* **Part #1** favorited media item
+
+  - Example D: Filling in the blanks for a generic Behavioral Statement:
+    - Part #1** - **Keep**
+    - Part #2** - **Ignore**
+    - Part #3** - **Ignore**
+      - Keep favorited media item.
+
+## Step 8: Use (#) to decide when keep/delete action (X) is performed:
+
+#### Decide when the configured action is taken **Part #4**:
+* No action taken on True - (X) is not performed when (Y) and )Z) are True
+* No action taken on False - (X) is not performed when (Y) and (Z) are False
+* Action taken on True - (X) is performed when (Y) and (Z) are True
+* Action taken on False - (X) is performed when (Y) and (Z) are False
+* Opposite action taken on True - Inverse of (X) is performed when (Y) and (Z) are True
+* Opposite action taken on False - Inverse of (X) is performed when (Y) and (Z) are False
+
+#### Possible Action Control **Part #4** combinations:
+* 0 - No action taken on True; No action taken on False (disabled)
+* 1 - No action taken on True; Action taken on False
+* 2 - No action taken on True; Opposite action taken on False
+* 3 - Action taken on True; No action taken on False (recommended)
+* 4 - Action taken on True; Action taken on False
+* 5 - Action taken on True; Opposite action taken on False
+* 6 - Opposite action taken on True; No action taken on False
+* 7 - Opposite action taken on True; Action taken on False
+* 8 - Opposite action taken on True; Opposite action taken on False
+
+* 0 or 3 are the recommended Action Controls.
+  * 1,2,4,5,6,7,8 are special use case Action Controls and are NOT recommended for the majority of use cases.
+
+## Step 9: Building Behavioral Statements for specific media types.
+
+* **Keep** whitelisted movie.
+- whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
+- or
+- whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
+
+* **Keep** favorited episode.
+- favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
+- or
+- favorited_behavior_episode=['keep', 'any', 'ignore', 3]
+
+* **Delete** blacklisted audio when **all** monitored users have it blacklisted.
+- blacklisted_behavior_audio=['delete', 'all', 'ignore', 3]
+
+* **Delete** whitelisted movie when **any** monitored users have it whitelisted and **all** monitored users meet movie_played_days and movie_played_count.
+- whitelisted_behavior_movie=['delete', 'any', 'all', 3]
+
+* **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
+- whitelisted_behavior_episode=['delete', 'all', 'any', 3]
 
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
@@ -190,6 +288,9 @@ episode_created_days=-1
 
 audio_played_days=-1
 audio_created_days=-1
+
+audiobook_played_days=-1
+audiobook_created_days=-1
 ```
 #### Part #2 of the Filter Statement: _Played Count Inequality_
 ```python
@@ -215,6 +316,9 @@ episode_created_played_count_comparison='>='
 
 audio_played_count_comparison='>='
 audio_created_played_count_comparison='>='
+
+audiobook_played_count_comparison='>='
+audiobook_created_played_count_comparison='>='
 ```
 #### Part #3 of the Filter Statement: _Play Count_
 ```python
@@ -231,36 +335,11 @@ episode_created_played_count=1
 
 audio_played_count=1
 audio_created_played_count=1
+
+audiobook_played_count=1
+audiobook_created_played_count=1
 ```
 ### Advanced Configuration File Variables
-#### Option for determining if a media item should be deleted or kept based on individual users' or all users' play counts:
-```python
-#----------------------------------------------------------#
-# Decide how play count with multiple users will behave
-#  0 - ok to delete media item when ANY monitored users meet the
-#      *_play_count_comparison and *_play_count
-#  1 - ok to delete media item when ALL monitored users meet the
-#      *_play_count_comparison and *_play_count
-# (0 : default)
-#----------------------------------------------------------#
-multiuser_play_count_movie=0
-multiuser_play_count_episode=0
-multiuser_play_count_audio=0
-multiuser_play_count_audiobook=0
-```
-#### Option for determining if a media item should be deleted or kept based on individual users' or all users' played days:
-```python
-#----------------------------------------------------------#
-# Decide how play state with multiple users will behave
-#  0 - ok to delete media item when ANY monitored users meet the *_played_days
-#  1 - ok to delete media item when ALL monitored users meet the *_played_days
-# (0 : default)
-#----------------------------------------------------------#
-multiuser_play_days_movie=0
-multiuser_play_days_episode=1
-multiuser_play_days_audio=0
-multiuser_play_days_audiobook=0
-```
 #### When enabled, media will not be deleted if it is marked as a favorite:
 ```python
 #----------------------------------------------------------#
@@ -268,51 +347,100 @@ multiuser_play_days_audiobook=0
 # Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
 # Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
 # Similar logic applies for other media types (movies, audio books, etc...)
-#  0 - ok to delete media items set as a favorite
-#  1 - when single user - do not delete media items when set as a favorite; when multi-user - do not delete media item when all monitored users have set it as a favorite
-#  2 - when single user - not applicable; when multi-user - do not delete media item when any monitored users have it set as a favorite
-# (1 : default)
+#
+# -1 - disable favorites
+#  0 - keep played media item when ALL monitored user(s) have it set as a favorite
+#  1 - keep played media item when ANY monitored user(s) have it set as a favorite
+#  2 - ok to delete played media item when ALL monitored user(s) have it set as a favorite; ignoring *_played_days and *_played_count
+#  3 - ok to delete played media item when ANY monitored user(s) have it set as a favorite; ignoring *_played_days and *_played_count
+#  4 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days
+#  5 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_count
+#  6 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days and *_played_count
+#  7 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days
+#  8 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_count
+#  9 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days and *_played_count
+#  10 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days
+#  11 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_count
+#  12 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days and *_played_count
+#  13 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days
+#  14 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_count
+#  15 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days and *_played_count
+# (-1 : default)
 #----------------------------------------------------------#
-keep_favorites_movie=1
-keep_favorites_episode=1
-keep_favorites_audio=1
-keep_favorites_audiobook=1
+favorites_behavior_movie=-1
+favorites_behavior_episode=-1
+favorites_behavior_audio=-1
+favorites_behavior_audiobook=-1
 ```
-#### Option for determining if a media item should be deleted or kept based on other users' whitelisted libraries:
+#### Keep movie if genre favorited:
 ```python
 #----------------------------------------------------------#
-# Decide how whitelists with multiple users behave
-#  0 - do not delete media item when ANY monitored users have the parent library whitelisted
-#  1 - do not delete media item when ALL monitored users have the parent library whitelisted
+# Advanced movie favorites configurations
+#     Requires 'favorites_behavior_movie>=1'
+#----------------------------------------------------------#
+#  Keep movie based on the genres
+#  0 - ok to delete movie when genres are set as a favorite
+#  1 - keep movie if FIRST genre listed is set as a favorite
+#  2 - keep movie if ANY genre listed is set as a favorite
 # (0 : default)
 #----------------------------------------------------------#
-multiuser_whitelist_movie=0
-multiuser_whitelist_episode=0
-multiuser_whitelist_audio=0
-multiuser_whitelist_audiobook=0
+favorites_advanced_movie_genre=0
+favorites_advanced_movie_library_genre=0
 ```
-#### Blacktag a media item to be deleted after it is played:
+#### Keep episode if genre or studio-network favorited:
 ```python
 #----------------------------------------------------------#
-# User entered blacktag name; chosen during setup
-#  Use a comma ',' to seperate multiple tag names
-#   Ex: tagname,tag name,tag-name
-#  Backslash '\' not allowed
+# Advanced episode favorites configurations
+#     Requires 'favorites_behavior_episode>=1'
 #----------------------------------------------------------#
-blacktag='black_tagname,black_tag name,black_tag-name'
-```
-#### When enabled, blacktagged media will not be deleted until ALL users have played it:
-```python
-#----------------------------------------------------------#
-# Decide when blacktagged media items are deleted
-#  0 - ok to delete blacktagged media item after ANY monitored user has played it
-#  1 - ok to delete blacktagged media item after ALL monitored users have played it
+#  Keep episode based on the genre(s) or studio-network(s)
+#  0 - ok to delete episode when its genres or studio-networks are set as a favorite
+#  1 - keep episode if FIRST genre or studio-network is set as a favorite
+#  2 - keep episode if ANY genres or studio-networks are set as a favorite
 # (0 : default)
 #----------------------------------------------------------#
-delete_blacktagged_movie=0
-delete_blacktagged_episode=0
-delete_blacktagged_audio=0
-delete_blacktagged_audiobook=0
+favorites_advanced_episode_genre=0
+favorites_advanced_season_genre=0
+favorites_advanced_series_genre=0
+favorites_advanced_tv_library_genre=0
+favorites_advanced_tv_studio_network=0
+favorites_advanced_tv_studio_network_genre=0
+```
+#### Keep track if genre or artist favorited:
+```python
+#----------------------------------------------------------#
+# Advanced track favorites configurations
+#     Requires 'favorites_behavior_audio>=1'
+#----------------------------------------------------------#
+#  Keep track based on the genre(s) or artist(s)
+#  0 - ok to delete track when its genres or artists are set as a favorite
+#  1 - keep track if FIRST genre or artist is set as a favorite
+#  2 - keep track if ANY genres or artists are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorites_advanced_track_genre=0
+favorites_advanced_album_genre=0
+favorites_advanced_music_library_genre=0
+favorites_advanced_track_artist=0
+favorites_advanced_album_artist=0
+```
+#### Keep audio book track if genre or author favorited:
+```python
+#----------------------------------------------------------#
+# Advanced audio book favorites configurations
+#     Requires 'favorites_behavior_audiobook>=1'
+#----------------------------------------------------------#
+#  Keep audio book track based on the genres or authors
+#  0 - ok to delete audio book track when its genres or authors are set as a favorite
+#  1 - keep audio book track if FIRST genre or author is set as a favorite
+#  2 - keep audio book track if ANY genres or authors are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorites_advanced_audiobook_track_genre=0
+favorites_advanced_audiobook_genre=0
+favorites_advanced_audiobook_library_genre=0
+favorites_advanced_audiobook_track_author=0
+favorites_advanced_audiobook_author=0
 ```
 #### Whitetag a media item to be kept after it is played:
 ```python
@@ -324,11 +452,139 @@ delete_blacktagged_audiobook=0
 #----------------------------------------------------------#
 whitetag='white_tagname,white_tag name,white_tag-name'
 ```
+#### The desired whitetag behavior:
+```python
+#---------------------------------------------------------#
+# Decide when whitetagged media items are deleted
+# Tags applied to a media item are seen by ALL users
+#
+# -1 - disable whitetags
+#  0 - keep played media item when ALL monitored user(s) have it whitetagged
+# n/a - 
+#  2 - ok to delete played media item when ALL monitored user(s) have it whitetagged; ignoring *_played_days and *_played_count
+# n/a - 
+#  4 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_days
+#  5 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_count
+#  6 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_days and *_played_count
+#  7 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_days
+#  8 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_count
+#  9 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_days and *_played_count
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a -
+# (-1 : default)
+#----------------------------------------------------------#
+whitetagged_behavior_movie=-1
+whitetagged_behavior_episode=-1
+whitetagged_behavior_audio=-1
+whitetagged_behavior_audiobook=-1
+```
+#### Blacktag a media item to be deleted after it is played:
+```python
+#----------------------------------------------------------#
+# User entered blacktag name; chosen during setup
+#  Use a comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
+#----------------------------------------------------------#
+blacktag='black_tagname,black_tag name,black_tag-name'
+```
+#### The desired blacktag behavior:
+```python
+#----------------------------------------------------------#
+# Decide when blacktagged media items are deleted
+# Tags applied to a media item are seen by ALL users
+#
+# -1 - disable blacktags
+#  0 - keep played media item when ALL monitored user(s) have it blacktagged
+# n/a - 
+#  2 - ok to delete played media item when ALL monitored user(s) have it blacktagged; ignoring *_played_days and *_played_count
+# n/a - 
+#  4 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_days
+#  5 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_count
+#  6 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_days and *_played_count
+#  7 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_days
+#  8 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_count
+#  9 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_days and *_played_count
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a - 
+# n/a - 
+# (-1 : default)
+#----------------------------------------------------------#
+blacktagged_behavior_movie=-1
+blacktagged_behavior_episode=-1
+blacktagged_behavior_audio=-1
+blacktagged_behavior_audiobook=-1
+```
+#### The desired whitelist behavior:
+```python
+#----------------------------------------------------------#
+# Decide how whitelists with multiple users behave
+#
+# -1 - disable whitelists
+#  0 - keep played media item when ALL monitored user(s) have it whitelisted
+#  1 - keep played media item when ANY monitored user(s) have it whitelisted
+#  2 - ok to delete played media item when ALL monitored user(s) have it whitelisted; ignoring *_played_days and *_played_count
+#  3 - ok to delete played media item when ANY monitored user(s) have it whitelisted; ignoring *_played_days and *_played_count
+#  4 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days
+#  5 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_count
+#  6 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days and *_played_count
+#  7 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days
+#  8 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_count
+#  9 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days and *_played_count
+#  10 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days
+#  11 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_count
+#  12 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days and *_played_count
+#  13 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days
+#  14 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_count
+#  15 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days and *_played_count
+# (-1 : default)
+#----------------------------------------------------------#
+whitelisted_behavior_movie=-1
+whitelisted_behavior_episode=-1
+whitelisted_behavior_audio=-1
+whitelisted_behavior_audiobook=-1
+```
+#### The desired blacklist behavior:
+```python
+#----------------------------------------------------------#
+# Decide how blacklists with multiple users behave
+#
+# -1 - disable blacklists
+#  0 - keep played media item when ALL monitored user(s) have it blacklisted
+#  1 - keep played media item when ANY monitored user(s) have it blacklisted
+#  2 - ok to delete played media item when ALL monitored user(s) have it blacklisted; ignoring *_played_days and *_played_count
+#  3 - ok to delete played media item when ANY monitored user(s) have it blacklisted; ignoring *_played_days and *_played_count
+#  4 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days
+#  5 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_count
+#  6 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days and *_played_count
+#  7 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days
+#  8 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_count
+#  9 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days and *_played_count
+#  10 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days
+#  11 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_count
+#  12 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days and *_played_count
+#  13 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days
+#  14 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_count
+#  15 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days and *_played_count
+# (-1 : default)
+#----------------------------------------------------------#
+blacklisted_behavior_movie=-1
+blacklisted_behavior_episode=-1
+blacklisted_behavior_audio=-1
+blacklisted_behavior_audiobook=-1
+```
 #### At least this many episodes will remain in each tv series; Does not care about played or unplayed states:
 ```python
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
-# This value applies to both played and unplayed episodes
+# This ignores the played and unplayed states of episodes
 #  0 - Episodes will be deleted based on the Filter Statement
 #  1-730500 - Episodes will be deleted based on the Filter Statement; unless
 #              the remaining played and unplayed episodes are less than or equal
@@ -356,9 +612,9 @@ minimum_number_played_episodes=0
 #### Set the behavior of ```minimum_number_episodes``` and/or ```minimum_number_played_episodes```:
 ```python
 #----------------------------------------------------------#
-# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave
+# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave.
 # The minimum number of played and unplayed episodes will vary for each user and for each
-#  series when multiple users are playing the same series at different paces.
+#  series when multiple users are watching the same series at different paces.
 # The following option gives a mechanism to control this in different ways.
 # The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...
 #  'User's Name' - The UserName specified; If matching UserName not found script will assume default.
@@ -376,117 +632,6 @@ minimum_number_played_episodes=0
 # ('Min Played Min Unplayed' : default)
 #----------------------------------------------------------#
 minimum_number_episodes_behavior='Min Played Min Unplayed'
-```
-#### Deleting media items is disabled by default:
-```python
-#----------------------------------------------------------#
-# Must be a boolean True or False value
-#  False - Disables the ability to delete media (dry run mode)
-#  True - Enable the ability to delete media
-# (False : default)
-#----------------------------------------------------------#
-REMOVE_FILES=False
-```
-#### Keep movie if genre favorited:
-```python
-#----------------------------------------------------------#
-# Advanced movie genre configurations
-#     Requires 'keep_favorites_movie=1'
-#----------------------------------------------------------#
-#  Keep movie based on the genres
-#  0 - ok to delete movie when genres are set as a favorite
-#  1 - keep movie if FIRST genre listed is set as a favorite
-#  2 - keep movie if ANY genre listed is set as a favorite
-# (0 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_movie_genre=0
-keep_favorites_advanced_movie_library_genre=0
-```
-#### Keep episode if genre or studio-network favorited:
-```python
-#----------------------------------------------------------#
-# Advanced episode genre/studio-network configurations
-#     Requires 'keep_favorites_episode=1'
-#----------------------------------------------------------#
-#  Keep episode based on the genre(s) or studio-network(s)
-#  0 - ok to delete episode when its genres or studio-networks are set as a favorite
-#  1 - keep episode if FIRST genre or studio-network is set as a favorite
-#  2 - keep episode if ANY genres or studio-networks are set as a favorite
-# (0 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_episode_genre=0
-keep_favorites_advanced_season_genre=0
-keep_favorites_advanced_series_genre=0
-keep_favorites_advanced_tv_library_genre=0
-keep_favorites_advanced_tv_studio_network=0
-keep_favorites_advanced_tv_studio_network_genre=0
-```
-#### Keep track if genre or artist favorited:
-```python
-#----------------------------------------------------------#
-# Advanced track genre/artist configurations
-#     Requires 'keep_favorites_audio=1'
-#----------------------------------------------------------#
-#  Keep track based on the genre(s) or artist(s)
-#  0 - ok to delete track when its genres or artists are set as a favorite
-#  1 - keep track if FIRST genre or artist is set as a favorite
-#  2 - keep track if ANY genres or artists are set as a favorite
-# (0 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_track_genre=0
-keep_favorites_advanced_album_genre=0
-keep_favorites_advanced_music_library_genre=0
-keep_favorites_advanced_track_artist=0
-keep_favorites_advanced_album_artist=0
-```
-#### Keep audio book track if genre or author favorited:
-```python
-#----------------------------------------------------------#
-# Advanced audio book track genre/author configurations
-#     Requires 'keep_favorites_audiobook=1'
-#----------------------------------------------------------#
-#  Keep audio book track based on the genres or authors
-#  0 - ok to delete audio book track when its genres or authors are set as a favorite
-#  1 - keep audio book track if FIRST genre or author is set as a favorite
-#  2 - keep audio book track if ANY genres or authors are set as a favorite
-# (0 : default)
-#----------------------------------------------------------#
-keep_favorites_advanced_audio_book_track_genre=0
-keep_favorites_advanced_audio_book_genre=0
-keep_favorites_advanced_audio_book_library_genre=0
-keep_favorites_advanced_audio_book_track_author=0
-keep_favorites_advanced_audio_book_author=0
-```
-#### Control output printed to the console
-```python
-#----------------------------------------------------------#
-# Enable/Disable console outputs by type
-#----------------------------------------------------------#
-#  Should the script print its output to the console
-#  False - Do not print this output type to the console
-#  True - Print this output type to the console
-# (True : default)
-#----------------------------------------------------------#
-print_script_header=True
-print_warnings=True
-print_user_header=True
-print_movie_delete_info=True
-print_movie_keep_info=True
-print_movie_error_info=True
-print_episode_delete_info=True
-print_episode_keep_info=True
-print_episode_error_info=True
-print_audio_delete_info=True
-print_audio_keep_info=True
-print_audio_error_info=True
-print_audiobook_delete_info=True
-print_audiobook_keep_info=True
-print_audiobook_error_info=True
-print_summary_header=True
-print_movie_summary=True
-print_episode_summary=True
-print_audio_summary=True
-print_audiobook_summary=True
 ```
 #### Add LastPlayedDate for media items without it
 ```python
@@ -510,6 +655,34 @@ episode_set_missing_last_played_date=1
 audio_set_missing_last_played_date=1
 audiobook_set_missing_last_played_date=1
 ```
+#### Control output printed to the console
+```python
+#----------------------------------------------------------#
+# Enable/Disable console outputs by type
+#----------------------------------------------------------#
+#  Should the script print its output to the console
+#  False - Do not print this output type to the console
+#  True - Print this output type to the console
+# (True : default)
+#----------------------------------------------------------#
+print_script_header=True
+print_warnings=True
+print_user_header=True
+print_movie_delete_info=True
+print_movie_keep_info=True
+print_episode_delete_info=True
+print_episode_keep_info=True
+print_audio_delete_info=True
+print_audio_keep_info=True
+print_audiobook_delete_info=True
+print_audiobook_keep_info=True
+print_summary_header=True
+print_movie_summary=True
+print_episode_summary=True
+print_audio_summary=True
+print_audiobook_summary=True
+print_script_footer=True
+```
 #### Edit user to library assocations using current config
 ```python
 #----------------------------------------------------------#
@@ -521,6 +694,16 @@ audiobook_set_missing_last_played_date=1
 # (False : default)
 #----------------------------------------------------------#
 UPDATE_CONFIG=False
+```
+#### Deleting media items is disabled by default:
+```python
+#----------------------------------------------------------#
+# Must be a boolean True or False value
+#  False - Disables the ability to delete media (dry run mode)
+#  True - Enable the ability to delete media
+# (False : default)
+#----------------------------------------------------------#
+REMOVE_FILES=False
 ```
 ### Automatically Created Configuration File Variables
 ```python
@@ -539,7 +722,7 @@ UPDATE_CONFIG=False
 #  0 - 'emby'
 #  1 - 'jellyfin'
 #----------------------------------------------------------#
-server_brand='serverbrand'
+server_brand='server brand'
 ```
 #### Full URL of media server
 ```python
@@ -562,26 +745,24 @@ auth_key='0123456789abcdef0123456789abcdef'
 #----------------------------------------------------------#
 # Decide how the script will use the libraries chosen for each user
 #  Only used during creation or editing of the configuration file
-#  0 - blacklist - Chosen libraries will be blacklisted
+#  0 - blacklist - Chosen libraries will blacklisted
 #                  All other libraries will be whitelisted
-#  1 - whitelist - Chosen libraries will be whitelisted
+#  1 - whitelist - Chosen libraries will whitelisted
 #                  All other libraries will be blacklisted
 # (blacklist : default)
 #----------------------------------------------------------#
-script_behavior='abclist'
+library_setup_behavior='abclist'
 ```
 #### How will media items be matched to their respective libraries?
 ```python
 #----------------------------------------------------------#
-# Decide how the script will match media items to the blacklisted and whiteliested libraries
+# Decide how the script will match media items to libraries
 #  0 - byId - Media items will be matched to libraries using 'LibraryIds'
 #  1 - byPath - Media items will be matched to libraries using 'Paths'
-#  2 - byNetworkPath - Media items will be matched to libraries using 'NetworkPaths'
+#  2 - byNetwork Path - Media items will be matched to libraries using 'NetworkPaths'
 # Filtering byId does not apply to the rules below.
 # Filtering byPath requires no shared network folders are configured.
-#  When this is true Emby/Jellyfin return a path for each media item.
 # Filtering byNetworkPath requires shared network folders are configured.
-#  When this is true Emby/Jellyfin return a newtork path for each media item.
 # (byId : default)
 #----------------------------------------------------------#
 library_matching_behavior='byAbc'
@@ -651,18 +832,14 @@ api_query_item_limit=25
 ```python
 #----------------------------------------------------------#
 # API cache maximum size
-# This is a crude FIFO RAM cache
 # To keep the script running efficiently we do not want to send the
 #  same requests to the server repeatedly
-# If the script is running slowly during media item collection for each user try
-#  increasing the cache size
-# Recommend NOT to exceed more than 20% of the server's total RAM
-# If the cache is smaller than any single reponse, that response will
-#  not be cached
-# During testing on the developlment server, 1MB of cache is better
+# If any single data entry is larger than the cache size, that data entry
+#  will not be cached
+# During testing on the developlment server, 0.1MB of cache is better
 #  than 0MB of cache
-# It is recommened to disable the cache if the server is not able to
-#  spare an extra 1MB of RAM
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
 #
 # MegaByte Sizing Reference
 #  1MB = 1048576 Bytes
@@ -670,21 +847,63 @@ api_query_item_limit=25
 #  10000MB = 10GB
 #
 #  0 - Disable cache
-#  1-10000 - Size of cache in megabytes (MB)
-#  (20 : default)
+#  1-1000 - Size of cache in megabytes (MB)
+#  (10 : default)
 #----------------------------------------------------------#
-api_query_cache_size=20
+api_query_cache_size=10
+```
+#### Fallback cached item removal behavior when no entry is old enough
+```python
+#----------------------------------------------------------#
+# API cache fallback behavior
+# By default the script is a hybrid LFU/LRU RAM Cache
+#
+# 1.First the cache is filled
+# 2.Once full the cache uses api_query_cache_last_accessed_time to
+#    establish a minimum age an entry has to be for removal
+# 3.Then the oldest entry meeting the minimum age (from step 2) with
+#    the lowest number of hits (reads) is removed
+# 4.If no entrys meet the minimum age or all have the same number of
+#    cache hits (reads); api_query_cache_fallback_behavior is used
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
+#
+# Fallback To
+#  'FIFO' - First In First Out (first entry is removed)
+#  'LFU' - Least Frequently Used (first entry with the lowest number of hits is removed)
+#  'LRU' - Least Recently Used (first entry with the oldest access time is removed)
+#  (LRU : default)
+#----------------------------------------------------------#
+api_query_cache_fallback_behavior='LRU'
+```
+#### Miniumum amount of time a cached entry could live
+```python
+#----------------------------------------------------------#
+# API cache entry minium age
+#
+# Once full the cache uses api_query_cache_last_accessed_time to
+#  establish a minimum age an entry has to be for removal
+#
+# Bigger is NOT always better here. The older an entry is allowed
+#  to be, the less entries can be removed from cache when it is full.
+#  When this happens the script will not be able to find an entry that
+#  satisfies LRU/LFU and will use api_query_cache_fallback_behavior
+#  until there is enough space in cache for the newest entry.
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
+#
+#  0-600000 - Minimum cached entry age for removal in milliseconds (ms)
+#  (200 : default)
+#----------------------------------------------------------#
+api_query_cache_last_accessed_time=200
 ```
 #### DEBUG
 ```python
 #----------------------------------------------------------#
-# Must be a boolean True or False value or an integer 0 thru 4
+# Must be an integer value
 #  Debug log file save to: /the/script/directory/mumc_DEBUG.log
 #  The debug log file can be large (i.e. 10s to 100s of MBytes)
 #  Recommend only enabling DEBUG when necessary
-#  False - Debug messages disabled
-#   0 - Debug messages disabled
-#  True - Level 1 debug messages enabled
 #   1 - Level 1 debug messaging enabled
 #   2 - Level 2 debug messaging enabled
 #   3 - Level 3 debug messaging enabled
@@ -696,19 +915,25 @@ DEBUG=0
 
 # Delete Or Keep Priorities Of A Media Item
 
-1. **Favorites & Whitetags** (Highest Priority)
+1. **Favorites** (Highest Priority)
+   - _Media item will be kept_
+      - Whitetags ignored
+      - Blacktags ignored
+      - Whitelists ignored
+      - Blacklists ignored
+2. **Whitetags**
    - _Media item will be kept_
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
-2. **Blacktags**
+3. **Blacktags**
    - _Media item will be deleted_
       - Whitelists ignored
       - Blacklists ignored
-3. **Whitelists**
+4. **Whitelists**
    - _Media item will be kept_
       - Blacklists ignored
-4. **Blacklists** (Lowest priority)
+5. **Blacklists** (Lowest priority)
    - _Media item will be deleted_
 
 # Blacklisting vs Whitelisting

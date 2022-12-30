@@ -110,6 +110,7 @@ media_cleaner.py
 #mumc_config_defaults.py
 mumc_config.py
 #mumc.py
+launch.json
 
 # visual studio
 .vscode/
