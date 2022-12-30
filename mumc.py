@@ -25,7 +25,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.3.3'
+    Version='3.3.4'
 
     return(Version)
 
@@ -349,7 +349,8 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
-                    GLOBAL_CACHED_DATA.saveEntryToCache(url,data)
+                    if (not ((response._method == 'DELETE') or (response._method == 'POST'))):
+                        GLOBAL_CACHED_DATA.saveEntryToCache(url,data)
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
