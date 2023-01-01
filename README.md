@@ -9,7 +9,7 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## mumc_config.py
 ```mumc_config.py```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
-## Step 1: What is a Filter Statement and a Behavioral Statement?
+## Step 1: What is a Filter Statement? What is a Behavioral Statement?
 
 * A Filter Statement is a simple way to tell the script how to find media items taking up your disk space.
 * A Behavioral Statement is a simple way to tell the script how to delete media items found with the Filter Statment.
@@ -21,7 +21,7 @@ Generic Filter Statement Parts (each media type has their own Filter Statement P
 * **Part #2** - Played Count Inequality
 * **Part #3** - Played Count
 
-Starting with a generic Filter Statement:
+Starting with generic Filter Statements:
 * Find media items Played/Created at least **Part #1** days ago with a played count **Part #2** **Part #3**.
 
   - Example A: Filling in the blanks for a generic media items _played_ Filter Statement:
@@ -184,80 +184,80 @@ Generic Behavioral Statement Parts (each media type has their own Behavioral Sta
 * **Part #4** - Action Control (# : 0 thru 8)
 
 * The Behavior Statement is processed as follows:
-  *  **Step #1** - Determine (Y) if the media item is Favorited/Whitetagged/Blacktagged/Whitelisted/Blacklisted for ALL monitored users or ANY monitored users; True or False is the result
-  *  **Step #2** - Determine (Z) if the media item meets played days and played count for ALL monitored users or ANY monitored users; True or False is the result
-  *  **Step #3** - 'and' the True/False results from **Step #1** and **Step #2**
+  *  **Step #1** - Determine (Y) if the media item is Favorited/Whitetagged/Blacktagged/Whitelisted/Blacklisted for ALL monitored users or ANY monitored users; ```True``` or ```False``` is the result
+  *  **Step #2** - Determine (Z) if the media item meets played days and played count for ALL monitored users or ANY monitored users; ```True``` or ```False``` is the result
+  *  **Step #3** -  ```(Y and Z)``` **Step #1** and **Step #2**; ```True``` or ```False``` is the result
   *  **Step #4** - Look up the desired Action Control (#)
-  *  **Step #5** - If the Action Control from **Step #4** allows; Take the result from Step3 and perform the Action (X); i.e. keep media item or delete media item
+  *  **Step #5** - If the Action Control from **Step #4** allows; Take the result from **Step #3** and perform the Action (X); i.e. keep media item or delete media item
 
 Starting with generic Behavioral Statements:
 
 * **Part #1** favorited media item when **Part #2** monitored user(s) have it favorited and after **Part #3** monitored user(s) meet *_played_days and *_played_count
 
-  - Example A: Filling in the blanks for a generic Behavioral Statement:
+  - Example A: Filling in the blanks for a generic Favorites Behavioral Statement:
     - Part #1** - **Delete**
     - Part #2** - **Any**
     - Part #3** - **All**
-      - Delete favorited media item when Any monitored user(s) have it favorited and after All monitored user(s) meet *_played_days and *_played_count.
+      - **Delete** favorited media item when **Any** monitored user(s) have it favorited and after **All** monitored user(s) meet *_played_days and *_played_count.
 
 * **Part #1** blacktagged media item when **Part #2** monitored user(s) have it blacktagged and after **Part #3** monitored user(s) meet *_played_days and *_played_count
 
-  - Example B: Filling in the blanks for a generic Behavioral Statement:
+  - Example B: Filling in the blanks for a generic Blacktags Behavioral Statement:
     - Part #1** - **Delete**
     - Part #2** - **All**
     - Part #3** - **Any**
-      - Delete blacktagged media item when All monitored user(s) have it blacktagged and after Any monitored user(s) meet *_played_days and *_played_count.
+      - **Delete** blacktagged media item when **All** monitored user(s) have it blacktagged and after **Any** monitored user(s) meet *_played_days and *_played_count.
 
 * **Part #1** whitelisted media item when **Part #2** monitored user(s) have it favorited
 
-  - Example C: Filling in the blanks for a generic Behavioral Statement:
+  - Example C: Filling in the blanks for a generic Whitelistes Behavioral Statement:
     - Part #1** - **Keep**
     - Part #2** - **Any**
     - Part #3** - **Ignore**
-      - Keep whitelisted media item when Any monitored user(s) have it whitelisted.
+      - **Keep** whitelisted media item when **Any** monitored user(s) have it whitelisted.
 
 * **Part #1** favorited media item
 
-  - Example D: Filling in the blanks for a generic Behavioral Statement:
+  - Example D: Filling in the blanks for a generic Favorites Behavioral Statement:
     - Part #1** - **Keep**
     - Part #2** - **Ignore**
     - Part #3** - **Ignore**
-      - Keep favorited media item.
+      - **Keep** favorited media item.
 
 ## Step 8: Use (#) to decide when keep/delete action (X) is performed:
 
-#### Decide when the configured action is taken **Part #4**:
-* No action taken on True - (X) is not performed when (Y) and )Z) are True
-* No action taken on False - (X) is not performed when (Y) and (Z) are False
-* Action taken on True - (X) is performed when (Y) and (Z) are True
-* Action taken on False - (X) is performed when (Y) and (Z) are False
-* Opposite action taken on True - Inverse of (X) is performed when (Y) and (Z) are True
-* Opposite action taken on False - Inverse of (X) is performed when (Y) and (Z) are False
+#### **Part #4** Decide when the configured action from Step 7 is taken:
+* No action taken on ```True``` - (X) is not performed when ```(Y and Z)``` is ```True```
+* No action taken on ```False``` - (X) is not performed when ```(Y and Z)``` is ```False```
+* Action taken on ```True``` - (X) is performed when ```(Y and Z)``` is ```True```
+* Action taken on ```False``` - (X) is performed when ```(Y and Z)``` is ```False```
+* Opposite action taken on ```True``` - Inverse of (X) is performed when ```(Y and Z)``` is ```True```
+* Opposite action taken on ```False``` - Inverse of (X) is performed when ```(Y and Z)``` is ```False```
 
 #### Possible Action Control **Part #4** combinations:
-* 0 - No action taken on True; No action taken on False (disabled)
-* 1 - No action taken on True; Action taken on False
-* 2 - No action taken on True; Opposite action taken on False
-* 3 - Action taken on True; No action taken on False (recommended)
-* 4 - Action taken on True; Action taken on False
-* 5 - Action taken on True; Opposite action taken on False
-* 6 - Opposite action taken on True; No action taken on False
-* 7 - Opposite action taken on True; Action taken on False
-* 8 - Opposite action taken on True; Opposite action taken on False
+* 0 - No action taken on ```True```; No action taken on ```False``` (disabled)
+* 1 - No action taken on ```True```; Action taken on ```False```
+* 2 - No action taken on ```True```; Opposite action taken on ```False```
+* 3 - Action taken on ```True```; No action taken on ```False``` (recommended)
+* 4 - Action taken on ```True```; Action taken on ```False```
+* 5 - Action taken on ```True```; Opposite action taken on ```False```
+* 6 - Opposite action taken on ```True```; No action taken on ```False```
+* 7 - Opposite action taken on ```True```; Action taken on ```False```
+* 8 - Opposite action taken on ```True```; Opposite action taken on ```False```
 
 * 0 or 3 are the recommended Action Controls.
-  * 1,2,4,5,6,7,8 are special use case Action Controls and are NOT recommended for the majority of use cases.
+  * 1,2,4,5,6,7,8 are special unverified use case Action Controls and are NOT recommended for any users.
 
 ## Step 9: Building Behavioral Statements for specific media types.
 
 * **Keep** whitelisted movie.
 - whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
-- or
+- Or
 - whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
 
 * **Keep** favorited episode.
 - favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
-- or
+- Or
 - favorited_behavior_episode=['keep', 'any', 'ignore', 3]
 
 * **Delete** blacklisted audio when **all** monitored users have it blacklisted.
@@ -269,33 +269,29 @@ Starting with generic Behavioral Statements:
 * **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
 - whitelisted_behavior_episode=['delete', 'all', 'any', 3]
 
+* **Tip:**
+  * **Keep** - Removes the media item from the delete list
+  * **Delete** - Adds media item to the delete list
+
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
-#### Part #1 of the Filter Statement: _Condition Days_
+#### Played Filter Statements:
 ```python
 #----------------------------------------------------------#
-# Condition Days: Delete media items last played or created at least this many days ago
+# Played Filter Statements
+#
+# [A,B,C]
+#
+# A - Condition Days
+# B - Played Count Inequality
+# C - Played Count
+#
+# Condition Days (A): Find media items last played or created at least this many days ago
 #   0-730500 - Number of days filter will use to determine when the media items was
 #              last played or when the media item was created
 #  -1 - To disable deleting specified media type
-# (-1 : default)
-#----------------------------------------------------------#
-movie_played_days=-1
-movie_created_days=-1
-
-episode_played_days=-1
-episode_created_days=-1
-
-audio_played_days=-1
-audio_created_days=-1
-
-audiobook_played_days=-1
-audiobook_created_days=-1
-```
-#### Part #2 of the Filter Statement: _Played Count Inequality_
-```python
-#----------------------------------------------------------#
-# Played Count Inequality: Delete media items within this range based off of the chosen *_played_count.
+#
+# Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
 #   > - Filter media items with a played count greater than *_played_count days ago
 #   < - Filter media items with a played count less than *_played_count days ago
 #   >= - Filter media items with a played count greater than or equal to *_played_count days ago
@@ -306,71 +302,111 @@ audiobook_created_days=-1
 #   not >= - Filter media items with a played count not greater than or equal to *_played_count days ago
 #   not <= - Filter media items with a played count not less than or equal to *_played_count days ago
 #   not == - Filter media items with a played count not equal to *_played_count days ago
-# (>= : default)
+#
+# Played Count (C): Find media items with a played count relative to this number.
+#   0-730500 - Number of times a media item has been played
+#
+# ([-1,'>=',1] : default)
 #----------------------------------------------------------#
-movie_played_count_comparison='>='
-movie_created_played_count_comparison='>='
-
-episode_played_count_comparison='>='
-episode_created_played_count_comparison='>='
-
-audio_played_count_comparison='>='
-audio_created_played_count_comparison='>='
-
-audiobook_played_count_comparison='>='
-audiobook_created_played_count_comparison='>='
+played_filter_movie=[-1, '>=', 1]
+played_filter_episode=[-1, '>=', 1]
+played_filter_audio=[-1, '>=', 1]
+played_filter_audiobook=[-1, '>=', 1]
 ```
-#### Part #3 of the Filter Statement: _Play Count_
+#### Created Filter Statements:
 ```python
 #----------------------------------------------------------#
-# Played Count: Delete media items with a played count relative to this number.
+# Created Filter Statements
+#
+# [A,B,C,D]
+#
+# A - Condition Days
+# B - Played Count Inequality
+# C - Played Count
+# D - Behaviorial Control
+#
+# Condition Days (A): Find media items last played or created at least this many days ago
+#   0-730500 - Number of days filter will use to determine when the media items was
+#              last played or when the media item was created
+#  -1 - To disable deleting specified media type
+#
+# Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
+#   > - Filter media items with a played count greater than *_played_count days ago
+#   < - Filter media items with a played count less than *_played_count days ago
+#   >= - Filter media items with a played count greater than or equal to *_played_count days ago
+#   <= - Filter media items with a played count less than or equal to *_played_count days ago
+#   == - Filter media items with a played count equal to *_played_count days ago
+#   not > - Filter media items with a played count not greater than *_played_count days ago
+#   not < - Filter media items with a played count not less than *_played_count days ago
+#   not >= - Filter media items with a played count not greater than or equal to *_played_count days ago
+#   not <= - Filter media items with a played count not less than or equal to *_played_count days ago
+#   not == - Filter media items with a played count not equal to *_played_count days ago
+#
+# Played Count (C): Find media items with a played count relative to this number.
 #   0-730500 - Number of times a media item has been played
-# (1 : default)
+#
+# Behavioral Control (D): Determine if favorited_behavior_*, whitetagged_behavior_*, blacktagged_behavior_*,
+#  whitelisted_behavior_*, and blacklisted_behavior_* apply to media items meeting the created_filter_*.
+#   False - Media items meeting the created_filter_* will be deleted regardless of favorited_behavior_*,
+#    whitetagged_behavior_*, blacktagged_behavior_*, whitelisted_behavior_*, and blacklisted_behavior_*
+#   True - Media items meeting the created_filter_* will also have to meet configured behaviors; favorited_behavior_*,
+#    whitetagged_behavior_*, blacktagged_behavior_*, whitelisted_behavior_*, and blacklisted_behavior_*
+#
+# ([-1,'>=',1,True] : default)
 #----------------------------------------------------------#
-movie_played_count=1
-movie_created_played_count=1
-
-episode_played_count=1
-episode_created_played_count=1
-
-audio_played_count=1
-audio_created_played_count=1
-
-audiobook_played_count=1
-audiobook_created_played_count=1
+created_filter_movie=[-1, '>=', 1, True]
+created_filter_episode=[-1, '>=', 1, True]
+created_filter_audio=[-1, '>=', 1, True]
+created_filter_audiobook=[-1, '>=', 1, True]
 ```
 ### Advanced Configuration File Variables
-#### When enabled, media will not be deleted if it is marked as a favorite:
+#### Favorited Behavioral Statements:
 ```python
 #----------------------------------------------------------#
-# Decide if media set as a favorite should be deleted
-# Favoriting a series, season, or network-channel will treat all child episodes as if they are favorites
-# Favoriting an artist, album-artist, or album will treat all child tracks as if they are favorites
-# Similar logic applies for other media types (movies, audio books, etc...)
+# Favorited Behavioral Statements
 #
-# -1 - disable favorites
-#  0 - keep played media item when ALL monitored user(s) have it set as a favorite
-#  1 - keep played media item when ANY monitored user(s) have it set as a favorite
-#  2 - ok to delete played media item when ALL monitored user(s) have it set as a favorite; ignoring *_played_days and *_played_count
-#  3 - ok to delete played media item when ANY monitored user(s) have it set as a favorite; ignoring *_played_days and *_played_count
-#  4 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days
-#  5 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_count
-#  6 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days and *_played_count
-#  7 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days
-#  8 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_count
-#  9 - ok to delete played media item when ALL monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days and *_played_count
-#  10 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days
-#  11 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_count
-#  12 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ALL monitored user(s) meet *_played_days and *_played_count
-#  13 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days
-#  14 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_count
-#  15 - ok to delete played media item when ANY monitored user(s) have it set as a favorite and after ANY monitored user(s) meet *_played_days and *_played_count
-# (-1 : default)
+# Favoriting is the first (and highest) priority
+#  Whitetagging behavior is ignored
+#  Blacktagging behavior is ignored
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item favorited.
+#   all - Every monitored user must have the media item favorited
+#   any - One or more monitored users must have the media item favorited
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','ignore','ignore',3] : default)
 #----------------------------------------------------------#
-favorites_behavior_movie=-1
-favorites_behavior_episode=-1
-favorites_behavior_audio=-1
-favorites_behavior_audiobook=-1
+favorited_behavior_movie=['keep', 'ignore', 'ignore', 3]
+favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
+favorited_behavior_audio=['keep', 'ignore', 'ignore', 3]
+favorited_behavior_audiobook=['keep', 'ignore', 'ignore', 3]
 ```
 #### Keep movie if genre favorited:
 ```python
@@ -452,35 +488,53 @@ favorites_advanced_audiobook_author=0
 #----------------------------------------------------------#
 whitetag='white_tagname,white_tag name,white_tag-name'
 ```
-#### The desired whitetag behavior:
+#### Whitetagged Behavioral Statements:
 ```python
-#---------------------------------------------------------#
-# Decide when whitetagged media items are deleted
-# Tags applied to a media item are seen by ALL users
-#
-# -1 - disable whitetags
-#  0 - keep played media item when ALL monitored user(s) have it whitetagged
-# n/a - 
-#  2 - ok to delete played media item when ALL monitored user(s) have it whitetagged; ignoring *_played_days and *_played_count
-# n/a - 
-#  4 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_days
-#  5 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_count
-#  6 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ALL monitored user(s) meet *_played_days and *_played_count
-#  7 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_days
-#  8 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_count
-#  9 - ok to delete played media item when ALL monitored user(s) have it whitetagged and after ANY monitored user(s) meet *_played_days and *_played_count
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a -
-# (-1 : default)
 #----------------------------------------------------------#
-whitetagged_behavior_movie=-1
-whitetagged_behavior_episode=-1
-whitetagged_behavior_audio=-1
-whitetagged_behavior_audiobook=-1
+# Whitetagged Behavioral Statements
+#  Tags applied to a media item are seen by all users
+#
+# Whitetagging is the second priority
+#  Blacktagging behavior is ignored
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item whitetagged.
+#   all - Every monitored user must have the media item whitetagged
+#   any - One or more monitored users must have the media item whitetagged
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','ignore','ignore',3] : default)
+#----------------------------------------------------------#
+whitetagged_behavior_movie=['keep', 'ignore', 'ignore', 0]
+whitetagged_behavior_episode=['keep', 'ignore', 'ignore', 0]
+whitetagged_behavior_audio=['keep', 'ignore', 'ignore', 0]
+whitetagged_behavior_audiobook=['keep', 'ignore', 'ignore', 0]
 ```
 #### Blacktag a media item to be deleted after it is played:
 ```python
@@ -492,93 +546,141 @@ whitetagged_behavior_audiobook=-1
 #----------------------------------------------------------#
 blacktag='black_tagname,black_tag name,black_tag-name'
 ```
-#### The desired blacktag behavior:
+#### Blacktagged Behavioral Statements:
 ```python
 #----------------------------------------------------------#
-# Decide when blacktagged media items are deleted
-# Tags applied to a media item are seen by ALL users
+# Blacktagged Behavioral Statements
+#  Tags applied to a media item are seen by all users
 #
-# -1 - disable blacktags
-#  0 - keep played media item when ALL monitored user(s) have it blacktagged
-# n/a - 
-#  2 - ok to delete played media item when ALL monitored user(s) have it blacktagged; ignoring *_played_days and *_played_count
-# n/a - 
-#  4 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_days
-#  5 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_count
-#  6 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ALL monitored user(s) meet *_played_days and *_played_count
-#  7 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_days
-#  8 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_count
-#  9 - ok to delete played media item when ALL monitored user(s) have it blacktagged and after ANY monitored user(s) meet *_played_days and *_played_count
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a - 
-# n/a - 
-# (-1 : default)
+# Blacktagging is the third priority
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item blacktagged.
+#   all - Every monitored user must have the media item blacktagged
+#   any - One or more monitored users must have the media item blacktagged
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['delete','all','all',3] : default)
 #----------------------------------------------------------#
-blacktagged_behavior_movie=-1
-blacktagged_behavior_episode=-1
-blacktagged_behavior_audio=-1
-blacktagged_behavior_audiobook=-1
+blacktagged_behavior_movie=['delete', 'all', 'any', 0]
+blacktagged_behavior_episode=['delete', 'all', 'any', 0]
+blacktagged_behavior_audio=['delete', 'all', 'any', 0]
+blacktagged_behavior_audiobook=['delete', 'all', 'any', 0]
 ```
-#### The desired whitelist behavior:
+#### Whitelisted Behavioral Statements:
 ```python
 #----------------------------------------------------------#
-# Decide how whitelists with multiple users behave
+# Whitelisted Behavioral Statements
 #
-# -1 - disable whitelists
-#  0 - keep played media item when ALL monitored user(s) have it whitelisted
-#  1 - keep played media item when ANY monitored user(s) have it whitelisted
-#  2 - ok to delete played media item when ALL monitored user(s) have it whitelisted; ignoring *_played_days and *_played_count
-#  3 - ok to delete played media item when ANY monitored user(s) have it whitelisted; ignoring *_played_days and *_played_count
-#  4 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days
-#  5 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_count
-#  6 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days and *_played_count
-#  7 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days
-#  8 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_count
-#  9 - ok to delete played media item when ALL monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days and *_played_count
-#  10 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days
-#  11 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_count
-#  12 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ALL monitored user(s) meet *_played_days and *_played_count
-#  13 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days
-#  14 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_count
-#  15 - ok to delete played media item when ANY monitored user(s) have it whitelisted and after ANY monitored user(s) meet *_played_days and *_played_count
-# (-1 : default)
+# Whitelisting is the fourth priority
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item whitelisted.
+#   all - Every monitored user must have the media item whitelisted
+#   any - One or more monitored users must have the media item whitelisted
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','ignore','ignore',3] : default)
 #----------------------------------------------------------#
-whitelisted_behavior_movie=-1
-whitelisted_behavior_episode=-1
-whitelisted_behavior_audio=-1
-whitelisted_behavior_audiobook=-1
+whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
+whitelisted_behavior_episode=['keep', 'ignore', 'ignore', 3]
+whitelisted_behavior_audio=['keep', 'ignore', 'ignore', 3]
+whitelisted_behavior_audiobook=['keep', 'ignore', 'ignore', 3]
 ```
-#### The desired blacklist behavior:
+#### Blacklisted Behavioral Statements:
 ```python
 #----------------------------------------------------------#
-# Decide how blacklists with multiple users behave
+# Blacklisted Behavioral Statements
 #
-# -1 - disable blacklists
-#  0 - keep played media item when ALL monitored user(s) have it blacklisted
-#  1 - keep played media item when ANY monitored user(s) have it blacklisted
-#  2 - ok to delete played media item when ALL monitored user(s) have it blacklisted; ignoring *_played_days and *_played_count
-#  3 - ok to delete played media item when ANY monitored user(s) have it blacklisted; ignoring *_played_days and *_played_count
-#  4 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days
-#  5 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_count
-#  6 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days and *_played_count
-#  7 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days
-#  8 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_count
-#  9 - ok to delete played media item when ALL monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days and *_played_count
-#  10 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days
-#  11 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_count
-#  12 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ALL monitored user(s) meet *_played_days and *_played_count
-#  13 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days
-#  14 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_count
-#  15 - ok to delete played media item when ANY monitored user(s) have it blacklisted and after ANY monitored user(s) meet *_played_days and *_played_count
-# (-1 : default)
+# Blacklisting is the fifth (and lowest) priority
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item blacklisted.
+#   all - Every monitored user must have the media item blacklisted
+#   any - One or more monitored users must have the media item blacklisted
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['delete','any','any',3] : default)
 #----------------------------------------------------------#
-blacklisted_behavior_movie=-1
-blacklisted_behavior_episode=-1
-blacklisted_behavior_audio=-1
-blacklisted_behavior_audiobook=-1
+blacklisted_behavior_movie=['delete', 'any', 'any', 3]
+blacklisted_behavior_episode=['delete', 'any', 'any', 3]
+blacklisted_behavior_audio=['delete', 'any', 'any', 3]
+blacklisted_behavior_audiobook=['delete', 'any', 'any', 3]
 ```
 #### At least this many episodes will remain in each tv series; Does not care about played or unplayed states:
 ```python

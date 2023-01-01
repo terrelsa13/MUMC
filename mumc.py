@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.1-beta'
+    Version='4.0.2-beta'
 
     return(Version)
 
@@ -9625,7 +9625,7 @@ try:
                 print_byType('https://github.com/terrelsa13/MUMC/releases',True)
                 print_byType('',True)
                 exit(0)
-        if ((argv[1] == '-c') and (len(argv) == 3)):
+        if (((argv[1] == '-c') or (argv[1] == '-config')) and (len(argv) == 3)):
             GLOBAL_TRIED_ALT_CONFIG=True
             #Attempt to import the alternate config file as cfg
             #Check for the .py extension and no spaces or periods in the module name
@@ -9644,17 +9644,19 @@ try:
                 print_byType('',True)
                 print_byType('Alternate configuration file must have a .py extension and follow the Python module naming convention',True)
                 print_byType('',True)
-                print_byType('These are NOT valid module names:',True)
+                print_byType('These are NOT valid config file names:',True)
                 print_byType('',True)
-                print_byType('\t/path/to/alternate.module.py',True)
-                print_byType('\t/path/to/alternate module.py',True)
-                print_byType('\tc:\\path\\to\\alternate.module.py',True)
-                print_byType('\tc:\\path\\to\\alternate module.py',True)
+                print_byType('\t/path/to/alternate.config.py',True)
+                print_byType('\t/path/to/alternate config.py',True)
+                print_byType('\tc:\\path\\to\\alternate.config.py',True)
+                print_byType('\tc:\\path\\to\\alternate config.py',True)
                 print_byType('',True)
-                print_byType('These are valid module names:',True)
+                print_byType('These are valid config file names:',True)
                 print_byType('',True)
-                print_byType('\t/path/to/alternate_module.py',True)
-                print_byType('\tc:\\path\\to\\alternate_module.py',True)
+                print_byType('\t/path/to/alternateconfig.py',True)
+                print_byType('\t/path/to/alternate_config.py',True)
+                print_byType('\tc:\\path\\to\\alternateconfig.py',True)
+                print_byType('\tc:\\path\\to\\alternate_config.py',True)
                 print_byType('',True)
                 exit(0)
         else:
@@ -9665,6 +9667,7 @@ try:
     GLOBAL_DEBUG=cfg.DEBUG
     #removing DEBUG from mumc_config.py file will allow the configuration to be reset
 
+    #Initialize cache
     GLOBAL_CACHED_DATA=cached_data_handler()
 
     GLOBAL_SERVER_BRAND=cfg.server_brand.lower()
