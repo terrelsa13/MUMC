@@ -1018,25 +1018,25 @@ DEBUG=0
 # Delete Or Keep Priorities Of A Media Item
 
 1. **Favorites** (Highest Priority)
-   - _Media item will be kept_
+   - _Media item will follow Action (W) in favorited_behavior_*_
       - Whitetags ignored
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
 2. **Whitetags**
-   - _Media item will be kept_
+   - _Media item will follow Action (W) in whitetagged_behavior_*_
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
 3. **Blacktags**
-   - _Media item will be deleted_
+   - _Media item will follow Action (W) in blacktagged_behavior_*_
       - Whitelists ignored
       - Blacklists ignored
 4. **Whitelists**
-   - _Media item will be kept_
+   - _Media item will follow Action (W) in whitelisted_behavior_*_
       - Blacklists ignored
 5. **Blacklists** (Lowest priority)
-   - _Media item will be deleted_
+   - _Media item will follow Action (W) in blacklisted_behavior_*_
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/27#issue-1293645665)
@@ -1057,9 +1057,8 @@ DEBUG=0
 
 # Requirements
 * Linux, Windows, or MAC
-   - I do not have a Mac to confirm; but should be similiar to Linux
-* Python 3.10
-   - Older versions of python 3.x will likely work; but are not supported
+* Python 3.11
+   - Other versions of python 3.x will likely work; but are not supported
    - Python 2.x or earlier are not supported and will not work
 * python-dateutil **must be installed**
 * Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
@@ -1070,12 +1069,12 @@ DEBUG=0
   - Instead use the link below to create an alternate install of Python
     - [Python 3.7 example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/) (These instructions will apply to any version of Python.)
 * Verify your Python verison
-   - $```python3 -V```
+   - $```python3.11 -V```
 * Next install the python-dateutil module with the following commands:
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
    - $```pip3 install -U pip```
-   - $```pip3 install python-dateutil```
+   - $```pip3.11 install python-dateutil```
 * **\*OPTIONAL\*** Use a text editor to update the mumc_config_defaults.py file with desired default values
    - $```nano /path/to/mumc_config_defaults.py```
 * Make the script executable
@@ -1116,9 +1115,9 @@ DEBUG=0
 
 # Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
 * Below cron entry runs ```mumc.py``` everyday at 00:00hrs (aka 12:00am)
-   - $```0 0 * * * /usr/local/bin/python3.10 /opt/mumc/mumc.py```
+   - $```0 0 * * * /usr/local/bin/python3.11 /opt/mumc/mumc.py```
 * Below cron entry runs ```mumc.py``` every Monday at 01:23hrs (aka 1:23)am and saves the output to a file called mumc.log in the /var/log/ directory
-   - $```23 1 * * 1 /usr/local/bin/python3.10 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
+   - $```23 1 * * 1 /usr/local/bin/python3.11 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
 
 # Schedule To Run (Windows)
 * Please consult your favorite search engine for a Windows task scheduler
