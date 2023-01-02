@@ -272,7 +272,7 @@ Starting with generic Behavioral Statements:
 
 #### Tip:
 * **Keep** - Removes the media item from the delete list
-* **Delete** - Adds media item to the delete list
+* **Delete** - Adds the media item to the delete list
 
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
