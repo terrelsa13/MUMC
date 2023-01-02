@@ -1018,25 +1018,25 @@ DEBUG=0
 # Delete Or Keep Priorities Of A Media Item
 
 1. **Favorites** (Highest Priority)
-   - _Media item will follow Action (W) in favorited_behavior_*_
+   - _Media item will follow Action (W) in favorited\_behavior\_\*_
       - Whitetags ignored
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
 2. **Whitetags**
-   - _Media item will follow Action (W) in whitetagged_behavior_*_
+   - _Media item will follow Action (W) in whitetagged\_behavior\_\*_
       - Blacktags ignored
       - Whitelists ignored
       - Blacklists ignored
 3. **Blacktags**
-   - _Media item will follow Action (W) in blacktagged_behavior_*_
+   - _Media item will follow Action (W) in blacktagged\_behavior\_\*_
       - Whitelists ignored
       - Blacklists ignored
 4. **Whitelists**
-   - _Media item will follow Action (W) in whitelisted_behavior_*_
+   - _Media item will follow Action (W) in whitelisted\_behavior\_\*_
       - Blacklists ignored
 5. **Blacklists** (Lowest priority)
-   - _Media item will follow Action (W) in blacklisted_behavior_*_
+   - _Media item will follow Action (W) in blacklisted\_behavior\_\*_
 
 # Blacklisting vs Whitelisting
 * [Explaination and examples.](https://github.com/terrelsa13/MUMC/issues/27#issue-1293645665)
