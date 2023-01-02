@@ -224,29 +224,30 @@ Starting with generic Behavioral Statements:
     - Part #3** - **Ignore**
       - **Keep** favorited media item.
 
-## Step 8: Use (#) to decide when keep/delete action (X) is performed:
-
-#### **Part #4** Decide when the configured action from Step 7 is taken:
-* No action taken on ```True``` - (X) is not performed when ```(Y and Z)``` is ```True```
-* No action taken on ```False``` - (X) is not performed when ```(Y and Z)``` is ```False```
-* Action taken on ```True``` - (X) is performed when ```(Y and Z)``` is ```True```
-* Action taken on ```False``` - (X) is performed when ```(Y and Z)``` is ```False```
-* Opposite action taken on ```True``` - Inverse of (X) is performed when ```(Y and Z)``` is ```True```
-* Opposite action taken on ```False``` - Inverse of (X) is performed when ```(Y and Z)``` is ```False```
+## Step 8: Use (#) to decide when keep/delete Action (X) is performed:
+(
+#### **Part #4** Decide when the configured Action (X) from Step 7 is taken:
+* No Action (X) taken on ```True``` - Delete or Keep is not performed when ```(Y and Z)``` is ```True```
+* No Action (X) taken on ```False``` - Delete or Keep is not performed when ```(Y and Z)``` is ```False```
+* Action (X) taken on ```True``` - Delete or Keep is performed when ```(Y and Z)``` is ```True```
+* Action (X) taken on ```False``` - Delete or Keep is performed when ```(Y and Z)``` is ```False```
+* Opposite Action (X) taken on ```True``` - Inverse of Delete or Keep is performed when ```(Y and Z)``` is ```True```
+* Opposite Action (X) taken on ```False``` - Inverse of Delete or Keep is performed when ```(Y and Z)``` is ```False```
 
 #### Possible Action Control **Part #4** combinations:
-* 0 - No action taken on ```True```; No action taken on ```False``` (disabled)
-* 1 - No action taken on ```True```; Action taken on ```False```
-* 2 - No action taken on ```True```; Opposite action taken on ```False```
-* 3 - Action taken on ```True```; No action taken on ```False``` (recommended)
-* 4 - Action taken on ```True```; Action taken on ```False```
-* 5 - Action taken on ```True```; Opposite action taken on ```False```
-* 6 - Opposite action taken on ```True```; No action taken on ```False```
-* 7 - Opposite action taken on ```True```; Action taken on ```False```
-* 8 - Opposite action taken on ```True```; Opposite action taken on ```False```
+* 0 - No Action (X) taken on ```True```; No Action (X) taken on ```False``` (disabled)
+* 1 - No Action (X) taken on ```True```; Action (X) taken on ```False```
+* 2 - No Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
+* 3 - Action (X) taken on ```True```; No Action (X) taken on ```False``` (recommended)
+* 4 - Action (X) taken on ```True```; Action (X) taken on ```False```
+* 5 - Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
+* 6 - Opposite Action (X) taken on ```True```; No Action (X) taken on ```False```
+* 7 - Opposite Action (X) taken on ```True```; Action (X) taken on ```False```
+* 8 - Opposite Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
 
 * 0 or 3 are the recommended Action Controls.
-  * 1,2,4,5,6,7,8 are special unverified use case Action Controls and are NOT recommended for any users.
+  * 1,2,4,5,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
+    * Use at your own discretion.
 
 ## Step 9: Building Behavioral Statements for specific media types.
 
