@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.3-beta'
+    Version='4.0.4-beta'
 
     return(Version)
 
@@ -4638,6 +4638,11 @@ def whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,wlu
                                     item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,item['Id'],'playedPatternCleanup'),item['PlayedDays'],item['CreatedDays'],item['CutOffDatePlayed'],item['CutOffDateCreated'], item['PlayedCountComparison'],item['PlayedCount'],item['CreatedPlayedCountComparison'],item['CreatedPlayedCount'])
                                     item[isMeetingPlayedFilter]=(item_matches_played_days_filter and item_matches_played_count_filter)
                                 itemsDictionary[subUserId][item['Id']]=item.copy()
+                #remove whitelist/blacklist library Id and Path trackers so the item matches what a user has
+                 #and can be removed from the delete list later if needed
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryId')
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryPath')
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryNetPath')
         itemsDictionary[monitoredUsersAction]=actionFilter
         itemsDictionary[monitoredUsersMeetPlayedFilter]=playedFilter
         itemsDictionary[configuredBehavior]=methodFilter
