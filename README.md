@@ -244,8 +244,8 @@ Starting with generic Behavioral Statements:
 * 6 - Opposite Action (X) taken on ```True```; No Action (X) taken on ```False```
 * 7 - Opposite Action (X) taken on ```True```; Action (X) taken on ```False```
 * 8 - Opposite Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
-
-* 0 or 3 are the recommended Action Controls.
+#### Information
+* **0** or **3** are the recommended Action Controls (#).
   * 1,2,4,5,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
     * Use at your own discretion.
 
@@ -270,9 +270,9 @@ Starting with generic Behavioral Statements:
 * **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
 - whitelisted_behavior_episode=['delete', 'all', 'any', 3]
 
-* **Tip:**
-  * **Keep** - Removes the media item from the delete list
-  * **Delete** - Adds media item to the delete list
+#### Tip:
+* **Keep** - Removes the media item from the delete list
+* **Delete** - Adds media item to the delete list
 
 #  Contents Of The Configuration File
 ### Basic Configuration File Variables
