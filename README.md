@@ -195,33 +195,33 @@ Starting with generic Behavioral Statements:
 * **Part #1** favorited media item when **Part #2** monitored user(s) have it favorited and after **Part #3** monitored user(s) meet *_played_days and *_played_count
 
   - Example A: Filling in the blanks for a generic Favorites Behavioral Statement:
-    - Part #1** - **Delete**
-    - Part #2** - **Any**
-    - Part #3** - **All**
+    - Part #1 - **Delete**
+    - Part #2 - **Any**
+    - Part #3 - **All**
       - **Delete** favorited media item when **Any** monitored user(s) have it favorited and after **All** monitored user(s) meet *_played_days and *_played_count.
 
 * **Part #1** blacktagged media item when **Part #2** monitored user(s) have it blacktagged and after **Part #3** monitored user(s) meet *_played_days and *_played_count
 
   - Example B: Filling in the blanks for a generic Blacktags Behavioral Statement:
-    - Part #1** - **Delete**
-    - Part #2** - **All**
-    - Part #3** - **Any**
+    - Part #1 - **Delete**
+    - Part #2 - **All**
+    - Part #3 - **Any**
       - **Delete** blacktagged media item when **All** monitored user(s) have it blacktagged and after **Any** monitored user(s) meet *_played_days and *_played_count.
 
 * **Part #1** whitelisted media item when **Part #2** monitored user(s) have it favorited
 
   - Example C: Filling in the blanks for a generic Whitelistes Behavioral Statement:
-    - Part #1** - **Keep**
-    - Part #2** - **Any**
-    - Part #3** - **Ignore**
+    - Part #1 - **Keep**
+    - Part #2 - **Any**
+    - Part #3 - **Ignore**
       - **Keep** whitelisted media item when **Any** monitored user(s) have it whitelisted.
 
 * **Part #1** favorited media item
 
   - Example D: Filling in the blanks for a generic Favorites Behavioral Statement:
-    - Part #1** - **Keep**
-    - Part #2** - **Ignore**
-    - Part #3** - **Ignore**
+    - Part #1 - **Keep**
+    - Part #2 - **Ignore**
+    - Part #3 - **Ignore**
       - **Keep** favorited media item.
 
 ## Step 8: Use (#) to decide when keep/delete Action (X) is performed.
