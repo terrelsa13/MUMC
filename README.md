@@ -225,7 +225,6 @@ Starting with generic Behavioral Statements:
       - **Keep** favorited media item.
 
 ## Step 8: Use (#) to decide when keep/delete Action (X) is performed:
-(
 #### **Part #4** Decide when the configured Action (X) from Step 7 is taken:
 * No Action (X) taken on ```True``` - Delete or Keep is not performed when ```(Y and Z)``` is ```True```
 * No Action (X) taken on ```False``` - Delete or Keep is not performed when ```(Y and Z)``` is ```False```
@@ -249,8 +248,7 @@ Starting with generic Behavioral Statements:
   * 1,2,4,5,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
     * Use at your own discretion.
 
-## Step 9: Building Behavioral Statements for specific media types.
-
+## Step 9: Building Behavioral Statements for specific media types:
 * **Keep** whitelisted movie.
 - whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
 - Or
