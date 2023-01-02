@@ -64,11 +64,11 @@ Starting with generic Filter Statements:
 There are many possible combinations!
 
 ## Step 4: The dangers of ill-thought-out Filter Statements.
+
 You are **SOLEY RESPONSIBLE** if you misconfigure your Filter Statement and delete large portions of your library. I recommend staying in dry-run mode until you are certain things are working exactly as you want them to.
 #### !!!DANGEROUS Filter Examples Below BEWARE!!!
 What you **_NEVER_** want to do is to set ```*_created_days=TO_SOME_LOW_NUMBER```.
 Doing this WILL delete MOST if not ALL of your library.
-
 ##### Never do this unless you are 1000% confident it is doing exactly what you expect:
 * Find movies created at least **0** days ago...
   - movie_created_days=0
@@ -88,7 +88,7 @@ Doing this WILL delete MOST if not ALL of your library.
 
 You get the point right?
 
-## Step 5: A couple things to remember when building Filter Statements
+## Step 5: A couple things to remember when building Filter Statements.
 
 Filter Statements implying negative played counts will be evaluted as ```*_played_count=0``` (i.e. unplayed media items).
 
@@ -114,7 +114,7 @@ _Played_ Filter Statements overlapping zero and postive numbered played counts w
   - movie_played_count_comparison='>='
   - movie_played_count=0
 
-## Step 6: Example Filter Statements
+## Step 6: Example Filter Statements.
 
 #### Filter Statement to delete movies played 90 or more days ago.
 
@@ -224,7 +224,8 @@ Starting with generic Behavioral Statements:
     - Part #3** - **Ignore**
       - **Keep** favorited media item.
 
-## Step 8: Use (#) to decide when keep/delete Action (X) is performed:
+## Step 8: Use (#) to decide when keep/delete Action (X) is performed.
+
 #### **Part #4** Decide when the configured Action (X) from Step 7 is taken:
 * No Action (X) taken on ```True``` - Delete or Keep is not performed when ```(Y and Z)``` is ```True```
 * No Action (X) taken on ```False``` - Delete or Keep is not performed when ```(Y and Z)``` is ```False```
@@ -248,7 +249,8 @@ Starting with generic Behavioral Statements:
   * 1,2,4,5,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
     * Use at your own discretion.
 
-## Step 9: Building Behavioral Statements for specific media types:
+## Step 9: Building Behavioral Statements for specific media types.
+
 * **Keep** whitelisted movie.
 - whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
 - Or
