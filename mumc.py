@@ -4454,7 +4454,6 @@ def modify_lastPlayedDate(item,userKey):
     authKey=cfg.auth_key
 
     #save current date-time with specified format to item["UserData"]["LastPlayedDate"]
-    #item["UserData"]["LastPlayedDate"]=str(datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"))
     item["UserData"]["LastPlayedDate"]=str(datetime.strftime(GLOBAL_DATE_TIME_NOW, "%Y-%m-%dT%H:%M:%S.000Z"))
 
     if (GLOBAL_DEBUG):
