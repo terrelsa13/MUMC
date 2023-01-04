@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.4-beta'
+    Version='4.0.5-beta'
 
     return(Version)
 
@@ -329,7 +329,7 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                 #request recieved; but taking long time to return data
                 while (response.getcode() == 202):
                     #wait 200ms
-                    time.sleep(0.2)
+                    time.sleep(delay/5)
                     if (debugBool):
                         appendTo_DEBUG_log("\nWaiting for server to return data from the " + str(reqeustDebugMessage) + " Request; then trying again...",2)
                 if (response.getcode() == 200):
@@ -608,49 +608,6 @@ def get_tag_name(tagbehavior,existingtag):
                     print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
             else:
                 print('\nDo not use backslash \'\\\'. Try again.\n')
-
-
-#Get condition days media types?
-def get_condition_days(mediaType):
-    defaultage=get_default_config_values(mediaType + '_condition_days')
-    valid_age=False
-    while (valid_age == False):
-        print('Choose the number of days to wait before deleting ' + mediaType + ' media items')
-        print('Valid values: 0-730500 days')
-        print('             -1 to disable deleting ' + mediaType + ' media items')
-        print('Press Enter to use default value')
-        age=input('Enter number of days (default ' + str(defaultage) + '): ')
-        if (age == ''):
-            valid_age=True
-            return(defaultage)
-        else:
-            try:
-                age_float=float(age)
-                if ((age_float % 1) == 0):
-                    age_int=int(age_float)
-                    if ((int(age_int) >= -1) and (int(age_int) <= 730500)):
-                        valid_age=True
-                        return(age_int)
-                    else:
-                        print('\nIgnoring Out Of Range ' + mediaType + ' Value. Try again.\n')
-                else:
-                    print('\nIgnoring ' + mediaType + ' Decimal Value. Try again.\n')
-            except:
-                print('\nIgnoring Non-Whole Number ' + mediaType + ' Value. Try again.\n')
-
-
-#use of hashed password removed
-#hash admin password
-#def get_admin_password_sha1(password):
-#    #password_sha1=password #input('Enter admin password (password will be hashed in config file): ')
-#    password_sha1=hashlib.sha1(password.encode()).hexdigest()
-#    return(password_sha1)
-
-# Hash password if not hashed
-#if cfg.admin_password_sha1 == '':
-#     cfg.admin_password_sha1=hashlib.sha1(cfg.admin_password.encode()).hexdigest()
-#auth_key=''
-#print('Hash:'+ cfg.admin_password_sha1)
 
 
 #Determine if server is Jellyfin
@@ -1390,19 +1347,6 @@ def build_configuration_file(cfg,updateConfig):
         #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
         user_keys_and_bllibs,user_keys_and_wllibs=get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateConfig,library_matching_behavior.lower())
         print('-----------------------------------------------------------')
-
-        #ask user for number of days to wait before attempting to delete movie
-        #movie_played_days = get_condition_days('movie')
-        #print('-----------------------------------------------------------')
-        #ask user for number of days to wait before attempting to delete episode
-        #episode_played_days = get_condition_days('episode')
-        #print('-----------------------------------------------------------')
-        #ask user for number of days to wait before attempting to delete audio track
-        #audio_played_days = get_condition_days('audio')
-        #if (isJellyfinServer()):
-            #print('-----------------------------------------------------------')
-            #ask user for number of days to wait before attempting to delete audiobook track
-            #audiobook_played_days = get_condition_days('audiobook')
 
         #set REMOVE_FILES
         REMOVE_FILES=False
