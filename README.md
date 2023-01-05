@@ -252,23 +252,23 @@ Starting with generic Behavioral Statements:
 ## Step 9: Building Behavioral Statements for specific media types.
 
 * **Keep** whitelisted movie.
-- whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
-- Or
-- whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
+  * whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
+  * Or
+  * whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
 
 * **Keep** favorited episode.
-- favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
-- Or
-- favorited_behavior_episode=['keep', 'any', 'ignore', 3]
+  * favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
+  * Or
+  * favorited_behavior_episode=['keep', 'any', 'ignore', 3]
 
 * **Delete** blacklisted audio when **all** monitored users have it blacklisted.
-- blacklisted_behavior_audio=['delete', 'all', 'ignore', 3]
+  * blacklisted_behavior_audio=['delete', 'all', 'ignore', 3]
 
 * **Delete** whitelisted movie when **any** monitored users have it whitelisted and **all** monitored users meet movie_played_days and movie_played_count.
-- whitelisted_behavior_movie=['delete', 'any', 'all', 3]
+  * whitelisted_behavior_movie=['delete', 'any', 'all', 3]
 
 * **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
-- whitelisted_behavior_episode=['delete', 'all', 'any', 3]
+  * whitelisted_behavior_episode=['delete', 'all', 'any', 3]
 
 #### Tip:
 * **Keep** - Removes the media item from the delete list
