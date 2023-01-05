@@ -270,8 +270,8 @@ Starting with generic Behavioral Statements:
 * **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
   * whitelisted_behavior_episode=['delete', 'all', 'any', 3]
 
-* **DISABLE** blacktagged movies. [X (keep or delete), Y (all or any), Z (all or any), Action Control (#) 0]
-  * whitetagged_behavior_episode=['X', 'Y', 'Z', 0]
+* **DISABLE** favoited movies. [X (keep or delete), Y (all or any), Z (all or any), Action Control (#) 0]
+  * favorited_behavior_episode=['X', 'Y', 'Z', 0]
 
 #### Tip:
 * **Keep** - Removes the media item from the delete list
