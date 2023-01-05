@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.5-beta'
+    Version='4.0.6-beta'
 
     return(Version)
 
@@ -4001,7 +4001,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                         minPlayed_ToBeDeleted[0]=userId
 
                 #store value if greater than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
                     maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                     maxUnplayed_ToBeDeleted[0]=userId
 
@@ -4020,7 +4020,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                     minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                     minUnplayed_ToBeDeleted[0]=userId
 
-            #check for desired behaviorType; assign min/max played/unplayed valuse for each series depending on behaviorType
+            #check for desired behaviorType; assign min/max played/unplayed values for each series depending on behaviorType
             if (min_num_episode_behavior == behaviorTypes['maxplayed']):
                 episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
                 episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]

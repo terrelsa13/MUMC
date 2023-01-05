@@ -80,7 +80,7 @@ defaultConfigValues={
 
         'minimum_number_episodes':0,
         'minimum_number_played_episodes':0,
-        'minimum_number_episodes_behavior':'Min Played Min Unplayed',
+        'minimum_number_episodes_behavior':'Max Played Min Unplayed',
 
         'movie_set_missing_last_played_date':1,
         'episode_set_missing_last_played_date':1,
