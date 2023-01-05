@@ -25,7 +25,7 @@ from mumc_config_defaults import get_default_config_values
 #Get the current script version
 def get_script_version():
 
-    Version='3.3.5'
+    Version='3.3.6'
 
     return(Version)
 
@@ -3823,7 +3823,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
         for episodeItem in deleteItems:
             #verify media item is an episode
             if (episodeItem['Type'] == 'Episode'):
-                #check if the seriesId associated to the episode is was tracked for this user
+                #check if the seriesId associated to the episode is tracked for this user
                 if (episodeItem['SeriesId'] in episodeCounts_byUserId[userId]):
                     #if seriesId has not already processed; add it so it can be
                     if not (episodeItem['SeriesId'] in episodes_toBeDeletedOrRemain):
@@ -3986,7 +3986,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                     if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
                         episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
 
-                    #create dictionary entry containg season and episode number for each episode
+                    #create dictionary entry containing season and episode number for each episode
                     episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
                     episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
                 except:
@@ -4067,7 +4067,7 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                         minPlayed_ToBeDeleted[0]=userId
 
                 #store value if greater than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
+                if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
                     maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
                     maxUnplayed_ToBeDeleted[0]=userId
 
@@ -7339,7 +7339,7 @@ def get_media_items():
         deleteItems=get_minEpisodesToKeep(episodeCounts_byUserId, deleteItems)
 
     if (GLOBAL_DEBUG):
-        appendTo_DEBUG_log('-----------------------------------------------------------',2)
+        appendTo_DEBUG_log('\n-----------------------------------------------------------',2)
         appendTo_DEBUG_log('',2)
         if (((episode_played_days >= 0) or (episode_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
             appendTo_DEBUG_log('\nepisodeCounts_byUserId: ',3)
