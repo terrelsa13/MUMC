@@ -253,12 +253,12 @@ Starting with generic Behavioral Statements:
 
 * **Keep** whitelisted movie.
   * whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
-  * Or
+    Or
   * whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
 
 * **Keep** favorited episode.
   * favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
-  * Or
+    Or
   * favorited_behavior_episode=['keep', 'any', 'ignore', 3]
 
 * **Delete** blacklisted audio when **all** monitored users have it blacklisted.
@@ -269,6 +269,9 @@ Starting with generic Behavioral Statements:
 
 * **Delete** whitetagged episode when **all** monitored users have it whitetagged and **any** monitored users meet episode_played_days and episode_played_count.
   * whitelisted_behavior_episode=['delete', 'all', 'any', 3]
+
+* **DISABLE** blacktagged movies. [X (keep or delete), Y (all or any), Z (all or any), Action Control (#) 0]
+  * whitetagged_behavior_episode=['X', 'Y', 'Z', 0]
 
 #### Tip:
 * **Keep** - Removes the media item from the delete list
