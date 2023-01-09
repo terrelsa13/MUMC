@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.6-beta'
+    Version='4.0.7-beta'
 
     return(Version)
 
@@ -8299,7 +8299,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8319,7 +8319,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8339,7 +8339,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8360,7 +8360,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8639,7 +8639,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8659,7 +8659,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8679,7 +8679,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8700,7 +8700,7 @@ def cfgCheck():
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8736,7 +8736,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8756,7 +8756,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8776,7 +8776,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8797,7 +8797,7 @@ def cfgCheck():
                      (len(check) == 4) and
                      ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                      ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
-                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                      ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\' and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8819,7 +8819,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8839,7 +8839,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8859,7 +8859,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8880,7 +8880,7 @@ def cfgCheck():
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8902,7 +8902,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8922,7 +8922,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8942,7 +8942,7 @@ def cfgCheck():
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                  ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
@@ -8963,7 +8963,7 @@ def cfgCheck():
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
