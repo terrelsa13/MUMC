@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.7-beta'
+    Version='4.0.8-beta'
 
     return(Version)
 
@@ -4602,7 +4602,7 @@ def blacklist_playedPatternCleanup(itemsDictionary,library_matching_behavior,blu
 
 
 #Add/Remove item to/from delete list if meeting favorite/whitetagged/blacktagged/whitelisted pattern and played pattern
-def addItem_removeItem_fromDeleteList_usingPlayedPatterns(itemsDictionary,deleteItems,deleteItemsIdTracker):
+def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,deleteItems,deleteItemsIdTracker):
     isMeetingAction_dict={}
     isMeetingPlayedFilter_dict={}
     itemId_tracker=[]
@@ -4676,9 +4676,9 @@ def addItem_removeItem_fromDeleteList_usingPlayedPatterns(itemsDictionary,delete
                                     isMeetingAction_dict[itemId]|=False
                                 else:
                                     isMeetingAction_dict[itemId]=True
-                                if (actionFilter == andIt):
+                                if (playedFilter == andIt):
                                     isMeetingPlayedFilter_dict[itemId]&=False
-                                elif (actionFilter == orIt):
+                                elif (playedFilter == orIt):
                                     isMeetingPlayedFilter_dict[itemId]|=False
                                 else:
                                     isMeetingPlayedFilter_dict[itemId]=True
@@ -4686,41 +4686,41 @@ def addItem_removeItem_fromDeleteList_usingPlayedPatterns(itemsDictionary,delete
                     if (isMeetingAction_dict[itemId] and isMeetingPlayedFilter_dict[itemId]):
                         if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
                             #No action taken on True
-                            deleteFromList=None
+                            addItemToDeleteList=None
                         elif ((behaviorFilter == 3) or (behaviorFilter == 4) or (behaviorFilter == 5)):
                             #Action taken on True
                             if (methodFilter == addIt):
-                                deleteFromList=True
+                                addItemToDeleteList=True
                             else:
-                                deleteFromList=False
+                                addItemToDeleteList=False
                         else: #((behaviorFilter == 6) or (behaviorFilter == 7) or (behaviorFilter == 8)):
                             #Opposite action taken on True
                             if (methodFilter == addIt):
-                                deleteFromList=False
+                                addItemToDeleteList=False
                             else:
-                                deleteFromList=True
+                                addItemToDeleteList=True
                     else:
                         if ((behaviorFilter == 0) or (behaviorFilter == 3) or (behaviorFilter == 6)):
                             #No action taken on False
-                            deleteFromList=None
+                            addItemToDeleteList=None
                         elif ((behaviorFilter == 1) or (behaviorFilter == 4) or (behaviorFilter == 7)):
                             #Action taken on False
                             if (methodFilter == addIt):
-                                deleteFromList=True
+                                addItemToDeleteList=True
                             else:
-                                deleteFromList=False
+                                addItemToDeleteList=False
                         else: #((behaviorFilter == 2) or (behaviorFilter == 5) or (behaviorFilter == 8)):
                             #Opposite action taken on False
                             if (methodFilter == addIt):
-                                deleteFromList=False
+                                addItemToDeleteList=False
                             else:
-                                deleteFromList=True
+                                addItemToDeleteList=True
 
-                    if (deleteFromList == True):
+                    if (addItemToDeleteList == True):
                         if (not (item['Id'] in deleteItemsIdTracker)):
                             deleteItems.append(item)
                             deleteItemsIdTracker.append(item['Id'])
-                    elif (deleteFromList == False):
+                    elif (addItemToDeleteList == False):
                         if (item['Id'] in deleteItemsIdTracker):
                             try:
                                 deleteItems.remove(item)
@@ -7511,159 +7511,159 @@ def get_media_items():
     #Add blacklisted items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (blacklisted_behavior_movie[3] >= 0)):
         isblacklisted_and_played_byUserId_Movie=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Movie,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacklisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (blacklisted_behavior_episode[3] >= 0)):
         isblacklisted_and_played_byUserId_Episode=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Episode,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacklisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (blacklisted_behavior_audio[3] >= 0)):
         isblacklisted_and_played_byUserId_Audio=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Audio,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacklisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (blacklisted_behavior_audiobook[3] >= 0)):
         isblacklisted_and_played_byUserId_AudioBook=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_AudioBook,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacklisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_MOVIE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Movie),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_EPISODE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Episode),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIO: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Audio),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIOBOOK: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_AudioBook),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitelisted items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (whitelisted_behavior_movie[3] >= 0)):
         iswhitelisted_and_played_byUserId_Movie=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Movie,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitelisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (whitelisted_behavior_episode[3] >= 0)):
         iswhitelisted_and_played_byUserId_Episode=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Episode,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitelisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (whitelisted_behavior_audio[3] >= 0)):
         iswhitelisted_and_played_byUserId_Audio=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Audio,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitelisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (whitelisted_behavior_audiobook[3] >= 0)):
         iswhitelisted_and_played_byUserId_AudioBook=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_AudioBook,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitelisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_MOVIE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Movie),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_EPISODE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Episode),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIO: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Audio),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIOBOOK: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_AudioBook),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add blacktagged items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (blacktagged_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacktagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (blacktagged_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacktagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (blacktagged_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacktagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (blacktagged_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isblacktagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_MOVIE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Movie),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_EPISODE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Episode),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIO: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Audio),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIOBOOK: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_AudioBook),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitetagged items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (whitetagged_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitetagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (whitetagged_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitetagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (whitetagged_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitetagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (whitetagged_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingPlayedPatterns(iswhitetagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_MOVIE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Movie),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_EPISODE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Episode),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIO: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Audio),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIOBOOK: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_AudioBook),3)
+            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add favorited items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (favorited_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isfavorited_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (favorited_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isfavorited_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (favorited_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isfavorited_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (favorited_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingPlayedPatterns(isfavorited_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_MOVIE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Movie),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_EPISODE: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Episode),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIO: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Audio),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIOBOOK: ',3)
-            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_AudioBook),3)
+            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Keep a minimum number of episodes
@@ -7699,7 +7699,7 @@ def get_media_items():
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\nPOST PROCESSING FINISHED\n",2)
         appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)),3)
-        appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
+        #appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
 
     if (GLOBAL_DEBUG):
         print_common_delete_keep_info=True

@@ -240,13 +240,13 @@ Starting with generic Behavioral Statements:
 * 2 - No Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
 * 3 - Action (X) taken on ```True```; No Action (X) taken on ```False``` (recommended)
 * 4 - Action (X) taken on ```True```; Action (X) taken on ```False```
-* 5 - Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
+* 5 - Action (X) taken on ```True```; Opposite Action (X) taken on ```False``` (recommended)
 * 6 - Opposite Action (X) taken on ```True```; No Action (X) taken on ```False```
 * 7 - Opposite Action (X) taken on ```True```; Action (X) taken on ```False```
 * 8 - Opposite Action (X) taken on ```True```; Opposite Action (X) taken on ```False```
 #### Information
-* **0** or **3** are the recommended Action Controls (#).
-  * 1,2,4,5,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
+* **0**, **3**, or **5** are the recommended Action Controls (#).
+  * 1,2,4,6,7,8 are special use case Action Controls; these are NOT recommended and NOT supported.
     * Use at your own discretion.
 
 ## Step 9: Building Behavioral Statements for specific media types.
