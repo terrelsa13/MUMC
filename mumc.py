@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.8-beta'
+    Version='4.0.9-beta'
 
     return(Version)
 
@@ -78,6 +78,17 @@ def print2json(rawjson):
     #create a formatted string of the python JSON object
     ezjson = convert2json(rawjson)
     print_byType(ezjson,True)
+
+
+def convert_timeToString(byUserId_item):
+    for userId in byUserId_item:
+        for itemId in byUserId_item[userId]:
+            if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
+                byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
+            if ('CutOffDateCreated' in byUserId_item[userId][itemId]):
+                byUserId_item[userId][itemId]['CutOffDateCreated']=str(byUserId_item[userId][itemId]['CutOffDateCreated'])
+
+    return(byUserId_item)
 
 
 #Check if json index exists
@@ -4582,16 +4593,21 @@ def whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,wlu
                                     item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,item['Id'],'playedPatternCleanup'),item['PlayedDays'],item['CreatedDays'],item['CutOffDatePlayed'],item['CutOffDateCreated'], item['PlayedCountComparison'],item['PlayedCount'],item['CreatedPlayedCountComparison'],item['CreatedPlayedCount'])
                                     item[isMeetingPlayedFilter]=(item_matches_played_days_filter and item_matches_played_count_filter)
                                 itemsDictionary[subUserId][item['Id']]=item.copy()
-                #remove whitelist/blacklist library Id and Path trackers so the item matches what a user has
-                 #and can be removed from the delete list later if needed
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryId')
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryPath')
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryNetPath')
         itemsDictionary[monitoredUsersAction]=actionFilter
         itemsDictionary[monitoredUsersMeetPlayedFilter]=playedFilter
         itemsDictionary[configuredBehavior]=methodFilter
         itemsDictionary[actionBehavior]=behaviorFilter
         itemsDictionary[actionType]=wordFilter
+
+    for userId in itemsDictionary:
+        if (not ((userId == monitoredUsersAction) or (userId == monitoredUsersMeetPlayedFilter) or (userId == configuredBehavior) or 
+                 (userId == actionBehavior) or (userId == actionType))):
+            for itemId in itemsDictionary[userId]:
+                #remove whitelist/blacklist library Id and Path trackers so the item matches what a user has
+                 #and can be removed from the delete list later if needed
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryId')
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryPath')
+                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryNetPath')
 
     return itemsDictionary
 
@@ -4718,13 +4734,19 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
 
                     if (addItemToDeleteList == True):
                         if (not (item['Id'] in deleteItemsIdTracker)):
-                            deleteItems.append(item)
+                            deleteItems.append(item.copy())
                             deleteItemsIdTracker.append(item['Id'])
                     elif (addItemToDeleteList == False):
                         if (item['Id'] in deleteItemsIdTracker):
                             try:
-                                deleteItems.remove(item)
-                                deleteItemsIdTracker.remove(item['Id'])
+                                if (item in deleteItems):
+                                    deleteItems.remove(item)
+                                    deleteItemsIdTracker.remove(item['Id'])
+                                else:
+                                    for delItem in deleteItems:
+                                        if (item['Id'] == delItem['Id']):
+                                            deleteItems.remove(delItem)
+                                            deleteItemsIdTracker.remove(item['Id'])
                             except:
                                 itemId_tracker.remove(itemId)
 
@@ -4763,6 +4785,7 @@ def get_playedCreatedDays_playedCreatedCounts(item,played_days,created_days,cut_
         item_matches_created_played_count_filter=False
 
     return item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter
+
 
 
 # get played, favorited, and tagged media items
@@ -7527,19 +7550,23 @@ def get_media_items():
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_MOVIE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Movie),3)
+            isblacklisted_and_played_byUserId_Movie=convert_timeToString(isblacklisted_and_played_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_EPISODE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Episode),3)
+            isblacklisted_and_played_byUserId_Episode=convert_timeToString(isblacklisted_and_played_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIO: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Audio),3)
+            isblacklisted_and_played_byUserId_Audio=convert_timeToString(isblacklisted_and_played_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIOBOOK: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_AudioBook),3)
+            isblacklisted_and_played_byUserId_AudioBook=convert_timeToString(isblacklisted_and_played_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitelisted items to delete list that meet the defined played state
@@ -7561,19 +7588,23 @@ def get_media_items():
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_MOVIE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Movie),3)
+            iswhitelisted_and_played_byUserId_Movie=convert_timeToString(iswhitelisted_and_played_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_EPISODE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Episode),3)
+            iswhitelisted_and_played_byUserId_Episode=convert_timeToString(iswhitelisted_and_played_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIO: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Audio),3)
+            iswhitelisted_and_played_byUserId_Audio=convert_timeToString(iswhitelisted_and_played_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIOBOOK: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_AudioBook),3)
+            iswhitelisted_and_played_byUserId_AudioBook=convert_timeToString(iswhitelisted_and_played_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add blacktagged items to delete list that meet the defined played state
@@ -7591,19 +7622,23 @@ def get_media_items():
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_MOVIE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Movie),3)
+            isblacktagged_and_played_byUserId_Movie=convert_timeToString(isblacktagged_and_played_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_EPISODE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Episode),3)
+            isblacktagged_and_played_byUserId_Episode=convert_timeToString(isblacktagged_and_played_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIO: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Audio),3)
+            isblacktagged_and_played_byUserId_Audio=convert_timeToString(isblacktagged_and_played_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIOBOOK: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_AudioBook),3)
+            isblacktagged_and_played_byUserId_AudioBook=convert_timeToString(isblacktagged_and_played_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitetagged items to delete list that meet the defined played state
@@ -7621,19 +7656,23 @@ def get_media_items():
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_MOVIE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Movie),3)
+            iswhitetagged_and_played_byUserId_Movie=convert_timeToString(iswhitetagged_and_played_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_EPISODE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Episode),3)
+            iswhitetagged_and_played_byUserId_Episode=convert_timeToString(iswhitetagged_and_played_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIO: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Audio),3)
+            iswhitetagged_and_played_byUserId_Audio=convert_timeToString(iswhitetagged_and_played_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIOBOOK: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_AudioBook),3)
+            iswhitetagged_and_played_byUserId_AudioBook=convert_timeToString(iswhitetagged_and_played_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add favorited items to delete list that meet the defined played state
@@ -7651,19 +7690,23 @@ def get_media_items():
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_MOVIE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Movie),3)
+            isfavorited_and_played_byUserId_Movie=convert_timeToString(isfavorited_and_played_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_EPISODE: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Episode),3)
+            isfavorited_and_played_byUserId_Episode=convert_timeToString(isfavorited_and_played_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIO: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Audio),3)
+            isfavorited_and_played_byUserId_Audio=convert_timeToString(isfavorited_and_played_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIOBOOK: ',3)
-            #appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_AudioBook),3)
+            isfavorited_and_played_byUserId_AudioBook=convert_timeToString(isfavorited_and_played_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Keep a minimum number of episodes
@@ -7699,7 +7742,12 @@ def get_media_items():
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log("\nPOST PROCESSING FINISHED\n",2)
         appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)),3)
-        #appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
+        for mediaItem in deleteItems:
+            if ('CutOffDatePlayed' in mediaItem):
+                mediaItem['CutOffDatePlayed']=str(mediaItem['CutOffDatePlayed'])
+            if ('CutOffDateCreated' in mediaItem):
+                mediaItem['CutOffDateCreated']=str(mediaItem['CutOffDateCreated'])
+        appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
 
     if (GLOBAL_DEBUG):
         print_common_delete_keep_info=True
