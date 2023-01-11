@@ -405,12 +405,12 @@ created_filter_audiobook=[-1, '>=', 1, True]
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
 #
-# (['keep','ignore','ignore',3] : default)
+# (['keep','any','ignore',3] : default)
 #----------------------------------------------------------#
-favorited_behavior_movie=['keep', 'ignore', 'ignore', 3]
-favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
-favorited_behavior_audio=['keep', 'ignore', 'ignore', 3]
-favorited_behavior_audiobook=['keep', 'ignore', 'ignore', 3]
+favorited_behavior_movie=['keep', 'any', 'ignore', 3]
+favorited_behavior_episode=['keep', 'any', 'ignore', 3]
+favorited_behavior_audio=['keep', 'any', 'ignore', 3]
+favorited_behavior_audiobook=['keep', 'any', 'ignore', 3]
 ```
 #### Keep movie if genre favorited:
 ```python
@@ -516,7 +516,7 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #
 # User Conditional (X): Specify how monitored users must have the media item whitetagged.
 #   all - Every monitored user must have the media item whitetagged
-#   any - One or more monitored users must have the media item whitetagged
+#   any - N/A; Tags apply to all users
 #
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
@@ -533,12 +533,12 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
 #
-# (['keep','ignore','ignore',3] : default)
+# (['keep','all','ignore',3] : default)
 #----------------------------------------------------------#
-whitetagged_behavior_movie=['keep', 'ignore', 'ignore', 0]
-whitetagged_behavior_episode=['keep', 'ignore', 'ignore', 0]
-whitetagged_behavior_audio=['keep', 'ignore', 'ignore', 0]
-whitetagged_behavior_audiobook=['keep', 'ignore', 'ignore', 0]
+whitetagged_behavior_movie=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_episode=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_audio=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_audiobook=['keep', 'all', 'ignore', 0]
 ```
 #### Blacktag a media item to be deleted after it is played:
 ```python
@@ -573,7 +573,7 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 #
 # User Conditional (X): Specify how monitored users must have the media item blacktagged.
 #   all - Every monitored user must have the media item blacktagged
-#   any - One or more monitored users must have the media item blacktagged
+#   any - N/A; Tags apply to all users
 #
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
@@ -590,7 +590,7 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
 #
-# (['delete','all','all',3] : default)
+# (['delete','all','any',0] : default)
 #----------------------------------------------------------#
 blacktagged_behavior_movie=['delete', 'all', 'any', 0]
 blacktagged_behavior_episode=['delete', 'all', 'any', 0]
@@ -635,12 +635,12 @@ blacktagged_behavior_audiobook=['delete', 'all', 'any', 0]
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
 #
-# (['keep','ignore','ignore',3] : default)
+# (['keep','any','ignore',3] : default)
 #----------------------------------------------------------#
-whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
-whitelisted_behavior_episode=['keep', 'ignore', 'ignore', 3]
-whitelisted_behavior_audio=['keep', 'ignore', 'ignore', 3]
-whitelisted_behavior_audiobook=['keep', 'ignore', 'ignore', 3]
+whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_episode=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_audio=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_audiobook=['keep', 'any', 'ignore', 3]
 ```
 #### Blacklisted Behavioral Statements:
 ```python

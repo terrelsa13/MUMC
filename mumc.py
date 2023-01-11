@@ -82,11 +82,13 @@ def print2json(rawjson):
 
 def convert_timeToString(byUserId_item):
     for userId in byUserId_item:
-        for itemId in byUserId_item[userId]:
-            if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
-                byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
-            if ('CutOffDateCreated' in byUserId_item[userId][itemId]):
-                byUserId_item[userId][itemId]['CutOffDateCreated']=str(byUserId_item[userId][itemId]['CutOffDateCreated'])
+        if (not((userId == 'ActionBehavior') or (userId == 'ActionType') or (userId == 'MonitoredUsersAction') or
+                (userId == 'MonitoredUsersMeetPlayedFilter') or(userId == 'ConfiguredBehavior'))):
+            for itemId in byUserId_item[userId]:
+                if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
+                    byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
+                if ('CutOffDateCreated' in byUserId_item[userId][itemId]):
+                    byUserId_item[userId][itemId]['CutOffDateCreated']=str(byUserId_item[userId][itemId]['CutOffDateCreated'])
 
     return(byUserId_item)
 
@@ -1531,7 +1533,6 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# User Conditional (X): Specify how monitored users must have the media item favorited.\n"
     config_file += "#   all - Every monitored user must have the media item favorited\n"
     config_file += "#   any - One or more monitored users must have the media item favorited\n"
-    config_file += "#   ignore - Ignore if monitored user have the media item favorited\n"
     config_file += "#\n"
     config_file += "# Played Conditional (Y): Specify how monitored users must meet played_filter_*.\n"
     config_file += "#   all - Every monitored user must meet the played_filter_*\n"
@@ -1549,7 +1550,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   7 - Opposite action taken on True; Action taken on False\n"
     config_file += "#   8 - Opposite action taken on True; Opposite action taken on False\n"
     config_file += "#\n"
-    config_file += "# (['keep','ignore','ignore',3] : default)\n"
+    config_file += "# (['keep','any','ignore',3] : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "favorited_behavior_movie=" + str(get_default_config_values('favorited_behavior_movie')) + "\n"
@@ -1693,7 +1694,6 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# User Conditional (X): Specify how monitored users must have the media item whitetagged.\n"
     config_file += "#   all - Every monitored user must have the media item whitetagged\n"
     config_file += "#   any - N/A; Tags apply to all users\n"
-    config_file += "#   ignore - Ignore if monitored user have the media item whitetagged\n"
     config_file += "#\n"
     config_file += "# Played Conditional (Y): Specify how monitored users must meet played_filter_*.\n"
     config_file += "#   all - Every monitored user must meet the played_filter_*\n"
@@ -1711,7 +1711,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   7 - Opposite action taken on True; Action taken on False\n"
     config_file += "#   8 - Opposite action taken on True; Opposite action taken on False\n"
     config_file += "#\n"
-    config_file += "# (['keep','ignore','ignore',3] : default)\n"
+    config_file += "# (['keep','all','ignore',0] : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "whitetagged_behavior_movie=" + str(get_default_config_values('whitetagged_behavior_movie')) + "\n"
@@ -1761,7 +1761,6 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# User Conditional (X): Specify how monitored users must have the media item blacktagged.\n"
     config_file += "#   all - Every monitored user must have the media item blacktagged\n"
     config_file += "#   any - N/A; Tags apply to all users\n"
-    config_file += "#   ignore - Ignore if monitored user have the media item blacktagged\n"
     config_file += "#\n"
     config_file += "# Played Conditional (Y): Specify how monitored users must meet played_filter_*.\n"
     config_file += "#   all - Every monitored user must meet the played_filter_*\n"
@@ -1779,7 +1778,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   7 - Opposite action taken on True; Action taken on False\n"
     config_file += "#   8 - Opposite action taken on True; Opposite action taken on False\n"
     config_file += "#\n"
-    config_file += "# (['delete','all','all',3] : default)\n"
+    config_file += "# (['delete','all','any',0] : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "blacktagged_behavior_movie=" + str(get_default_config_values('blacktagged_behavior_movie')) + "\n"
@@ -1815,7 +1814,6 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# User Conditional (X): Specify how monitored users must have the media item whitelisted.\n"
     config_file += "#   all - Every monitored user must have the media item whitelisted\n"
     config_file += "#   any - One or more monitored users must have the media item whitelisted\n"
-    config_file += "#   ignore - Ignore if monitored user have the media item whitelisted\n"
     config_file += "#\n"
     config_file += "# Played Conditional (Y): Specify how monitored users must meet played_filter_*.\n"
     config_file += "#   all - Every monitored user must meet the played_filter_*\n"
@@ -1833,7 +1831,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   7 - Opposite action taken on True; Action taken on False\n"
     config_file += "#   8 - Opposite action taken on True; Opposite action taken on False\n"
     config_file += "#\n"
-    config_file += "# (['keep','ignore','ignore',3] : default)\n"
+    config_file += "# (['keep','any','ignore',3] : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "whitelisted_behavior_movie=" + str(get_default_config_values('whitelisted_behavior_movie')) + "\n"
@@ -1868,7 +1866,6 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "# User Conditional (X): Specify how monitored users must have the media item blacklisted.\n"
     config_file += "#   all - Every monitored user must have the media item blacklisted\n"
     config_file += "#   any - One or more monitored users must have the media item blacklisted\n"
-    config_file += "#   ignore - Ignore if monitored user have the media item blacklisted\n"
     config_file += "#\n"
     config_file += "# Played Conditional (Y): Specify how monitored users must meet played_filter_*.\n"
     config_file += "#   all - Every monitored user must meet the played_filter_*\n"
@@ -4523,31 +4520,31 @@ def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
 
 
 #Parse behavior for favorites, whitetags, blacktags, and whitelists
-def parse_actionedConfigurationBehavior(item,user_key,theActionType,isActioned_and_played_byUserId,action_behavior,item_isActioned,item_matches_played_days_filter,item_matches_played_count_filter):
+def parse_actionedConfigurationBehavior(item,isactioned_extra_byUserId,user_key,theActionType,isActioned_and_played_byUserId,action_behavior,item_isActioned,item_matches_played_days_filter,item_matches_played_count_filter):
 
-    itemCopy=item.copy()
+    itemCopy=item
 
-    isActioned_and_played_byUserId['ActionBehavior']=action_behavior[3]
+    isactioned_extra_byUserId['ActionBehavior']=action_behavior[3]
 
-    isActioned_and_played_byUserId['ActionType']=theActionType
+    isactioned_extra_byUserId['ActionType']=theActionType
 
-    isActioned_and_played_byUserId['MonitoredUsersAction']=action_behavior[1].lower()
+    isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior[1].lower()
 
-    itemCopy['IsMeetingAction']=item_isActioned
+    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
 
-    isActioned_and_played_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].lower()
+    isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].lower()
 
-    itemCopy['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
 
-    isActioned_and_played_byUserId['ConfiguredBehavior']=action_behavior[0].lower()
+    isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior[0].lower()
 
-    isActioned_and_played_byUserId[user_key][itemCopy['Id']]=itemCopy
+    isActioned_and_played_byUserId[user_key][item['Id']]=item
 
-    return isActioned_and_played_byUserId
+    return isActioned_and_played_byUserId,isactioned_extra_byUserId
 
 
 #Because we are not searching directly for unplayed whitelisted items; cleanup needs to happen to help the watched patterns make sense
-def whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpaths_json,user_wllib_paths_json):
+def whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpaths_json,user_wllib_paths_json):
     itemId_tracker=[]
     #userId_tracker=[]
 
@@ -4561,18 +4558,12 @@ def whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,wlu
     actionBehavior='ActionBehavior'
     actionType='ActionType'
 
-    if ((monitoredUsersAction in itemsDictionary) and (monitoredUsersMeetPlayedFilter in itemsDictionary)):
-        actionFilter=itemsDictionary[monitoredUsersAction]
-        playedFilter=itemsDictionary[monitoredUsersMeetPlayedFilter]
-        methodFilter=itemsDictionary[configuredBehavior]
-        behaviorFilter=itemsDictionary[actionBehavior]
-        wordFilter=itemsDictionary[actionType]
-
-        itemsDictionary.pop(monitoredUsersAction)
-        itemsDictionary.pop(monitoredUsersMeetPlayedFilter)
-        itemsDictionary.pop(configuredBehavior)
-        itemsDictionary.pop(actionBehavior)
-        itemsDictionary.pop(actionType)
+    if ((monitoredUsersAction in itemsExtraDictionary) and (monitoredUsersMeetPlayedFilter in itemsExtraDictionary)):
+        actionFilter=itemsExtraDictionary[monitoredUsersAction]
+        playedFilter=itemsExtraDictionary[monitoredUsersMeetPlayedFilter]
+        methodFilter=itemsExtraDictionary[configuredBehavior]
+        behaviorFilter=itemsExtraDictionary[actionBehavior]
+        wordFilter=itemsExtraDictionary[actionType]
 
         #for userId in itemsDictionary:
         #userId_tracker=wluser_keys_json_verify
@@ -4581,44 +4572,30 @@ def whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,wlu
             for itemId in itemsDictionary[userId]:
                 if not (itemId in itemId_tracker):
                     itemId_tracker.append(itemId)
-                    item=itemsDictionary[userId][itemId].copy()
+                    item=itemsDictionary[userId][itemId]
                     for subUserId in wluser_keys_json_verify:
                         if (not(userId == subUserId)):
                             if (not(item['Id'] in itemsDictionary[subUserId])):
-                                item[isMeetingAction]=get_isItemWhitelisted(item,item['WhitelistBlacklistLibraryId'],item['WhitelistBlacklistLibraryNetPath'],item['WhitelistBlacklistLibraryPath'],library_matching_behavior,
+                                itemsExtraDictionary[subUserId][item['Id']]={}
+                                itemsExtraDictionary[subUserId][item['Id']][isMeetingAction]=get_isItemWhitelisted(item,itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryId'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryNetPath'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryPath'],library_matching_behavior,
                                 user_wllib_keys_json[wluser_keys_json_verify.index(subUserId)],user_wllib_netpaths_json[wluser_keys_json_verify.index(subUserId)],user_wllib_paths_json[wluser_keys_json_verify.index(subUserId)])
                                 if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
-                                    item[isMeetingPlayedFilter]=True
+                                    itemsExtraDictionary[subUserId][item['Id']][isMeetingPlayedFilter]=True
                                 else:
-                                    item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,item['Id'],'playedPatternCleanup'),item['PlayedDays'],item['CreatedDays'],item['CutOffDatePlayed'],item['CutOffDateCreated'], item['PlayedCountComparison'],item['PlayedCount'],item['CreatedPlayedCountComparison'],item['CreatedPlayedCount'])
-                                    item[isMeetingPlayedFilter]=(item_matches_played_days_filter and item_matches_played_count_filter)
-                                itemsDictionary[subUserId][item['Id']]=item.copy()
-        itemsDictionary[monitoredUsersAction]=actionFilter
-        itemsDictionary[monitoredUsersMeetPlayedFilter]=playedFilter
-        itemsDictionary[configuredBehavior]=methodFilter
-        itemsDictionary[actionBehavior]=behaviorFilter
-        itemsDictionary[actionType]=wordFilter
+                                    item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,item['Id'],'playedPatternCleanup'),itemsExtraDictionary[userId][item['Id']]['PlayedDays'],itemsExtraDictionary[userId][item['Id']]['CreatedDays'],itemsExtraDictionary[userId][item['Id']]['CutOffDatePlayed'],itemsExtraDictionary[userId][item['Id']]['CutOffDateCreated'],itemsExtraDictionary[userId][item['Id']]['PlayedCountComparison'],itemsExtraDictionary[userId][item['Id']]['PlayedCount'],itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCountComparison'],itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCount'])
+                                    itemsExtraDictionary[subUserId][item['Id']][isMeetingPlayedFilter]=(item_matches_played_days_filter and item_matches_played_count_filter)
+                                itemsDictionary[subUserId][item['Id']]=item
 
-    for userId in itemsDictionary:
-        if (not ((userId == monitoredUsersAction) or (userId == monitoredUsersMeetPlayedFilter) or (userId == configuredBehavior) or 
-                 (userId == actionBehavior) or (userId == actionType))):
-            for itemId in itemsDictionary[userId]:
-                #remove whitelist/blacklist library Id and Path trackers so the item matches what a user has
-                 #and can be removed from the delete list later if needed
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryId')
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryPath')
-                itemsDictionary[userId][itemId].pop('WhitelistBlacklistLibraryNetPath')
-
-    return itemsDictionary
+    return itemsDictionary,itemsExtraDictionary
 
 
 #Because we are not searching directly for unplayed blacklisted items; cleanup needs to happen to make the watched patterns make sense
-def blacklist_playedPatternCleanup(itemsDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json):
-    return whitelist_playedPatternCleanup(itemsDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json)
+def blacklist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json):
+    return whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json)
 
 
 #Add/Remove item to/from delete list if meeting favorite/whitetagged/blacktagged/whitelisted pattern and played pattern
-def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,deleteItems,deleteItemsIdTracker):
+def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,itemsExtraDictionary,deleteItems,deleteItemsIdTracker):
     isMeetingAction_dict={}
     isMeetingPlayedFilter_dict={}
     itemId_tracker=[]
@@ -4640,18 +4617,12 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
     actionBehavior='ActionBehavior'
     actionType='ActionType'
 
-    if ((monitoredUsersAction in itemsDictionary) and (monitoredUsersMeetPlayedFilter in itemsDictionary)):
-        actionFilter=itemsDictionary[monitoredUsersAction]
-        playedFilter=itemsDictionary[monitoredUsersMeetPlayedFilter]
-        methodFilter=itemsDictionary[configuredBehavior]
-        behaviorFilter=itemsDictionary[actionBehavior]
-        wordFilter=itemsDictionary[actionType]
-
-        itemsDictionary.pop(monitoredUsersAction)
-        itemsDictionary.pop(monitoredUsersMeetPlayedFilter)
-        itemsDictionary.pop(configuredBehavior)
-        itemsDictionary.pop(actionBehavior)
-        itemsDictionary.pop(actionType)
+    if ((monitoredUsersAction in itemsExtraDictionary) and (monitoredUsersMeetPlayedFilter in itemsExtraDictionary)):
+        actionFilter=itemsExtraDictionary[monitoredUsersAction]
+        playedFilter=itemsExtraDictionary[monitoredUsersMeetPlayedFilter]
+        methodFilter=itemsExtraDictionary[configuredBehavior]
+        behaviorFilter=itemsExtraDictionary[actionBehavior]
+        wordFilter=itemsExtraDictionary[actionType]
 
         for userId in itemsDictionary:
             userId_tracker.append(userId)
@@ -4665,8 +4636,8 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
                     for subUserId in userId_tracker:
                         if (firstLoop):
                             if (itemId in itemsDictionary[subUserId]):
-                                isMeetingAction_dict[itemId]=itemsDictionary[subUserId][itemId][isMeetingAction]
-                                isMeetingPlayedFilter_dict[itemId]=itemsDictionary[subUserId][itemId][isMeetingPlayedFilter]
+                                isMeetingAction_dict[itemId]=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
+                                isMeetingPlayedFilter_dict[itemId]=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
                             else:
                                 isMeetingAction_dict[itemId]=False
                                 isMeetingPlayedFilter_dict[itemId]=False
@@ -4674,15 +4645,15 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
                         else:
                             if (itemId in itemsDictionary[subUserId]):
                                 if (actionFilter == andIt):
-                                    isMeetingAction_dict[itemId]&=itemsDictionary[subUserId][itemId][isMeetingAction]
+                                    isMeetingAction_dict[itemId]&=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
                                 elif (actionFilter == orIt):
-                                    isMeetingAction_dict[itemId]|=itemsDictionary[subUserId][itemId][isMeetingAction]
-                                else:
-                                    isMeetingAction_dict[itemId]=True
+                                    isMeetingAction_dict[itemId]|=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
+                                #else:
+                                    #isMeetingAction_dict[itemId]=True
                                 if (playedFilter == andIt):
-                                    isMeetingPlayedFilter_dict[itemId]&=itemsDictionary[subUserId][itemId][isMeetingPlayedFilter]
+                                    isMeetingPlayedFilter_dict[itemId]&=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
                                 elif (playedFilter == orIt):
-                                    isMeetingPlayedFilter_dict[itemId]|=itemsDictionary[subUserId][itemId][isMeetingPlayedFilter]
+                                    isMeetingPlayedFilter_dict[itemId]|=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
                                 else:
                                     isMeetingPlayedFilter_dict[itemId]=True
                             else:
@@ -4690,8 +4661,8 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
                                     isMeetingAction_dict[itemId]&=False
                                 elif (actionFilter == orIt):
                                     isMeetingAction_dict[itemId]|=False
-                                else:
-                                    isMeetingAction_dict[itemId]=True
+                                #else:
+                                    #isMeetingAction_dict[itemId]=True
                                 if (playedFilter == andIt):
                                     isMeetingPlayedFilter_dict[itemId]&=False
                                 elif (playedFilter == orIt):
@@ -4734,7 +4705,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,de
 
                     if (addItemToDeleteList == True):
                         if (not (item['Id'] in deleteItemsIdTracker)):
-                            deleteItems.append(item.copy())
+                            deleteItems.append(item)
                             deleteItemsIdTracker.append(item['Id'])
                     elif (addItemToDeleteList == False):
                         if (item['Id'] in deleteItemsIdTracker):
@@ -4786,6 +4757,20 @@ def get_playedCreatedDays_playedCreatedCounts(item,played_days,created_days,cut_
 
     return item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter
 
+
+def update_byUserId_playedStates(extra_byUserId_Episode,userKey,itemId,episode_played_days,episode_created_days,cut_off_date_played_episode,
+                                 cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,
+                                 episode_created_played_count_comparison,episode_created_played_count):
+    extra_byUserId_Episode[userKey][itemId]['PlayedDays']=episode_played_days
+    extra_byUserId_Episode[userKey][itemId]['CreatedDays']=episode_created_days
+    extra_byUserId_Episode[userKey][itemId]['CutOffDatePlayed']=cut_off_date_played_episode
+    extra_byUserId_Episode[userKey][itemId]['CutOffDateCreated']=cut_off_date_created_episode
+    extra_byUserId_Episode[userKey][itemId]['PlayedCountComparison']=episode_played_count_comparison
+    extra_byUserId_Episode[userKey][itemId]['PlayedCount']=episode_played_count
+    extra_byUserId_Episode[userKey][itemId]['CreatedPlayedCountComparison']=episode_created_played_count_comparison
+    extra_byUserId_Episode[userKey][itemId]['CreatedPlayedCount']=episode_created_played_count
+
+    return extra_byUserId_Episode
 
 
 # get played, favorited, and tagged media items
@@ -4857,14 +4842,19 @@ def get_media_items():
 
         #dictionary of favorited and played items by userId
         isfavorited_and_played_byUserId_Movie={}
+        isfavorited_extraInfo_byUserId_Movie={}
         #dictionary of whitetagged items by userId
         iswhitetagged_and_played_byUserId_Movie={}
+        iswhitetagged_extraInfo_byUserId_Movie={}
         #dictionary of blacktagged items by userId
         isblacktagged_and_played_byUserId_Movie={}
+        isblacktagged_extraInfo_byUserId_Movie={}
         #dictionary of whitelisted items by userId
         iswhitelisted_and_played_byUserId_Movie={}
+        iswhitelisted_extraInfo_byUserId_Movie={}
         #dictionary of blacklisted items by userId
         isblacklisted_and_played_byUserId_Movie={}
+        isblacklisted_extraInfo_byUserId_Movie={}
 
     if ((episode_played_days >= 0) or (episode_created_days >= 0)):
         cut_off_date_played_episode=date_time_now - timedelta(episode_played_days)
@@ -4894,14 +4884,19 @@ def get_media_items():
 
         #dictionary of favortied and played items by userId
         isfavorited_and_played_byUserId_Episode={}
+        isfavorited_extraInfo_byUserId_Episode={}
         #dictionary of whitetagged items by userId
         iswhitetagged_and_played_byUserId_Episode={}
+        iswhitetagged_extraInfo_byUserId_Episode={}
         #dictionary of blacktagged items by userId
         isblacktagged_and_played_byUserId_Episode={}
+        isblacktagged_extraInfo_byUserId_Episode={}
         #dictionary of whitelisted items by userId
         iswhitelisted_and_played_byUserId_Episode={}
+        iswhitelisted_extraInfo_byUserId_Episode={}
         #dictionary of blacklisted items by userId
         isblacklisted_and_played_byUserId_Episode={}
+        isblacklisted_extraInfo_byUserId_Episode={}
         #dictionary of episode item counts by userId
         episodeCounts_byUserId={}
 
@@ -4929,14 +4924,19 @@ def get_media_items():
 
         #dictionary of favorited and played items by userId
         isfavorited_and_played_byUserId_Audio={}
+        isfavorited_extraInfo_byUserId_Audio={}
         #dictionary of whitetagged items by userId
         iswhitetagged_and_played_byUserId_Audio={}
+        iswhitetagged_extraInfo_byUserId_Audio={}
         #dictionary of blacktagged items by userId
         isblacktagged_and_played_byUserId_Audio={}
+        isblacktagged_extraInfo_byUserId_Audio={}
         #dictionary of whitelisted items by userId
         iswhitelisted_and_played_byUserId_Audio={}
+        iswhitelisted_extraInfo_byUserId_Audio={}
         #dictionary of blacklisted items by userId
         isblacklisted_and_played_byUserId_Audio={}
+        isblacklisted_extraInfo_byUserId_Audio={}
 
     if ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)):
         cut_off_date_played_audiobook=date_time_now - timedelta(audiobook_played_days)
@@ -4962,14 +4962,19 @@ def get_media_items():
 
         #dictionary of favorited and played items by userId
         isfavorited_and_played_byUserId_AudioBook={}
+        isfavorited_extraInfo_byUserId_AudioBook={}
         #dictionary of whitetagged items by userId
         iswhitetagged_and_played_byUserId_AudioBook={}
+        iswhitetagged_extraInfo_byUserId_AudioBook={}
         #dictionary of blacktagged items by userId
         isblacktagged_and_played_byUserId_AudioBook={}
+        isblacktagged_extraInfo_byUserId_AudioBook={}
         #dictionary of whitelisted items by userId
         iswhitelisted_and_played_byUserId_AudioBook={}
+        iswhitelisted_extraInfo_byUserId_AudioBook={}
         #dictionary of blacklisted items by userId
         isblacklisted_and_played_byUserId_AudioBook={}
+        isblacklisted_extraInfo_byUserId_AudioBook={}
 
     if (GLOBAL_DEBUG):
         print_script_header=True
@@ -5112,52 +5117,72 @@ def get_media_items():
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             #dictionary of favortied and played items by userId
             isfavorited_and_played_byUserId_Movie[user_key]={}
+            isfavorited_extraInfo_byUserId_Movie[user_key]={}
             #dictionary of whitetagged items by userId
             iswhitetagged_and_played_byUserId_Movie[user_key]={}
+            iswhitetagged_extraInfo_byUserId_Movie[user_key]={}
             #dictionary of blacktagged items by userId
             isblacktagged_and_played_byUserId_Movie[user_key]={}
+            isblacktagged_extraInfo_byUserId_Movie[user_key]={}
             #dictionary of whitelisted items by userId
             iswhitelisted_and_played_byUserId_Movie[user_key]={}
+            iswhitelisted_extraInfo_byUserId_Movie[user_key]={}
             #dictionary of blacklisted items by userId
             isblacklisted_and_played_byUserId_Movie[user_key]={}
+            isblacklisted_extraInfo_byUserId_Movie[user_key]={}
 
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             #dictionary of favortied and played items by userId
             isfavorited_and_played_byUserId_Episode[user_key]={}
+            isfavorited_extraInfo_byUserId_Episode[user_key]={}
             #dictionary of whitetagged items by userId
             iswhitetagged_and_played_byUserId_Episode[user_key]={}
+            iswhitetagged_extraInfo_byUserId_Episode[user_key]={}
             #dictionary of blacktagged items by userId
             isblacktagged_and_played_byUserId_Episode[user_key]={}
+            isblacktagged_extraInfo_byUserId_Episode[user_key]={}
             #dictionary of whitelisted items by userId
             iswhitelisted_and_played_byUserId_Episode[user_key]={}
+            iswhitelisted_extraInfo_byUserId_Episode[user_key]={}
             #dictionary of blacklisted items by userId
             isblacklisted_and_played_byUserId_Episode[user_key]={}
+            isblacklisted_extraInfo_byUserId_Episode[user_key]={}
             #dictionary of episode item counts by userId
             episodeCounts_byUserId[user_key]=defaultdict(dict)
 
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             #dictionary of favortied and played items by userId
             isfavorited_and_played_byUserId_Audio[user_key]={}
+            isfavorited_extraInfo_byUserId_Audio[user_key]={}
             #dictionary of whitetagged items by userId
             iswhitetagged_and_played_byUserId_Audio[user_key]={}
+            iswhitetagged_extraInfo_byUserId_Audio[user_key]={}
             #dictionary of blacktagged items by userId
+            isblacktagged_extraInfo_byUserId_Audio[user_key]={}
             isblacktagged_and_played_byUserId_Audio[user_key]={}
             #dictionary of whitelisted items by userId
             iswhitelisted_and_played_byUserId_Audio[user_key]={}
+            iswhitelisted_extraInfo_byUserId_Audio[user_key]={}
             #dictionary of blacklisted items by userId
             isblacklisted_and_played_byUserId_Audio[user_key]={}
+            isblacklisted_extraInfo_byUserId_Audio[user_key]={}
 
         if ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)):
             #dictionary of favortied and played items by userId
             isfavorited_and_played_byUserId_AudioBook[user_key]={}
+            isfavorited_extraInfo_byUserId_AudioBook[user_key]={}
             #dictionary of whitetagged items by userId
             iswhitetagged_and_played_byUserId_AudioBook[user_key]={}
+            iswhitetagged_extraInfo_byUserId_AudioBook[user_key]={}
             #dictionary of blacktagged items by userId
             isblacktagged_and_played_byUserId_AudioBook[user_key]={}
+            isblacktagged_extraInfo_byUserId_AudioBook[user_key]={}
             #dictionary of whitelisted items by userId
             iswhitelisted_and_played_byUserId_AudioBook[user_key]={}
+            iswhitelisted_extraInfo_byUserId_AudioBook[user_key]={}
             #dictionary of blacklisted items by userId
             isblacklisted_and_played_byUserId_AudioBook[user_key]={}
+            isblacklisted_extraInfo_byUserId_AudioBook[user_key]={}
 
     currentPosition=0
 
@@ -5633,20 +5658,23 @@ def get_media_items():
                                     #Fill in the blanks
                                     item=prepare_MOVIEoutput(item,user_key)
 
+                                    isfavorited_extraInfo_byUserId_Movie[user_key][item['Id']]={}
+                                    iswhitetagged_extraInfo_byUserId_Movie[user_key][item['Id']]={}
+                                    isblacktagged_extraInfo_byUserId_Movie[user_key][item['Id']]={}
+                                    iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]={}
+                                    isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]={}
+
 ##########################################################################################################################################
 
                                     item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
                                     =get_playedCreatedDays_playedCreatedCounts(item,movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,
                                                                                movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
 
-                                    item['PlayedDays']=movie_played_days
-                                    item['CreatedDays']=movie_created_days
-                                    item['CutOffDatePlayed']=cut_off_date_played_movie
-                                    item['CutOffDateCreated']=cut_off_date_created_movie
-                                    item['PlayedCountComparison']=movie_played_count_comparison
-                                    item['PlayedCount']=movie_played_count
-                                    item['CreatedPlayedCountComparison']=movie_created_played_count_comparison
-                                    item['CreatedPlayedCount']=movie_created_played_count
+                                    isfavorited_extraInfo_byUserId_Movie=update_byUserId_playedStates(isfavorited_extraInfo_byUserId_Movie,user_key,item['Id'],movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
+                                    iswhitetagged_extraInfo_byUserId_Movie=update_byUserId_playedStates(iswhitetagged_extraInfo_byUserId_Movie,user_key,item['Id'],movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
+                                    isblacktagged_extraInfo_byUserId_Movie=update_byUserId_playedStates(isblacktagged_extraInfo_byUserId_Movie,user_key,item['Id'],movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
+                                    iswhitelisted_extraInfo_byUserId_Movie=update_byUserId_playedStates(iswhitelisted_extraInfo_byUserId_Movie,user_key,item['Id'],movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
+                                    isblacklisted_extraInfo_byUserId_Movie=update_byUserId_playedStates(isblacklisted_extraInfo_byUserId_Movie,user_key,item['Id'],movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count)
 
 ##########################################################################################################################################
 
@@ -5666,7 +5694,7 @@ def get_media_items():
                                     isFavorited_Display=(item_isFavorited or item_isFavorited_Advanced)
 
                                     #favorite behavior enabled
-                                    isfavorited_and_played_byUserId_Movie=parse_actionedConfigurationBehavior(item,user_key,'favorited',isfavorited_and_played_byUserId_Movie,favorited_behavior_movie,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isfavorited_and_played_byUserId_Movie,isfavorited_extraInfo_byUserId_Movie=parse_actionedConfigurationBehavior(item,isfavorited_extraInfo_byUserId_Movie,user_key,'favorited',isfavorited_and_played_byUserId_Movie,favorited_behavior_movie,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -5679,7 +5707,7 @@ def get_media_items():
                                     isWhiteTagged_Display=item_isWhiteTagged
 
                                     #whitetag behavior enabled
-                                    iswhitetagged_and_played_byUserId_Movie=parse_actionedConfigurationBehavior(item,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Movie,whitetagged_behavior_movie,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitetagged_and_played_byUserId_Movie,iswhitetagged_extraInfo_byUserId_Movie=parse_actionedConfigurationBehavior(item,iswhitetagged_extraInfo_byUserId_Movie,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Movie,whitetagged_behavior_movie,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -5692,7 +5720,7 @@ def get_media_items():
                                     isBlackTagged_Display=item_isBlackTagged
 
                                     #blacktag behavior enabled
-                                    isblacktagged_and_played_byUserId_Movie=parse_actionedConfigurationBehavior(item,user_key,'blacktagged',isblacktagged_and_played_byUserId_Movie,blacktagged_behavior_movie,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacktagged_and_played_byUserId_Movie,isblacktagged_extraInfo_byUserId_Movie=parse_actionedConfigurationBehavior(item,isblacktagged_extraInfo_byUserId_Movie,user_key,'blacktagged',isblacktagged_and_played_byUserId_Movie,blacktagged_behavior_movie,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -5701,18 +5729,20 @@ def get_media_items():
                                     if (data_list_pos in data_from_whitelisted_queries):
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
                                     else: #check if we are at a blacklist queried data_list_pos
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
 
                                     isWhiteListed_Display=item_isWhiteListed
 
                                     #whitelist behavior enabled
-                                    iswhitelisted_and_played_byUserId_Movie=parse_actionedConfigurationBehavior(item,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Movie,whitelisted_behavior_movie,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitelisted_and_played_byUserId_Movie,iswhitelisted_extraInfo_byUserId_Movie=parse_actionedConfigurationBehavior(item,iswhitelisted_extraInfo_byUserId_Movie,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Movie,whitelisted_behavior_movie,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -5721,13 +5751,15 @@ def get_media_items():
                                     if (data_list_pos in data_from_blacklisted_queries):
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
                                     else: #check if we are at a whitelist queried data_list_pos
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Movie[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
 
                                     isBlackListed_Display=item_isBlackListed
 
@@ -6181,20 +6213,23 @@ def get_media_items():
                                     #Fill in the blanks
                                     item=prepare_EPISODEoutput(item,user_key)
 
+                                    isfavorited_extraInfo_byUserId_Episode[user_key][item['Id']]={}
+                                    iswhitetagged_extraInfo_byUserId_Episode[user_key][item['Id']]={}
+                                    isblacktagged_extraInfo_byUserId_Episode[user_key][item['Id']]={}
+                                    iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]={}
+                                    isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]={}
+
 ##########################################################################################################################################
 
                                     item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
                                     =get_playedCreatedDays_playedCreatedCounts(item,episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,
                                                                                episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
 
-                                    item['PlayedDays']=episode_played_days
-                                    item['CreatedDays']=episode_created_days
-                                    item['CutOffDatePlayed']=cut_off_date_played_episode
-                                    item['CutOffDateCreated']=cut_off_date_created_episode
-                                    item['PlayedCountComparison']=episode_played_count_comparison
-                                    item['PlayedCount']=episode_played_count
-                                    item['CreatedPlayedCountComparison']=episode_created_played_count_comparison
-                                    item['CreatedPlayedCount']=episode_created_played_count
+                                    isfavorited_extraInfo_byUserId_Episode=update_byUserId_playedStates(isfavorited_extraInfo_byUserId_Episode,user_key,item['Id'],episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
+                                    iswhitetagged_extraInfo_byUserId_Episode=update_byUserId_playedStates(iswhitetagged_extraInfo_byUserId_Episode,user_key,item['Id'],episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
+                                    isblacktagged_extraInfo_byUserId_Episode=update_byUserId_playedStates(isblacktagged_extraInfo_byUserId_Episode,user_key,item['Id'],episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
+                                    iswhitelisted_extraInfo_byUserId_Episode=update_byUserId_playedStates(iswhitelisted_extraInfo_byUserId_Episode,user_key,item['Id'],episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
+                                    isblacklisted_extraInfo_byUserId_Episode=update_byUserId_playedStates(isblacklisted_extraInfo_byUserId_Episode,user_key,item['Id'],episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count)
 
 ##########################################################################################################################################
 
@@ -6217,7 +6252,7 @@ def get_media_items():
                                     isFavorited_Display=(item_isFavorited or item_isFavorited_Advanced)
 
                                     #favorites behavior enabled
-                                    isfavorited_and_played_byUserId_Episode=parse_actionedConfigurationBehavior(item,user_key,'favorited',isfavorited_and_played_byUserId_Episode,favorited_behavior_episode,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isfavorited_and_played_byUserId_Episode,isfavorited_extraInfo_byUserId_Episode=parse_actionedConfigurationBehavior(item,isfavorited_extraInfo_byUserId_Episode,user_key,'favorited',isfavorited_and_played_byUserId_Episode,favorited_behavior_episode,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6230,7 +6265,7 @@ def get_media_items():
                                     isWhiteTagged_Display=item_isWhiteTagged
 
                                     #whitetag behavior enabled
-                                    iswhitetagged_and_played_byUserId_Episode=parse_actionedConfigurationBehavior(item,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Episode,whitetagged_behavior_episode,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitetagged_and_played_byUserId_Episode,iswhitetagged_extraInfo_byUserId_Episode=parse_actionedConfigurationBehavior(item,iswhitetagged_extraInfo_byUserId_Episode,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Episode,whitetagged_behavior_episode,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6243,7 +6278,7 @@ def get_media_items():
                                     isBlackTagged_Display=item_isBlackTagged
 
                                     #blacktag behavior enabled
-                                    isblacktagged_and_played_byUserId_Episode=parse_actionedConfigurationBehavior(item,user_key,'blacktagged',isblacktagged_and_played_byUserId_Episode,blacktagged_behavior_episode,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacktagged_and_played_byUserId_Episode,isblacktagged_extraInfo_byUserId_Episode=parse_actionedConfigurationBehavior(item,isblacktagged_extraInfo_byUserId_Episode,user_key,'blacktagged',isblacktagged_and_played_byUserId_Episode,blacktagged_behavior_episode,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6252,20 +6287,20 @@ def get_media_items():
                                     if (data_list_pos in data_from_whitelisted_queries):
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
-                                        item['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
-                                        item['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
-                                        item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
                                     else: #check if we are at a blacklist queried data_list_pos
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
-                                        item['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
-                                        item['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
-                                        item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
 
                                     isWhiteListed_Display=item_isWhiteListed
 
                                     #whitelist behavior enabled
-                                    iswhitelisted_and_played_byUserId_Episode=parse_actionedConfigurationBehavior(item,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Episode,whitelisted_behavior_episode,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitelisted_and_played_byUserId_Episode,iswhitelisted_extraInfo_byUserId_Episode=parse_actionedConfigurationBehavior(item,iswhitelisted_extraInfo_byUserId_Episode,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Episode,whitelisted_behavior_episode,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6274,20 +6309,20 @@ def get_media_items():
                                     if (data_list_pos in data_from_blacklisted_queries):
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
-                                        item['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
-                                        item['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
-                                        item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
                                     else: #check if we are at a whitelist queried data_list_pos
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
-                                        item['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
-                                        item['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
-                                        item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Episode[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
 
                                     isBlackListed_Display=item_isBlackListed
 
                                     #blacklist behavior enabled
-                                    isblacklisted_and_played_byUserId_Episode=parse_actionedConfigurationBehavior(item,user_key,'blacklisted',isblacklisted_and_played_byUserId_Episode,blacklisted_behavior_episode,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacklisted_and_played_byUserId_Episode,isblacklisted_extraInfo_byUserId_Episode=parse_actionedConfigurationBehavior(item,isblacklisted_extraInfo_byUserId_Episode,user_key,'blacklisted',isblacklisted_and_played_byUserId_Episode,blacklisted_behavior_episode,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6757,20 +6792,23 @@ def get_media_items():
                                     #Fill in the blanks
                                     item=prepare_AUDIOoutput(item,user_key,"audio")
 
+                                    isfavorited_extraInfo_byUserId_Audio[user_key][item['Id']]={}
+                                    iswhitetagged_extraInfo_byUserId_Audio[user_key][item['Id']]={}
+                                    isblacktagged_extraInfo_byUserId_Audio[user_key][item['Id']]={}
+                                    iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]={}
+                                    isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]={}
+
 ##########################################################################################################################################
 
                                     item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
                                     =get_playedCreatedDays_playedCreatedCounts(item,audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,
                                                                                audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
 
-                                    item['PlayedDays']=audio_played_days
-                                    item['CreatedDays']=audio_created_days
-                                    item['CutOffDatePlayed']=cut_off_date_played_audio
-                                    item['CutOffDateCreated']=cut_off_date_created_audio
-                                    item['PlayedCountComparison']=audio_played_count_comparison
-                                    item['PlayedCount']=audio_played_count
-                                    item['CreatedPlayedCountComparison']=audio_created_played_count_comparison
-                                    item['CreatedPlayedCount']=audio_created_played_count
+                                    isfavorited_extraInfo_byUserId_Audio=update_byUserId_playedStates(isfavorited_extraInfo_byUserId_Audio,user_key,item['Id'],audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
+                                    iswhitetagged_extraInfo_byUserId_Audio=update_byUserId_playedStates(iswhitetagged_extraInfo_byUserId_Audio,user_key,item['Id'],audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
+                                    isblacktagged_extraInfo_byUserId_Audio=update_byUserId_playedStates(isblacktagged_extraInfo_byUserId_Audio,user_key,item['Id'],audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
+                                    iswhitelisted_extraInfo_byUserId_Audio=update_byUserId_playedStates(iswhitelisted_extraInfo_byUserId_Audio,user_key,item['Id'],audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
+                                    isblacklisted_extraInfo_byUserId_Audio=update_byUserId_playedStates(isblacklisted_extraInfo_byUserId_Audio,user_key,item['Id'],audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count)
 
 ##########################################################################################################################################
 
@@ -6792,7 +6830,7 @@ def get_media_items():
                                     isFavorited_Display=(item_isFavorited or item_isFavorited_Advanced)
 
                                     #favorite behavior enabled
-                                    isfavorited_and_played_byUserId_Audio=parse_actionedConfigurationBehavior(item,user_key,'favorited',isfavorited_and_played_byUserId_Audio,favorited_behavior_audio,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isfavorited_and_played_byUserId_Audio,isfavorited_extraInfo_byUserId_Audio=parse_actionedConfigurationBehavior(item,isfavorited_extraInfo_byUserId_Audio,user_key,'favorited',isfavorited_and_played_byUserId_Audio,favorited_behavior_audio,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6805,7 +6843,7 @@ def get_media_items():
                                     isWhiteTagged_Display=item_isWhiteTagged
 
                                     #whitetag behavior enabled
-                                    iswhitetagged_and_played_byUserId_Audio=parse_actionedConfigurationBehavior(item,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Audio,whitetagged_behavior_audio,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitetagged_and_played_byUserId_Audio,iswhitetagged_extraInfo_byUserId_Audio=parse_actionedConfigurationBehavior(item,iswhitetagged_extraInfo_byUserId_Audio,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Audio,whitetagged_behavior_audio,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6818,7 +6856,7 @@ def get_media_items():
                                     isBlackTagged_Display=item_isBlackTagged
 
                                     #blacktag behavior enabled
-                                    isblacktagged_and_played_byUserId_Audio=parse_actionedConfigurationBehavior(item,user_key,'blacktagged',isblacktagged_and_played_byUserId_Audio,blacktagged_behavior_audio,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacktagged_and_played_byUserId_Audio,isblacktagged_extraInfo_byUserId_Audio=parse_actionedConfigurationBehavior(item,isblacktagged_extraInfo_byUserId_Audio,user_key,'blacktagged',isblacktagged_and_played_byUserId_Audio,blacktagged_behavior_audio,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6827,18 +6865,20 @@ def get_media_items():
                                     if (data_list_pos in data_from_whitelisted_queries):
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
                                     else: #check if we are at a blacklist queried data_list_pos
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
 
                                     isWhiteListed_Display=item_isWhiteListed
 
                                     #whitelist behavior enabled
-                                    iswhitelisted_and_played_byUserId_Audio=parse_actionedConfigurationBehavior(item,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Audio,whitelisted_behavior_audio,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitelisted_and_played_byUserId_Audio,iswhitelisted_extraInfo_byUserId_Audio=parse_actionedConfigurationBehavior(item,iswhitelisted_extraInfo_byUserId_Audio,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Audio,whitelisted_behavior_audio,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6847,13 +6887,15 @@ def get_media_items():
                                     if (data_list_pos in data_from_blacklisted_queries):
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
                                     else: #check if we are at a whitelist queried data_list_pos
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        isblacklisted_extraInfo_byUserId_Audio[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
 
                                     isBlackListed_Display=item_isBlackListed
 
@@ -7311,20 +7353,23 @@ def get_media_items():
                                     #Fill in the blanks
                                     item=prepare_AUDIOBOOKoutput(item,user_key,"audiobook")
 
+                                    isfavorited_extraInfo_byUserId_AudioBook[user_key][item['Id']]={}
+                                    iswhitetagged_extraInfo_byUserId_AudioBook[user_key][item['Id']]={}
+                                    isblacktagged_extraInfo_byUserId_AudioBook[user_key][item['Id']]={}
+                                    iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]={}
+                                    isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]={}
+
 ##########################################################################################################################################
 
                                     item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
                                     =get_playedCreatedDays_playedCreatedCounts(item,audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,
                                                                                audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
 
-                                    item['PlayedDays']=audiobook_played_days
-                                    item['CreatedDays']=audiobook_created_days
-                                    item['CutOffDatePlayed']=cut_off_date_played_audiobook
-                                    item['CutOffDateCreated']=cut_off_date_created_audiobook
-                                    item['PlayedCountComparison']=audiobook_played_count_comparison
-                                    item['PlayedCount']=audiobook_played_count
-                                    item['CreatedPlayedCountComparison']=audiobook_created_played_count_comparison
-                                    item['CreatedPlayedCount']=audiobook_created_played_count
+                                    isfavorited_extraInfo_byUserId_AudioBook=update_byUserId_playedStates(isfavorited_extraInfo_byUserId_AudioBook,user_key,item['Id'],audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
+                                    iswhitetagged_extraInfo_byUserId_AudioBook=update_byUserId_playedStates(iswhitetagged_extraInfo_byUserId_AudioBook,user_key,item['Id'],audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
+                                    isblacktagged_extraInfo_byUserId_AudioBook=update_byUserId_playedStates(isblacktagged_extraInfo_byUserId_AudioBook,user_key,item['Id'],audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
+                                    iswhitelisted_extraInfo_byUserId_AudioBook=update_byUserId_playedStates(iswhitelisted_extraInfo_byUserId_AudioBook,user_key,item['Id'],audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
+                                    isblacklisted_extraInfo_byUserId_AudioBook=update_byUserId_playedStates(isblacklisted_extraInfo_byUserId_AudioBook,user_key,item['Id'],audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count)
 
 ##########################################################################################################################################
 
@@ -7346,7 +7391,7 @@ def get_media_items():
                                     isFavorited_Display=(item_isFavorited or item_isFavorited_Advanced)
 
                                     #favorite behavior enabled
-                                    isfavorited_and_played_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,user_key,'favorited',isfavorited_and_played_byUserId_AudioBook,favorited_behavior_audiobook,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isfavorited_and_played_byUserId_AudioBook,isfavorited_extraInfo_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,isfavorited_extraInfo_byUserId_AudioBook,user_key,'favorited',isfavorited_and_played_byUserId_AudioBook,favorited_behavior_audiobook,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -7359,7 +7404,7 @@ def get_media_items():
                                     isWhiteTagged_Display=item_isWhiteTagged
 
                                     #whitetag behavior enabled
-                                    iswhitetagged_and_played_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,user_key,'whitetagged',iswhitetagged_and_played_byUserId_AudioBook,whitetagged_behavior_audiobook,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitetagged_and_played_byUserId_AudioBook,iswhitetagged_extraInfo_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,iswhitetagged_extraInfo_byUserId_AudioBook,user_key,'whitetagged',iswhitetagged_and_played_byUserId_AudioBook,whitetagged_behavior_audiobook,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -7372,7 +7417,7 @@ def get_media_items():
                                     isBlackTagged_Display=item_isBlackTagged
 
                                     #blacktag behavior enabled
-                                    isblacktagged_and_played_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,user_key,'blacktagged',isblacktagged_and_played_byUserId_AudioBook,blacktagged_behavior_audiobook,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacktagged_and_played_byUserId_AudioBook,isblacktagged_extraInfo_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,isblacktagged_extraInfo_byUserId_AudioBook,user_key,'blacktagged',isblacktagged_and_played_byUserId_AudioBook,blacktagged_behavior_audiobook,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -7381,18 +7426,20 @@ def get_media_items():
                                     if (data_list_pos in data_from_whitelisted_queries):
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
                                     else: #check if we are at a blacklist queried data_list_pos
                                         item_isWhiteListed=get_isItemWhitelisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_wllib_keys_json[currentPosition],user_wllib_netpath_json[currentPosition],user_wllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        iswhitelisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
 
                                     isWhiteListed_Display=item_isWhiteListed
 
                                     #whitelist behavior enabled
-                                    iswhitelisted_and_played_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,user_key,'whitelisted',iswhitelisted_and_played_byUserId_AudioBook,whitelisted_behavior_audiobook,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    iswhitelisted_and_played_byUserId_AudioBook,iswhitelisted_extraInfo_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,iswhitelisted_extraInfo_byUserId_AudioBook,user_key,'whitelisted',iswhitelisted_and_played_byUserId_AudioBook,whitelisted_behavior_audiobook,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -7401,13 +7448,15 @@ def get_media_items():
                                     if (data_list_pos in data_from_blacklisted_queries):
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_BlkLst,LibraryNetPath_BlkLst,LibraryPath_BlkLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
                                     else: #check if we are at a whitelist queried data_list_pos
                                         item_isBlackListed=get_isItemBlacklisted(item,LibraryID_WhtLst,LibraryNetPath_WhtLst,LibraryPath_WhtLst,library_matching_behavior,
                                                                                        user_bllib_keys_json[currentPosition],user_bllib_netpath_json[currentPosition],user_bllib_path_json[currentPosition])
-
-                                    item['WhitelistBlacklistLibraryId']=LibraryID_BlkLst
-                                    item['WhitelistBlacklistLibraryPath']=LibraryPath_BlkLst
-                                    item['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_BlkLst
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryId']=LibraryID_WhtLst
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryPath']=LibraryPath_WhtLst
+                                        isblacklisted_extraInfo_byUserId_AudioBook[user_key][item['Id']]['WhitelistBlacklistLibraryNetPath']=LibraryNetPath_WhtLst
 
                                     isBlackListed_Display=item_isBlackListed
 
@@ -7533,180 +7582,200 @@ def get_media_items():
 
     #Add blacklisted items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (blacklisted_behavior_movie[3] >= 0)):
-        isblacklisted_and_played_byUserId_Movie=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Movie,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        isblacklisted_and_played_byUserId_Movie,isblacklisted_extraInfo_byUserId_Movie=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Movie,isblacklisted_extraInfo_byUserId_Movie,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Movie,isblacklisted_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (blacklisted_behavior_episode[3] >= 0)):
-        isblacklisted_and_played_byUserId_Episode=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Episode,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        isblacklisted_and_played_byUserId_Episode,isblacklisted_extraInfo_byUserId_Episode=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Episode,isblacklisted_extraInfo_byUserId_Episode,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Episode,isblacklisted_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (blacklisted_behavior_audio[3] >= 0)):
-        isblacklisted_and_played_byUserId_Audio=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Audio,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        isblacklisted_and_played_byUserId_Audio,isblacklisted_extraInfo_byUserId_Audio=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_Audio,isblacklisted_extraInfo_byUserId_Audio,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Audio,isblacklisted_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (blacklisted_behavior_audiobook[3] >= 0)):
-        isblacklisted_and_played_byUserId_AudioBook=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_AudioBook,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        isblacklisted_and_played_byUserId_AudioBook,isblacklisted_extraInfo_byUserId_AudioBook=blacklist_playedPatternCleanup(isblacklisted_and_played_byUserId_AudioBook,isblacklisted_extraInfo_byUserId_AudioBook,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_AudioBook,isblacklisted_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_MOVIE: ',3)
-            isblacklisted_and_played_byUserId_Movie=convert_timeToString(isblacklisted_and_played_byUserId_Movie)
             appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Movie),3)
+            isblacklisted_extraInfo_byUserId_Movie=convert_timeToString(isblacklisted_extraInfo_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_extraInfo_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_EPISODE: ',3)
-            isblacklisted_and_played_byUserId_Episode=convert_timeToString(isblacklisted_and_played_byUserId_Episode)
             appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Episode),3)
+            isblacklisted_extraInfo_byUserId_Episode=convert_timeToString(isblacklisted_extraInfo_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_extraInfo_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIO: ',3)
-            isblacklisted_and_played_byUserId_Audio=convert_timeToString(isblacklisted_and_played_byUserId_Audio)
             appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Audio),3)
+            isblacklisted_extraInfo_byUserId_Audio=convert_timeToString(isblacklisted_extraInfo_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_extraInfo_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacklisted_Played_AUDIOBOOK: ',3)
-            isblacklisted_and_played_byUserId_AudioBook=convert_timeToString(isblacklisted_and_played_byUserId_AudioBook)
             appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_AudioBook),3)
+            isblacklisted_extraInfo_byUserId_AudioBook=convert_timeToString(isblacklisted_extraInfo_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isblacklisted_extraInfo_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitelisted items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (whitelisted_behavior_movie[3] >= 0)):
-        iswhitelisted_and_played_byUserId_Movie=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Movie,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        iswhitelisted_and_played_byUserId_Movie,iswhitelisted_extraInfo_byUserId_Movie=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Movie,iswhitelisted_extraInfo_byUserId_Movie,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Movie,iswhitelisted_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (whitelisted_behavior_episode[3] >= 0)):
-        iswhitelisted_and_played_byUserId_Episode=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Episode,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        iswhitelisted_and_played_byUserId_Episode,iswhitelisted_extraInfo_byUserId_Episode=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Episode,iswhitelisted_extraInfo_byUserId_Episode,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Episode,iswhitelisted_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (whitelisted_behavior_audio[3] >= 0)):
-        iswhitelisted_and_played_byUserId_Audio=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Audio,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        iswhitelisted_and_played_byUserId_Audio,iswhitelisted_extraInfo_byUserId_Audio=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_Audio,iswhitelisted_extraInfo_byUserId_Audio,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Audio,iswhitelisted_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (whitelisted_behavior_audiobook[3] >= 0)):
-        iswhitelisted_and_played_byUserId_AudioBook=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_AudioBook,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        iswhitelisted_and_played_byUserId_AudioBook,iswhitelisted_extraInfo_byUserId_AudioBook=whitelist_playedPatternCleanup(iswhitelisted_and_played_byUserId_AudioBook,iswhitelisted_extraInfo_byUserId_AudioBook,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_AudioBook,iswhitelisted_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_MOVIE: ',3)
-            iswhitelisted_and_played_byUserId_Movie=convert_timeToString(iswhitelisted_and_played_byUserId_Movie)
             appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Movie),3)
+            iswhitelisted_extraInfo_byUserId_Movie=convert_timeToString(iswhitelisted_extraInfo_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_extraInfo_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_EPISODE: ',3)
-            iswhitelisted_and_played_byUserId_Episode=convert_timeToString(iswhitelisted_and_played_byUserId_Episode)
             appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Episode),3)
+            iswhitelisted_extraInfo_byUserId_Episode=convert_timeToString(iswhitelisted_extraInfo_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_extraInfo_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIO: ',3)
-            iswhitelisted_and_played_byUserId_Audio=convert_timeToString(iswhitelisted_and_played_byUserId_Audio)
             appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Audio),3)
+            iswhitelisted_extraInfo_byUserId_Audio=convert_timeToString(iswhitelisted_extraInfo_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_extraInfo_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitelisted_Played_AUDIOBOOK: ',3)
-            iswhitelisted_and_played_byUserId_AudioBook=convert_timeToString(iswhitelisted_and_played_byUserId_AudioBook)
             appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_AudioBook),3)
+            iswhitelisted_extraInfo_byUserId_AudioBook=convert_timeToString(iswhitelisted_extraInfo_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_extraInfo_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add blacktagged items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (blacktagged_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Movie,isblacktagged_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (blacktagged_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Episode,isblacktagged_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (blacktagged_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Audio,isblacktagged_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (blacktagged_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_AudioBook,isblacktagged_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_MOVIE: ',3)
-            isblacktagged_and_played_byUserId_Movie=convert_timeToString(isblacktagged_and_played_byUserId_Movie)
             appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Movie),3)
+            isblacktagged_extraInfo_byUserId_Movie=convert_timeToString(isblacktagged_extraInfo_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_extraInfo_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_EPISODE: ',3)
-            isblacktagged_and_played_byUserId_Episode=convert_timeToString(isblacktagged_and_played_byUserId_Episode)
             appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Episode),3)
+            isblacktagged_extraInfo_byUserId_Episode=convert_timeToString(isblacktagged_extraInfo_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_extraInfo_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIO: ',3)
-            isblacktagged_and_played_byUserId_Audio=convert_timeToString(isblacktagged_and_played_byUserId_Audio)
             appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Audio),3)
+            isblacktagged_extraInfo_byUserId_Audio=convert_timeToString(isblacktagged_extraInfo_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_extraInfo_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisblacktagged_Played_AUDIOBOOK: ',3)
-            isblacktagged_and_played_byUserId_AudioBook=convert_timeToString(isblacktagged_and_played_byUserId_AudioBook)
             appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_AudioBook),3)
+            isblacktagged_extraInfo_byUserId_AudioBook=convert_timeToString(isblacktagged_extraInfo_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isblacktagged_extraInfo_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add whitetagged items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (whitetagged_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Movie,iswhitetagged_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (whitetagged_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Episode,iswhitetagged_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (whitetagged_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Audio,iswhitetagged_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (whitetagged_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_AudioBook,iswhitetagged_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_MOVIE: ',3)
-            iswhitetagged_and_played_byUserId_Movie=convert_timeToString(iswhitetagged_and_played_byUserId_Movie)
             appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Movie),3)
+            iswhitetagged_extraInfo_byUserId_Movie=convert_timeToString(iswhitetagged_extraInfo_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_extraInfo_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_EPISODE: ',3)
-            iswhitetagged_and_played_byUserId_Episode=convert_timeToString(iswhitetagged_and_played_byUserId_Episode)
             appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Episode),3)
+            iswhitetagged_extraInfo_byUserId_Episode=convert_timeToString(iswhitetagged_extraInfo_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_extraInfo_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIO: ',3)
-            iswhitetagged_and_played_byUserId_Audio=convert_timeToString(iswhitetagged_and_played_byUserId_Audio)
             appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Audio),3)
+            iswhitetagged_extraInfo_byUserId_Audio=convert_timeToString(iswhitetagged_extraInfo_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_extraInfo_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\niswhitetagged_Played_AUDIOBOOK: ',3)
-            iswhitetagged_and_played_byUserId_AudioBook=convert_timeToString(iswhitetagged_and_played_byUserId_AudioBook)
             appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_AudioBook),3)
+            iswhitetagged_extraInfo_byUserId_AudioBook=convert_timeToString(iswhitetagged_extraInfo_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_extraInfo_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Add favorited items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (favorited_behavior_movie[3] >= 0)):
-        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
+        deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Movie,isfavorited_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (favorited_behavior_episode[3] >= 0)):
-        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
+        deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Episode,isfavorited_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (favorited_behavior_audio[3] >= 0)):
-        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
+        deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Audio,isfavorited_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (favorited_behavior_audiobook[3] >= 0)):
-        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
+        deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_AudioBook,isfavorited_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n-----------------------------------------------------------',3)
         appendTo_DEBUG_log("\n",3)
         if ((movie_played_days >= 0) or (movie_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_MOVIE: ',3)
-            isfavorited_and_played_byUserId_Movie=convert_timeToString(isfavorited_and_played_byUserId_Movie)
             appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Movie),3)
+            isfavorited_extraInfo_byUserId_Movie=convert_timeToString(isfavorited_extraInfo_byUserId_Movie)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_extraInfo_byUserId_Movie),3)
             appendTo_DEBUG_log("\n",3)
         if ((episode_played_days >= 0) or (episode_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_EPISODE: ',3)
-            isfavorited_and_played_byUserId_Episode=convert_timeToString(isfavorited_and_played_byUserId_Episode)
             appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Episode),3)
+            isfavorited_extraInfo_byUserId_Episode=convert_timeToString(isfavorited_extraInfo_byUserId_Episode)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_extraInfo_byUserId_Episode),3)
             appendTo_DEBUG_log("\n",3)
         if ((audio_played_days >= 0) or (audio_created_days >= 0)):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIO: ',3)
-            isfavorited_and_played_byUserId_Audio=convert_timeToString(isfavorited_and_played_byUserId_Audio)
             appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Audio),3)
+            isfavorited_extraInfo_byUserId_Audio=convert_timeToString(isfavorited_extraInfo_byUserId_Audio)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_extraInfo_byUserId_Audio),3)
             appendTo_DEBUG_log("\n",3)
         if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0))):
             appendTo_DEBUG_log('\nisfavorited_Played_AUDIOBOOK: ',3)
-            isfavorited_and_played_byUserId_AudioBook=convert_timeToString(isfavorited_and_played_byUserId_AudioBook)
             appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_AudioBook),3)
+            isfavorited_extraInfo_byUserId_AudioBook=convert_timeToString(isfavorited_extraInfo_byUserId_AudioBook)
+            appendTo_DEBUG_log("\n" + convert2json(isfavorited_extraInfo_byUserId_AudioBook),3)
             appendTo_DEBUG_log("\n",3)
 
     #Keep a minimum number of episodes
@@ -7744,9 +7813,9 @@ def get_media_items():
         appendTo_DEBUG_log("\nFinalized List Of Items To Be Deleted: " + str(len(deleteItems)),3)
         for mediaItem in deleteItems:
             if ('CutOffDatePlayed' in mediaItem):
-                mediaItem['CutOffDatePlayed']=str(mediaItem['CutOffDatePlayed'])
+                deleteItems['CutOffDatePlayed']=str(mediaItem['CutOffDatePlayed'])
             if ('CutOffDateCreated' in mediaItem):
-                mediaItem['CutOffDateCreated']=str(mediaItem['CutOffDateCreated'])
+                deleteItems['CutOffDateCreated']=str(mediaItem['CutOffDateCreated'])
         appendTo_DEBUG_log("\n" + convert2json(deleteItems),4)
 
     if (GLOBAL_DEBUG):
@@ -8163,7 +8232,7 @@ def cfgCheck():
                  ((check[0] >= -1) and (check[0] <= 730500)) and
                  ((check[2] >= 0) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: played_filter_movie must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: played_filter_movie must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The played_filter_movie variable is missing from mumc_config.py\n'
 
@@ -8185,7 +8254,7 @@ def cfgCheck():
                   (check[1] == 'not >=') or (check[1] == 'not <=')) and
                  ((check[2] >= 0) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: played_filter_episode must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: played_filter_episode must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The played_filter_episode variable is missing from mumc_config.py\n'
 
@@ -8207,7 +8276,7 @@ def cfgCheck():
                   (check[1] == 'not >=') or (check[1] == 'not <=')) and
                  ((check[2] >= 0) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: played_filter_audio must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: played_filter_audio must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The played_filter_audio variable is missing from mumc_config.py\n'
 
@@ -8230,7 +8299,7 @@ def cfgCheck():
                      (check[1] == 'not >=') or (check[1] == 'not <=')) and
                     ((check[2] >= 0) and (check[2] <= 730500)))
                 ):
-                error_found_in_mumc_config_py+='ConfigValueError: played_filter_audiobook must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: played_filter_audiobook must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The played_filter_audiobook variable is missing from mumc_config.py\n'
 
@@ -8256,7 +8325,7 @@ def cfgCheck():
                  ((check[2] >= 0) and (check[2] <= 730500)) and
                  ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: created_filter_movie must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: created_filter_movie must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The created_filter_movie variable is missing from mumc_config.py\n'
 
@@ -8280,7 +8349,7 @@ def cfgCheck():
                  ((check[2] >= 0) and (check[2] <= 730500)) and
                  ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: created_filter_episode must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: created_filter_episode must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The created_filter_episode variable is missing from mumc_config.py\n'
 
@@ -8304,7 +8373,7 @@ def cfgCheck():
                  ((check[2] >= 0) and (check[2] <= 730500)) and
                  ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: created_filter_audio must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+            error_found_in_mumc_config_py+='ConfigValueError: created_filter_audio must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The created_filter_audio variable is missing from mumc_config.py\n'
 
@@ -8329,7 +8398,7 @@ def cfgCheck():
                     ((check[2] >= 0) and (check[2] <= 730500)) and
                     ((check[3] == True) or (check[3] == False)))
                 ):
-                error_found_in_mumc_config_py+='ConfigValueError: created_filter_audiobook must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
+                error_found_in_mumc_config_py+='ConfigValueError: created_filter_audiobook must be a list with four entries\n\tValid range for fourth entry -1 thru 730500\n\tValid values for second are inequalities\'all\', \'any\', and/or \'ignore\'\n\tValid range for third entry 0 thru 730500\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The created_filter_audiobook variable is missing from mumc_config.py\n'
 
@@ -8346,11 +8415,11 @@ def cfgCheck():
                  (type(check[2]) is str) and
                  (type(check[3]) is int) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The favorited_behavior_movie variable is missing from mumc_config.py\n'
 
@@ -8366,11 +8435,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The favorited_behavior_episode variable is missing from mumc_config.py\n'
 
@@ -8386,11 +8455,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The favorited_behavior_audio variable is missing from mumc_config.py\n'
 
@@ -8407,11 +8476,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-                error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+                error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The favorited_behavior_audiobook variable is missing from mumc_config.py\n'
 
@@ -8686,7 +8755,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8706,7 +8775,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8726,7 +8795,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8747,7 +8816,7 @@ def cfgCheck():
                     (type(check[3]) is int) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                    ((check[1].lower() == 'all')) and
                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
@@ -8783,7 +8852,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8803,7 +8872,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8823,7 +8892,7 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
@@ -8844,7 +8913,7 @@ def cfgCheck():
                      (type(check[3]) is int) and
                      (len(check) == 4) and
                      ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                     ((check[1].lower() == 'all') or (check[1].lower() == 'ignore')) and
+                     ((check[1].lower() == 'all')) and
                      ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                      ((check[3] >= 0) and (check[3] <= 8)))
                 ):
@@ -8866,11 +8935,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The whitelisted_behavior_movie variable is missing from mumc_config.py\n'
 
@@ -8886,11 +8955,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The whitelisted_behavior_episode variable is missing from mumc_config.py\n'
 
@@ -8906,11 +8975,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The whitelisted_behavior_audio variable is missing from mumc_config.py\n'
 
@@ -8927,11 +8996,11 @@ def cfgCheck():
                     (type(check[3]) is int) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+                error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The whitelisted_behavior_audiobook variable is missing from mumc_config.py\n'
 
@@ -8949,11 +9018,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_movie must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The blacklisted_behavior_movie variable is missing from mumc_config.py\n'
 
@@ -8969,11 +9038,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_episode must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The blacklisted_behavior_episode variable is missing from mumc_config.py\n'
 
@@ -8989,11 +9058,11 @@ def cfgCheck():
                  (type(check[3]) is int) and
                  (len(check) == 4) and
                  ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                  ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                  ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+            error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audio must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The blacklisted_behavior_audio variable is missing from mumc_config.py\n'
 
@@ -9010,11 +9079,11 @@ def cfgCheck():
                     (type(check[3]) is int) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'any') or (check[1].lower() == 'ignore')) and
+                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
+                error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry \'delete\' and \'keep\'\n\tValid values for second and third entry \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry 0 thru 8\n'
         else:
             error_found_in_mumc_config_py+='ConfigNameError: The blacklisted_behavior_audiobook variable is missing from mumc_config.py\n'
 

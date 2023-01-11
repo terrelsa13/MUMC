@@ -26,10 +26,10 @@ defaultConfigValues={
 
         #------------Advanced Config Options Start Here-------------#
 
-        'favorited_behavior_movie':['keep','ignore','ignore',3],
-        'favorited_behavior_episode':['keep','ignore','ignore',3],
-        'favorited_behavior_audio':['keep','ignore','ignore',3],
-        'favorited_behavior_audiobook':['keep','ignore','ignore',3],
+        'favorited_behavior_movie':['keep','any','ignore',3],
+        'favorited_behavior_episode':['keep','any','ignore',3],
+        'favorited_behavior_audio':['keep','any','ignore',3],
+        'favorited_behavior_audiobook':['keep','any','ignore',3],
 
         'favorited_advanced_movie_genre':0,
         'favorited_advanced_movie_library_genre':0,
@@ -56,10 +56,10 @@ defaultConfigValues={
 
         'whitetag':'',
 
-        'whitetagged_behavior_movie':['keep','ignore','ignore',0],
-        'whitetagged_behavior_episode':['keep','ignore','ignore',0],
-        'whitetagged_behavior_audio':['keep','ignore','ignore',0],
-        'whitetagged_behavior_audiobook':['keep','ignore','ignore',0],
+        'whitetagged_behavior_movie':['keep','all','ignore',0],
+        'whitetagged_behavior_episode':['keep','all','ignore',0],
+        'whitetagged_behavior_audio':['keep','all','ignore',0],
+        'whitetagged_behavior_audiobook':['keep','all','ignore',0],
 
         'blacktag':'',
 
@@ -68,10 +68,10 @@ defaultConfigValues={
         'blacktagged_behavior_audio':['delete','all','any',0],
         'blacktagged_behavior_audiobook':['delete','all','any',0],
 
-        'whitelisted_behavior_movie':['keep','ignore','ignore',3],
-        'whitelisted_behavior_episode':['keep','ignore','ignore',3],
-        'whitelisted_behavior_audio':['keep','ignore','ignore',3],
-        'whitelisted_behavior_audiobook':['keep','ignore','ignore',3],
+        'whitelisted_behavior_movie':['keep','any','ignore',3],
+        'whitelisted_behavior_episode':['keep','any','ignore',3],
+        'whitelisted_behavior_audio':['keep','any','ignore',3],
+        'whitelisted_behavior_audiobook':['keep','any','ignore',3],
 
         'blacklisted_behavior_movie':['delete','any','any',3],
         'blacklisted_behavior_episode':['delete','any','any',3],
