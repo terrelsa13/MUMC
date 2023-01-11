@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.10-beta'
+    Version='4.0.11-beta'
 
     return(Version)
 
@@ -5764,7 +5764,7 @@ def get_media_items():
                                     isBlackListed_Display=item_isBlackListed
 
                                     #blacklist behavior enabled
-                                    isblacklisted_and_played_byUserId_Movie=parse_actionedConfigurationBehavior(item,user_key,'blacklisted',isblacklisted_and_played_byUserId_Movie,blacklisted_behavior_movie,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacklisted_and_played_byUserId_Movie,isblacklisted_extraInfo_byUserId_Movie=parse_actionedConfigurationBehavior(item,isblacklisted_extraInfo_byUserId_Movie,user_key,'blacklisted',isblacklisted_and_played_byUserId_Movie,blacklisted_behavior_movie,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -6900,7 +6900,7 @@ def get_media_items():
                                     isBlackListed_Display=item_isBlackListed
 
                                     #blacklist behavior enabled
-                                    isblacklisted_and_played_byUserId_Audio=parse_actionedConfigurationBehavior(item,user_key,'blacklisted',isblacklisted_and_played_byUserId_Audio,blacklisted_behavior_audio,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacklisted_and_played_byUserId_Audio,isblacklisted_extraInfo_byUserId_Audio=parse_actionedConfigurationBehavior(item,isblacklisted_extraInfo_byUserId_Audio,user_key,'blacklisted',isblacklisted_and_played_byUserId_Audio,blacklisted_behavior_audio,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
@@ -7461,7 +7461,7 @@ def get_media_items():
                                     isBlackListed_Display=item_isBlackListed
 
                                     #blacklist behavior enabled
-                                    isblacklisted_and_played_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,user_key,'blacklisted',isblacklisted_and_played_byUserId_AudioBook,blacklisted_behavior_audiobook,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                    isblacklisted_and_played_byUserId_AudioBook,isblacklisted_extraInfo_byUserId_AudioBook=parse_actionedConfigurationBehavior(item,isblacklisted_extraInfo_byUserId_AudioBook,user_key,'blacklisted',isblacklisted_and_played_byUserId_AudioBook,blacklisted_behavior_audiobook,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
 
 ##########################################################################################################################################
 
