@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.0.11-beta'
+    Version='4.0.12-beta'
 
     return(Version)
 
@@ -1545,7 +1545,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#   2 - No action taken on True; Opposite action taken on False\n"
     config_file += "#   3 - Action taken on True; No action taken on False (recommended)\n"
     config_file += "#   4 - Action taken on True; Action taken on False\n"
-    config_file += "#   5 - Action taken on True; Opposite action taken on False\n"
+    config_file += "#   5 - Action taken on True; Opposite action taken on False (recommended)\n"
     config_file += "#   6 - Opposite action taken on True; No action taken on False\n"
     config_file += "#   7 - Opposite action taken on True; Action taken on False\n"
     config_file += "#   8 - Opposite action taken on True; Opposite action taken on False\n"
@@ -4522,51 +4522,28 @@ def prepare_AUDIOBOOKoutput(item,user_key,mediaType):
 #Parse behavior for favorites, whitetags, blacktags, and whitelists
 def parse_actionedConfigurationBehavior(item,isactioned_extra_byUserId,user_key,theActionType,isActioned_and_played_byUserId,action_behavior,item_isActioned,item_matches_played_days_filter,item_matches_played_count_filter):
 
-    itemCopy=item
-
     isactioned_extra_byUserId['ActionBehavior']=action_behavior[3]
-
     isactioned_extra_byUserId['ActionType']=theActionType
-
     isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior[1].lower()
-
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
-
     isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].lower()
-
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
-
     isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior[0].lower()
-
     isActioned_and_played_byUserId[user_key][item['Id']]=item
 
     return isActioned_and_played_byUserId,isactioned_extra_byUserId
 
 
-#Because we are not searching directly for unplayed whitelisted items; cleanup needs to happen to help the watched patterns make sense
-def whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpaths_json,user_wllib_paths_json):
+#Because we are not searching directly for unplayed whitelisted items; cleanup needs to happen to help the behavioral patterns make sense
+def whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpaths_json,user_wllib_paths_json,):
     itemId_tracker=[]
-    #userId_tracker=[]
 
-    monitoredUsersAction='MonitoredUsersAction'
-    isMeetingAction='IsMeetingAction'
-    
-    monitoredUsersMeetPlayedFilter='MonitoredUsersMeetPlayedFilter'
-    isMeetingPlayedFilter='IsMeetingPlayedFilter'
-
-    configuredBehavior='ConfiguredBehavior'
-    actionBehavior='ActionBehavior'
-    actionType='ActionType'
-
-    if ((monitoredUsersAction in itemsExtraDictionary) and (monitoredUsersMeetPlayedFilter in itemsExtraDictionary)):
-        actionFilter=itemsExtraDictionary[monitoredUsersAction]
-        playedFilter=itemsExtraDictionary[monitoredUsersMeetPlayedFilter]
-        methodFilter=itemsExtraDictionary[configuredBehavior]
-        behaviorFilter=itemsExtraDictionary[actionBehavior]
-        wordFilter=itemsExtraDictionary[actionType]
-
-        #for userId in itemsDictionary:
-        #userId_tracker=wluser_keys_json_verify
+    if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
+        #actionFilter=itemsExtraDictionary['MonitoredUsersAction']
+        #playedFilter=itemsExtraDictionary['MonitoredUsersMeetPlayedFilter']
+        #methodFilter=itemsExtraDictionary['ConfiguredBehavior']
+        behaviorFilter=itemsExtraDictionary['ActionBehavior']
+        #wordFilter=itemsExtraDictionary['ActionType']
 
         for userId in itemsDictionary:
             for itemId in itemsDictionary[userId]:
@@ -4577,21 +4554,71 @@ def whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_
                         if (not(userId == subUserId)):
                             if (not(item['Id'] in itemsDictionary[subUserId])):
                                 itemsExtraDictionary[subUserId][item['Id']]={}
-                                itemsExtraDictionary[subUserId][item['Id']][isMeetingAction]=get_isItemWhitelisted(item,itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryId'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryNetPath'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryPath'],library_matching_behavior,
+                                itemsExtraDictionary[subUserId][item['Id']]['IsMeetingAction']=get_isItemWhitelisted(item,itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryId'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryNetPath'],itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryPath'],library_matching_behavior,
                                 user_wllib_keys_json[wluser_keys_json_verify.index(subUserId)],user_wllib_netpaths_json[wluser_keys_json_verify.index(subUserId)],user_wllib_paths_json[wluser_keys_json_verify.index(subUserId)])
                                 if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
-                                    itemsExtraDictionary[subUserId][item['Id']][isMeetingPlayedFilter]=True
+                                    itemsExtraDictionary[subUserId][item['Id']]['IsMeetingPlayedFilter']=True
                                 else:
                                     item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,item['Id'],'playedPatternCleanup'),itemsExtraDictionary[userId][item['Id']]['PlayedDays'],itemsExtraDictionary[userId][item['Id']]['CreatedDays'],itemsExtraDictionary[userId][item['Id']]['CutOffDatePlayed'],itemsExtraDictionary[userId][item['Id']]['CutOffDateCreated'],itemsExtraDictionary[userId][item['Id']]['PlayedCountComparison'],itemsExtraDictionary[userId][item['Id']]['PlayedCount'],itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCountComparison'],itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCount'])
-                                    itemsExtraDictionary[subUserId][item['Id']][isMeetingPlayedFilter]=(item_matches_played_days_filter and item_matches_played_count_filter)
+                                    itemsExtraDictionary[subUserId][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
                                 itemsDictionary[subUserId][item['Id']]=item
 
     return itemsDictionary,itemsExtraDictionary
 
 
-#Because we are not searching directly for unplayed blacklisted items; cleanup needs to happen to make the watched patterns make sense
+#Because we are not searching directly for unplayed blacklisted items; cleanup needs to happen to make the behavioral patterns make sense
 def blacklist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json):
     return whitelist_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json)
+
+
+#Because we are not searching directly for non-favorited items; cleanup needs to happen to help the behavioral patterns make sense
+def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,favorited_behavior_media,advFav0,advFav1,advFav2=0,advFav3=0,advFav4=0,advFav5=0):
+    userId_tracker=[]
+    itemId_tracker=[]
+
+    for userId in itemsDictionary:
+        userId_tracker.append(userId)
+
+    for userId in itemsDictionary:
+        for itemId in itemsDictionary[userId]:
+            if not (itemId in itemId_tracker):
+                itemId_tracker.append(itemId)
+                for subUserId in userId_tracker:
+                    if (not(userId == subUserId)):
+                        if (not(itemId in itemsDictionary[subUserId])):
+
+                            item=get_ADDITIONAL_itemInfo(subUserId,itemId,'playedPatternCleanup')
+
+                            itemsDictionary[subUserId][itemId]=item
+                            itemsExtraDictionary[subUserId][itemId]={}
+                            itemsExtraDictionary=update_byUserId_playedStates(itemsExtraDictionary,subUserId,itemId,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
+
+                            if (item['Type'].lower() == 'movie'):
+                                itemIsFav=get_isMOVIE_Fav(item,subUserId)
+                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1)):
+                                    itemIsAdvFav=get_isMOVIE_AdvancedFav(item,subUserId,advFav0,advFav1)
+                            elif (item['Type'].lower() == 'episode'):
+                                itemIsFav=get_isEPISODE_Fav(item,subUserId)
+                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4 or advFav5)):
+                                    itemIsAdvFav=get_isEPISODE_AdvancedFav(item,subUserId,advFav0,advFav1,advFav2,advFav3,advFav4,advFav5)
+                            elif (item['Type'].lower() == 'audio'):
+                                itemIsFav=get_isAUDIO_Fav(item,subUserId)
+                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4)):
+                                    itemIsAdvFav=get_isAUDIO_AdvancedFav(item,subUserId,advFav0,advFav1,advFav2,advFav3,advFav4)
+                            elif (item['Type'].lower() == 'audiobook'):
+                                itemIsFav=get_isAUDIOBOOK_Fav(item,subUserId)
+                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4)):
+                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(item,subUserId,advFav0,advFav1,advFav2,advFav3,advFav4)
+
+                            if (itemIsFav or itemIsAdvFav):
+                                itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=True
+                            else:
+                                itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=None
+
+                            item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(get_ADDITIONAL_itemInfo(subUserId,itemId,'playedPatternCleanup'),itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
+                            itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+
+    return itemsDictionary,itemsExtraDictionary
 
 
 #Add/Remove item to/from delete list if meeting favorite/whitetagged/blacktagged/whitelisted pattern and played pattern
@@ -4607,22 +4634,12 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
     addIt='delete'
     #removeIt='keep'
 
-    monitoredUsersAction='MonitoredUsersAction'
-    isMeetingAction='IsMeetingAction'
-    
-    monitoredUsersMeetPlayedFilter='MonitoredUsersMeetPlayedFilter'
-    isMeetingPlayedFilter='IsMeetingPlayedFilter'
-
-    configuredBehavior='ConfiguredBehavior'
-    actionBehavior='ActionBehavior'
-    actionType='ActionType'
-
-    if ((monitoredUsersAction in itemsExtraDictionary) and (monitoredUsersMeetPlayedFilter in itemsExtraDictionary)):
-        actionFilter=itemsExtraDictionary[monitoredUsersAction]
-        playedFilter=itemsExtraDictionary[monitoredUsersMeetPlayedFilter]
-        methodFilter=itemsExtraDictionary[configuredBehavior]
-        behaviorFilter=itemsExtraDictionary[actionBehavior]
-        wordFilter=itemsExtraDictionary[actionType]
+    if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
+        actionFilter=itemsExtraDictionary['MonitoredUsersAction']
+        playedFilter=itemsExtraDictionary['MonitoredUsersMeetPlayedFilter']
+        methodFilter=itemsExtraDictionary['ConfiguredBehavior']
+        behaviorFilter=itemsExtraDictionary['ActionBehavior']
+        #wordFilter=itemsExtraDictionary['ActionType']
 
         for userId in itemsDictionary:
             userId_tracker.append(userId)
@@ -4630,39 +4647,51 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
         for userId in itemsDictionary:
             for itemId in itemsDictionary[userId]:
                 if not (itemId in itemId_tracker):
-                    firstLoop=True
+                    firstMeetingActionLoop=True
+                    firstPlayedFilterLoop=True
                     itemId_tracker.append(itemId)
                     item=itemsDictionary[userId][itemId]
                     for subUserId in userId_tracker:
-                        if (firstLoop):
+                        if (firstMeetingActionLoop):
                             if (itemId in itemsDictionary[subUserId]):
-                                isMeetingAction_dict[itemId]=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
-                                isMeetingPlayedFilter_dict[itemId]=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
-                            else:
-                                isMeetingAction_dict[itemId]=False
-                                isMeetingPlayedFilter_dict[itemId]=False
-                            firstLoop=False
+                                if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                    isMeetingAction_dict[itemId]=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
+                                    firstMeetingActionLoop=False
                         else:
                             if (itemId in itemsDictionary[subUserId]):
                                 if (actionFilter == andIt):
-                                    isMeetingAction_dict[itemId]&=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
+                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                        isMeetingAction_dict[itemId]&=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
                                 elif (actionFilter == orIt):
-                                    isMeetingAction_dict[itemId]|=itemsExtraDictionary[subUserId][itemId][isMeetingAction]
-                                #else:
-                                    #isMeetingAction_dict[itemId]=True
-                                if (playedFilter == andIt):
-                                    isMeetingPlayedFilter_dict[itemId]&=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
-                                elif (playedFilter == orIt):
-                                    isMeetingPlayedFilter_dict[itemId]|=itemsExtraDictionary[subUserId][itemId][isMeetingPlayedFilter]
-                                else:
-                                    isMeetingPlayedFilter_dict[itemId]=True
+                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                        isMeetingAction_dict[itemId]|=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
                             else:
                                 if (actionFilter == andIt):
                                     isMeetingAction_dict[itemId]&=False
                                 elif (actionFilter == orIt):
                                     isMeetingAction_dict[itemId]|=False
-                                #else:
-                                    #isMeetingAction_dict[itemId]=True
+
+                        if (firstPlayedFilterLoop):
+                            if (itemId in itemsDictionary[subUserId]):
+                                #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
+                                if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                    isMeetingPlayedFilter_dict[itemId]=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
+                                    firstPlayedFilterLoop=False
+                        else:
+                            if (itemId in itemsDictionary[subUserId]):
+                                if (playedFilter == andIt):
+                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
+                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                        isMeetingPlayedFilter_dict[itemId]&=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
+                                elif (playedFilter == orIt):
+                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
+                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                        isMeetingPlayedFilter_dict[itemId]|=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
+                                else:
+                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
+                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
+                                        isMeetingPlayedFilter_dict[itemId]=True
+                            else:
                                 if (playedFilter == andIt):
                                     isMeetingPlayedFilter_dict[itemId]&=False
                                 elif (playedFilter == orIt):
@@ -4678,13 +4707,13 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
                             #Action taken on True
                             if (methodFilter == addIt):
                                 addItemToDeleteList=True
-                            else:
+                            else: #(methodFilter == removeIt):
                                 addItemToDeleteList=False
                         else: #((behaviorFilter == 6) or (behaviorFilter == 7) or (behaviorFilter == 8)):
                             #Opposite action taken on True
                             if (methodFilter == addIt):
                                 addItemToDeleteList=False
-                            else:
+                            else: #(methodFilter == removeIt):
                                 addItemToDeleteList=True
                     else:
                         if ((behaviorFilter == 0) or (behaviorFilter == 3) or (behaviorFilter == 6)):
@@ -4694,13 +4723,13 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
                             #Action taken on False
                             if (methodFilter == addIt):
                                 addItemToDeleteList=True
-                            else:
+                            else: #(methodFilter == removeIt):
                                 addItemToDeleteList=False
                         else: #((behaviorFilter == 2) or (behaviorFilter == 5) or (behaviorFilter == 8)):
                             #Opposite action taken on False
                             if (methodFilter == addIt):
                                 addItemToDeleteList=False
-                            else:
+                            else: #(methodFilter == removeIt):
                                 addItemToDeleteList=True
 
                     if (addItemToDeleteList == True):
@@ -6242,9 +6271,9 @@ def get_media_items():
 
                                     #Get if media item is set as an advanced favorite
                                     item_isFavorited_Advanced=False
-                                    if ((favorited_behavior_episode[3] >= 0) and (favorited_advanced_episode_genre or favorited_advanced_season_genre) or
+                                    if ((favorited_behavior_episode[3] >= 0) and (favorited_advanced_episode_genre or favorited_advanced_season_genre or
                                         favorited_advanced_series_genre or favorited_advanced_tv_library_genre or favorited_advanced_tv_studio_network or
-                                        favorited_advanced_tv_studio_network_genre):
+                                        favorited_advanced_tv_studio_network_genre)):
                                         item_isFavorited_Advanced=get_isEPISODE_AdvancedFav(item,user_key,favorited_advanced_episode_genre,favorited_advanced_season_genre,
                                                                                             favorited_advanced_series_genre,favorited_advanced_tv_library_genre,favorited_advanced_tv_studio_network,favorited_advanced_tv_studio_network_genre)
 
@@ -7742,12 +7771,16 @@ def get_media_items():
 
     #Add favorited items to delete list that meet the defined played state
     if (((movie_played_days >= 0) or (movie_created_days >= 0)) and (favorited_behavior_movie[3] >= 0)):
+        isfavorited_and_played_byUserId_Movie,isfavorited_extraInfo_byUserId_Movie=favorites_playedPatternCleanup(isfavorited_and_played_byUserId_Movie,isfavorited_extraInfo_byUserId_Movie,movie_played_days,movie_created_days,cut_off_date_played_movie,cut_off_date_created_movie,movie_played_count_comparison,movie_played_count,movie_created_played_count_comparison,movie_created_played_count,favorited_behavior_movie,favorited_advanced_movie_genre,favorited_advanced_movie_library_genre)
         deleteItems_Movie,deleteItemsIdTracker_Movie=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Movie,isfavorited_extraInfo_byUserId_Movie,deleteItems_Movie,deleteItemsIdTracker_Movie)
     if (((episode_played_days >= 0) or (episode_created_days >= 0)) and (favorited_behavior_episode[3] >= 0)):
+        isfavorited_and_played_byUserId_Episode,isfavorited_extraInfo_byUserId_Episode=favorites_playedPatternCleanup(isfavorited_and_played_byUserId_Episode,isfavorited_extraInfo_byUserId_Episode,episode_played_days,episode_created_days,cut_off_date_played_episode,cut_off_date_created_episode,episode_played_count_comparison,episode_played_count,episode_created_played_count_comparison,episode_created_played_count,favorited_behavior_episode,favorited_advanced_episode_genre,favorited_advanced_season_genre,favorited_advanced_series_genre,favorited_advanced_tv_library_genre,favorited_advanced_tv_studio_network,favorited_advanced_tv_studio_network_genre)
         deleteItems_Episode,deleteItemsIdTracker_Episode=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Episode,isfavorited_extraInfo_byUserId_Episode,deleteItems_Episode,deleteItemsIdTracker_Episode)
     if (((audio_played_days >= 0) or (audio_created_days >= 0)) and (favorited_behavior_audio[3] >= 0)):
+        isfavorited_and_played_byUserId_Audio,isfavorited_extraInfo_byUserId_Audio=favorites_playedPatternCleanup(isfavorited_and_played_byUserId_Audio,isfavorited_extraInfo_byUserId_Audio,audio_played_days,audio_created_days,cut_off_date_played_audio,cut_off_date_created_audio,audio_played_count_comparison,audio_played_count,audio_created_played_count_comparison,audio_created_played_count,favorited_behavior_audio,favorited_advanced_track_genre,favorited_advanced_album_genre,favorited_advanced_music_library_genre,favorited_advanced_track_artist,favorited_advanced_album_artist)
         deleteItems_Audio,deleteItemsIdTracker_Audio=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Audio,isfavorited_extraInfo_byUserId_Audio,deleteItems_Audio,deleteItemsIdTracker_Audio)
     if ((isJellyfinServer()) and ((audiobook_played_days >= 0) or (audiobook_created_days >= 0)) and (favorited_behavior_audiobook[3] >= 0)):
+        isfavorited_and_played_byUserId_AudioBook,isfavorited_extraInfo_byUserId_AudioBook=favorites_playedPatternCleanup(isfavorited_and_played_byUserId_AudioBook,isfavorited_extraInfo_byUserId_AudioBook,audiobook_played_days,audiobook_created_days,cut_off_date_played_audiobook,cut_off_date_created_audiobook,audiobook_played_count_comparison,audiobook_played_count,audiobook_created_played_count_comparison,audiobook_created_played_count,favorited_behavior_audiobook,favorited_advanced_audiobook_track_genre,favorited_advanced_audiobook_genre,favorited_advanced_audiobook_library_genre,favorited_advanced_audiobook_track_author,favorited_advanced_audiobook_author)
         deleteItems_AudioBook,deleteItemsIdTracker_AudioBook=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_AudioBook,isfavorited_extraInfo_byUserId_AudioBook,deleteItems_AudioBook,deleteItemsIdTracker_AudioBook)
 
     if (GLOBAL_DEBUG):
