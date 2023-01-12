@@ -4593,6 +4593,7 @@ def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,media_pl
                             itemsExtraDictionary[subUserId][itemId]={}
                             itemsExtraDictionary=update_byUserId_playedStates(itemsExtraDictionary,subUserId,itemId,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
 
+                            itemIsAdvFav=False
                             if (item['Type'].lower() == 'movie'):
                                 itemIsFav=get_isMOVIE_Fav(item,subUserId)
                                 if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1)):
