@@ -82,10 +82,10 @@ defaultConfigValues={
         'minimum_number_played_episodes':0,
         'minimum_number_episodes_behavior':'Max Played Min Unplayed',
 
-        'movie_set_missing_last_played_date':1,
-        'episode_set_missing_last_played_date':1,
-        'audio_set_missing_last_played_date':1,
-        'audiobook_set_missing_last_played_date':1,
+        'movie_set_missing_last_played_date':True,
+        'episode_set_missing_last_played_date':True,
+        'audio_set_missing_last_played_date':True,
+        'audiobook_set_missing_last_played_date':True,
 
         'print_script_header':True,
         'print_warnings':True,

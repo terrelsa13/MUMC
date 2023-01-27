@@ -180,7 +180,7 @@ __Behavioral Statements apply to:__
 Generic Behavioral Statement Parts (each media type has their own Behavioral Statement Parts):
 * **Part #1** - Action (X : Keep or Delete)
 * **Part #2** - User Conditional (Y : All or Any)
-* **Part #3** - Played Conditional (Z : All or Any)
+* **Part #3** - Played Conditional (Z : All, Any, or Ignore)
 * **Part #4** - Action Control (# : 0 thru 8)
 
 * The Behavior Statement is processed as follows:
@@ -220,7 +220,7 @@ Starting with generic Behavioral Statements:
 
   - Example D: Filling in the blanks for a generic Favorites Behavioral Statement:
     - Part #1 - **Keep**
-    - Part #2 - **Ignore**
+    - Part #2 - **Any**
     - Part #3 - **Ignore**
       - **Keep** favorited media item.
 
@@ -251,18 +251,14 @@ Starting with generic Behavioral Statements:
 
 ## Step 9: Building Behavioral Statements for specific media types.
 
-* **Keep** whitelisted movie.
-  * whitelisted_behavior_movie=['keep', 'ignore', 'ignore', 3]
-    Or
-  * whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
-
-* **Keep** favorited episode.
-  * favorited_behavior_episode=['keep', 'ignore', 'ignore', 3]
-    Or
+* **Keep** favorited episode when **any** monitored users have it favorited.
   * favorited_behavior_episode=['keep', 'any', 'ignore', 3]
 
 * **Delete** blacklisted audio when **all** monitored users have it blacklisted.
   * blacklisted_behavior_audio=['delete', 'all', 'ignore', 3]
+
+* **Delete** favorited episode when **any** monitored users have it blacklisted and **all** monitored users meet episode_played_days and episode_played_count.
+  * blacklisted_behavior_audio=['delete', 'all', 'ignore', 5]
 
 * **Delete** whitelisted movie when **any** monitored users have it whitelisted and **all** monitored users meet movie_played_days and movie_played_count.
   * whitelisted_behavior_movie=['delete', 'any', 'all', 3]
@@ -290,9 +286,8 @@ Starting with generic Behavioral Statements:
 # B - Played Count Inequality
 # C - Played Count
 #
-# Condition Days (A): Find media items last played or created at least this many days ago
-#   0-730500 - Number of days filter will use to determine when the media items was
-#              last played or when the media item was created
+# Condition Days (A): Find media items last played this many days ago
+#   0-730500 - Number of days filter will use to determine when the media item was last played
 #  -1 - To disable deleting specified media type
 #
 # Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
@@ -308,7 +303,7 @@ Starting with generic Behavioral Statements:
 #   not == - Filter media items with a played count not equal to *_played_count days ago
 #
 # Played Count (C): Find media items with a played count relative to this number.
-#   0-730500 - Number of times a media item has been played
+#   1-730500 - Number of times a media item has been played
 #
 # ([-1,'>=',1] : default)
 #----------------------------------------------------------#
@@ -329,9 +324,8 @@ played_filter_audiobook=[-1, '>=', 1]
 # C - Played Count
 # D - Behaviorial Control
 #
-# Condition Days (A): Find media items last played or created at least this many days ago
-#   0-730500 - Number of days filter will use to determine when the media items was
-#              last played or when the media item was created
+# Condition Days (A): Find media items created at least this many days ago
+#   0-730500 - Number of days filter will use to determine when the media item was created
 #  -1 - To disable deleting specified media type
 #
 # Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
@@ -393,6 +387,7 @@ created_filter_audiobook=[-1, '>=', 1, True]
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
 #   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
 #
 # Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
 #   0 - No action taken on True; No action taken on False (disabled)
@@ -400,7 +395,7 @@ created_filter_audiobook=[-1, '>=', 1, True]
 #   2 - No action taken on True; Opposite action taken on False
 #   3 - Action taken on True; No action taken on False (recommended)
 #   4 - Action taken on True; Action taken on False
-#   5 - Action taken on True; Opposite action taken on False
+#   5 - Action taken on True; Opposite action taken on False (recommended)
 #   6 - Opposite action taken on True; No action taken on False
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
@@ -521,6 +516,7 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
 #   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
 #
 # Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
 #   0 - No action taken on True; No action taken on False (disabled)
@@ -528,12 +524,12 @@ whitetag='white_tagname,white_tag name,white_tag-name'
 #   2 - No action taken on True; Opposite action taken on False
 #   3 - Action taken on True; No action taken on False (recommended)
 #   4 - Action taken on True; Action taken on False
-#   5 - Action taken on True; Opposite action taken on False
+#   5 - Action taken on True; Opposite action taken on False (recommended)
 #   6 - Opposite action taken on True; No action taken on False
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
 #
-# (['keep','all','ignore',3] : default)
+# (['keep','all','ignore',0] : default)
 #----------------------------------------------------------#
 whitetagged_behavior_movie=['keep', 'all', 'ignore', 0]
 whitetagged_behavior_episode=['keep', 'all', 'ignore', 0]
@@ -578,6 +574,7 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
 #   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
 #
 # Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
 #   0 - No action taken on True; No action taken on False (disabled)
@@ -585,7 +582,7 @@ blacktag='black_tagname,black_tag name,black_tag-name'
 #   2 - No action taken on True; Opposite action taken on False
 #   3 - Action taken on True; No action taken on False (recommended)
 #   4 - Action taken on True; Action taken on False
-#   5 - Action taken on True; Opposite action taken on False
+#   5 - Action taken on True; Opposite action taken on False (recommended)
 #   6 - Opposite action taken on True; No action taken on False
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
@@ -623,6 +620,7 @@ blacktagged_behavior_audiobook=['delete', 'all', 'any', 0]
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
 #   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
 #
 # Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
 #   0 - No action taken on True; No action taken on False (disabled)
@@ -630,7 +628,7 @@ blacktagged_behavior_audiobook=['delete', 'all', 'any', 0]
 #   2 - No action taken on True; Opposite action taken on False
 #   3 - Action taken on True; No action taken on False (recommended)
 #   4 - Action taken on True; Action taken on False
-#   5 - Action taken on True; Opposite action taken on False
+#   5 - Action taken on True; Opposite action taken on False (recommended)
 #   6 - Opposite action taken on True; No action taken on False
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
@@ -667,6 +665,7 @@ whitelisted_behavior_audiobook=['keep', 'any', 'ignore', 3]
 # Played Conditional (Y): Specify how monitored users must meet played_filter_*.
 #   all - Every monitored user must meet the played_filter_*
 #   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
 #
 # Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
 #   0 - No action taken on True; No action taken on False (disabled)
@@ -674,7 +673,7 @@ whitelisted_behavior_audiobook=['keep', 'any', 'ignore', 3]
 #   2 - No action taken on True; Opposite action taken on False
 #   3 - Action taken on True; No action taken on False (recommended)
 #   4 - Action taken on True; Action taken on False
-#   5 - Action taken on True; Opposite action taken on False
+#   5 - Action taken on True; Opposite action taken on False (recommended)
 #   6 - Opposite action taken on True; No action taken on False
 #   7 - Opposite action taken on True; Action taken on False
 #   8 - Opposite action taken on True; Opposite action taken on False
@@ -747,26 +746,26 @@ minimum_number_episodes_behavior='Min Played Min Unplayed'
 #  not populated. To allow the script to maintain functionality
 #  the current date and time the script is run can be used as the
 #  LastPlayedDate value.
-#  0 - Do not set the LastPlayedDate; days since played will show as
+#  False - Do not set the LastPlayedDate; days since played will show as
 #        the number of days since 1970-Jan-01 00:00:00hrs for any media
 #        items missng the LastPlayedDate data.
-#  1 - Set the LastPlayedDate; the current date-time the script is
+#  True - Set the LastPlayedDate; the current date-time the script is
 #        run will be saved as the LastPlayedDate for any media items
 #        missing the LastPlayedDate data. Only media items missing the
 #        LastPlayedDate data are modified
-# (1 : default)
+# (True : default)
 #----------------------------------------------------------#
-movie_set_missing_last_played_date=1
-episode_set_missing_last_played_date=1
-audio_set_missing_last_played_date=1
-audiobook_set_missing_last_played_date=1
+movie_set_missing_last_played_date=True
+episode_set_missing_last_played_date=True
+audio_set_missing_last_played_date=True
+audiobook_set_missing_last_played_date=True
 ```
 #### Control output printed to the console
 ```python
 #----------------------------------------------------------#
 # Enable/Disable console outputs by type
 #----------------------------------------------------------#
-#  Should the script print its output to the console
+# Should the script print its output to the console
 #  False - Do not print this output type to the console
 #  True - Print this output type to the console
 # (True : default)
