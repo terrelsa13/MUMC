@@ -1,0 +1,686 @@
+#-------------Basic Config Options Start Here---------------#
+
+#----------------------------------------------------------#
+# Played Filter Statements
+#
+# [A,B,C]
+#
+# A - Condition Days
+# B - Played Count Inequality
+# C - Played Count
+#
+# Condition Days (A): Find media items last played or created at least this many days ago
+#   0-730500 - Number of days filter will use to determine when the media items was
+#              last played or when the media item was created
+#  -1 - To disable deleting specified media type
+#
+# Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
+#   > - Filter media items with a played count greater than *_played_count days ago
+#   < - Filter media items with a played count less than *_played_count days ago
+#   >= - Filter media items with a played count greater than or equal to *_played_count days ago
+#   <= - Filter media items with a played count less than or equal to *_played_count days ago
+#   == - Filter media items with a played count equal to *_played_count days ago
+#   not > - Filter media items with a played count not greater than *_played_count days ago
+#   not < - Filter media items with a played count not less than *_played_count days ago
+#   not >= - Filter media items with a played count not greater than or equal to *_played_count days ago
+#   not <= - Filter media items with a played count not less than or equal to *_played_count days ago
+#   not == - Filter media items with a played count not equal to *_played_count days ago
+#
+# Played Count (C): Find media items with a played count relative to this number.
+#   0-730500 - Number of times a media item has been played
+#
+# ([-1,'>=',1] : default)
+#----------------------------------------------------------#
+played_filter_movie=[0, '>=', 1]
+played_filter_episode=[0, '>=', 1]
+played_filter_audio=[-1, '>=', 1]
+played_filter_audiobook=[-1, '>=', 1]
+
+#----------------------------------------------------------#
+# Created Filter Statements
+#
+# [A,B,C,D]
+#
+# A - Condition Days
+# B - Played Count Inequality
+# C - Played Count
+# D - Behaviorial Control
+#
+# Condition Days (A): Find media items last played or created at least this many days ago
+#   0-730500 - Number of days filter will use to determine when the media items was
+#              last played or when the media item was created
+#  -1 - To disable deleting specified media type
+#
+# Played Count Inequality (B): Delete media items within this range based off of the chosen *_played_count.
+#   > - Filter media items with a played count greater than *_played_count days ago
+#   < - Filter media items with a played count less than *_played_count days ago
+#   >= - Filter media items with a played count greater than or equal to *_played_count days ago
+#   <= - Filter media items with a played count less than or equal to *_played_count days ago
+#   == - Filter media items with a played count equal to *_played_count days ago
+#   not > - Filter media items with a played count not greater than *_played_count days ago
+#   not < - Filter media items with a played count not less than *_played_count days ago
+#   not >= - Filter media items with a played count not greater than or equal to *_played_count days ago
+#   not <= - Filter media items with a played count not less than or equal to *_played_count days ago
+#   not == - Filter media items with a played count not equal to *_played_count days ago
+#
+# Played Count (C): Find media items with a played count relative to this number.
+#   0-730500 - Number of times a media item has been played
+#
+# Behavioral Control (D): Determine if favorited_behavior_*, whitetagged_behavior_*, blacktagged_behavior_*,
+#  whitelisted_behavior_*, and blacklisted_behavior_* apply to media items meeting the created_filter_*.
+#   False - Media items meeting the created_filter_* will be deleted regardless of favorited_behavior_*,
+#    whitetagged_behavior_*, blacktagged_behavior_*, whitelisted_behavior_*, and blacklisted_behavior_*
+#   True - Media items meeting the created_filter_* will also have to meet configured behaviors; favorited_behavior_*,
+#    whitetagged_behavior_*, blacktagged_behavior_*, whitelisted_behavior_*, and blacklisted_behavior_*
+#
+# ([-1,'>=',1,True] : default)
+#----------------------------------------------------------#
+created_filter_movie=[1, '>=', 0, False]
+created_filter_episode=[1, '>=', 0, False]
+created_filter_audio=[-1, '>=', 1, True]
+created_filter_audiobook=[-1, '>=', 1, True]
+
+#------------Advanced Config Options Start Here-------------#
+
+#----------------------------------------------------------#
+# Favorited Behavioral Statements
+#
+# Favoriting is the first (and highest) priority
+#  Whitetagging behavior is ignored
+#  Blacktagging behavior is ignored
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item favorited.
+#   all - Every monitored user must have the media item favorited
+#   any - One or more monitored users must have the media item favorited
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','any','ignore',3] : default)
+#----------------------------------------------------------#
+favorited_behavior_movie=['delete', 'any', 'all', 5]
+favorited_behavior_episode=['delete', 'any', 'all', 5]
+favorited_behavior_audio=['keep', 'any', 'ignore', 3]
+favorited_behavior_audiobook=['keep', 'any', 'ignore', 3]
+
+#----------------------------------------------------------#
+# Advanced movie favorites configurations
+#     Requires 'favorited_behavior_movie[3]>=0'
+#----------------------------------------------------------#
+#  Keep movie based on the genres
+#  0 - ok to delete movie when genres are set as a favorite
+#  1 - keep movie if FIRST genre listed is set as a favorite
+#  2 - keep movie if ANY genre listed is set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorited_advanced_movie_genre=0
+favorited_advanced_movie_library_genre=0
+
+#----------------------------------------------------------#
+# Advanced episode favorites configurations
+#     Requires 'favorited_behavior_episode[3]>=0'
+#----------------------------------------------------------#
+#  Keep episode based on the genre(s) or studio-network(s)
+#  0 - ok to delete episode when its genres or studio-networks are set as a favorite
+#  1 - keep episode if FIRST genre or studio-network is set as a favorite
+#  2 - keep episode if ANY genres or studio-networks are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorited_advanced_episode_genre=0
+favorited_advanced_season_genre=0
+favorited_advanced_series_genre=0
+favorited_advanced_tv_library_genre=0
+favorited_advanced_tv_studio_network=0
+favorited_advanced_tv_studio_network_genre=0
+
+#----------------------------------------------------------#
+# Advanced track favorites configurations
+#     Requires 'favorited_behavior_audio[3]>=0'
+#----------------------------------------------------------#
+#  Keep track based on the genre(s) or artist(s)
+#  0 - ok to delete track when its genres or artists are set as a favorite
+#  1 - keep track if FIRST genre or artist is set as a favorite
+#  2 - keep track if ANY genres or artists are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorited_advanced_track_genre=0
+favorited_advanced_album_genre=0
+favorited_advanced_music_library_genre=0
+favorited_advanced_track_artist=0
+favorited_advanced_album_artist=0
+
+#----------------------------------------------------------#
+# Advanced audio book favorites configurations
+#     Requires 'favorited_behavior_audiobook[3]>=0'
+#----------------------------------------------------------#
+#  Keep audio book track based on the genres or authors
+#  0 - ok to delete audio book track when its genres or authors are set as a favorite
+#  1 - keep audio book track if FIRST genre or author is set as a favorite
+#  2 - keep audio book track if ANY genres or authors are set as a favorite
+# (0 : default)
+#----------------------------------------------------------#
+favorited_advanced_audiobook_track_genre=0
+favorited_advanced_audiobook_genre=0
+favorited_advanced_audiobook_library_genre=0
+favorited_advanced_audiobook_track_author=0
+favorited_advanced_audiobook_author=0
+
+#----------------------------------------------------------#
+# User entered whitetag name; chosen during setup
+#  Use a comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
+#----------------------------------------------------------#
+whitetag=''
+
+#----------------------------------------------------------#
+# Whitetagged Behavioral Statements
+#  Tags applied to a media item are seen by all users
+#
+# Whitetagging is the second priority
+#  Blacktagging behavior is ignored
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item whitetagged.
+#   all - Every monitored user must have the media item whitetagged
+#   any - N/A; Tags apply to all users
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','all','ignore',0] : default)
+#----------------------------------------------------------#
+whitetagged_behavior_movie=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_episode=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_audio=['keep', 'all', 'ignore', 0]
+whitetagged_behavior_audiobook=['keep', 'all', 'ignore', 0]
+
+#----------------------------------------------------------#
+# User entered blacktag name; chosen during setup
+#  Use a comma ',' to seperate multiple tag names
+#   Ex: tagname,tag name,tag-name
+#  Backslash '\' not allowed
+#----------------------------------------------------------#
+blacktag=''
+
+#----------------------------------------------------------#
+# Blacktagged Behavioral Statements
+#  Tags applied to a media item are seen by all users
+#
+# Blacktagging is the third priority
+#  Whitelisting behavior is ignored
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item blacktagged.
+#   all - Every monitored user must have the media item blacktagged
+#   any - N/A; Tags apply to all users
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['delete','all','any',0] : default)
+#----------------------------------------------------------#
+blacktagged_behavior_movie=['delete', 'all', 'any', 0]
+blacktagged_behavior_episode=['delete', 'all', 'any', 0]
+blacktagged_behavior_audio=['delete', 'all', 'any', 0]
+blacktagged_behavior_audiobook=['delete', 'all', 'any', 0]
+
+#----------------------------------------------------------#
+# Whitelisted Behavioral Statements
+#
+# Whitelisting is the fourth priority
+#  Blacklisting behavior is ignored
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item whitelisted.
+#   all - Every monitored user must have the media item whitelisted
+#   any - One or more monitored users must have the media item whitelisted
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['keep','any','ignore',3] : default)
+#----------------------------------------------------------#
+whitelisted_behavior_movie=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_episode=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_audio=['keep', 'any', 'ignore', 3]
+whitelisted_behavior_audiobook=['keep', 'any', 'ignore', 3]
+
+#----------------------------------------------------------#
+# Blacklisted Behavioral Statements
+#
+# Blacklisting is the fifth (and lowest) priority
+#
+# [W, X, Y, Z]
+#
+# W - Action
+# X - User Conditional
+# Y - Played Conditional
+# Z - Action Control
+#
+# Action (W): Specify which action should be taken when (X) and (Y) is True.
+#   delete - Delete media item from server
+#   keep - Do NOT delete media item from server
+#
+# User Conditional (X): Specify how monitored users must have the media item blacklisted.
+#   all - Every monitored user must have the media item blacklisted
+#   any - One or more monitored users must have the media item blacklisted
+#
+# Played Conditional (Y): Specify how monitored users must meet played_filter_*.
+#   all - Every monitored user must meet the played_filter_*
+#   any - One or more monitored users must meet the played_filter_*
+#   ignore - Ignore if monitored users meet the played_filter_*
+#
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+#   0 - No action taken on True; No action taken on False (disabled)
+#   1 - No action taken on True; Action taken on False
+#   2 - No action taken on True; Opposite action taken on False
+#   3 - Action taken on True; No action taken on False (recommended)
+#   4 - Action taken on True; Action taken on False
+#   5 - Action taken on True; Opposite action taken on False
+#   6 - Opposite action taken on True; No action taken on False
+#   7 - Opposite action taken on True; Action taken on False
+#   8 - Opposite action taken on True; Opposite action taken on False
+#
+# (['delete','any','any',3] : default)
+#----------------------------------------------------------#
+blacklisted_behavior_movie=['delete', 'any', 'any', 3]
+blacklisted_behavior_episode=['delete', 'any', 'any', 3]
+blacklisted_behavior_audio=['delete', 'any', 'any', 3]
+blacklisted_behavior_audiobook=['delete', 'any', 'any', 3]
+
+#----------------------------------------------------------#
+# Decide the minimum number of episodes to remain in all tv series'
+# This ignores the played and unplayed states of episodes
+#  0 - Episodes will be deleted based on the Filter Statement
+#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
+#              the remaining played and unplayed episodes are less than or equal
+#              to the chosen value
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_episodes=0
+
+#----------------------------------------------------------#
+# Decide the minimum number of played episodes to remain in all tv series'
+# Keeping one or more played epsiodes for each series allows the "Next Up"
+#  functionality to notify user(s) when a new episode for a series
+#  is available
+# This value applies only to played and episodes
+#  0 - Episodes will be deleted based on the Filter Statement
+#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
+#              the remaining played episodes are less than or equal to the
+#              chosen value
+# (0 : default)
+#----------------------------------------------------------#
+minimum_number_played_episodes=0
+
+#----------------------------------------------------------#
+# Decide how 'minimum_number_episodes' and 'minimum_number_played_episodes' will behave.
+# The minimum number of played and unplayed episodes will vary for each user and for each
+#  series when multiple users are watching the same series at different paces.
+# The following option gives a mechanism to control this in different ways.
+# The 'minimum_number_episodes' and 'minimum_number_played_episodes' will be based off of...
+#  'User's Name' - The UserName specified; If matching UserName not found script will assume default.
+#  'User's Id' - The UserId specified; If matching UserName not found script will assume default.
+#  'Max Played' - The first user with the highest number of played episodes to be deleted for each series.
+#  'Min Played' - The first user with the lowest number of played episodes to be deleted for each series.
+#  'Max Unplayed' - The first user with the highest number of unplayed episodes to be deleted for each series.
+#  'Min Unplayed' - The first user with the lowest number of unplayed episodes to be deleted for each series.
+# The Max/Min Played/Unplayed values can be mixed and matched. For example...
+#  'Max Unplayed Min Played' - The number played episodes to be deleted is based off the user
+#                                with the highest number of unplayed episodes to be deleted for a
+#                                specified series. The number of unplayed episodes to be deleted is
+#                                based off the user with the lowest number of played episodes to be
+#                                deleted for a specified series.
+# ('Min Played Min Unplayed' : default)
+#----------------------------------------------------------#
+minimum_number_episodes_behavior='Max Played Min Unplayed'
+
+#----------------------------------------------------------#
+# Add last played date for items missing the LastPlayedDate data
+# When played state is imported from Trakt the LastPlayedDate is
+#  not populated. To allow the script to maintain functionality
+#  the current date and time the script is run can be used as the
+#  LastPlayedDate value.
+#  0 - Do not set the LastPlayedDate; days since played will show as
+#        the number of days since 1970-Jan-01 00:00:00hrs for any media
+#        items missng the LastPlayedDate data.
+#  1 - Set the LastPlayedDate; the current date-time the script is
+#        run will be saved as the LastPlayedDate for any media items
+#        missing the LastPlayedDate data. Only media items missing the
+#        LastPlayedDate data are modified
+# (1 : default)
+#----------------------------------------------------------#
+movie_set_missing_last_played_date=1
+episode_set_missing_last_played_date=1
+audio_set_missing_last_played_date=1
+audiobook_set_missing_last_played_date=1
+
+#----------------------------------------------------------#
+# Enable/Disable console outputs by type
+#----------------------------------------------------------#
+#  Should the script print its output to the console
+#  False - Do not print this output type to the console
+#  True - Print this output type to the console
+# (True : default)
+#----------------------------------------------------------#
+print_script_header=True
+print_warnings=True
+print_user_header=True
+print_movie_delete_info=True
+print_movie_keep_info=True
+print_episode_delete_info=True
+print_episode_keep_info=True
+print_audio_delete_info=True
+print_audio_keep_info=True
+print_audiobook_delete_info=True
+print_audiobook_keep_info=True
+print_summary_header=True
+print_movie_summary=True
+print_episode_summary=True
+print_audio_summary=True
+print_audiobook_summary=True
+print_script_footer=True
+
+#----------------------------------------------------------#
+# Set to True to add new users or edit existing users
+# Must be a boolean True or False value
+#  False - Operate normally
+#  True  - Enable configuration editor mode; will NOT delete media items
+#           Resets to dry run mode (REMOVE_FILES=False)
+# (False : default)
+#----------------------------------------------------------#
+UPDATE_CONFIG=False
+
+#----------------------------------------------------------#
+# Must be a boolean True or False value
+#  False - Disables the ability to delete media (dry run mode)
+#  True - Enable the ability to delete media
+# (False : default)
+#----------------------------------------------------------#
+REMOVE_FILES=False
+
+#---------!!!DO NOT MODIFY ANYTHING BELOW!!!----------------#
+# These are automatically created during setup.
+#   If you do not know EXACTLY what you are doing; changing these
+#      may cause script failure.
+#   The only way to recover from script failure is to revert the
+#      config back to the way it was OR rebuild a new config.
+#----------------------------------------------------------#
+
+#----------------------------------------------------------#
+# Server branding; chosen during setup
+#  0 - 'emby'
+#  1 - 'jellyfin'
+#----------------------------------------------------------#
+server_brand='jellyfin'
+
+#----------------------------------------------------------#
+# Server URL; created during setup
+#----------------------------------------------------------#
+server_url='http://watch.tv/jf'
+
+#----------------------------------------------------------#
+# Authentication Key; requested from server during setup
+#  Used for API queries sent to the server
+#  Also know as an Access Token
+#----------------------------------------------------------#
+auth_key='f8abcf8adb2a4593b2f740056f533205'
+
+#----------------------------------------------------------#
+# Decide how the script will use the libraries chosen for each user
+#  Only used during creation or editing of the configuration file
+#  0 - blacklist - Chosen libraries will blacklisted
+#                  All other libraries will be whitelisted
+#  1 - whitelist - Chosen libraries will whitelisted
+#                  All other libraries will be blacklisted
+# (blacklist : default)
+#----------------------------------------------------------#
+library_setup_behavior='blacklist'
+
+#----------------------------------------------------------#
+# Decide how the script will match media items to libraries
+#  0 - byId - Media items will be matched to libraries using 'LibraryIds'
+#  1 - byPath - Media items will be matched to libraries using 'Paths'
+#  2 - byNetwork Path - Media items will be matched to libraries using 'NetworkPaths'
+# Filtering byId does not apply to the rules below.
+# Filtering byPath requires no shared network folders are configured.
+# Filtering byNetworkPath requires shared network folders are configured.
+# (byId : default)
+#----------------------------------------------------------#
+library_matching_behavior='byId'
+
+#----------------------------------------------------------#
+# User UserName(s) and UserId(s) of monitored account(s); chosen during setup
+# The order of the UserName(s):UserId(s) here must match the order of the
+#  UserId(s)/UserNames(s) in user_bl_libs and user_wl_libs
+#----------------------------------------------------------#
+user_keys='["User1:d3a1cbbc5ced4f7a85a8889f47ac159e", "user2:962c4def2d8548f4b383110f562467d1"]'
+
+#----------------------------------------------------------#
+# Blacklisted libraries with corresponding user keys(s)
+# These libraries are typically searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
+user_bl_libs='[{"userid": "d3a1cbbc5ced4f7a85a8889f47ac159e", "username": "User1", "0": {"libid": "5097fea0ddd7d6eb5a4cb2fda7c6f6ff", "collectiontype": "tvshows", "path": "/media/Pharaoh/xbmc/TV", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/TV"}}, {"userid": "962c4def2d8548f4b383110f562467d1", "username": "user2", "0": {"libid": "5097fea0ddd7d6eb5a4cb2fda7c6f6ff", "collectiontype": "tvshows", "path": "/media/Pharaoh/xbmc/TV", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/TV"}}]'
+
+#----------------------------------------------------------#
+# Whitelisted libraries with corresponding user keys(s)
+# These libraries are typically not searched for media items to delete
+# Chosen during setup
+#----------------------------------------------------------#
+user_wl_libs='[{"userid": "d3a1cbbc5ced4f7a85a8889f47ac159e", "username": "User1", "1": {"libid": "bd99fd9391c5b909ef4c3f78c9a3ad95", "collectiontype": "music", "path": "/media/Pharaoh/xbmc/Music/Albums", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Albums"}, "2": {"libid": "bd99fd9391c5b909ef4c3f78c9a3ad95", "collectiontype": "music", "path": "/media/Pharaoh/xbmc/Music/Albums2", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Albums2"}, "3": {"libid": "9d7ad6afe9afa2dab1a2f6e00ad28fa6", "collectiontype": "boxsets", "path": "/var/lib/jellyfin/data/collections", "networkpath": ""}, "4": {"libid": "f137a2dd21bbc1b99aa5c0f6bf02a805", "collectiontype": "movies", "path": "/media/Pharaoh/xbmc/Movies", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Movies"}, "5": {"libid": "4e985111ed7f570b595204d82adb02f3", "collectiontype": "books", "path": "/media/Pharaoh/xbmc/Books", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Books"}}, {"userid": "962c4def2d8548f4b383110f562467d1", "username": "user2", "1": {"libid": "bd99fd9391c5b909ef4c3f78c9a3ad95", "collectiontype": "music", "path": "/media/Pharaoh/xbmc/Music/Albums", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Albums"}, "2": {"libid": "bd99fd9391c5b909ef4c3f78c9a3ad95", "collectiontype": "music", "path": "/media/Pharaoh/xbmc/Music/Albums2", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Albums2"}, "3": {"libid": "9d7ad6afe9afa2dab1a2f6e00ad28fa6", "collectiontype": "boxsets", "path": "/var/lib/jellyfin/data/collections", "networkpath": ""}, "4": {"libid": "f137a2dd21bbc1b99aa5c0f6bf02a805", "collectiontype": "movies", "path": "/media/Pharaoh/xbmc/Movies", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Movies"}, "5": {"libid": "4e985111ed7f570b595204d82adb02f3", "collectiontype": "books", "path": "/media/Pharaoh/xbmc/Books", "networkpath": "smb://hieroglyph/Pharaoh/xbmc/Books"}}]'
+
+#----------------------------------------------------------#
+# API query attempts
+# Number of times to retry an API request
+#  Delay between initial attempt and the first retry is 1 second
+#  The delay will double with each attempt after the first retry
+#  Delay between the orginal request and retry #1 is (2^0) 1 second
+#  Delay between retry #1 and retry #2 is (2^1) 2 seconds
+#  Delay between retry #2 and retry #3 is (2^2) 4 seconds
+#  Delay between retry #3 and retry #4 is (2^3) 8 seconds
+#  Delay between retry #4 and retry #5 is (2^4) 16 seconds
+#  Delay between retry #5 and retry #6 is (2^5) 32 seconds
+#  ...
+#  Delay between retry #15 and retry #16 is (2^15) 32768 seconds
+#  0-16 - number of retry attempts
+#  (4 : default)
+#----------------------------------------------------------#
+api_query_attempts=4
+
+#----------------------------------------------------------#
+# API query item limit
+# To keep the server running smoothly we do not want it to return a
+#  large amount of metadata from a single API query
+# If the server lags or bogs down when this script runs try lowering
+#  this value to allow the server to return smaller amounts of data
+# ALL media items and their metadata are processed regardless of this value
+#  1-10000 - maximum number of media items the server will return for each API query
+#  (25 : default)
+#----------------------------------------------------------#
+api_query_item_limit=100
+
+#----------------------------------------------------------#
+# API cache maximum size
+# To keep the script running efficiently we do not want to send the
+#  same requests to the server repeatedly
+# If any single data entry is larger than the cache size, that data entry
+#  will not be cached
+# During testing on the developlment server, even 0.1MB of cache is better
+#  than 0MB of cache
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
+#
+# MegaByte Sizing Reference
+#  1MB = 1048576 Bytes
+#  1000MB = 1GB
+#  10000MB = 10GB
+#
+#  0 - Disable cache
+#  1-1000 - Size of cache in megabytes (MB)
+#  (10 : default)
+#----------------------------------------------------------#
+api_query_cache_size=40.598602
+
+#----------------------------------------------------------#
+# API cache fallback behavior
+# By default the script is a hybrid LFU-LRU RAM Cache
+#
+# 1.First the cache is filled
+# 2.Once full the cache uses api_query_cache_last_accessed_time to
+#    establish a minimum age an entry has to be for removal
+# 3.Then the oldest entry meeting the minimum age (from step 2) with
+#    the lowest number of hits (reads) is removed
+# 4.If no entrys meet the minimum age or all have the same number of
+#    cache hits (reads); api_query_cache_fallback_behavior is used
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
+#
+# Fallback To
+#  'FIFO' - First In First Out (first entry is removed)
+#  'LFU' - Least Frequently Used (first entry with the lowest number of hits is removed)
+#  'LRU' - Least Recently Used (first entry with the oldest access time is removed)
+#  (LRU : default)
+#----------------------------------------------------------#
+api_query_cache_fallback_behavior='LRU'
+
+#----------------------------------------------------------#
+# API cache entry minium age
+#
+# Once full the cache uses api_query_cache_last_accessed_time to
+#  establish a minimum age an entry has to be for removal
+#
+# Bigger is NOT always better. The older an entry is allowed to be, the lower
+#  the number of elgible entries for removal when cache is full.
+#  When this happens the script will not be able to find an entry that
+#  satisfies LFU-LRU and will use api_query_cache_fallback_behavior
+#  until there is enough space in cache for the newest entry.
+# Recommend setting DEBUG=1 to print the cache stats to determine the
+#  best cache settings (i.e. size, fallback behavior, and last accessed time)
+#
+# Millisecond Timing Reference
+#  1ms = 0.001s
+#  1000ms = 1s
+#  100000ms = 100s
+#
+#  0-600000 - Minimum cached entry age for removal in milliseconds (ms)
+#  (200 : default)
+#----------------------------------------------------------#
+api_query_cache_last_accessed_time=200
+
+#----------------------------------------------------------#
+# Must be an integer value
+#  Debug log file save to: /the/script/directory/mumc_DEBUG.log
+#  The debug log file can be large (i.e. 10s to 100s of MBytes)
+#  Recommend only enabling DEBUG when necessary
+#  False - Debug messages disabled
+#   0 - Debug messages disabled
+#  True - Level 1 debug messages enabled
+#   1 - Level 1 debug messaging enabled
+#   2 - Level 2 debug messaging enabled
+#   3 - Level 3 debug messaging enabled
+#   4 - Level 4 debug messaging enabled
+# (0 : default)
+#----------------------------------------------------------#
+DEBUG=4
+
+#-------------End Config Options----------------------------#
