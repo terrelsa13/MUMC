@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.1-beta'
+    Version='4.1.2-beta'
 
     return(Version)
 
@@ -244,19 +244,6 @@ class cached_data_handler:
         self.newest_cached_data_entry_number=None
         self.oldest_cached_data_entry_number=None
         self.total_cumulative_cached_data_entry_number=None
-        #try:
-            #self.api_query_cache_size=cfg.api_query_cache_size * GLOBAL_BYTES_IN_MEGABYTES
-        #except:
-            #self.api_query_cache_size=0
-        #try:
-            #self.api_query_cache_fallback_behavior=cfg.api_query_cache_fallback_behavior.upper()
-        #except:
-            #self.api_query_cache_fallback_behavior='LRU'
-        #try:
-            #self.api_query_cache_last_accessed_time=cfg.api_query_cache_last_accessed_time
-        #except:
-            #self.api_query_cache_last_accessed_time=0
-
         self.api_query_cache_size=config_dict['api_query_cache_size'] * GLOBAL_BYTES_IN_MEGABYTES
         self.api_query_cache_fallback_behavior=config_dict['api_query_cache_fallback_behavior'].upper()
         self.api_query_cache_last_accessed_time=config_dict['api_query_cache_last_accessed_time']
@@ -351,11 +338,14 @@ class cached_data_handler:
         except:
             return False
 
+
     def getLowestAttributeValueCacheEntryIndex(self,cached_data_list):
         return cached_data_list.index(min(cached_data_list))
 
+
     def getTimeWindow(self):
         return (time.time() * 1000) - self.api_query_cache_last_accessed_time
+
 
     def addEntryToCache(self,url,data):
         potentialEntrySize=(self.getDataSize(url) + self.getDataSize(data))
@@ -422,17 +412,20 @@ class cached_data_handler:
         else:
             return False
 
+
     def getCachedEntrySize(self,url):
         try:
             return self.cached_entry_sizes[self.getIndexFromURL(url)]
         except:
             return None
 
+
     def getCachedEntryHits(self,url):
         try:
             return self.cached_entry_frequency[self.getIndexFromURL(url)]
         except:
             return None
+
 
     def getCachedEntryTime(self,url):
         try:
@@ -2887,7 +2880,6 @@ def get_isItemMonitored(mediasource):
 
 #Determine if there is a matching item or Determine if an item starts with the other
 def get_isItemMatching_doesItemStartWith(item_one, item_two):
-
     #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
     item_one = item_one.replace('\\','/')
     item_two = item_two.replace('\\','/')
@@ -2922,7 +2914,6 @@ def get_isItemMatching_doesItemStartWith(item_one, item_two):
 
 #Determine if media item whitelisted for the current user or for another user
 def get_isItemWhitelisted(item,LibraryID,LibraryNetPath,LibraryPath,library_matching_behavior,user_wllib_key_json,user_wllib_netpath_json,user_wllib_path_json):
-
     item_isWhiteListed=False
     itemWhiteListedValue=''
 
@@ -2931,9 +2922,7 @@ def get_isItemWhitelisted(item,LibraryID,LibraryNetPath,LibraryPath,library_matc
         appendTo_DEBUG_log("\n",1)
 
     if (library_matching_behavior == 'byid'):
-
         item_isWhiteListed, itemWhiteListedValue=get_isItemMatching_doesItemStartWith(LibraryID,user_wllib_key_json)
-
     elif (library_matching_behavior == 'bypath'):
         if ("Path" in item):
             ItemPath = item["Path"]
@@ -2941,9 +2930,7 @@ def get_isItemWhitelisted(item,LibraryID,LibraryNetPath,LibraryPath,library_matc
             ItemPath = item["MediaSources"]["Path"]
         else:
             ItemPath = LibraryPath
-
         item_isWhiteListed, itemWhiteListedValue=get_isItemMatching_doesItemStartWith(ItemPath,user_wllib_path_json)
-
     elif (library_matching_behavior == 'bynetworkpath'):
         if ("Path" in item):
             ItemNetPath = item["Path"]
@@ -2951,7 +2938,6 @@ def get_isItemWhitelisted(item,LibraryID,LibraryNetPath,LibraryPath,library_matc
             ItemNetPath = item["MediaSources"]["Path"]
         else:
             ItemNetPath = LibraryNetPath
-
         item_isWhiteListed, itemWhiteListedValue=get_isItemMatching_doesItemStartWith(ItemNetPath,user_wllib_netpath_json)
 
     if (GLOBAL_DEBUG):
@@ -6314,7 +6300,6 @@ def sort_audiobook_deleteItems_List(item):
 
 #api call to delete items
 def delete_media_item(itemID,config_dict):
-
     #build API delete request for specified media item
     url=config_dict['server_url'] + '/Items/' + itemID + '?api_key=' + config_dict['auth_key']
 
@@ -6339,7 +6324,6 @@ def delete_media_item(itemID,config_dict):
 
 #list and delete items past played threshold
 def output_itemsToDelete(deleteItems,config_dict):
-
     deleteItems_Tracker=[]
     print_summary_header=config_dict['print_summary_header']
     print_movie_summary=config_dict['print_movie_summary']
