@@ -690,10 +690,10 @@ blacklisted_behavior_audiobook=['delete', 'any', 'any', 3]
 #----------------------------------------------------------#
 # Decide the minimum number of episodes to remain in all tv series'
 # This ignores the played and unplayed states of episodes
-#  0 - Episodes will be deleted based on the Filter Statement
-#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
-#              the remaining played and unplayed episodes are less than or equal
-#              to the chosen value
+#  0 - Episodes will be deleted based on the Filter and Behavioral Statements
+#  1-730500 - Episodes will be deleted based on the Filter and Behavioral Statements;
+#              unless the remaining played and unplayed episodes are less than or
+#              equal to the chosen value
 # (0 : default)
 #----------------------------------------------------------#
 minimum_number_episodes=0
@@ -706,9 +706,9 @@ minimum_number_episodes=0
 #  functionality to notify user(s) when a new episode for a series
 #  is available
 # This value applies only to played and episodes
-#  0 - Episodes will be deleted based on the Filter Statement
-#  1-730500 - Episodes will be deleted based on the Filter Statement; unless
-#              the remaining played episodes are less than or equal to the
+#  0 - Episodes will be deleted based on the Filter and Behavioral Statements
+#  1-730500 - Episodes will be deleted based on the Filter and Behavioral Statements;
+#              unless the remaining played episodes are less than or equal to the
 #              chosen value
 # (0 : default)
 #----------------------------------------------------------#
@@ -941,8 +941,7 @@ api_query_item_limit=25
 #  same requests to the server repeatedly
 # If any single data entry is larger than the cache size, that data entry
 #  will not be cached
-# During testing on the developlment server, 0.1MB of cache is better
-#  than 0MB of cache
+# 0.1MB of cache is better than 0MB of cache
 # Recommend setting DEBUG=1 to print the cache stats to determine the
 #  best cache settings (i.e. size, fallback behavior, and last accessed time)
 #
@@ -952,7 +951,7 @@ api_query_item_limit=25
 #  10000MB = 10GB
 #
 #  0 - Disable cache
-#  1-1000 - Size of cache in megabytes (MB)
+#  1-10000 - Size of cache in megabytes (MB)
 #  (10 : default)
 #----------------------------------------------------------#
 api_query_cache_size=10
@@ -994,6 +993,9 @@ api_query_cache_fallback_behavior='LRU'
 #  When this happens the script will not be able to find an entry that
 #  satisfies LRU/LFU and will use api_query_cache_fallback_behavior
 #  until there is enough space in cache for the newest entry.
+# Of course setting a bigger cache size means needing to remove less
+#  cache entries.
+# Increase api_query_cache_size before increasing this api_query_cache_last_accessed_time
 # Recommend setting DEBUG=1 to print the cache stats to determine the
 #  best cache settings (i.e. size, fallback behavior, and last accessed time)
 #
@@ -1114,7 +1116,7 @@ DEBUG=0
   - Type: ```python mumc.py```
 
 # First Run (Other Operating Systems)
-* Please consult your favorite search engine
+* Consult your favorite search engine
 
 # Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
 * Below cron entry runs ```mumc.py``` everyday at 00:00hrs (aka 12:00am)
@@ -1123,10 +1125,10 @@ DEBUG=0
    - $```23 1 * * 1 /usr/local/bin/python3.11 /opt/mumc/mumc.py > /var/log/mumc.log 2>&1```
 
 # Schedule To Run (Windows)
-* Please consult your favorite search engine for a Windows task scheduler
+* Consult your favorite search engine for a Windows task scheduler
 
 # Schedule To Run (Other Operating Systems)
-* Please consult your favorite search engine
+* Consult your favorite search engine
 
 # Donation
 If you find MUMC useful and would like to show support, please consider the option below.

@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.2-beta'
+    Version='4.1.3-beta'
 
     return(Version)
 
@@ -2023,10 +2023,10 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#----------------------------------------------------------#\n"
     config_file += "# Decide the minimum number of episodes to remain in all tv series'\n"
     config_file += "# This ignores the played and unplayed states of episodes\n"
-    config_file += "#  0 - Episodes will be deleted based on the Filter Statement\n"
-    config_file += "#  1-730500 - Episodes will be deleted based on the Filter Statement; unless\n"
-    config_file += "#              the remaining played and unplayed episodes are less than or equal\n"
-    config_file += "#              to the chosen value\n"
+    config_file += "#  0 - Episodes will be deleted based on the Filter and Behavioral Statements\n"
+    config_file += "#  1-730500 - Episodes will be deleted based on the Filter and Behavioral Statements;\n"
+    config_file += "#              unless the remaining played and unplayed episodes are less than or\n"
+    config_file += "#              equal to the chosen value\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
@@ -2041,9 +2041,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  functionality to notify user(s) when a new episode for a series\n"
     config_file += "#  is available\n"
     config_file += "# This value applies only to played and episodes\n"
-    config_file += "#  0 - Episodes will be deleted based on the Filter Statement\n"
-    config_file += "#  1-730500 - Episodes will be deleted based on the Filter Statement; unless\n"
-    config_file += "#              the remaining played episodes are less than or equal to the\n"
+    config_file += "#  0 - Episodes will be deleted based on the Filter and Behavioral Statements\n"
+    config_file += "#  1-730500 - Episodes will be deleted based on the Filter and Behavioral Statements;\n"
+    config_file += "#              unless the remaining played episodes are less than or equal to the\n"
     config_file += "#              chosen value\n"
     config_file += "# (0 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
@@ -2305,8 +2305,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  same requests to the server repeatedly\n"
     config_file += "# If any single data entry is larger than the cache size, that data entry\n"
     config_file += "#  will not be cached\n"
-    config_file += "# During testing on the developlment server, even 0.1MB of cache is better\n"
-    config_file += "#  than 0MB of cache\n"
+    config_file += "# 0.1MB of cache is better than 0MB of cache\n"
     config_file += "# Recommend setting DEBUG=1 to print the cache stats to determine the\n"
     config_file += "#  best cache settings (i.e. size, fallback behavior, and last accessed time)\n"
     config_file += "#\n"
@@ -2316,8 +2315,8 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  10000MB = 10GB\n"
     config_file += "#\n"
     config_file += "#  0 - Disable cache\n"
-    config_file += "#  1-1000 - Size of cache in megabytes (MB)\n"
-    config_file += "#  (10 : default)\n"
+    config_file += "#  1-10000 - Size of cache in megabytes (MB)\n"
+    config_file += "#  (32 : default)\n"
     config_file += "#----------------------------------------------------------#\n"
     if not (updateConfig):
         config_file += "api_query_cache_size=" + str(get_default_config_values('api_query_cache_size')) + "\n"
@@ -2362,6 +2361,9 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  When this happens the script will not be able to find an entry that\n"
     config_file += "#  satisfies LFU-LRU and will use api_query_cache_fallback_behavior\n"
     config_file += "#  until there is enough space in cache for the newest entry.\n"
+    config_file += "# Of course setting a bigger cache size means needing to remove less\n"
+    config_file += "#  cache entries.\n"
+    config_file += "# Increase api_query_cache_size before increasing this api_query_cache_last_accessed_time\n"
     config_file += "# Recommend setting DEBUG=1 to print the cache stats to determine the\n"
     config_file += "#  best cache settings (i.e. size, fallback behavior, and last accessed time)\n"
     config_file += "#\n"
@@ -8182,9 +8184,9 @@ def cfgCheck():
         if (
             not ((type(check) is int) or (type(check) is float) and
             (check >= 0) and
-            (check <= 1000))
+            (check <= 10000))
         ):
-            error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be a number; valid range 0 thru 1000\n'
+            error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be a number; valid range 0 thru 10000\n'
         else:
             config_dict['api_query_cache_size']=check
     else:
@@ -8552,7 +8554,7 @@ deleteItems_audiobook=run_post_processing(config_dict,audiobook_dict)
 
 #sort and combine into single list
 deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) + sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
-            sorted(deleteItems_audio,key=sort_audio_deleteItems_List) + sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
+             sorted(deleteItems_audio,key=sort_audio_deleteItems_List) + sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
 
 #show and delete media items
 output_itemsToDelete(deleteItems,config_dict)

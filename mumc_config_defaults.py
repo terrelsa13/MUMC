@@ -111,7 +111,7 @@ defaultConfigValues={
 
         #------------Cache Settings-------------#
 
-        'api_query_cache_size':10,
+        'api_query_cache_size':32,
         'api_query_cache_fallback_behavior':'LRU',
         'api_query_cache_last_accessed_time':200
     }
