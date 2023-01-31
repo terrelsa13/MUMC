@@ -12,7 +12,7 @@ _**Optional:**_ Before running the script for the first time; you can edit this 
 ## Step 1: What is a Filter Statement? What is a Behavioral Statement?
 
 * A Filter Statement is a simple way to tell the script how to find media items taking up your disk space.
-* A Behavioral Statement is a simple way to tell the script how to delete media items found with the Filter Statment.
+* A Behavioral Statement is a simple way to tell the script how to delete media items found with the Filter Statement.
   - This also means the media items **not matching** the Filter Statement and Behavioral Statement are kept safe for watching later.
 ## Step 2: The basics of building a generic Filter Statement.
 

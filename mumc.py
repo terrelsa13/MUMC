@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.3-beta'
+    Version='4.1.4-beta'
 
     return(Version)
 
@@ -244,9 +244,18 @@ class cached_data_handler:
         self.newest_cached_data_entry_number=None
         self.oldest_cached_data_entry_number=None
         self.total_cumulative_cached_data_entry_number=None
-        self.api_query_cache_size=config_dict['api_query_cache_size'] * GLOBAL_BYTES_IN_MEGABYTES
-        self.api_query_cache_fallback_behavior=config_dict['api_query_cache_fallback_behavior'].upper()
-        self.api_query_cache_last_accessed_time=config_dict['api_query_cache_last_accessed_time']
+        try:
+            self.api_query_cache_size=config_dict['api_query_cache_size'] * GLOBAL_BYTES_IN_MEGABYTES
+        except:
+            self.api_query_cache_size=get_default_config_values('api_query_cache_size')
+        try:
+            self.api_query_cache_fallback_behavior=config_dict['api_query_cache_fallback_behavior'].upper()
+        except:
+            self.api_query_cache_fallback_behavior=get_default_config_values('api_query_cache_fallback_behavior')
+        try:
+            self.api_query_cache_last_accessed_time=config_dict['api_query_cache_last_accessed_time']
+        except:
+            self.api_query_cache_last_accessed_time=get_default_config_values('api_query_cache_last_accessed_time')
 
 
     def wipeCache(self):
@@ -448,7 +457,11 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    data = GLOBAL_CACHED_DATA.getCachedDataFromURL(url)
+    try:
+        data = GLOBAL_CACHED_DATA.getCachedDataFromURL(url)
+    except:
+        data = False
+
     if (data):
         getdata = False
     else:
@@ -8290,7 +8303,7 @@ def defaultHelper():
 GLOBAL_DEBUG=0
 GLOBAL_CONFIG_FILE_NAME='mumc_config.py'
 GLOBAL_DEBUG_FILE_NAME='mumc_DEBUG.log'
-
+GLOBAL_CACHED_DATA=cached_data_handler({})
 GLOBAL_BYTES_IN_MEGABYTES=1048576
 GLOBAL_DATE_TIME_NOW=datetime.now()
 GLOBAL_DATE_TIME_UTC_NOW=datetime.utcnow()
