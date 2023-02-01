@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.4-beta'
+    Version='4.1.15-beta'
 
     return(Version)
 
