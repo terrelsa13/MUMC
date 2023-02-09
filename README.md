@@ -1,4 +1,4 @@
-# Support For MUMC v3.x.x Ending 2023 March 01st.
+# Support For MUMC v3.x.x Ending 2023 March 31st.
 * Recommend moving to [MUMC v4.x.x](https://github.com/terrelsa13/MUMC/tree/MUMC_v4-BETA)
 
 # Multi-User Media Cleaner
