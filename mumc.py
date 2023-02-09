@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.15-beta'
+    Version='4.1.16-beta'
 
     return(Version)
 
@@ -806,8 +806,10 @@ def get_authentication_key(server_url, username, password):
 
 #Unpack library data structure from config
 def user_lib_builder(json_lib_entry):
-    #lib_json=json.loads(json_lib_entry)
-    lib_json=json_lib_entry
+    if (isinstance(json_lib_entry, str)):
+        lib_json=json.loads(json_lib_entry)
+    elif (isinstance(json_lib_entry, list)):
+        lib_json=json_lib_entry
     built_userid=[]
     built_username=[]
     built_libid=[]
@@ -4784,11 +4786,11 @@ def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,favorite
                                         appendTo_DEBUG_log("\nadvFav4: " + str(advFav4),3)
                                         appendTo_DEBUG_log("\nadvFav5: " + str(advFav5),3)
                             elif (item['Type'].lower() == 'audio'):
-                                itemIsFav=get_isAUDIO_Fav(item,subUserId)
+                                itemIsFav=get_isAUDIO_Fav(item,subUserId,'Audio')
                                 if (GLOBAL_DEBUG):
                                     appendTo_DEBUG_log("\nAudio is favorite: " + str(itemIsFav),3)
                                 if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4)):
-                                    itemIsAdvFav=get_isAUDIO_AdvancedFav(item,subUserId,advFav0,advFav1,advFav2,advFav3,advFav4)
+                                    itemIsAdvFav=get_isAUDIO_AdvancedFav(item,subUserId,'Audio',advFav0,advFav1,advFav2,advFav3,advFav4)
                                     if (GLOBAL_DEBUG):
                                         appendTo_DEBUG_log("\nadvFav0: " + str(advFav0),3)
                                         appendTo_DEBUG_log("\nadvFav1: " + str(advFav1),3)
@@ -4796,11 +4798,11 @@ def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,favorite
                                         appendTo_DEBUG_log("\nadvFav3: " + str(advFav3),3)
                                         appendTo_DEBUG_log("\nadvFav4: " + str(advFav4),3)
                             elif (item['Type'].lower() == 'audiobook'):
-                                itemIsFav=get_isAUDIOBOOK_Fav(item,subUserId)
+                                itemIsFav=get_isAUDIOBOOK_Fav(item,subUserId,'AudioBook')
                                 if (GLOBAL_DEBUG):
                                     appendTo_DEBUG_log("\nAudioBook is favorite: " + str(itemIsFav),3)
                                 if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4)):
-                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(item,subUserId,advFav0,advFav1,advFav2,advFav3,advFav4)
+                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(item,subUserId,'AudioBook',advFav0,advFav1,advFav2,advFav3,advFav4)
                                     if (GLOBAL_DEBUG):
                                         appendTo_DEBUG_log("\nadvFav0: " + str(advFav0),3)
                                         appendTo_DEBUG_log("\nadvFav1: " + str(advFav1),3)
@@ -5388,13 +5390,13 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 if ((mediaType_lower == 'audio') or (mediaType_lower == 'audiobook')):
                     FieldsState_Favorited_From_Whitelist=FieldsState_Favorited_From_Whitelist + ',ArtistItems,AlbumId,AlbumArtist'
-                    SortBy_Favorited_From_Whitelist='Artist,PremiereDate,ProductionYear,Album' + SortBy_Favorited_From_Whitelist
+                    SortBy_Favorited_From_Whitelist='Artist,PremiereDate,ProductionYear,Album,' + SortBy_Favorited_From_Whitelist
                     if (isEmbyServer()):
                         if (mediaType_lower == 'audio'):
                             IncludeItemTypes_Favorited_From_Whitelist+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
                     else:
                         if (mediaType_lower == 'audio'):
-                            IncludeItemTypes_Favorited_From_Whitelist+='Audio,MusicAlbum,Playlist,CollectionFolder'
+                            IncludeItemTypes_Favorited_From_Whitelist+=',Audio,MusicAlbum,Playlist,CollectionFolder'
                         elif (mediaType_lower == 'audiobook'):
                             IncludeItemTypes_Favorited_From_Whitelist+=',Book,MusicAlbum,Playlist,CollectionFolder'
 
@@ -5431,13 +5433,13 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 if ((mediaType_lower == 'audio') or (mediaType_lower == 'audiobook')):
                     FieldsState_BlackTagged_From_BlackList=FieldsState_BlackTagged_From_BlackList + ',ArtistItems,AlbumId,AlbumArtist'
-                    SortBy_BlackTagged_From_BlackList='Artist,PremiereDate,ProductionYear,Album' + SortBy_BlackTagged_From_BlackList
+                    SortBy_BlackTagged_From_BlackList='Artist,PremiereDate,ProductionYear,Album,' + SortBy_BlackTagged_From_BlackList
                     if (isEmbyServer()):
                         if (mediaType_lower == 'audio'):
                             IncludeItemTypes_BlackTagged_From_BlackList+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
                     else:
                         if (mediaType_lower == 'audio'):
-                            IncludeItemTypes_BlackTagged_From_BlackList+='Audio,MusicAlbum,Playlist,CollectionFolder'
+                            IncludeItemTypes_BlackTagged_From_BlackList+=',Audio,MusicAlbum,Playlist,CollectionFolder'
                         elif (mediaType_lower == 'audiobook'):
                             IncludeItemTypes_BlackTagged_From_BlackList+=',Book,MusicAlbum,Playlist,CollectionFolder'
 
@@ -5474,7 +5476,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 if ((mediaType_lower == 'audio') or (mediaType_lower == 'audiobook')):
                     FieldsState_BlackTagged_From_WhiteList=FieldsState_BlackTagged_From_WhiteList + ',ArtistItems,AlbumId,AlbumArtist'
-                    SortBy_BlackTagged_From_WhiteList='Artist,PremiereDate,ProductionYear,Album' + SortBy_BlackTagged_From_WhiteList
+                    SortBy_BlackTagged_From_WhiteList='Artist,PremiereDate,ProductionYear,Album,' + SortBy_BlackTagged_From_WhiteList
                     if (isEmbyServer()):
                         if (mediaType_lower == 'audio'):
                             IncludeItemTypes_BlackTagged_From_WhiteList+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
@@ -5517,7 +5519,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 if ((mediaType_lower == 'audio') or (mediaType_lower == 'audiobook')):
                     FieldsState_WhiteTagged_From_Blacklist=FieldsState_WhiteTagged_From_Blacklist + ',ArtistItems,AlbumId,AlbumArtist'
-                    SortBy_WhiteTagged_From_Blacklist='Artist,PremiereDate,ProductionYear,Album' + SortBy_WhiteTagged_From_Blacklist
+                    SortBy_WhiteTagged_From_Blacklist='Artist,PremiereDate,ProductionYear,Album,' + SortBy_WhiteTagged_From_Blacklist
                     if (isEmbyServer()):
                         if (mediaType_lower == 'audio'):
                             IncludeItemTypes_WhiteTagged_From_Blacklist+=',Audio,AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
@@ -5560,7 +5562,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 if ((mediaType_lower == 'audio') or (mediaType_lower == 'audiobook')):
                     FieldsState_WhiteTagged_From_Whitelist=FieldsState_WhiteTagged_From_Whitelist + ',ArtistItems,AlbumId,AlbumArtist'
-                    SortBy_WhiteTagged_From_Whitelist='Artist,PremiereDate,ProductionYear,Album' + SortBy_WhiteTagged_From_Whitelist
+                    SortBy_WhiteTagged_From_Whitelist='Artist,PremiereDate,ProductionYear,Album,' + SortBy_WhiteTagged_From_Whitelist
                     if (isEmbyServer()):
                         if (mediaType_lower == 'audio'):
                             IncludeItemTypes_WhiteTagged_From_Whitelist+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
@@ -5736,7 +5738,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
 
                 #Combine dictionaries into list of dictionaries
                 #Order here is important
-                data_list=[data_Favorited_From_Whitelist, #0
+                data_lists=[data_Favorited_From_Whitelist, #0
                             data_Favorited_From_Whitelist_Children, #1
                             data_Whitetagged_From_Whitelist, #2
                             data_Whitetagged_From_Whitelist_Children, #3
@@ -5768,15 +5770,15 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
                                             QueriesRemaining_Blacklist |
                                             QueriesRemaining_Whitelist)
 
-                #track where we are in the data_list
+                #track where we are in the data_lists
                 data_list_pos=0
 
                 #Determine if media item is shown as DELETE or KEEP
-                #Loop thru each dictionary in data_list[#]
-                for data in data_list:
+                #Loop thru each dictionary in data_lists[#]
+                for data_dict in data_lists:
 
-                    #Loop thru each dictionary[item]
-                    for item in data['Items']:
+                    #Loop thru each data_dict['Items'] item
+                    for item in data_dict['Items']:
 
                         #Check if item was already processed for this user
                         if not (item['Id'] in user_processed_itemsId):
@@ -6619,7 +6621,7 @@ def cfgCheck():
             #Double newline for debug log formatting
             appendTo_DEBUG_log("\n\nserver_brand='" + str(check) + "'",2)
         if (
-            not ((type(check) is str) and
+            not ((isinstance(check,str)) and
             ((check == 'emby') or
             (check == 'jellyfin')))
         ):
@@ -6646,9 +6648,10 @@ def cfgCheck():
             userid_check_list.append(user_info.split(':',1)[1])
             for check_irt in userid_check_list:
                 if (
-                    not ((type(check_irt) is str) and
-                    (len(check_irt) == 32) and
-                    (str(check_irt).isalnum()))
+                    not ((isinstance(check_list,list)) and
+                        (isinstance(check_irt,str)) and
+                        (len(check_irt) == 32) and
+                        (str(check_irt).isalnum()))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
         else:
@@ -6663,18 +6666,18 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nplayed_filter_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (len(check) == 3) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[2] >= 1) and (check[2] <= 730500)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (len(check) == 3) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[2] >= 1) and (check[2] <= 730500)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: played_filter_movie must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
@@ -6687,18 +6690,18 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nplayed_filter_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (len(check) == 3) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[2] >= 1) and (check[2] <= 730500)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (len(check) == 3) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[2] >= 1) and (check[2] <= 730500)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: played_filter_episode must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
@@ -6711,18 +6714,18 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nplayed_filter_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (len(check) == 3) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[2] >= 1) and (check[2] <= 730500)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (len(check) == 3) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[2] >= 1) and (check[2] <= 730500)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: played_filter_audio must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
@@ -6736,17 +6739,17 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nplayed_filter_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                    (type(check[0]) is int) and
-                    (type(check[1]) is str) and
-                    (type(check[2]) is int) and
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],int)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],int)) and
                     (len(check) == 3) and
                     ((check[0] >= -1) and (check[0] <= 730500)) and
                     ((check[1] == '>') or (check[1] == '<') or
-                     (check[1] == '>=') or (check[1] == '<=') or
-                     (check[1] == '==') or (check[1] == 'not ==') or
-                     (check[1] == 'not >') or (check[1] == 'not <') or
-                     (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                    (check[1] == '>=') or (check[1] == '<=') or
+                    (check[1] == '==') or (check[1] == 'not ==') or
+                    (check[1] == 'not >') or (check[1] == 'not <') or
+                    (check[1] == 'not >=') or (check[1] == 'not <=')) and
                     ((check[2] >= 1) and (check[2] <= 730500)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: played_filter_audiobook must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
@@ -6762,20 +6765,20 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\ncreated_filter_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (type(check[3]) is bool) and
-                 (len(check) == 4) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[2] >= 0) and (check[2] <= 730500)) and
-                 ((check[3] == True) or (check[3] == False)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (isinstance(check[3],bool)) and
+                (len(check) == 4) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[2] >= 0) and (check[2] <= 730500)) and
+                ((check[3] == True) or (check[3] == False)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: created_filter_movie must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
@@ -6788,20 +6791,20 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\ncreated_filter_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (type(check[3]) is bool) and
-                 (len(check) == 4) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[2] >= 0) and (check[2] <= 730500)) and
-                 ((check[3] == True) or (check[3] == False)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (isinstance(check[3],bool)) and
+                (len(check) == 4) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[2] >= 0) and (check[2] <= 730500)) and
+                ((check[3] == True) or (check[3] == False)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: created_filter_episode must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
@@ -6814,20 +6817,20 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\ncreated_filter_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is int) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is int) and
-                 (type(check[3]) is bool) and
-                 (len(check) == 4) and
-                 ((check[0] >= -1) and (check[0] <= 730500)) and
-                 ((check[1] == '>') or (check[1] == '<') or
-                  (check[1] == '>=') or (check[1] == '<=') or
-                  (check[1] == '==') or (check[1] == 'not ==') or
-                  (check[1] == 'not >') or (check[1] == 'not <') or
-                  (check[1] == 'not >=') or (check[1] == 'not <=')) and
-                 ((check[2] >= 0) and (check[2] <= 730500)) and
-                 ((check[3] == True) or (check[3] == False)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],int)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],int)) and
+                (isinstance(check[3],bool)) and
+                (len(check) == 4) and
+                ((check[0] >= -1) and (check[0] <= 730500)) and
+                ((check[1] == '>') or (check[1] == '<') or
+                (check[1] == '>=') or (check[1] == '<=') or
+                (check[1] == '==') or (check[1] == 'not ==') or
+                (check[1] == 'not >') or (check[1] == 'not <') or
+                (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                ((check[2] >= 0) and (check[2] <= 730500)) and
+                ((check[3] == True) or (check[3] == False)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: created_filter_audio must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
@@ -6841,18 +6844,18 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\ncreated_filter_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                    (type(check[0]) is int) and
-                    (type(check[1]) is str) and
-                    (type(check[2]) is int) and
-                    (type(check[3]) is bool) and
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],int)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],int)) and
+                    (isinstance(check[3],bool)) and
                     (len(check) == 4) and
                     ((check[0] >= -1) and (check[0] <= 730500)) and
                     ((check[1] == '>') or (check[1] == '<') or
-                     (check[1] == '>=') or (check[1] == '<=') or
-                     (check[1] == '==') or (check[1] == 'not ==') or
-                     (check[1] == 'not >') or (check[1] == 'not <') or
-                     (check[1] == 'not >=') or (check[1] == 'not <=')) and
+                    (check[1] == '>=') or (check[1] == '<=') or
+                    (check[1] == '==') or (check[1] == 'not ==') or
+                    (check[1] == 'not >') or (check[1] == 'not <') or
+                    (check[1] == 'not >=') or (check[1] == 'not <=')) and
                     ((check[2] >= 0) and (check[2] <= 730500)) and
                     ((check[3] == True) or (check[3] == False)))
                 ):
@@ -6869,15 +6872,15 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_behavior_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -6890,16 +6893,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_behavior_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -6912,16 +6915,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_behavior_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -6935,16 +6938,16 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nfavorited_behavior_audiobook=" + str(check),2)
             if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],str)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],str)) and
+                    (isinstance(check[3],int)) and
+                    (len(check) == 4) and
+                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                    ((check[3] >= 0) and (check[3] <= 8)))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: favorited_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
@@ -6959,9 +6962,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_movie_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_movie_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -6974,9 +6977,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_movie_library_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_movie_library_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -6991,9 +6994,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_episode_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_episode_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7006,9 +7009,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_season_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_season_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7021,9 +7024,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_series_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_series_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7036,9 +7039,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_tv_library_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_tv_library_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7051,9 +7054,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_tv_studio_network=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_tv_studio_network must be an integer; valid range 0 thru 2\n'
         else:
@@ -7066,9 +7069,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_tv_studio_network_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_tv_studio_network_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7083,9 +7086,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_track_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_track_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7098,9 +7101,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_album_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_album_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7113,9 +7116,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_music_library_genre=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_music_library_genre must be an integer; valid range 0 thru 2\n'
         else:
@@ -7143,9 +7146,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_album_artist=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_album_artist must be an integer; valid range 0 thru 2\n'
         else:
@@ -7161,9 +7164,9 @@ def cfgCheck():
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log("\nfavorited_advanced_audiobook_track_genre=" + str(check),2)
                 if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
+                    not ((isinstance(check,int)) and
+                        (check >= 0) and
+                        (check <= 2))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_audiobook_track_genre must be an integer; valid range 0 thru 2\n'
                 else:
@@ -7176,9 +7179,9 @@ def cfgCheck():
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log("\nfavorited_advanced_audiobook_genre=" + str(check),2)
                 if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
+                    not ((isinstance(check,int)) and
+                        (check >= 0) and
+                        (check <= 2))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_audiobook_genre must be an integer; valid range 0 thru 2\n'
                 else:
@@ -7191,9 +7194,9 @@ def cfgCheck():
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log("\nfavorited_advanced_audiobook_library_genre=" + str(check),2)
                 if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
+                    not ((isinstance(check,int)) and
+                        (check >= 0) and
+                        (check <= 2))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_audiobook_library_genre must be an integer; valid range 0 thru 2\n'
                 else:
@@ -7206,9 +7209,9 @@ def cfgCheck():
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log("\nfavorited_advanced_audiobook_track_author=" + str(check),2)
                 if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
+                    not ((isinstance(check,int)) and
+                        (check >= 0) and
+                        (check <= 2))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_audiobook_track_author must be an integer; valid range 0 thru 2\n'
                 else:
@@ -7221,9 +7224,9 @@ def cfgCheck():
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log("\nfavorited_advanced_audiobook_author=" + str(check),2)
                 if (
-                    not ((type(check) is int) and
-                    (check >= 0) and
-                    (check <= 2))
+                    not ((isinstance(check,int)) and
+                        (check >= 0) and
+                        (check <= 2))
                 ):
                     error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_audiobook_author must be an integer; valid range 0 thru 2\n'
                 else:
@@ -7237,9 +7240,9 @@ def cfgCheck():
         check=cfg.whitetag
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitetag='" + str(check) + "'",2)
-        if not (
-            (type(check) is str) and
-            (check.find('\\') < 0)
+        if (
+            not ((isinstance(check,str)) and
+                (check.find('\\') < 0))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: Whitetag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
         else:
@@ -7254,16 +7257,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitetagged_behavior_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7276,16 +7279,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitetagged_behavior_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7298,16 +7301,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitetagged_behavior_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitetagged_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7321,11 +7324,11 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nwhitetagged_behavior_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                    (type(check[0]) is str) and
-                    (type(check[1]) is str) and
-                    (type(check[2]) is str) and
-                    (type(check[3]) is int) and
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],str)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],str)) and
+                    (isinstance(check[3],int)) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all')) and
@@ -7344,9 +7347,9 @@ def cfgCheck():
         check=cfg.blacktag
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacktag='" + str(check) + "'",2)
-        if not (
-            (type(check) is str) and
-            (check.find('\\') < 0)
+        if (
+            not ((isinstance(check,str)) and
+                (check.find('\\') < 0))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: Blacktag(s) must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
         else:
@@ -7361,16 +7364,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacktagged_behavior_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7383,16 +7386,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacktagged_behavior_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7405,16 +7408,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacktagged_behavior_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7428,16 +7431,16 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nblacktagged_behavior_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                     (type(check[0]) is str) and
-                     (type(check[1]) is str) and
-                     (type(check[2]) is str) and
-                     (type(check[3]) is int) and
-                     (len(check) == 4) and
-                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                     ((check[1].lower() == 'all')) and
-                     ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                     ((check[3] >= 0) and (check[3] <= 8)))
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],str)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],str)) and
+                    (isinstance(check[3],int)) and
+                    (len(check) == 4) and
+                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                    ((check[1].lower() == 'all')) and
+                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                    ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='ConfigValueError: blacktagged_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
@@ -7452,16 +7455,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitelisted_behavior_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7474,16 +7477,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitelisted_behavior_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7496,16 +7499,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nwhitelisted_behavior_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: whitelisted_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7519,11 +7522,11 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nwhitelisted_behavior_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                    (type(check[0]) is str) and
-                    (type(check[1]) is str) and
-                    (type(check[2]) is str) and
-                    (type(check[3]) is int) and
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],str)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],str)) and
+                    (isinstance(check[3],int)) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
@@ -7543,16 +7546,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacklisted_behavior_movie=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7565,16 +7568,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacklisted_behavior_episode=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7587,16 +7590,16 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nblacklisted_behavior_audio=" + str(check),2)
         if (
-            not ((type(check) is list) and
-                 (type(check[0]) is str) and
-                 (type(check[1]) is str) and
-                 (type(check[2]) is str) and
-                 (type(check[3]) is int) and
-                 (len(check) == 4) and
-                 ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                 ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                 ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
-                 ((check[3] >= 0) and (check[3] <= 8)))
+            not ((isinstance(check,list)) and
+                (isinstance(check[0],str)) and
+                (isinstance(check[1],str)) and
+                (isinstance(check[2],str)) and
+                (isinstance(check[3],int)) and
+                (len(check) == 4) and
+                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
+                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
+                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or (check[2].lower() == 'ignore')) and
+                ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='ConfigValueError: blacklisted_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
@@ -7610,11 +7613,11 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nblacklisted_behavior_audiobook=" + str(check),2)
             if (
-                not ((type(check) is list) and
-                    (type(check[0]) is str) and
-                    (type(check[1]) is str) and
-                    (type(check[2]) is str) and
-                    (type(check[3]) is int) and
+                not ((isinstance(check,list)) and
+                    (isinstance(check[0],str)) and
+                    (isinstance(check[1],str)) and
+                    (isinstance(check[2],str)) and
+                    (isinstance(check[3],int)) and
                     (len(check) == 4) and
                     ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
                     ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
@@ -7634,9 +7637,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nminimum_number_episodes=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 730500))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 730500))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: minimum_number_episodes must be an integer; valid range 0 thru 730500\n'
         else:
@@ -7649,9 +7652,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nminimum_number_played_episodes=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 730500))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 730500))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: minimum_number_played_episodes must be an integer; valid range 0 thru 730500\n'
         else:
@@ -7674,28 +7677,28 @@ def cfgCheck():
         if (usersname_usersid_match == False):
             check = check.replace(' ','')
         if (
-            not ((type(check) is str) and
-            ((usersname_usersid_match == True) or
-            (check == 'maxplayed') or
-            (check == 'maxplayedmaxplayed') or
-            (check == 'minplayed') or
-            (check == 'minplayedminplayed') or
-            (check == 'maxunplayed') or
-            (check == 'maxunplayedmaxunplayed') or
-            (check == 'minunplayed') or
-            (check == 'minunplayedminunplayed') or
-            (check == 'maxplayedmaxunplayed') or
-            (check == 'minplayedminunplayed') or
-            (check == 'maxplayedminunplayed') or
-            (check == 'minplayedmaxunplayed') or
-            (check == 'minunplayedminplayed') or
-            (check == 'minunplayedmaxunplayed') or
-            (check == 'minunplayedmaxplayed') or
-            (check == 'minplayedmaxplayed') or
-            (check == 'maxunplayedminunplayed') or
-            (check == 'maxunplayedminplayed') or
-            (check == 'maxunplayedmaxplayed') or
-            (check == 'maxplayedminplayed')))
+            not ((isinstance(check,str)) and
+                ((usersname_usersid_match == True) or
+                (check == 'maxplayed') or
+                (check == 'maxplayedmaxplayed') or
+                (check == 'minplayed') or
+                (check == 'minplayedminplayed') or
+                (check == 'maxunplayed') or
+                (check == 'maxunplayedmaxunplayed') or
+                (check == 'minunplayed') or
+                (check == 'minunplayedminunplayed') or
+                (check == 'maxplayedmaxunplayed') or
+                (check == 'minplayedminunplayed') or
+                (check == 'maxplayedminunplayed') or
+                (check == 'minplayedmaxunplayed') or
+                (check == 'minunplayedminplayed') or
+                (check == 'minunplayedmaxunplayed') or
+                (check == 'minunplayedmaxplayed') or
+                (check == 'minplayedmaxplayed') or
+                (check == 'maxunplayedminunplayed') or
+                (check == 'maxunplayedminplayed') or
+                (check == 'maxunplayedmaxplayed') or
+                (check == 'maxplayedminplayed')))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: minimum_number_episodes_behavior must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
         else:
@@ -7710,9 +7713,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nmovie_set_missing_last_played_date=" + str(check),2)
         if (
-            not ((type(check) is bool) and
-            (check == True) or
-            (check == False))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: movie_set_missing_last_played_date must be a boolean; valid values True and False\n'
         else:
@@ -7725,9 +7728,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nepisode_set_missing_last_played_date=" + str(check),2)
         if (
-            not ((type(check) is bool) and
-            (check == True) or
-            (check == False))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: episode_set_missing_last_played_date must be a boolean; valid values True and False\n'
         else:
@@ -7740,9 +7743,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\naudio_set_missing_last_played_date=" + str(check),2)
         if (
-            not ((type(check) is bool) and
-            (check == True) or
-            (check == False))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: audio_set_missing_last_played_date must be a boolean; valid values True and False\n'
         else:
@@ -7756,9 +7759,9 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\naudiobook_set_missing_last_played_date=" + str(check),2)
             if (
-                not ((type(check) is bool) and
-                (check == True) or
-                (check == False))
+                not ((isinstance(check,bool)) and
+                    (check == True) or
+                    (check == False))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: audiobook_set_missing_last_played_date must be a boolean; valid values True and False\n'
             else:
@@ -7773,9 +7776,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_script_header='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_script_header must be a boolean; valid values True and False\n'
         else:
@@ -7788,9 +7791,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_warnings='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_warnings must be a boolean; valid values True and False\n'
         else:
@@ -7803,9 +7806,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_user_header='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_user_header must be a boolean; valid values True and False\n'
         else:
@@ -7818,9 +7821,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_movie_delete_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_movie_delete_info must be a boolean; valid values True and False\n'
         else:
@@ -7833,9 +7836,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_movie_keep_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_movie_keep_info must be a boolean; valid values True and False\n'
         else:
@@ -7848,9 +7851,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_episode_delete_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_episode_delete_info must be a boolean; valid values True and False\n'
         else:
@@ -7863,9 +7866,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_episode_keep_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_episode_keep_info must be a boolean; valid values True and False\n'
         else:
@@ -7878,9 +7881,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_audio_delete_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_audio_delete_info must be a boolean; valid values True and False\n'
         else:
@@ -7893,9 +7896,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_audio_keep_info='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_audio_keep_info must be a boolean; valid values True and False\n'
         else:
@@ -7909,9 +7912,9 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nprint_audiobook_delete_info='" + str(check) + "'",2)
             if (
-                not ((type(check) is bool) and
-                ((check == True) or
-                (check == False)))
+                not ((isinstance(check,bool)) and
+                    (check == True) or
+                    (check == False))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_delete_info must be a boolean; valid values True and False\n'
             else:
@@ -7924,9 +7927,9 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nprint_audiobook_keep_info='" + str(check) + "'",2)
             if (
-                not ((type(check) is bool) and
-                ((check == True) or
-                (check == False)))
+                not ((isinstance(check,bool)) and
+                    (check == True) or
+                    (check == False))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_keep_info must be a boolean; valid values True and False\n'
             else:
@@ -7939,9 +7942,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_summary_header='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_summary_header must be a boolean; valid values True and False\n'
         else:
@@ -7954,9 +7957,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_movie_summary='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_movie_summary must be a boolean; valid values True and False\n'
         else:
@@ -7969,9 +7972,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_episode_summary='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_episode_summary must be a boolean; valid values True and False\n'
         else:
@@ -7984,9 +7987,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_audio_summary='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_audio_summary must be a boolean; valid values True and False\n'
         else:
@@ -8000,9 +8003,9 @@ def cfgCheck():
             if (GLOBAL_DEBUG):
                 appendTo_DEBUG_log("\nprint_audiobook_summary='" + str(check) + "'",2)
             if (
-                not ((type(check) is bool) and
-                ((check == True) or
-                (check == False)))
+                not ((isinstance(check,bool)) and
+                    (check == True) or
+                    (check == False))
             ):
                 error_found_in_mumc_config_py+='ConfigValueError: print_audiobook_summary must be a boolean; valid values True and False\n'
             else:
@@ -8015,9 +8018,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nprint_script_footer='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: print_script_footer must be a boolean; valid values True and False\n'
         else:
@@ -8032,9 +8035,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nUPDATE_CONFIG='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: UPDATE_CONFIG must be a boolean; valid values True and False\n'
         else:
@@ -8049,10 +8052,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nREMOVE_FILES='" + str(check) + "'",2)
         if (
-            not ((type(check) is bool) and
-            
-            ((check == True) or
-            (check == False)))
+            not ((isinstance(check,bool)) and
+                (check == True) or
+                (check == False))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: REMOVE_FILES must be a boolean; valid values True and False\n'
         else:
@@ -8067,7 +8069,7 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nserver_url='" + str(check) + "'",2)
         if (
-            not (type(check) is str)
+            not (isinstance(check,str))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: server_url must be a string\n'
         else:
@@ -8082,7 +8084,7 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nauth_key='" + str(check) + "'",2)
         if (
-            not ((type(check) is str) and
+            not ((isinstance(check,str)) and
             (len(check) == 32) and
             (str(check).isalnum()))
         ):
@@ -8099,7 +8101,7 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nlibrary_setup_behavior='" + str(check) + "'",2)
         if (
-            not (type(check) is str) and
+            not (isinstance(check,str)) and
             ((check == 'blacklist') or (check == 'whitelist'))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: library_setup_behavior must be a string; valid values \'blacklist\' or \'whitelist\'\n'
@@ -8115,7 +8117,7 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nlibrary_matching_behavior='" + str(check) + "'",2)
         if (
-            not (type(check) is str) and
+            not (isinstance(check,str)) and
             ((check == 'byid') or (check == 'bypath') or (check == 'bynetworkpath'))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: library_matching_behavior must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'\n'
@@ -8163,9 +8165,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_attempts=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 16))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 16))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: api_query_attempts must be an integer; valid range 0 thru 16\n'
         else:
@@ -8178,9 +8180,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_item_limit=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 1) and
-            (check <= 10000))
+            not ((isinstance(check,int)) and
+                (check >= 1) and
+                (check <= 10000))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: api_query_item_limit must be an integer; valid range 0 thru 10000\n'
         else:
@@ -8195,9 +8197,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_cache_size=" + str(check),2)
         if (
-            not ((type(check) is int) or (type(check) is float) and
-            (check >= 0) and
-            (check <= 10000))
+            not ((isinstance(check,int)) or (isinstance(check,float)) and
+                (check >= 0) and
+                (check <= 10000))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_size must be a number; valid range 0 thru 10000\n'
         else:
@@ -8210,8 +8212,8 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_cache_fallback_behavior='" + str(check) + "'",2)
         if (
-            not (type(check) is str) and
-            ((check == 'FIFO') or (check == 'LFU') or (check == 'LRU'))
+            not (isinstance(check,str)) and
+                ((check == 'FIFO') or (check == 'LFU') or (check == 'LRU'))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_fallback_behavior must be a string; valid values \'FIFO\', \'LFU\', or \'LRU\'\n'
         else:
@@ -8224,9 +8226,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\napi_query_cache_last_accessed_time=" + str(check),2)
         if (
-            not ((type(check) is int) or (type(check) is float) and
-            (check >= 0) and
-            (check <= 60000))
+            not ((isinstance(check,int)) or (isinstance(check,float)) and
+                (check >= 0) and
+                (check <= 60000))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: api_query_cache_last_accessed_time must be a number; valid range 0 thru 60000\n'
         else:
@@ -8241,9 +8243,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nDEBUG=" + str(check),2)
         if (
-            not (type(check) is int) and
-            ((check >= 0) and
-            (check <= 4))
+            not (isinstance(check,int)) and
+                ((check >= 0) and
+                (check <= 4))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: DEBUG must be a integer or bool; valid range 0 thru 4\n'
         else:
@@ -8438,11 +8440,11 @@ if (
     (config_dict['played_filter_movie'][0] == -1) and
     (config_dict['played_filter_episode'][0] == -1) and
     (config_dict['played_filter_audio'][0] == -1) and
-    ((('played_filter_movie' in config_dict) and (does_index_exist(config_dict['played_filter_movie'],0)) and (config_dict['played_filter_audiobook'][0] == -1)) or (not ('played_filter_movie' in config_dict))) and
+    ((('played_filter_audiobook' in config_dict) and (does_index_exist(config_dict['played_filter_audiobook'],0)) and (config_dict['played_filter_audiobook'][0] == -1)) or (not ('played_filter_audiobook' in config_dict))) and
     (config_dict['created_filter_movie'][0] == -1) and
     (config_dict['created_filter_episode'][0] == -1) and
-    (config_dict['created_filter_episode'][0] == -1) and
-    ((('created_filter_movie' in config_dict) and (does_index_exist(config_dict['created_filter_movie'],0))) or (not ('played_filter_movie' in config_dict)))
+    (config_dict['created_filter_audio'][0] == -1) and
+    ((('created_filter_audiobook' in config_dict) and (does_index_exist(config_dict['created_filter_audiobook'],0)) and (config_dict['created_filter_audiobook'][0] == -1)) or (not ('created_filter_audiobook' in config_dict)))
     ):
     appendTo_DEBUG_log("\n",1)
     print_byType('* ATTENTION!!!                                            *',config_dict['print_warnings'])
@@ -8559,18 +8561,22 @@ else:
                     appendTo_DEBUG_log("\n",1)
                 print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',config_dict['print_warnings'])
 
-#perform post processing for each media type
-deleteItems_movie=run_post_processing(config_dict,movie_dict)
-deleteItems_episode=run_post_processing(config_dict,episode_dict)
-deleteItems_audio=run_post_processing(config_dict,audio_dict)
-deleteItems_audiobook=run_post_processing(config_dict,audiobook_dict)
+if (not (all_media_disabled)):
+    #perform post processing for each media type
+    deleteItems_movie=run_post_processing(config_dict,movie_dict)
+    deleteItems_episode=run_post_processing(config_dict,episode_dict)
+    deleteItems_audio=run_post_processing(config_dict,audio_dict)
+    if (isJellyfinServer()):
+        deleteItems_audiobook=run_post_processing(config_dict,audiobook_dict)
+    else:
+        deleteItems_audiobook=[]
 
-#sort and combine into single list
-deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) + sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
-             sorted(deleteItems_audio,key=sort_audio_deleteItems_List) + sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
+    #sort and combine into single list
+    deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) + sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
+                sorted(deleteItems_audio,key=sort_audio_deleteItems_List) + sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
 
-#show and delete media items
-output_itemsToDelete(deleteItems,config_dict)
+    #show and delete media items
+    output_itemsToDelete(deleteItems,config_dict)
 
 #show cache stats
 print_cache_stats(config_dict)
