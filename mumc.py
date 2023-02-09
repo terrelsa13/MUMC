@@ -24,7 +24,7 @@ from sys import path
 #Get the current script version
 def get_script_version():
 
-    Version='4.1.16-beta'
+    Version='4.1.17-beta'
 
     return(Version)
 
@@ -3951,47 +3951,47 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems):
                 if (GLOBAL_DEBUG):
                     appendTo_DEBUG_log('\n',3)
                     #Check if string or integer
-                    if (type(deleteItem['Id']) is str):
+                    if (isinstance(deleteItem['Id'],str)):
                         appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is String',3)
-                    elif (type(deleteItem['Id']) is int):
+                    elif (isinstance(deleteItem['Id'],int)):
                         appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is Integer',3)
                     appendTo_DEBUG_log('\ndeleteItem[\'Id\'] = ' + str(deleteItem['Id']),3)
 
                     #Check if string or integer
-                    if (type(deleteItem['ParentIndexNumber']) is str):
+                    if (isinstance(deleteItem['ParentIndexNumber'],str)):
                         appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] : Is String',3)
                         try:
                             deleteItem['ParentIndexNumber'] = int(deleteItem['ParentIndexNumber'])
                             appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] Converted : Is Now Integer',3)
                         except:
                             appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] Not Coverted : Skipping This Item',3)
-                    elif (type(deleteItem['ParentIndexNumber']) is int):
+                    elif (isinstance(deleteItem['ParentIndexNumber'],int)):
                         appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] : Is Integer',3)
                     appendTo_DEBUG_log('\ndeleteItem[\'ParentIndexNumber\'] = ' + str(deleteItem['ParentIndexNumber']),3)
 
                     #Check if string or integer
-                    if (type(deleteItem['SeriesId']) is str):
+                    if (isinstance(deleteItem['SeriesId'],str)):
                         appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] : Is String',3)
-                    elif (type(deleteItem['SeriesId']) is int):
+                    elif (isinstance(deleteItem['SeriesId'],int)):
                         appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] : Is Integer',3)
                     appendTo_DEBUG_log('\ndeleteItem[\'SeriesId\'] = ' + str(deleteItem['SeriesId']),3)
 
                     #Check if string or integer
-                    if (type(episodeTracker[deleteItem['SeriesId']]['MaxSeason']) is str):
+                    if (isinstance(episodeTracker[deleteItem['SeriesId']]['MaxSeason'],str)):
                         appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] : Is String',3)
-                    elif (type(episodeTracker[deleteItem['SeriesId']]['MaxSeason']) is int):
+                    elif (isinstance(episodeTracker[deleteItem['SeriesId']]['MaxSeason'],int)):
                         appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] : Is Integer',3)
                     appendTo_DEBUG_log('\nepisodeTracker[deleteItem[\'SeriesId\']][\'MaxSeason\'] = ' + str(episodeTracker[deleteItem['SeriesId']]['MaxSeason']),3)
 
                 try:
                     #Check if string or integer
-                    if (type(deleteItem['ParentIndexNumber']) is str):
+                    if (isinstance(deleteItem['ParentIndexNumber'],str)):
                         deleteItem['ParentIndexNumber'] = int(deleteItem['ParentIndexNumber'])
                     if (deleteItem['ParentIndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxSeason']):
                         episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = deleteItem['ParentIndexNumber']
 
                     #Check if string or integer
-                    if (type(deleteItem['IndexNumber']) is str):
+                    if (isinstance(deleteItem['IndexNumber'],str)):
                         deleteItem['IndexNumber'] = int(deleteItem['IndexNumber'])
                     if (deleteItem['IndexNumber'] > episodeTracker[deleteItem['SeriesId']]['MaxEpisode']):
                         episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = deleteItem['IndexNumber']
@@ -7131,9 +7131,9 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nfavorited_advanced_track_artist=" + str(check),2)
         if (
-            not ((type(check) is int) and
-            (check >= 0) and
-            (check <= 2))
+            not ((isinstance(check,int)) and
+                (check >= 0) and
+                (check <= 2))
         ):
             error_found_in_mumc_config_py+='ConfigValueError: favorited_advanced_track_artist must be an integer; valid range 0 thru 2\n'
         else:
