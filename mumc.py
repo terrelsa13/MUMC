@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import urllib.request as urlrequest
 import urllib.parse as urlparse
 import importlib
@@ -11,7 +10,6 @@ import json
 import time
 import uuid
 import os
-
 from mumc_config_defaults import get_default_config_values
 from datetime import datetime,timedelta,timezone
 from collections import defaultdict
@@ -23,9 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-
-    Version='4.1.17-beta'
-
+    Version='4.1.18-beta'
     return(Version)
 
 
@@ -510,7 +506,10 @@ def requestURL(url, debugBool, reqeustDebugMessage, retries):
                     getdata = False
                     if (debugBool):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(reqeustDebugMessage) + " request:",2)
-                        appendTo_DEBUG_log("\n" + convert2json(data),4)
+                        if (data):
+                            appendTo_DEBUG_log("\n" + data,4)
+                        else:
+                            appendTo_DEBUG_log("\nNo data returned",4)
                 else:
                     getdata = False
                     print_byType("\n" + "An error occurred while attempting to retrieve data from the API.",True)
