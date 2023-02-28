@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.18-beta'
+    Version='4.1.19-beta'
     return(Version)
 
 
@@ -49,6 +49,49 @@ def get_python_version():
 def get_operating_system_info():
     return(platform.platform())
 
+#Get major, minor and patch version numbers along with release version information
+def get_semantic_version_parts(version):
+    semVersionDict={}
+    try:
+        semVersionDict['major']=int(get_major_semantic_version(version))
+        semVersionDict['minor']=int(get_minor_semantic_version(version))
+        semVersionDict['patch']=int(get_patch_semantic_version(version))
+        semVersionDict['release']=str(get_prerelease_semantic_version(version))
+        return semVersionDict
+    except:
+        raise ValueError(f"{version} is not formatted correctly")
+
+
+#Get major semanic version number
+def get_major_semantic_version(version):
+    verParts = version.split(".")
+    return verParts[0]
+
+
+#Get minor semanic version number
+def get_minor_semantic_version(version):
+    verParts = version.split(".")
+    return verParts[1]
+
+
+#Get patch semanic version number
+def get_patch_semantic_version(version):
+    verParts = version.split(".")
+    if (verParts[2].find("-") >= 0):
+        verPreRel = version.split("-")
+        verParts[2] = verParts[2].replace("-"+verPreRel[1],"")
+    return verParts[2]
+
+
+#Get release version information
+def get_prerelease_semantic_version(version):
+    verParts = version.split(".")
+    if (verParts[2].find("-") >= 0):
+        verPreRel = version.split("-")
+        return verPreRel[1]
+    else:
+        return "stable"
+
 
 #save to mumc_DEBUG.log when DEBUG is enabled
 def appendTo_DEBUG_log(string_to_save,debugLevel):
@@ -70,7 +113,7 @@ def print_informational_header():
     else:
         print_script_header=cfg.print_script_header
 
-    print_byType('-----------------------------------------------------------',print_script_header)
+    print_byType('\n-----------------------------------------------------------',print_script_header)
     if (GLOBAL_DEBUG):
         appendTo_DEBUG_log('\n',1)
     print_byType('',print_script_header)
@@ -1362,7 +1405,7 @@ def get_users_and_libraries(server_url,auth_key,library_setup_behavior,updateCon
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (library_setup_behavior == 'blacklist'):
                     message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=library_matching_behavior(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
+                    userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
                 else: #(library_setup_behavior == 'whitelist'):
                     message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
                     userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(server_url,auth_key,message,data[user_number_int]['Policy'],data[user_number_int]['Id'],data[user_number_int]['Name'],False,library_matching_behavior)
@@ -2400,9 +2443,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#  Debug log file save to: /the/script/directory/mumc_DEBUG.log\n"
     config_file += "#  The debug log file can be large (i.e. 10s to 100s of MBytes)\n"
     config_file += "#  Recommend only enabling DEBUG when necessary\n"
-    config_file += "#  False - Debug messages disabled\n"
-    config_file += "#   0 - Debug messages disabled\n"
-    config_file += "#  True - Level 1 debug messages enabled\n"
+    config_file += "#   0 - Debug messaging disabled\n"
     config_file += "#   1 - Level 1 debug messaging enabled\n"
     config_file += "#   2 - Level 2 debug messaging enabled\n"
     config_file += "#   3 - Level 3 debug messaging enabled\n"
@@ -6642,19 +6683,22 @@ def cfgCheck():
         check_user_keys_length=len(check_list)
         username_check_list=[]
         userid_check_list=[]
-        for user_info in check_list:
-            username_check_list.append(user_info.split(':',1)[0])
-            userid_check_list.append(user_info.split(':',1)[1])
-            for check_irt in userid_check_list:
-                if (
-                    not ((isinstance(check_list,list)) and
-                        (isinstance(check_irt,str)) and
-                        (len(check_irt) == 32) and
-                        (str(check_irt).isalnum()))
-                ):
-                    error_found_in_mumc_config_py+='ConfigValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
+        if (check_user_keys_length > 0):
+            for user_info in check_list:
+                username_check_list.append(user_info.split(':',1)[0])
+                userid_check_list.append(user_info.split(':',1)[1])
+                for check_irt in userid_check_list:
+                    if (
+                        not ((isinstance(check_list,list)) and
+                            (isinstance(check_irt,str)) and
+                            (len(check_irt) == 32) and
+                            (str(check_irt).isalnum()))
+                    ):
+                        error_found_in_mumc_config_py+='ConfigValueError: user_keys must be a single list with a dictionary entry for each monitored UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
+            else:
+                config_dict['user_keys']=check_list
         else:
-            config_dict['user_keys']=check_list
+            error_found_in_mumc_config_py+='ConfigValueError: user_keys cannot be empty\n'
     else:
         error_found_in_mumc_config_py+='ConfigNameError: The user_keys variable is missing from mumc_config.py\n'
 
@@ -8133,11 +8177,14 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nuser_bl_libs=" + convert2json(check_list),2)
         check_user_bllibs_length=len(check_list)
-        #Check number of users matches the number of blacklist entries
-        if not (check_user_bllibs_length == check_user_keys_length):
-            error_found_in_mumc_config_py+='ConfigValueError: Number of configured users does not match the number of configured blacklists\n'
+        if (check_user_bllibs_length > 0):
+            #Check number of users matches the number of blacklist entries
+            if not (check_user_bllibs_length == check_user_keys_length):
+                error_found_in_mumc_config_py+='ConfigValueError: user_bl_libs Number of configured users does not match the number of configured blacklists\n'
+            else:
+                error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
         else:
-            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
+            error_found_in_mumc_config_py+='ConfigValueError: user_bl_libs cannot be empty\n'
 
         config_dict['user_bl_libs']=check_list
 
@@ -8149,11 +8196,14 @@ def cfgCheck():
         if (GLOBAL_DEBUG):
             appendTo_DEBUG_log("\nuser_wl_libs=" + convert2json(check_list),2)
         check_user_wllibs_length=len(check_list)
-        #Check number of users matches the number of whitelist entries
-        if not (check_user_wllibs_length == check_user_keys_length):
-            error_found_in_mumc_config_py+='ConfigValueError: Number of configured users does not match the number of configured whitelists\n'
+        if (check_user_wllibs_length > 0):
+            #Check number of users matches the number of whitelist entries
+            if not (check_user_wllibs_length == check_user_keys_length):
+                error_found_in_mumc_config_py+='ConfigValueError: user_wl_libs Number of configured users does not match the number of configured whitelists\n'
+            else:
+                error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
         else:
-            error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
+            error_found_in_mumc_config_py+='ConfigValueError: user_wl_libs cannot be empty\n'
 
         config_dict['user_wl_libs']=check_list
 

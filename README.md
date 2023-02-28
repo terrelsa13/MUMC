@@ -1011,6 +1011,7 @@ api_query_cache_last_accessed_time=200
 #  Debug log file save to: /the/script/directory/mumc_DEBUG.log
 #  The debug log file can be large (i.e. 10s to 100s of MBytes)
 #  Recommend only enabling DEBUG when necessary
+#   0 - Debug messaging disabled
 #   1 - Level 1 debug messaging enabled
 #   2 - Level 2 debug messaging enabled
 #   3 - Level 3 debug messaging enabled
