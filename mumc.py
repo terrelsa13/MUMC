@@ -4979,7 +4979,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
                             deleteItems.append(item)
                             deleteItemsIdTracker.append(item['Id'])
                     elif (addItemToDeleteList == False):
-                        if (item['Id'] in deleteItemsIdTracker):
+                        while item['Id'] in deleteItemsIdTracker:
                             try:
                                 if (item in deleteItems):
                                     deleteItems.remove(item)
