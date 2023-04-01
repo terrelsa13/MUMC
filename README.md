@@ -1,5 +1,7 @@
-# Support For MUMC v3.x.x Ending 2023 March 31st.
-* Recommend moving to [MUMC v4.x.x](https://github.com/terrelsa13/MUMC/tree/MUMC_v4-BETA)
+# Please Update To [The Lastest Version](https://github.com/terrelsa13/MUMC) Of MUMC.
+* Only the default branch will receive updates.
+* This branch is available for reference, but is no longer maintained.
+# Version 4 And Later Are Not Backwards Compatible
 
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want taking up disk space.
