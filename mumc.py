@@ -8635,5 +8635,6 @@ print_footer_information(config_dict)
 
 #clear cache
 GLOBAL_CACHED_DATA.wipeCache()
+#comment
 
 ############# END OF SCRIPT #############
