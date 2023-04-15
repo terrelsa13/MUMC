@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.20'
+    Version='4.2.0'
     return(Version)
 
 
@@ -96,7 +96,7 @@ def get_prerelease_semantic_version(version):
 #save to mumc_DEBUG.log when DEBUG is enabled
 def appendTo_DEBUG_log(string_to_save,debugLevel):
     if (GLOBAL_DEBUG >= debugLevel):
-        save_file(str(string_to_save),GLOBAL_DEBUG_FILE_NAME,"a")
+        append_to_file(str(string_to_save),GLOBAL_DEBUG_FILE_NAME)
 
 
 #determine if the requested console output line should be shown or hidden
@@ -1466,20 +1466,6 @@ def change_to_script_directory(cwd):
     os.chdir(script_dir)
 
 
-#Save file to the directory this script is running from; even when the GLOBAL_CWD is not the same
-def save_file(dataInput,fileName,fileCreateType):
-    #Change to the script's directory
-    change_to_script_directory(GLOBAL_CWD)
-    #Open file in script's directory
-    f = open(fileName, fileCreateType)
-    #Write to file
-    f.write(dataInput)
-    #Close file
-    f.close()
-    #Change back to original working directory
-    os.chdir(GLOBAL_CWD)
-
-
 #get user input needed to build or edit the mumc_config.py file
 def build_configuration_file(cfg,updateConfig):
 
@@ -2458,8 +2444,7 @@ def build_configuration_file(cfg,updateConfig):
     config_file += "#-------------End Config Options----------------------------#"
 
     #Save the config file to the directory this script is running from
-    #save_file(config_file)
-    save_file(config_file,GLOBAL_CONFIG_FILE_NAME,"w")
+    write_to_file(config_file,GLOBAL_CONFIG_FILE_NAME)
 
     #Check config editing was not requested
     if not (updateConfig):
@@ -8345,6 +8330,374 @@ def defaultHelper():
     print_byType('\n/path/to/python3.x /path/to/mumc.py -help',True)
     print_byType('',True)
     exit(0)
+
+
+# Change to the specified directory
+def change_to_directory(directory):
+    #change back to original working directory
+    os.chdir(os.path.abspath(os.path.dirname(directory)))
+
+
+def getFullPathName(filePathName):
+    fullPathName=None
+
+    if (doesFileExist(filePathName)):
+        fullPathName=os.path.abspath(filePathName)
+    else:
+        for directory in path:
+            if (doesFileExist(os.path.join(directory,filePathName))):
+                fullPathName=os.path.join(directory,filePathName)
+    return fullPathName
+
+
+def doesFileExist(filePathName):
+    fileExists=False
+
+    #check if file exists; script can be run from anywhere; recommend using full paths
+    if os.path.exists(os.path.abspath(filePathName)):
+        fileExists=True
+    return fileExists
+
+
+def get_current_directory():
+    return os.path.abspath(os.getcwd())
+
+
+# Delete existing mumc_DEBUG.log file
+def delete_file(filePathName):
+    #get cwd
+    cwd=get_current_directory()
+
+    #check if file exists in cwd (script can be run from anywhere so this could be any directory)
+    if (doesFileExist(filePathName)):
+        fullPathName=getFullPathName(filePathName)
+    else:
+        fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),filePathName)
+
+    #change to delete file's directory
+    change_to_directory(fullPathName)
+
+    try:
+        #delete the file
+        os.remove(fullPathName)
+    except FileNotFoundError:
+        print_byType('\n' + filePathName + ' does not exist and therefore cannot be deleted',False)
+    #change back to cwd
+    change_to_directory(cwd)
+
+
+def action_to_file(fullPathName,action):
+    #open file as append
+    return open(fullPathName,action)
+
+
+#Save file to the directory this script is running from; even when the cwd is not the same
+def append_to_file(dataInput,filePathName):
+    #get cwd
+    cwd=get_current_directory()
+
+    if (doesFileExist(filePathName)):
+        fullPathName=getFullPathName(filePathName)
+    else:
+        fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),filePathName)
+
+    #change to append file's directory
+    change_to_directory(fullPathName)
+    #open file as append
+    f = action_to_file(fullPathName,'a')
+    #Write data to file
+    f.write(dataInput)
+    #Close file
+    f.close()
+    #change back to cwd
+    change_to_directory(cwd)
+
+
+#Save file to the directory this script is running from; even when the cwd is not the same
+def write_to_file(dataInput,filePathName):
+    #get cwd
+    cwd=get_current_directory()
+
+    if (doesFileExist(filePathName)):
+        fullPathName=getFullPathName(filePathName)
+    else:
+        fullPathName=os.path.join(os.path.abspath(os.path.basename(__file__)),filePathName)
+
+    #change to append file's directory
+    change_to_directory(fullPathName)
+    #open file as append
+    f = action_to_file(fullPathName,'w')
+    #Write data to file
+    f.write(dataInput)
+    #Close file
+    f.close()
+    #change back to cwd
+    change_to_directory(cwd)
+
+
+#define custom exception
+class CMDOptionIndexError(Exception):
+    pass
+
+
+#define custom exception
+class AlternateConfigArgumentError(Exception):
+    pass
+
+
+#define custom exception
+class AlternateConfigNotFoundError(Exception):
+    pass
+
+
+#define custom exception
+class UnknownCMDOptionError(Exception):
+    pass
+
+
+#define custom exception
+class AlternateConfigSyntaxError(Exception):
+    pass
+
+
+#show the command line help text
+def defaultHelper():
+    #print_byType('\nUse -h or -help for command line option(s)',True)
+    print_byType('\nFor help use -h or -help',True)
+    print_byType('\n/path/to/python3.x /path/to/mumc.py -help',True)
+    print_byType('',True)
+    #exit(0)
+
+#show the command line help text
+def findHelpCMDRequest(argv):
+    for cmdOption in argv:
+        if (cmdOption == '-h') or ((cmdOption == '-help')):
+            print_byType('\nMUMC Version: ' + get_script_version(),True)
+            print_byType('Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.',True)
+            print_byType('',True)
+            print_byType('Usage:',True)
+            print_byType('/path/to/python3.x /path/to/mumc.py [-option] [arg]',True)
+            print_byType('',True)
+            print_byType('Options:',True)
+            print_byType('-c [path], -config [path]   Specify alternate *.py configuration file',True)
+            print_byType('-d, -container              Script is running in a container',True)
+            print_byType('-h, -help                   Show this help menu',True)
+            print_byType('',True)
+            print_byType('Latest Release:',True)
+            print_byType('https://github.com/terrelsa13/MUMC/releases',True)
+            print_byType('',True)
+            exit(0)
+
+def findUnknownCMDRequest(argv,optionsList):
+    for cmdOption in argv:
+        if (cmdOption.startswith('-')):
+            if (not(cmdOption in optionsList)):
+                return True
+    return False
+
+def findAltConfigCMDRequest(argv):
+    for cmdOption in argv:
+        if ((cmdOption == '-c') or (cmdOption == '-config')):
+            return True
+    return False
+
+
+def findAltConfigCMDArgument(argv,altConfigInfo,optionsList):
+    try:
+        if (altConfigInfo):
+            #loop thru options and verify -c has an alternate path after it
+            for checkOption in optionsList:
+                if (argv.index('-c')+1 >= len(argv)):
+                    raise CMDOptionIndexError
+    except (CMDOptionIndexError):
+        print_byType('',True)
+        print_byType('CMDOptionIndexError: Cannot find /path/to/alternate_config.py after -c',True)
+        print_byType('',True)
+        print_byType('Verify the \'-c\' option looks like this: -c /path/to/alternate_config.py',True)
+        print_byType('',True)
+        print_byType(' '.join(argv),True)
+        print_byType('',True)
+        defaultHelper()
+        exit(0)
+
+
+def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList):
+    try:
+        if (altConfigInfo):
+            #loop thru options and verify what comes after -c is not another option
+            for checkOption in optionsList:
+                if ((argv[argv.index('-c')+1]) == checkOption):
+                    raise AlternateConfigArgumentError
+    except (AlternateConfigArgumentError):
+        print_byType('',True)
+        print_byType('AlternateConfigArgumentError: Cannot find /path/to/alternate_config.py after -c',True)
+        print_byType('',True)
+        print_byType('Verify the \'-c\' option looks like this: -c /path/to/alternate_config.py',True)
+        print_byType('',True)
+        print_byType(' '.join(argv),True)
+        print_byType('',True)
+        defaultHelper()
+        exit(0)
+
+
+def verifyAltConfigPathFileExist(argv,altConfigInfo):
+    try:
+        if (altConfigInfo):
+            #verify alternate config path and file exist
+            #if (not(os.path.exists(argv[argv.index('-c')+1]))):
+                #raise AlternateConfigNotFoundError
+            #check if file exists in cwd (script can be run from anywhere so this could be any directory)
+            if (doesFileExist(argv[argv.index('-c')+1])):
+                fullPathName=getFullPathName(argv[argv.index('-c')+1])
+            else:
+                fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),argv[argv.index('-c')+1])
+            #verify alternate config path and file exist
+            if (not(doesFileExist(fullPathName))):
+                raise AlternateConfigNotFoundError
+    except (AlternateConfigNotFoundError):
+        print_byType('',True)
+        print_byType('AlternateConfigNotFoundError: Alternate config path or file does not exist; check for typo or create file',True)
+        print_byType('',True)
+        print_byType(' '.join(argv),True)
+        print_byType('',True)
+        defaultHelper()
+        exit(0)
+
+
+def parseAltConfigPathFileSyntax(argv,altConfigInfo,cmdOption,moduleExtension):
+    try:
+        if (altConfigInfo):
+            if ((os.path.splitext(argv[argv.index(cmdOption)+1])[1] == moduleExtension) and
+                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(".") == 0) and
+                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(" ") == 0)):
+                #Get path without file.name
+                altConfigPath=os.path.dirname(argv[argv.index(cmdOption)+1])
+                #Get file without extension
+                altConfigFileNoExt=os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])
+            else:
+                raise AlternateConfigSyntaxError
+    except (AlternateConfigSyntaxError):
+        print_byType('',True)
+        print_byType('Alternate configuration file must have a .py extension and follow the Python module naming convention',True)
+        print_byType('',True)
+        print_byType('These are NOT valid config file names:',True)
+        print_byType('',True)
+        print_byType('\t' + argv[argv.index(cmdOption)+1],True)
+        print_byType('',True)
+        print_byType('\t/path/to/alternate.config.py',True)
+        print_byType('\t/path/to/alternate config.py',True)
+        print_byType('\tc:\\path\\to\\alternate.config.py',True)
+        print_byType('\tc:\\path\\to\\alternate config.py',True)
+        print_byType('',True)
+        print_byType('These are valid config file names:',True)
+        print_byType('',True)
+        print_byType('\t/path/to/alternateconfig.py',True)
+        print_byType('\t/path/to/alternate_config.py',True)
+        print_byType('\tc:\\path\\to\\alternateconfig.py',True)
+        print_byType('\tc:\\path\\to\\alternate_config.py',True)
+        print_byType('',True)
+        defaultHelper()
+        exit(0)
+
+    return altConfigPath,altConfigFileNoExt
+
+
+def importConfig(altConfigInfo,altConfigPath,altConfigFileNoExt,containerized):
+    try:
+        #Attempt to import the alternate config file as cfg
+        #Check for the .py extension and no spaces or periods in the module name
+        if (altConfigInfo):
+            #Insert alternate config to path at the top of the path list so it can be search and imported first
+            #We want the alternate config path to be searched first incase the the alternate config is also named mumc_config.py
+            #Searching the alternate config path first will allow the alternate config file to be found first
+            if (not(altConfigPath in path)):
+                path.insert(0,altConfigPath)
+            #Cannot do a direct import using a variable; use the importlib.import_module instead
+            #Also cannot import the whole path; add the path to path then import by filename
+            cfg = importlib.import_module(altConfigFileNoExt,altConfigPath)
+        else:
+            #try importing the mumc_config.py file
+            #if mumc_config.py file does not exist go to except and create one
+            import mumc_config as cfg
+
+        #try assigning the DEBUG variable from mumc_config.py file
+        #if DEBUG does not exsit go to except and rebuild the mumc_config.py file
+        global GLOBAL_DEBUG
+        GLOBAL_DEBUG=cfg.DEBUG
+        #removing DEBUG from mumc_config.py file will allow the configuration to be reset
+
+        #try assigning the server_brand variable from mumc_config.py file
+        #if server_brand does not exsit go to except and rebuild the mumc_config.py file
+        global GLOBAL_SERVER_BRAND
+        GLOBAL_SERVER_BRAND=cfg.server_brand.lower()
+        #removing DEBUG from mumc_config.py file will allow the configuration to be reset
+    except (AttributeError):
+        if (containerized or altConfigInfo):
+            print_byType('',True)
+            print_byType('Config file missing \'DEBUG\' and/or \'server_brand\' variables',True)
+            print_byType('',True)
+            print_byType('Either add missing config variables or rebuild the config by running: /path/to/python /path/to/mumc.py',True)
+            print_byType('',True)
+            defaultHelper()
+            exit(0)
+        else:
+            GLOBAL_DEBUG=0
+            #tell user config found; but missing DEBUG or server_brand options
+            update_config = False
+            build_configuration_file(None,update_config)
+            #exit gracefully
+            exit(0)
+
+    return cfg
+
+
+def findContainerCMDRequest(argv):
+    for cmdOption in argv:
+        if ((cmdOption == '-d') or (cmdOption == '-container')):
+            return True
+    return False
+
+#######################################################################################################
+
+
+def parse_command_line_options():
+
+    cmdopt_dict={}
+    cmdopt_dict['argv']=argv
+    cmdopt_dict['containerized']=False
+    cmdopt_dict['optionsList']=['-c','-d','-h']
+    cmdopt_dict['moduleExtension']='.py'
+
+    #look for -h or -help command line option
+    findHelpCMDRequest(cmdopt_dict['argv'])
+
+    #look for unknown command line options
+    if (findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'])):
+        raise UnknownCMDOptionError
+
+    #look for -c or -config command line optoin
+    cmdopt_dict['altConfigInfo']=findAltConfigCMDRequest(cmdopt_dict['argv'])
+ 
+    #look for argument after -c or -config command line option
+    findAltConfigCMDArgument(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],cmdopt_dict['optionsList'])
+ 
+    #look for -d or -container command line option
+    cmdopt_dict['containerized']=findContainerCMDRequest(cmdopt_dict['argv'])
+
+    #look for another option directly after -c or -config command instead of the path
+    findNoOptionAfterAltConfigCMDRequest(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],cmdopt_dict['optionsList'])
+
+    #verify the specified alternate config path and file exist
+    verifyAltConfigPathFileExist(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'])
+
+    if (cmdopt_dict['altConfigInfo']):
+        #verify alternate config path and file follow python naming conveniton
+        cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt']=parseAltConfigPathFileSyntax(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],'-c',cmdopt_dict['moduleExtension'])
+    else:
+        cmdopt_dict['altConfigPath']=None
+        cmdopt_dict['altConfigFileNoExt']=None
+
+    return cmdopt_dict
 #######################################################################################################
 
 
@@ -8364,104 +8717,19 @@ GLOBAL_DATE_TIME_NOW_TZ_UTC=datetime.now(timezone.utc)
 GLOBAL_CWD = os.getcwd()
 
 #change to script's directory
-change_to_script_directory(GLOBAL_CWD)
+#change_to_script_directory(GLOBAL_CWD)
 #remove old DEBUG if it exists
-if os.path.exists(GLOBAL_DEBUG_FILE_NAME):
-    os.remove(GLOBAL_DEBUG_FILE_NAME)
+#if os.path.exists(GLOBAL_DEBUG_FILE_NAME):
+    #os.remove(GLOBAL_DEBUG_FILE_NAME)
 #change back to original working directory
-os.chdir(GLOBAL_CWD)
+#os.chdir(GLOBAL_CWD)
+delete_file(GLOBAL_DEBUG_FILE_NAME)
 
-GLOBAL_TRIED_ALT_CONFIG=False
+#parse command line options
+cmdopt_dict=parse_command_line_options()
 
-try:
-    if (len(argv) == 1):
-        #try importing the mumc_config.py file
-        #if mumc_config.py file does not exist go to except and create one
-        import mumc_config as cfg
-    else:
-        #try importing an alternate mumc_config.py file
-        #if alternate mumc_config.py file does not exist go to except and create one
-        for cmdOption in argv:
-            if (cmdOption == '-h') or ((cmdOption == '-help')):
-                print_byType('\nMUMC Version: ' + get_script_version(),True)
-                print_byType('Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.',True)
-                print_byType('',True)
-                print_byType('Usage:',True)
-                print_byType('/path/to/python3.x /path/to/mumc.py [-option] [arg]',True)
-                print_byType('',True)
-                print_byType('Options:',True)
-                print_byType('-c, -config          Specify alternate *.py configuration file',True)
-                print_byType('-h, -help            Show this help menu',True)
-                print_byType('',True)
-                print_byType('Latest Release:',True)
-                print_byType('https://github.com/terrelsa13/MUMC/releases',True)
-                print_byType('',True)
-                exit(0)
-        if (((argv[1] == '-c') or (argv[1] == '-config')) and (len(argv) == 3)):
-            GLOBAL_TRIED_ALT_CONFIG=True
-            #Attempt to import the alternate config file as cfg
-            #Check for the .py extension and no spaces or periods in the module name
-            if ((os.path.splitext(argv[2])[1] == '.py') and
-                ((os.path.basename(os.path.splitext(argv[2])[0])).count(".") == 0) and
-                ((os.path.basename(os.path.splitext(argv[2])[0])).count(" ") == 0)):
-                #Get path without file.name
-                altConfigPath=os.path.dirname(argv[2])
-                #Get file without extension
-                altConfigFileNoExt=os.path.basename(os.path.splitext(argv[2])[0])
-                #Add directory of alternate config to path so it can be imported
-                path.append(altConfigPath)
-                #Cannot do a direct import using a variable; use the importlib.import_module instead
-                cfg = importlib.import_module(altConfigFileNoExt)
-            else:
-                print_byType('',True)
-                print_byType('Alternate configuration file must have a .py extension and follow the Python module naming convention',True)
-                print_byType('',True)
-                print_byType('These are NOT valid config file names:',True)
-                print_byType('',True)
-                print_byType('\t/path/to/alternate.config.py',True)
-                print_byType('\t/path/to/alternate config.py',True)
-                print_byType('\tc:\\path\\to\\alternate.config.py',True)
-                print_byType('\tc:\\path\\to\\alternate config.py',True)
-                print_byType('',True)
-                print_byType('These are valid config file names:',True)
-                print_byType('',True)
-                print_byType('\t/path/to/alternateconfig.py',True)
-                print_byType('\t/path/to/alternate_config.py',True)
-                print_byType('\tc:\\path\\to\\alternateconfig.py',True)
-                print_byType('\tc:\\path\\to\\alternate_config.py',True)
-                print_byType('',True)
-                exit(0)
-        else:
-            defaultHelper()
-
-    #try assigning the DEBUG variable from mumc_config.py file
-    #if DEBUG does not exsit go to except and rebuild the mumc_config.py file
-    GLOBAL_DEBUG=cfg.DEBUG
-    #removing DEBUG from mumc_config.py file will allow the configuration to be reset
-
-    #try assigning the server_brand variable from mumc_config.py file
-    #if server_brand does not exsit go to except and rebuild the mumc_config.py file
-    GLOBAL_SERVER_BRAND=cfg.server_brand.lower()
-    #removing DEBUG from mumc_config.py file will allow the configuration to be reset
-
-#the exception
-except (AttributeError, ModuleNotFoundError):
-    if (not (GLOBAL_TRIED_ALT_CONFIG)):
-        GLOBAL_DEBUG=0
-
-        #we are here because the mumc_config.py file does not exist
-        #this is either the first time the script is running or mumc_config.py file was deleted
-        #when this happens create a new mumc_config.py file
-        #another possible reason we are here...
-        #the above attempt to set GLOBAL_DEBUG=cfg.DEBUG failed likely because DEBUG is missing from the mumc_config.py file
-        #when this happens create a new mumc_config.py file
-        update_config = False
-        build_configuration_file(None,update_config)
-    else:
-        defaultHelper()
-
-    #exit gracefully
-    exit(0)
+#import config file
+cfg=importConfig(cmdopt_dict['altConfigInfo'],cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt'],cmdopt_dict['containerized'])
 
 #get and check config values are what we expect them to be
 config_dict=cfgCheck()
