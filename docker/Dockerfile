@@ -10,4 +10,4 @@ VOLUME /config
 COPY mumc_config_defaults.py .
 COPY mumc.py .
 
-ENTRYPOINT ["python", "./mumc.py"]
+ENTRYPOINT ["python", "./mumc.py", "-d"]
