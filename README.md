@@ -1004,7 +1004,7 @@ api_query_cache_fallback_behavior='LRU'
 #----------------------------------------------------------#
 api_query_cache_last_accessed_time=200
 ```
-#### DEBUG
+#### DEBUG Control
 ```python
 #----------------------------------------------------------#
 # Must be an integer value
