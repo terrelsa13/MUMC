@@ -1116,7 +1116,10 @@ DEBUG=0
 * Once ```mumc_config.py``` is configured as desired, run the script again using the same command from above
   - Type: ```python mumc.py```
 
-# First Run (Other Operating Systems)
+# First Docker Container
+* WIP
+
+# First Run (Other Methods)
 * Consult your favorite search engine
 
 # Schedule To Run Using Crontab (Debian, Ubuntu, and Linux Mint)
