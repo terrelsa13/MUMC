@@ -1116,7 +1116,7 @@ DEBUG=0
 * Once ```mumc_config.py``` is configured as desired, run the script again using the same command from above
   - Type: ```python mumc.py```
 
-# First Docker Container
+# First Run Docker Container
 * WIP
 
 # First Run (Other Methods)
