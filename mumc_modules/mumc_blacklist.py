@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+from mumc_modules.mumc_whitelist import get_isItemWhitelisted,whitelist_playedPatternCleanup
+
+
+#Determine if media item whitelisted for the current user or for another user
+def get_isItemBlacklisted(the_dict,item,LibraryID,LibraryNetPath,LibraryPath,library_matching_behavior,user_bllib_key_json,user_bllib_netpath_json,user_bllib_path_json):
+    return get_isItemWhitelisted(the_dict,item,LibraryID,LibraryNetPath,LibraryPath,library_matching_behavior,user_bllib_key_json,user_bllib_netpath_json,user_bllib_path_json)
+
+
+#Because we are not searching directly for unplayed blacklisted items; cleanup needs to happen to make the behavioral patterns make sense
+def blacklist_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json):
+    return whitelist_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpaths_json,user_bllib_paths_json)
