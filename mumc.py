@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import multiprocessing
-#from multiprocessing import Pool
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
@@ -11,8 +10,6 @@ from mumc_modules.mumc_console_info import print_informational_header,print_star
 from mumc_modules.mumc_get_media import getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import delete_file
-
-#from datetime import datetime
 
 
 def main():

@@ -766,6 +766,11 @@ audiobook_set_missing_last_played_date=True
 # Enable/Disable console outputs by type
 #----------------------------------------------------------#
 # Should the script print its output to the console
+#  Everytime something is printed to the console the script has to
+#   wait for the print to finish. This causes the script to run slower
+#   The biggest offenders are:
+#     print_*_delete_info
+#     print_*_keep_info
 #  False - Do not print this output type to the console
 #  True - Print this output type to the console
 # (True : default)
