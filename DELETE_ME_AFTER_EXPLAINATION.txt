@@ -1,0 +1,695 @@
+# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+
+#### [W, X, Y, Z]
+#### W - Action
+#### X - User Conditional
+#### Y - Played Conditional
+#### Z - Action Control
+
+
+- ['delete', 'all', 'all', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - and
+    - meets the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - or
+    - does not meet the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['delete', 'all', 'any', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - and
+    - meets the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - or
+    - does not meet the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['delete', 'any', 'any', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - and
+    - meets the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - or
+    - does not meet the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['delete', 'any', 'all', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - and
+    - meets the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - or
+    - does not meet the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['keep', 'all', 'all', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - and
+    - meets the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - or
+    - does not meet the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+
+- ['keep', 'all', 'any', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - and
+    - meets the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - or
+    - does not meet the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+
+- ['keep', 'any', 'any', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - and
+    - meets the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - or
+    - does not meet the played_filter for at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+
+- ['keep', 'any', 'all', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - and
+    - meets the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - or
+    - does not meet the played_filter for all monitored users.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+
+- ['delete', 'all', 'ignore', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['delete', 'any', 'ignore', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is added to the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+
+- ['keep', 'all', 'ignore', Z]
+  - MediaItem1...
+    - is favorited by all monitored users.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by all monitored users.
+    - played_filter is ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+
+- ['keep', 'any', 'ignore', Z]
+  - MediaItem1...
+    - is favorited by at least one monitored user.
+    - played_filter ignored.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list
+  - MediaItem1...
+    - is not favorited by at least one monitored user.
+    - Z == 0 - No action taken on True; No action taken on False (disabled)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 1 - No action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 2 - No action taken on True; Opposite action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 3 - Action taken on True; No action taken on False (recommended)
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 4 - Action taken on True; Action taken on False
+      - MediaItem1 is added to the delete list
+    - Z == 5 - Action taken on True; Opposite action taken on False (recommended)
+      - MediaItem1 is removed from the delete list
+    - Z == 6 - Opposite action taken on True; No action taken on False
+      - No action taken on MediaItem1
+        - If MediaItem1 is in the delete list; it will remain in the delete list
+        - If MediaItem1 is not in the delete list; it will remain not in the delete list
+    - Z == 7 - Opposite action taken on True; Action taken on False
+      - MediaItem1 is removed from the delete list
+    - Z == 8 - Opposite action taken on True; Opposite action taken on False
+      - MediaItem1 is added to the delete list

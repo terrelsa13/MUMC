@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
+from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist import blacklist_playedPatternCleanup
 from mumc_modules.mumc_whitelist import whitelist_playedPatternCleanup
 from mumc_modules.mumc_favorited import favorites_playedPatternCleanup
 from mumc_modules.mumc_minimum_episodes import get_minEpisodesToKeep
+from mumc_modules.mumc_console_info import print_post_processing_started,print_post_processing_verbal_progress,print_post_processing_verbal_progress_min_episode,print_post_processing_completed
 
 
 def convert_timeToString(byUserId_item):
@@ -20,10 +21,36 @@ def convert_timeToString(byUserId_item):
     return(byUserId_item)
 
 
+def build_behaviorPattern(isMeeting_dict,behavior_pattern_dict,itemsDictionary,itemsExtraDictionary):
+
+    itemId=behavior_pattern_dict['itemId']
+    subUserId=behavior_pattern_dict['subUserId']
+
+    if (isMeeting_dict and (itemId in isMeeting_dict)):
+        if (itemId in itemsDictionary[subUserId]):
+            if (itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']):
+                isMeeting_dict[itemId]<<=1
+                isMeeting_dict[itemId]+=1
+            else:
+                isMeeting_dict[itemId]<<=1
+    else:
+        if (itemId in itemsDictionary[subUserId]):
+            if (itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']):
+                isMeeting_dict[itemId]=1
+            else:
+                isMeeting_dict[itemId]=0
+        else:
+            isMeeting_dict[itemId]=1
+
+    return isMeeting_dict
+
+
 #Add/Remove item to/from delete list if meeting favorite/whitetagged/blacktagged/whitelisted pattern and played pattern
 def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,itemsExtraDictionary,deleteItems,deleteItemsIdTracker):
     isMeetingAction_dict={}
     isMeetingPlayedFilter_dict={}
+    isMeetingCreatedPlayedFilter_dict={}
+    behavior_pattern_dict={}
     itemId_tracker=[]
     userId_tracker=[]
 
@@ -34,8 +61,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
     #removeIt='keep'
 
     if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
-        actionFilter=itemsExtraDictionary['MonitoredUsersAction']
-        playedFilter=itemsExtraDictionary['MonitoredUsersMeetPlayedFilter']
+        #actionFilter=itemsExtraDictionary['MonitoredUsersAction']
         methodFilter=itemsExtraDictionary['ConfiguredBehavior']
         behaviorFilter=itemsExtraDictionary['ActionBehavior']
         #wordFilter=itemsExtraDictionary['ActionType']
@@ -43,62 +69,68 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
         for userId in itemsDictionary:
             userId_tracker.append(userId)
 
+        userId_tracker_len=len(userId_tracker)
+        max_binary_value=(2**userId_tracker_len)-1
+
         for userId in itemsDictionary:
             for itemId in itemsDictionary[userId]:
+
+                behavior_pattern_dict['itemId']=itemId
+
                 if not (itemId in itemId_tracker):
-                    firstMeetingActionLoop=True
-                    firstPlayedFilterLoop=True
                     itemId_tracker.append(itemId)
                     item=itemsDictionary[userId][itemId]
+
                     for subUserId in userId_tracker:
-                        if (firstMeetingActionLoop):
-                            if (itemId in itemsDictionary[subUserId]):
-                                if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                    isMeetingAction_dict[itemId]=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
-                                    firstMeetingActionLoop=False
-                        else:
-                            if (itemId in itemsDictionary[subUserId]):
-                                if (actionFilter == andIt):
-                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                        isMeetingAction_dict[itemId]&=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
-                                elif (actionFilter == orIt):
-                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                        isMeetingAction_dict[itemId]|=itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']
-                            else:
-                                if (actionFilter == andIt):
-                                    isMeetingAction_dict[itemId]&=False
-                                elif (actionFilter == orIt):
-                                    isMeetingAction_dict[itemId]|=False
 
-                        if (firstPlayedFilterLoop):
-                            if (itemId in itemsDictionary[subUserId]):
-                                #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
-                                if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                    isMeetingPlayedFilter_dict[itemId]=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
-                                    firstPlayedFilterLoop=False
-                        else:
-                            if (itemId in itemsDictionary[subUserId]):
-                                if (playedFilter == andIt):
-                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
-                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                        isMeetingPlayedFilter_dict[itemId]&=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
-                                elif (playedFilter == orIt):
-                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
-                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                        isMeetingPlayedFilter_dict[itemId]|=itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']
-                                else:
-                                    #Yes verify 'IsMeetingAction' is NOT None on purpose; only want to use this if action is True or False
-                                    if (not(itemsExtraDictionary[subUserId][itemId]['IsMeetingAction'] == None)):
-                                        isMeetingPlayedFilter_dict[itemId]=True
-                            else:
-                                if (playedFilter == andIt):
-                                    isMeetingPlayedFilter_dict[itemId]&=False
-                                elif (playedFilter == orIt):
-                                    isMeetingPlayedFilter_dict[itemId]|=False
-                                else:
-                                    isMeetingPlayedFilter_dict[itemId]=True
+                        behavior_pattern_dict['subUserId']=subUserId
 
-                    if (isMeetingAction_dict[itemId] and isMeetingPlayedFilter_dict[itemId]):
+                        isMeetingAction_dict=build_behaviorPattern(isMeetingAction_dict,behavior_pattern_dict,itemsDictionary,itemsExtraDictionary)
+                        isMeetingPlayedFilter_dict=build_behaviorPattern(isMeetingPlayedFilter_dict,behavior_pattern_dict,itemsDictionary,itemsExtraDictionary)
+                        isMeetingCreatedPlayedFilter_dict=build_behaviorPattern(isMeetingCreatedPlayedFilter_dict,behavior_pattern_dict,itemsDictionary,itemsExtraDictionary)
+
+                    #all - Every monitored user must have the media item blacklisted/whitelites/blacktagged/whitetagged/favortied
+                    if (itemsExtraDictionary['MonitoredUsersAction'] == andIt):
+                        actionControl=isMeetingAction_dict[itemId] == max_binary_value
+                    #any - One or more monitored users must have the media item blacklisted/whitelisted/favorited (does not apply to blacktagged/whitetagged)
+                    elif (itemsExtraDictionary['MonitoredUsersAction'] == orIt):
+                        actionControl=isMeetingAction_dict[itemId] >= 1
+                    #ignore - Should never get here
+                    else: #(itemsExtraDictionary['MonitoredUsersAction'] == 'ignore'):
+                        #actionControl=True
+                        raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate actionControl assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
+
+                    #all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
+                    if (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt):
+                        playedControl=(isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value
+                    #any - One or more monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt):
+                        playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
+                    #all_any - Every monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_' + orIt)):
+                        playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value
+                    #any_all - One or more monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_' + andIt)):
+                        playedControl=(isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
+                    #all_played - Every monitored user(s) must meet the Played Count and Played Count Inequality of the played_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_played')):
+                        playedControl=isMeetingPlayedFilter_dict[itemId] == max_binary_value
+                    #any_played - One or more monitored user(s) must meet the Played Count and Played Count Inequality of the played_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_played')):
+                        playedControl=isMeetingPlayedFilter_dict[itemId] >= 1
+                    #all_created - Every monitored user(s) must meet the Played Count and Played Count Inequality of the created_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_created')):
+                        playedControl=isMeetingCreatedPlayedFilter_dict[itemId] == max_binary_value
+                    #any_created - One or more monitored user(s) must meet the Played Count and Played Count Inequality of the created_filter_*
+                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_created')):
+                        playedControl=isMeetingCreatedPlayedFilter_dict[itemId] >= 1
+                    #ignore - Ignore if monitored user(s) meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
+                    else: #(itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == 'ignore'):
+                        playedControl=True
+
+                    behavioralControl=actionControl and playedControl
+
+                    if (behavioralControl):
                         if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
                             #No action taken on True
                             addItemToDeleteList=None
@@ -147,6 +179,8 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(itemsDictionary,it
                                             deleteItems.remove(delItem)
                                             deleteItemsIdTracker.remove(item['Id'])
                             except:
+                                deleteItems.append('ITEM ERROR: Unable To Remove Media Item From Delete List.')
+                                deleteItemsIdTracker.append(item['Id'])
                                 itemId_tracker.remove(itemId)
 
     return deleteItems,deleteItemsIdTracker
@@ -169,9 +203,18 @@ def update_byUserId_playedStates(extra_byUserId_Media,userKey,itemId,media_playe
 
 
 #add played and created data for item during post-processing
-def add_missingItems_byUserId_playedStates(the_dict,itemsDictionary,itemsExtraDictionary,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count):
+def add_missingItems_byUserId_playedStates(the_dict,itemsDictionary,itemsExtraDictionary,postproc_dict):
     userId_tracker=[]
     itemId_tracker=[]
+
+    media_played_days=postproc_dict['media_played_days']
+    media_created_days=postproc_dict['media_created_days']
+    cut_off_date_played_media=postproc_dict['cut_off_date_played_media']
+    cut_off_date_created_media=postproc_dict['cut_off_date_created_media']
+    media_played_count_comparison=postproc_dict['media_played_count_comparison']
+    media_played_count=postproc_dict['media_played_count']
+    media_created_played_count_comparison=postproc_dict['media_created_played_count_comparison']
+    media_created_played_count=postproc_dict['media_created_played_count']
 
     for userId in itemsDictionary:
         userId_tracker.append(userId)
@@ -192,100 +235,109 @@ def add_missingItems_byUserId_playedStates(the_dict,itemsDictionary,itemsExtraDi
 
 def run_post_processing(the_dict,media_dict):
 
-    mediaType=media_dict['mediaType'].upper()
+    postproc_dict={}
 
-    library_matching_behavior=the_dict['library_matching_behavior']
-    bluser_keys_json_verify=the_dict['bluser_keys_json_verify']
-    user_bllib_keys_json=the_dict['user_bllib_keys_json']
-    user_bllib_netpath_json=the_dict['user_bllib_netpath_json']
-    user_bllib_path_json=the_dict['user_bllib_path_json']
-    wluser_keys_json_verify=the_dict['wluser_keys_json_verify']
-    user_wllib_keys_json=the_dict['user_wllib_keys_json']
-    user_wllib_netpath_json=the_dict['user_wllib_netpath_json']
-    user_wllib_path_json=the_dict['user_wllib_path_json']
+    postproc_dict['mediaType']=media_dict['mediaType'].upper()
 
-    cut_off_date_played_media=the_dict['cut_off_date_played_media']
-    cut_off_date_created_media=the_dict['cut_off_date_created_media']
-    minimum_number_episodes=the_dict['minimum_number_episodes']
-    minimum_number_played_episodes=the_dict['minimum_number_played_episodes']
-    print_common_delete_keep_info=the_dict['print_common_delete_keep_info']
+    postproc_dict['library_matching_behavior']=the_dict['library_matching_behavior']
+    postproc_dict['bluser_keys_json_verify']=the_dict['bluser_keys_json_verify']
+    postproc_dict['user_bllib_keys_json']=the_dict['user_bllib_keys_json']
+    postproc_dict['user_bllib_netpath_json']=the_dict['user_bllib_netpath_json']
+    postproc_dict['user_bllib_path_json']=the_dict['user_bllib_path_json']
+    postproc_dict['wluser_keys_json_verify']=the_dict['wluser_keys_json_verify']
+    postproc_dict['user_wllib_keys_json']=the_dict['user_wllib_keys_json']
+    postproc_dict['user_wllib_netpath_json']=the_dict['user_wllib_netpath_json']
+    postproc_dict['user_wllib_path_json']=the_dict['user_wllib_path_json']
 
-    if (mediaType == 'MOVIE'):
-        media_played_days=the_dict['played_filter_movie'][0]
-        media_created_days=the_dict['created_filter_movie'][0]
-        media_played_count_comparison=the_dict['played_filter_movie'][1]
-        media_created_played_count_comparison=the_dict['created_filter_movie'][1]
-        media_played_count=the_dict['played_filter_movie'][2]
-        media_created_played_count=the_dict['created_filter_movie'][2]
-        media_created_played_behavioral_control=the_dict['created_filter_movie'][3]
-        blacklisted_behavior_media=the_dict['blacklisted_behavior_movie']
-        whitelisted_behavior_media=the_dict['blacklisted_behavior_movie']
-        blacktagged_behavior_media=the_dict['blacklisted_behavior_movie']
-        whitetagged_behavior_media=the_dict['blacklisted_behavior_movie']
-        favorited_behavior_media=the_dict['blacklisted_behavior_movie']
-        advFav0_media=the_dict['favorited_advanced_movie_genre']
-        advFav1_media=the_dict['favorited_advanced_movie_library_genre']
-        advFav2_media=0
-        advFav3_media=0
-        advFav4_media=0
-        advFav5_media=0
-    elif (mediaType == 'EPISODE'):
-        media_played_days=the_dict['played_filter_episode'][0]
-        media_created_days=the_dict['created_filter_episode'][0]
-        media_played_count_comparison=the_dict['played_filter_episode'][1]
-        media_created_played_count_comparison=the_dict['created_filter_episode'][1]
-        media_played_count=the_dict['played_filter_episode'][2]
-        media_created_played_count=the_dict['created_filter_episode'][2]
-        media_created_played_behavioral_control=the_dict['created_filter_episode'][3]
-        blacklisted_behavior_media=the_dict['blacklisted_behavior_episode']
-        whitelisted_behavior_media=the_dict['blacklisted_behavior_episode']
-        blacktagged_behavior_media=the_dict['blacklisted_behavior_episode']
-        whitetagged_behavior_media=the_dict['blacklisted_behavior_episode']
-        favorited_behavior_media=the_dict['blacklisted_behavior_episode']
-        advFav0_media=the_dict['favorited_advanced_episode_genre']
-        advFav1_media=the_dict['favorited_advanced_season_genre']
-        advFav2_media=the_dict['favorited_advanced_series_genre']
-        advFav3_media=the_dict['favorited_advanced_tv_library_genre']
-        advFav4_media=the_dict['favorited_advanced_tv_studio_network']
-        advFav5_media=the_dict['favorited_advanced_tv_studio_network_genre']
-    elif (mediaType == 'AUDIO'):
-        media_played_days=the_dict['played_filter_audio'][0]
-        media_created_days=the_dict['created_filter_audio'][0]
-        media_played_count_comparison=the_dict['played_filter_audio'][1]
-        media_created_played_count_comparison=the_dict['created_filter_audio'][1]
-        media_played_count=the_dict['played_filter_audio'][2]
-        media_created_played_count=the_dict['created_filter_audio'][2]
-        media_created_played_behavioral_control=the_dict['created_filter_audio'][3]
-        blacklisted_behavior_media=the_dict['blacklisted_behavior_audio']
-        whitelisted_behavior_media=the_dict['blacklisted_behavior_audio']
-        blacktagged_behavior_media=the_dict['blacklisted_behavior_audio']
-        whitetagged_behavior_media=the_dict['blacklisted_behavior_audio']
-        favorited_behavior_media=the_dict['blacklisted_behavior_audio']
-        advFav0_media=the_dict['favorited_advanced_track_genre']
-        advFav1_media=the_dict['favorited_advanced_album_genre']
-        advFav2_media=the_dict['favorited_advanced_music_library_genre']
-        advFav3_media=the_dict['favorited_advanced_track_artist']
-        advFav4_media=the_dict['favorited_advanced_album_artist']
-        advFav5_media=0
-    elif (mediaType == 'AUDIOBOOK'):
-        media_played_days=the_dict['played_filter_audiobook'][0]
-        media_created_days=the_dict['created_filter_audiobook'][0]
-        media_played_count_comparison=the_dict['played_filter_audiobook'][1]
-        media_created_played_count_comparison=the_dict['created_filter_audiobook'][1]
-        media_played_count=the_dict['played_filter_audiobook'][2]
-        media_created_played_count=the_dict['created_filter_audiobook'][2]
-        media_created_played_behavioral_control=the_dict['created_filter_audiobook'][3]
-        blacklisted_behavior_media=the_dict['blacklisted_behavior_audiobook']
-        whitelisted_behavior_media=the_dict['blacklisted_behavior_audiobook']
-        blacktagged_behavior_media=the_dict['blacklisted_behavior_audiobook']
-        whitetagged_behavior_media=the_dict['blacklisted_behavior_audiobook']
-        favorited_behavior_media=the_dict['blacklisted_behavior_audiobook']
-        advFav0_media=the_dict['favorited_advanced_audiobook_track_genre']
-        advFav1_media=the_dict['favorited_advanced_audiobook_genre']
-        advFav2_media=the_dict['favorited_advanced_audiobook_library_genre']
-        advFav3_media=the_dict['favorited_advanced_audiobook_track_author']
-        advFav4_media=the_dict['favorited_advanced_audiobook_author']
-        advFav5_media=0
+    postproc_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media']
+    postproc_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media']
+    postproc_dict['minimum_number_episodes']=the_dict['minimum_number_episodes']
+    postproc_dict['minimum_number_played_episodes']=the_dict['minimum_number_played_episodes']
+
+    if (postproc_dict['mediaType'] == 'MOVIE'):
+        postproc_dict['media_played_days']=the_dict['played_filter_movie'][0]
+        postproc_dict['media_created_days']=the_dict['created_filter_movie'][0]
+        postproc_dict['media_played_count_comparison']=the_dict['played_filter_movie'][1]
+        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_movie'][1]
+        postproc_dict['media_played_count']=the_dict['played_filter_movie'][2]
+        postproc_dict['media_created_played_count']=the_dict['created_filter_movie'][2]
+        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_movie'][3]
+        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_movie']
+        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_movie']
+        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_movie']
+        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_movie']
+        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_movie']
+        postproc_dict['advFav0_media']=the_dict['favorited_advanced_movie_genre']
+        postproc_dict['advFav1_media']=the_dict['favorited_advanced_movie_library_genre']
+        postproc_dict['advFav2_media']=0
+        postproc_dict['advFav3_media']=0
+        postproc_dict['advFav4_media']=0
+        postproc_dict['advFav5_media']=0
+        postproc_dict['print_media_post_processing']=the_dict['print_movie_post_processing_info']
+        postproc_dict['media_post_processing_format']=the_dict['movie_post_processing_format']
+    elif (postproc_dict['mediaType'] == 'EPISODE'):
+        postproc_dict['media_played_days']=the_dict['played_filter_episode'][0]
+        postproc_dict['media_created_days']=the_dict['created_filter_episode'][0]
+        postproc_dict['media_played_count_comparison']=the_dict['played_filter_episode'][1]
+        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_episode'][1]
+        postproc_dict['media_played_count']=the_dict['played_filter_episode'][2]
+        postproc_dict['media_created_played_count']=the_dict['created_filter_episode'][2]
+        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_episode'][3]
+        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_episode']
+        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_episode']
+        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_episode']
+        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_episode']
+        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_episode']
+        postproc_dict['advFav0_media']=the_dict['favorited_advanced_episode_genre']
+        postproc_dict['advFav1_media']=the_dict['favorited_advanced_season_genre']
+        postproc_dict['advFav2_media']=the_dict['favorited_advanced_series_genre']
+        postproc_dict['advFav3_media']=the_dict['favorited_advanced_tv_library_genre']
+        postproc_dict['advFav4_media']=the_dict['favorited_advanced_tv_studio_network']
+        postproc_dict['advFav5_media']=the_dict['favorited_advanced_tv_studio_network_genre']
+        postproc_dict['print_media_post_processing']=the_dict['print_episode_post_processing_info']
+        postproc_dict['media_post_processing_format']=the_dict['episode_post_processing_format']
+    elif (postproc_dict['mediaType'] == 'AUDIO'):
+        postproc_dict['media_played_days']=the_dict['played_filter_audio'][0]
+        postproc_dict['media_created_days']=the_dict['created_filter_audio'][0]
+        postproc_dict['media_played_count_comparison']=the_dict['played_filter_audio'][1]
+        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_audio'][1]
+        postproc_dict['media_played_count']=the_dict['played_filter_audio'][2]
+        postproc_dict['media_created_played_count']=the_dict['created_filter_audio'][2]
+        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_audio'][3]
+        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_audio']
+        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_audio']
+        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_audio']
+        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_audio']
+        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_audio']
+        postproc_dict['advFav0_media']=the_dict['favorited_advanced_track_genre']
+        postproc_dict['advFav1_media']=the_dict['favorited_advanced_album_genre']
+        postproc_dict['advFav2_media']=the_dict['favorited_advanced_music_library_genre']
+        postproc_dict['advFav3_media']=the_dict['favorited_advanced_track_artist']
+        postproc_dict['advFav4_media']=the_dict['favorited_advanced_album_artist']
+        postproc_dict['advFav5_media']=0
+        postproc_dict['print_media_post_processing']=the_dict['print_audio_post_processing_info']
+        postproc_dict['media_post_processing_format']=the_dict['audio_post_processing_format']
+    elif (postproc_dict['mediaType'] == 'AUDIOBOOK'):
+        postproc_dict['media_played_days']=the_dict['played_filter_audiobook'][0]
+        postproc_dict['media_created_days']=the_dict['created_filter_audiobook'][0]
+        postproc_dict['media_played_count_comparison']=the_dict['played_filter_audiobook'][1]
+        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_audiobook'][1]
+        postproc_dict['media_played_count']=the_dict['played_filter_audiobook'][2]
+        postproc_dict['media_created_played_count']=the_dict['created_filter_audiobook'][2]
+        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_audiobook'][3]
+        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_audiobook']
+        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_audiobook']
+        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_audiobook']
+        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_audiobook']
+        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_audiobook']
+        postproc_dict['advFav0_media']=the_dict['favorited_advanced_audiobook_track_genre']
+        postproc_dict['advFav1_media']=the_dict['favorited_advanced_audiobook_genre']
+        postproc_dict['advFav2_media']=the_dict['favorited_advanced_audiobook_library_genre']
+        postproc_dict['advFav3_media']=the_dict['favorited_advanced_audiobook_track_author']
+        postproc_dict['advFav4_media']=the_dict['favorited_advanced_audiobook_author']
+        postproc_dict['advFav5_media']=the_dict['favorited_advanced_audiobook_library_author']
+        postproc_dict['print_media_post_processing']=the_dict['print_audiobook_post_processing_info']
+        postproc_dict['media_post_processing_format']=the_dict['audiobook_post_processing_format']
 
     #lists and dictionaries of items to be deleted
     deleteItems=[]
@@ -308,9 +360,9 @@ def run_post_processing(the_dict,media_dict):
     mediaCounts_byUserId={}
 
     #check media is enabled before post-processing
-    if ((media_played_days >= 0) or (media_created_days >= 0)):
+    if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
 
-        print_byType("\n" + mediaType + " POST PROCESSING STARTED...",print_common_delete_keep_info,the_dict)
+        print_post_processing_started(the_dict,postproc_dict)
 
         for user_key in media_dict:
             if (not(user_key == 'mediaType')):
@@ -331,135 +383,122 @@ def run_post_processing(the_dict,media_dict):
                 mediaCounts_byUserId |= media_dict[user_key]['mediaCounts_byUserId']
 
         if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\nList Of Possible Created " + mediaType + " Items To Be Deleted: " + str(len(deleteItems_createdMedia)),3,the_dict)
+            appendTo_DEBUG_log("\nList Of Possible Created " + postproc_dict['mediaType'] + " Items To Be Deleted: " + str(len(deleteItems_createdMedia)),3,the_dict)
             appendTo_DEBUG_log("\n" + convert2json(deleteItems_createdMedia),4,the_dict)
-            appendTo_DEBUG_log("\nList Of Possible Behavioral " + mediaType + " Items To Be Deleted: " + str(len(deleteItems_behavioralMedia)),3,the_dict)
+            appendTo_DEBUG_log("\nList Of Possible Behavioral " + postproc_dict['mediaType'] + " Items To Be Deleted: " + str(len(deleteItems_behavioralMedia)),3,the_dict)
             appendTo_DEBUG_log("\n" + convert2json(deleteItems_behavioralMedia),4,the_dict)
 
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (media_created_played_behavioral_control)):
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['media_created_played_behavioral_control'])):
             deleteItems_Media=deleteItems_behavioralMedia + deleteItems_createdMedia
             deleteItemsIdTracker_Media=deleteItemsIdTracker_behavioralMedia + deleteItemsIdTracker_createdMedia
+            appendTo_DEBUG_log("\nCombining List Of Possible Created media with List Of Possible Behavioral media for post processing",3,the_dict)
         else:
             deleteItems_Media=deleteItems_behavioralMedia
             deleteItemsIdTracker_Media=deleteItemsIdTracker_behavioralMedia
+            appendTo_DEBUG_log("\nOnly using List Of Possible Behavioral media for post processing",3,the_dict)
 
         #Add blacklisted items to delete list that meet the defined played state
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (blacklisted_behavior_media[3] >= 0)):
-            if (not(mediaType == "AUDIO")):
-                print_byType("\nPROCESSING BLACKLISTED " + mediaType + "S...",print_common_delete_keep_info,the_dict)
-            else:
-                print_byType("\nPROCESSING BLACKLISTED " + mediaType + "...",print_common_delete_keep_info,the_dict)
-            isblacklisted_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
-            isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media=blacklist_playedPatternCleanup(the_dict,isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media,library_matching_behavior,bluser_keys_json_verify,user_bllib_keys_json,user_bllib_netpath_json,user_bllib_path_json)
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['blacklisted_behavior_media'][3] >= 0)):
+            print_post_processing_verbal_progress(the_dict,postproc_dict,'BLACKLISTED')
+            isblacklisted_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media,postproc_dict)
+            isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media=blacklist_playedPatternCleanup(the_dict,isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media,postproc_dict)
             deleteItems_Media,deleteItemsIdTracker_Media=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media,deleteItems_Media,deleteItemsIdTracker_Media)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
-            if ((media_played_days >= 0) or (media_created_days >= 0)):
-                appendTo_DEBUG_log("\nisblacklisted_Played_" + mediaType + ":",3,the_dict)
+            if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
+                appendTo_DEBUG_log("\nisblacklisted_Played_" + postproc_dict['mediaType'] + ":",3,the_dict)
                 appendTo_DEBUG_log("\n" + convert2json(isblacklisted_and_played_byUserId_Media),3,the_dict)
                 isblacklisted_extraInfo_byUserId_Media=convert_timeToString(isblacklisted_extraInfo_byUserId_Media)
                 appendTo_DEBUG_log("\n" + convert2json(isblacklisted_extraInfo_byUserId_Media),3,the_dict)
                 appendTo_DEBUG_log("\n",3,the_dict)
 
         #Add whitelisted items to delete list that meet the defined played state
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (whitelisted_behavior_media[3] >= 0)):
-            if (not(mediaType == "AUDIO")):
-                print_byType("\nPROCESSING WHITELISTED " + mediaType + "S...",print_common_delete_keep_info,the_dict)
-            else:
-                print_byType("\nPROCESSING WHITELISTED " + mediaType + "...",print_common_delete_keep_info,the_dict)
-            iswhitelisted_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
-            iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media=whitelist_playedPatternCleanup(the_dict,iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media,library_matching_behavior,wluser_keys_json_verify,user_wllib_keys_json,user_wllib_netpath_json,user_wllib_path_json)
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['whitelisted_behavior_media'][3] >= 0)):
+            print_post_processing_verbal_progress(the_dict,postproc_dict,'WHITELISTED')
+            iswhitelisted_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media,postproc_dict)
+            iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media=whitelist_playedPatternCleanup(the_dict,iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media,postproc_dict)
             deleteItems_Media,deleteItemsIdTracker_Media=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media,deleteItems_Media,deleteItemsIdTracker_Media)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
-            if ((media_played_days >= 0) or (media_created_days >= 0)):
-                appendTo_DEBUG_log("\niswhitelisted_Played_" + mediaType + ":",3,the_dict)
+            if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
+                appendTo_DEBUG_log("\niswhitelisted_Played_" + postproc_dict['mediaType'] + ":",3,the_dict)
                 appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_and_played_byUserId_Media),3,the_dict)
                 iswhitelisted_extraInfo_byUserId_Media=convert_timeToString(iswhitelisted_extraInfo_byUserId_Media)
                 appendTo_DEBUG_log("\n" + convert2json(iswhitelisted_extraInfo_byUserId_Media),3,the_dict)
                 appendTo_DEBUG_log("\n",3,the_dict)
 
         #Add blacktagged items to delete list that meet the defined played state
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (blacktagged_behavior_media[3] >= 0)):
-            if (not(mediaType == "AUDIO")):
-                print_byType("\nPROCESSING BLACKTAGGED " + mediaType + "S...",print_common_delete_keep_info,the_dict)
-            else:
-                print_byType("\nPROCESSING BLACKTAGGED " + mediaType + "...",print_common_delete_keep_info,the_dict)
-            isblacktagged_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isblacktagged_and_played_byUserId_Media,isblacktagged_extraInfo_byUserId_Media,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['blacktagged_behavior_media'][3] >= 0)):
+            print_post_processing_verbal_progress(the_dict,postproc_dict,'BLACKTAGGED')
+            isblacktagged_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isblacktagged_and_played_byUserId_Media,isblacktagged_extraInfo_byUserId_Media,postproc_dict)
             deleteItems_Media,deleteItemsIdTracker_Media=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isblacktagged_and_played_byUserId_Media,isblacktagged_extraInfo_byUserId_Media,deleteItems_Media,deleteItemsIdTracker_Media)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
-            if ((media_played_days >= 0) or (media_created_days >= 0)):
-                appendTo_DEBUG_log("\nisblacktagged_Played_" + mediaType + ":",3,the_dict)
+            if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
+                appendTo_DEBUG_log("\nisblacktagged_Played_" + postproc_dict['mediaType'] + ":",3,the_dict)
                 appendTo_DEBUG_log("\n" + convert2json(isblacktagged_and_played_byUserId_Media),3,the_dict)
                 isblacktagged_extraInfo_byUserId_Media=convert_timeToString(isblacktagged_extraInfo_byUserId_Media)
                 appendTo_DEBUG_log("\n" + convert2json(isblacktagged_extraInfo_byUserId_Media),3,the_dict)
                 appendTo_DEBUG_log("\n",3,the_dict)
 
         #Add whitetagged items to delete list that meet the defined played state
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (whitetagged_behavior_media[3] >= 0)):
-            if (not(mediaType == "AUDIO")):
-                print_byType("\nPROCESSING WHITETAGGED " + mediaType + "S...",print_common_delete_keep_info,the_dict)
-            else:
-                print_byType("\nPROCESSING WHITETAGGED " + mediaType + "...",print_common_delete_keep_info,the_dict)
-            iswhitetagged_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,iswhitetagged_and_played_byUserId_Media,iswhitetagged_extraInfo_byUserId_Media,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['whitetagged_behavior_media'][3] >= 0)):
+            print_post_processing_verbal_progress(the_dict,postproc_dict,'WHITETAGGED')
+            iswhitetagged_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,iswhitetagged_and_played_byUserId_Media,iswhitetagged_extraInfo_byUserId_Media,postproc_dict)
             deleteItems_Media,deleteItemsIdTracker_Media=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(iswhitetagged_and_played_byUserId_Media,iswhitetagged_extraInfo_byUserId_Media,deleteItems_Media,deleteItemsIdTracker_Media)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
-            if ((media_played_days >= 0) or (media_created_days >= 0)):
-                appendTo_DEBUG_log("\niswhitetagged_Played_" + mediaType + ":",3,the_dict)
+            if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
+                appendTo_DEBUG_log("\niswhitetagged_Played_" + postproc_dict['mediaType'] + ":",3,the_dict)
                 appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_and_played_byUserId_Media),3,the_dict)
                 iswhitetagged_extraInfo_byUserId_Media=convert_timeToString(iswhitetagged_extraInfo_byUserId_Media)
                 appendTo_DEBUG_log("\n" + convert2json(iswhitetagged_extraInfo_byUserId_Media),3,the_dict)
                 appendTo_DEBUG_log("\n",3,the_dict)
 
         #Add favorited items to delete list that meet the defined played state
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (favorited_behavior_media[3] >= 0)):
-            if (not(mediaType == "AUDIO")):
-                print_byType("\nPROCESSING FAVORITED " + mediaType + "S...",print_common_delete_keep_info,the_dict)
-            else:
-                print_byType("\nPROCESSING FAVORITED " + mediaType + "...",print_common_delete_keep_info,the_dict)
-            isfavorited_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['favorited_behavior_media'][3] >= 0)):
+            print_post_processing_verbal_progress(the_dict,postproc_dict,'FAVORITED')
+            isfavorited_extraInfo_byUserId_Media=add_missingItems_byUserId_playedStates(the_dict,isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media,postproc_dict)
 
-            isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media=favorites_playedPatternCleanup(the_dict,isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media,favorited_behavior_media,advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media,advFav5_media)
+            isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media=favorites_playedPatternCleanup(the_dict,isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media,postproc_dict)
             deleteItems_Media,deleteItemsIdTracker_Media=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media,deleteItems_Media,deleteItemsIdTracker_Media)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
-            if ((media_played_days >= 0) or (media_created_days >= 0)):
-                appendTo_DEBUG_log("\nisfavorited_Played_" + mediaType + ":",3,the_dict)
+            if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
+                appendTo_DEBUG_log("\nisfavorited_Played_" + postproc_dict['mediaType'] + ":",3,the_dict)
                 appendTo_DEBUG_log("\n" + convert2json(isfavorited_and_played_byUserId_Media),3,the_dict)
                 isfavorited_extraInfo_byUserId_Media=convert_timeToString(isfavorited_extraInfo_byUserId_Media)
                 appendTo_DEBUG_log("\n" + convert2json(isfavorited_extraInfo_byUserId_Media),3,the_dict)
                 appendTo_DEBUG_log("\n",3,the_dict)
 
         #only applies to episodes
-        if (mediaType == 'episode'):
+        if (postproc_dict['mediaType'] == 'episode'):
             #Keep a minimum number of episodes
-            if (((media_played_days >= 0) or (media_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
-                print_byType("\nPROCESSING MINIMUM NUMBER " + mediaType + "S...",print_common_delete_keep_info,the_dict)
+            if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and ((postproc_dict['minimum_number_episodes'] >= 1) or (postproc_dict['minimum_number_played_episodes'] >= 1))):
+                print_post_processing_verbal_progress_min_episode(the_dict,postproc_dict)
                 #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
                 deleteItems_Media=get_minEpisodesToKeep(mediaCounts_byUserId, deleteItems_Media, the_dict)
 
             if (the_dict['DEBUG']):
                 appendTo_DEBUG_log('-----------------------------------------------------------',2,the_dict)
                 appendTo_DEBUG_log('',2,the_dict)
-                if (((media_played_days >= 0) or (media_created_days >= 0)) and ((minimum_number_episodes >= 1) or (minimum_number_played_episodes >= 1))):
+                if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and ((postproc_dict['minimum_number_episodes'] >= 1) or (postproc_dict['minimum_number_played_episodes'] >= 1))):
                     appendTo_DEBUG_log('\nmediaCounts_byUserId: ',3,the_dict)
                     appendTo_DEBUG_log("\n" + convert2json(mediaCounts_byUserId),3,the_dict)
                     appendTo_DEBUG_log("\n",3,the_dict)
 
         deleteItems+=deleteItems_Media
-        if (((media_played_days >= 0) or (media_created_days >= 0)) and (not (media_created_played_behavioral_control))):
+        if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (not (postproc_dict['media_created_played_behavioral_control']))):
             deleteItems+=deleteItems_createdMedia
 
         if (the_dict['DEBUG']):
@@ -471,11 +510,7 @@ def run_post_processing(the_dict,media_dict):
                     deleteItems['CutOffDateCreated']=str(mediaItem['CutOffDateCreated'])
             appendTo_DEBUG_log("\n" + convert2json(deleteItems),4,the_dict)
 
-        print_byType("\n" + mediaType + " POST PROCESSING COMPLETE.",print_common_delete_keep_info,the_dict)
-
-        if (the_dict['DEBUG']):
-            print_common_delete_keep_info=True
-        #print_byType('\n',print_common_delete_keep_info,the_dict)
+        print_post_processing_completed(the_dict,postproc_dict)
 
     return deleteItems
 

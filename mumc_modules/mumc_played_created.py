@@ -8,65 +8,65 @@ def get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_play
 
     if (filter_played_count_comparison == '>'):
         #Play counts 1 thru 730500
-        isPlayed_Filter_Value='True'
+        isPlayed_Filter_Value='playedOnly'
     elif (filter_played_count_comparison == '<'):
         if ((filter_played_count == 0) or (filter_played_count == 1)):
             #Play counts 0 and 1
-            isPlayed_Filter_Value='False'
+            isPlayed_Filter_Value='unplayedOnly'
         else:
-            #Play counts 0 thru 730499
-            isPlayed_Filter_Value=''
+            #Play counts 2 thru 730499
+            isPlayed_Filter_Value='playedAndUnplayed'
     elif (filter_played_count_comparison == '>='):
         if (filter_played_count == 0):
-            #Play counts 0 thru 730500
-            isPlayed_Filter_Value=''
+            #Play count 0
+            isPlayed_Filter_Value='playedAndUnplayed'
         else:
             #Play counts 1 thru 730500
-            isPlayed_Filter_Value='True'
+            isPlayed_Filter_Value='playedOnly'
     elif (filter_played_count_comparison == '<='):
         if (filter_played_count == 0):
             #Play count 0
-            isPlayed_Filter_Value='False'
+            isPlayed_Filter_Value='unplayedOnly'
         else:
-            #Play counts 0 thru 730500
-            isPlayed_Filter_Value=''
+            #Play counts 1 thru 730500
+            isPlayed_Filter_Value='playedAndUnplayed'
     elif (filter_played_count_comparison == '=='):
         if (filter_played_count == 0):
             #Play count 0
-            isPlayed_Filter_Value='False'
+            isPlayed_Filter_Value='unplayedOnly'
         else:
             #Play count 1 thru 730500
-            isPlayed_Filter_Value='True'
+            isPlayed_Filter_Value='playedOnly'
     elif (filter_played_count_comparison == 'not >'):
         if ((filter_played_count == 0) or (filter_played_count == 1)):
-            #Play count 0
-            isPlayed_Filter_Value='False'
+            #Play count 0 thru 1
+            isPlayed_Filter_Value='unplayedOnly'
         else:
-            #Play count 1 thru 730499
-            isPlayed_Filter_Value=''
+            #Play count 2 thru 730499
+            isPlayed_Filter_Value='playedAndUnplayed'
     elif (filter_played_count_comparison == 'not <'):
         #Play counts 1 thru 730500
-        isPlayed_Filter_Value='True'
+        isPlayed_Filter_Value='playedOnly'
     elif (filter_played_count_comparison == 'not >='):
         if ((filter_played_count == 0) or (filter_played_count == 1)):
             #Play count 0
-            isPlayed_Filter_Value='False'
+            isPlayed_Filter_Value='unplayedOnly'
         else:
             #Play count 1 thru 730499
-            isPlayed_Filter_Value=''
+            isPlayed_Filter_Value='playedAndUnplayed'
     elif (filter_played_count_comparison == 'not <='):
         #Play count 1 thru 730500
-        isPlayed_Filter_Value='True'
+        isPlayed_Filter_Value='playedOnly'
     elif (filter_played_count_comparison == 'not =='):
         if (filter_played_count == 0):
             #Play count 1 thru 730500
-            isPlayed_Filter_Value='True'
+            isPlayed_Filter_Value='playedOnly'
         else:
             #Play count 0 thru 730500
-            isPlayed_Filter_Value=''
+            isPlayed_Filter_Value='playedAndUnplayed'
     else:
         #Play count comparison unknown
-        isPlayed_Filter_Value=''
+        isPlayed_Filter_Value='playedAndUnplayed'
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value,2,the_dict)
@@ -92,118 +92,187 @@ def get_isPlayedCreated_FilterValue(the_dict,played_days,created_days,filter_pla
     else:
         isCreated_Filter_Value='disabled'
 
-    if ((isPlayed_Filter_Value == 'False') and (isCreated_Filter_Value == 'False')):
-        return isPlayed_Filter_Value
-    elif ((isPlayed_Filter_Value == 'True') and (isCreated_Filter_Value == 'True')):
-        return isPlayed_Filter_Value
-    elif ((isPlayed_Filter_Value == 'disabled') and ((isCreated_Filter_Value == 'False') or (isCreated_Filter_Value == 'True'))):
-        return isCreated_Filter_Value
-    elif (((isPlayed_Filter_Value == 'False') or (isPlayed_Filter_Value == 'True')) and (isCreated_Filter_Value == 'disabled')):
-        return isPlayed_Filter_Value
+    if ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'unplayedOnly')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'playedOnly')):
+        return 'True'
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'unplayedOnly')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'playedOnly')):
+        return 'True'
+    elif ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'disabled')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'disabled')):
+        return 'True'
     else:
         return ''
 
 
 # determine if media item has been played specified amount of times
-def get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count):
+def get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count,itemPlayedCount,itemIsPlayed):
 
-    item_play_count=item['UserData']['PlayCount']
-    item_played=item['UserData']['Played']
+    #itemPlayedCount=item['UserData']['PlayCount']
+    #itemIsPlayed=item['UserData']['Played']
 
     if (media_condition == 'created'):
-        IsPlayed=get_isCreated_FilterValue(the_dict,filter_count_comparison,filter_count)
+        IsPlayedStatus=get_isCreated_FilterValue(the_dict,filter_count_comparison,filter_count)
     else:
-        IsPlayed='True'
+        IsPlayedStatus='playedOnly'
 
     item_matches_played_count_filter=False
 
-    if (((IsPlayed == 'True') and item_played) or ((IsPlayed == 'False') and not item_played) or (IsPlayed == '')):
+    if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and not itemIsPlayed) or (IsPlayedStatus == 'playedAndUnplayed')):
         if (filter_count_comparison == '>'):
-            if (item_play_count > filter_count):
+            if (itemPlayedCount > filter_count):
                 #media item play count greater than specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == '<'):
-            if (item_play_count < filter_count):
+            if (itemPlayedCount < filter_count):
                 #media item play count less than specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == '>='):
-            if (item_play_count >= filter_count):
+            if (itemPlayedCount >= filter_count):
                 #media item play count greater than or equal to specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == '<='):
-            if (item_play_count <= filter_count):
+            if (itemPlayedCount <= filter_count):
                 #media item play count less than or equal to specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == '=='):
-            if (item_play_count == filter_count):
+            if (itemPlayedCount == filter_count):
                 #media item play count equal to specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == 'not >'):
-            if (not (item_play_count > filter_count)):
+            if (not (itemPlayedCount > filter_count)):
                 #media item play count not greater than specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == 'not <'):
-            if (not (item_play_count < filter_count)):
+            if (not (itemPlayedCount < filter_count)):
                 #media item play count not less than specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == 'not >='):
-            if (not (item_play_count >= filter_count)):
+            if (not (itemPlayedCount >= filter_count)):
                 #media item play count not greater than or equal to specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == 'not <='):
-            if (not (item_play_count <= filter_count)):
+            if (not (itemPlayedCount <= filter_count)):
                 #media item play count not less than or equal to specified value
                 item_matches_played_count_filter=True
         elif (filter_count_comparison == 'not =='):
-            if (not (item_play_count == filter_count)):
+            if (not (itemPlayedCount == filter_count)):
                 #media item play count not equal to specified value
                 item_matches_played_count_filter=True
+    #elif ((IsPlayedStatus == 'playedOnly') and (not itemIsPlayed)):
+        #item_matches_played_count_filter=None
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",2,the_dict)
-        if (((IsPlayed == 'True') and item_played) or ((IsPlayed == 'False') and not item_played) or (IsPlayed == '')):
-            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter),2,the_dict,)
+        if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and not itemIsPlayed) or (IsPlayedStatus == 'playedAndUnplayed')):
+            appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter),2,the_dict,)
         else:
-            appendTo_DEBUG_log("\n" + str(item_play_count) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed",2,the_dict,)
+            appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed",2,the_dict,)
 
     return item_matches_played_count_filter
 
 
 # determine if media item has been played specified amount of times
-def get_createdPlayedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count):
-    return get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count)
+def get_createdPlayedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count,itemPlayedCount,itemIsPlayed):
+    return get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filter_count,itemPlayedCount,itemIsPlayed)
 
+
+# get played status of media item
+def get_isItemPlayed(item):
+
+    #there are multiple pieces of data denoting if a media item is played/unplayed
+    #require at least this many are True before deciding the media item is played
+    itemIsPlayedControlFloor=2
+    itemIsPlayedControlCount=0
+    itemIsPlayed=False
+
+    if ('UserData' in item):
+        if ('LastPlayedDate' in item['UserData']) and (not (item['UserData']['LastPlayedDate'] == 'Unplayed')):
+            itemIsPlayedControlCount += 1
+        if ('PlayCount' in item['UserData']) and (item['UserData']['PlayCount'] > 0):
+            itemIsPlayedControlCount += 1
+        if ('Played' in item['UserData']) and (item['UserData']['Played']):
+            itemIsPlayedControlCount += 1
+
+    if (itemIsPlayedControlCount >= itemIsPlayedControlFloor):
+        itemIsPlayed=True
+
+    return(itemIsPlayed)
+
+
+def get_isItemMeetingDaysFilter(date_string,cut_off_date):
+
+    item_meets_day_count=False
+
+    if ((cut_off_date) > (parse(date_string))):
+        #media item meets the played/created days count
+        item_meets_day_count=True
+    else:
+        #media item does not meet the played/created days count
+        item_meets_day_count=False
+
+    return item_meets_day_count
 
 #get played days and counts; get created days and counts
-def get_playedCreatedDays_playedCreatedCounts(the_dict,item,played_days,created_days,cut_off_date_played,cut_off_date_created, played_count_comparison,played_count,created_played_count_comparison,created_played_count):
+def get_playedCreatedDays_playedCreatedCounts(the_dict,item,played_days,created_days,cut_off_date_played,cut_off_date_created,played_count_comparison,played_count,created_played_count_comparison,created_played_count):
 
-    #establish played cutoff date for media item
-    if ((played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
-        and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
-        if ((cut_off_date_played) > (parse(item['UserData']['LastPlayedDate']))):
-            item_matches_played_days_filter=True
-        else:
-            item_matches_played_days_filter=False
-    else:
-        item_matches_played_days_filter=False
+    item_matches_played_days_filter=False
+    item_matches_created_days_filter=False
+    itemPlayedCount=0
+    item_matches_played_count_filter=False
+    item_matches_created_played_count_filter=False
 
-    #establish created cutoff date for media item
-    if ((created_days >= 0) and ('DateCreated' in item)):
-        if (cut_off_date_created > parse(item['DateCreated'])):
-            item_matches_created_days_filter=True
-        else:
-            item_matches_created_days_filter=False
-    else:
-        item_matches_created_days_filter=False
+    #is played
 
-    #Decide if media item meets the played count filter criteria
-    #and
-    #Decide if media item meets the created played count filter criteria
-    if (('UserData' in item) and ('PlayCount' in item['UserData'])):
-        item_matches_played_count_filter=get_playedStatus(the_dict,item,'played',played_count_comparison,played_count)
-        item_matches_created_played_count_filter=get_createdPlayedStatus(the_dict,item,'created',created_played_count_comparison,created_played_count)
-    else:
-        item_matches_played_count_filter=False
-        item_matches_created_played_count_filter=False
+    #played X days ago
+    #played Y number of times
 
-    return item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter
+    #created X days ago
+    #created-played Y number of times
+
+    itemIsPlayed=get_isItemPlayed(item)
+
+    if (itemIsPlayed):
+        #establish if media item meets the played cutoff date and is played
+        #if ((played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData']) and (not (item['UserData']['LastPlayedDate'] == 'Unplayed'))):
+        if ((played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])):
+            #was media item last played long enough ago?
+            item_matches_played_days_filter=get_isItemMeetingDaysFilter(item['UserData']['LastPlayedDate'],cut_off_date_played)
+        #else:
+            #media item is unplayed
+            #item_matches_played_days_filter=False
+
+        #establish if media item meets the created cutoff date and is played
+        if ((created_days >= 0) and ('DateCreated' in item)):
+            #was media item created long enough ago?
+            item_matches_created_days_filter=get_isItemMeetingDaysFilter(item['DateCreated'],cut_off_date_created)
+        #else:
+            #item_matches_created_days_filter=False
+
+        if (((played_days >= 0) or (created_days >= 0)) and ('UserData' in item) and ('PlayCount' in item['UserData'])):
+            itemPlayedCount=item['UserData']['PlayCount']
+        #else:
+            #itemPlayedCount=0
+
+        #Decide if media item meets the played count filter criteria
+        #and
+        #Decide if media item meets the created played count filter criteria
+        if (('UserData' in item) and ('PlayCount' in item['UserData'])):
+            #if (not (item_matches_played_days_filter == None)):
+                #item_matches_played_count_filter=get_playedStatus(the_dict,item,'played',played_count_comparison,played_count,itemPlayedCount,itemIsPlayed)
+            #else:
+                #item_matches_played_count_filter=None
+            #if (not (item_matches_created_days_filter == None)):
+                #item_matches_created_played_count_filter=get_createdPlayedStatus(the_dict,item,'created',created_played_count_comparison,created_played_count,itemPlayedCount,itemIsPlayed)
+            #else:
+                #item_matches_created_played_count_filter=None
+            item_matches_played_count_filter=get_playedStatus(the_dict,item,'played',played_count_comparison,played_count,itemPlayedCount,itemIsPlayed)
+            item_matches_created_played_count_filter=get_createdPlayedStatus(the_dict,item,'created',created_played_count_comparison,created_played_count,itemPlayedCount,itemIsPlayed)
+        #else:
+            #item_matches_played_count_filter=False
+            #item_matches_created_played_count_filter=False
+
+    return itemIsPlayed,itemPlayedCount,item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter

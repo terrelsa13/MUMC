@@ -705,7 +705,7 @@ minimum_number_episodes=0
 # Keeping one or more played epsiodes for each series allows the "Next Up"
 #  functionality to notify user(s) when a new episode for a series
 #  is available
-# This value applies only to played and episodes
+# This value applies only to played episodes
 #  0 - Episodes will be deleted based on the Filter and Behavioral Statements
 #  1-730500 - Episodes will be deleted based on the Filter and Behavioral Statements;
 #              unless the remaining played episodes are less than or equal to the
@@ -776,7 +776,7 @@ audiobook_set_missing_last_played_date=True
 # (True : default)
 #----------------------------------------------------------#
 print_script_header=True
-print_warnings=True
+print_script_warning=True
 print_user_header=True
 print_movie_delete_info=True
 print_movie_keep_info=True
@@ -786,12 +786,116 @@ print_audio_delete_info=True
 print_audio_keep_info=True
 print_audiobook_delete_info=True
 print_audiobook_keep_info=True
+print_movie_post_processing_info=True
+print_episode_post_processing_info=True
+print_audio_post_processing_info=True
+print_audiobook_post_processing_info=True
 print_summary_header=True
 print_movie_summary=True
 print_episode_summary=True
 print_audio_summary=True
 print_audiobook_summary=True
 print_script_footer=True
+```
+#### Control console text formatting
+```python
+#----------------------------------------------------------#
+# Modify console outputs formatting
+#----------------------------------------------------------#
+# Should the script print its output with a specific format
+#
+# [FC, BC, FS]
+#
+# FC - Font Color
+# BC - Background Color (aka highlight)
+# FS - Font Style
+#
+# Directly run the following command to see which attributes your console supports:
+#  pythonX mumc_modules/mumc_console_attributes.py
+#
+# Or run the script with the -a option:
+#  pythonX mumc.py -a
+#
+# Replace X with the proper python version number (i.e. python3, python3.11, etc...)
+#
+#  Font & Background Colors:
+#   'black'
+#   'red'
+#   'green'
+#   'yellow'
+#   'blue'
+#   'magenta'
+#   'cyan'
+#   'white'
+#   'bright black' - Must be supported by your command line utility
+#   'bright red' - Must be supported by your command line utility
+#   'bright green' - Must be supported by your command line utility
+#   'bright yellow' - Must be supported by your command line utility
+#   'bright blue' - Must be supported by your command line utility
+#   'bright magenta' - Must be supported by your command line utility
+#   'bright cyan' - Must be supported by your command line utility
+#   'bright white' - Must be supported by your command line utility
+#   'default' - As defined by your command line utility
+#   '' - No formatting is used (aka default)
+#   None - No formatting is used
+#
+#  Font Styles:
+#   'bold'
+#   'faint' - Must be supported by your command line utility
+#   'italic' - Must be supported by your command line utility
+#   'underline'
+#   'slow blink' - Must be supported by your command line utility
+#   'fast blink' - Must be supported by your command line utility
+#   'swap' - Must be supported by your command line utility
+#   'conceal' - Must be supported by your command line utility
+#   'strikethrough' - Must be supported by your command line utility
+#   'fraktur' - Must be supported by your command line utility
+#   'double underline' - Must be supported by your command line utility
+#   'frame' - Must be supported by your command line utility
+#   'encircle' - Must be supported by your command line utility
+#   'overline' - Must be supported by your command line utility
+#   'ideogram underline' - Must be supported by your command line utility
+#   'ideogram double underline' - Must be supported by your command line utility
+#   'ideogram overline' - Must be supported by your command line utility
+#   'ideogram double overline' - Must be supported by your command line utility
+#   'ideogram stress mark' - Must be supported by your command line utility
+#   'superscript' - Must be supported by your command line utility
+#   'subscript' - Must be supported by your command line utility
+#   'default' - As defined by your command line utility
+#   '' - No formatting is used (aka default)
+#   None - No formatting is used
+#
+# Example:
+#  Print the movie delete information with red, underlined text, and a bright black highlight.
+#
+#   movie_delete_info_format=[FC, BC, FS]
+#
+#   FC = 'red'
+#   BC = 'bright black'
+#   FS = 'underline
+#
+#   movie_delete_info_format=['red','bright black','underline']
+#
+# ('' : default)
+#----------------------------------------------------------#
+script_header_format=['','','']
+script_warnings_format=['','','']
+user_header_format=['','','']
+movie_delete_info_format=['','','']
+movie_keep_info_format=['','','']
+episode_delete_info_format=['','','']
+episode_keep_info_format=['','','']
+audio_delete_info_format=['','','']
+audio_keep_info_format=['','','']
+movie_post_processing_format=['','','']
+episode_post_processing_format=['','','']
+audio_post_processing_format=['','','']
+audiobook_post_processing_format=['','','']
+summary_header_format=['','','']
+movie_summary_format=['','','']
+episode_summary_format=['','','']
+audio_summary_format=['','','']
+script_footer_format=['','','']
 ```
 #### Edit user to library assocations using current config
 ```python

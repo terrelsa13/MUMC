@@ -1,128 +1,147 @@
 #!/usr/bin/env python3
 import json
 import os
+from pathlib import Path
 from sys import path
 
 
+# Add directory to $PATH at specified position; if no position specified add to end of $PATH
+def add_to_PATH(path_to_add,position=-1):
+    if (not(path_to_add in path)):
+        path.insert(position,path_to_add)
+
 # Change to the specified directory
 def change_to_directory(directory):
-    #change back to original working directory
+    #change back to specified directory
     os.chdir(os.path.abspath(os.path.dirname(directory)))
 
 
 def getFullPathName(filePathName):
+    #full path preferred
+    #if not full path then search cwd, mumc_dir, and $PATH dirs
     fullPathName=None
-
     if (doesFileExist(filePathName)):
-        fullPathName=os.path.abspath(filePathName)
+        fullPathName=str(Path(filePathName).resolve())
     else:
-        for directory in path:
-            if (doesFileExist(os.path.join(directory,filePathName))):
-                fullPathName=os.path.join(directory,filePathName)
+        for directory in reversed(path):
+            if (doesFileExist(directory / filePathName)):
+                fullPathName=str(Path(directory / filePathName))
     return fullPathName
+
+
+def doesDirectoryExist(PathName):
+    pathExists=False
+
+    #check if path exists
+    if (Path(PathName).is_dir()):
+        pathExists=True
+    return pathExists
 
 
 def doesFileExist(filePathName):
     fileExists=False
-
     #check if file exists; script can be run from anywhere; recommend using full paths
-    if os.path.exists(os.path.abspath(filePathName)):
+    if (Path(filePathName).is_file()):
         fileExists=True
     return fileExists
 
 
+def getFileExtension(path_or_filename):
+    if (doesFileExist(path_or_filename)):
+        #return os.path.splitext(path_or_filename[1])
+        return Path(path_or_filename).suffix
+    else:
+        return None
+
+
 def get_current_directory():
-    return os.path.abspath(os.getcwd())
+    return Path('.').parent.resolve()
+    #return Path.cwd()
 
 
 # Delete existing mumc_DEBUG.log file
-def delete_file(the_dict):
-
-    if (the_dict['cwd'] == None):
-        #get cwd
-        cwd=get_current_directory()
-    else:
-        cwd=the_dict['cwd']
-
-    #check if file exists in cwd (script can be run from anywhere so this could be any directory)
-    if (doesFileExist(the_dict['debug_file_name'])):
-        fullPathName=getFullPathName(the_dict['debug_file_name'])
-    else:
-        fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),the_dict['debug_file_name'])
-
-    #change to delete file's directory
-    change_to_directory(fullPathName)
-
-    try:
-        #delete the file
-        os.remove(fullPathName)
-    except FileNotFoundError:
-        print_byType('\n' + the_dict['debug_file_name'] + ' does not exist and therefore cannot be deleted',False,the_dict)
-    #change back to cwd
-    change_to_directory(cwd)
-
-
-def action_to_file(fullPathName,action):
-    #open file as append
-    return open(fullPathName,action)
+def delete_debug_log(the_dict):
+    Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
 
 
 #Save file to the directory this script is running from; even when the cwd is not the same
 def append_to_file(dataInput,filePathName):
-    #get cwd
-    cwd=get_current_directory()
+    fullPathName=getFullPathName(filePathName)
 
-    if (doesFileExist(filePathName)):
-        fullPathName=getFullPathName(filePathName)
-    else:
-        fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),filePathName)
-
-    #change to append file's directory
-    change_to_directory(fullPathName)
-    #open file as append
-    f = action_to_file(fullPathName,'a')
-    #Write data to file
-    f.write(dataInput)
-    #Close file
-    f.close()
-    #change back to cwd
-    change_to_directory(cwd)
+    #Save the config file
+    with open(fullPathName,'a') as file:
+        file.write(dataInput)
 
 
 #Save file to the directory this script is running from; even when the cwd is not the same
 def write_to_file(dataInput,filePathName):
-    #get cwd
-    cwd=get_current_directory()
+    fullPathName=getFullPathName(filePathName)
 
-    if (doesFileExist(filePathName)):
-        fullPathName=getFullPathName(filePathName)
+    #Save the config file
+    with open(fullPathName,'w') as file:
+        file.write(dataInput)
+
+
+def parse_string_and_newlines(string_to_print):
+    string_to_print_list=[]
+    string_to_print_list_0=string_to_print.splitlines(True)
+
+    for string_to_print_item_0 in string_to_print_list_0:
+        if ("\n" in string_to_print_item_0):
+            string_to_print_item_1=[]
+            if (not (string_to_print_item_0 == "\n")):
+                string_to_print_item_1 = string_to_print_item_0.split("\n")
+                string_to_print_item_1[1]="\n"
+            else:
+                string_to_print_item_1.append("\n")
+            for string_to_print_list_item in string_to_print_item_1:
+                string_to_print_list.append(string_to_print_list_item)
+        else:
+            string_to_print_list.append(string_to_print_item_0)
+
+    return string_to_print_list
+
+
+def print_byAttributes(string_to_print,text_attributes,the_dict):
+    if (string_to_print == ''):
+        print(string_to_print)
+    elif ("\n" in string_to_print):
+            string_to_print_list=parse_string_and_newlines(string_to_print)
+            string_to_print_list_len=len(string_to_print_list)
+            for x in range(string_to_print_list_len):
+                if (string_to_print_list[x] == "\n"):
+                    string_to_print_list[x]=the_dict['text_attrs'].build_ansi_escaped_newlines(string_to_print_list[x])
+                else:
+                    string_to_print_list[x]=the_dict['text_attrs'].build_ansi_escaped_string(string_to_print_list[x],
+                        the_dict['text_attrs'].build_ansi_escape_codes(
+                        [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes[0]),
+                        the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes[1]),
+                        the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes[2])]))
+            string_to_print=''.join(string_to_print_list).rstrip()
+            print(''.join(string_to_print))
     else:
-        #fullPathName=os.path.join(os.path.abspath(os.path.basename(__file__)),filePathName)
-        #fullPathName=os.path.join(os.path.abspath(__file__),filePathName)
-        fullPathName=filePathName
-
-    #change to append file's directory
-    change_to_directory(fullPathName)
-    #open file as append
-    f = action_to_file(fullPathName,'w')
-    #Write data to file
-    f.write(dataInput)
-    #Close file
-    f.close()
-    #change back to cwd
-    change_to_directory(cwd)
+        print(the_dict['text_attrs'].build_ansi_escaped_string(string_to_print,
+            the_dict['text_attrs'].build_ansi_escape_codes(
+            [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes[0]),
+            the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes[1]),
+            the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes[2])])))
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
 def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
     if (the_dict['DEBUG'] >= debugLevel):
-        append_to_file(str(string_to_save),os.path.join(the_dict['cwd'],the_dict['debug_file_name']))
+
+        if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
+            with open(Path(the_dict['mumc_path']) / the_dict['debug_file_name'],'a') as file:
+                pass
+
+        append_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
 
 
 #determine if the requested console output line should be shown or hidden
-def print_byType(string_to_print,ok_to_print,the_dict):
+def print_byType(string_to_print,ok_to_print,the_dict,text_attributes):
     if (ok_to_print):
-        print(str(string_to_print))
+            print_byAttributes(string_to_print,text_attributes,the_dict)
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log(string_to_print,1,the_dict)
 

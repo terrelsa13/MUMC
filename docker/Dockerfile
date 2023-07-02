@@ -7,6 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 VOLUME /config
 
+RUN mkdir -p mumc_modules/
+
 COPY mumc_modules/*.py mumc_modules/
 COPY mumc_config_defaults.py .
 COPY mumc.py .

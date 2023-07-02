@@ -5,7 +5,7 @@ from collections import defaultdict
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import getChildren_favoritedMediaItems,get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
+from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,list_to_urlparsed_string
 from mumc_modules.mumc_blacklist import get_isItemBlacklisted
 from mumc_modules.mumc_whitelist import get_isItemWhitelisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
@@ -52,15 +52,42 @@ def get_isItemMonitored(mediasource,the_dict):
 
 
 #Parse behavior for favorites, whitetags, blacktags, and whitelists
-def parse_actionedConfigurationBehavior(the_dict,item,isactioned_extra_byUserId,user_key,theActionType,isActioned_and_played_byUserId,action_behavior,item_isActioned,item_matches_played_days_filter,item_matches_played_count_filter):
+def parse_actionedConfigurationBehavior(the_dict,item,isactioned_extra_byUserId,user_key,theActionType,isActioned_and_played_byUserId,action_behavior,item_isActioned,item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount):
 
     isactioned_extra_byUserId['ActionBehavior']=action_behavior[3]
     isactioned_extra_byUserId['ActionType']=theActionType
     isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior[1].lower()
-    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
     isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].lower()
-    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
     isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior[0].lower()
+
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsItemPlayed']=itemIsPlayed
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsItemPlayedCount']=itemPlayedCount
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedDays']=item_matches_played_days_filter
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedCount']=item_matches_played_count_filter
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedDays']=item_matches_created_days_filter
+    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedCount']=item_matches_created_played_count_filter
+
+    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
+    isactioned_extra_byUserId[user_key][item['Id']]['itemIsPlayed']=itemIsPlayed
+    isactioned_extra_byUserId[user_key][item['Id']]['itemPlayedCount']=itemPlayedCount
+    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_played_days_filter']=item_matches_played_days_filter
+    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_played_count_filter']=item_matches_played_count_filter
+    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_days_filter']=item_matches_created_days_filter
+    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_played_count_filter']=item_matches_created_played_count_filter
+
+    #if ((not item_matches_played_days_filter) and (not item_matches_played_count_filter)):
+        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=None
+    #else:
+        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+
+    #if ((not item_matches_created_days_filter) and (not item_matches_created_played_count_filter)):
+        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=None
+    #else:
+        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
+    isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
+
     isActioned_and_played_byUserId[user_key][item['Id']]=item
 
     if (the_dict['DEBUG']):
@@ -146,6 +173,8 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         media_created_played_count=the_dict['created_filter_movie'][2]
         print_media_delete_info=the_dict['print_movie_delete_info']
         print_media_keep_info=the_dict['print_movie_keep_info']
+        media_delete_info_format=the_dict['movie_delete_info_format']
+        media_keep_info_format=the_dict['movie_keep_info_format']
         favorited_behavior_media=the_dict['favorited_behavior_movie']
         advFav0_media=the_dict['favorited_advanced_movie_genre']
         advFav1_media=the_dict['favorited_advanced_movie_library_genre']
@@ -154,7 +183,9 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         advFav4_media=0
         advFav5_media=0
         whitetagged_behavior_media=the_dict['whitetagged_behavior_movie']
+        whitetags.extend(the_dict['movie_whitetag'])
         blacktagged_behavior_media=the_dict['blacktagged_behavior_movie']
+        blacktags.extend(the_dict['movie_blacktag'])
         whitelisted_behavior_media=the_dict['whitelisted_behavior_movie']
         blacklisted_behavior_media=the_dict['blacklisted_behavior_movie']
     elif (mediaType_lower == 'episode'):
@@ -168,6 +199,8 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         media_created_played_count=the_dict['created_filter_episode'][2]
         print_media_delete_info=the_dict['print_episode_delete_info']
         print_media_keep_info=the_dict['print_episode_keep_info']
+        media_delete_info_format=the_dict['episode_delete_info_format']
+        media_keep_info_format=the_dict['episode_keep_info_format']
         favorited_behavior_media=the_dict['favorited_behavior_episode']
         advFav0_media=the_dict['favorited_advanced_episode_genre']
         advFav1_media=the_dict['favorited_advanced_season_genre']
@@ -176,7 +209,9 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         advFav4_media=the_dict['favorited_advanced_tv_studio_network']
         advFav5_media=the_dict['favorited_advanced_tv_studio_network_genre']
         whitetagged_behavior_media=the_dict['whitetagged_behavior_episode']
+        whitetags.extend(the_dict['episode_whitetag'])
         blacktagged_behavior_media=the_dict['blacktagged_behavior_episode']
+        blacktags.extend(the_dict['episode_blacktag'])
         whitelisted_behavior_media=the_dict['whitelisted_behavior_episode']
         blacklisted_behavior_media=the_dict['blacklisted_behavior_episode']
     elif (mediaType_lower == 'audio'):
@@ -190,6 +225,8 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         media_created_played_count=the_dict['created_filter_audio'][2]
         print_media_delete_info=the_dict['print_audio_delete_info']
         print_media_keep_info=the_dict['print_audio_keep_info']
+        media_delete_info_format=the_dict['audio_delete_info_format']
+        media_keep_info_format=the_dict['audio_keep_info_format']
         favorited_behavior_media=the_dict['favorited_behavior_audio']
         advFav0_media=the_dict['favorited_advanced_track_genre']
         advFav1_media=the_dict['favorited_advanced_album_genre']
@@ -198,7 +235,9 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         advFav4_media=the_dict['favorited_advanced_album_artist']
         advFav5_media=0
         whitetagged_behavior_media=the_dict['whitetagged_behavior_audio']
+        whitetags.extend(the_dict['audio_whitetag'])
         blacktagged_behavior_media=the_dict['blacktagged_behavior_audio']
+        blacktags.extend(the_dict['audio_blacktag'])
         whitelisted_behavior_media=the_dict['whitelisted_behavior_audio']
         blacklisted_behavior_media=the_dict['blacklisted_behavior_audio']
     elif (mediaType_lower == 'audiobook'):
@@ -213,15 +252,19 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
             media_created_played_count=the_dict['created_filter_audiobook'][2]
             print_media_delete_info=the_dict['print_audiobook_delete_info']
             print_media_keep_info=the_dict['print_audiobook_keep_info']
+            media_delete_info_format=the_dict['audiobook_delete_info_format']
+            media_keep_info_format=the_dict['audiobook_keep_info_format']
             favorited_behavior_media=the_dict['favorited_behavior_audiobook']
             advFav0_media=the_dict['favorited_advanced_audiobook_track_genre']
             advFav1_media=the_dict['favorited_advanced_audiobook_genre']
             advFav2_media=the_dict['favorited_advanced_audiobook_library_genre']
             advFav3_media=the_dict['favorited_advanced_audiobook_track_author']
             advFav4_media=the_dict['favorited_advanced_audiobook_author']
-            advFav5_media=0
+            advFav5_media=the_dict['favorited_advanced_audiobook_library_author']
             whitetagged_behavior_media=the_dict['whitetagged_behavior_audiobook']
+            whitetags.extend(the_dict['audiobook_whitetag'])
             blacktagged_behavior_media=the_dict['blacktagged_behavior_audiobook']
+            blacktags.extend(the_dict['audiobook_blacktag'])
             whitelisted_behavior_media=the_dict['whitelisted_behavior_audiobook']
             blacklisted_behavior_media=the_dict['blacklisted_behavior_audiobook']
         else: #(isEmbyServer(the_dict)):
@@ -233,6 +276,8 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
             media_created_played_count=0
             print_media_delete_info=False
             print_media_keep_info=False
+            media_delete_info_format=['','','']
+            media_keep_info_format=['','','']
             favorited_behavior_media=['keep','any','ignore',0]
             advFav0_media=0
             advFav1_media=0
@@ -241,7 +286,9 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
             advFav4_media=0
             advFav5_media=0
             whitetagged_behavior_media=['keep','any','ignore',0]
+            whitetags=whitetags
             blacktagged_behavior_media=['keep','any','ignore',0]
+            blacktags=blacktags
             whitelisted_behavior_media=['keep','any','ignore',0]
             blacklisted_behavior_media=['keep','any','ignore',0]
 
@@ -549,7 +596,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                 EnableImages_Blacktagged_From_BlackList='False'
                 CollapseBoxSetItems_Blacktagged_From_BlackList='False'
                 #Encode blacktags so they are url acceptable
-                BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
+                BlackTags_Tagged=list_to_urlparsed_string(blacktags)
 
                 if (mediaType_lower == 'movie'):
                     IncludeItemTypes_BlackTagged_From_BlackList+=',BoxSet,CollectionFolder'
@@ -592,7 +639,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                 EnableImages_Blacktagged_From_WhiteList='False'
                 CollapseBoxSetItems_Blacktagged_From_WhiteList='False'
                 #Encode blacktags so they are url acceptable
-                BlackTags_Tagged=urlparse.quote(blacktags.replace(',','|'))
+                BlackTags_Tagged=list_to_urlparsed_string(blacktags)
 
                 if (mediaType_lower == 'movie'):
                     IncludeItemTypes_BlackTagged_From_WhiteList+=',BoxSet,CollectionFolder'
@@ -635,7 +682,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                 EnableImages_Whitetagged_From_Blacklist='False'
                 CollapseBoxSetItems_Whitetagged_From_Blacklist='False'
                 #Encode whitetags so they are url acceptable
-                WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
+                WhiteTags_Tagged=list_to_urlparsed_string(whitetags)
 
                 if (mediaType_lower == 'movie'):
                     IncludeItemTypes_WhiteTagged_From_Blacklist+=',BoxSet,CollectionFolder'
@@ -678,7 +725,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                 EnableImages_Whitetagged_From_Whitelist='False'
                 CollapseBoxSetItems_Whitetagged_From_Whitelist='False'
                 #Encode whitetags so they are url acceptable
-                WhiteTags_Tagged=urlparse.quote(whitetags.replace(',','|'))
+                WhiteTags_Tagged=list_to_urlparsed_string(whitetags)
 
                 if (mediaType_lower == 'movie'):
                     IncludeItemTypes_WhiteTagged_From_Whitelist+=',BoxSet,CollectionFolder'
@@ -950,7 +997,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
 ##########################################################################################################################################
 
                                 #Get determine if item meets played days, created days, played counts, and played-created counts
-                                item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
+                                itemIsPlayed,itemPlayedCount,item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter\
                                 =get_playedCreatedDays_playedCreatedCounts(the_dict,item,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,
                                                                             media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count)
 
@@ -987,13 +1034,13 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                     if (mediaType_lower == 'audio'):
                                         item_isFavorited_Advanced=get_isAUDIO_AdvancedFav(the_dict,item,user_key,'Audio',advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media)
                                     if (mediaType_lower == 'audiobook'):
-                                        item_isFavorited_Advanced=get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_key,'AudioBook',advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media)
+                                        item_isFavorited_Advanced=get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_key,'AudioBook',advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media,advFav5_media)
 
                                 #Determine what will show as the favorite status for this user and media item
                                 isFavorited_Display=(item_isFavorited or item_isFavorited_Advanced)
 
                                 #favorite behavior enabled
-                                isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isfavorited_extraInfo_byUserId_Media,user_key,'favorited',isfavorited_and_played_byUserId_Media,favorited_behavior_media,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter)
+                                isfavorited_and_played_byUserId_Media,isfavorited_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isfavorited_extraInfo_byUserId_Media,user_key,'favorited',isfavorited_and_played_byUserId_Media,favorited_behavior_media,(item_isFavorited or item_isFavorited_Advanced),item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount)
 
 ##########################################################################################################################################
 
@@ -1003,17 +1050,17 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 elif (not (whitetags == '')):
                                     if (mediaType_lower == 'movie'):
                                         item_isWhiteTagged=get_isMOVIE_Tagged(the_dict,item,user_key,whitetags)
-                                    if (mediaType_lower == 'episode'):
+                                    elif (mediaType_lower == 'episode'):
                                         item_isWhiteTagged=get_isEPISODE_Tagged(the_dict,item,user_key,whitetags)
-                                    if (mediaType_lower == 'audio'):
+                                    elif (mediaType_lower == 'audio'):
                                         item_isWhiteTagged=get_isAUDIO_Tagged(the_dict,item,user_key,whitetags)
-                                    if (mediaType_lower == 'audiobook'):
+                                    elif (mediaType_lower == 'audiobook'):
                                         item_isWhiteTagged=get_isAUDIOBOOK_Tagged(the_dict,item,user_key,whitetags)
 
                                 isWhiteTagged_Display=item_isWhiteTagged
 
                                 #whitetag behavior enabled
-                                iswhitetagged_and_played_byUserId_Media,iswhitetagged_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,iswhitetagged_extraInfo_byUserId_Media,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Media,whitetagged_behavior_media,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                iswhitetagged_and_played_byUserId_Media,iswhitetagged_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,iswhitetagged_extraInfo_byUserId_Media,user_key,'whitetagged',iswhitetagged_and_played_byUserId_Media,whitetagged_behavior_media,item_isWhiteTagged,item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount)
 
 ##########################################################################################################################################
 
@@ -1023,17 +1070,17 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 elif (not (blacktags == '')):
                                     if (mediaType_lower == 'movie'):
                                         item_isBlackTagged=get_isMOVIE_Tagged(the_dict,item,user_key,blacktags)
-                                    if (mediaType_lower == 'episode'):
+                                    elif (mediaType_lower == 'episode'):
                                         item_isBlackTagged=get_isEPISODE_Tagged(the_dict,item,user_key,blacktags)
-                                    if (mediaType_lower == 'audio'):
+                                    elif (mediaType_lower == 'audio'):
                                         item_isBlackTagged=get_isAUDIO_Tagged(the_dict,item,user_key,blacktags)
-                                    if (mediaType_lower == 'audiobook'):
+                                    elif (mediaType_lower == 'audiobook'):
                                         item_isBlackTagged=get_isAUDIOBOOK_Tagged(the_dict,item,user_key,blacktags)
 
                                 isBlackTagged_Display=item_isBlackTagged
 
                                 #blacktag behavior enabled
-                                isblacktagged_and_played_byUserId_Media,isblacktagged_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isblacktagged_extraInfo_byUserId_Media,user_key,'blacktagged',isblacktagged_and_played_byUserId_Media,blacktagged_behavior_media,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter)
+                                isblacktagged_and_played_byUserId_Media,isblacktagged_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isblacktagged_extraInfo_byUserId_Media,user_key,'blacktagged',isblacktagged_and_played_byUserId_Media,blacktagged_behavior_media,item_isBlackTagged,item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount)
 
 ##########################################################################################################################################
 
@@ -1055,7 +1102,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 isWhiteListed_Display=item_isWhiteListed
 
                                 #whitelist behavior enabled
-                                iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,iswhitelisted_extraInfo_byUserId_Media,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Media,whitelisted_behavior_media,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                iswhitelisted_and_played_byUserId_Media,iswhitelisted_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,iswhitelisted_extraInfo_byUserId_Media,user_key,'whitelisted',iswhitelisted_and_played_byUserId_Media,whitelisted_behavior_media,item_isWhiteListed,item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount)
 
 ##########################################################################################################################################
 
@@ -1077,7 +1124,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 isBlackListed_Display=item_isBlackListed
 
                                 #blacklist behavior enabled
-                                isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isblacklisted_extraInfo_byUserId_Media,user_key,'blacklisted',isblacklisted_and_played_byUserId_Media,blacklisted_behavior_media,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter)
+                                isblacklisted_and_played_byUserId_Media,isblacklisted_extraInfo_byUserId_Media=parse_actionedConfigurationBehavior(the_dict,item,isblacklisted_extraInfo_byUserId_Media,user_key,'blacklisted',isblacklisted_and_played_byUserId_Media,blacklisted_behavior_media,item_isBlackListed,item_matches_played_days_filter,item_matches_played_count_filter,item_matches_created_days_filter,item_matches_created_played_count_filter,itemIsPlayed,itemPlayedCount)
 
 ##########################################################################################################################################
 
@@ -1116,7 +1163,9 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                                     'isBlackListed_Display':isBlackListed_Display,
                                                     'showItemAsDeleted':showItemAsDeleted,
                                                     'print_media_delete_info':print_media_delete_info,
-                                                    'print_media_keep_info':print_media_keep_info}
+                                                    'print_media_keep_info':print_media_keep_info,
+                                                    'media_delete_info_format':media_delete_info_format,
+                                                    'media_keep_info_format':media_keep_info_format}
 
                                 #Build and display media item output details for currently processing user
                                 if (mediaType.lower() == 'episode'):
@@ -1135,10 +1184,10 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
 
 ############# End Media #############
 
-    if (the_dict['DEBUG']):
-        print_common_delete_keep_info=True
-        appendTo_DEBUG_log("\n",1,the_dict)
-    print_byType('-----------------------------------------------------------',print_common_delete_keep_info,the_dict)
+    #if (the_dict['DEBUG']):
+        #print_common_delete_keep_info=True
+        #appendTo_DEBUG_log("\n",1,the_dict)
+    print_byType(the_dict['console_separator_'],print_common_delete_keep_info,the_dict,the_dict['user_header_format'])
 
     media_dict[user_key]['deleteItems_Media']=deleteItems_Media
     media_dict[user_key]['deleteItemsIdTracker_Media']=deleteItemsIdTracker_Media
@@ -1157,52 +1206,6 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
     media_dict[user_key]['mediaCounts_byUserId']=mediaCounts_byUserId
 
     return media_dict,media_found
-
-
-'''
-def getMedia(the_dict):
-
-    movie_dict={}
-    episode_dict={}
-    audio_dict={}
-    audiobook_dict={}
-
-    #Get items that could be ready for deletion
-    for user_key in the_dict['user_keys_json']:
-        movie_dict[user_key]={}
-        episode_dict[user_key]={}
-        audio_dict[user_key]={}
-        audiobook_dict[user_key]={}
-
-        print_user_header(user_key,the_dict)
-
-        #query the server for movie media items
-        movie_dict,movie_found=get_media_items('movie',the_dict,movie_dict,user_key)
-        #query the server for episode media items
-        episode_dict,episode_found=get_media_items('episode',the_dict,episode_dict,user_key)
-        #query the server for audio media items
-        audio_dict,audio_found=get_media_items('audio',the_dict,audio_dict,user_key)
-        #query the server for audiobook media items
-         #audioBook media type only applies to jellyfin
-         #Jellyfin sets audiobooks to a media type of audioBook
-         #Emby sets audiobooks to a media type of audio (see audio section)
-        if (isJellyfinServer(the_dict['server_brand'])):
-            audiobook_dict,audiobook_found=get_media_items('audiobook',the_dict,audiobook_dict,user_key)
-        else:
-            audiobook_found=False
-
-        the_dict['currentPosition']+=1
-
-        media_found=(movie_found or episode_found or audio_found or audiobook_found)
-
-        if not (the_dict['all_media_disabled']):
-            if not (media_found):
-                if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\n",1,the_dict)
-                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',the_dict['print_warnings'],the_dict)
-
-    return movie_dict,episode_dict,audio_dict,audiobook_dict
-'''
 
 
 def getMedia(the_dict):
@@ -1243,6 +1246,6 @@ def getMedia(the_dict):
             if not (media_found):
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log("\n",1,the_dict)
-                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',the_dict['print_warnings'],the_dict)
+                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',the_dict['print_script_warning'],the_dict)
 
     return movie_dict,episode_dict,audio_dict,audiobook_dict

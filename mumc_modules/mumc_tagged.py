@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 import uuid
+import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith,does_index_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
+
+
+def list_to_urlparsed_string(the_list):
+    tag_string=''
+    for xltag in the_list:
+        if (tag_string == ''):
+            tag_string=str(xltag)
+        else:
+            tag_string+='|' + str(xltag)
+
+    return urlparse.quote(tag_string)
 
 
 def get_isItemTagged(usertags,tagged_items,item,the_dict):
@@ -25,7 +37,8 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['TagItems'])):
                 taglist.add(item['TagItems'][tagpos]['Name'])
             #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
+            #itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
+            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's tags state
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
@@ -42,7 +55,8 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['Tags'])):
                 taglist.add(item['Tags'][tagpos])
             #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
+            #itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
+            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's usertags state
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
@@ -64,7 +78,8 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
     child_list=[]
     child_itemId_isTagged=[]
     StartIndex=0
-    insert_tagName=user_tags.split(',')[0]
+    #insert_tagName=user_tags.split(',')[0]
+    insert_tagName=user_tags[0]
     insert_tagId=uuid.uuid4().int
 
     #Loop thru items returned as tagged

@@ -95,7 +95,7 @@ def get_admin_username():
 #admin password?
 def get_admin_password():
     #print('Plain text password used to grab authentication key; hashed password stored in config file.')
-    print('Plain text password used to grab authentication key; password not stored.')
+    print('Plain text password used to grab authentication key; password is not stored.')
     password=input('Enter admin password: ')
     return(password)
 

@@ -2,7 +2,7 @@
 import urllib.request as urlrequest
 import json
 import time
-from mumc_modules.mumc_output import print_byType,appendTo_DEBUG_log,convert2json
+from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 
 
 #Limit the amount of data returned for a single API call
@@ -78,17 +78,18 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                             appendTo_DEBUG_log(convert2json(data) + "\n",4,the_dict)
                     except Exception as err:
                         if (err.msg == 'Unauthorized'):
-                            print_byType("\n" + str(err),True,the_dict)
-                            print_byType("\nAUTH_ERROR: User Not Authorized To Access Library",True,the_dict)
-                            raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library")
+                            if (debugState):
+                                appendTo_DEBUG_log("\n" + str(err),2,the_dict)
+                                appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
+                            raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
                         else:
                             time.sleep(delay)
                             #delay value doubles each time the same API request is resent
                             delay += delay
                             if (delay >= (2**retryAttempts)):
-                                print_byType("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",True,the_dict)
-                                print_byType("\n" + "An error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",True,the_dict)
-                                return(err)
+                                if (debugState):
+                                    appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",2,the_dict)
+                                raise RuntimeError("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
@@ -103,20 +104,22 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                             appendTo_DEBUG_log("\nNo data returned",4,the_dict)
                 else:
                     getdata = False
-                    print_byType("\n" + "An error occurred while attempting to retrieve data from the API.",True,the_dict)
-                    return('Attempt to get data at: ' + reqeustDebugMessage + '. Server responded with code: ' + str(response.getcode()))
+                    if (debugState):
+                        appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
+                    raise RuntimeError("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()))
         except Exception as err:
-            if (err.msg == 'Unauthorized'):
-                print_byType("\n" + str(err),True,the_dict)
-                print_byType("\nAUTH_ERROR: User Not Authorized To Access Library",True,the_dict)
-
-                raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library")
+            #if (err.msg == 'Unauthorized'):
+            if (err.reason.strerror == 'Connection refused'):
+                if (debugState):
+                    appendTo_DEBUG_log("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource",2,the_dict)
+                raise RuntimeError("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource")
             else:
                 time.sleep(delay)
                 #delay value doubles each time the same API request is resent
                 delay += delay
                 if (delay >= (2**retryAttempts)):
-                    print_byType("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",True,the_dict)
-                    return(err)
+                    if (debugState):
+                        appendTo_DEBUG_log("\n" + str(err) + "\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",2,the_dict)
+                    raise RuntimeError("\n" + str(err) + "\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
 
     return(data)

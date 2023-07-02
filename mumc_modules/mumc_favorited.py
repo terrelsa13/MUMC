@@ -510,7 +510,7 @@ def get_isAUDIO_Fav(the_dict,item,user_key,itemType):
 
 #determine if genres for music track, album, or artist are set to favorite
 def get_isAUDIO_AdvancedFav(the_dict,item,user_key,itemType,favorited_advanced_track_genre,favorited_advanced_album_genre,
-                            favorited_advanced_music_library_genre,favorited_advanced_track_artist,favorited_advanced_album_artist):
+                            favorited_advanced_music_library_genre,favorited_advanced_track_artist,favorited_advanced_album_artist,favorited_advanced_album_library_artist=0):
 
     if (itemType == 'Audio'):
         lookupTopicTrack='track'
@@ -556,6 +556,9 @@ def get_isAUDIO_AdvancedFav(the_dict,item,user_key,itemType,favorited_advanced_t
     if ((not (album_item_info['Id'] in isfav_AUDIO['albumartist'])) or (isfav_AUDIO['albumartist'][album_item_info['Id']] == False)):
         isfav_AUDIO['albumartist']=get_isARTIST_Fav(user_key,album_item_info,isfav_AUDIO['albumartist'],favorited_advanced_album_artist,lookupTopicAlbum + '_artist',the_dict)
 
+    if ((not (album_item_info['Id'] in isfav_AUDIO['libraryartist'])) or (isfav_AUDIO['libraryartist'][album_item_info['Id']] == False)):
+        isfav_AUDIO['libraryartist']=get_isARTIST_Fav(user_key,album_item_info,isfav_AUDIO['libraryartist'],favorited_advanced_album_library_artist,lookupTopicAlbum + '_library_artist',the_dict)
+
 ### End Album/Book #####################################################################################
 
 ### Library ########################################################################################
@@ -599,16 +602,24 @@ def get_isAUDIOBOOK_Fav(the_dict,item,user_key,itemType):
 
 #determine if genres for audiobook track, book, or author are set to favorite
 def get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_key,itemType,favorited_advanced_audiobook_track_genre,favorited_advanced_audiobook_genre,
-                                favorited_advanced_audiobook_library_genre,favorited_advanced_audiobook_track_author,favorited_advanced_audiobook_author):
+                                favorited_advanced_audiobook_library_genre,favorited_advanced_audiobook_track_author,favorited_advanced_audiobook_author,favorited_advanced_audiobook_library_author):
     return get_isAUDIO_AdvancedFav(the_dict,item,user_key,itemType,favorited_advanced_audiobook_track_genre,favorited_advanced_audiobook_genre,
-                                   favorited_advanced_audiobook_library_genre,favorited_advanced_audiobook_track_author,favorited_advanced_audiobook_author)
+                                   favorited_advanced_audiobook_library_genre,favorited_advanced_audiobook_track_author,favorited_advanced_audiobook_author,favorited_advanced_audiobook_library_author)
 
 
 #Because we are not searching directly for non-favorited items; cleanup needs to happen to help the behavioral patterns make sense
 #def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,favorited_behavior_media,advFav0,advFav1,advFav2=0,advFav3=0,advFav4=0,advFav5=0):
-def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,favorited_behavior_media,advFav0,advFav1,advFav2=0,advFav3=0,advFav4=0,advFav5=0):
+def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,postproc_dict):
     userId_tracker=[]
     itemId_tracker=[]
+
+    favorited_behavior_media=postproc_dict['favorited_behavior_media']
+    advFav0=postproc_dict['advFav0_media']
+    advFav1=postproc_dict['advFav1_media']
+    advFav2=postproc_dict['advFav2_media']
+    advFav3=postproc_dict['advFav3_media']
+    advFav4=postproc_dict['advFav4_media']
+    advFav5=postproc_dict['advFav5_media']
 
     for userId in itemsDictionary:
         userId_tracker.append(userId)
@@ -665,23 +676,44 @@ def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary
                                 itemIsFav=get_isAUDIOBOOK_Fav(the_dict,item,subUserId,'AudioBook')
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nAudioBook is favorite: " + str(itemIsFav),3,the_dict)
-                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4)):
-                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(the_dict,item,subUserId,'AudioBook',advFav0,advFav1,advFav2,advFav3,advFav4)
+                                if ((favorited_behavior_media[3] >= 0) and (advFav0 or advFav1 or advFav2 or advFav3 or advFav4 or advFav5)):
+                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(the_dict,item,subUserId,'AudioBook',advFav0,advFav1,advFav2,advFav3,advFav4,advFav5)
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav0: " + str(advFav0),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav1: " + str(advFav1),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav2: " + str(advFav2),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav3: " + str(advFav3),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav4: " + str(advFav4),3,the_dict)
+                                        appendTo_DEBUG_log("\nadvFav5: " + str(advFav5),3,the_dict)
 
                             if (itemIsFav or itemIsAdvFav):
                                 itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=True
                             else:
-                                itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=None
+                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=None
+                                itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=False
 
-                            item_matches_played_days_filter,x,item_matches_played_count_filter,y=get_playedCreatedDays_playedCreatedCounts(the_dict,get_ADDITIONAL_itemInfo(subUserId,itemId,'playedPatternCleanup',the_dict),itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
-                            itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+                            mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(subUserId,itemId,'playedPatternCleanup',the_dict)
+                            itemIsPlayed,itemPlayedCount,item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
+                            #if (not (item_matches_played_days_filter == None)):
+                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
+                            #else:
+                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=None
+                            itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']=itemIsPlayed
+                            itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']=itemPlayedCount
+                            itemsExtraDictionary[subUserId][itemId]['item_matches_played_days_filter']=item_matches_played_days_filter #meeting played X days ago?
+                            itemsExtraDictionary[subUserId][itemId]['item_matches_created_days_filter']=item_matches_created_days_filter #meeting created X days ago?
+                            itemsExtraDictionary[subUserId][itemId]['item_matches_played_count_filter']=item_matches_played_count_filter #played X number of times?
+                            itemsExtraDictionary[subUserId][itemId]['item_matches_created_played_count_filter']=item_matches_created_played_count_filter #created-played X number of times?
+                            itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter) #meeting complete played_filter_*?
+                            itemsExtraDictionary[subUserId][itemId]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter) #meeting complete created_filter_*?
                             if (the_dict['DEBUG']):
-                                appendTo_DEBUG_log("\nIsMeetingPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']),3,the_dict)
+                                appendTo_DEBUG_log("\itemIsPlayed: " + str(itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']),3,the_dict)
+                                appendTo_DEBUG_log("\itemPlayedCount: " + str(itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']),3,the_dict)
+                                appendTo_DEBUG_log("\item_matches_played_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_days_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\item_matches_created_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_days_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\item_matches_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_count_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\item_matches_created_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_played_count_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\IsMeetingPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']),3,the_dict)
+                                appendTo_DEBUG_log("\IsMeetingCreatedPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingCreatedPlayedFilter']),3,the_dict)
 
     return itemsDictionary,itemsExtraDictionary

@@ -2,6 +2,40 @@
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
+#Check if *keys (nested) exists in `element` (dict or list).
+def keys_exist(the_element, *keys_indexes):
+
+    if not isinstance(the_element, dict):
+        raise AttributeError('keys_exist() expects dict as first argument.')
+    if len(keys_indexes) == 0:
+        raise AttributeError('keys_exist() expects at least two arguments, one given.')
+
+    temp_element = the_element
+    for key_index in keys_indexes:
+        try:
+            temp_element = temp_element[key_index]
+        except KeyError:
+            return False
+    return True
+
+
+#Check if *keys (nested) exists in `element` (dict or list).
+def return_value(the_element, *keys_indexes):
+
+    if not isinstance(the_element, dict):
+        raise AttributeError('return_value() expects dict as first argument.')
+    if len(keys_indexes) == 0:
+        raise AttributeError('return_value() expects at least two arguments, one given.')
+
+    temp_element = the_element
+    for key_index in keys_indexes:
+        try:
+            temp_element = temp_element[key_index]
+        except KeyError:
+            return None
+    return temp_element
+
+
 #Check if json index exists
 def does_index_exist(item, indexvalue, the_dict):
     try:
