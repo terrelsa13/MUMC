@@ -150,7 +150,7 @@ def cfgCheckLegacy(cfg,the_dict):
 #######################################################################################################
 
     if hasattr(cfg,'server_brand'):
-        check=cfg.server_brand.lower()
+        check=cfg.server_brand.casefold()
         server_brand=check
         if (the_dict['DEBUG']):
             #Double newline for debug log formatting
@@ -164,6 +164,7 @@ def cfgCheckLegacy(cfg,the_dict):
             server_brand='invalid'
         else:
             config_dict['server_brand']=check
+            server_brand=check
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The admin_settings > server > brand key is missing from mumc_config.yaml\n'
         server_brand='invalid'
@@ -271,7 +272,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The played_filter_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'played_filter_audiobook'):
             check=cfg.played_filter_audiobook
             if (the_dict['DEBUG']):
@@ -376,7 +377,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The created_filter_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'created_filter_audiobook'):
             check=cfg.created_filter_audiobook
             if (the_dict['DEBUG']):
@@ -415,13 +416,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[1],str)) and
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: favorited_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -441,13 +442,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: favorited_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -467,13 +468,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: favorited_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -482,7 +483,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The favorited_behavior_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'favorited_behavior_audiobook'):
             check=cfg.favorited_behavior_audiobook
             if (the_dict['DEBUG']):
@@ -494,13 +495,13 @@ def cfgCheckLegacy(cfg,the_dict):
                     (isinstance(check[2],str)) and
                     (isinstance(check[3],int)) and
                     (len(check) == 4) and
-                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                     (check[2].lower() == 'any_all') or(check[2].lower() == 'all_any') or
-                     (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                     (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                     (check[2].lower() == 'ignore')) and
+                    ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                    ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                    ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                     (check[2].casefold() == 'any_all') or(check[2].casefold() == 'all_any') or
+                     (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                     (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                     (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
             ):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: favorited_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -712,7 +713,7 @@ def cfgCheckLegacy(cfg,the_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
             if hasattr(cfg, 'favorited_advanced_audiobook_track_genre'):
                 check=cfg.favorited_advanced_audiobook_track_genre
                 if (the_dict['DEBUG']):
@@ -832,13 +833,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitetagged_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -858,13 +859,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitetagged_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -884,13 +885,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitetagged_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -899,7 +900,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The whitetagged_behavior_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'whitetagged_behavior_audiobook'):
             check=cfg.whitetagged_behavior_audiobook
             if (the_dict['DEBUG']):
@@ -911,13 +912,13 @@ def cfgCheckLegacy(cfg,the_dict):
                     (isinstance(check[2],str)) and
                     (isinstance(check[3],int)) and
                     (len(check) == 4) and
-                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                     (check[2].lower() == 'any_all') or(check[2].lower() == 'all_any') or
-                     (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                     (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                     (check[2].lower() == 'ignore')) and
+                    ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                    ((check[1].casefold() == 'all')) and
+                    ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                     (check[2].casefold() == 'any_all') or(check[2].casefold() == 'all_any') or
+                     (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                     (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                     (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: whitetagged_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -955,13 +956,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacktagged_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -981,13 +982,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacktagged_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1007,13 +1008,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacktagged_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1022,7 +1023,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The blacktagged_behavior_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'blacktagged_behavior_audiobook'):
             check=cfg.blacktagged_behavior_audiobook
             if (the_dict['DEBUG']):
@@ -1034,13 +1035,13 @@ def cfgCheckLegacy(cfg,the_dict):
                     (isinstance(check[2],str)) and
                     (isinstance(check[3],int)) and
                     (len(check) == 4) and
-                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                     (check[2].lower() == 'any_all') or(check[2].lower() == 'all_any') or
-                     (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                     (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                     (check[2].lower() == 'ignore')) and
+                    ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                    ((check[1].casefold() == 'all')) and
+                    ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                     (check[2].casefold() == 'any_all') or(check[2].casefold() == 'all_any') or
+                     (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                     (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                     (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: blacktagged_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1062,13 +1063,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitelisted_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1088,13 +1089,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitelisted_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1114,13 +1115,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: whitelisted_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1129,7 +1130,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The whitelisted_behavior_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'whitelisted_behavior_audiobook'):
             check=cfg.whitelisted_behavior_audiobook
             if (the_dict['DEBUG']):
@@ -1141,13 +1142,13 @@ def cfgCheckLegacy(cfg,the_dict):
                     (isinstance(check[2],str)) and
                     (isinstance(check[3],int)) and
                     (len(check) == 4) and
-                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                     (check[2].lower() == 'any_all') or(check[2].lower() == 'all_any') or
-                     (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                     (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                     (check[2].lower() == 'ignore')) and
+                    ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                    ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                    ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                     (check[2].casefold() == 'any_all') or(check[2].casefold() == 'all_any') or
+                     (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                     (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                     (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: whitelisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1169,13 +1170,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacklisted_behavior_movie must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1195,13 +1196,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacklisted_behavior_episode must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1221,13 +1222,13 @@ def cfgCheckLegacy(cfg,the_dict):
                 (isinstance(check[2],str)) and
                 (isinstance(check[3],int)) and
                 (len(check) == 4) and
-                ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                 (check[2].lower() == 'any_all') or (check[2].lower() == 'all_any') or
-                 (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                 (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                 (check[2].lower() == 'ignore')) and
+                ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                 (check[2].casefold() == 'any_all') or (check[2].casefold() == 'all_any') or
+                 (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                 (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                 (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: blacklisted_behavior_audio must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1236,7 +1237,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The blacklisted_behavior_audio variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'blacklisted_behavior_audiobook'):
             check=cfg.blacklisted_behavior_audiobook
             if (the_dict['DEBUG']):
@@ -1248,13 +1249,13 @@ def cfgCheckLegacy(cfg,the_dict):
                     (isinstance(check[2],str)) and
                     (isinstance(check[3],int)) and
                     (len(check) == 4) and
-                    ((check[0].lower() == 'delete') or (check[0].lower() == 'keep')) and
-                    ((check[1].lower() == 'all') or (check[1].lower() == 'any')) and
-                    ((check[2].lower() == 'all') or (check[2].lower() == 'any') or
-                     (check[2].lower() == 'any_all') or(check[2].lower() == 'all_any') or
-                     (check[2].lower() == 'any_played') or (check[2].lower() == 'all_played') or
-                     (check[2].lower() == 'any_created') or (check[2].lower() == 'all_created') or
-                     (check[2].lower() == 'ignore')) and
+                    ((check[0].casefold() == 'delete') or (check[0].casefold() == 'keep')) and
+                    ((check[1].casefold() == 'all') or (check[1].casefold() == 'any')) and
+                    ((check[2].casefold() == 'all') or (check[2].casefold() == 'any') or
+                     (check[2].casefold() == 'any_all') or(check[2].casefold() == 'all_any') or
+                     (check[2].casefold() == 'any_played') or (check[2].casefold() == 'all_played') or
+                     (check[2].casefold() == 'any_created') or (check[2].casefold() == 'all_created') or
+                     (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: blacklisted_behavior_audiobook must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
@@ -1386,7 +1387,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The audio_set_missing_last_played_date variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_set_missing_last_played_date'):
             check=cfg.audiobook_set_missing_last_played_date
             if (the_dict['DEBUG']):
@@ -1419,20 +1420,20 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_script_header variable is missing from mumc_config.py\n'
 
-    if hasattr(cfg, 'print_script_warning'):
-        check=cfg.print_script_warning
+    if hasattr(cfg, 'print_warnings'):
+        check=cfg.print_warnings
         if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\nprint_script_warning='" + str(check) + "'",2,the_dict)
+            appendTo_DEBUG_log("\nprint_warnings='" + str(check) + "'",2,the_dict)
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: print_script_warning must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigValueError: print_warnings must be a boolean; valid values True and False\n'
         else:
-            config_dict['print_script_warning']=check
+            config_dict['print_warnings']=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The print_script_warning variable is missing from mumc_config.py\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The print_warnings variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
@@ -1539,7 +1540,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_audio_keep_info variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_delete_info'):
             check=cfg.print_audiobook_delete_info
             if (the_dict['DEBUG']):
@@ -1569,8 +1570,6 @@ def cfgCheckLegacy(cfg,the_dict):
                 config_dict['print_audiobook_keep_info']=check
         else:
             error_found_in_mumc_config_py+='LegacyConfigNameError: The print_audiobook_keep_info variable is missing from mumc_config.py\n'
-
-
 
     if hasattr(cfg, 'print_movie_post_processing_info'):
         check=cfg.print_movie_post_processing_info
@@ -1617,7 +1616,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_audio_post_processing_info variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_post_processing_info'):
             check=cfg.print_audiobook_post_processing_info
             if (the_dict['DEBUG']):
@@ -1649,9 +1648,9 @@ def cfgCheckLegacy(cfg,the_dict):
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_summary_header variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_movie_summary'):
-        check=cfg.print_movie_summary_info
+        check=cfg.print_movie_summary
         if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\nprint_movie_summary_info='" + str(check) + "'",2,the_dict)
+            appendTo_DEBUG_log("\nprint_movie_summary='" + str(check) + "'",2,the_dict)
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or
@@ -1664,7 +1663,7 @@ def cfgCheckLegacy(cfg,the_dict):
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_movie_summary variable is missing from mumc_config.py\n'
 
     if hasattr(cfg, 'print_episode_summary'):
-        check=cfg.print_episode_summary_info
+        check=cfg.print_episode_summary
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nprint_episode_summary='" + str(check) + "'",2,the_dict)
         if (
@@ -1693,7 +1692,7 @@ def cfgCheckLegacy(cfg,the_dict):
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The print_audio_summary variable is missing from mumc_config.py\n'
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_summary'):
             check=cfg.print_audiobook_summary
             if (the_dict['DEBUG']):
@@ -1916,7 +1915,7 @@ def cfgCheckLegacy(cfg,the_dict):
         #error_found_in_mumc_config_py+='LegacyConfigNameError: The audio_keep_info_format variable is missing from mumc_config.py\n'
         config_dict['audio_keep_info_format']=['','','']
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_delete_info_format'):
             check=cfg.audiobook_delete_info_format
             if (the_dict['DEBUG']):
@@ -2022,7 +2021,7 @@ def cfgCheckLegacy(cfg,the_dict):
         #error_found_in_mumc_config_py+='LegacyConfigNameError: The audio_post_processing_format variable is missing from mumc_config.py\n'
         config_dict['audio_post_processing_format']=['','','']
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_post_processing_format'):
             check=cfg.audiobook_post_processing_format
             if (the_dict['DEBUG']):
@@ -2128,7 +2127,7 @@ def cfgCheckLegacy(cfg,the_dict):
         #error_found_in_mumc_config_py+='LegacyConfigNameError: The audio_summary_format variable is missing from mumc_config.py\n'
         config_dict['audio_summary_format']=['','','']
 
-    if (isJellyfinServer(the_dict['server_brand'])):
+    if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_summary_format'):
             check=cfg.audiobook_summary_format
             if (the_dict['DEBUG']):
@@ -2256,7 +2255,7 @@ def cfgCheckLegacy(cfg,the_dict):
 #######################################################################################################
 
     if hasattr(cfg, 'library_matching_behavior'):
-        check=cfg.library_matching_behavior.lower()
+        check=cfg.library_matching_behavior.casefold()
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nlibrary_matching_behavior='" + str(check) + "'",2,the_dict)
         if (

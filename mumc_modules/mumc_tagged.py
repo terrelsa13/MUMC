@@ -79,8 +79,11 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
     child_itemId_isTagged=[]
     StartIndex=0
     #insert_tagName=user_tags.split(',')[0]
-    insert_tagName=user_tags[0]
-    insert_tagId=uuid.uuid4().int
+    if (user_tags):
+        insert_tagName=user_tags[0]
+    else:
+        insert_tagName=''
+    #insert_tagId=uuid.uuid4().int
 
     #Loop thru items returned as tagged
     for data in data_Tagged['Items']:
@@ -139,22 +142,26 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                             child_itemIsTagged=False
                             #Check if child item has already been processed
                             if not (child_item['Id'] in user_processed_itemsId):
+                                insert_tagName=data['TagItems'][0]['Name']
                                 #Emby and jellyfin store tags differently
                                 if (isEmbyServer(the_dict['server_brand'])):
                                     #Does 'TagItems' exist
                                     if not ('TagItems' in child_item):
                                         #if it does not; add desired tag to metadata
-                                        child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                        #child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                        child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
                                     #Does 'TagItems'[] exist
                                     elif not (does_index_exist(child_item['TagItems'],0,the_dict)):
                                         #if it does not; add desired tag to metadata
-                                        child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                        #child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
+                                        child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
                                     else: #Tag already exists
                                         #Determine if the existing tags are any of the tags we are looking for
                                         child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
                                         #If existing tags are not ones we are lookign for then insert desired tag
                                         if not (child_itemIsTagged):
-                                            child_item['TagItems'].append({'Name':insert_tagName,'Id':insert_tagId})
+                                            #child_item['TagItems'].append({'Name':insert_tagName,'Id':insert_tagId})
+                                            child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
                                 #Emby and jellyfin store tags differently
                                 else: #(isJellyfinServer())
                                     #Does 'TagItems' exist

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+import multiprocessing
 import urllib.parse as urlparse
-from datetime import timedelta
+from datetime import timedelta,datetime
 from collections import defaultdict
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
@@ -56,9 +57,9 @@ def parse_actionedConfigurationBehavior(the_dict,item,isactioned_extra_byUserId,
 
     isactioned_extra_byUserId['ActionBehavior']=action_behavior[3]
     isactioned_extra_byUserId['ActionType']=theActionType
-    isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior[1].lower()
-    isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].lower()
-    isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior[0].lower()
+    isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior[1].casefold()
+    isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior[2].casefold()
+    isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior[0].casefold()
 
     #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
     #isactioned_extra_byUserId[user_key][item['Id']]['IsItemPlayed']=itemIsPlayed
@@ -143,9 +144,9 @@ def get_singleUserDeleteStatus(the_dict,item_matches_played_count_filter,item_ma
 # get played, favorited, and tagged media items
 # save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
-def get_media_items(mediaType,the_dict,media_dict,user_key):
+def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
 
-    mediaType_lower=mediaType.lower()
+    mediaType_lower=mediaType.casefold()
     mediaType_upper=mediaType.upper()
     mediaType_title=mediaType.title()
 
@@ -164,7 +165,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
 
     if (mediaType_lower == 'movie'):
         if (not(mediaType in media_dict)):
-            media_dict['mediaType']=mediaType.lower()
+            media_dict['mediaType']=mediaType.casefold()
         media_played_days=the_dict['played_filter_movie'][0]
         media_created_days=the_dict['created_filter_movie'][0]
         media_played_count_comparison=the_dict['played_filter_movie'][1]
@@ -190,7 +191,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         blacklisted_behavior_media=the_dict['blacklisted_behavior_movie']
     elif (mediaType_lower == 'episode'):
         if (not(mediaType in media_dict)):
-            media_dict['mediaType']=mediaType.lower()
+            media_dict['mediaType']=mediaType.casefold()
         media_played_days=the_dict['played_filter_episode'][0]
         media_created_days=the_dict['created_filter_episode'][0]
         media_played_count_comparison=the_dict['played_filter_episode'][1]
@@ -216,7 +217,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         blacklisted_behavior_media=the_dict['blacklisted_behavior_episode']
     elif (mediaType_lower == 'audio'):
         if (not(mediaType in media_dict)):
-            media_dict['mediaType']=mediaType.lower()
+            media_dict['mediaType']=mediaType.casefold()
         media_played_days=the_dict['played_filter_audio'][0]
         media_created_days=the_dict['created_filter_audio'][0]
         media_played_count_comparison=the_dict['played_filter_audio'][1]
@@ -242,8 +243,8 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
         blacklisted_behavior_media=the_dict['blacklisted_behavior_audio']
     elif (mediaType_lower == 'audiobook'):
         if (not(mediaType in media_dict)):
-            media_dict['mediaType']=mediaType.lower()
-        if (isJellyfinServer(the_dict)):
+            media_dict['mediaType']=mediaType.casefold()
+        if (isJellyfinServer(the_dict['server_brand'])):
             media_played_days=the_dict['played_filter_audiobook'][0]
             media_created_days=the_dict['created_filter_audiobook'][0]
             media_played_count_comparison=the_dict['played_filter_audiobook'][1]
@@ -981,11 +982,11 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 #Fill in the blanks
                                 if (mediaType_lower == 'movie'):
                                     item=prepare_MOVIEoutput(the_dict,item,user_key,the_dict['movie_set_missing_last_played_date'])
-                                if (mediaType_lower == 'episode'):
+                                elif (mediaType_lower == 'episode'):
                                     item=prepare_EPISODEoutput(the_dict,item,user_key,the_dict['episode_set_missing_last_played_date'])
-                                if (mediaType_lower == 'audio'):
+                                elif (mediaType_lower == 'audio'):
                                     item=prepare_AUDIOoutput(the_dict,item,user_key,the_dict['audio_set_missing_last_played_date'],mediaType_lower)
-                                if (mediaType_lower == 'audiobook'):
+                                elif (mediaType_lower == 'audiobook'):
                                     item=prepare_AUDIOBOOKoutput(the_dict,item,user_key,the_dict['audiobook_set_missing_last_played_date'],mediaType_lower)
 
                                 isfavorited_extraInfo_byUserId_Media[user_key][item['Id']]={}
@@ -1017,11 +1018,11 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 else:
                                     if (mediaType_lower == 'movie'):
                                         item_isFavorited=get_isMOVIE_Fav(the_dict,item,user_key)
-                                    if (mediaType_lower == 'episode'):
+                                    elif (mediaType_lower == 'episode'):
                                         item_isFavorited=get_isEPISODE_Fav(the_dict,item,user_key)
-                                    if (mediaType_lower == 'audio'):
+                                    elif (mediaType_lower == 'audio'):
                                         item_isFavorited=get_isAUDIO_Fav(the_dict,item,user_key,'Audio')
-                                    if (mediaType_lower == 'audiobook'):
+                                    elif (mediaType_lower == 'audiobook'):
                                         item_isFavorited=get_isAUDIOBOOK_Fav(the_dict,item,user_key,'AudioBook')
 
                                 #Get if media item is set as an advanced favorite
@@ -1029,11 +1030,11 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                 if ((favorited_behavior_media[3] >= 0) and (advFav0_media or advFav1_media or advFav2_media or advFav3_media or advFav4_media or advFav5_media)):
                                     if (mediaType_lower == 'movie'):
                                         item_isFavorited_Advanced=get_isMOVIE_AdvancedFav(the_dict,item,user_key,advFav0_media,advFav1_media)
-                                    if (mediaType_lower == 'episode'):
+                                    elif (mediaType_lower == 'episode'):
                                         item_isFavorited_Advanced=get_isEPISODE_AdvancedFav(the_dict,item,user_key,advFav0_media,advFav1_media, advFav2_media,advFav3_media,advFav4_media,advFav5_media)
-                                    if (mediaType_lower == 'audio'):
+                                    elif (mediaType_lower == 'audio'):
                                         item_isFavorited_Advanced=get_isAUDIO_AdvancedFav(the_dict,item,user_key,'Audio',advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media)
-                                    if (mediaType_lower == 'audiobook'):
+                                    elif (mediaType_lower == 'audiobook'):
                                         item_isFavorited_Advanced=get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_key,'AudioBook',advFav0_media,advFav1_media,advFav2_media,advFav3_media,advFav4_media,advFav5_media)
 
                                 #Determine what will show as the favorite status for this user and media item
@@ -1168,7 +1169,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
                                                     'media_keep_info_format':media_keep_info_format}
 
                                 #Build and display media item output details for currently processing user
-                                if (mediaType.lower() == 'episode'):
+                                if (mediaType.casefold() == 'episode'):
                                     build_print_media_item_details(the_dict,item,mediaType,output_state_dict,get_days_since_played(item['UserData']['LastPlayedDate'],the_dict),get_days_since_created(item['DateCreated'],the_dict),get_season_episode(item['ParentIndexNumber'],item['IndexNumber'],the_dict))
                                 else:
                                     build_print_media_item_details(the_dict,item,mediaType,output_state_dict,get_days_since_played(item['UserData']['LastPlayedDate'],the_dict),get_days_since_created(item['DateCreated'],the_dict))
@@ -1205,7 +1206,73 @@ def get_media_items(mediaType,the_dict,media_dict,user_key):
     media_dict[user_key]['isfavorited_extraInfo_byUserId_Media']=isfavorited_extraInfo_byUserId_Media
     media_dict[user_key]['mediaCounts_byUserId']=mediaCounts_byUserId
 
-    return media_dict,media_found
+    media_returns['media_dict']=media_dict
+    media_returns['media_found']=media_found
+
+    return media_returns
+
+
+'''
+def getMedia(the_dict):
+
+    movie_dict={}
+    episode_dict={}
+    audio_dict={}
+    audiobook_dict={}
+
+    #Get items that could be ready for deletion
+    for user_key in the_dict['user_keys_json']:
+        movie_returns=[]
+        episode_returns=[]
+        audio_returns=[]
+        audiobook_returns=[]
+        movie_dict[user_key]={}
+        episode_dict[user_key]={}
+        audio_dict[user_key]={}
+        audiobook_dict[user_key]={}
+
+        print_user_header(user_key,the_dict)
+
+        #query the server for movie media items
+        #movie_dict,movie_found=get_media_items('movie',the_dict,movie_dict,user_key)
+        movie_returns=get_media_items('movie',the_dict,movie_dict,user_key,movie_returns)
+        #query the server for episode media items
+        #episode_dict,episode_found=get_media_items('episode',the_dict,episode_dict,user_key)
+        episode_returns=get_media_items('episode',the_dict,episode_dict,user_key,episode_returns)
+        #query the server for audio media items
+        #audio_dict,audio_found=get_media_items('audio',the_dict,audio_dict,user_key)
+        audio_returns=get_media_items('audio',the_dict,audio_dict,user_key,audio_returns)
+        #query the server for audiobook media items
+         #audioBook media type only applies to jellyfin
+         #Jellyfin sets audiobooks to a media type of audioBook
+         #Emby sets audiobooks to a media type of audio (see audio section)
+        #audiobook_dict,audiobook_found=get_media_items('audiobook',the_dict,audiobook_dict,user_key)
+        audiobook_returns=get_media_items('audiobook',the_dict,audiobook_dict,user_key,audiobook_returns)
+ 
+        movie_dict.update(movie_returns[0])
+        movie_found=movie_returns[1]
+        episode_dict.update(episode_returns[0])
+        episode_found=episode_returns[1]
+        audio_dict.update(audio_returns[0])
+        audio_found=audio_returns[1]
+        audiobook_dict.update(audiobook_returns[0])
+        audiobook_found=audiobook_returns[1]
+ 
+        if (isEmbyServer(the_dict['server_brand'])):
+            audiobook_found=False
+
+        the_dict['currentPosition']+=1
+
+        media_found=(movie_found or episode_found or audio_found or audiobook_found)
+
+        if not (the_dict['all_media_disabled']):
+            if not (media_found):
+                if (the_dict['DEBUG']):
+                    appendTo_DEBUG_log("\n",1,the_dict)
+                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['print_script_warning'],the_dict)
+
+    return movie_dict,episode_dict,audio_dict,audiobook_dict
+'''
 
 
 def getMedia(the_dict):
@@ -1224,18 +1291,70 @@ def getMedia(the_dict):
 
         print_user_header(user_key,the_dict)
 
-        #query the server for movie media items
-        movie_dict,movie_found=get_media_items('movie',the_dict,movie_dict,user_key)
-        #query the server for episode media items
-        episode_dict,episode_found=get_media_items('episode',the_dict,episode_dict,user_key)
-        #query the server for audio media items
-        audio_dict,audio_found=get_media_items('audio',the_dict,audio_dict,user_key)
-        #query the server for audiobook media items
-         #audioBook media type only applies to jellyfin
-         #Jellyfin sets audiobooks to a media type of audioBook
-         #Emby sets audiobooks to a media type of audio (see audio section)
-        audiobook_dict,audiobook_found=get_media_items('audiobook',the_dict,audiobook_dict,user_key)
-        if (not (isJellyfinServer(the_dict['server_brand']))):
+        #when debug is disabled and no media delete/keep items are being output to the console; allow multiprocessing
+        if (
+           (not (the_dict['DEBUG'])) and
+           ((not (the_dict['print_movie_delete_info'] or the_dict['print_movie_keep_info'])) and
+           (not (the_dict['print_episode_delete_info'] or the_dict['print_episode_keep_info'])) and
+           (not (the_dict['print_audio_delete_info'] or the_dict['print_audio_keep_info'])) and
+           ((isEmbyServer(the_dict['server_brand'])) or
+           (isJellyfinServer(the_dict['server_brand']) and
+           (not (the_dict['print_audiobook_delete_info'] or the_dict['print_audiobook_keep_info'])))))
+           ):
+
+            #print('Start Get Media: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+
+            movie_returns=multiprocessing.Manager().dict()
+            episode_returns=multiprocessing.Manager().dict()
+            audio_returns=multiprocessing.Manager().dict()
+            audiobook_returns=multiprocessing.Manager().dict()
+
+            #prepare for post processing; return dictionary of lists of media items to be deleted
+            #setup for multiprocessing of the post processing of each media type
+            mpp_movieGetMedia=multiprocessing.Process(target=get_media_items,args=('movie',the_dict,movie_dict,user_key,movie_returns))
+            mpp_episodeGetMedia=multiprocessing.Process(target=get_media_items,args=('episode',the_dict,episode_dict,user_key,episode_returns))
+            mpp_audioGetMedia=multiprocessing.Process(target=get_media_items,args=('audio',the_dict,audio_dict,user_key,audio_returns))
+            mpp_audiobookGetMedia=multiprocessing.Process(target=get_media_items,args=('audiobook',the_dict,audiobook_dict,user_key,audiobook_returns))
+
+            #start all multi processes
+            #order intentially: Audio, Episodes, Movies, Audiobooks
+            mpp_audioGetMedia.start(),mpp_episodeGetMedia.start(),mpp_movieGetMedia.start(),mpp_audiobookGetMedia.start()
+            mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join(), mpp_audiobookGetMedia.join()
+            mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close(),mpp_audiobookGetMedia.close()
+
+            #print('Stop Get Media: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+        else: ##when debug is enabled or any media delete/keep items are being output to the console; do not allow multiprocessing
+            movie_returns={}
+            episode_returns={}
+            audio_returns={}
+            audiobook_returns={}
+
+            #query the server for movie media items
+            movie_returns=get_media_items('movie',the_dict,movie_dict,user_key,movie_returns)
+            #query the server for episode media items
+            episode_returns=get_media_items('episode',the_dict,episode_dict,user_key,episode_returns)
+            #query the server for audio media items
+            audio_returns=get_media_items('audio',the_dict,audio_dict,user_key,audio_returns)
+            #query the server for audiobook media items
+            #audioBook media type only applies to jellyfin
+            #Jellyfin sets audiobooks to a media type of audioBook
+            #Emby sets audiobooks to a media type of audio (see audio section)
+            audiobook_returns=get_media_items('audiobook',the_dict,audiobook_dict,user_key,audiobook_returns)
+
+        #if (movie_returns):
+        movie_dict.update(movie_returns['media_dict'])
+        movie_found=movie_returns['media_found']
+        #if (episode_returns):
+        episode_dict.update(episode_returns['media_dict'])
+        episode_found=episode_returns['media_found']
+        #if (audio_returns):
+        audio_dict.update(audio_returns['media_dict'])
+        audio_found=audio_returns['media_found']
+        #if (audiobook_returns):
+        audiobook_dict.update(audiobook_returns['media_dict'])
+        audiobook_found=audiobook_returns['media_found']
+ 
+        if (isEmbyServer(the_dict['server_brand'])):
             audiobook_found=False
 
         the_dict['currentPosition']+=1
@@ -1246,6 +1365,6 @@ def getMedia(the_dict):
             if not (media_found):
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log("\n",1,the_dict)
-                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]',the_dict['print_script_warning'],the_dict)
+                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['print_script_warning'],the_dict,the_dict['script_warnings_format'])
 
     return movie_dict,episode_dict,audio_dict,audiobook_dict

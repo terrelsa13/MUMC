@@ -13,7 +13,7 @@ def assignVarTest(init_dict,cfg):
     #try assigning the below variables from the mumc_config.yaml file
     #if any do not exist go to except and rebuild the mumc_config.yaml file
     init_dict['config_version']=cfg['version']
-    init_dict['server_brand']=cfg['admin_settings']['server']['brand'].lower()
+    init_dict['server_brand']=cfg['admin_settings']['server']['brand'].casefold()
     init_dict['DEBUG']=cfg['DEBUG']
 
     return init_dict
@@ -54,14 +54,14 @@ def importConfig(init_dict,cmdopt_dict):
             init_dict=assignVarTest(init_dict,cfg)
 
         else:
-            if (doesFileExist(init_dict['mumc_path'] / init_dict['config_file_name'])):
-                #try importing the mumc_config.py file
-                #if mumc_config.py file does not exist go to except and create one
+            if (doesFileExist(init_dict['mumc_path'] / init_dict['config_file_name_yaml'])):
+                #try importing the mumc_config.yaml file
+                #if mumc_config.yaml file does not exist try importing the legacy mumc_config.py file
                 with open(init_dict['mumc_path'] / init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
             else:
-                #try importing the mumc_config.yaml file
-                #if mumc_config.yaml file does not exist go to except and create one
+                #try importing the mumc_config.py file
+                #if mumc_config.py file does not exist go to except and create one
                 import mumc_config as cfg
 
                 #run a config check on the legacy mumc_config.py before converting to mumc_config.yaml

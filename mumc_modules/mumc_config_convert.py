@@ -239,7 +239,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['advanced']['library_genre']=cfg.favorited_advanced_audiobook_library_genre
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['advanced']['track_author']=cfg.favorited_advanced_audiobook_track_author
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['advanced']['author']=cfg.favorited_advanced_audiobook_author
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['advanced']['author']=cfg.favorited_advanced_audiobook_library_author
+        config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['advanced']['library_author']=cfg.favorited_advanced_audiobook_library_author
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']={}
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action']=cfg.whitetagged_behavior_audiobook[0]
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['user_conditional']=cfg.whitetagged_behavior_audiobook[1]
@@ -314,7 +314,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     config_data['advanced_settings']['console_controls']['footers']['script']['formatting']['background']['color']=cfg.script_footer_format[1]
     config_data['advanced_settings']['console_controls']['warnings']={}
     config_data['advanced_settings']['console_controls']['warnings']['script']={}
-    config_data['advanced_settings']['console_controls']['warnings']['script']['show']=cfg.print_script_warning
+    config_data['advanced_settings']['console_controls']['warnings']['script']['show']=cfg.print_warnings
     config_data['advanced_settings']['console_controls']['warnings']['script']['formatting']={}
     config_data['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']={}
     config_data['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=cfg.script_warnings_format[0]
@@ -348,7 +348,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     config_data['advanced_settings']['console_controls']['movie']['post_processing']['formatting']['background']={}
     config_data['advanced_settings']['console_controls']['movie']['post_processing']['formatting']['background']['color']=cfg.movie_post_processing_format[1]
     config_data['advanced_settings']['console_controls']['movie']['summary']={}
-    config_data['advanced_settings']['console_controls']['movie']['summary']['show']=cfg.print_movie_summary_info
+    config_data['advanced_settings']['console_controls']['movie']['summary']['show']=cfg.print_movie_summary
     config_data['advanced_settings']['console_controls']['movie']['summary']['formatting']={}
     config_data['advanced_settings']['console_controls']['movie']['summary']['formatting']['font']={}
     config_data['advanced_settings']['console_controls']['movie']['summary']['formatting']['font']['color']=cfg.movie_summary_format[0]
@@ -382,7 +382,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     config_data['advanced_settings']['console_controls']['episode']['post_processing']['formatting']['background']={}
     config_data['advanced_settings']['console_controls']['episode']['post_processing']['formatting']['background']['color']=cfg.episode_post_processing_format[1]
     config_data['advanced_settings']['console_controls']['episode']['summary']={}
-    config_data['advanced_settings']['console_controls']['episode']['summary']['show']=cfg.print_episode_summary_info
+    config_data['advanced_settings']['console_controls']['episode']['summary']['show']=cfg.print_episode_summary
     config_data['advanced_settings']['console_controls']['episode']['summary']['formatting']={}
     config_data['advanced_settings']['console_controls']['episode']['summary']['formatting']['font']={}
     config_data['advanced_settings']['console_controls']['episode']['summary']['formatting']['font']['color']=cfg.episode_summary_format[0]
@@ -416,7 +416,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     config_data['advanced_settings']['console_controls']['audio']['post_processing']['formatting']['background']={}
     config_data['advanced_settings']['console_controls']['audio']['post_processing']['formatting']['background']['color']=cfg.audio_post_processing_format[1]
     config_data['advanced_settings']['console_controls']['audio']['summary']={}
-    config_data['advanced_settings']['console_controls']['audio']['summary']['show']=cfg.print_audio_summary_info
+    config_data['advanced_settings']['console_controls']['audio']['summary']['show']=cfg.print_audio_summary
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']={}
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['font']={}
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['font']['color']=cfg.audio_summary_format[0]
@@ -600,7 +600,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         configPath=get_current_directory()
 
     #Save the config file
-    with open(configPath / configFileNameNoExt + '.yaml','w') as file:
+    with open(configPath / (configFileNameNoExt + '.yaml'),'w') as file:
         file.write('---\n')
         yaml.safe_dump(config_data,file,sort_keys=False)
         file.write('...')

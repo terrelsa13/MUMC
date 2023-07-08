@@ -638,7 +638,7 @@ def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary
 
                             itemIsFav=False
                             itemIsAdvFav=False
-                            if (item['Type'].lower() == 'movie'):
+                            if (item['Type'].casefold() == 'movie'):
                                 itemIsFav=get_isMOVIE_Fav(the_dict,item,subUserId)
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nMovie is favorite: " + str(itemIsFav),3,the_dict)
@@ -647,7 +647,7 @@ def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav0: " + str(advFav0),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav1: " + str(advFav1),3,the_dict)
-                            elif (item['Type'].lower() == 'episode'):
+                            elif (item['Type'].casefold() == 'episode'):
                                 itemIsFav=get_isEPISODE_Fav(the_dict,item,subUserId)
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nEpisode is favorite: " + str(itemIsFav),3,the_dict)
@@ -660,7 +660,7 @@ def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary
                                         appendTo_DEBUG_log("\nadvFav3: " + str(advFav3),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav4: " + str(advFav4),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav5: " + str(advFav5),3,the_dict)
-                            elif (item['Type'].lower() == 'audio'):
+                            elif (item['Type'].casefold() == 'audio'):
                                 itemIsFav=get_isAUDIO_Fav(the_dict,item,subUserId,'Audio')
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nAudio is favorite: " + str(itemIsFav),3,the_dict)
@@ -672,7 +672,7 @@ def favorites_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary
                                         appendTo_DEBUG_log("\nadvFav2: " + str(advFav2),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav3: " + str(advFav3),3,the_dict)
                                         appendTo_DEBUG_log("\nadvFav4: " + str(advFav4),3,the_dict)
-                            elif (item['Type'].lower() == 'audiobook'):
+                            elif (item['Type'].casefold() == 'audiobook'):
                                 itemIsFav=get_isAUDIOBOOK_Fav(the_dict,item,subUserId,'AudioBook')
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nAudioBook is favorite: " + str(itemIsFav),3,the_dict)

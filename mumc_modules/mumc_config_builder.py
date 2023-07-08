@@ -9,7 +9,7 @@ from mumc_modules.mumc_url import requestURL
 from mumc_modules.mumc_server_type import isJellyfinServer,isEmbyServer
 from mumc_modules.mumc_config_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_console_info import build_all_media_disabled,build_new_config_setup_to_delete_media
+from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
 from mumc_modules.mumc_configuration import mumc_configuration_builder
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 
@@ -794,8 +794,8 @@ def build_configuration_file(cfg,the_dict):
         the_dict['library_setup_behavior']=get_library_setup_behavior(the_dict['library_setup_behavior'])
         print('-----------------------------------------------------------')
         #ask user how they want media items to be matched to libraries/folders
-        #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.lower())
-        the_dict['library_matching_behavior']=get_library_matching_behavior(the_dict['library_matching_behavior'].lower())
+        #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
+        the_dict['library_matching_behavior']=get_library_matching_behavior(the_dict['library_matching_behavior'].casefold())
         print('-----------------------------------------------------------')
         #set auth_key to allow printing username next to userkey
         #auth_key=cfg.auth_key
@@ -852,8 +852,7 @@ def build_configuration_file(cfg,the_dict):
                 (((isJellyfinServer(the_dict['server_brand'])) and (get_default_config_values('played_filter_audiobook')[0] == -1)) or (isEmbyServer(the_dict['server_brand']))) and
                 (((isJellyfinServer(the_dict['server_brand'])) and (get_default_config_values('created_filter_audiobook')[0] == -1)) or (isEmbyServer(the_dict['server_brand'])))
                 ):
-                strings_list_to_print=build_all_media_disabled(the_dict)
-                print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+                print_all_media_disabled(the_dict)
 
             try:
                 strings_list_to_print=['']

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from datetime import timedelta
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist import blacklist_playedPatternCleanup
@@ -249,8 +250,6 @@ def run_post_processing(the_dict,media_dict):
     postproc_dict['user_wllib_netpath_json']=the_dict['user_wllib_netpath_json']
     postproc_dict['user_wllib_path_json']=the_dict['user_wllib_path_json']
 
-    postproc_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media']
-    postproc_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media']
     postproc_dict['minimum_number_episodes']=the_dict['minimum_number_episodes']
     postproc_dict['minimum_number_played_episodes']=the_dict['minimum_number_played_episodes']
 
@@ -338,6 +337,9 @@ def run_post_processing(the_dict,media_dict):
         postproc_dict['advFav5_media']=the_dict['favorited_advanced_audiobook_library_author']
         postproc_dict['print_media_post_processing']=the_dict['print_audiobook_post_processing_info']
         postproc_dict['media_post_processing_format']=the_dict['audiobook_post_processing_format']
+
+    postproc_dict['cut_off_date_played_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_played_days'])
+    postproc_dict['cut_off_date_created_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_created_days'])
 
     #lists and dictionaries of items to be deleted
     deleteItems=[]

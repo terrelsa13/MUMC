@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import multiprocessing
 from pathlib import Path
+from datetime import datetime
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_check import cfgCheckLegacy
-#from mumc_modules.mumc_config_build import edit_configuration_file,buildUserLibraries
+from mumc_modules.mumc_config_builder import edit_configuration_file,buildUserLibraries
 from mumc_modules.mumc_post_process import postProcessing
-from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,build_all_media_disabled,cache_data_to_debug
+from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
 from mumc_modules.mumc_get_media import getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import get_current_directory,delete_debug_log
@@ -61,7 +62,7 @@ def main():
     #if it is; proceed and process media items
     if (config_dict['all_media_disabled']):
         #output message letting user know none of the media is enabled to be monitored
-        build_all_media_disabled(config_dict)
+        print_all_media_disabled(config_dict)
     else:
         #build the user libraries from config data
         config_dict=buildUserLibraries(config_dict)
@@ -69,27 +70,36 @@ def main():
         #prepare for the main event; return dictionaries of media items per monitored user
         movie_dict,episode_dict,audio_dict,audiobook_dict=getMedia(config_dict)
 
-        #print('Start Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+        #when debug is disabled allow mulitprocessing
+        if (not (config_dict['DEBUG'])):
+            #print('\nStart Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
 
-        deleteItems_dict=multiprocessing.Manager().dict()
+            deleteItems_dict=multiprocessing.Manager().dict()
 
-        #prepare for post processing; return lists of media items to be deleted
-        #deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook=postProcessing(config_dict,movie_dict,episode_dict,audio_dict,audiobook_dict)
+            #prepare for post processing; return lists of media items to be deleted
+            #deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook=postProcessing(config_dict,movie_dict,episode_dict,audio_dict,audiobook_dict)
 
-        #prepare for post processing; return dictionary of lists of media items to be deleted
-        #setup for multiprocessing of the post processing of each media type
-        mpp0=multiprocessing.Process(target=postProcessing,args=(config_dict,movie_dict,deleteItems_dict))
-        mpp1=multiprocessing.Process(target=postProcessing,args=(config_dict,episode_dict,deleteItems_dict))
-        mpp2=multiprocessing.Process(target=postProcessing,args=(config_dict,audio_dict,deleteItems_dict))
-        mpp3=multiprocessing.Process(target=postProcessing,args=(config_dict,audiobook_dict,deleteItems_dict))
+            #prepare for post processing; return dictionary of lists of media items to be deleted
+            #setup for multiprocessing of the post processing of each media type
+            mpp_movie_post_process=multiprocessing.Process(target=postProcessing,args=(config_dict,movie_dict,deleteItems_dict))
+            mpp_episodePostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,episode_dict,deleteItems_dict))
+            mpp_audioPostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,audio_dict,deleteItems_dict))
+            mpp_audiobookPostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,audiobook_dict,deleteItems_dict))
 
-        #start all multi processes
-        #order intentially: Audio, Episodes, Movies, Audiobooks
-        mpp2.start(),mpp1.start(),mpp0.start(),mpp3.start()
-        mpp2.join(), mpp1.join(), mpp0.join(), mpp3.join()
-        mpp2.close(),mpp1.close(),mpp0.close(),mpp3.close()
+            #start all multi processes
+            #order intentially: Audio, Episodes, Movies, Audiobooks
+            mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_audiobookPostProcess.start()
+            mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(), mpp_audiobookPostProcess.join()
+            mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_audiobookPostProcess.close()
 
-        #print('Stop Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+            #print('Stop Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+        else: #when debug disabled do not allow multiprocessing; this will allow stepping thru debug
+            deleteItems_dict=[]
+
+            deleteItems_dict['movie']=postProcessing(config_dict,movie_dict,deleteItems_dict)
+            deleteItems_dict['episode']=postProcessing(config_dict,episode_dict,deleteItems_dict)
+            deleteItems_dict['audio']=postProcessing(config_dict,audio_dict,deleteItems_dict)
+            deleteItems_dict['audiobook']=postProcessing(config_dict,audiobook_dict,deleteItems_dict)
 
         #sort lists of items to be deleted into a single list
         deleteItems=sortDeleteLists(deleteItems_dict['movie'],deleteItems_dict['episode'],deleteItems_dict['audio'],deleteItems_dict['audiobook'])

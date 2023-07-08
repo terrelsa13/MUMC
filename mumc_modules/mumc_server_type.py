@@ -3,7 +3,7 @@
 
 #Determine if server is Jellyfin
 def isJellyfinServer(server_brand):
-    if (server_brand == "jellyfin".casefold()):
+    if (server_brand.casefold() == "jellyfin"):
         return True
     else:
         return False

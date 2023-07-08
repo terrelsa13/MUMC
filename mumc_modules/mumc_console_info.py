@@ -62,7 +62,7 @@ def print_user_header(user_key,the_dict):
     user_data=requestURL(url, the_dict['DEBUG'], 'current_user', the_dict['api_query_attempts'],the_dict)
 
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Get List Of Media For:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,user_data['Name'] + ' - ' + user_data['Id'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
@@ -127,13 +127,13 @@ def build_print_media_item_details(the_dict,item,mediaType,output_state_dict,day
 
             strings_list[0]=strings_list[0] + item['Type']
 
-            if (mediaType.lower() == 'movie'):
+            if (mediaType.casefold() == 'movie'):
                 strings_list[0]=strings_list[0] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name']
-            elif (mediaType.lower() == 'episode'):
+            elif (mediaType.casefold() == 'episode'):
                 strings_list[0]=strings_list[0] + ' - ' + item['SeriesName'] + ' - ' + season_episode + ' - ' + item['Name'] + ' - ' + item['SeriesStudio']
-            elif (mediaType.lower() == 'audio'):
+            elif (mediaType.casefold() == 'audio'):
                 strings_list[0]=strings_list[0] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name']
-            elif (mediaType.lower() == 'audiobook'):
+            elif (mediaType.casefold() == 'audiobook'):
                 strings_list[0]=strings_list[0] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' +item['Artists'][0]
 
             strings_list[0]=strings_list[0] + ' - ' + days_since_played + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + days_since_created + ' - Favorite: ' +\
@@ -370,7 +370,7 @@ def print_failed_to_load_config(the_dict):
 
 
 #print all media disabled helper
-def build_all_media_disabled(the_dict):
+def print_all_media_disabled(the_dict):
     strings_list_to_print=['']
 
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
@@ -392,7 +392,7 @@ def build_all_media_disabled(the_dict):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* created_filter_audiobook[A]=-1                          *')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-    print_byType(strings_list_to_print[0],True,the_dict,the_dict['script_warnings_format'])
+    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
 
 
 #print how to delete files info

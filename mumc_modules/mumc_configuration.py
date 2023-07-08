@@ -631,7 +631,7 @@ def mumc_configuration_builder(cfg,the_dict):
     config_file += "#----------------------------------------------------------#\n"
     if not (the_dict['UPDATE_CONFIG']):
         config_file += "print_script_header=" + str(get_default_config_values('print_script_header')) + "\n"
-        config_file += "print_script_warning=" + str(get_default_config_values('print_script_warning')) + "\n"
+        config_file += "print_warnings=" + str(get_default_config_values('print_warnings')) + "\n"
         config_file += "print_user_header=" + str(get_default_config_values('print_user_header')) + "\n"
         config_file += "print_movie_delete_info=" + str(get_default_config_values('print_movie_delete_info')) + "\n"
         config_file += "print_movie_keep_info=" + str(get_default_config_values('print_movie_keep_info')) + "\n"
@@ -656,7 +656,7 @@ def mumc_configuration_builder(cfg,the_dict):
         config_file += "print_script_footer=" + str(get_default_config_values('print_script_footer')) + "\n"
     elif (the_dict['UPDATE_CONFIG']):
         config_file += "print_script_header=" + str(cfg.print_script_header) + "\n"
-        config_file += "print_script_warning=" + str(cfg.print_script_warning) + "\n"
+        config_file += "print_warnings=" + str(cfg.print_warnings) + "\n"
         config_file += "print_user_header=" + str(cfg.print_user_header) + "\n"
         config_file += "print_movie_delete_info=" + str(cfg.print_movie_delete_info) + "\n"
         config_file += "print_movie_keep_info=" + str(cfg.print_movie_keep_info) + "\n"
@@ -673,9 +673,9 @@ def mumc_configuration_builder(cfg,the_dict):
         if (isJellyfinServer(the_dict['server_brand'])):
             config_file += "print_audiobook_post_processing_info=" + str(cfg.print_audiobook_post_processing_info) + "\n"
         config_file += "print_summary_header=" + str(cfg.print_summary_header) + "\n"
-        config_file += "print_movie_summary=" + str(cfg.print_movie_summary_info) + "\n"
-        config_file += "print_episode_summary=" + str(cfg.print_episode_summary_info) + "\n"
-        config_file += "print_audio_summary=" + str(cfg.print_audio_summary_info) + "\n"
+        config_file += "print_movie_summary=" + str(cfg.print_movie_summary) + "\n"
+        config_file += "print_episode_summary=" + str(cfg.print_episode_summary) + "\n"
+        config_file += "print_audio_summary=" + str(cfg.print_audio_summary) + "\n"
         if (isJellyfinServer(the_dict['server_brand'])):
             config_file += "print_audiobook_summary=" + str(cfg.print_audiobook_summary) + "\n"
         config_file += "print_script_footer=" + str(get_default_config_values('print_script_footer')) + "\n"

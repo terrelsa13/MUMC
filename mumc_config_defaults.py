@@ -94,7 +94,7 @@ defaultConfigValues={
         'audiobook_set_missing_last_played_date':True,
 
         'print_script_header':True,
-        'print_script_warning':True,
+        'print_warnings':True,
         'print_user_header':True,
         'print_movie_delete_info':True,
         'print_movie_keep_info':True,

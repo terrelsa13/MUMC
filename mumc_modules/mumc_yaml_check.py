@@ -185,12 +185,12 @@ def cfgCheckYAML(cfg,the_dict):
         server_brand=check
         if (
             not ((isinstance(check,str)) and
-            ((check.lower() == 'emby') or (check.lower() == 'jellyfin')))
+            ((check.casefold() == 'emby') or (check.casefold() == 'jellyfin')))
         ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
             #server_brand='invalid
         else:
-            config_dict['server_brand']=check.lower()
+            config_dict['server_brand']=check.casefold()
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > brand key is missing from mumc_config.yaml\n'
         #server_brand='invalid'
@@ -672,7 +672,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -684,7 +684,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -696,11 +696,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -750,7 +750,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -762,7 +762,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -774,11 +774,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -821,7 +821,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -833,7 +833,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -845,11 +845,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -892,7 +892,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -904,7 +904,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -916,11 +916,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -946,7 +946,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -958,7 +958,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -970,11 +970,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1000,7 +1000,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1012,7 +1012,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1024,11 +1024,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1126,7 +1126,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1138,7 +1138,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -1150,11 +1150,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1197,7 +1197,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1209,7 +1209,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -1221,11 +1221,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1268,7 +1268,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1280,7 +1280,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1292,11 +1292,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1322,7 +1322,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1334,7 +1334,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1346,11 +1346,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1376,7 +1376,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1388,7 +1388,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1400,11 +1400,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1490,7 +1490,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1502,7 +1502,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -1514,11 +1514,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1561,7 +1561,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1573,7 +1573,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all')))
+                 ((check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > user_conditional must be a string\n\tValid value \'all\'\n'
         else:
@@ -1585,11 +1585,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1632,7 +1632,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1644,7 +1644,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1656,11 +1656,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1686,7 +1686,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
         else:
@@ -1698,7 +1698,7 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','user_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'any') or (check.lower() == 'all')))
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
         else:
@@ -1710,11 +1710,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','played_conditional')
         if (
             not (isinstance(check,str) and
-                 ((check.lower() == 'all') or (check.lower() == 'any') or
-                 (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                 (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                 (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                 (check.lower() == 'ignore')))
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
         else:
@@ -1741,7 +1741,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                    ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
             else:
@@ -1753,7 +1753,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','user_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'any') or (check.lower() == 'all')))
+                    ((check.casefold() == 'any') or (check.casefold() == 'all')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
             else:
@@ -1765,11 +1765,11 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','played_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all') or (check.lower() == 'any') or
-                    (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                    (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                    (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                    (check.lower() == 'ignore')))
+                    ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                    (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                    (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                    (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                    (check.casefold() == 'ignore')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
             else:
@@ -1867,7 +1867,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                    ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
             else:
@@ -1879,7 +1879,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','user_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all')))
+                    ((check.casefold() == 'all')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > user_conditional must be a string\n\tValid value \'all\'\n'
             else:
@@ -1891,11 +1891,11 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','played_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all') or (check.lower() == 'any') or
-                    (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                    (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                    (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                    (check.lower() == 'ignore')))
+                    ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                    (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                    (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                    (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                    (check.casefold() == 'ignore')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
             else:
@@ -1938,7 +1938,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                    ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
             else:
@@ -1950,7 +1950,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','user_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all')))
+                    ((check.casefold() == 'all')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > user_conditional must be a string\n\tValid value \'all\'\n'
             else:
@@ -1962,11 +1962,11 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','played_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all') or (check.lower() == 'any') or
-                    (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                    (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                    (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                    (check.lower() == 'ignore')))
+                    ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                    (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                    (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                    (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                    (check.casefold() == 'ignore')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
             else:
@@ -2009,7 +2009,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                    ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
             else:
@@ -2021,7 +2021,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','user_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'any') or (check.lower() == 'all')))
+                    ((check.casefold() == 'any') or (check.casefold() == 'all')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
             else:
@@ -2033,11 +2033,11 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','played_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all') or (check.lower() == 'any') or
-                    (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                    (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                    (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                    (check.lower() == 'ignore')))
+                    ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                    (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                    (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                    (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                    (check.casefold() == 'ignore')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
             else:
@@ -2063,7 +2063,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'delete') or (check.lower() == 'keep')))
+                    ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacklisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
             else:
@@ -2075,7 +2075,7 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','user_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'any') or (check.lower() == 'all')))
+                    ((check.casefold() == 'any') or (check.casefold() == 'all')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacklisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
             else:
@@ -2087,11 +2087,11 @@ def cfgCheckYAML(cfg,the_dict):
             check=return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','played_conditional')
             if (
                 not (isinstance(check,str) and
-                    ((check.lower() == 'all') or (check.lower() == 'any') or
-                    (check.lower() == 'any_all') or (check.lower() == 'all_any') or
-                    (check.lower() == 'any_played') or (check.lower() == 'all_played') or
-                    (check.lower() == 'any_created') or (check.lower() == 'all_created') or
-                    (check.lower() == 'ignore')))
+                    ((check.casefold() == 'all') or (check.casefold() == 'any') or
+                    (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                    (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                    (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                    (check.casefold() == 'ignore')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacklisted > played_conditional must be a string\n\tValid values \'any\', \'all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
             else:
@@ -3355,11 +3355,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'admin_settings','behavior','list')
         if (
             not ((isinstance(check,str)) and
-                (check.lower() == 'whitelist') or (check.lower() == 'blacklist'))
+                (check.casefold() == 'whitelist') or (check.casefold() == 'blacklist'))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > list must be a string\n\tValid values are whitelist or blacklist\n'
         else:
-            config_dict['library_setup_behavior']=check.lower()
+            config_dict['library_setup_behavior']=check.casefold()
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > list variable is missing from mumc_config.py\n'
 
@@ -3367,11 +3367,11 @@ def cfgCheckYAML(cfg,the_dict):
         check=return_value(cfg,'admin_settings','behavior','matching')
         if (
             not ((isinstance(check,str)) and
-                (check.lower() == 'byid') or (check.lower() == 'bypath') or (check.lower() == 'bynetworkpath'))
+                (check.casefold() == 'byid') or (check.casefold() == 'bypath') or (check.casefold() == 'bynetworkpath'))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > matching must be a string\n\tValid values are whitelist or blacklist\n'
         else:
-            config_dict['library_matching_behavior']=check.lower()
+            config_dict['library_matching_behavior']=check.casefold()
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching variable is missing from mumc_config.py\n'
 
