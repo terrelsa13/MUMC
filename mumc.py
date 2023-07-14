@@ -7,7 +7,7 @@ from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_check import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import edit_configuration_file,buildUserLibraries
-from mumc_modules.mumc_post_process import postProcessing
+from mumc_modules.mumc_post_process import postProcessing,init_postProcessing
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
 from mumc_modules.mumc_get_media import getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
@@ -70,6 +70,9 @@ def main():
         #prepare for the main event; return dictionaries of media items per monitored user
         movie_dict,episode_dict,audio_dict,audiobook_dict=getMedia(config_dict)
 
+        deleteItems_dict=init_postProcessing(movie_dict,episode_dict,audio_dict,audiobook_dict,config_dict)
+
+        '''
         #when debug is disabled allow mulitprocessing
         if (not (config_dict['DEBUG'])):
             #print('\nStart Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
@@ -100,6 +103,7 @@ def main():
             deleteItems_dict['episode']=postProcessing(config_dict,episode_dict,deleteItems_dict)
             deleteItems_dict['audio']=postProcessing(config_dict,audio_dict,deleteItems_dict)
             deleteItems_dict['audiobook']=postProcessing(config_dict,audiobook_dict,deleteItems_dict)
+        '''
 
         #sort lists of items to be deleted into a single list
         deleteItems=sortDeleteLists(deleteItems_dict['movie'],deleteItems_dict['episode'],deleteItems_dict['audio'],deleteItems_dict['audiobook'])

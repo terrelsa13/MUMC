@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import multiprocessing
 from datetime import timedelta
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
@@ -535,5 +536,40 @@ def postProcessing(the_dict,media_dict,deleteItems_dict):
             deleteItems_dict[media_dict['mediaType']]=deleteItems_media
         else:
             deleteItems_dict[media_dict['mediaType']]+=deleteItems_media
+
+    return deleteItems_dict
+
+
+def init_postProcessing(movie_dict,episode_dict,audio_dict,audiobook_dict,config_dict):
+    #when debug is disabled allow mulitprocessing
+    if (not (config_dict['DEBUG'])):
+        #print('\nStart Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+
+        deleteItems_dict=multiprocessing.Manager().dict()
+
+        #prepare for post processing; return lists of media items to be deleted
+        #deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook=postProcessing(config_dict,movie_dict,episode_dict,audio_dict,audiobook_dict)
+
+        #prepare for post processing; return dictionary of lists of media items to be deleted
+        #setup for multiprocessing of the post processing of each media type
+        mpp_movie_post_process=multiprocessing.Process(target=postProcessing,args=(config_dict,movie_dict,deleteItems_dict))
+        mpp_episodePostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,episode_dict,deleteItems_dict))
+        mpp_audioPostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,audio_dict,deleteItems_dict))
+        mpp_audiobookPostProcess=multiprocessing.Process(target=postProcessing,args=(config_dict,audiobook_dict,deleteItems_dict))
+
+        #start all multi processes
+        #order intentially: Audio, Episodes, Movies, Audiobooks
+        mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_audiobookPostProcess.start()
+        mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(), mpp_audiobookPostProcess.join()
+        mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_audiobookPostProcess.close()
+
+        #print('Stop Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+    else: #when debug enabled do not allow multiprocessing; this will allow stepping thru debug
+        deleteItems_dict=[]
+
+        deleteItems_dict['movie']=postProcessing(config_dict,movie_dict,deleteItems_dict)
+        deleteItems_dict['episode']=postProcessing(config_dict,episode_dict,deleteItems_dict)
+        deleteItems_dict['audio']=postProcessing(config_dict,audio_dict,deleteItems_dict)
+        deleteItems_dict['audiobook']=postProcessing(config_dict,audiobook_dict,deleteItems_dict)
 
     return deleteItems_dict
