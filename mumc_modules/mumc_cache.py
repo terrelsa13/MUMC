@@ -8,7 +8,7 @@ from mumc_config_defaults import get_default_config_values
 #Cached URL request controls
 class cached_data_handler:
     #Initialize and define cache variables
-    def __init__(self,the_dict):
+    def __init__(self,cfg):
         self.cached_data={}
         self.cached_entry_urls=[]
         self.cached_entry_sizes=[]
@@ -22,23 +22,23 @@ class cached_data_handler:
         self.newest_cached_data_entry_number=None
         self.oldest_cached_data_entry_number=None
         self.total_cumulative_cached_data_entry_number=None
-        self.updateCacheVariables(the_dict)
+        self.updateCacheVariables(cfg)
 
 
     #Upated defined cache variables
-    def updateCacheVariables(self,the_dict):
+    def updateCacheVariables(self,cfg):
         try:
-            self.api_query_cache_size=the_dict['api_query_cache_size'] * the_dict['bytes_in_megabytes']
+            self.api_query_cache_size=cfg['admin_settings']['cache']['size'] * cfg['bytes_in_megabytes']
         except:
-            self.api_query_cache_size=get_default_config_values('api_query_cache_size') * the_dict['bytes_in_megabytes']
+            self.api_query_cache_size=cfg['cache_size'] * cfg['bytes_in_megabytes']
         try:
-            self.api_query_cache_fallback_behavior=the_dict['api_query_cache_fallback_behavior'].upper()
+            self.api_query_cache_fallback_behavior=cfg['admin_settings']['cache']['fallback_behavior'].upper()
         except:
-            self.api_query_cache_fallback_behavior=get_default_config_values('api_query_cache_fallback_behavior')
+            self.api_query_cache_fallback_behavior=cfg['fallback_behavior']
         try:
-            self.api_query_cache_last_accessed_time=the_dict['api_query_cache_last_accessed_time']
+            self.api_query_cache_last_accessed_time=cfg['admin_settings']['cache']['last_accessed_time']
         except:
-            self.api_query_cache_last_accessed_time=get_default_config_values('api_query_cache_last_accessed_time')
+            self.api_query_cache_last_accessed_time=cfg['last_accessed_time']
 
 
     def wipeCache(self):

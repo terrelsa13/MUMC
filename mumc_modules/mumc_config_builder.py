@@ -12,6 +12,7 @@ from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
 from mumc_modules.mumc_configuration import mumc_configuration_builder
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
+from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 
 
 #api call to get admin account authentication token
@@ -168,7 +169,7 @@ def buildUserLibraries(the_dict):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nBuilding Whitelisted Libraries...",2,the_dict)
     #Build the library data from the data structures stored in the configuration file
-    wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_path_json,user_wllib_netpath_json,user_wllib_selection_json=user_lib_builder(the_dict['user_wl_libs'],the_dict,'whitelist')
+    wluser_keys_json_verify,wluser_names_json_verify,user_wllib_keys_json,user_wllib_collectiontype_json,user_wllib_path_json,user_wllib_netpath_json,user_wllib_seluser_wllib_selection_jsonection_json=user_lib_builder(the_dict['user_wl_libs'],the_dict,'whitelist')
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nBuilding Blacklisted Libraries...",2,the_dict)
@@ -572,9 +573,9 @@ def get_users_and_libraries(the_dict):
     #Check if not running for the first time
     if (the_dict['UPDATE_CONFIG']):
         #Build the library data from the data structures stored in the configuration file
-        bluser_keys_json_verify,bluser_names_json_verify,w,x,y,z=user_lib_builder(the_dict['user_bl_libs'],the_dict)
+        bluser_keys_json_verify,bluser_names_json_verify,v,w,x,y,z=user_lib_builder(the_dict['user_bl_libs'],the_dict,'blacklist')
         #Build the library data from the data structures stored in the configuration file
-        wluser_keys_json_verify,wluser_names_json_verify,w,x,y,z=user_lib_builder(the_dict['user_wl_libs'],the_dict)
+        wluser_keys_json_verify,wluser_names_json_verify,v,w,x,y,z=user_lib_builder(the_dict['user_wl_libs'],the_dict,'whitelist')
 
         #verify userIds are in same order for both blacklist and whitelist libraries
         if (bluser_keys_json_verify == wluser_keys_json_verify):
@@ -588,32 +589,36 @@ def get_users_and_libraries(the_dict):
 
         i=0
         #usernames_userkeys=json.loads(the_dict['user_keys'])
-        usernames_userkeys=the_dict['user_keys']
+        usernames_userkeys=the_dict['user_names']
         #Pre-populate the existing userkeys and libraries; only new users are fully shown; existing user will display minimal info
         for rerun_userkey in user_keys_json:
             userId_set.add(rerun_userkey)
             if (rerun_userkey == bluser_keys_json_verify[i]):
                 #userId_bllib_dict[rerun_userkey]=json.loads(cfg.user_bl_libs)[i]
                 userId_bllib_dict[rerun_userkey]=the_dict['user_bl_libs'][i]
-                for usernames_userkeys_str in usernames_userkeys:
-                    usernames_userkeys_list=usernames_userkeys_str.split(":")
-                    if (len(usernames_userkeys_list) == 2):
-                        if (usernames_userkeys_list[1] == rerun_userkey):
-                            userId_bllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
-                    else:
-                        raise ValueError('\nUnable to edit config when username contains colon (:).')
+                #for usernames_userkeys_str in usernames_userkeys:
+                    #usernames_userkeys_list=usernames_userkeys_str.split(":")
+                    #if (len(usernames_userkeys_list) == 2):
+                        #if (usernames_userkeys_list[1] == rerun_userkey):
+                            #userId_bllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
+                userId_bllib_dict[rerun_userkey]['username']=usernames_userkeys[rerun_userkey]
+                userId_bllib_dict[rerun_userkey]['userid']=rerun_userkey
+                    #else:
+                        #raise ValueError('\nUnable to edit config when username contains colon (:).')
             else:
                 raise ValueError('\nValueError: Order of user_keys and user_wl libs are not in the same order.')
             if (rerun_userkey == wluser_keys_json_verify[i]):
                 #userId_wllib_dict[rerun_userkey]=json.loads(cfg.user_wl_libs)[i]
                 userId_wllib_dict[rerun_userkey]=the_dict['user_wl_libs'][i]
-                for usernames_userkeys_str in usernames_userkeys:
-                    usernames_userkeys_list=usernames_userkeys_str.split(":")
-                    if (len(usernames_userkeys_list) == 2):
-                        if (usernames_userkeys_list[1] == rerun_userkey):
-                            userId_wllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
-                    else:
-                        raise ValueError('\nUnable to edit config when username contains colon (:).')
+                #for usernames_userkeys_str in usernames_userkeys:
+                    #usernames_userkeys_list=usernames_userkeys_str.split(":")
+                    #if (len(usernames_userkeys_list) == 2):
+                        #if (usernames_userkeys_list[1] == rerun_userkey):
+                            #userId_wllib_dict[rerun_userkey]['username']=usernames_userkeys_list[0]
+                userId_wllib_dict[rerun_userkey]['username']=usernames_userkeys[rerun_userkey]
+                userId_wllib_dict[rerun_userkey]['userid']=rerun_userkey
+                    #else:
+                        #raise ValueError('\nUnable to edit config when username contains colon (:).')
             else:
                 raise ValueError('\nValueError: Order of user_keys and user_bl libs are not in the same order.')
             i += 1
@@ -760,11 +765,11 @@ def build_configuration_file(cfg,the_dict):
         the_dict['auth_key']=get_authentication_key(the_dict)
 
         #ask user how they want to choose libraries/folders
-        the_dict['library_setup_behavior']=get_library_setup_behavior(None)
+        the_dict['library_setup_behavior']=get_library_setup_behavior()
         print('-----------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
-        the_dict['library_matching_behavior']=get_library_matching_behavior(None)
+        the_dict['library_matching_behavior']=get_library_matching_behavior()
         print('-----------------------------------------------------------')
 
         #Initialize for compare with other tag to prevent using the same tag in both blacktag and whitetag
@@ -791,11 +796,11 @@ def build_configuration_file(cfg,the_dict):
         print('-----------------------------------------------------------')
         #ask user how they want to choose libraries/folders
         #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
-        the_dict['library_setup_behavior']=get_library_setup_behavior(the_dict['library_setup_behavior'])
+        cfg['admin_settings']['behavior']['list']=get_library_setup_behavior(cfg['admin_settings']['behavior']['list'].casefold())
         print('-----------------------------------------------------------')
         #ask user how they want media items to be matched to libraries/folders
         #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
-        the_dict['library_matching_behavior']=get_library_matching_behavior(the_dict['library_matching_behavior'].casefold())
+        cfg['admin_settings']['behavior']['matching']=get_library_matching_behavior(cfg['admin_settings']['behavior']['matching'].casefold())
         print('-----------------------------------------------------------')
         #set auth_key to allow printing username next to userkey
         #auth_key=cfg.auth_key
@@ -829,10 +834,14 @@ def build_configuration_file(cfg,the_dict):
         raise ValueError('Error! User key values do not match.')
 
     print('-----------------------------------------------------------')
-    #Build and save yaml config file
-    yaml_configurationBuilder(the_dict)
     #Build the legacy config file
     #config_file=mumc_configuration_builder(cfg,the_dict)
+
+    #Build and save yaml config file
+    if not (the_dict['UPDATE_CONFIG']):
+        yaml_configurationBuilder(the_dict)
+    else: #(Update_Config):
+        yaml_configurationUpdater(cfg,the_dict)
 
     #Save the legacy config file
     #write_to_file(config_file,os.path.join(the_dict['cwd'],the_dict['config_file_name']))

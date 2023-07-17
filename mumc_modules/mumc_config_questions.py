@@ -101,7 +101,7 @@ def get_admin_password():
 
 
 #Blacklisting or Whitelisting?
-def get_library_setup_behavior(library_setup_behavior):
+def get_library_setup_behavior(library_setup_behavior=None):
     defaultbehavior='blacklist'
     valid_behavior=False
     while (valid_behavior == False):
@@ -131,7 +131,7 @@ def get_library_setup_behavior(library_setup_behavior):
 
 
 #Blacklisting or Whitelisting?
-def get_library_matching_behavior(library_matching_behavior):
+def get_library_matching_behavior(library_matching_behavior=None):
     defaultbehavior='byId'
     valid_behavior=False
     while (valid_behavior == False):

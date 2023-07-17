@@ -1176,6 +1176,7 @@ DEBUG=0
    - Other versions of python 3.x will likely work; but are not supported
    - Python 2.x or earlier are not supported and will not work
 * python-dateutil **must be installed**
+* PyYAML **must be installed**
 * Emby/Jellyfin need to have OS level permissions on Linux machines to delete media items: [Read This Post](https://github.com/terrelsa13/MUMC/issues/28#issue-1293649223)
 
 # First Run (Debian, Ubuntu, and Linux Mint)
@@ -1185,20 +1186,16 @@ DEBUG=0
     - [Python 3.7 example](https://tecadmin.net/install-python-3-7-on-ubuntu-linuxmint/) (These instructions will apply to any version of Python.)
 * Verify your Python verison
    - $```python3.11 -V```
-* Next install the python-dateutil module with the following commands:
+* Next install the python-dateutil and PyYAML modules with the following commands:
    - $```sudo apt-get upgrade -y```
    - $```sudo apt-get install python3-pip -y```
    - $```pip3 install -U pip```
-   - $```pip3.11 install python-dateutil```
-* **\*OPTIONAL\*** Use a text editor to update the mumc_config_defaults.py file with desired default values
-   - $```nano /path/to/mumc_config_defaults.py```
+   - $```pip install -r /path/to/mumc/requirements.txt``
 * Make the script executable
    - $```chmod +x /path/to/mumc.py```
 * Run the script
-   - $```/path/to/python3.x /path/to/mumc.py```
+   - $```/path/to/python3.x /path/to/mumc/mumc.py```
 * First time the script is run, it will walk through creating the mumc_config.py file
-* If you get the below python error the python-dateutil module was not properly installed
-   - ```ModuleNotFoundError: No module named 'dateutil' python-dateutil```
 
 # First Run (Windows)
 * Download the latest [MUMC.zip](https://github.com/terrelsa13/MUMC/releases/latest)
@@ -1213,16 +1210,16 @@ DEBUG=0
   - Type: ```cmd```
   - Press: ```Enter``` key
 * Using the command window, install the python-dateutil module
-  - Type: ```pip install python-dateutil```
-* After the python-dateutil module is installed keep the command window open
+  - Type: ```pip install -r C:\Users\Zoomies\MUMC\requirements.txt```
+* After the python-dateutil and PyYAML modules are installed keep the command window open
 * Change current working directory of the command window to the ```C:\Users\Zoomies\MUMC``` folder using the command below
-  - Type: cd ```C:\Users\Zoomies\MUMC```
+  - Type: ```cd C:\Users\Zoomies\MUMC```
 * Now run the script in the command window using the command below
   - Type: ```python mumc.py```
   - Follow the script prompts
     - First time the script is run, it will walk through creating the ```mumc_config.py``` file in ```C:\Users\Zoomies\MUMC``` folder
-* After the ```mumc_config.py``` file is created it can be edited in a text editor (e.g. Notepad, Notepad++, Visual Studio, UltraEdit, etc...)
-* Once ```mumc_config.py``` is configured as desired, run the script again using the same command from above
+* After the ```mumc_config.yaml``` file is created it can be edited in a text editor (e.g. Notepad, Notepad++, Visual Studio, UltraEdit, etc...)
+* Once ```mumc_config.yaml``` is configured as desired, run the script again using the same command from above
   - Type: ```python mumc.py```
 
 # First Run Docker Container

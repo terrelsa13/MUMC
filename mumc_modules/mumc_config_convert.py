@@ -4,72 +4,7 @@ import json
 from sys import path
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_output import get_current_directory
-
-
-def libConvertToYAML(user_wl_libs,user_bl_libs):
-    user_data_list=[]
-    user_wl_data_list=[]
-    user_bl_data_list=[]
-    user_wl_data_dict={}
-    user_bl_data_dict={}
-    user_lib_dict={}
-    user_wl_libs_loaded=json.loads(user_wl_libs)
-    user_bl_libs_loaded=json.loads(user_bl_libs)
-
-    for wlentry in user_wl_libs_loaded:
-        user_wl_data_dict['user_id']=wlentry['userid']
-        user_wl_data_dict['user_name']=wlentry['username']
-        user_wl_data_dict['whitelist']=[]
-        one_or_more_wl_entry=False
-        for entry_data in wlentry:
-            if (entry_data.isnumeric()):
-                user_lib_dict['libid']=wlentry[entry_data]['libid']
-                user_lib_dict['collectiontype']=wlentry[entry_data]['collectiontype']
-                user_lib_dict['path']=wlentry[entry_data]['path']
-                user_lib_dict['networkpath']=wlentry[entry_data]['networkpath']
-                user_lib_dict['selection']=int(entry_data)
-                user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
-                one_or_more_wl_entry=True
-        #if user has no whitelist entries then set template with None/null values
-        if (one_or_more_wl_entry == False):
-            user_lib_dict['libid']=''
-            user_lib_dict['collectiontype']=''
-            user_lib_dict['path']=''
-            user_lib_dict['networkpath']=''
-            user_lib_dict['selection']=-1
-            user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
-        user_wl_data_list.append(user_wl_data_dict.copy())
-
-    for blentry in user_bl_libs_loaded:
-        user_bl_data_dict['user_id']=blentry['userid']
-        user_bl_data_dict['user_name']=blentry['username']
-        user_bl_data_dict['blacklist']=[]
-        one_or_more_bl_entry=False
-        for entry_data in blentry:
-            if (entry_data.isnumeric()):
-                user_lib_dict['libid']=blentry[entry_data]['libid']
-                user_lib_dict['collectiontype']=blentry[entry_data]['collectiontype']
-                user_lib_dict['path']=blentry[entry_data]['path']
-                user_lib_dict['networkpath']=blentry[entry_data]['networkpath']
-                user_lib_dict['selection']=int(entry_data)
-                user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
-                one_or_more_bl_entry=True
-        #if user has no blacklist entries then set template with None/null values
-        if (one_or_more_bl_entry == False):
-            user_lib_dict['libid']=''
-            user_lib_dict['collectiontype']=''
-            user_lib_dict['path']=''
-            user_lib_dict['networkpath']=''
-            user_lib_dict['selection']=-1
-            user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
-        user_bl_data_list.append(user_bl_data_dict.copy())
-
-    #user_data_list=user_wl_data_list+user_bl_data_list
-    for user in user_wl_data_list:
-        user_data_list.append(user)
-        user_data_list[user_data_list.index(user)]['blacklist']=user_bl_data_list[user_data_list.index(user)]['blacklist']
-
-    return user_data_list
+from mumc_modules.mumc_configuration_yaml import libConvertToYAML
 
 
 def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):

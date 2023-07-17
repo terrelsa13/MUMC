@@ -72,7 +72,7 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
     return user_data_list
 
 
-def yaml_configurationBuilder(the_dict):
+def yaml_configurationBuilder(the_cfg,saveFile=True):
     config_data={}
     config_data['version']=get_script_version()
     config_data['basic_settings']={}
@@ -107,7 +107,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['basic_settings']['filter_statements']['audio']['created']['count_equality']='>='
     config_data['basic_settings']['filter_statements']['audio']['created']['count']=1
     config_data['basic_settings']['filter_statements']['audio']['created']['behavioral_control']=True
-    if (the_dict['server_brand'] == 'jellyfin'):
+    if (the_cfg['server_brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements']['audiobook']={}
         config_data['basic_settings']['filter_statements']['audiobook']['played']={}
         config_data['basic_settings']['filter_statements']['audiobook']['played']['condition_days']=-1
@@ -226,7 +226,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['user_conditional']='any'
     config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['played_conditional']='any_played'
     config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action_control']=3
-    if (the_dict['server_brand'] == 'jellyfin'):
+    if (the_cfg['server_brand'] == 'jellyfin'):
         config_data['advanced_settings']['behavioral_statements']['audiobook']={}
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']={}
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']='keep'
@@ -275,7 +275,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']=True
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['episode']=True
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audio']=True
-    if (the_dict['server_brand'] == 'jellyfin'):
+    if (the_cfg['server_brand'] == 'jellyfin'):
         config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=True
     #config_data['advanced_settings']['console_controls']={}
     config_data['advanced_settings']['console_controls']={}
@@ -424,7 +424,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['font']['style']=''
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['background']={}
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['background']['color']=''
-    if (the_dict['server_brand'] == 'jellyfin'):
+    if (the_cfg['server_brand'] == 'jellyfin'):
         #config_data['advanced_settings']['console_controls']['audiobook']={}
         config_data['advanced_settings']['console_controls']['audiobook']={}
         config_data['advanced_settings']['console_controls']['audiobook']['delete']={}
@@ -463,14 +463,14 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['REMOVE_FILES']=False
     config_data['admin_settings']={}
     config_data['admin_settings']['server']={}
-    config_data['admin_settings']['server']['brand']=the_dict['server_brand']
-    config_data['admin_settings']['server']['url']=the_dict['server_url']
-    config_data['admin_settings']['server']['auth_key']=the_dict['auth_key']
+    config_data['admin_settings']['server']['brand']=the_cfg['server_brand']
+    config_data['admin_settings']['server']['url']=the_cfg['server_url']
+    config_data['admin_settings']['server']['auth_key']=the_cfg['auth_key']
     config_data['admin_settings']['behavior']={}
-    config_data['admin_settings']['behavior']['list']=the_dict['library_setup_behavior']
-    config_data['admin_settings']['behavior']['matching']=the_dict['library_matching_behavior']
+    config_data['admin_settings']['behavior']['list']=the_cfg['library_setup_behavior']
+    config_data['admin_settings']['behavior']['matching']=the_cfg['library_matching_behavior']
     config_data['admin_settings']['users']=[]
-    config_data['admin_settings']['users']+=libConvertToYAML(the_dict['user_wl_libs'],the_dict['user_bl_libs'])
+    config_data['admin_settings']['users']+=libConvertToYAML(the_cfg['user_wl_libs'],the_cfg['user_bl_libs'])
 
     config_data['admin_settings']['api_controls']={}
     config_data['admin_settings']['api_controls']['attempts']=4
@@ -479,7 +479,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['admin_settings']['cache']['size']=32
     config_data['admin_settings']['cache']['fallback_behavior']='LRU'
     config_data['admin_settings']['cache']['last_accessed_time']=200
-    config_data['DEBUG']=the_dict['DEBUG']
+    config_data['DEBUG']=the_cfg['DEBUG']
 
     #config_dump='\n---\n' + yaml.dump(config_data,sort_keys=False) + '...'
 
@@ -488,8 +488,11 @@ def yaml_configurationBuilder(the_dict):
     #if (configPath == None):
         #configPath=get_current_directory()
 
-    #Save the config file
-    with open(the_dict['mumc_path'] / the_dict['config_file_name_yaml'],'w') as file:
-        file.write('---\n')
-        yaml.safe_dump(config_data,file,sort_keys=False)
-        file.write('...')
+    if (saveFile):
+        #Save the config file
+        with open(the_cfg['mumc_path'] / the_cfg['config_file_name_yaml'],'w') as file:
+            file.write('---\n')
+            yaml.safe_dump(config_data,file,sort_keys=False)
+            file.write('...')
+    else:
+        return config_data

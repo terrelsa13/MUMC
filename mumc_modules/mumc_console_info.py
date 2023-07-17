@@ -29,29 +29,29 @@ def precat_to_console_strings_list(string_to_prepend,strings_list):
 
 
 #print informational header to console
-def print_informational_header(the_dict):
+def print_informational_header(the_cfg):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['_console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + get_script_version())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['server_brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['server_brand'].capitalize() + ' Version: ' + get_server_version(the_cfg))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + the_cfg['date_time_now'].strftime('%Y%m%d%H%M%S'))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator_'])
 
-    print_byType(strings_list_to_print[0],the_dict['print_script_header'],the_dict,the_dict['script_header_format'])
+    print_byType(strings_list_to_print[0],the_cfg['print_script_header'],the_cfg,the_cfg['script_header_format'])
 
 
 #print starting header to console
-def print_starting_header(the_dict):
+def print_starting_header(the_cfg):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Start...')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Cleaning media for server at: ' + the_dict['server_url'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Cleaning media for server at: ' + the_cfg['server_url'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator_'])
 
-    print_byType(strings_list_to_print[0],the_dict['print_script_header'],the_dict,the_dict['script_header_format'])
+    print_byType(strings_list_to_print[0],the_cfg['print_script_header'],the_cfg,the_cfg['script_header_format'])
 
 
 #print header for specific user
@@ -247,15 +247,15 @@ def print_and_delete_items(deleteItems,the_dict):
 
 
 #show the command line help text
-def default_helper_menu(the_dict):
+def default_helper_menu(the_cfg):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nFor help use -h or -help')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n/path/to/python3.x /path/to/mumc.py -help')
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
 
 
 #show the full help menu
-def print_full_help_menu(the_dict):
+def print_full_help_menu(the_cfg):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nMUMC Version: ' + get_script_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.')
@@ -273,7 +273,7 @@ def print_full_help_menu(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'https://github.com/terrelsa13/MUMC/releases')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
 
 
 #print missing argument for alternate config helper
@@ -291,7 +291,7 @@ def missing_config_argument_helper(argv,the_dict):
 
 
 #print missing config argument format error
-def missing_config_argument_format_helper(argv,the_dict):
+def missing_config_argument_format_helper(argv,the_cfg):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'AlternateConfigArgumentError: Cannot find /path/to/alternate_config.py after -c')
@@ -301,7 +301,7 @@ def missing_config_argument_format_helper(argv,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
 
 
 #print alt config does not exist helper

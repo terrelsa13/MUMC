@@ -8,16 +8,34 @@ from mumc_modules.mumc_console_info import default_helper_menu,concat_to_console
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
+def importHasException(init_dict,cmdopt_dict):
+    if (cmdopt_dict['containerized'] or cmdopt_dict['altConfigInfo']):
+        print_failed_to_load_config(init_dict)
+        default_helper_menu(init_dict)
+        #exit gracefully
+        exit(0)
+    else:
+        #tell user config found; but missing DEBUG or server_brand options
+        init_dict['DEBUG']=0
+        init_dict['UPDATE_CONFIG']=False
+        build_configuration_file(None,init_dict)
+        #exit gracefully
+        exit(0)
+
+
 #removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
-def assignVarTest(init_dict,cfg):
-    #try assigning the below variables from the mumc_config.yaml file
-    #if any do not exist go to except and rebuild the mumc_config.yaml file
-    init_dict['config_version']=cfg['version']
-    init_dict['server_brand']=cfg['admin_settings']['server']['brand'].casefold()
-    init_dict['DEBUG']=cfg['DEBUG']
+def assignVarTest(init_dict,cmdopt_dict,cfg):
+    try:
+        #try assigning the below variables from the mumc_config.yaml file
+        #if any do not exist go to except and rebuild the mumc_config.yaml file
+        init_dict['config_version']=cfg['version']
+        init_dict['server_brand']=cfg['admin_settings']['server']['brand'].casefold()
+        init_dict['DEBUG']=cfg['DEBUG']
+
+    except (AttributeError, ModuleNotFoundError, KeyError):
+        importHasException(init_dict,cmdopt_dict)
 
     return init_dict
-
 
 def importConfig(init_dict,cmdopt_dict):
     try:
@@ -51,7 +69,7 @@ def importConfig(init_dict,cmdopt_dict):
                     cfg = yaml.safe_load(mumc_config_yaml)
 
             #make sure a few of the necessary config variables are there
-            init_dict=assignVarTest(init_dict,cfg)
+            init_dict=assignVarTest(init_dict,cmdopt_dict,cfg)
 
         else:
             if (doesFileExist(init_dict['mumc_path'] / init_dict['config_file_name_yaml'])):
@@ -75,20 +93,9 @@ def importConfig(init_dict,cmdopt_dict):
                     cfg = yaml.safe_load(mumc_config_yaml)
 
             #make sure a few of the necessary config variables are there
-            init_dict=assignVarTest(init_dict,cfg)
+            init_dict=assignVarTest(init_dict,cmdopt_dict,cfg)
 
-    except (AttributeError, ModuleNotFoundError):
-        if (cmdopt_dict['containerized'] or cmdopt_dict['altConfigInfo']):
-            print_failed_to_load_config(init_dict)
-            default_helper_menu(init_dict)
-            #exit gracefully
-            exit(0)
-        else:
-            #tell user config found; but missing DEBUG or server_brand options
-            init_dict['DEBUG']=0
-            init_dict['UPDATE_CONFIG']=False
-            build_configuration_file(None,init_dict)
-            #exit gracefully
-            exit(0)
+    except (AttributeError, ModuleNotFoundError, KeyError):
+        importHasException(init_dict,cmdopt_dict)
 
     return cfg,init_dict

@@ -131,8 +131,10 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
 def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
     if (the_dict['DEBUG'] >= debugLevel):
 
+        #if debug file does not exist; create blank file
         if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
             with open(Path(the_dict['mumc_path']) / the_dict['debug_file_name'],'a') as file:
+                #create blank file
                 pass
 
         append_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
