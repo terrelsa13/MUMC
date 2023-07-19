@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.21'
+    Version='4.1.22'
     return(Version)
 
 
@@ -5488,7 +5488,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             TotalItems_BlackTagged_From_WhiteList=1
             QueryLimit_BlackTagged_From_WhiteList=1
             QueriesRemaining_BlackTagged_From_WhiteList=True
-            APIDebugMsg_BlackTagged_From_WhiteList=mediaType_lower + '_blacktagged_fromwhitelisted_media_items'
+            APIDebugMsg_BlackTagged_From_WhiteList=mediaType_lower + '_blacktagged_from_whitelisted_media_items'
 
             if not (LibraryID_WhtLst == ''):
                 #Build query for blacktagged media items from whitelist
@@ -5531,7 +5531,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             TotalItems_WhiteTagged_From_Blacklist=1
             QueryLimit_WhiteTagged_From_Blacklist=1
             QueriesRemaining_WhiteTagged_From_Blacklist=True
-            APIDebugMsg_WhiteTagged_From_Blacklist=mediaType_lower + '_whitetagged_media_items'
+            APIDebugMsg_WhiteTagged_From_Blacklist=mediaType_lower + '_whitetagged_from_blacklsited_media_items'
 
             if not (LibraryID_BlkLst == ''):
                 #Build query for whitetagged media items from blacklist
@@ -5574,7 +5574,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             TotalItems_WhiteTagged_From_Whitelist=1
             QueryLimit_WhiteTagged_From_Whitelist=1
             QueriesRemaining_WhiteTagged_From_Whitelist=True
-            APIDebugMsg_WhiteTagged_From_Whitelist=mediaType_lower + '_whitetagged_media_items'
+            APIDebugMsg_WhiteTagged_From_Whitelist=mediaType_lower + '_whitetagged_from_whitelisted_media_items'
 
             if not (LibraryID_WhtLst == ''):
                 #Build query for whitetagged media items from whitelist
