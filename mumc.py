@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.20'
+    Version='4.1.21'
     return(Version)
 
 
@@ -4360,7 +4360,7 @@ def get_createdPlayedStatus(item,media_condition,filter_count_comparison,filter_
 def get_playedCreatedDays_playedCreatedCounts(item,played_days,created_days,cut_off_date_played,cut_off_date_created, played_count_comparison,played_count,created_played_count_comparison,created_played_count):
 
     #establish played cutoff date for media item
-    if ((played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData'])
+    if ((played_days >= 0) and ('UserData' in item) and ('LastPlayedDate' in item['UserData']) and (not (item['UserData']['LastPlayedDate'] == 'Unplayed'))
         and ('Played' in item['UserData']) and (item['UserData']['Played'] == True)):
         if ((cut_off_date_played) > (parse(item['UserData']['LastPlayedDate']))):
             item_matches_played_days_filter=True

@@ -109,6 +109,7 @@ media_cleaner_config.py
 media_cleaner.py
 #mumc_config_defaults.py
 mumc_config.py
+mumc_config.yaml*
 #mumc.py
 launch.json
 .orig
