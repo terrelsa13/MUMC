@@ -500,7 +500,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
             TotalItems_Favorited_From_Blacklist=1
             QueryLimit_Favorited_From_Blacklist=1
             QueriesRemaining_Favorited_From_Blacklist=True
-            APIDebugMsg_Favorited_From_Blacklist=mediaType_lower + '_Favorited_From_Blacklist_media_items'
+            APIDebugMsg_Favorited_From_Blacklist=mediaType_lower + '_Favorited_From_Blacklisted_media_items'
 
             if not (LibraryID_BlkLst == ''):
                     #Build query for Favorited_From_Blacklist media items
@@ -542,7 +542,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
             TotalItems_Favorited_From_Whitelist=1
             QueryLimit_Favorited_From_Whitelist=1
             QueriesRemaining_Favorited_From_Whitelist=True
-            APIDebugMsg_Favorited_From_Whitelist=mediaType_lower + '_Favorited_From_Whitelist_media_items'
+            APIDebugMsg_Favorited_From_Whitelist=mediaType_lower + '_Favorited_From_Whitelisted_media_items'
 
             if not (LibraryID_WhtLst == ''):
                 #Build query for Favorited_From_Whitelist media items
@@ -627,7 +627,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
             TotalItems_BlackTagged_From_WhiteList=1
             QueryLimit_BlackTagged_From_WhiteList=1
             QueriesRemaining_BlackTagged_From_WhiteList=True
-            APIDebugMsg_BlackTagged_From_WhiteList=mediaType_lower + '_blacktagged_fromwhitelisted_media_items'
+            APIDebugMsg_BlackTagged_From_WhiteList=mediaType_lower + '_blacktagged_from whitelisted_media_items'
 
             if not (LibraryID_WhtLst == ''):
                 #Build query for blacktagged media items from whitelist
@@ -670,7 +670,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
             TotalItems_WhiteTagged_From_Blacklist=1
             QueryLimit_WhiteTagged_From_Blacklist=1
             QueriesRemaining_WhiteTagged_From_Blacklist=True
-            APIDebugMsg_WhiteTagged_From_Blacklist=mediaType_lower + '_whitetagged_media_items'
+            APIDebugMsg_WhiteTagged_From_Blacklist=mediaType_lower + '_whitetagged_from_blacklisted_media_items'
 
             if not (LibraryID_BlkLst == ''):
                 #Build query for whitetagged media items from blacklist
@@ -713,7 +713,7 @@ def get_media_items(mediaType,the_dict,media_dict,user_key,media_returns):
             TotalItems_WhiteTagged_From_Whitelist=1
             QueryLimit_WhiteTagged_From_Whitelist=1
             QueriesRemaining_WhiteTagged_From_Whitelist=True
-            APIDebugMsg_WhiteTagged_From_Whitelist=mediaType_lower + '_whitetagged_media_items'
+            APIDebugMsg_WhiteTagged_From_Whitelist=mediaType_lower + '_whitetagged_from_whitelisted_media_items'
 
             if not (LibraryID_WhtLst == ''):
                 #Build query for whitetagged media items from whitelist
