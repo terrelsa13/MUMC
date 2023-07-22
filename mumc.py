@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.23'
+    Version='4.1.24'
     return(Version)
 
 
@@ -2732,7 +2732,7 @@ def getChildren_favoritedMediaItems(user_key,data_Favorited,filter_played_count_
                 #Build query for child media items
                 #include all item types; filter applied in first API calls for each media type in get_media_items()
                 IncludeItemTypes=''
-                FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
+                FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData,UserDataPlayCount,UserDataLastPlayedDate'
                 if (isJellyfinServer()):
                     SortBy='SeriesSortName'
                 else:
@@ -2821,7 +2821,7 @@ def getChildren_taggedMediaItems(user_key,data_Tagged,user_tags,filter_played_co
                 if not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio')):
                     #include all item types; filter applied in first API calls for each media type in get_media_items()
                     IncludeItemTypes=''
-                    FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
+                    FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData,UserDataPlayCount,UserDataLastPlayedDate'
                     if (isJellyfinServer()):
                         SortBy='SeriesSortName'
                     else:
@@ -3070,7 +3070,7 @@ def get_ADDITIONAL_itemInfo(user_key,itemId,lookupTopic):
 
     #Get additonal item information
     url=(server_url + '/Users/' + user_key  + '/Items/' + str(itemId) +
-        '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags&api_key=' + auth_key)
+        '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags,UserDataPlayCount,UserDataLastPlayedDate&api_key=' + auth_key)
 
     itemInfo=requestURL(url, GLOBAL_DEBUG, lookupTopic, cfg.api_query_attempts)
 
@@ -5300,7 +5300,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_BlkLst == ''):
                 #Build query for watched media items in blacklists
                 IncludeItemTypes_Blacklist=mediaType_title
-                FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_Blacklist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Blacklist='Ascending'
                 EnableUserData_Blacklist='True'
@@ -5336,7 +5336,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_WhtLst == ''):
                 #Build query for watched media items in whitelists
                 IncludeItemTypes_Whitelist=mediaType_title
-                FieldsState_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_Whitelist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Whitelist='Ascending'
                 EnableUserData_Whitelist='True'
@@ -5372,7 +5372,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_BlkLst == ''):
                     #Build query for Favorited_From_Blacklist media items
                 IncludeItemTypes_Favorited_From_Blacklist=mediaType_title
-                FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_Favorited_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_Favorited_From_Blacklist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Favorited_From_Blacklist='Ascending'
                 EnableUserData_Favorited_From_Blacklist='True'
@@ -5414,7 +5414,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_WhtLst == ''):
                 #Build query for Favorited_From_Whitelist media items
                 IncludeItemTypes_Favorited_From_Whitelist=mediaType_title
-                FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_Favorited_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_Favorited_From_Whitelist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_Favorited_From_Whitelist='Ascending'
                 EnableUserData_Favorited_From_Whitelist='True'
@@ -5456,7 +5456,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_BlkLst == ''):
                 #Build query for blacktagged media items from blacklist
                 IncludeItemTypes_BlackTagged_From_BlackList=mediaType_title
-                FieldsState_BlackTagged_From_BlackList='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_BlackTagged_From_BlackList='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_BlackTagged_From_BlackList='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_BlackTagged_From_BlackList='Ascending'
                 EnableUserData_Blacktagged_From_BlackList='True'
@@ -5499,7 +5499,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_WhtLst == ''):
                 #Build query for blacktagged media items from whitelist
                 IncludeItemTypes_BlackTagged_From_WhiteList=mediaType_title
-                FieldsState_BlackTagged_From_WhiteList='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_BlackTagged_From_WhiteList='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_BlackTagged_From_WhiteList='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_BlackTagged_From_WhiteList='Ascending'
                 EnableUserData_Blacktagged_From_WhiteList='True'
@@ -5542,7 +5542,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_BlkLst == ''):
                 #Build query for whitetagged media items from blacklist
                 IncludeItemTypes_WhiteTagged_From_Blacklist=mediaType_title
-                FieldsState_WhiteTagged_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_WhiteTagged_From_Blacklist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_WhiteTagged_From_Blacklist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_WhiteTagged_From_Blacklist='Ascending'
                 EnableUserData_Whitetagged_From_Blacklist='True'
@@ -5585,7 +5585,7 @@ def get_media_items(mediaType,config_dict,media_dict,user_key):
             if not (LibraryID_WhtLst == ''):
                 #Build query for whitetagged media items from whitelist
                 IncludeItemTypes_WhiteTagged_From_Whitelist=mediaType_title
-                FieldsState_WhiteTagged_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+                FieldsState_WhiteTagged_From_Whitelist='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
                 SortBy_WhiteTagged_From_Whitelist='ParentIndexNumber,IndexNumber,Name'
                 SortOrder_WhiteTagged_From_Whitelist='Ascending'
                 EnableUserData_Whitetagged_From_Whitelist='True'
