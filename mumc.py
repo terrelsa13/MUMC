@@ -21,7 +21,7 @@ from sys import path
 
 #Get the current script version
 def get_script_version():
-    Version='4.1.22'
+    Version='4.1.23'
     return(Version)
 
 
@@ -3158,7 +3158,8 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
     elif ('ParentId' in item):
         season_item_info = get_ADDITIONAL_itemInfo(user_key,item['ParentId'],'season_info')
 
-    istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info)
+    if (season_item_info):
+        istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info)
 
 ### End Season ####################################################################################
 
@@ -3171,7 +3172,8 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
     elif ('ParentId' in season_item_info):
         series_item_info = get_ADDITIONAL_itemInfo(user_key,season_item_info['ParentId'],'series_info')
 
-    istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
+    if (series_item_info):
+        istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info)
 
 ### End Series ####################################################################################
 
@@ -3180,7 +3182,8 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
     if ('ParentId' in series_item_info):
         tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_key,series_item_info['ParentId'],'tv_library_info')
 
-    istag_EPISODE['tvlibrary'][tvlibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvlibrary_item_info)
+    if (tvlibrary_item_info):
+        istag_EPISODE['tvlibrary'][tvlibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvlibrary_item_info)
 
 ### End TV Library ####################################################################################
 
@@ -3193,7 +3196,8 @@ def get_isEPISODE_Tagged(item,user_key,usertags):
         #Get series studio network's item info
         tvstudionetwork_item_info = get_STUDIO_itemInfo(user_key,series_item_info['SeriesStudio'])
 
-    istag_EPISODE['seriesstudionetwork'][tvstudionetwork_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvstudionetwork_item_info)
+    if (tvstudionetwork_item_info):
+        istag_EPISODE['seriesstudionetwork'][tvstudionetwork_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvstudionetwork_item_info)
 
 ### End Studio Network ###################################################################################
 
@@ -3238,7 +3242,8 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
     elif ('AlbumId' in item):
         album_item_info = get_ADDITIONAL_itemInfo(user_key,item['AlbumId'],'album_info')
 
-    istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info)
+    if (album_item_info):
+        istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info)
 
 ### End Album/Book #####################################################################################
 
@@ -3248,7 +3253,8 @@ def get_isAUDIO_Tagged(item,user_key,usertags):
     if ('ParentId' in album_item_info):
         audiolibrary_item_info = get_ADDITIONAL_itemInfo(user_key,album_item_info['ParentId'],'library_info')
 
-    istag_AUDIO['audiolibrary'][audiolibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,audiolibrary_item_info)
+    if (audiolibrary_item_info):
+        istag_AUDIO['audiolibrary'][audiolibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,audiolibrary_item_info)
 
 ### End Library #####################################################################################
 
