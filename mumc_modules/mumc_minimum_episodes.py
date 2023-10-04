@@ -5,13 +5,17 @@ from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemI
 
 
 # Determine episodes to be removed from deletion list to keep the mininum/minimum played episode numbers
-def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems,the_dict):
+def get_minEpisodesToKeep(postproc_dict,the_dict):
+
+    episodeCounts_byUserId=postproc_dict['mediaCounts_byUserId']
+    deleteItems=postproc_dict['deleteItems_Media']
 
     #user_keys = json.loads(the_dict['user_keys'])
     user_keys = the_dict['user_keys']
-    minimum_number_episodes = the_dict['minimum_number_episodes']
-    minimum_number_played_episodes = the_dict['minimum_number_played_episodes']
-    minimum_number_episodes_behavior = the_dict['minimum_number_episodes_behavior']
+    minimum_number_episodes = postproc_dict['minimum_number_episodes']
+    minimum_number_played_episodes = postproc_dict['minimum_number_played_episodes']
+    minimum_number_episodes_behavior = postproc_dict['minimum_number_episodes_behavior']
+
     minimum_number_episodes_behavior_modified = minimum_number_episodes_behavior.casefold().replace(' ','')
 
     episodes_toBeDeletedOrRemain={}
@@ -471,4 +475,6 @@ def get_minEpisodesToKeep(episodeCounts_byUserId,deleteItems,the_dict):
                 #remove episode from delete list
                 deleteItems.pop(deleteItemIndex)
 
-    return(deleteItems)
+    postproc_dict['deleteItems_Media']=deleteItems
+
+    return postproc_dict

@@ -6,13 +6,15 @@ from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override
 from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_check import cfgCheckLegacy
-from mumc_modules.mumc_config_builder import edit_configuration_file,buildUserLibraries
+from mumc_modules.mumc_config_builder import edit_configuration_file
+#from mumc_modules.mumc_userlib_builder import buildUserLibraries
 from mumc_modules.mumc_post_process import postProcessing,init_postProcessing
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
-from mumc_modules.mumc_get_media import getMedia
+from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
+from mumc_modules.mumc_yaml_map import yaml_mapper
 
 
 def main():
@@ -30,10 +32,11 @@ def main():
 
     #get and check config values are what we expect them to be
     cfgCheckYAML(cfg,init_dict)
-    #config_dict=cfgCheckLegacy(cfg,init_dict)
 
-    #merge config_dict and init_dict
-    cfg.update(init_dict)
+    #merge cfg and init_dict; goal is to preserve cfg's structure
+    init_dict.update(cfg.copy())
+    cfg=init_dict.copy()
+    init_dict.clear()
 
     #update cache variables with values specified in the config file
     cfg['cached_data'].updateCacheVariables(cfg)
@@ -46,52 +49,54 @@ def main():
         exit(0)
 
     #output details about script, Emby/Jellying, and server
-    print_informational_header(cfg_dict)
+    print_informational_header(cfg)
 
     #when debug is enabled force all console outputs
-    cfg_dict=override_consoleOutputs_onDEBUG(cfg_dict)
+    cfg=override_consoleOutputs_onDEBUG(cfg)
 
     #output the starting header
-    print_starting_header(cfg_dict)
+    print_starting_header(cfg)
 
     #before running the main part of the script, determine if at least one media type is enabled to be monitored
-    cfg_dict=getIsAnyMediaEnabled(cfg_dict)
+    cfg=getIsAnyMediaEnabled(cfg)
 
     #check if at least one media type is enabled ot be monitored
     #if not; print message to console
     #if it is; proceed and process media items
-    if (config_dict['all_media_disabled']):
+    if (cfg['all_media_disabled']):
         #output message letting user know none of the media is enabled to be monitored
-        print_all_media_disabled(config_dict)
+        print_all_media_disabled(cfg)
     else:
         #build the user libraries from config data
-        config_dict=buildUserLibraries(config_dict)
+        #cfg=buildUserLibraries(cfg)
 
         #prepare for the main event; return dictionaries of media items per monitored user
-        movie_dict,episode_dict,audio_dict,audiobook_dict=getMedia(config_dict)
+        #movie_dict,episode_dict,audio_dict,audiobook_dict=init_getMedia(cfg)
+        cfg=init_getMedia(cfg)
 
         #prepare for post processing; return list of media items to be deleted
-        deleteItems_dict=init_postProcessing(movie_dict,episode_dict,audio_dict,audiobook_dict,config_dict)
+        deleteItems_dict=init_postProcessing(cfg)
 
         #sort lists of items to be deleted into a single list
-        deleteItems=sortDeleteLists(deleteItems_dict['movie'],deleteItems_dict['episode'],deleteItems_dict['audio'],deleteItems_dict['audiobook'])
+        deleteItems=sortDeleteLists(deleteItems_dict)
         #deleteItems=sortDeleteLists(deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook)
 
-        #output to console the items to be deleted; then delete media items
-        print_and_delete_items(deleteItems,config_dict)
+        #output to console the items to be deleted; then delete media items        #output toto console the items to be deleted; then delete media items
+
+        print_and_delete_items(deleteItems,cfg)
 
     #show cache stats
-    print_cache_stats(config_dict)
+    print_cache_stats(cfg)
 
-    if (config_dict['DEBUG'] == 255):
+    if (cfg['DEBUG'] == 255):
         #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
-        cache_data_to_debug(config_dict)
+        cache_data_to_debug(cfg)
 
     #show footer info
-    print_footer_information(config_dict)
+    print_footer_information(cfg)
 
     #clear cache
-    config_dict['cached_data'].wipeCache()
+    cfg['cached_data'].wipeCache()
 
 
 ############# START OF SCRIPT #############

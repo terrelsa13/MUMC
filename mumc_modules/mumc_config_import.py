@@ -6,7 +6,7 @@ from mumc_modules.mumc_config_builder import build_configuration_file
 from mumc_modules.mumc_output import print_byType,getFileExtension,add_to_PATH,doesFileExist
 from mumc_modules.mumc_console_info import default_helper_menu,concat_to_console_strings_list,print_failed_to_load_config
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
-
+from mumc_modules.mumc_yaml_map import yaml_mapper
 
 def importHasException(init_dict,cmdopt_dict):
     if (cmdopt_dict['containerized'] or cmdopt_dict['altConfigInfo']):
@@ -15,27 +15,30 @@ def importHasException(init_dict,cmdopt_dict):
         #exit gracefully
         exit(0)
     else:
-        #tell user config found; but missing DEBUG or server_brand options
+        #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
         init_dict['DEBUG']=0
-        init_dict['UPDATE_CONFIG']=False
-        build_configuration_file(None,init_dict)
+        init_dict['advanced_settings']={}
+        init_dict['advanced_settings']['UPDATE_CONFIG']=False
+        build_configuration_file(init_dict)
         #exit gracefully
         exit(0)
 
 
-#removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
+#verify specified variables are avaialbe in the config
 def assignVarTest(init_dict,cmdopt_dict,cfg):
     try:
+        #removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
         #try assigning the below variables from the mumc_config.yaml file
         #if any do not exist go to except and rebuild the mumc_config.yaml file
-        init_dict['config_version']=cfg['version']
-        init_dict['server_brand']=cfg['admin_settings']['server']['brand'].casefold()
+        #init_dict['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand'].casefold()
+        init_dict['version']=cfg['version']
         init_dict['DEBUG']=cfg['DEBUG']
 
     except (AttributeError, ModuleNotFoundError, KeyError):
         importHasException(init_dict,cmdopt_dict)
 
     return init_dict
+
 
 def importConfig(init_dict,cmdopt_dict):
     try:
@@ -67,8 +70,8 @@ def importConfig(init_dict,cmdopt_dict):
 
                 with open(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileNoExt'] + '.yaml', 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
-
             #make sure a few of the necessary config variables are there
+
             init_dict=assignVarTest(init_dict,cmdopt_dict,cfg)
 
         else:
@@ -86,7 +89,7 @@ def importConfig(init_dict,cmdopt_dict):
                 legacy_dict=cfgCheckLegacy(cfg,init_dict)
                 legacy_dict=legacy_dict
 
-                #convert legacy mumc_config.py to mumc_config.yaml
+                #convert legacy mumc_config.py to mumc_config.yaml; output is mumc_config.yaml
                 convert_legacyConfigToYAML(cfg,init_dict['mumc_path'],init_dict['config_file_name_no_ext'])
 
                 with open(init_dict['mumc_path'] / init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:

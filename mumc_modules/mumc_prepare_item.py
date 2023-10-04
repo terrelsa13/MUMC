@@ -7,7 +7,7 @@ from mumc_modules.mumc_compare_items import does_index_exist
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_MOVIEoutput(the_dict,item,user_key,movie_set_missing_last_played_date):
+def prepare_MOVIEoutput(the_dict,item,user_info,movie_set_missing_last_played_date):
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output",2,the_dict)
@@ -37,7 +37,7 @@ def prepare_MOVIEoutput(the_dict,item,user_key,movie_set_missing_last_played_dat
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             if (movie_set_missing_last_played_date):
-                modify_lastPlayedDate(item,user_key,the_dict)
+                modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
                 item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (the_dict['DEBUG']):
@@ -63,7 +63,7 @@ def prepare_MOVIEoutput(the_dict,item,user_key,movie_set_missing_last_played_dat
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_EPISODEoutput(the_dict,item,user_key,episode_set_missing_last_played_date):
+def prepare_EPISODEoutput(the_dict,item,user_info,episode_set_missing_last_played_date):
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n\nPreparing Episode " + item['Id'] + " For Output",2,the_dict)
@@ -95,7 +95,7 @@ def prepare_EPISODEoutput(the_dict,item,user_key,episode_set_missing_last_played
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if not ('LastPlayedDate' in item['UserData']):
             if (episode_set_missing_last_played_date == 1):
-                modify_lastPlayedDate(item,user_key,the_dict)
+                modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
                 item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
             if (the_dict['DEBUG']):
@@ -121,14 +121,14 @@ def prepare_EPISODEoutput(the_dict,item,user_key,episode_set_missing_last_played
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_AUDIOoutput(the_dict,item,user_key,audio_set_missing_last_played_date,mediaType):
+def prepare_AUDIOoutput(the_dict,item,user_info,audio_set_missing_last_played_date,mediaType):
 
     if (mediaType == "audio"):
         audio_set_missing_last_played_date=audio_set_missing_last_played_date
     else:
         audio_set_missing_last_played_date=0
 
-    if ((isJellyfinServer(the_dict['server_brand'])) and (mediaType == "audiobook")):
+    if ((isJellyfinServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == "audiobook")):
         audiobook_set_missing_last_played_date=audio_set_missing_last_played_date
     else:
         audiobook_set_missing_last_played_date=0
@@ -187,7 +187,7 @@ def prepare_AUDIOoutput(the_dict,item,user_key,audio_set_missing_last_played_dat
         if not ('LastPlayedDate' in item['UserData']):
             if (((mediaType == "audio") and (audio_set_missing_last_played_date == 1)) or
                ((isJellyfinServer(the_dict['server_brand'])) and (mediaType == "audiobook") and (audiobook_set_missing_last_played_date == 1))):
-                modify_lastPlayedDate(item,user_key,the_dict)
+                modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
                 item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
         if (the_dict['DEBUG']):
@@ -220,5 +220,5 @@ def prepare_AUDIOoutput(the_dict,item,user_key,audio_set_missing_last_played_dat
 
 #check if desired metadata exists
 # if it does not populate it with unknown
-def prepare_AUDIOBOOKoutput(the_dict,item,user_key,audiobook_set_missing_last_played_date,mediaType):
-    return prepare_AUDIOoutput(item,user_key,audiobook_set_missing_last_played_date,mediaType)
+def prepare_AUDIOBOOKoutput(the_dict,item,user_info,audiobook_set_missing_last_played_date,mediaType):
+    return prepare_AUDIOoutput(the_dict,item,user_info,audiobook_set_missing_last_played_date,mediaType)

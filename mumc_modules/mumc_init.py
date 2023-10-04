@@ -8,6 +8,7 @@ from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_compare_items import does_index_exist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
+from mumc_modules.mumc_compare_items import keys_exist
 
 
 def initialize_mumc(cwd,mumc_path):
@@ -38,10 +39,10 @@ def initialize_mumc(cwd,mumc_path):
     #get command line arguments
     the_cfg['argv']=argv
 
-    the_cfg['console_separator']='-----------------------------------------------------------'
-    the_cfg['console_separator_']='-----------------------------------------------------------\n'
-    the_cfg['_console_separator']='\n-----------------------------------------------------------'
-    the_cfg['_console_separator_']='\n-----------------------------------------------------------\n'
+    the_cfg['console_separator']='----------------------------------------------------------------------------------------'
+    the_cfg['console_separator_']='----------------------------------------------------------------------------------------\n'
+    the_cfg['_console_separator']='\n----------------------------------------------------------------------------------------'
+    the_cfg['_console_separator_']='\n----------------------------------------------------------------------------------------\n'
 
     the_cfg['cache_size']=16#MB initial default value
     the_cfg['bytes_in_megabytes']=1048576
@@ -53,50 +54,52 @@ def initialize_mumc(cwd,mumc_path):
     return the_cfg
 
 
-def getIsAnyMediaEnabled(the_cfg):
+def getIsAnyMediaEnabled(the_dict):
+    audiobook_played_exists=keys_exist(the_dict['basic_settings']['filter_statements'],'audiobook','played','condition_days')
+    audiobook_created_exists=keys_exist(the_dict['basic_settings']['filter_statements'],'audiobook','created','condition_days')
+
     if (
-        (the_cfg['played_filter_movie'][0] == -1) and
-        (the_cfg['played_filter_episode'][0] == -1) and
-        (the_cfg['played_filter_audio'][0] == -1) and
-        ((('played_filter_audiobook' in the_cfg) and (does_index_exist(the_cfg['played_filter_audiobook'],0)) and (the_cfg['played_filter_audiobook'][0] == -1)) or (not ('played_filter_audiobook' in the_cfg))) and
-        (the_cfg['created_filter_movie'][0] == -1) and
-        (the_cfg['created_filter_episode'][0] == -1) and
-        (the_cfg['created_filter_audio'][0] == -1) and
-        ((('created_filter_audiobook' in the_cfg) and (does_index_exist(the_cfg['created_filter_audiobook'],0)) and (the_cfg['created_filter_audiobook'][0] == -1)) or (not ('created_filter_audiobook' in the_cfg)))
-        ):
-        the_cfg['all_media_disabled']=True
+        (the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and
+        (the_dict['basic_settings']['filter_statements']['episode']['played']['condition_days'] == -1) and
+        (the_dict['basic_settings']['filter_statements']['audio']['played']['condition_days'] == -1) and
+        ((audiobook_played_exists and (the_dict['basic_settings']['filter_statements']['audiobook']['played']['condition_days'] == -1)) or (not audiobook_played_exists)) and
+        (the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1) and
+        (the_dict['basic_settings']['filter_statements']['episode']['created']['condition_days'] == -1) and
+        (the_dict['basic_settings']['filter_statements']['audio']['created']['condition_days'] == -1) and
+        ((audiobook_created_exists and (the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)) or (not audiobook_created_exists))
+       ):
+        the_dict['all_media_disabled']=True
     else:
-        the_cfg['all_media_disabled']=False
-    return the_cfg
+        the_dict['all_media_disabled']=False
+
+    return the_dict
 
 
 #force console outputs when DEBUG enabled
-def override_consoleOutputs_onDEBUG(the_cfg):
+def override_consoleOutputs_onDEBUG(the_dict):
 
-    if (the_cfg['DEBUG']):
-        the_cfg['print_script_header']=True
-        the_cfg['print_script_warning']=True
-        the_cfg['print_user_header']=True
-        the_cfg['print_movie_delete_info']=True
-        the_cfg['print_movie_keep_info']=True
-        the_cfg['print_episode_delete_info']=True
-        the_cfg['print_episode_keep_info']=True
-        the_cfg['print_audio_delete_info']=True
-        the_cfg['print_audio_keep_info']=True
-        if(isJellyfinServer(the_cfg['server_brand'])):
-            the_cfg['print_audiobook_delete_info']=True
-            the_cfg['print_audiobook_keep_info']=True
-        the_cfg['print_movie_post_processing_info']=True
-        the_cfg['print_episode_post_processing_info']=True
-        the_cfg['print_audio_post_processing_info']=True
-        if(isJellyfinServer(the_cfg['server_brand'])):
-            the_cfg['print_audiobook_post_processing_info']=True
-        the_cfg['print_summary_header']=True
-        the_cfg['print_movie_summary']=True
-        the_cfg['print_episode_summary']=True
-        the_cfg['print_audio_summary']=True
-        if(isJellyfinServer(the_cfg['server_brand'])):
-            the_cfg['print_audiobook_summary']=True
-        the_cfg['print_script_footer']=True
+    if (the_dict['DEBUG']):
+        the_dict['advanced_settings']['console_controls']['headers']['script']['show']=True
+        the_dict['advanced_settings']['console_controls']['headers']['user']['show']=True
+        the_dict['advanced_settings']['console_controls']['headers']['summary']['show']=True
+        the_dict['advanced_settings']['console_controls']['footers']['script']['show']=True
+        the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
+        the_dict['advanced_settings']['console_controls']['movie']['delete']['show']=True
+        the_dict['advanced_settings']['console_controls']['movie']['keep']['show']=True
+        the_dict['advanced_settings']['console_controls']['movie']['post_processing']['show']=True
+        the_dict['advanced_settings']['console_controls']['movie']['summary']['show']=True
+        the_dict['advanced_settings']['console_controls']['episode']['delete']['show']=True
+        the_dict['advanced_settings']['console_controls']['episode']['keep']['show']=True
+        the_dict['advanced_settings']['console_controls']['episode']['post_processing']['show']=True
+        the_dict['advanced_settings']['console_controls']['episode']['summary']['show']=True
+        the_dict['advanced_settings']['console_controls']['audio']['delete']['show']=True
+        the_dict['advanced_settings']['console_controls']['audio']['keep']['show']=True
+        the_dict['advanced_settings']['console_controls']['audio']['post_processing']['show']=True
+        the_dict['advanced_settings']['console_controls']['audio']['summary']['show']=True
+        if(isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+            the_dict['advanced_settings']['console_controls']['audiobook']['delete']['show']=True
+            the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']=True
+            the_dict['advanced_settings']['console_controls']['audiobook']['post_processing']['show']=True
+            the_dict['advanced_settings']['console_controls']['audiobook']['summary']['show']=True
 
-    return the_cfg
+    return the_dict

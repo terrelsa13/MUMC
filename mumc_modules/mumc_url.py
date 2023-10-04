@@ -6,13 +6,19 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 
 
 #Limit the amount of data returned for a single API call
-def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg,the_dict):
+def api_query_handler(suffix_str,var_dict,the_dict):
 
-    data=requestURL(url, the_dict['DEBUG'], APIDebugMsg, the_dict['api_query_attempts'], the_dict)
+    url=var_dict['apiQuery_' + suffix_str]
+    StartIndex=var_dict['StartIndex_' + suffix_str]
+    TotalItems=var_dict['TotalItems_' + suffix_str]
+    QueryLimit=var_dict['QueryLimit_' + suffix_str]
+    APIDebugMsg=var_dict['APIDebugMsg_' + suffix_str]
+
+    data=requestURL(url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'], the_dict)
 
     TotalItems = data['TotalRecordCount']
     StartIndex = StartIndex + QueryLimit
-    QueryLimit = the_dict['api_query_item_limit']
+    QueryLimit = the_dict['admin_settings']['api_controls']['item_limit']
     if ((StartIndex + QueryLimit) >= (TotalItems)):
         QueryLimit = TotalItems - StartIndex
 
@@ -27,7 +33,13 @@ def api_query_handler(url,StartIndex,TotalItems,QueryLimit,APIDebugMsg,the_dict)
         appendTo_DEBUG_log("\nTotal records for this query is: " + str(TotalItems),2,the_dict)
         appendTo_DEBUG_log("\nAre there records remaining: " + str(QueryItemsRemaining),2,the_dict)
 
-    return(data,StartIndex,TotalItems,QueryLimit,QueryItemsRemaining)
+    var_dict['data_' + suffix_str]=data
+    var_dict['StartIndex_' + suffix_str]=StartIndex
+    var_dict['TotalItems_' + suffix_str]=TotalItems
+    var_dict['QueryLimit_' + suffix_str]=QueryLimit
+    var_dict['QueriesRemaining_' + suffix_str]=QueryItemsRemaining
+
+    return var_dict
 
 
 #send url request

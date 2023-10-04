@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+import multiprocessing
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
 #Check if *keys (nested) exists in `element` (dict or list).
 def keys_exist(the_element, *keys_indexes):
 
-    if not isinstance(the_element, dict):
+    if (not (isinstance(the_element, dict) or isinstance(the_element, multiprocessing.managers.DictProxy))):
         raise AttributeError('keys_exist() expects dict as first argument.')
     if len(keys_indexes) == 0:
         raise AttributeError('keys_exist() expects at least two arguments, one given.')
@@ -20,12 +21,12 @@ def keys_exist(the_element, *keys_indexes):
 
 
 #Check if *keys (nested) exists in `element` (dict or list).
-def return_value(the_element, *keys_indexes):
+def return_key_value(the_element, *keys_indexes):
 
     if not isinstance(the_element, dict):
-        raise AttributeError('return_value() expects dict as first argument.')
+        raise AttributeError('return_key_value() expects dict as first argument.')
     if len(keys_indexes) == 0:
-        raise AttributeError('return_value() expects at least two arguments, one given.')
+        raise AttributeError('return_key_value() expects at least two arguments, one given.')
 
     temp_element = the_element
     for key_index in keys_indexes:
@@ -50,7 +51,7 @@ def does_index_exist(item, indexvalue, the_dict):
 
 
 #Determine if there is a matching item or Determine if an item starts with the other
-def get_isItemMatching_doesItemStartWith(item_one, item_two,the_dict):
+def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
     #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
     item_one = item_one.replace('\\','/')
     item_two = item_two.replace('\\','/')

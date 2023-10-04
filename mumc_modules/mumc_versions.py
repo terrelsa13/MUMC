@@ -12,14 +12,14 @@ def get_script_version():
 #Get the current Emby/Jellyfin server version
 def get_server_version(the_dict):
 
-    server_url=the_dict['server_url']
-    auth_key=the_dict['auth_key']
+    server_url=the_dict['admin_settings']['server']['url']
+    auth_key=the_dict['admin_settings']['server']['auth_key']
     lookupTopic="get_server_version"
 
     #Get additonal item information
     url=(server_url + '/System/Info?api_key=' + auth_key)
 
-    ServerInfo=requestURL(url, the_dict['DEBUG'], lookupTopic, the_dict['api_query_attempts'],the_dict)
+    ServerInfo=requestURL(url, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'],the_dict)
 
     return(ServerInfo['Version'])
 

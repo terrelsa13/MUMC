@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
+import urllib.request as urlrequest
+from collections import defaultdict
+from operator import attrgetter
+import json
+import os
+from mumc_config_defaults import get_default_config_values
+from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json,write_to_file,print_byType
+from mumc_modules.mumc_url import requestURL
+from mumc_modules.mumc_versions import get_script_version
 from mumc_config_defaults import get_default_config_values
 
 
@@ -100,6 +110,36 @@ def get_admin_password():
     return(password)
 
 
+#admin account authentication token?
+def get_authentication_key(admin_username,admin_password,the_dict):
+    #login info
+    values = {'Username' : admin_username, 'Pw' : admin_password}
+    #DATA = urlparse.urlencode(values)
+    #DATA = DATA.encode('ascii')
+    DATA = convert2json(values)
+    DATA = DATA.encode('utf-8')
+
+    #works for both Emby and Jellyfin
+    xAuth = 'Authorization'
+    #assuming jellyfin will eventually change to this
+    #if (isEmbyServer()):
+        #xAuth = 'X-Emby-Authorization'
+    #else #(isJellyfinServer()):
+        #xAuth = 'X-Jellyfin-Authorization'
+
+    headers = {xAuth : 'Emby UserId="' + admin_username  + '", Client="mumc.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
+
+    req = urlrequest.Request(url=the_dict['admin_settings']['server']['url'] + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
+
+    #preConfigDebug = 3
+    preConfigDebug = 0
+
+    #api call
+    data=requestURL(req, preConfigDebug, 'get_authentication_key', 3, the_dict)
+
+    return(data['AccessToken'])
+
+
 #Blacklisting or Whitelisting?
 def get_library_setup_behavior(library_setup_behavior=None):
     defaultbehavior='blacklist'
@@ -130,7 +170,7 @@ def get_library_setup_behavior(library_setup_behavior=None):
             print('\nInvalid choice. Try again.\n')
 
 
-#Blacklisting or Whitelisting?
+#Library behavior?
 def get_library_matching_behavior(library_matching_behavior=None):
     defaultbehavior='byId'
     valid_behavior=False
@@ -165,39 +205,59 @@ def get_library_matching_behavior(library_matching_behavior=None):
 #Blacktagging or Whitetagging String Name?
 def get_tag_name(tagbehavior,existingtag):
     defaulttag=get_default_config_values(tagbehavior)
+    repeat_tags=''
+    tags_to_remove=[]
     valid_tag=False
     while (valid_tag == False):
         print('Enter the desired ' + tagbehavior + ' name. Do not use backslash \'\\\'.')
         print('Use a comma \',\' to seperate multiple tag names.')
+        print('Empty space(s) at the beginning or end of tags will be removed')
         print(' Ex: tagname,tag name,tag-name')
-        if (defaulttag == ''):
-            print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
-            inputtagname=input('Input desired ' + tagbehavior + 's: ')
-        else:
-            inputtagname=input('Input desired ' + tagbehavior + 's (default \'' + defaulttag + '\'): ')
+        print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
+        inputtagname=input('Input desired ' + tagbehavior + 's: ')
+        #if (defaulttag == ''):
+            #print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
+            #inputtagname=input('Input desired ' + tagbehavior + 's: ')
+        #else:
+            #inputtagname=input('Input desired ' + tagbehavior + 's (default \'' + defaulttag + '\'): ')
         #Remove duplicates
         inputtagname = ','.join(set(inputtagname.split(',')))
         if (inputtagname == ''):
             valid_tag=True
-            return(defaulttag)
+            return []
         else:
             if (inputtagname.find('\\') <= 0):
                 #replace single quote (') with backslash-single quote (\')
                 inputtagname=inputtagname.replace('\'','\\\'')
                 valid_tag=True
-                inputtagname_split=inputtagname.split(',')
-                for inputtag in inputtagname_split:
-                    if not (inputtag == ''):
-                        existingtag_split=existingtag.split(',')
-                        for donetag in existingtag_split:
+                inputtagname_return=inputtagname.split(',')
+                #clean space(s) at the beginning and end of each tag entry
+                for inputtagname_temp in inputtagname_return:
+                    inputtagname_clean=inputtagname_temp.strip()
+                    inputtagname_return[inputtagname_return.index(inputtagname_temp)]=inputtagname_clean
+                inputtagname_return=list(set(inputtagname_return))
+                for inputtag in inputtagname_return:
+                    if (not (inputtag == '')):
+                        #existingtag_split=existingtag.split(',')
+                        #for donetag in existingtag_split:
+                        for donetag in existingtag:
                             if (inputtag == donetag):
                                 valid_tag=False
+                                if (not (repeat_tags)):
+                                    repeat_tags+=inputtag
+                                else:
+                                    repeat_tags+=(', ' + inputtag)
                     else:
-                        inputtagname_split.remove(inputtag)
+                        tags_to_remove.append(inputtag)
+                #remove any blank tags
+                for remove_tag in tags_to_remove:
+                    inputtagname_return.remove(remove_tag)
                 if (valid_tag):
-                    return(','.join(inputtagname_split))
+                    #return(','.join(inputtagname_return))
+                    return inputtagname_return
                 else:
-                    print('\nCannot use the same tag as a blacktag and a whitetag.\n')
+                    print('\nFound already used tag(s): ' + repeat_tags)
+                    print('Cannot use the same tag for blacktags and whitetags.\n')
                     print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
             else:
                 print('\nDo not use backslash \'\\\'. Try again.\n')

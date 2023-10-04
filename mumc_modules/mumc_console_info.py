@@ -6,6 +6,7 @@ from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
 from mumc_modules.mumc_delete import delete_media_item
 from mumc_modules.mumc_url import requestURL
+from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
 
 
 #concatenate to the running list of strings
@@ -29,45 +30,47 @@ def precat_to_console_strings_list(string_to_prepend,strings_list):
 
 
 #print informational header to console
-def print_informational_header(the_cfg):
+def print_informational_header(the_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['_console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + get_script_version())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['server_brand'].capitalize() + ' Version: ' + get_server_version(the_cfg))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    #strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + get_script_version())
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + the_dict['version'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + the_cfg['date_time_now'].strftime('%Y%m%d%H%M%S'))
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator_'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
-    print_byType(strings_list_to_print[0],the_cfg['print_script_header'],the_cfg,the_cfg['script_header_format'])
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
 
 
 #print starting header to console
-def print_starting_header(the_cfg):
+def print_starting_header(the_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Start...')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Cleaning media for server at: ' + the_cfg['server_url'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_cfg['console_separator_'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Cleaning media for server at: ' + the_dict['admin_settings']['server']['url'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
-    print_byType(strings_list_to_print[0],the_cfg['print_script_header'],the_cfg,the_cfg['script_header_format'])
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
 
 
 #print header for specific user
-def print_user_header(user_key,the_dict):
+def print_user_header(user_info,the_dict):
     #for user_key in user_keys_json:
-    url=the_dict['server_url'] + '/Users/' + user_key  + '/?api_key=' + the_dict['auth_key']
+    #url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/?api_key=' + the_dict['admin_settings']['server']['auth_key']
 
-    user_data=requestURL(url, the_dict['DEBUG'], 'current_user', the_dict['api_query_attempts'],the_dict)
+    #user_data=requestURL(url, the_dict['DEBUG'], 'current_user', the_dict['admin_settings']['api_controls']['attempts'],the_dict)
 
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Get List Of Media For:')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,user_data['Name'] + ' - ' + user_data['Id'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,user_info['user_name'] + ' - ' + user_info['user_id'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-    print_byType(strings_list_to_print[0],the_dict['print_user_header'],the_dict,the_dict['user_header_format'])
+    #print_byType(strings_list_to_print[0],the_dict['print_user_header'],the_dict,the_dict['user_header_format'])
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['user']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['user']['formatting'])
 
 
 #print cache statistics for cache tuning
@@ -89,7 +92,7 @@ def print_cache_stats(the_dict):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Total number of items through cache: ' + str(the_dict['cached_data'].total_cumulative_cached_data_entry_number))
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-        print_byType(strings_list_to_print[0],the_dict['print_script_footer'],the_dict,['','',''])
+        print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
 
 
 #print all cached data elevated DEBUG value required
@@ -104,7 +107,7 @@ def cache_data_to_debug(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nAll Cached URLs And Data:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,convert2json(the_dict['cached_data'].cached_data))
 
-    appendTo_DEBUG_log(strings_list_to_print[0],255,the_dict)
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
 
 
 #print ending footer and time to console
@@ -114,11 +117,28 @@ def print_footer_information(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
-    print_byType(strings_list_to_print[0],the_dict['print_script_footer'],the_dict,the_dict['script_footer_format'])
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
 
 
 #build and then print the individual media item data
-def build_print_media_item_details(the_dict,item,mediaType,output_state_dict,days_since_played,days_since_created,season_episode=None):
+def build_print_media_item_details(item,var_dict,the_dict):
+
+    mediaType=var_dict['media_type_lower']
+    isFavorited_Display=var_dict['isFavorited_Display']
+    isFavorited_Display=var_dict['isFavorited_Display']
+    isWhitetagged_Display=var_dict['isWhitetagged_Display']
+    isBlacktagged_Display=var_dict['isBlacktagged_Display']
+    isWhitelisted_Display=var_dict['isWhitelisted_Display']
+    isBlacklisted_Display=var_dict['isBlacklisted_Display']
+    showItemAsDeleted=var_dict['showItemAsDeleted']
+    print_media_delete_info=var_dict['print_media_delete_info']
+    print_media_keep_info=var_dict['print_media_keep_info']
+    media_delete_info_format=var_dict['media_delete_info_format']
+    media_keep_info_format=var_dict['media_keep_info_format']
+    days_since_played=get_days_since_played(item['UserData']['LastPlayedDate'],the_dict)
+    days_since_created=get_days_since_created(item['DateCreated'],the_dict)
+    if (mediaType == 'episode'):
+        season_episode=get_season_episode(item['ParentIndexNumber'],item['IndexNumber'],the_dict)
 
     strings_list=['']
 
@@ -127,34 +147,32 @@ def build_print_media_item_details(the_dict,item,mediaType,output_state_dict,day
 
             strings_list[0]=strings_list[0] + item['Type']
 
-            if (mediaType.casefold() == 'movie'):
+            if (mediaType == 'movie'):
                 strings_list[0]=strings_list[0] + ' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name']
-            elif (mediaType.casefold() == 'episode'):
+            elif (mediaType == 'episode'):
                 strings_list[0]=strings_list[0] + ' - ' + item['SeriesName'] + ' - ' + season_episode + ' - ' + item['Name'] + ' - ' + item['SeriesStudio']
-            elif (mediaType.casefold() == 'audio'):
+            elif (mediaType == 'audio'):
                 strings_list[0]=strings_list[0] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name']
-            elif (mediaType.casefold() == 'audiobook'):
+            elif (mediaType == 'audiobook'):
                 strings_list[0]=strings_list[0] + ' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' +item['Artists'][0]
 
-            strings_list[0]=strings_list[0] + ' - ' + days_since_played + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + days_since_created + ' - Favorite: ' +\
-                                 str(output_state_dict['isFavorited_Display']) + ' - WhiteTag: ' + str(output_state_dict['isWhiteTagged_Display']) + ' - BlackTag: ' +\
-                                 str(output_state_dict['isBlackTagged_Display']) + ' - Whitelisted: ' + str(output_state_dict['isWhiteListed_Display']) + ' - Blacklisted: ' +\
-                                 str(output_state_dict['isBlackListed_Display']) + ' - ' + item['Type'] + 'ID: ' + item['Id']
+            strings_list[0]=strings_list[0] + ' - ' + days_since_played + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + days_since_created + ' - Favorite: ' + str(isFavorited_Display) + ' - Whitetag: ' + \
+                str(isWhitetagged_Display) + ' - Blacktag: ' + str(isBlacktagged_Display) + ' - Whitelisted: ' + str(isWhitelisted_Display) + ' - Blacklisted: ' + str(isBlacklisted_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id']
 
         except (KeyError, IndexError):
             strings_list[0]=['']
             strings_list[0]=strings_list[0] + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
             if (the_dict['DEBUG']):
-                appendTo_DEBUG_log('\nError encountered - ' + mediaType.upper() + ': \nitem: ' + str(item) + '\nitem' + str(item),2,the_dict)
+                appendTo_DEBUG_log('\nError encountered - ' + mediaType + ': \nitem: ' + str(item) + '\nitem' + str(item),2,the_dict)
 
-        if (output_state_dict['showItemAsDeleted']):
+        if (showItemAsDeleted):
             strings_list[0]=':*[DELETE] - ' + strings_list[0]
-            print_media_info=output_state_dict['print_media_delete_info']
-            media_info_format=output_state_dict['media_delete_info_format']
+            print_media_info=print_media_delete_info
+            media_info_format=media_delete_info_format
         else:
             strings_list[0]=':[KEEPING] - ' + strings_list[0]
-            print_media_info=output_state_dict['print_media_keep_info']
-            media_info_format=output_state_dict['media_keep_info_format']
+            print_media_info=print_media_keep_info
+            media_info_format=media_keep_info_format
 
         strings_list=concat_to_console_strings_list(strings_list,'')
 
@@ -164,20 +182,20 @@ def build_print_media_item_details(the_dict,item,mediaType,output_state_dict,day
 #list and delete items past played threshold
 def print_and_delete_items(deleteItems,the_dict):
     deleteItems_Tracker=[]
-    print_summary_header=the_dict['print_summary_header']
-    print_movie_summary=the_dict['print_movie_summary']
-    print_episode_summary=the_dict['print_episode_summary']
-    print_audio_summary=the_dict['print_audio_summary']
-    summary_header_format=the_dict['summary_header_format']
-    movie_summary_format=the_dict['movie_summary_format']
-    episode_summary_format=the_dict['episode_summary_format']
-    audio_summary_format=the_dict['audio_summary_format']
-    if (isJellyfinServer(the_dict['server_brand'])):
-        print_audiobook_summary=the_dict['print_audiobook_summary']
-        audiobook_summary_format=the_dict['audiobook_summary_format']
+    print_summary_header=the_dict['advanced_settings']['console_controls']['headers']['summary']['show']
+    print_movie_summary=the_dict['advanced_settings']['console_controls']['movie']['summary']['show']
+    print_episode_summary=the_dict['advanced_settings']['console_controls']['episode']['summary']['show']
+    print_audio_summary=the_dict['advanced_settings']['console_controls']['audio']['summary']['show']
+    summary_header_format=the_dict['advanced_settings']['console_controls']['headers']['summary']['formatting']
+    movie_summary_format=the_dict['advanced_settings']['console_controls']['movie']['summary']['formatting']
+    episode_summary_format=the_dict['advanced_settings']['console_controls']['episode']['summary']['formatting']
+    audio_summary_format=the_dict['advanced_settings']['console_controls']['audio']['summary']['formatting']
+    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        print_audiobook_summary=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['show']
+        audiobook_summary_format=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']
     else:
         print_audiobook_summary=False
-        audiobook_summary_format=['','','']
+        audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
 
     #print_common_summary = (print_summary_header or print_movie_summary or print_episode_summary or print_audio_summary or print_audiobook_summary)
 
@@ -371,28 +389,28 @@ def print_failed_to_load_config(the_dict):
 
 #print all media disabled helper
 def print_all_media_disabled(the_dict):
-    strings_list_to_print=['']
+    strings_list_to_print=[""]
 
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* ATTENTION!!!                                            *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* No media types are being monitored.                     *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Open the mumc_config.py file in a text editor.          *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Set at least one media type\'s condition days to >=0.    *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'*                                                         *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* played_filter_movie[A]=-1                               *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* played_filter_episode[A]=-1                             *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* played_filter_audio[A]=-1                               *')
-    if (isJellyfinServer(the_dict['server_brand'])):
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* played_filter_audiobook[A]=-1                           *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'*                                                         *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* created_filter_movie[A]=-1                              *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* created_filter_episode[A]=-1                            *')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* created_filter_audio[A]=-1                              *')
-    if (isJellyfinServer(the_dict['server_brand'])):
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* created_filter_audiobook[A]=-1                          *')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* ATTENTION!!!                                                                         *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* No media types are being monitored.                                                  *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* Open the mumc_config.yaml file in a text editor.                                     *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* Set at least one media type's condition_days >= 0.                                   *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"*                                                                                      *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - movie - played - condition_days: -1             *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - episode - played - condition_days: -1           *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audio - played - condition_days: -1             *")
+    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audiobook - played - condition_days: -1         *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"*                                                                                      *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - movie - created - condition_days: -1            *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - episode - created - condition_days: -1          *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audio - created - condition_days: -1            *")
+    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audiobook - created - condition_days: -1        *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
 
 #print how to delete files info
@@ -407,7 +425,7 @@ def remove_files_helper(strings_list_to_print,the_dict):
 
 #print new config info
 def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
-    if not (the_dict['REMOVE_FILES']):
+    if not (the_dict['advanced_settings']['REMOVE_FILES']):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Config file is not setup to delete media.')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Config file is in dry run mode to prevent deleting media.')
@@ -422,7 +440,7 @@ def build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dic
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Summary Of Deleted Media:')
 
-    if not bool(the_dict['REMOVE_FILES']):
+    if not bool(the_dict['advanced_settings']['REMOVE_FILES']):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Dry Run Mode')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* REMOVE_FILES=\'False\'')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* No Media Deleted')
@@ -440,7 +458,7 @@ def build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dic
 #print post processing started
 def print_post_processing_started(the_dict,postproc_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + postproc_dict['mediaType'] + ' POST PROCESSING STARTED...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + postproc_dict['media_type_upper'] + ' POST PROCESSING STARTED...')
 
     print_byType(strings_list_to_print[0],postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])
 
@@ -449,10 +467,10 @@ def print_post_processing_started(the_dict,postproc_dict):
 def print_post_processing_verbal_progress(the_dict,postproc_dict,prost_processing_step):
     strings_list_to_print=['']
 
-    if (not(postproc_dict['mediaType'] == 'AUDIO')):
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING ' + prost_processing_step.upper() + ' ' + postproc_dict['mediaType'] + 'S...')
+    if (not(postproc_dict['media_type_lower'] == 'audio')):
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING ' + prost_processing_step.upper() + ' ' + postproc_dict['media_type_upper'] + 'S...')
     else:
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING ' + prost_processing_step.upper() + ' ' + postproc_dict['mediaType'] + '...')
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING ' + prost_processing_step.upper() + ' ' + postproc_dict['media_type_upper'] + '...')
 
     print_byType(strings_list_to_print[0],postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])
 
@@ -460,7 +478,7 @@ def print_post_processing_verbal_progress(the_dict,postproc_dict,prost_processin
 #print post processing verbal progress info for minimum episodes
 def print_post_processing_verbal_progress_min_episode(the_dict,postproc_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING MINIMUM NUMBER ' + postproc_dict['mediaType'] + 'S...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nPROCESSING MINIMUM NUMBER ' + postproc_dict['media_type_upper'] + 'S...')
 
     print_byType(strings_list_to_print[0],postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])
 
@@ -468,6 +486,6 @@ def print_post_processing_verbal_progress_min_episode(the_dict,postproc_dict):
 #print post processing completed
 def print_post_processing_completed(the_dict,postproc_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + postproc_dict['mediaType'] + ' POST PROCESSING COMPLETE.')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + postproc_dict['media_type_upper'] + ' POST PROCESSING COMPLETE.')
 
     print_byType(strings_list_to_print[0],postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])

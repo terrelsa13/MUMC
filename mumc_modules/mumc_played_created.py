@@ -80,7 +80,14 @@ def get_isCreated_FilterValue(the_dict,filter_created_played_count_comparison,fi
 
 
 # Combine isPlayed value with isCreated-Played value
-def get_isPlayedCreated_FilterValue(the_dict,played_days,created_days,filter_played_count_comparison,filter_played_count,filter_created_played_count_comparison,filter_created_played_count):
+def get_isPlayedCreated_FilterValue(the_dict,var_dict):
+
+    played_days=var_dict['media_played_days']
+    created_days=var_dict['media_created_days']
+    filter_played_count_comparison=var_dict['media_played_count_comparison']
+    filter_played_count=var_dict['media_played_count']
+    filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
+    filter_created_played_count=var_dict['media_created_played_count']
 
     if (played_days >= 0):
         isPlayed_Filter_Value=get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_played_count)
@@ -210,9 +217,9 @@ def get_isItemMeetingDaysFilter(date_string,cut_off_date):
     if ((cut_off_date) > (parse(date_string))):
         #media item meets the played/created days count
         item_meets_day_count=True
-    else:
-        #media item does not meet the played/created days count
-        item_meets_day_count=False
+    #else:
+        ##media item does not meet the played/created days count
+        #item_meets_day_count=False
 
     return item_meets_day_count
 
@@ -224,6 +231,7 @@ def get_playedCreatedDays_playedCreatedCounts(the_dict,item,played_days,created_
     itemPlayedCount=0
     item_matches_played_count_filter=False
     item_matches_created_played_count_filter=False
+    return_dict={}
 
     #is played
 
@@ -275,4 +283,11 @@ def get_playedCreatedDays_playedCreatedCounts(the_dict,item,played_days,created_
             #item_matches_played_count_filter=False
             #item_matches_created_played_count_filter=False
 
-    return itemIsPlayed,itemPlayedCount,item_matches_played_days_filter,item_matches_created_days_filter,item_matches_played_count_filter,item_matches_created_played_count_filter
+    return_dict['itemIsPlayed']=itemIsPlayed
+    return_dict['itemPlayedCount']=itemPlayedCount
+    return_dict['item_matches_played_days_filter']=item_matches_played_days_filter
+    return_dict['item_matches_created_days_filter']=item_matches_created_days_filter
+    return_dict['item_matches_played_count_filter']=item_matches_played_count_filter
+    return_dict['item_matches_created_played_count_filter']=item_matches_created_played_count_filter
+
+    return return_dict

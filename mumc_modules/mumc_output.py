@@ -107,6 +107,16 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
         print(string_to_print)
     elif ("\n" in string_to_print):
             string_to_print_list=parse_string_and_newlines(string_to_print)
+            for str_to_print in string_to_print_list:
+                if (str_to_print == "\n"):
+                    str_to_print=the_dict['text_attrs'].build_ansi_escaped_newlines(str_to_print)
+                else:
+                    str_to_print=the_dict['text_attrs'].build_ansi_escaped_string(str_to_print,
+                        the_dict['text_attrs'].build_ansi_escape_codes(
+                        [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes['font']['color']),
+                        the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes['background']['color']),
+                        the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes['font']['style'])]))
+            '''
             string_to_print_list_len=len(string_to_print_list)
             for x in range(string_to_print_list_len):
                 if (string_to_print_list[x] == "\n"):
@@ -117,6 +127,7 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
                         [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes[0]),
                         the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes[1]),
                         the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes[2])]))
+            '''
             string_to_print=''.join(string_to_print_list).rstrip()
             print(''.join(string_to_print))
     else:

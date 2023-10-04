@@ -21,7 +21,12 @@ def sort_audiobook_deleteItems_List(item):
     return sort_audio_deleteItems_List(item)
 
 
-def sortDeleteLists(deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook):
+def sortDeleteLists(deleteItems_dict):
+    deleteItems_movie=deleteItems_dict['movie']
+    deleteItems_episode=deleteItems_dict['episode']
+    deleteItems_audio=deleteItems_dict['audio']
+    deleteItems_audiobook=deleteItems_dict['audiobook']
+
     #sort and combine into single list
     deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) +
                 sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
@@ -29,3 +34,6 @@ def sortDeleteLists(deleteItems_movie,deleteItems_episode,deleteItems_audio,dele
                 sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
 
     return deleteItems
+
+def sortLibSelection(libList):
+    return libList['selection']
