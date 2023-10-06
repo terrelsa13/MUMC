@@ -283,7 +283,9 @@ def get_isMOVIE_Fav(the_dict,item,user_info):
 
 
 #determine if genres for movie or library are set to favorite
-def get_isMOVIE_AdvancedFav(the_dict,item,user_info,advFav_media):
+def get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict):
+
+    advFav_media=var_dict['advFav_media']
 
     #DEBUG log formatting
     if (the_dict['DEBUG']):
@@ -386,7 +388,9 @@ def get_isEPISODE_Fav(the_dict,item,user_info):
 
 
 #determine if genres for episode, season, series, or studio-network are set to favorite
-def get_isEPISODE_AdvancedFav(the_dict,item,user_info,advFav_media):
+def get_isEPISODE_AdvancedFav(the_dict,item,user_info,var_dict):
+
+    advFav_media=var_dict['advFav_media']
 
     #DEBUG log formatting
     if (the_dict['DEBUG']):
@@ -483,7 +487,9 @@ def get_isEPISODE_AdvancedFav(the_dict,item,user_info,advFav_media):
 
 
 #determine if music track or album are set to favorite
-def get_isAUDIO_Fav(the_dict,item,user_info,itemType):
+def get_isAUDIO_Fav(the_dict,item,user_info,var_dict):
+
+    itemType=var_dict['media_type_title']
 
     if (itemType == 'Audio'):
         lookupTopicAlbum='album'
@@ -546,16 +552,30 @@ def get_isAUDIO_Fav(the_dict,item,user_info,itemType):
 
 
 #determine if genres for music track, album, or artist are set to favorite
-def get_isAUDIO_AdvancedFav(the_dict,item,user_info,itemType,advFav_media):
+def get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict):
+
+    itemType=var_dict['media_type_title']
 
     if (itemType == 'Audio'):
         lookupTopicTrack='track'
         lookupTopicAlbum='album'
         lookupTopicLibrary='music_library'
+        favorited_advanced_track_genre=var_dict['advFav_media']['genre']
+        favorited_advanced_album_genre=var_dict['advFav_media']['album_genre']
+        favorited_advanced_music_library_genre=var_dict['advFav_media']['library_genre']
+        favorited_advanced_track_artist=var_dict['advFav_media']['track_artist']
+        favorited_advanced_album_library_artist=0
+        favorited_advanced_album_artist=var_dict['advFav_media']['album_artist']
     elif (itemType == 'AudioBook'):
         lookupTopicTrack='audiobook'
         lookupTopicAlbum='book'
         lookupTopicLibrary='audiobook_library'
+        favorited_advanced_track_genre=var_dict['advFav_media']['genre']
+        favorited_advanced_album_genre=var_dict['advFav_media']['audiobook_genre']
+        favorited_advanced_music_library_genre=var_dict['advFav_media']['library_genre']
+        favorited_advanced_track_artist=var_dict['advFav_media']['track_author']
+        favorited_advanced_album_library_artist=var_dict['advFav_media']['author']
+        favorited_advanced_album_artist=var_dict['advFav_media']['library_author']
     else:
         raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
 
@@ -638,13 +658,13 @@ def get_isAUDIO_AdvancedFav(the_dict,item,user_info,itemType,advFav_media):
 
 
 #determine if audiobook track or book are set to favorite
-def get_isAUDIOBOOK_Fav(the_dict,item,user_info,itemType):
-    return get_isAUDIO_Fav(the_dict,item,user_info,itemType)
+def get_isAUDIOBOOK_Fav(the_dict,item,user_info,var_dict):
+    return get_isAUDIO_Fav(the_dict,item,user_info,var_dict)
 
 
 #determine if genres for audiobook track, book, or author are set to favorite
-def get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_info,itemType,advFav_media):
-    return get_isAUDIO_AdvancedFav(the_dict,item,user_info,itemType,advFav_media)
+def get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_info,var_dict):
+    return get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict)
 
 
 #Because we are not searching directly for non-favorited items; cleanup needs to happen to help the behavioral patterns make sense
@@ -678,59 +698,60 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
                 for subUserId in userId_tracker:
                     if (not(userId == subUserId)):
                         if (not(itemId in itemsDictionary[subUserId])):
-
-                            item=get_ADDITIONAL_itemInfo(subUserId,itemId,'favorites_playedPatternCleanup',the_dict)
+                            tempUserId={}
+                            tempUserId['user_id']=subUserId
+                            item=get_ADDITIONAL_itemInfo(tempUserId,itemId,'favorites_playedPatternCleanup',the_dict)
 
                             itemsDictionary[subUserId][itemId]=item
 
                             itemIsFav=False
                             itemIsAdvFav=False
                             if (item['Type'].casefold() == 'movie'):
-                                itemIsFav=get_isMOVIE_Fav(the_dict,item,subUserId)
+                                itemIsFav=get_isMOVIE_Fav(the_dict,item,tempUserId)
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nMovie is favorite: " + str(itemIsFav),3,the_dict)
                                 advFav=False
                                 for advFavItem in postproc_dict['advFav_media']:
-                                    if (advFavItem >= 0):
+                                    if (postproc_dict['advFav_media'][advFavItem] >= 0):
                                         advFav=True
-                                if ((favorited_behavior_media[3] >= 0) and advFav):
-                                    itemIsAdvFav=get_isMOVIE_AdvancedFav(the_dict,item,subUserId,postproc_dict['advFav_media'])
+                                if ((favorited_behavior_media['action_control'] >= 0) and advFav):
+                                    itemIsAdvFav=get_isMOVIE_AdvancedFav(the_dict,item,tempUserId,postproc_dict)
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav: " + str(postproc_dict['advFav_media']),3,the_dict)
                             elif (item['Type'].casefold() == 'episode'):
-                                itemIsFav=get_isEPISODE_Fav(the_dict,item,subUserId)
+                                itemIsFav=get_isEPISODE_Fav(the_dict,item,tempUserId)
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nEpisode is favorite: " + str(itemIsFav),3,the_dict)
                                 advFav=False
                                 for advFavItem in postproc_dict['advFav_media']:
-                                    if (advFavItem >= 0):
+                                    if (postproc_dict['advFav_media'][advFavItem] >= 0):
                                         advFav=True
-                                if ((favorited_behavior_media[3] >= 0) and advFav):
-                                    itemIsAdvFav=get_isEPISODE_AdvancedFav(the_dict,item,subUserId,postproc_dict['advFav_media'])
+                                if ((favorited_behavior_media['action_control'] >= 0) and advFav):
+                                    itemIsAdvFav=get_isEPISODE_AdvancedFav(the_dict,item,tempUserId,postproc_dict)
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav: " + str(postproc_dict['advFav_media']),3,the_dict)
                             elif (item['Type'].casefold() == 'audio'):
-                                itemIsFav=get_isAUDIO_Fav(the_dict,item,subUserId,'Audio')
+                                itemIsFav=get_isAUDIO_Fav(the_dict,item,tempUserId,'Audio')
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nAudio is favorite: " + str(itemIsFav),3,the_dict)
                                 advFav=False
                                 for advFavItem in postproc_dict['advFav_media']:
-                                    if (advFavItem >= 0):
+                                    if (postproc_dict['advFav_media'][advFavItem] >= 0):
                                         advFav=True
-                                if ((favorited_behavior_media[3] >= 0) and advFav):
-                                    itemIsAdvFav=get_isAUDIO_AdvancedFav(the_dict,item,subUserId,'Audio',postproc_dict['advFav_media'])
+                                if ((favorited_behavior_media['action_control'] >= 0) and advFav):
+                                    itemIsAdvFav=get_isAUDIO_AdvancedFav(the_dict,item,tempUserId,postproc_dict)
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav: " + str(postproc_dict['advFav_media']),3,the_dict)
                             elif (item['Type'].casefold() == 'audiobook'):
-                                itemIsFav=get_isAUDIOBOOK_Fav(the_dict,item,subUserId,'AudioBook')
+                                itemIsFav=get_isAUDIOBOOK_Fav(the_dict,item,tempUserId,'AudioBook')
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nAudioBook is favorite: " + str(itemIsFav),3,the_dict)
                                 advFav=False
                                 for advFavItem in postproc_dict['advFav_media']:
-                                    if (advFavItem >= 0):
+                                    if (postproc_dict['advFav_media'][advFavItem] >= 0):
                                         advFav=True
-                                if ((favorited_behavior_media[3] >= 0) and advFav):
-                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(the_dict,item,subUserId,'AudioBook',postproc_dict['advFav_media'])
+                                if ((favorited_behavior_media['action_control'] >= 0) and advFav):
+                                    itemIsAdvFav=get_isAUDIOBOOK_AdvancedFav(the_dict,item,tempUserId,postproc_dict)
                                     if (the_dict['DEBUG']):
                                         appendTo_DEBUG_log("\nadvFav: " + str(postproc_dict['advFav_media']),3,the_dict)
 
@@ -740,8 +761,9 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
                                 #itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=None
                                 itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=False
 
-                            mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(subUserId,itemId,'playedPatternCleanup',the_dict)
-                            played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
+                            mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(tempUserId,itemId,'playedPatternCleanup',the_dict)
+                            #played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
+                            played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
                             #if (not (item_matches_played_days_filter == None)):
                                 #itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)

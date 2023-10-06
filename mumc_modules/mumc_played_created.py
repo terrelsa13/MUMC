@@ -224,7 +224,16 @@ def get_isItemMeetingDaysFilter(date_string,cut_off_date):
     return item_meets_day_count
 
 #get played days and counts; get created days and counts
-def get_playedCreatedDays_playedCreatedCounts(the_dict,item,played_days,created_days,cut_off_date_played,cut_off_date_created,played_count_comparison,played_count,created_played_count_comparison,created_played_count):
+def get_playedCreatedDays_playedCreatedCounts(the_dict,item,var_dict):
+
+    played_days=var_dict['media_played_days']
+    created_days=var_dict['media_created_days']
+    cut_off_date_played=var_dict['cut_off_date_played_media']
+    cut_off_date_created=var_dict['cut_off_date_created_media']
+    played_count_comparison=var_dict['media_played_count_comparison']
+    played_count=var_dict['media_played_count']
+    created_played_count_comparison=var_dict['media_created_played_count_comparison']
+    created_played_count=var_dict['media_created_played_count']
 
     item_matches_played_days_filter=False
     item_matches_created_days_filter=False

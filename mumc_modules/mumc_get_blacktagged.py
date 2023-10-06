@@ -124,9 +124,6 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
         '&Recursive=' + var_dict['Recursive_Blacktagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Blacklist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
 
-        var_dict['data_Blacktagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-        var_dict['data_Child_Of_Blacktagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-
         #Send the API query for for blacktagged from blacklist media items
         #var_dict['data_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['APIDebugMsg_Blacktagged_From_Blacklist'],the_dict)
         var_dict=api_query_handler('Blacktagged_From_Blacklist',var_dict,the_dict)
@@ -143,6 +140,17 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo blacktagged media items are blacklisted",2,the_dict)
 
+        var_dict['data_Child_Of_Blacktagged_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+        var_dict['QueryLimit_Child_Of_Blacktagged_From_Blacklist']=0
+        var_dict['QueriesRemaining_Child_Of_Blacktagged_From_Blacklist']=False
+
+    var_dict['data_Blacktagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Blacktagged_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
+    var_dict['data_Blacktagged_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Child_Of_Blacktagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Child_Of_Blacktagged_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
+    var_dict['data_Child_Of_Blacktagged_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
+
     return var_dict
 
 
@@ -156,9 +164,6 @@ def whitelist_blacktagged_query(user_info,var_dict,the_dict):
         '&Recursive=' + var_dict['Recursive_Blacktagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Whitelist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
 
-        var_dict['data_Blacktagged_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
-        var_dict['data_Child_Of_Blacktagged_From_Whitelist_Children']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
-
         #Send the API query for for blacktagged from whitelist media items
         #var_dict['data_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['APIDebugMsg_Blacktagged_From_Whitelist'],the_dict)
         var_dict=api_query_handler('Blacktagged_From_Whitelist',var_dict,the_dict)
@@ -166,7 +171,7 @@ def whitelist_blacktagged_query(user_info,var_dict,the_dict):
         #Define reasoning for lookup
         var_dict['APIDebugMsg_Child_Of_Blacktagged_From_Whitelist']='Child_Of_Blacktagged_Item_From_Whitelist'
         #data_Blacktagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_Whitelist,blacktags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Blacktag_From_Whitelist_Child,media_played_days,media_created_days)
-        var_dict['data_Child_Of_Blacktagged_From_Whitelist_Children']=getChildren_taggedMediaItems('Blacktagged_From_Whitelist',user_info,var_dict,the_dict)
+        var_dict['data_Child_Of_Blacktagged_From_Whitelist']=getChildren_taggedMediaItems('Blacktagged_From_Whitelist',user_info,var_dict,the_dict)
 
     else: #((var_dict['Blacktags_Parsed'] == '') or (var_dict['this_whitelist_lib']['lib_id'] == ''))
         var_dict['data_Blacktagged_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
@@ -174,5 +179,16 @@ def whitelist_blacktagged_query(user_info,var_dict,the_dict):
         var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=False
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo blacktagged media items are whitelisted",2,the_dict)
+
+        var_dict['data_Child_Of_Blacktagged_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+        var_dict['QueryLimit_Child_Of_Blacktagged_From_Whitelist']=0
+        var_dict['QueriesRemaining_Child_Of_Blacktagged_From_Whitelist']=False
+
+    var_dict['data_Blacktagged_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Blacktagged_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
+    var_dict['data_Blacktagged_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
+    var_dict['data_Child_Of_Blacktagged_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Child_Of_Blacktagged_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
+    var_dict['data_Child_Of_Blacktagged_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 
     return var_dict

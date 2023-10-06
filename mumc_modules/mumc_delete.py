@@ -8,7 +8,7 @@ from mumc_modules.mumc_url import requestURL
 #api call to delete items
 def delete_media_item(itemID,the_dict):
     #build API delete request for specified media item
-    url=the_dict['server_url'] + '/Items/' + itemID + '?api_key=' + the_dict['auth_key']
+    url=the_dict['admin_settings']['server']['url'] + '/Items/' + itemID + '?api_key=' + the_dict['admin_settings']['server']['auth_key']
 
     req = urlrequest.Request(url,method='DELETE')
 
@@ -18,7 +18,7 @@ def delete_media_item(itemID,the_dict):
         appendTo_DEBUG_log("\nRequest:\n" + str(req),4,the_dict)
 
     #Check if REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
-    if (the_dict['REMOVE_FILES']):
+    if (the_dict['advanced_settings']['REMOVE_FILES']):
         try:
             requestURL(req, the_dict['DEBUG'], 'delete_media_item_request', 3, the_dict)
         except Exception:

@@ -109,8 +109,6 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
         '&Fields=' + var_dict['FieldsState_Blacklist'] + '&Recursive=' + var_dict['Recursive_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacklist'] +
         '&EnableImages=' + var_dict['EnableImages_Blacklist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Blacklist'] + '&api_key=' + var_dict['auth_key'])
 
-        var_dict['data_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-
         #Send the API query for for watched media items in blacklists
         #var_dict['data_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['QueriesRemaining_Blacklist']=api_query_handler(var_dict['apiQuery_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['APIDebugMsg_Blacklist'],the_dict)
         var_dict=api_query_handler('Blacklist',var_dict,the_dict)
@@ -122,6 +120,10 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
         var_dict['QueriesRemaining_Blacklist']=False
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo watched media items are blacklisted",2,the_dict)
+
+    var_dict['data_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
+    var_dict['data_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
 
     return var_dict
 
@@ -135,8 +137,6 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
         '&Fields=' + var_dict['FieldsState_Whitelist'] + '&Recursive=' + var_dict['Recursive_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitelist'] +
         '&EnableImages=' + var_dict['EnableImages_Whitelist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Whitelist'] + '&api_key=' + var_dict['auth_key'])
 
-        var_dict['data_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
-
         #Send the API query for for watched media items in whitelists
         #var_dict['data_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['QueriesRemaining_Whitelist']=api_query_handler(var_dict['apiQuery_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['APIDebugMsg_Whitelist'],the_dict)
         var_dict=api_query_handler('Whitelist',var_dict,the_dict)
@@ -148,5 +148,9 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
         var_dict['QueriesRemaining_Whitelist']=False
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo watched media items are whitelisted",2,the_dict)
+
+    var_dict['data_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
+    var_dict['data_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 
     return var_dict

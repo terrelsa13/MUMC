@@ -391,6 +391,9 @@ def run_postProcessing(the_dict,media_dict):
         postproc_dict['media_post_processing_format']=the_dict['audiobook_post_processing_format']
     '''
 
+    postproc_dict['advFav_media']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['extra']
+
+    '''
     postproc_dict['advFav_media']=[]
     if (postproc_dict['media_type_lower'] == 'movie'):
         postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['genre'])
@@ -422,7 +425,7 @@ def run_postProcessing(the_dict,media_dict):
             postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_author'])
         else: #(isEmbyServer(the_dict)):
             pass
-            '''
+
             media_played_days=-1
             media_created_days=-1
             media_played_count_comparison='=='
@@ -448,7 +451,7 @@ def run_postProcessing(the_dict,media_dict):
             blacktags=blacktags
             whitelisted_behavior_media=['keep','any','ignore',0]
             blacklisted_behavior_media=['keep','any','ignore',0]
-            '''
+    '''
 
     #postproc_dict['cut_off_date_played_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_played_days'])
     #postproc_dict['cut_off_date_created_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_created_days'])

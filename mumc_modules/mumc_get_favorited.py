@@ -121,9 +121,6 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
         '&Recursive=' + var_dict['Recursive_Favorited_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Blacklist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Blacklist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
 
-        var_dict['data_Favorited_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-        var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-
         #Send the API query for for Favorited from Blacklist media items
         #var_dict['data_Favorited_From_Blacklist'],var_dict['StartIndex_Favorited_From_Blacklist'],var_dict['TotalItems_Favorited_From_Blacklist'],var_dict['QueryLimit_Favorited_From_Blacklist'],var_dict['QueriesRemaining_Favorited_From_Blacklist']=api_query_handler(var_dict['apiQuery_Favorited_From_Blacklist'],var_dict['StartIndex_Favorited_From_Blacklist'],var_dict['TotalItems_Favorited_From_Blacklist'],var_dict['QueryLimit_Favorited_From_Blacklist'],var_dict['APIDebugMsg_Favorited_From_Blacklist'],the_dict)
         var_dict=api_query_handler('Favorited_From_Blacklist',var_dict,the_dict)
@@ -142,6 +139,17 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo favorited media items are blacklisted",2,the_dict)
 
+        var_dict['data_Child_Of_Favorited_Item_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+        var_dict['QueryLimit_Child_Of_Favorited_Item_From_Blacklistt']=0
+        var_dict['QueriesRemaining_Child_Of_Favorited_Item_From_Blacklist']=False
+
+    var_dict['data_Favorited_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Favorited_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
+    var_dict['data_Favorited_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
+    var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
+    var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
+
     return var_dict
 
 
@@ -153,9 +161,6 @@ def whitelist_favorited_query(user_info,var_dict,the_dict):
         '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Whitelist'] +
         '&Recursive=' + var_dict['Recursive_Favorited_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Whitelist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Whitelist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
-
-        var_dict['data_Favorited_From_Whitelist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-        var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
 
         #Send the API query for for Favorited from Whitelist media items
         #var_dict['data_Favorited_From_Whitelist'],var_dict['StartIndex_Favorited_From_Whitelist'],var_dict['TotalItems_Favorited_From_Whitelist'],var_dict['QueryLimit_Favorited_From_Whitelist'],var_dict['QueriesRemaining_Favorited_From_Whitelist']=api_query_handler(var_dict['apiQuery_Favorited_From_Whitelist'],var_dict['StartIndex_Favorited_From_Whitelist'],var_dict['TotalItems_Favorited_From_Whitelist'],var_dict['QueryLimit_Favorited_From_Whitelist'],var_dict['APIDebugMsg_Favorited_From_Whitelist'],the_dict)
@@ -174,5 +179,16 @@ def whitelist_favorited_query(user_info,var_dict,the_dict):
         var_dict['QueriesRemaining_Favorited_From_Whitelist']=False
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo favorited media items are whitelisted",2,the_dict)
+
+        var_dict['data_Child_Of_Favorited_Item_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+        var_dict['QueryLimit_Child_Of_Favorited_Item_From_Whitelistt']=0
+        var_dict['QueriesRemaining_Child_Of_Favorited_Item_From_Whitelist']=False
+
+    var_dict['data_Favorited_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Favorited_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
+    var_dict['data_Favorited_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
+    var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
+    var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 
     return var_dict

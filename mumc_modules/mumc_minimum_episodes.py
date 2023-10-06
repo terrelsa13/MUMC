@@ -10,8 +10,7 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
     episodeCounts_byUserId=postproc_dict['mediaCounts_byUserId']
     deleteItems=postproc_dict['deleteItems_Media']
 
-    #user_keys = json.loads(the_dict['user_keys'])
-    user_keys = the_dict['user_keys']
+    users_info = postproc_dict['user_info']
     minimum_number_episodes = postproc_dict['minimum_number_episodes']
     minimum_number_played_episodes = postproc_dict['minimum_number_played_episodes']
     minimum_number_episodes_behavior = postproc_dict['minimum_number_episodes_behavior']
@@ -61,6 +60,9 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
     #Build a dictionary to track episode information for each seriesId by userId
     #loop thru userIds
     for userId in episodeCounts_byUserId:
+        for user_info_entry in users_info:
+            if (userId == user_info_entry['user_id']):
+                user_info=user_info_entry
         #loop thru list of items to be deleted
         for episodeItem in deleteItems:
             #verify media item is an episode
@@ -80,13 +82,13 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['PlayedEpisodeCount']
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['UnplayedEpisodeCount']
                     #increment for played or unplayed episode counts that may be deleted
-                    if (get_ADDITIONAL_itemInfo(userId,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
+                    if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
                     else:
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
                 else:
                     #manually build any missing season and episode information for user's who did meet the filter criteria
-                    series_info = get_SERIES_itemInfo(episodeItem,userId,the_dict)
+                    series_info = get_SERIES_itemInfo(episodeItem,user_info,the_dict)
                     #if seriesId has not already processed; add it so it can be
                     if not (series_info['Id'] in episodes_toBeDeletedOrRemain):
                         episodes_toBeDeletedOrRemain[series_info['Id']]={}
@@ -103,7 +105,7 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['PlayedEpisodeCount'] = PlayedEpisodeCount
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['UnplayedEpisodeCount'] = UnplayedItemCount
                     #increment for played or unplayed episode counts that may be deleted
-                    if (get_ADDITIONAL_itemInfo(userId,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
+                    if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
                     else:
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
@@ -255,18 +257,19 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
     #check if minimum_number_episodes_behavior is a userName or userId
     else:
         #loop thru userNames:userIds
-        for userInfo in user_keys:
+        for userInfo in users_info:
             #check if match has already been made
             if (username_userid_match == False):
                 #split userName and userId into a list
-                userNames_userIds_List=userInfo.split(":")
-                #make possible userName strings ot be compared case insensitive
-                if (userNames_userIds_List[0].casefold() == minimum_number_episodes_behavior.casefold()):
+                userName=userInfo['user_name']
+                userId=userInfo['user_id']
+                #make possible userName strings topbe compared case insensitive
+                if (userName.casefold() == minimum_number_episodes_behavior.casefold()):
                     #userName match found
                     min_num_episode_behavior = behaviorTypes['username']
                     username_userid_match=True
-                #make possible userId strings ot be compared case insensitive
-                if (userNames_userIds_List[1].casefold() == minimum_number_episodes_behavior.casefold()):
+                #make possible userId strings to be compared case insensitive
+                if (userId.casefold() == minimum_number_episodes_behavior.casefold()):
                     #userId match found
                     min_num_episode_behavior = behaviorTypes['userid']
                     username_userid_match=True
@@ -275,10 +278,10 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
             #loop thru each series
             for seriesId in episodes_toBeDeletedOrRemain:
                 #determine played and unplayed numbers specifically for this user
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = userNames_userIds_List[1]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = userNames_userIds_List[1]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userNames_userIds_List[1]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = userInfo
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = userInfo
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userInfo['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][userInfo['user_id']]['UnplayedToBeDeleted']
             #make sure we got here without matching a userName or userId
             if (username_userid_match == False):
                 #if we did; prep for using the default behavior
@@ -298,117 +301,120 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
         for seriesId in episodes_toBeDeletedOrRemain:
             #loop thru each user
             for userId in episodes_toBeDeletedOrRemain[seriesId]:
+                for users_info in postproc_dict['user_info']:
+                    if (userId == users_info['user_id']):
+                        user_info=users_info
                 #store value if greater than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] > maxPlayed_ToBeDeleted[1]):
-                    maxPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
-                    maxPlayed_ToBeDeleted[0]=userId
+                if (episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['PlayedToBeDeleted'] > maxPlayed_ToBeDeleted[1]):
+                    maxPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['PlayedToBeDeleted']
+                    maxPlayed_ToBeDeleted[0]=user_info
 
                     #initialize minimum value as max
                     if (minPlayed_ToBeDeleted[1] == -1):
-                        minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
-                        minPlayed_ToBeDeleted[0]=userId
+                        minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['PlayedToBeDeleted']
+                        minPlayed_ToBeDeleted[0]=user_info
 
                 #store value if greater than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
-                    maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
-                    maxUnplayed_ToBeDeleted[0]=userId
+                if (episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['UnplayedToBeDeleted'] > maxUnplayed_ToBeDeleted[1]):
+                    maxUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['UnplayedToBeDeleted']
+                    maxUnplayed_ToBeDeleted[0]=user_info
 
                     #initialize minimum value as max
                     if (minUnplayed_ToBeDeleted[1] == -1):
-                        minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
-                        minUnplayed_ToBeDeleted[0]=userId
+                        minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['UnplayedToBeDeleted']
+                        minUnplayed_ToBeDeleted[0]=user_info
 
                 #store value if less than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted'] < minPlayed_ToBeDeleted[1]):
-                    minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
-                    minPlayed_ToBeDeleted[0]=userId
+                if (episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['PlayedToBeDeleted'] < minPlayed_ToBeDeleted[1]):
+                    minPlayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['PlayedToBeDeleted']
+                    minPlayed_ToBeDeleted[0]=user_info
 
                 #store value if less than last
-                if (episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted'] < minUnplayed_ToBeDeleted[1]):
-                    minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
-                    minUnplayed_ToBeDeleted[0]=userId
+                if (episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['UnplayedToBeDeleted'] < minUnplayed_ToBeDeleted[1]):
+                    minUnplayed_ToBeDeleted[1]=episodes_toBeDeletedOrRemain[seriesId][user_info['user_id']]['UnplayedToBeDeleted']
+                    minUnplayed_ToBeDeleted[0]=user_info
 
             #check for desired behaviorType; assign min/max played/unplayed values for each series depending on behaviorType
             if (min_num_episode_behavior == behaviorTypes['maxplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxplayedmaxunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minplayedminunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxplayedminunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minplayedmaxunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minunplayedminplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minunplayedmaxunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minunplayedmaxplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['minplayedmaxplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxunplayedminunplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minUnplayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxunplayedminplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxunplayedmaxplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxUnplayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxUnplayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxUnplayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
             elif (min_num_episode_behavior == behaviorTypes['maxplayedminplayed']):
-                episodeTracker[seriesId]['PlayedToBeDeleted_Id'] = maxPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['UnplayedToBeDeleted_Id'] = minPlayed_ToBeDeleted[0]
-                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]]['PlayedToBeDeleted']
-                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]]['UnplayedToBeDeleted']
+                episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'] = maxPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'] = minPlayed_ToBeDeleted[0]
+                episodeTracker[seriesId]['PlayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][maxPlayed_ToBeDeleted[0]['user_id']]['PlayedToBeDeleted']
+                episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
 
     #loop thru each series
     for seriesId in episodeTracker:
@@ -432,7 +438,7 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         #skip empty grid positions
                         if not (episodeId ==  ''):
                             #get played status for specified episodeId
-                            if (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for played item',the_dict)['UserData']['Played']):
+                            if (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',the_dict)['UserData']['Played']):
                                 #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 PlayedToBeDeleted_LoopControl += 1
@@ -449,7 +455,7 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         #skip empty grid positions
                         if not (episodeId ==  ''):
                             #get played status for specified episodeId
-                            if not (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_Id'],episodeId,'filtering episode tracker grid for unplayed item',the_dict)['UserData']['Played']):
+                            if not (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for unplayed item',the_dict)['UserData']['Played']):
                                 #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 UnplayedToBeDeleted_LoopControl += 1

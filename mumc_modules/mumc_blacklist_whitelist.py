@@ -6,11 +6,14 @@ from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 
 
 #Determine if media item whitelisted for the current user or for another user
-def get_isItemWhitelisted_Blacklisted(baselist,checklist,item,user_info,var_dict,the_dict):
+def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
 
-    LibraryID=var_dict['this_' + baselist + '_lib']['lib_id']
-    LibraryNetPath=var_dict['this_' + baselist + '_lib']['network_path']
-    LibraryPath=var_dict['this_' + baselist + '_lib']['path']
+    LibraryID=item['mumc']['lib_id']
+    LibraryNetPath=item['mumc']['path']
+    LibraryPath=item['mumc']['network_path']
+    #LibraryID=var_dict['this_' + baselist + '_lib']['lib_id']
+    #LibraryNetPath=var_dict['this_' + baselist + '_lib']['network_path']
+    #LibraryPath=var_dict['this_' + baselist + '_lib']['path']
     #library_matching_behavior=var_dict['library_matching_behavior']
     library_matching_behavior=the_dict['admin_settings']['behavior']['matching']
 
@@ -113,9 +116,7 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                                     appendTo_DEBUG_log("\nAdd missing itemid " + str(item['Id']) + " to " + str(itemsExtraDictionary[sub_user_info['user_id']]),3,the_dict)
                             if (not('IsMeetingAction' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
 
-                                testData=get_ADDITIONAL_itemInfo(sub_user_info,itemId,'testData',the_dict)
-
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(baselist,checklist,item,sub_user_info,var_dict,the_dict)
+                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(checklist,item,sub_user_info,the_dict)
                                 '''
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(the_dict,item,
                                 itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryId'],
@@ -131,11 +132,8 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                                 #if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
                                     #itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=True
                                 #else:
-                                mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info['user_id'],item['Id'],'playedPatternCleanup',the_dict)
-                                played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,itemsExtraDictionary[userId][item['Id']]['PlayedDays'],
-                                itemsExtraDictionary[userId][item['Id']]['CreatedDays'],itemsExtraDictionary[userId][item['Id']]['CutOffDatePlayed'],itemsExtraDictionary[userId][item['Id']]['CutOffDateCreated'],
-                                itemsExtraDictionary[userId][item['Id']]['PlayedCountComparison'],itemsExtraDictionary[userId][item['Id']]['PlayedCount'],itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCountComparison'],
-                                itemsExtraDictionary[userId][item['Id']]['CreatedPlayedCount'])
+                                mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'playedPatternCleanup',the_dict)
+                                played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
                                 #if (not (item_matches_played_days_filter == None)):
                                     #itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
