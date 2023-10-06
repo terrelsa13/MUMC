@@ -113,6 +113,8 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                                     appendTo_DEBUG_log("\nAdd missing itemid " + str(item['Id']) + " to " + str(itemsExtraDictionary[sub_user_info['user_id']]),3,the_dict)
                             if (not('IsMeetingAction' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
 
+                                testData=get_ADDITIONAL_itemInfo(sub_user_info,itemId,'testData',the_dict)
+
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(baselist,checklist,item,sub_user_info,var_dict,the_dict)
                                 '''
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(the_dict,item,
