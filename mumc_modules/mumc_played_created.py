@@ -214,12 +214,13 @@ def get_isItemMeetingDaysFilter(date_string,cut_off_date):
 
     item_meets_day_count=False
 
-    if ((cut_off_date) > (parse(date_string))):
-        #media item meets the played/created days count
-        item_meets_day_count=True
-    #else:
-        ##media item does not meet the played/created days count
-        #item_meets_day_count=False
+    if (not (date_string == 'Unplayed')):
+        if ((cut_off_date) > (parse(date_string))):
+            #media item meets the played/created days count
+            item_meets_day_count=True
+        #else:
+            ##media item does not meet the played/created days count
+            #item_meets_day_count=False
 
     return item_meets_day_count
 
