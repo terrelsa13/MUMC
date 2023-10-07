@@ -10,6 +10,13 @@ from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 #TBD
 def yaml_configurationUpdater(the_dict,saveFile=True):
     config_data={}
+    config_data['version']=the_dict['version']
+    config_data['basic_settings']=the_dict['basic_settings']
+    config_data['advanced_settings']=the_dict['advanced_settings']
+    config_data['admin_settings']=the_dict['admin_settings']
+    config_data['DEBUG']=the_dict['DEBUG']
+
+    '''
     config_data=setYAMLConfigSkeleton(config_data)
     config_data['version']=get_script_version()
     config_data['basic_settings']['filter_statements']['movie']['played']['condition_days']=-1
@@ -250,6 +257,7 @@ def yaml_configurationUpdater(the_dict,saveFile=True):
     config_data['admin_settings']['cache']['fallback_behavior']='LRU'
     config_data['admin_settings']['cache']['last_accessed_time']=200
     config_data['DEBUG']=the_dict['DEBUG']
+    '''
 
     if (saveFile):
         #Save the config file

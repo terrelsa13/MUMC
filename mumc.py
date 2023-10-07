@@ -45,6 +45,14 @@ def main():
     if (cfg['advanced_settings']['UPDATE_CONFIG']):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg)
+        
+        #show cache stats
+        print_cache_stats(cfg)
+
+        if (cfg['DEBUG'] == 255):
+            #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+            cache_data_to_debug(cfg)
+
         #exit gracefully after updating config
         exit(0)
 
