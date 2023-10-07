@@ -4,7 +4,7 @@ import json
 from sys import path
 from mumc_modules.mumc_configuration_yaml import libConvertToYAML
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_output import get_current_directory
+from mumc_modules.mumc_output import save_yaml_config,get_current_directory
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 
 #TBD
@@ -259,6 +259,10 @@ def yaml_configurationUpdater(the_dict,saveFile=True):
     config_data['DEBUG']=the_dict['DEBUG']
     '''
 
+    #save yaml config file
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+
+    '''
     if (saveFile):
         #Save the config file
         with open(the_dict['mumc_path'] / the_dict['config_file_name_yaml'],'w') as file:
@@ -267,5 +271,6 @@ def yaml_configurationUpdater(the_dict,saveFile=True):
             file.write('...')
     else:
         return config_data
+    '''
 
-    return
+    #return

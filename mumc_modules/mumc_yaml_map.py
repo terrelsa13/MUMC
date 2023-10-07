@@ -49,12 +49,12 @@ class BWlistElement:
     path: str
     network_path: str
 
-    def __init__(self, lib_id: str, lib_enabled: bool, collection_type: str, path: str, network_path: str) -> None:
+    def __init__(self, lib_id: str, collection_type: str, path: str, network_path: str, lib_enabled: bool) -> None:
         self.lib_id = lib_id
-        self.lib_enabled = lib_enabled
         self.collection_type = collection_type
         self.path = path
         self.network_path = network_path
+        self.lib_enabled = lib_enabled
 
 
 class User:

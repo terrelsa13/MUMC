@@ -488,8 +488,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
         var_dict['shortest_list']='whitelist'
 
     for listlen in range(var_dict['list_diff']):
-        #user_info[shortest_list].insert((shortest_list_length+listlen),{'lib_id':None,'lib_enabled':False,'collection_type':None,'path':None,'network_path':None})
-        user_info[var_dict['shortest_list']].insert((var_dict['shortest_list_length']+listlen),{'lib_id':None,'lib_enabled':False,'collection_type':None,'path':None,'network_path':None})
+        #user_info[shortest_list].insert((shortest_list_length+listlen),{'lib_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
+        user_info[var_dict['shortest_list']].insert((var_dict['shortest_list_length']+listlen),{'lib_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
 
     var_dict['media_found']=False
 

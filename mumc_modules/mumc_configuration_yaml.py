@@ -3,13 +3,8 @@ import yaml
 import json
 from sys import path
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_output import get_current_directory
+from mumc_modules.mumc_output import save_yaml_config,get_current_directory
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-
-
-class NoAliasDumper(yaml.SafeDumper):
-    def ignore_aliases(self, data):
-        return True
 
 
 def libConvertToYAML(user_wl_libs,user_bl_libs):
@@ -78,7 +73,7 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
     return user_data_list
 
 
-def yaml_configurationBuilder(the_dict,saveFile=True):
+def yaml_configurationBuilder(the_dict):
     the_dict_copy=the_dict.copy()
     the_dict_keys=['version','basic_settings','advanced_settings','admin_settings','DEBUG']
     config_data={thekey:the_dict_copy[thekey] for thekey in the_dict_keys}
@@ -331,12 +326,5 @@ def yaml_configurationBuilder(the_dict,saveFile=True):
     if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited'].pop('extra')
 
-    if (saveFile):
-        #Save the config file
-        with open(the_dict['mumc_path'] / the_dict['config_file_name_yaml'],'w') as file:
-            file.write('---\n')
-            #yaml.safe_dump(config_data,file,sort_keys=False)
-            yaml.dump(config_data,file,sort_keys=False,Dumper=NoAliasDumper)
-            file.write('...')
-    else:
-        return config_data
+    #save yaml config file
+    save_yaml_config(the_dict['mumc_path'] / the_dict['config_file_name_yaml'],config_data)

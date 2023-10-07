@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-import json
 import os
+import json
+import yaml
 from pathlib import Path
 from sys import path
+
+
+class NoAliasDumper(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        return True
 
 
 # Add directory to $PATH at specified position; if no position specified add to end of $PATH
 def add_to_PATH(path_to_add,position=-1):
     if (not(path_to_add in path)):
         path.insert(position,path_to_add)
+
 
 # Change to the specified directory
 def change_to_directory(directory):
@@ -80,6 +87,15 @@ def write_to_file(dataInput,filePathName):
     #Save the config file
     with open(fullPathName,'w') as file:
         file.write(dataInput)
+
+
+def save_yaml_config(dataInput,filePathName):
+    #Save the config file
+    with open(filePathName,'w') as file:
+        file.write('---\n')
+        #yaml.safe_dump(config_data,file,sort_keys=False)
+        yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
+        file.write('...')
 
 
 def parse_string_and_newlines(string_to_print):

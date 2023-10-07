@@ -753,7 +753,7 @@ def get_users_and_libraries(the_dict):
             if (not (folder['CollectionType'] == 'boxsets')):
                 for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
                     lib_dict['lib_id']=folder[libraryGuid]
-                    lib_dict['lib_enabled']=True
+                    #lib_dict['lib_enabled']=True
                     lib_dict['collection_type']=folder['CollectionType']
                     if ('Path' in folder['LibraryOptions']['PathInfos'][libpos]):
                         lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
@@ -763,6 +763,7 @@ def get_users_and_libraries(the_dict):
                         lib_dict['network_path']=folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath']
                     else:
                         lib_dict['network_path']=None
+                    lib_dict['lib_enabled']=True
                     lib_dict['selection']=None
                     if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
                         blacklist_list.append(lib_dict.copy())
