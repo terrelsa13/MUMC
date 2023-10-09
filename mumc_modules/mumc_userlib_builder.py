@@ -291,12 +291,13 @@ def get_library_folders(infotext, specified_user_data, mandatory, the_dict):
         oppList='whitelist'
         realList='blacklist'
 
-    #check if this user has already been processed
+    #check if this user has already been processed for this run session
     if (the_dict['admin_settings']['users'][user_pos][realList]):
-        the_dict['admin_settings']['users'][user_pos][realList]=sorted(the_dict['admin_settings']['users'][user_pos][realList],key=sortLibSelection)
-        for libElem in the_dict['admin_settings']['users'][user_pos][realList]:
-            the_dict['admin_settings']['users'][user_pos][oppList].insert(libElem['selection'],libElem.copy())
-        the_dict['admin_settings']['users'][user_pos][realList].clear()
+        if (not (the_dict['admin_settings']['users'][user_pos][realList][0]['selection'] == None)):
+            the_dict['admin_settings']['users'][user_pos][realList]=sorted(the_dict['admin_settings']['users'][user_pos][realList],key=sortLibSelection)
+            for libElem in the_dict['admin_settings']['users'][user_pos][realList]:
+                the_dict['admin_settings']['users'][user_pos][oppList].insert(libElem['selection'],libElem.copy())
+            the_dict['admin_settings']['users'][user_pos][realList].clear()
 
     #Check if this user has permission to access to all libraries or only specific libraries
     # then remove libraries user does not have access to
@@ -304,8 +305,12 @@ def get_library_folders(infotext, specified_user_data, mandatory, the_dict):
         for okFolders in user_policy['EnabledFolders']:
             enabledFolderIds_set.add(okFolders)
 
+        #copy list so we loop and modify
+        temp_user_libs=the_dict['admin_settings']['users'][user_pos][oppList].copy()
+        #reverse, so we remove list items from the bottom up
+        temp_user_libs.reverse()
         #Remove libraries this user does not have access to
-        for listinfo in the_dict['admin_settings']['users'][user_pos][oppList].copy():
+        for listinfo in temp_user_libs:
             if (not (listinfo['lib_id'] in enabledFolderIds_set)):
                 the_dict['admin_settings']['users'][user_pos][oppList].remove(listinfo)
 
@@ -643,7 +648,7 @@ def get_users_and_libraries(the_dict):
     preConfigDebug = False
 
     #api call
-    data=requestURL(req, preConfigDebug, 'get_users', 3, the_dict)
+    data_users=requestURL(req, preConfigDebug, 'get_users', 3, the_dict)
 
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
     req_folders=(the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders?api_key=' + the_dict['admin_settings']['server']['auth_key'])
@@ -653,6 +658,8 @@ def get_users_and_libraries(the_dict):
 
     #api calls
     data_folders = requestURL(req_folders, preConfigDebug, 'get_media_folders', 3, the_dict)
+
+    the_dict['data_folders']=[]
 
     #users_list=[]
     users_dict={}
@@ -737,43 +744,110 @@ def get_users_and_libraries(the_dict):
 
         #Uncomment if the config editor should only allow adding new users
         #This means the script will not allow editing exisitng users until a new user is added
-        #if ((len(user_keys_json)) == (len(data))):
+        #if ((len(user_keys_json)) == (len(data_users))):
             #print('-----------------------------------------------------------')
             #print('No new user(s) found.')
             #print('-----------------------------------------------------------')
             #print('Verify new user(s) added to the Emby/Jellyfin server.')
             #return(userId_bllib_dict, userId_wllib_dict)
+    #else:
+
+    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        libraryGuid='ItemId'
     else:
-        if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            libraryGuid='ItemId'
+        libraryGuid='Guid'
+
+    libpos_dict={}
+    libpos_list=[]
+
+    for folder in data_folders:
+        if (not (folder['CollectionType'] == 'boxsets')):
+            the_dict['data_folders'].append(folder)
+            libpos_list.append(folder[libraryGuid])
+            libpos_dict[folder[libraryGuid]]=libpos_list.index(folder[libraryGuid])
+            for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
+                lib_dict['lib_id']=folder[libraryGuid]
+                #lib_dict['lib_enabled']=True
+                lib_dict['collection_type']=folder['CollectionType']
+                if ('Path' in folder['LibraryOptions']['PathInfos'][libpos]):
+                    lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
+                else:
+                    lib_dict['path']=None
+                if ('NetworkPath' in folder['LibraryOptions']['PathInfos'][libpos]):
+                    lib_dict['network_path']=folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath']
+                else:
+                    lib_dict['network_path']=None
+                lib_dict['lib_enabled']=True
+                lib_dict['selection']=None
+                if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+                    blacklist_list.append(lib_dict.copy())
+                else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+                    whitelist_list.append(lib_dict.copy())
+
+    #whitelist_dict['whitelist']=whitelist_list
+    #blacklist_dict['blacklist']=blacklist_list
+
+    user_temp_list=[]
+    user_id_list=[]
+    user_id_dict={}
+    usersdata_existing=the_dict['admin_settings']['users'].copy()
+    user_id_existing_list=[]
+    user_id_existing_dict={}
+
+    for userdata in data_users:
+        user_id_list.append(userdata['Id'])
+        user_id_dict[userdata['Id']]=user_id_list.index(userdata['Id'])
+    #for userpos in range(len(data_users)):
+        #user_id_dict[data_users[userpos]['Id']]=userpos
+
+    for userdata in usersdata_existing:
+        user_id_existing_list.append(userdata['user_id'])
+        user_id_existing_dict[userdata['user_id']]=user_id_existing_list.index(userdata['user_id'])
+        for eachLib in userdata['whitelist']:
+            eachLib['selection']=None
+        for eachLib in userdata['blacklist']:
+            eachLib['selection']=None
+    #for userpos in range(len(usersdata_existing)):
+        #user_id_existing_dict[usersdata_existing[userpos]['user_id']]=userpos
+
+    for userdata in data_users:
+        if (userdata['Id'] in user_id_existing_list):
+            bltmplist=[]
+            wltmplist=[]
+            users_dict_temp['user_id']=userdata['Id']
+            users_dict_temp['user_name']=userdata['Name']
+            users_dict_temp['whitelist']=[]
+            users_dict_temp['blacklist']=[]
+            #add existing users and populate the 'selection' key with the correct library position
+            atmp=usersdata_existing[user_id_existing_list.index(userdata['Id'])]
+            for wlist in atmp['whitelist']:
+                if (wlist['lib_id'] in libpos_list):
+                    btmp=wlist.copy()
+                    btmp['selection']=libpos_dict[btmp['lib_id']]
+                    bltmplist.append(btmp)
+            users_dict_temp['whitelist']=bltmplist
+            for blist in atmp['blacklist']:
+                if (blist['lib_id'] in libpos_list):
+                    btmp=blist.copy()
+                    btmp['selection']=libpos_dict[btmp['lib_id']]
+                    wltmplist.append(btmp)
+            users_dict_temp['blacklist']=wltmplist
+            user_temp_list.append(users_dict_temp.copy())
         else:
-            libraryGuid='Guid'
+            users_dict_temp['user_id']=userdata['Id']
+            users_dict_temp['user_name']=userdata['Name']
+            #users_dict.update(users_dict_temp.copy())
+            #users_dict.update(whitelist_dict)
+            #users_dict.update(blacklist_dict)
+            users_dict_temp['whitelist']=whitelist_list
+            users_dict_temp['blacklist']=blacklist_list
+            #users_dict.update(users_dict_temp.copy())
+            #users_list.append(users_dict.copy())
+            #the_dict['admin_settings']['users'].append(users_dict_temp.copy())
+            user_temp_list.append(users_dict_temp.copy())
 
-        for folder in data_folders:
-            if (not (folder['CollectionType'] == 'boxsets')):
-                for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
-                    lib_dict['lib_id']=folder[libraryGuid]
-                    #lib_dict['lib_enabled']=True
-                    lib_dict['collection_type']=folder['CollectionType']
-                    if ('Path' in folder['LibraryOptions']['PathInfos'][libpos]):
-                        lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
-                    else:
-                        lib_dict['path']=None
-                    if ('NetworkPath' in folder['LibraryOptions']['PathInfos'][libpos]):
-                        lib_dict['network_path']=folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath']
-                    else:
-                        lib_dict['network_path']=None
-                    lib_dict['lib_enabled']=True
-                    lib_dict['selection']=None
-                    if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                        blacklist_list.append(lib_dict.copy())
-                    else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
-                        whitelist_list.append(lib_dict.copy())
-                    
-        #whitelist_dict['whitelist']=whitelist_list
-        #blacklist_dict['blacklist']=blacklist_list
-
-        for userdata in data:
+        '''
+        for userdata in data_users:
             users_dict_temp['user_id']=userdata['Id']
             users_dict_temp['user_name']=userdata['Name']
             users_dict.update(users_dict_temp.copy())
@@ -783,6 +857,9 @@ def get_users_and_libraries(the_dict):
             users_dict['blacklist']=blacklist_list.copy()
             #users_list.append(users_dict.copy())
             the_dict['admin_settings']['users'].append(users_dict.copy())
+        '''
+
+    the_dict['admin_settings']['users']=user_temp_list
 
     stop_loop=False
     single_user=False
@@ -791,9 +868,9 @@ def get_users_and_libraries(the_dict):
     while (stop_loop == False):
         i=0
         #Determine if we are looking at a mulitple user setup or a single user setup
-        if (len(data) > 1):
-            for user in data:
-                data[i]['userPosition']=i
+        if (len(data_users) > 1):
+            for user in data_users:
+                data_users[i]['userPosition']=i
                 if not (user['Id'] in userId_list):
                     print(str(i) +' - '+ user['Name'] + ' - ' + user['Id'])
                     userId_dict[i]=user['Id']
@@ -804,8 +881,8 @@ def get_users_and_libraries(the_dict):
                 i += 1
         else: #Single user setup
             single_user=True
-            for user in data:
-                data[i]['userPosition']=i
+            for user in data_users:
+                data_users[i]['userPosition']=i
                 userId_dict[i]=user['Id']
 
         print('')
@@ -834,13 +911,13 @@ def get_users_and_libraries(the_dict):
 
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
-                    message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    #userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data[user_number_int],False,the_dict)
-                    the_dict=get_library_folders(message,data[user_number_int],False,the_dict)
+                    message='Enter number of the library folder(s) to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
+                    #userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data_users[user_number_int],False,the_dict)
+                    the_dict=get_library_folders(message,data_users[user_number_int],False,the_dict)
                 else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                    message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                    #userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data[user_number_int],False,the_dict)
-                    the_dict=get_library_folders(message,data[user_number_int],False,the_dict)
+                    message='Enter number of the library folder(s) to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
+                    #userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data_users[user_number_int],False,the_dict)
+                    the_dict=get_library_folders(message,data_users[user_number_int],False,the_dict)
 
             #We get here when we are done selecting users to monitor
             #elif ((user_number == '') and (not (len(userId_list) == 0))):
@@ -865,13 +942,13 @@ def get_users_and_libraries(the_dict):
 
                     #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                     if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
-                        message='Enter number of the library folder to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                        #userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data[user_number_int],False,the_dict)
-                        the_dict=get_library_folders(message,data[user_number_int],False,the_dict)
+                        message='Enter number of the library folder(s) to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
+                        #userId_wllib_dict[userId_dict[user_number_int]],userId_bllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data_users[user_number_int],False,the_dict)
+                        the_dict=get_library_folders(message,data_users[user_number_int],False,the_dict)
                     else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                        message='Enter number of the library folder to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                        #userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data[user_number_int],False,the_dict)
-                        the_dict=get_library_folders(message,data[user_number_int],False,the_dict)
+                        message='Enter number of the library folder(s) to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
+                        #userId_bllib_dict[userId_dict[user_number_int]],userId_wllib_dict[userId_dict[user_number_int]]=get_library_folders(message,data_users[user_number_int],False,the_dict)
+                        the_dict=get_library_folders(message,data_users[user_number_int],False,the_dict)
 
                     if ((len(userId_list) >= i) and (the_dict['advanced_settings']['UPDATE_CONFIG'] == False)):
                         stop_loop=True
