@@ -291,13 +291,35 @@ def get_library_folders(infotext, specified_user_data, mandatory, the_dict):
         oppList='whitelist'
         realList='blacklist'
 
+    prevProcessedUser=False
     #check if this user has already been processed for this run session
-    if (the_dict['admin_settings']['users'][user_pos][realList]):
-        if (not (the_dict['admin_settings']['users'][user_pos][realList][0]['selection'] == None)):
-            the_dict['admin_settings']['users'][user_pos][realList]=sorted(the_dict['admin_settings']['users'][user_pos][realList],key=sortLibSelection)
-            for libElem in the_dict['admin_settings']['users'][user_pos][realList]:
-                the_dict['admin_settings']['users'][user_pos][oppList].insert(libElem['selection'],libElem.copy())
-            the_dict['admin_settings']['users'][user_pos][realList].clear()
+    for liblist in the_dict['admin_settings']['users'][user_pos][oppList]:
+        if (not (liblist['selection'] == None)):
+            prevProcessedUser=True
+    #check if this user has already been processed for this run session
+    for liblist in the_dict['admin_settings']['users'][user_pos][realList]:
+        if (not (liblist['selection'] == None)):
+            prevProcessedUser=True
+
+
+    #if (the_dict['admin_settings']['users'][user_pos][realList]):
+    #if (prevProcessedUser):
+        #move all libraries to the oppList
+    for liblist in the_dict['admin_settings']['users'][user_pos][realList]:
+        the_dict['admin_settings']['users'][user_pos][oppList].append(liblist)
+    #clear all libraries from the realList
+    the_dict['admin_settings']['users'][user_pos][realList].clear()
+
+    #if (not (the_dict['admin_settings']['users'][user_pos][realList][0]['selection'] == None)):
+    #the_dict['admin_settings']['users'][user_pos][realList]=sorted(the_dict['admin_settings']['users'][user_pos][realList],key=sortLibSelection)
+
+    if (prevProcessedUser):
+        #sort libraries in oppList by selection key
+        the_dict['admin_settings']['users'][user_pos][oppList]=sorted(the_dict['admin_settings']['users'][user_pos][oppList],key=sortLibSelection)
+
+    #for libElem in the_dict['admin_settings']['users'][user_pos][realList]:
+        #the_dict['admin_settings']['users'][user_pos][oppList].insert(libElem['selection'],libElem.copy())
+    #the_dict['admin_settings']['users'][user_pos][realList].clear()
 
     #Check if this user has permission to access to all libraries or only specific libraries
     # then remove libraries user does not have access to
@@ -670,6 +692,15 @@ def get_users_and_libraries(the_dict):
     blacklist_dict={}
     blacklist_list=[]
 
+    libpos_dict={}
+    libpos_list=[]
+    user_temp_list=[]
+    user_id_list=[]
+    user_id_dict={}
+    user_id_existing_list=[]
+    user_id_existing_dict={}
+    usersdata_existing=the_dict['admin_settings']['users'].copy()
+
     #define empty userId dictionary
     userId_dict={}
     #define empty monitored library dictionary
@@ -752,14 +783,14 @@ def get_users_and_libraries(the_dict):
             #return(userId_bllib_dict, userId_wllib_dict)
     #else:
 
+    #Emby and Jellyfin use different key-names for their libraryId
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         libraryGuid='ItemId'
     else:
         libraryGuid='Guid'
 
-    libpos_dict={}
-    libpos_list=[]
-
+    #Build library staging dictionaries for unprocessed users
+     #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
     for folder in data_folders:
         if (not (folder['CollectionType'] == 'boxsets')):
             the_dict['data_folders'].append(folder)
@@ -787,60 +818,66 @@ def get_users_and_libraries(the_dict):
     #whitelist_dict['whitelist']=whitelist_list
     #blacklist_dict['blacklist']=blacklist_list
 
-    user_temp_list=[]
-    user_id_list=[]
-    user_id_dict={}
-    usersdata_existing=the_dict['admin_settings']['users'].copy()
-    user_id_existing_list=[]
-    user_id_existing_dict={}
-
+    #Build list and dictionary with mirrored userId and position information for ALL users
     for userdata in data_users:
         user_id_list.append(userdata['Id'])
         user_id_dict[userdata['Id']]=user_id_list.index(userdata['Id'])
     #for userpos in range(len(data_users)):
         #user_id_dict[data_users[userpos]['Id']]=userpos
 
+    #Build list and dictionary with mirrored userId and position information for EXISTING users
     for userdata in usersdata_existing:
         user_id_existing_list.append(userdata['user_id'])
         user_id_existing_dict[userdata['user_id']]=user_id_existing_list.index(userdata['user_id'])
+        #Add selection key to each whitelist entry for existing users
         for eachLib in userdata['whitelist']:
             eachLib['selection']=None
+        #Add selection key to each blacklist entry for existing users
         for eachLib in userdata['blacklist']:
             eachLib['selection']=None
     #for userpos in range(len(usersdata_existing)):
         #user_id_existing_dict[usersdata_existing[userpos]['user_id']]=userpos
 
+    #Update the_dict['admin_settings']['users'] with ALL users and their possible dictionaries
+     #For EXISTING users update with their existing library selections
+     #For NEW users update with their possible library selections
     for userdata in data_users:
         if (userdata['Id'] in user_id_existing_list):
-            bltmplist=[]
-            wltmplist=[]
-            users_dict_temp['user_id']=userdata['Id']
-            users_dict_temp['user_name']=userdata['Name']
-            users_dict_temp['whitelist']=[]
-            users_dict_temp['blacklist']=[]
-            #add existing users and populate the 'selection' key with the correct library position
-            atmp=usersdata_existing[user_id_existing_list.index(userdata['Id'])]
-            for wlist in atmp['whitelist']:
-                if (wlist['lib_id'] in libpos_list):
-                    btmp=wlist.copy()
-                    btmp['selection']=libpos_dict[btmp['lib_id']]
-                    bltmplist.append(btmp)
-            users_dict_temp['whitelist']=bltmplist
-            for blist in atmp['blacklist']:
-                if (blist['lib_id'] in libpos_list):
-                    btmp=blist.copy()
-                    btmp['selection']=libpos_dict[btmp['lib_id']]
-                    wltmplist.append(btmp)
-            users_dict_temp['blacklist']=wltmplist
-            user_temp_list.append(users_dict_temp.copy())
+            #bltmplist=[]
+            #wltmplist=[]
+            #users_dict_temp['user_id']=userdata['Id']
+            #users_dict_temp['user_name']=userdata['Name']
+            #users_dict_temp['whitelist']=[]
+            #users_dict_temp['blacklist']=[]
+
+            #add existing users and populate the selection key with the correct library position
+            #user_data_existing=usersdata_existing[user_id_existing_list.index(userdata['Id'])]
+            #for wlist in user_data_existing['whitelist']:
+                #if (wlist['lib_id'] in libpos_list):
+                    #btmp=wlist.copy()
+                    #btmp['selection']=libpos_dict[btmp['lib_id']]
+                    #bltmplist.append(btmp)
+            #users_dict_temp['whitelist']=bltmplist
+            #for blist in user_data_existing['blacklist']:
+                #if (blist['lib_id'] in libpos_list):
+                    #btmp=blist.copy()
+                    #btmp['selection']=libpos_dict[btmp['lib_id']]
+                    #wltmplist.append(btmp)
+            #users_dict_temp['blacklist']=wltmplist
+
+            #users_dict_temp=usersdata_existing[user_id_existing_list.index(userdata['Id'])]
+            #user_temp_list.append(users_dict_temp.copy())
+
+            user_temp_list.append(usersdata_existing[user_id_existing_list.index(userdata['Id'])].copy())
+            #user_temp_list.append(usersdata_existing[user_id_existing_list.index(userdata['Id'])])
         else:
             users_dict_temp['user_id']=userdata['Id']
             users_dict_temp['user_name']=userdata['Name']
             #users_dict.update(users_dict_temp.copy())
             #users_dict.update(whitelist_dict)
             #users_dict.update(blacklist_dict)
-            users_dict_temp['whitelist']=whitelist_list
-            users_dict_temp['blacklist']=blacklist_list
+            users_dict_temp['whitelist']=whitelist_list.copy()
+            users_dict_temp['blacklist']=blacklist_list.copy()
             #users_dict.update(users_dict_temp.copy())
             #users_list.append(users_dict.copy())
             #the_dict['admin_settings']['users'].append(users_dict_temp.copy())
