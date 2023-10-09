@@ -42,7 +42,7 @@ def main():
     cfg['cached_data'].updateCacheVariables(cfg)
 
     #check if user wants to update the existing config file
-    if (cfg['advanced_settings']['UPDATE_CONFIG']):
+    if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg)
         

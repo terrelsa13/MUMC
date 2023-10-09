@@ -83,6 +83,14 @@ def findContainerCMDRequest(argv):
     return False
 
 
+#find configuration updater option
+def findConfigUpdaterCMDRequest(argv):
+    for cmdOption in argv:
+        if ((cmdOption == '-u') or (cmdOption == '-updater') or (cmdOption == '-config-updater') or (cmdOption == '-configuration-updater')):
+            return True
+    return False
+
+
 #check if alternate config argument is missing
 def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList,the_dict):
     try:
@@ -153,6 +161,7 @@ def parse_command_line_options(the_dict):
     cmdopt_dict['optionsList']=['-a','-attrs','-attributes','-attr','-attribute',
                                 '-c','-config','-configuration',
                                 '-d','-container',
+                                '-u','-updater','-config-updater','-configuration-updater'
                                 '-h', '-help','-?']
 
     #look for -h or -help command line option
@@ -173,6 +182,9 @@ def parse_command_line_options(the_dict):
  
     #look for -d or -container command line option
     cmdopt_dict['containerized']=findContainerCMDRequest(cmdopt_dict['argv'])
+
+    #look for -u or -updater or -config-updater or -configuration-updater command line option
+    cmdopt_dict['configUpdater']=findConfigUpdaterCMDRequest(cmdopt_dict['argv'])
 
     #look for another option directly after -c or -config command instead of the path
     findNoOptionAfterAltConfigCMDRequest(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],cmdopt_dict['optionsList'],the_dict)
