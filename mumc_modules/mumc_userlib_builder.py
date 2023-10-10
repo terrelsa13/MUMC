@@ -4,6 +4,7 @@ from collections import defaultdict
 from operator import attrgetter
 import json
 import os
+import copy
 from mumc_config_defaults import get_default_config_values
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json,write_to_file,print_byType
 from mumc_modules.mumc_url import requestURL
@@ -810,10 +811,15 @@ def get_users_and_libraries(the_dict):
                     lib_dict['network_path']=None
                 lib_dict['lib_enabled']=True
                 lib_dict['selection']=None
+                #put all libraries in the opposite list
                 if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+                    #blacklist_list.append(lib_dict)
                     blacklist_list.append(lib_dict.copy())
+                    #blacklist_list.append(copy.deepcopy(lib_dict))
                 else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+                    #whitelist_list.append(lib_dict)
                     whitelist_list.append(lib_dict.copy())
+                    #whitelist_list.append(copy.deepcopy(lib_dict))
 
     #whitelist_dict['whitelist']=whitelist_list
     #blacklist_dict['blacklist']=blacklist_list
@@ -868,20 +874,31 @@ def get_users_and_libraries(the_dict):
             #users_dict_temp=usersdata_existing[user_id_existing_list.index(userdata['Id'])]
             #user_temp_list.append(users_dict_temp.copy())
 
-            user_temp_list.append(usersdata_existing[user_id_existing_list.index(userdata['Id'])].copy())
             #user_temp_list.append(usersdata_existing[user_id_existing_list.index(userdata['Id'])])
+            #user_temp_list.append(usersdata_existing[user_id_existing_list.index(userdata['Id'])].copy())
+            user_temp_list.append(copy.deepcopy(usersdata_existing[user_id_existing_list.index(userdata['Id'])]))
         else:
             users_dict_temp['user_id']=userdata['Id']
             users_dict_temp['user_name']=userdata['Name']
             #users_dict.update(users_dict_temp.copy())
             #users_dict.update(whitelist_dict)
             #users_dict.update(blacklist_dict)
+
+            #users_dict_temp['whitelist']=whitelist_list
             users_dict_temp['whitelist']=whitelist_list.copy()
+            #users_dict_temp['whitelist']=copy.deepcopy(whitelist_list)
+
+            #users_dict_temp['blacklist']=blacklist_list
             users_dict_temp['blacklist']=blacklist_list.copy()
+            #users_dict_temp['blacklist']=copy.deepcopy(blacklist_list)
+
             #users_dict.update(users_dict_temp.copy())
             #users_list.append(users_dict.copy())
             #the_dict['admin_settings']['users'].append(users_dict_temp.copy())
-            user_temp_list.append(users_dict_temp.copy())
+
+            #user_temp_list.append(users_dict_temp)
+            #user_temp_list.append(users_dict_temp.copy())
+            user_temp_list.append(copy.deepcopy(users_dict_temp))
 
         '''
         for userdata in data_users:
@@ -896,7 +913,9 @@ def get_users_and_libraries(the_dict):
             the_dict['admin_settings']['users'].append(users_dict.copy())
         '''
 
-    the_dict['admin_settings']['users']=user_temp_list
+    #the_dict['admin_settings']['users']=user_temp_list
+    #the_dict['admin_settings']['users']=user_temp_list.copy()
+    the_dict['admin_settings']['users']=copy.deepcopy(user_temp_list)
 
     stop_loop=False
     single_user=False

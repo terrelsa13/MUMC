@@ -327,4 +327,4 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited'].pop('extra')
 
     #save yaml config file
-    save_yaml_config(the_dict['mumc_path'] / the_dict['config_file_name_yaml'],config_data)
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
