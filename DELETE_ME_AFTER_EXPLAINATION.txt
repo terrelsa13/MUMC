@@ -1,4 +1,4 @@
-# Action Control (Z): Specify the action the script will take when (X) and (Y) is True/False
+# Action Control (Z): Specify the action (W) the script will take when (X) and (Y) is True/False
 
 #### [W, X, Y, Z]
 #### W - Action
