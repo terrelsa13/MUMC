@@ -131,7 +131,7 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
         #Define reasoning for lookup
         var_dict['APIDebugMsg_Child_Of_Whitetagged_From_Blacklist']='Child_Of_Whitetagged_Item_From_Blacklist'
         #data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Whitetag_From_Blacklist_Child,media_played_days,media_created_days)
-        var_dict['data_Child_Of_Whitetagged_From_Blacklist_Children']=getChildren_taggedMediaItems('Whitetagged_From_Blacklist',user_info,var_dict,the_dict)
+        var_dict['data_Child_Of_Whitetagged_From_Blacklist']=getChildren_taggedMediaItems('Whitetagged_From_Blacklist',user_info,var_dict,the_dict)
 
         var_dict['data_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
         var_dict['data_Child_Of_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
