@@ -102,11 +102,11 @@ def build_configuration_file(the_dict):
         print('----------------------------------------------------------------------------------------')
         #ask user how they want to choose libraries/folders
         #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
-        the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'].casefold())
+        the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
         print('----------------------------------------------------------------------------------------')
         #ask user how they want media items to be matched to libraries/folders
         #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
-        the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'].casefold())
+        the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
 
     #set auth_key to allow printing username next to userkey

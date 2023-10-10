@@ -150,10 +150,10 @@ def get_library_setup_behavior(library_setup_behavior=None):
         print('                All other libraries will be whitelisted.')
         print('1 - whitelist - Chosen libraries will whitelisted.')
         print('                All other libraries will be blacklisted.')
-        if (library_setup_behavior == 'blacklist'):
+        if (library_setup_behavior.casefold() == 'blacklist'):
             print('')
             print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
-        elif (library_setup_behavior == 'whitelist'):
+        elif (library_setup_behavior.casefold() == 'whitelist'):
             print('')
             print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
         behavior=input('Choose how the script will use the chosen libraries. (default ' + defaultbehavior + '): ')
@@ -182,7 +182,9 @@ def get_library_matching_behavior(library_matching_behavior=None):
         print('   If your libraries do not have a \'Shared Network Folder\' you must filter byPath.')
         print('   If your libraries have a \'Shared Network Folder\' you must filter byNetworkPath.')
         print('   Filtering byId does not have the above limitations.')
-        if ((library_matching_behavior == 'byid') or (library_matching_behavior == 'bypath') or (library_matching_behavior == 'bynetworkpath')):
+        if ((library_matching_behavior.casefold() == 'byid') or
+            (library_matching_behavior.casefold() == 'bypath') or
+            (library_matching_behavior.casefold() == 'bynetworkpath')):
             print('')
             print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
         behavior=input('Choose how the script will match media items to libraries. (default ' + defaultbehavior + '): ')
