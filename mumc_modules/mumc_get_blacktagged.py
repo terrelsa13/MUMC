@@ -117,7 +117,7 @@ def init_whitelist_blacktagged_query(var_dict):
 def blacklist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or blacklist are not an empty strings
     #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_blacklist_lib']['lib_id'] == ''))):
-    if ((not var_dict['Blacktags_Parsed']) and (var_dict['this_blacklist_lib']['lib_enabled'])):
+    if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_blacklist_lib']['lib_enabled'])):
         #Built query for blacktagged from blacklist media items
         var_dict['apiQuery_Blacktagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Blacklist'] +
@@ -157,7 +157,7 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
 def whitelist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or whitelist are not an empty strings
     #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_whitelist_lib']['lib_id'] == ''))):
-    if ((not var_dict['Blacktags_Parsed']) and (var_dict['this_whitelist_lib']['lib_enabled'])):
+    if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_whitelist_lib']['lib_enabled'])):
         #Built query for blacktagged from whitelist media items
         var_dict['apiQuery_Blacktagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Whitelist'] +

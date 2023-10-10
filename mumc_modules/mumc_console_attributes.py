@@ -117,7 +117,7 @@ class console_text_attributes:
 
 ############# START OF SCRIPT #############
 
-if __name__ == "__main__":
+if (__name__ == "__main__"):
     console_text_attributes().console_attribute_test()
     exit(0)
 

@@ -5,7 +5,13 @@ from mumc_modules.mumc_url import requestURL
 
 #Get the current script version
 def get_script_version():
-    Version='5.0.1'
+    Version='5.0.2'
+    return(Version)
+
+
+#Get the min config version
+def get_min_config_version():
+    Version='5.0.0'
     return(Version)
 
 
@@ -32,6 +38,7 @@ def get_python_version():
 #Get the operating system information
 def get_operating_system_info():
     return(platform.platform())
+
 
 #Get major, minor and patch version numbers along with release version information
 def get_semantic_version_parts(version):

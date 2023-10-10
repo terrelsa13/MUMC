@@ -32,13 +32,13 @@ def libConvertLegacyToYAML(user_wl_libs,user_bl_libs):
                 user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
                 one_or_more_wl_entry=True
         #if user has no whitelist entries then set template with None/null values
-        if (one_or_more_wl_entry == False):
-            user_lib_dict['lib_id']=''
-            user_lib_dict['collection_type']=''
-            user_lib_dict['path']=''
-            user_lib_dict['network_path']=''
-            user_lib_dict['lib_enabled']=False
-            user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
+        #if (one_or_more_wl_entry == False):
+            #user_lib_dict['lib_id']=''
+            #user_lib_dict['collection_type']=''
+            #user_lib_dict['path']=''
+            #user_lib_dict['network_path']=''
+            #user_lib_dict['lib_enabled']=False
+            #user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
         user_wl_data_list.append(user_wl_data_dict.copy())
 
     for blentry in user_bl_libs_loaded:
@@ -56,13 +56,13 @@ def libConvertLegacyToYAML(user_wl_libs,user_bl_libs):
                 user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
                 one_or_more_bl_entry=True
         #if user has no blacklist entries then set template with None/null values
-        if (one_or_more_bl_entry == False):
-            user_lib_dict['lib_id']=''
-            user_lib_dict['collection_type']=''
-            user_lib_dict['path']=''
-            user_lib_dict['network_path']=''
-            user_lib_dict['lib_enabled']=False
-            user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
+        #if (one_or_more_bl_entry == False):
+            #user_lib_dict['lib_id']=''
+            #user_lib_dict['collection_type']=''
+            #user_lib_dict['path']=''
+            #user_lib_dict['network_path']=''
+            #user_lib_dict['lib_enabled']=False
+            #user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
         user_bl_data_list.append(user_bl_data_dict.copy())
 
     #user_data_list=user_wl_data_list+user_bl_data_list

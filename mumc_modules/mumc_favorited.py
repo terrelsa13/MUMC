@@ -615,8 +615,9 @@ def get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict):
         if ((not (album_item_info['Id'] in isfav_AUDIO['albumartist'])) or (isfav_AUDIO['albumartist'][album_item_info['Id']] == False)):
             isfav_AUDIO['albumartist']=get_isARTIST_Fav(user_info,album_item_info,isfav_AUDIO['albumartist'],favorited_advanced_album_artist,lookupTopicAlbum + '_artist',the_dict)
 
-        if ((not (album_item_info['Id'] in isfav_AUDIO['libraryartist'])) or (isfav_AUDIO['libraryartist'][album_item_info['Id']] == False)):
-            isfav_AUDIO['libraryartist']=get_isARTIST_Fav(user_info,album_item_info,isfav_AUDIO['libraryartist'],favorited_advanced_album_library_artist,lookupTopicAlbum + '_library_artist',the_dict)
+        if (itemType == 'AudioBook'):
+            if ((not (album_item_info['Id'] in isfav_AUDIO['libraryartist'])) or (isfav_AUDIO['libraryartist'][album_item_info['Id']] == False)):
+                isfav_AUDIO['libraryartist']=get_isARTIST_Fav(user_info,album_item_info,isfav_AUDIO['libraryartist'],favorited_advanced_album_library_artist,lookupTopicAlbum + '_library_artist',the_dict)
 
 ### End Album/Book #####################################################################################
 

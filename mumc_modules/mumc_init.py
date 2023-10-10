@@ -9,6 +9,7 @@ from mumc_modules.mumc_compare_items import does_index_exist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist
+from mumc_modules.mumc_versions import get_min_config_version,get_script_version
 
 
 def initialize_mumc(cwd,mumc_path):
@@ -17,6 +18,8 @@ def initialize_mumc(cwd,mumc_path):
 
     #Set dictionary variables
     the_cfg['DEBUG']=0
+    the_cfg['script_version']=get_script_version()
+    the_cfg['min_config_version']=get_min_config_version()
     the_cfg['config_file_name']='mumc_config.py'
     the_cfg['config_file_name_yaml']='mumc_config.yaml'
     the_cfg['config_file_name_no_ext']='mumc_config'

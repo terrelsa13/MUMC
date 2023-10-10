@@ -107,10 +107,14 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                         raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate actionControl assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
 
                     #all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
-                    if (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt):
+                    #all_all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
+                    if ((itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt) or
+                        (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt + '_' + andIt)):
                         playedControl=(isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value
                     #any - One or more monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
-                    elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt):
+                    #any_any - One or more monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
+                    elif ((itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt) or
+                          (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt + '_' + orIt)):
                         playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
                     #all_any - Every monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_' + orIt)):

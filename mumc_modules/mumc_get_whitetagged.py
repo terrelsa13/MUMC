@@ -117,7 +117,7 @@ def init_whitelist_whitetagged_query(var_dict):
 def blacklist_whitetagged_query(user_info,var_dict,the_dict):
     #Check if whitetag or blacklist are not an empty strings
     #if (( not (var_dict['Whitetags_Parsed'] == '')) and ( not (var_dict['this_blacklist_lib']['lib_id'] == ''))):
-    if ((not var_dict['Whitetags_Parsed']) and (var_dict['this_blacklist_lib']['lib_enabled'])):
+    if ((not (var_dict['Whitetags_Parsed'] == '')) and (var_dict['this_blacklist_lib']['lib_enabled'])):
         #Built query for whitetagged from Blacklist media items
         var_dict['apiQuery_Whitetagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Blacklist'] +
@@ -160,7 +160,7 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 def whitelist_whitetagged_query(user_info,var_dict,the_dict):
     #Check if whitetag or whitelist are not an empty strings
     #if (( not (var_dict['Whitetags_Parsed'] == '')) and ( not (var_dict['this_whitelist_lib']['lib_id'] == ''))):
-    if ((not var_dict['Whitetags_Parsed']) and (var_dict['this_whitelist_lib']['lib_enabled'])):
+    if ((not (var_dict['Whitetags_Parsed'] == '')) and (var_dict['this_whitelist_lib']['lib_enabled'])):
         #Built query for whitetagged_From_Whitelist= media items
         var_dict['apiQuery_Whitetagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Whitelist'] +

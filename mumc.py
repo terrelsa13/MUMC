@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import multiprocessing
+import copy
 from pathlib import Path
 from datetime import datetime
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
@@ -34,8 +35,10 @@ def main():
     cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
-    init_dict.update(cfg.copy())
-    cfg=init_dict.copy()
+    #init_dict.update(cfg.copy())
+    init_dict.update(copy.deepcopy(cfg))
+    #cfg=init_dict.copy()
+    cfg=copy.deepcopy(init_dict)
     init_dict.clear()
 
     #update cache variables with values specified in the config file
@@ -56,7 +59,7 @@ def main():
         #exit gracefully after updating config
         exit(0)
 
-    #output details about script, Emby/Jellying, and server
+    #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
 
     #when debug is enabled force all console outputs
@@ -109,7 +112,7 @@ def main():
 
 ############# START OF SCRIPT #############
 
-if __name__ == "__main__":
+if (__name__ == "__main__"):
     main()
 
 ############# END OF SCRIPT #############

@@ -793,14 +793,18 @@ def get_users_and_libraries(the_dict):
     #Build library staging dictionaries for unprocessed users
      #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
     for folder in data_folders:
-        if (not (folder['CollectionType'] == 'boxsets')):
+        #if (not (folder['CollectionType'] == 'boxsets')):
+        if (not (folder['LibraryOptions']['PathInfos'] == [])):
             the_dict['data_folders'].append(folder)
             libpos_list.append(folder[libraryGuid])
             libpos_dict[folder[libraryGuid]]=libpos_list.index(folder[libraryGuid])
             for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
                 lib_dict['lib_id']=folder[libraryGuid]
                 #lib_dict['lib_enabled']=True
-                lib_dict['collection_type']=folder['CollectionType']
+                if ('CollectionType' in folder):
+                    lib_dict['collection_type']=folder['CollectionType']
+                else:
+                    lib_dict['collection_type']=None
                 if ('Path' in folder['LibraryOptions']['PathInfos'][libpos]):
                     lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
                 else:
