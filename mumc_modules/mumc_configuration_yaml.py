@@ -3,56 +3,9 @@ import json
 from mumc_modules.mumc_output import save_yaml_config
 
 
-def filterYAMLConfigKeys(dirty_dict,*wanted_keys):
+def filterYAMLConfigKeys(dirty_dict,*clean_keys):
 
-    return {thekey:dirty_dict[thekey] for thekey in wanted_keys}
-
-
-def libConvertToYAML(user_wl_libs,user_bl_libs):
-    user_data_list=[]
-    user_wl_data_list=[]
-    user_bl_data_list=[]
-    user_wl_data_dict={}
-    user_bl_data_dict={}
-    user_lib_dict={}
-    user_wl_libs_loaded=json.loads(user_wl_libs)
-    user_bl_libs_loaded=json.loads(user_bl_libs)
-
-    for wlentry in user_wl_libs_loaded:
-        user_wl_data_dict['user_id']=wlentry['userid']
-        user_wl_data_dict['user_name']=wlentry['username']
-        user_wl_data_dict['whitelist']=[]
-        for entry_data in wlentry:
-            if (entry_data.isnumeric()):
-                user_lib_dict['lib_id']=wlentry[entry_data]['libid']
-                user_lib_dict['collection_type']=wlentry[entry_data]['collectiontype']
-                user_lib_dict['path']=wlentry[entry_data]['path']
-                user_lib_dict['network_path']=wlentry[entry_data]['networkpath']
-                user_lib_dict['lib_enabled']=True
-                user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
-
-        user_wl_data_list.append(user_wl_data_dict.copy())
-
-    for blentry in user_bl_libs_loaded:
-        user_bl_data_dict['user_id']=blentry['userid']
-        user_bl_data_dict['user_name']=blentry['username']
-        user_bl_data_dict['blacklist']=[]
-        for entry_data in blentry:
-            if (entry_data.isnumeric()):
-                user_lib_dict['lib_id']=blentry[entry_data]['libid']
-                user_lib_dict['collection_type']=blentry[entry_data]['collectiontype']
-                user_lib_dict['path']=blentry[entry_data]['path']
-                user_lib_dict['network_path']=blentry[entry_data]['networkpath']
-                user_lib_dict['lib_enabled']=True
-                user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
-
-        user_bl_data_list.append(user_bl_data_dict.copy())
-
-    for user in user_wl_data_list:
-        user_data_list.append(user)
-        user_data_list[user_data_list.index(user)]['blacklist']=user_bl_data_list[user_data_list.index(user)]['blacklist']
-
-    return user_data_list
+    return {cleanKey:dirty_dict[cleanKey] for cleanKey in clean_keys}
 
 
 def yaml_configurationBuilder(the_dict):

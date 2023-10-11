@@ -751,11 +751,11 @@ def cfgCheckYAML(cfg,init_dict):
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > advanced > library_genre must be an integer\n\tValid range 0 thru 2\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_movie_library_genre']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > advanced > library_genre is missing from mumc_config.py\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > extra > library_genre is missing from mumc_config.py\n'
 
     config_dict['whitetagged_behavior_movie']=[]
 
@@ -1108,11 +1108,11 @@ def cfgCheckYAML(cfg,init_dict):
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > advanced > library_genre must be an integer\n\tValid range 0 thru 2\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_tv_library_genre']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > advanced > library_genre is missing from mumc_config.py\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > extra > library_genre is missing from mumc_config.py\n'
 
     if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network')):
         check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network')
@@ -1477,11 +1477,11 @@ def cfgCheckYAML(cfg,init_dict):
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > advanced > library_genre must be an integer\n\tValid range 0 thru 2\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_music_library_genre']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > advanced > library_genre is missing from mumc_config.py\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > extra > library_genre is missing from mumc_config.py\n'
 
     if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','track_artist')):
         check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','track_artist')
@@ -1847,11 +1847,11 @@ def cfgCheckYAML(cfg,init_dict):
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > library_genre must be an integer\n\tValid range 0 thru 2\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
             else:
                 config_dict['favorited_advanced_audiobook_library_genre']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > library_genre is missing from mumc_config.py\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > extra > library_genre is missing from mumc_config.py\n'
 
         if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','track_author')):
             check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','track_author')

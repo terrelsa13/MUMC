@@ -27,6 +27,10 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']={}
+    the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=None
+    the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['user_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['played_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['action_control']=None
     the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action']=None
@@ -44,6 +48,10 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacklisted']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']={}
+    the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['action']=None
+    the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['user_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['played_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['action_control']=None
     the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action']=None
@@ -61,6 +69,10 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacklisted']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']={}
+    the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['action']=None
+    the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['user_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['played_conditional']=None
+    the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['action_control']=None
     the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action']=None
@@ -79,6 +91,10 @@ def setYAMLConfigSkeleton(the_dict):
     if (server_brand == 'jellyfin'):
         the_dict['advanced_settings']['behavioral_statements']['audiobook']={}
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']={}
+        the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']=None
+        the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['user_conditional']=None
+        the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['played_conditional']=None
+        the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action_control']=None
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']={}
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']={}
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action']=None

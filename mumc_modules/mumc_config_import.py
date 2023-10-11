@@ -63,15 +63,15 @@ def importConfig(init_dict,cmdopt_dict):
 
                 #run a config check on the legacy mumc_config.py before converting to mumc_config.yaml
                 legacy_dict=cfgCheckLegacy(cfg,init_dict)
-                legacy_dict=legacy_dict
+                #legacy_dict=legacy_dict
 
                 #function to convert legacy config to mumc_config.yaml
                 convert_legacyConfigToYAML(cfg,cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt'])
 
                 with open(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileNoExt'] + '.yaml', 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
-            #make sure a few of the necessary config variables are there
 
+            #make sure a few of the necessary config variables are there
             init_dict=assignVarTest(init_dict,cmdopt_dict,cfg)
 
         else:
@@ -87,7 +87,7 @@ def importConfig(init_dict,cmdopt_dict):
 
                 #run a config check on the legacy mumc_config.py before converting to mumc_config.yaml
                 legacy_dict=cfgCheckLegacy(cfg,init_dict)
-                legacy_dict=legacy_dict
+                #legacy_dict=legacy_dict
 
                 #convert legacy mumc_config.py to mumc_config.yaml; output is mumc_config.yaml
                 convert_legacyConfigToYAML(legacy_dict,init_dict['mumc_path'],init_dict['config_file_name_no_ext'])

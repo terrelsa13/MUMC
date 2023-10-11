@@ -2406,7 +2406,8 @@ def cfgCheckLegacy(cfg,the_dict):
     if not (error_found_in_mumc_config_py == ''):
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2,the_dict)
-        raise RuntimeError('\n' + error_found_in_mumc_config_py)
+        print('\n' + error_found_in_mumc_config_py)
+        exit(0)
 
 #######################################################################################################
     return config_dict
