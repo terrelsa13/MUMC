@@ -41,7 +41,7 @@ def main():
     if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg)
-        
+
         #show cache stats
         print_cache_stats(cfg)
 

@@ -191,6 +191,16 @@ def print_and_delete_items(deleteItems,the_dict):
         print_audiobook_summary=False
         audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
 
+    #get number of items to be deleted
+     #have to loop thru and look for item_ids because some media has almost
+      #the same data and would not be filtered out by turning this into a set
+    for item in deleteItems:
+        if (not(item['Id'] in deleteItems_Tracker)):
+            deleteItems_Tracker.append(item['Id'])
+    the_dict['deleteItemsLength']=len(deleteItems_Tracker)
+    #clear tracker so it can be used again below
+    deleteItems_Tracker.clear()
+
     #List items to be deleted
     strings_list_to_print=['']
     strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dict)
@@ -436,12 +446,12 @@ def build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dic
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Dry Run Mode')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* REMOVE_FILES=\'False\'')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* No Media Deleted')
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Items = ' + str(len(deleteItems)))
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Items = ' + str(the_dict['deleteItemsLength']))
 
         strings_list_to_print=remove_files_helper(strings_list_to_print,the_dict)
 
     else:
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Items Deleted = ' + str(len(deleteItems)) + '    *')
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Items Deleted = ' + str(the_dict['deleteItemsLength']) + '    *')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
     return strings_list_to_print
