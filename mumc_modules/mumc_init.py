@@ -15,6 +15,7 @@ def initialize_mumc(cwd,mumc_path):
 
     #Set dictionary variables
     the_cfg['DEBUG']=0
+    the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
     the_cfg['config_file_name']='mumc_config.py'
