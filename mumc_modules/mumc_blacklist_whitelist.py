@@ -61,9 +61,9 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\nItem is whitelisted/blacklisted for this user: ' + str(item_isWhitelisted_isBlacklisted),2,the_dict)
         appendTo_DEBUG_log('\nMatching whitelisted/blacklisted value for this user is: ' + str(itemWhitelistedBlacklistedValue),2,the_dict)
-        appendTo_DEBUG_log('\nLibraryId is: ' + LibraryID,2,the_dict)
-        appendTo_DEBUG_log('\nLibraryPath is: ' + LibraryPath,2,the_dict)
-        appendTo_DEBUG_log('\nLibraryNetPath is: ' + LibraryNetPath,2,the_dict)
+        appendTo_DEBUG_log('\nLibraryId is: ' + str(LibraryID),2,the_dict)
+        appendTo_DEBUG_log('\nLibraryPath is: ' + str(LibraryPath),2,the_dict)
+        appendTo_DEBUG_log('\nLibraryNetPath is: ' + str(LibraryNetPath),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted Keys are: ' + ','.join(map(str, user_wlbllib_key_json)),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted Paths are: ' + ','.join(map(str, user_wlbllib_path_json)),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted NetworkPaths are: ' + ','.join(map(str, user_wlbllib_netpath_json)),2,the_dict)

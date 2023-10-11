@@ -5,7 +5,7 @@ from mumc_modules.mumc_url import requestURL
 
 #Get the current script version
 def get_script_version():
-    Version='5.0.2'
+    Version='5.0.3'
     return(Version)
 
 

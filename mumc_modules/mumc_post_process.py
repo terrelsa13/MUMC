@@ -29,14 +29,14 @@ def build_behaviorPattern(isMeeting_dict,behavior_pattern_dict,itemsDictionary,i
 
     if (isMeeting_dict and (itemId in isMeeting_dict)):
         if (itemId in itemsDictionary[subUserId]):
-            if (itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']):
+            if (itemsExtraDictionary[subUserId][itemId][isMeeting_dict['IsMeeting']]):
                 isMeeting_dict[itemId]<<=1
                 isMeeting_dict[itemId]+=1
             else:
                 isMeeting_dict[itemId]<<=1
     else:
         if (itemId in itemsDictionary[subUserId]):
-            if (itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']):
+            if (itemsExtraDictionary[subUserId][itemId][isMeeting_dict['IsMeeting']]):
                 isMeeting_dict[itemId]=1
             else:
                 isMeeting_dict[itemId]=0
@@ -53,9 +53,9 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
     #deleteItems=postproc_dict['deleteItems_Media']
     #deleteItemsIdTracker=postproc_dict['deleteItemsIdTracker_Media']
 
-    isMeetingAction_dict={}
-    isMeetingPlayedFilter_dict={}
-    isMeetingCreatedPlayedFilter_dict={}
+    isMeetingAction_dict={'IsMeeting':'IsMeetingAction'}
+    isMeetingPlayedFilter_dict={'IsMeeting':'IsMeetingPlayedFilter'}
+    isMeetingCreatedPlayedFilter_dict={'IsMeeting':'IsMeetingCreatedPlayedFilter'}
     behavior_pattern_dict={}
     itemId_tracker=[]
     userId_tracker=[]
