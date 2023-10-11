@@ -75,8 +75,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
         for userId in itemsDictionary:
             userId_tracker.append(userId)
 
-        userId_tracker_len=len(userId_tracker)
-        max_binary_value=(2**userId_tracker_len)-1
+        max_binary_value=(2**len(userId_tracker))-1
 
         for userId in itemsDictionary:
             for itemId in itemsDictionary[userId]:
