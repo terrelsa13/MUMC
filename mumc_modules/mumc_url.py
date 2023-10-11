@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import urllib.request as urlrequest
+from urllib.error import HTTPError,URLError
 import json
 import time
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
@@ -70,12 +71,12 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
      #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
         try:
-            with urlrequest.urlopen(url) as response:
+            with urlrequest.urlopen(url,timeout=delay) as response:
                 if (debugState):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
                 #request recieved; but taking long time to return data
                 while (response.getcode() == 202):
-                    #wait 200ms
+                    #wait 20% of the delay value
                     time.sleep(delay/5)
                     if (debugState):
                         appendTo_DEBUG_log("\nWaiting for server to return data from the " + str(reqeustDebugMessage) + " Request; then trying again...",2,the_dict)
@@ -93,15 +94,19 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                             if (debugState):
                                 appendTo_DEBUG_log("\n" + str(err),2,the_dict)
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
-                            raise RuntimeError("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
+                            print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
+                            print('\n  URL: ' + url + '')
+                            exit(0)
                         else:
-                            time.sleep(delay)
+                            #time.sleep(delay)
                             #delay value doubles each time the same API request is resent
                             delay += delay
                             if (delay >= (2**retryAttempts)):
                                 if (debugState):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",2,the_dict)
-                                raise RuntimeError("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
+                                print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
+                                print('\n  URL: ' + url + '')
+                                exit(0)
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
@@ -118,20 +123,47 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                     getdata = False
                     if (debugState):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
-                    raise RuntimeError("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()))
-        except Exception as err:
-            if ((err.msg == 'Unauthorized')):
-                if (debugState):
-                    appendTo_DEBUG_log("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource",2,the_dict)
-                raise RuntimeError("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource")
-            else:
-            
-                time.sleep(delay)
-                #delay value doubles each time the same API request is resent
-                delay += delay
-                if (delay >= (2**retryAttempts)):
-                    if (debugState):
-                        appendTo_DEBUG_log("\n" + str(err) + "\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",2,the_dict)
-                    raise RuntimeError("\n" + str(err) + "\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
+                    print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()))
+                    print('\n  URL: ' + url + '')
+                    exit(0)
+        except HTTPError as err:
+            #time.sleep(delay)
+            #delay value doubles each time the same API request is resent
+            delay += delay
+            if (delay >= (2**retryAttempts)):
+                print('\nHTTPError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
+                print('\n  URL: ' + url + '')
+                print('\n' + str(err.status) + '\n' + str(err.reason))
+                if(debugState):
+                    appendTo_DEBUG_log('\nHTTPError: Unable to get information from server during processing of: ' + reqeustDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
+                    appendTo_DEBUG_log('\n' + str(err.status) + '\n' + str(err.reason),2,the_dict)
+                exit(0)
+        except URLError as err:
+            #time.sleep(delay)
+            #delay value doubles each time the same API request is resent
+            delay += delay
+            if (delay >= (2**retryAttempts)):
+                print('\nURLError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
+                print('\n  URL: ' + url + '')
+                print('\n' + str(err.reason))
+                if(debugState):
+                    appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + reqeustDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
+                    appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
+                exit(0)
+        except TimeoutError:
+            #time.sleep(delay)
+            #delay value doubles each time the same API request is resent
+            delay += delay
+            if (delay >= (2**retryAttempts)):
+                print('\nTimeoutError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
+                print('\n  URL: ' + url + '')
+                print('\nTimeout - Request taking too long')
+                if(debugState):
+                    appendTo_DEBUG_log('\nTimeoutError: Unable to get information from server during processing of: ' + reqeustDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
+                    appendTo_DEBUG_log('\nTimeout - Request taking too long',2,the_dict)
+                exit(0)
 
     return(data)
