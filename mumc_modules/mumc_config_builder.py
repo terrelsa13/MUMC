@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
-import urllib.request as urlrequest
-from collections import defaultdict
-from operator import attrgetter
-import json
-import os
-from mumc_config_defaults import get_default_config_values
-from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json,write_to_file,print_byType
-from mumc_modules.mumc_url import requestURL
-from mumc_modules.mumc_server_type import isJellyfinServer,isEmbyServer
+from mumc_modules.mumc_output import print_byType
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_authentication_key
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
-from mumc_modules.mumc_configuration import mumc_configuration_builder
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-from mumc_modules.mumc_compare_items import keys_exist
-from mumc_modules.mumc_sort import sortLibSelection
 from mumc_modules.mumc_userlib_builder import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 
@@ -93,10 +82,6 @@ def build_configuration_file(the_dict):
         the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
         print('----------------------------------------------------------------------------------------')
 
-        #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
-        #the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
-        #print('----------------------------------------------------------------------------------------')
-
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
         print('----------------------------------------------------------------------------------------')
@@ -118,35 +103,6 @@ def build_configuration_file(the_dict):
     #set REMOVE_FILES
     the_dict['advanced_settings']['REMOVE_FILES']=False
 
-    '''
-    userkeys_bllibs_list=[]
-    userbllibs_list=[]
-    userkeys_wllibs_list=[]
-    userwllibs_list=[]
-
-    #Attach userkeys to blacklist library data structure
-    for userkey, userbllib in the_dict['user_keys_and_bllibs'].items():
-        #Get all users
-        userkeys_bllibs_list.append(userbllib['username'] + ':' + userkey)
-        userbllibs_list.append(userbllib)
-
-    #Attach userkeys to whitelist library data structure
-    for userkey, userwllib in the_dict['user_keys_and_wllibs'].items():
-        userkeys_wllibs_list.append(userwllib['username'] + ':' + userkey)
-        userwllibs_list.append(userwllib)
-
-    #Check each user has an entry in blacklists and whitelists
-    # Then prep the data structure for writing to the config file
-    if (userkeys_bllibs_list == userkeys_wllibs_list):
-        the_dict['user_keys']=json.dumps(userkeys_bllibs_list)
-        #user_keys=json.dumps(userkeys_wllibs_list) #Only need to dump userkeys once
-        the_dict['user_bl_libs']=json.dumps(userbllibs_list)
-        the_dict['user_wl_libs']=json.dumps(userwllibs_list)
-    else:
-        raise ValueError('Error! User key values do not match.')
-    '''
-
-
     print('----------------------------------------------------------------------------------------')
     #Build the legacy config file
     #config_file=mumc_configuration_builder(cfg,the_dict)
@@ -166,37 +122,18 @@ def build_configuration_file(the_dict):
             the_dict=getIsAnyMediaEnabled(the_dict)
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
-            '''
-            #when all *_condition_days config options are disabled print notification
-            if (
-                (get_default_config_values('xplayed_filter_movie')[0] == -1) and
-                (get_default_config_values('xcreated_filter_movie')[0] == -1) and
-                (get_default_config_values('xplayed_filter_episode')[0] == -1) and
-                (get_default_config_values('xcreated_filter_episode')[0] == -1) and
-                (get_default_config_values('xplayed_filter_audio')[0] == -1) and
-                (get_default_config_values('xcreated_filter_audio')[0] == -1) and
-                (get_default_config_values('xplayed_filter_audiobook')[0] == -1) and
-                (((isJellyfinServer(the_dict['admin_settings']['server']['brand'])) and (get_default_config_values('xplayed_filter_audiobook')[0] == -1)) or (isEmbyServer(the_dict['admin_settings']['server']['brand']))) and
-                (((isJellyfinServer(the_dict['admin_settings']['server']['brand'])) and (get_default_config_values('xcreated_filter_audiobook')[0] == -1)) or (isEmbyServer(the_dict['admin_settings']['server']['brand'])))
-                ):
-                print_all_media_disabled(the_dict)
-            '''
 
             try:
                 strings_list_to_print=['']
                 strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-                #print_byType(strings_list_to_print[0],the_dict['xprint_script_warning'],the_dict,the_dict['xscript_warnings_format'])
                 print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:
-                #the_dict['xprint_script_warning']=True
-                #the_dict['xscript_warnings_format']=['','','']
                 the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
                 the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=''
                 the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['style']=''
                 the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['background']['color']=''
                 strings_list_to_print=['']
                 strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-                #print_byType(strings_list_to_print[0],the_dict['xprint_script_warning'],the_dict,the_dict['xscript_warnings_format'])
                 print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
         #the exception

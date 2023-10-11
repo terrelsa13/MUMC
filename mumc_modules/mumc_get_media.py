@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 import multiprocessing
-import urllib.parse as urlparse
-from datetime import timedelta,datetime
+from datetime import timedelta
 from collections import defaultdict
-from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
-from mumc_modules.mumc_favorited import getChildren_favoritedMediaItems,get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,list_to_urlparsed_string
+from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
-from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue,get_playedCreatedDays_playedCreatedCounts
+from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_item_info import get_SERIES_itemInfo
-from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_compare_items import keys_exist
 from mumc_modules.mumc_get_watched import init_blacklist_watched_query,init_whitelist_watched_query,blacklist_watched_query,whitelist_watched_query
 from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,init_whitelist_blacktagged_query,blacklist_blacktagged_query,whitelist_blacktagged_query
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
@@ -108,14 +103,6 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior['played_conditional'].casefold()
     isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior['action'].casefold()
 
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsItemPlayed']=itemIsPlayed
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsItemPlayedCount']=itemPlayedCount
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedDays']=item_matches_played_days_filter
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedCount']=item_matches_played_count_filter
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedDays']=item_matches_created_days_filter
-    #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedCount']=item_matches_created_played_count_filter
-
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
     isactioned_extra_byUserId[user_key][item['Id']]['itemIsPlayed']=itemIsPlayed
     isactioned_extra_byUserId[user_key][item['Id']]['itemPlayedCount']=itemPlayedCount
@@ -124,16 +111,8 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_days_filter']=item_matches_created_days_filter
     isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_played_count_filter']=item_matches_created_played_count_filter
 
-    #if ((not item_matches_played_days_filter) and (not item_matches_played_count_filter)):
-        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=None
-    #else:
-        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
 
-    #if ((not item_matches_created_days_filter) and (not item_matches_created_played_count_filter)):
-        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=None
-    #else:
-        #isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
 
     isActioned_and_played_byUserId[user_key][item['Id']]=item
@@ -167,7 +146,6 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
         #generate error
         pass
 
-    #return isActioned_and_played_byUserId,isactioned_extra_byUserId
     return return_dict
 
 
@@ -247,13 +225,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
     var_dict['library_matching_behavior']=the_dict['admin_settings']['behavior']['matching'].casefold()
 
-    #user_bllib_keys_json=the_dict['user_bllib_keys_json']
-    #user_bllib_netpath_json=the_dict['user_bllib_netpath_json']
-    #user_bllib_path_json=the_dict['user_bllib_path_json']
-    #user_wllib_keys_json=the_dict['user_wllib_keys_json']
-    #user_wllib_netpath_json=the_dict['user_wllib_netpath_json']
-    #user_wllib_path_json=the_dict['user_wllib_path_json']
-
     var_dict['media_played_days']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['played']['condition_days']
     var_dict['media_created_days']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['condition_days']
     var_dict['media_played_count_comparison']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['played']['count_equality']
@@ -296,42 +267,9 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['media_set_missing_last_played_date']=the_dict['advanced_settings']['trakt_fix']['set_missing_last_played_date'][var_dict['media_type_lower']]
 
     var_dict['print_common_delete_keep_info']=(var_dict['print_media_delete_info'] or var_dict['print_media_keep_info'])
-    #the_dict['print_common_delete_keep_info']=print_common_delete_keep_info
 
     var_dict['advFav_media']={}
     var_dict['advFav_media']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['favorited']['extra']
-    '''
-    if (var_dict['media_type_lower'] == 'movie'):
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['library_genre'])
-        #advFav2_media=0
-        #advFav3_media=0
-        #advFav4_media=0
-        #advFav5_media=0
-    elif (var_dict['media_type_lower'] == 'episode'):
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['season_genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['series_genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['library_genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network_genre'])
-    elif (var_dict['media_type_lower'] == 'audio'):
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['library_genre'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['track_artist'])
-        var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_artist'])
-    elif (var_dict['media_type_lower'] == 'audiobook'):
-        if (isJellyfinServer(var_dict['server_brand'])):
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['genre'])
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['audiobook_genre'])
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_genre'])
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['track_author'])
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['author'])
-            var_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_author'])
-        else: #(isEmbyServer(the_dict)):
-            pass
-    '''
 
     if (var_dict['media_type_lower'] == 'episode'):
         var_dict['minimum_number_episodes']=the_dict['advanced_settings']['episode_control']['minimum_episodes']
@@ -343,34 +281,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     #Determine played or created time; UTC time used for media items; determine played and created date for each media type
     var_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media'][var_dict['media_type_lower']]
     var_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media'][var_dict['media_type_lower']]
-
-    #var_dict['cut_off_date_played_media']=get=_timeDelta(the_dict['date_time_now_tz_utc'],timedelta(var_dict['media_played_days']))
-    #var_dict['cut_off_date_created_media']=get_timeDelta(the_dict['date_time_now_tz_utc'] - timedelta(var_dict['media_created_days']))
-
-    '''
-    #Update media_returns with the cut_off_date_played_media if it does not already exist
-    if (not (keys_exist(media_returns,'cut_off_date_played_media'))):
-        media_returns['cut_off_date_played_media']={}
-    #Update media_returns with the cut_off_date_created_media if it does not already exist
-    if (not (keys_exist(media_returns,'cut_off_date_created_media'))):
-        media_returns['cut_off_date_created_media']={}
-
-    #Update media_returns with the played time for this media type if it does not already exist
-    if (not (keys_exist(media_returns['cut_off_date_played_media'],var_dict['media_type_lower']))):
-        media_returns['cut_off_date_played_media'][var_dict['media_type_lower']]=var_dict['cut_off_date_played_media']
-    #Update media_returns with the created time for this media type if it does not already exist
-    if (not (keys_exist(media_returns['cut_off_date_created_media'],var_dict['media_type_lower']))):
-        media_returns['cut_off_date_created_media'][var_dict['media_type_lower']]=var_dict['cut_off_date_created_media']
-    '''
-        #moved to init_getMedia() to prevent race condition
-        #the_dict['cut_off_date_played_media']={}
-        #the_dict['cut_off_date_played_media']={}
-
-        #save cutoff dates-times back to the_dict for use during post processing
-        #if (not (keys_exist(the_dict['cut_off_date_played_media'],var_dict['media_type_lower']))):
-            #the_dict['calculated_cut_off_date_played_media'][var_dict['media_type_lower']]=var_dict.copy()['cut_off_date_played_media']
-        #if (not (keys_exist(the_dict['cut_off_date_created_media'],var_dict['media_type_lower']))):
-            #the_dict['calculated_cut_off_date_created_media'][var_dict['media_type_lower']]=var_dict.copy()['cut_off_date_created_media']
 
     #dictionary of favortied and played items by userId
     var_dict['isfavorited_and_played_byUserId_Media']={}
@@ -416,79 +326,25 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
     var_dict['currentUserPosition']=the_dict['currentUserPosition']
 
-    #get library attributes for user in this position
-    #user_bllib_keys_json_lensplit=user_bllib_keys_json[currentUserPosition].split(',')
-    #user_wllib_keys_json_lensplit=user_wllib_keys_json[currentUserPosition].split(',')
-    #user_bllib_netpath_json_lensplit=user_bllib_netpath_json[currentUserPosition].split(',')
-    #user_wllib_netpath_json_lensplit=user_wllib_netpath_json[currentUserPosition].split(',')
-    #user_bllib_path_json_lensplit=user_bllib_path_json[currentUserPosition].split(',')
-    #user_wllib_path_json_lensplit=user_wllib_path_json[currentUserPosition].split(',')
-
-    #get length of library attributes
-    #len_user_bllib_keys_json_lensplit=len(user_bllib_keys_json_lensplit)
-    #len_user_wllib_keys_json_lensplit=len(user_wllib_keys_json_lensplit)
-    #len_user_bllib_netpath_json_lensplit=len(user_bllib_netpath_json_lensplit)
-    #len_user_wllib_netpath_json_lensplit=len(user_wllib_netpath_json_lensplit)
-    #len_user_bllib_path_json_lensplit=len(user_bllib_path_json_lensplit)
-    #len_user_wllib_path_json_lensplit=len(user_wllib_path_json_lensplit)
-
-    #find min length of library attributes
-    #min_attribute_length=min(len_user_bllib_keys_json_lensplit,len_user_wllib_keys_json_lensplit,
-                                #len_user_bllib_netpath_json_lensplit,len_user_wllib_netpath_json_lensplit,
-                                #len_user_bllib_path_json_lensplit,len_user_wllib_path_json_lensplit)
-
-    #find max length of library attributes
-    #max_attribute_length=max(len_user_bllib_keys_json_lensplit,len_user_wllib_keys_json_lensplit,
-                                #len_user_bllib_netpath_json_lensplit,len_user_wllib_netpath_json_lensplit,
-                                #len_user_bllib_path_json_lensplit,len_user_wllib_path_json_lensplit)
-
-    #make all list attributes the same length
-    #while not (min_attribute_length == max_attribute_length):
-        #if (len_user_bllib_keys_json_lensplit < max_attribute_length):
-            #user_bllib_keys_json_lensplit.append('')
-            #len_user_bllib_keys_json_lensplit += 1
-        #if (len_user_wllib_keys_json_lensplit < max_attribute_length):
-            #user_wllib_keys_json_lensplit.append('')
-            #len_user_wllib_keys_json_lensplit += 1
-
-        #if (len_user_bllib_netpath_json_lensplit < max_attribute_length):
-            #user_bllib_netpath_json_lensplit.append('')
-            #len_user_bllib_netpath_json_lensplit += 1
-        #if (len_user_wllib_netpath_json_lensplit < max_attribute_length):
-            #user_wllib_netpath_json_lensplit.append('')
-            #len_user_wllib_netpath_json_lensplit += 1
-
-        #if (len_user_bllib_path_json_lensplit < max_attribute_length):
-            #user_bllib_path_json_lensplit.append('')
-            #len_user_bllib_path_json_lensplit += 1
-        #if (len_user_wllib_path_json_lensplit < max_attribute_length):
-            #user_wllib_path_json_lensplit.append('')
-            #len_user_wllib_path_json_lensplit += 1
-        #min_attribute_length += 1
-
     var_dict['whitelist_length'] = sum(1 for _ in user_info['whitelist'])
     var_dict['blacklist_length'] = sum(1 for _ in user_info['blacklist'])
     if (var_dict['whitelist_length'] > var_dict['blacklist_length']):
-        #var_dict['longest_list_length']=var_dict['whitelist_length']
         var_dict['shortest_list_length']=var_dict['blacklist_length']
         var_dict['list_diff']=var_dict['whitelist_length'] - var_dict['blacklist_length']
         #longest_list='whitelist'
         var_dict['shortest_list']='blacklist'
     elif (var_dict['blacklist_length'] > var_dict['whitelist_length']):
-        #var_dict['longest_list_length']=var_dict['blacklist_length']
         var_dict['shortest_list_length']=var_dict['whitelist_length']
         var_dict['list_diff']=var_dict['blacklist_length'] - var_dict['whitelist_length']
         #longest_list='blacklist'
         var_dict['shortest_list']='whitelist'
     else:
-        #var_dict['longest_list_length']=blacklist_length
         var_dict['shortest_list_length']=0
         var_dict['list_diff']=0
         #longest_list=''
         var_dict['shortest_list']='whitelist'
 
     for listlen in range(var_dict['list_diff']):
-        #user_info[shortest_list].insert((shortest_list_length+listlen),{'lib_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
         user_info[var_dict['shortest_list']].insert((var_dict['shortest_list_length']+listlen),{'lib_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
 
     var_dict['media_found']=False
@@ -502,9 +358,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
         var_dict['user_processed_item_Ids']=set()
 
-        #currentSubPosition=0
-
-        #for var_dict['this_blacklist_lib']['lib_id'],var_dict['this_whitelist_lib']['lib_id'],var_dict['this_blacklist_lib']['network_path'],var_dict['this_whitelist_lib']['network_path'],var_dict['this_blacklist_lib']['path'],var_dict['this_whitelist_lib']['path'] in zip(user_bllib_keys_json_lensplit,user_wllib_keys_json_lensplit,user_bllib_netpath_json_lensplit,user_wllib_netpath_json_lensplit,user_bllib_path_json_lensplit,user_wllib_path_json_lensplit):
         for var_dict['this_whitelist_lib'],var_dict['this_blacklist_lib'] in zip (user_info['whitelist'],user_info['blacklist']):
 
             var_dict=init_blacklist_favorited_query(var_dict)
@@ -515,344 +368,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
             var_dict=init_whitelist_blacktagged_query(var_dict)
             var_dict=init_blacklist_watched_query(var_dict,the_dict)
             var_dict=init_whitelist_watched_query(var_dict,the_dict)
-
-            '''
-            #Initialize api_query_handler() variables for watched media items in blacklists
-            var_dict['StartIndex_Blacklist']=0
-            var_dict['TotalItems_Blacklist']=1
-            var_dict['QueryLimit_Blacklist']=1
-            var_dict['QueriesRemaining_Blacklist']=True
-            var_dict['APIDebugMsg_Blacklist']=var_dict['media_type_lower'] + '_blacklist_media_items'
-
-            #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-            if (var_dict['this_blacklist_lib']['lib_enabled']):
-                #Build query for watched media items in blacklists
-                var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
-                var_dict['FieldsState_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Blacklist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Blacklist']='Ascending'
-                var_dict['EnableUserData_Blacklist']='True'
-                var_dict['Recursive_Blacklist']='True'
-                var_dict['EnableImages_Blacklist']='False'
-                var_dict['CollapseBoxSetItems_Blacklist']='False'
-                var_dict['IsPlayedState_Blacklist']=get_isPlayedCreated_FilterValue(the_dict,var_dict)
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['FieldsState_Blacklist']=var_dict['FieldsState_Blacklist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
-                    else:
-                        var_dict['SortBy_Blacklist']='SeriesName,' + var_dict['SortBy_Blacklist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Blacklist']=var_dict['FieldsState_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist' 
-                    var_dict['SortBy_Blacklist']='Artists,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacklist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Blacklist']+=',audiobook,book'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Blacklist']=',book'
-
-            #Initialize api_query_handler() variables for watched media items in whitelists
-            var_dict['StartIndex_Whitelist']=0
-            var_dict['TotalItems_Whitelist']=1
-            var_dict['QueryLimit_Whitelist']=1
-            var_dict['QueriesRemaining_Whitelist']=True
-            var_dict['APIDebugMsg_Whitelist']=var_dict['media_type_lower'] + '_whitelist_media_items'
-
-            #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-            if (var_dict['this_whitelist_lib']['lib_enabled']):
-                #Build query for watched media items in whitelists
-                var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
-                var_dict['FieldsState_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Whitelist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Whitelist']='Ascending'
-                var_dict['EnableUserData_Whitelist']='True'
-                var_dict['Recursive_Whitelist']='True'
-                var_dict['EnableImages_Whitelist']='False'
-                var_dict['CollapseBoxSetItems_Whitelist']='False'
-                var_dict['IsPlayedState_Whitelist']=get_isPlayedCreated_FilterValue(the_dict,var_dict)
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['FieldsState_Whitelist']=var_dict['FieldsState_Whitelist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
-                    else:
-                        var_dict['SortBy_Whitelist']='SeriesName,' + var_dict['SortBy_Whitelist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Whitelist']=var_dict['FieldsState_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Whitelist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Whitelist']+=',AudioBook,Book'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Whitelist']=',Book'
-
-            #Initialize api_query_handler() variables for Favorited from Blacklist media items
-            var_dict['StartIndex_Favorited_From_Blacklist']=0
-            var_dict['TotalItems_Favorited_From_Blacklist']=1
-            var_dict['QueryLimit_Favorited_From_Blacklist']=1
-            var_dict['QueriesRemaining_Favorited_From_Blacklist']=True
-            var_dict['APIDebugMsg_Favorited_From_Blacklist']=var_dict['media_type_lower'] + '_Favorited_From_Blacklisted_media_items'
-
-            #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-            if (var_dict['this_blacklist_lib']['lib_enabled']):
-                    #Build query for Favorited_From_Blacklist media items
-                var_dict['IncludeItemTypes_Favorited_From_Blacklist']=var_dict['media_type_title']
-                var_dict['FieldsState_Favorited_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Favorited_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Favorited_From_Blacklist']='Ascending'
-                var_dict['EnableUserData_Favorited_From_Blacklist']='True'
-                var_dict['Recursive_Favorited_From_Blacklist']='True'
-                var_dict['EnableImages_Favorited_From_Blacklist']='False'
-                var_dict['CollapseBoxSetItems_Favorited_From_Blacklist']='False'
-                var_dict['IsFavorite_From_Blacklist']='True'
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Favorited_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Blacklist']
-                    else:
-                        var_dict['SortBy_Favorited_From_Blacklist']='SeriesName,' + var_dict['SortBy_Favorited_From_Blacklist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Favorited_From_Blacklist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Favorited_From_Blacklist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-
-            #Initialize api_query_handler() variables for Favorited from Whitelist media items
-            var_dict['StartIndex_Favorited_From_Whitelist']=0
-            var_dict['TotalItems_Favorited_From_Whitelist']=1
-            var_dict['QueryLimit_Favorited_From_Whitelist']=1
-            var_dict['QueriesRemaining_Favorited_From_Whitelist']=True
-            var_dict['APIDebugMsg_Favorited_From_Whitelist']=var_dict['media_type_lower'] + '_Favorited_From_Whitelisted_media_items'
-
-            #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-            if (var_dict['this_whitelist_lib']['lib_enabled']):
-                #Build query for Favorited_From_Whitelist media items
-                var_dict['IncludeItemTypes_Favorited_From_Whitelist']=var_dict['media_type_title']
-                var_dict['FieldsState_Favorited_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Favorited_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Favorited_From_Whitelist']='Ascending'
-                var_dict['EnableUserData_Favorited_From_Whitelist']='True'
-                var_dict['Recursive_Favorited_From_Whitelist']='True'
-                var_dict['EnableImages_Favorited_From_Whitelist']='False'
-                var_dict['CollapseBoxSetItems_Favorited_From_Whitelist']='False'
-                var_dict['IsFavorite_From_Whitelist']='True'
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Favorited_From_Whitelist']=var_dict['FieldsState_Favorited_From_Whitelist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Favorited_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Whitelist']
-                    else:
-                        var_dict['SortBy_Favorited_From_Whitelist']='SeriesName,' + var_dict['SortBy_Favorited_From_Whitelist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Favorited_From_Whitelist']=var_dict['FieldsState_Favorited_From_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Favorited_From_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Favorited_From_Whitelist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',Audio,MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-
-            #Initialize api_query_handler() variables for blacktagged from blacklist media items
-            var_dict['StartIndex_Blacktagged_From_Blacklist']=0
-            var_dict['TotalItems_Blacktagged_From_Blacklist']=1
-            var_dict['QueryLimit_Blacktagged_From_Blacklist']=1
-            var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=True
-            var_dict['APIDebugMsg_Blacktagged_From_Blacklist']=var_dict['media_type_lower'] + '_blacktagged_from_blacklist_media_items'
-
-            #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-            if (var_dict['this_blacklist_lib']['lib_enabled']):
-                #Build query for blacktagged media items from blacklist
-                var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']=var_dict['media_type_title']
-                var_dict['FieldsState_Blacktagged_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Blacktagged_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Blacktagged_From_Blacklist']='Ascending'
-                var_dict['EnableUserData_Blacktagged_From_Blacklist']='True'
-                var_dict['Recursive_Blacktagged_From_Blacklist']='True'
-                var_dict['EnableImages_Blacktagged_From_Blacklist']='False'
-                var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist']='False'
-                #Encode blacktags so they are url acceptable
-                var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Blacktagged_From_Blacklist']=var_dict['FieldsState_Blacktagged_From_Blacklist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Blacktagged_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacktagged_From_Blacklist']
-                    else:
-                        var_dict['SortBy_Blacktagged_From_Blacklist']='SeriesName,' + var_dict['SortBy_Blacktagged_From_Blacklist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Blacktagged_From_Blacklist']=var_dict['FieldsState_Blacktagged_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Blacktagged_From_Blacklist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacktagged_From_Blacklist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',Audio,MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-
-            #Initialize api_query_handler() variables for blacktagged from whitelist media items
-            var_dict['StartIndex_Blacktagged_From_Whitelist']=0
-            var_dict['TotalItems_Blacktagged_From_Whitelist']=1
-            var_dict['QueryLimit_Blacktagged_From_Whitelist']=1
-            var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=True
-            var_dict['APIDebugMsg_Blacktagged_From_Whitelist']=var_dict['media_type_lower'] + '_blacktagged_from whitelisted_media_items'
-
-            #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-            if (var_dict['this_whitelist_lib']['lib_enabled']):
-                #Build query for blacktagged media items from whitelist
-                var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']=var_dict['media_type_title']
-                var_dict['FieldsState_Blacktagged_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Blacktagged_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Blacktagged_From_Whitelist']='Ascending'
-                var_dict['EnableUserData_Blacktagged_From_Whitelist']='True'
-                var_dict['Recursive_Blacktagged_From_Whitelist']='True'
-                var_dict['EnableImages_Blacktagged_From_Whitelist']='False'
-                var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist']='False'
-                #Encode blacktags so they are url acceptable
-                var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Blacktagged_From_Whitelist']=var_dict['FieldsState_Blacktagged_From_Whitelist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Blacktagged_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Blacktagged_From_Whitelist']
-                    else:
-                        var_dict['SortBy_Blacktagged_From_Whitelist']='SeriesName,' + var_dict['SortBy_Blacktagged_From_Whitelist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Blacktagged_From_Whitelist']=var_dict['FieldsState_Blacktagged_From_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Blacktagged_From_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacktagged_From_Whitelist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',Audio,MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-
-            #Initialize api_query_handler() variables for whitetagged from blacklist media items
-            var_dict['StartIndex_Whitetagged_From_Blacklist']=0
-            var_dict['TotalItems_Whitetagged_From_Blacklist']=1
-            var_dict['QueryLimit_Whitetagged_From_Blacklist']=1
-            var_dict['QueriesRemaining_Whitetagged_From_Blacklist']=True
-            var_dict['APIDebugMsg_Whitetagged_From_Blacklist']=var_dict['media_type_lower'] + '_whitetagged_from_blacklisted_media_items'
-
-            #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-            if (var_dict['this_blacklist_lib']['lib_enabled']):
-                #Build query for whitetagged media items from blacklist
-                var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']=var_dict['media_type_title']
-                var_dict['FieldsState_Whitetagged_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Whitetagged_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Whitetagged_From_Blacklist']='Ascending'
-                var_dict['EnableUserData_Whitetagged_From_Blacklist']='True'
-                var_dict['Recursive_Whitetagged_From_Blacklist']='True'
-                var_dict['EnableImages_Whitetagged_From_Blacklist']='False'
-                var_dict['CollapseBoxSetItems_Whitetagged_From_Blacklist']='False'
-                #Encode whitetags so they are url acceptable
-                var_dict['Whitetags_Parsed']=list_to_urlparsed_string(var_dict['whitetags'])
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Whitetagged_From_Blacklist']=var_dict['FieldsState_Whitetagged_From_Blacklist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Whitetagged_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Whitetagged_From_Blacklist']
-                    else:
-                        var_dict['SortBy_Whitetagged_From_Blacklist']='SeriesName,' + var_dict['SortBy_Whitetagged_From_Blacklist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Whitetagged_From_Blacklist']=var_dict['FieldsState_Whitetagged_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Whitetagged_From_Blacklist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Whitetagged_From_Blacklist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']+=',Audio,AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']+=',Audio,MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-
-            #Initialize api_query_handler() variables for whitetagged from whitelist media items
-            var_dict['StartIndex_Whitetagged_From_Whitelist']=0
-            var_dict['TotalItems_Whitetagged_From_Whitelist']=1
-            var_dict['QueryLimit_Whitetagged_From_Whitelist']=1
-            var_dict['QueriesRemaining_Whitetagged_From_Whitelist']=True
-            var_dict['APIDebugMsg_Whitetagged_From_Whitelist']=var_dict['media_type_lower'] + '_whitetagged_from_whitelisted_media_items'
-
-            #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-            if (var_dict['this_whitelist_lib']['lib_enabled']):
-                #Build query for whitetagged media items from whitelist
-                var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']=var_dict['media_type_title']
-                var_dict['FieldsState_Whitetagged_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
-                var_dict['SortBy_Whitetagged_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
-                var_dict['SortOrder_Whitetagged_From_Whitelist']='Ascending'
-                var_dict['EnableUserData_Whitetagged_From_Whitelist']='True'
-                var_dict['Recursive_Whitetagged_From_Whitelist']='True'
-                var_dict['EnableImages_Whitetagged_From_Whitelist']='False'
-                var_dict['CollapseBoxSetItems_Whitetagged_From_Whitelist']='False'
-                #Encode whitetags so they are url acceptable
-                var_dict['Whitetags_Parsed']=list_to_urlparsed_string(var_dict['whitetags'])
-
-                if (var_dict['media_type_lower'] == 'movie'):
-                    var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']+=',BoxSet,CollectionFolder'
-
-                if (var_dict['media_type_lower'] == 'episode'):
-                    var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']+=',Season,Series,CollectionFolder'
-                    var_dict['FieldsState_Whitetagged_From_Whitelist']=var_dict['FieldsState_Whitetagged_From_Whitelist'] + ',SeriesStudio,seriesStatus'
-                    if (isJellyfinServer(var_dict['server_brand'])):
-                        var_dict['SortBy_Whitetagged_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitetagged_From_Whitelist']
-                    else:
-                        var_dict['SortBy_Whitetagged_From_Whitelist']='SeriesName,' + var_dict['SortBy_Whitetagged_From_Whitelist']
-
-                if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-                    var_dict['FieldsState_Whitetagged_From_Whitelist']=var_dict['FieldsState_Whitetagged_From_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
-                    var_dict['SortBy_Whitetagged_From_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Whitetagged_From_Whitelist']
-                    if (isEmbyServer(var_dict['server_brand'])):
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']+=',AudioBook,Book,MusicAlbum,Playlist,CollectionFolder'
-                    else:
-                        if (var_dict['media_type_lower'] == 'audio'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']+=',MusicAlbum,Playlist,CollectionFolder'
-                        elif (var_dict['media_type_lower'] == 'audiobook'):
-                            var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']+=',Book,MusicAlbum,Playlist,CollectionFolder'
-            '''
 
             var_dict['QueryItemsRemaining_All']=True
 
@@ -866,193 +381,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                 var_dict=whitelist_blacktagged_query(user_info,var_dict,the_dict)
                 var_dict=blacklist_watched_query(user_info,var_dict,the_dict)
                 var_dict=whitelist_watched_query(user_info,var_dict,the_dict)
-
-                '''
-                #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-                if (var_dict['this_blacklist_lib']['lib_enabled']):
-                    #Built query for watched items in blacklists
-                    var_dict['apiQuery_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacklist']) + '&IsPlayed=' + var_dict['IsPlayedState_Blacklist'] +
-                    '&Fields=' + var_dict['FieldsState_Blacklist'] + '&Recursive=' + var_dict['Recursive_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacklist'] +
-                    '&EnableImages=' + var_dict['EnableImages_Blacklist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Blacklist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for watched media items in blacklists
-                    #var_dict['data_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['QueriesRemaining_Blacklist']=api_query_handler(var_dict['apiQuery_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['APIDebugMsg_Blacklist'],the_dict)
-                    var_dict=api_query_handler('Blacklist',var_dict,the_dict)
-                else:
-                    #When no media items are blacklisted; simulate an empty query being returned
-                    #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
-                    var_dict['data_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Blacklist']=0
-                    var_dict['QueriesRemaining_Blacklist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo watched media items are blacklisted",2,the_dict)
-
-                #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-                if (var_dict['this_whitelist_lib']['lib_enabled']):
-                    #Built query for watched items in whitelists
-                    var_dict['apiQuery_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Whitelist']) + '&IsPlayed=' + var_dict['IsPlayedState_Whitelist'] +
-                    '&Fields=' + var_dict['FieldsState_Whitelist'] + '&Recursive=' + var_dict['Recursive_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitelist'] +
-                    '&EnableImages=' + var_dict['EnableImages_Whitelist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Whitelist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for watched media items in whitelists
-                    #var_dict['data_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['QueriesRemaining_Whitelist']=api_query_handler(var_dict['apiQuery_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['APIDebugMsg_Whitelist'],the_dict)
-                    var_dict=api_query_handler('Whitelist',var_dict,the_dict)
-                else:
-                    #When no media items are whitelisted; simulate an empty query being returned
-                    #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
-                    var_dict['data_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Whitelist']=0
-                    var_dict['QueriesRemaining_Whitelist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo watched media items are whitelisted",2,the_dict)
-
-                #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-                if (var_dict['this_blacklist_lib']['lib_enabled']):
-                    #Built query for Favorited from Blacklist media items
-                    var_dict['apiQuery_Favorited_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Blacklist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Blacklist'] +
-                    '&Recursive=' + var_dict['Recursive_Favorited_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Blacklist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Blacklist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for Favorited from Blacklist media items
-                    #var_dict['data_Favorited_From_Blacklist'],var_dict['StartIndex_Favorited_From_Blacklist'],var_dict['TotalItems_Favorited_From_Blacklist'],var_dict['QueryLimit_Favorited_From_Blacklist'],var_dict['QueriesRemaining_Favorited_From_Blacklist']=api_query_handler(var_dict['apiQuery_Favorited_From_Blacklist'],var_dict['StartIndex_Favorited_From_Blacklist'],var_dict['TotalItems_Favorited_From_Blacklist'],var_dict['QueryLimit_Favorited_From_Blacklist'],var_dict['APIDebugMsg_Favorited_From_Blacklist'],the_dict)
-                    var_dict=api_query_handler('Favorited_From_Blacklist',var_dict,the_dict)
-                else:
-                    #When no media items are blacklisted; simulate an empty query being returned
-                    #this will prevent trying to compare to an empty blacklist string '' to the whitelist libraries later on
-                    var_dict['data_Favorited_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Favorited_From_Blacklist']=0
-                    var_dict['QueriesRemaining_Favorited_From_Blacklist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo favorited media items are blacklisted",2,the_dict)
-
-                #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-                if (var_dict['this_whitelist_lib']['lib_enabled']):
-                    #Built query for Favorited From Whitelist media items
-                    var_dict['apiQuery_Favorited_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Whitelist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Whitelist'] +
-                    '&Recursive=' + var_dict['Recursive_Favorited_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Whitelist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Whitelist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for Favorited from Whitelist media items
-                    #var_dict['data_Favorited_From_Whitelist'],var_dict['StartIndex_Favorited_From_Whitelist'],var_dict['TotalItems_Favorited_From_Whitelist'],var_dict['QueryLimit_Favorited_From_Whitelist'],var_dict['QueriesRemaining_Favorited_From_Whitelist']=api_query_handler(var_dict['apiQuery_Favorited_From_Whitelist'],var_dict['StartIndex_Favorited_From_Whitelist'],var_dict['TotalItems_Favorited_From_Whitelist'],var_dict['QueryLimit_Favorited_From_Whitelist'],var_dict['APIDebugMsg_Favorited_From_Whitelist'],the_dict)
-                    var_dict=api_query_handler('Favorited_From_Whitelist',var_dict,the_dict)
-                else:
-                    #When no media items are whitelisted; simulate an empty query being returned
-                    #this will prevent trying to compare to an empty whitelist string '' to the whitelist libraries later on
-                    var_dict['data_Favorited_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Favorited_From_Whitelist']=0
-                    var_dict['QueriesRemaining_Favorited_From_Whitelist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo favorited media items are whitelisted",2,the_dict)
-
-                #Check if blacktag or blacklist are not an empty strings
-                #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_blacklist_lib']['lib_id'] == ''))):
-                if ((not var_dict['Blacktags_Parsed']) and (var_dict['this_blacklist_lib']['lib_enabled'])):
-                    #Built query for blacktagged from blacklist media items
-                    var_dict['apiQuery_Blacktagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Blacklist'] +
-                    '&Recursive=' + var_dict['Recursive_Blacktagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Blacklist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for blacktagged from blacklist media items
-                    #var_dict['data_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['APIDebugMsg_Blacktagged_From_Blacklist'],the_dict)
-                    var_dict=api_query_handler('Blacktagged_From_Blacklist',var_dict,the_dict)
-                else: #((var_dict['Blacktags_Parsed'] == '') or (var_dict['this_blacklist_lib']['lib_id'] == ''))
-                    var_dict['data_Blacktagged_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Blacktagged_From_Blacklist']=0
-                    var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo blacktagged media items are blacklisted",2,the_dict)
-
-                #Check if blacktag or whitelist are not an empty strings
-                #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_whitelist_lib']['lib_id'] == ''))):
-                if ((not var_dict['Blacktags_Parsed']) and (var_dict['this_whitelist_lib']['lib_enabled'])):
-                    #Built query for blacktagged from whitelist media items
-                    var_dict['apiQuery_Blacktagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Whitelist'] +
-                    '&Recursive=' + var_dict['Recursive_Blacktagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Whitelist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for blacktagged from whitelist media items
-                    #var_dict['data_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['APIDebugMsg_Blacktagged_From_Whitelist'],the_dict)
-                    var_dict=api_query_handler('Blacktagged_From_Whitelist',var_dict,the_dict)
-                else: #((var_dict['Blacktags_Parsed'] == '') or (var_dict['this_whitelist_lib']['lib_id'] == ''))
-                    var_dict['data_Blacktagged_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Blacktagged_From_Whitelist']=0
-                    var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo blacktagged media items are whitelisted",2,the_dict)
-
-                #Check if whitetag or blacklist are not an empty strings
-                #if (( not (var_dict['Whitetags_Parsed'] == '')) and ( not (var_dict['this_blacklist_lib']['lib_id'] == ''))):
-                if ((not var_dict['Whitetags_Parsed']) and (var_dict['this_blacklist_lib']['lib_enabled'])):
-                    #Built query for whitetagged from Blacklist media items
-                    var_dict['apiQuery_Whitetagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Blacklist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Blacklist'] +
-                    '&Recursive=' + var_dict['Recursive_Whitetagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Blacklist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Blacklist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for whitetagged from Blacklist= media items
-                    #var_dict['data_Whitetagged_From_Blacklist'],var_dict['StartIndex_Whitetagged_From_Blacklist'],var_dict['TotalItems_Whitetagged_From_Blacklist'],var_dict['QueryLimit_Whitetagged_From_Blacklist'],var_dict['QueriesRemaining_Whitetagged_From_Blacklist']=api_query_handler(var_dict['apiQuery_Whitetagged_From_Blacklist'],var_dict['StartIndex_Whitetagged_From_Blacklist'],var_dict['TotalItems_Whitetagged_From_Blacklist'],var_dict['QueryLimit_Whitetagged_From_Blacklist'],var_dict['APIDebugMsg_Whitetagged_From_Blacklist'],the_dict)
-                    var_dict=api_query_handler('Whitetagged_From_Blacklist',var_dict,the_dict)
-                else: #(Whitetags_Tagged_From_Blacklist == '')
-                    var_dict['data_Whitetagged_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Whitetagged_From_Blacklist']=0
-                    var_dict['QueriesRemaining_Whitetagged_From_Blacklist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo whitetagged media items are blacklisted",2,the_dict)
-
-                #Check if whitetag or whitelist are not an empty strings
-                #if (( not (var_dict['Whitetags_Parsed'] == '')) and ( not (var_dict['this_whitelist_lib']['lib_id'] == ''))):
-                if ((not var_dict['Whitetags_Parsed']) and (var_dict['this_whitelist_lib']['lib_enabled'])):
-                    #Built query for whitetagged_From_Whitelist= media items
-                    var_dict['apiQuery_Whitetagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Whitelist'] +
-                    '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Whitelist'] +
-                    '&Recursive=' + var_dict['Recursive_Whitetagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Whitelist'] +
-                    '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Whitelist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
-
-                    #Send the API query for for whitetagged_From_Whitelist= media items
-                    #var_dict['data_Whitetagged_From_Whitelist'],var_dict['StartIndex_Whitetagged_From_Whitelist'],var_dict['TotalItems_Whitetagged_From_Whitelist'],var_dict['QueryLimit_Whitetagged_From_Whitelist'],var_dict['QueriesRemaining_Whitetagged_From_Whitelist']=api_query_handler(var_dict['apiQuery_Whitetagged_From_Whitelist'],var_dict['StartIndex_Whitetagged_From_Whitelist'],var_dict['TotalItems_Whitetagged_From_Whitelist'],var_dict['QueryLimit_Whitetagged_From_Whitelist'],var_dict['APIDebugMsg_Whitetagged_From_Whitelist'],the_dict)
-                    var_dict=api_query_handler('Whitetagged_From_Whitelist',var_dict,the_dict)
-                else: #(var_dict['Whitetags_Parsed'] == '')
-                    var_dict['data_Whitetagged_From_Whitelist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                    var_dict['QueryLimit_Whitetagged_From_Whitelist']=0
-                    var_dict['QueriesRemaining_Whitetagged_From_Whitelist']=False
-                    if (the_dict['DEBUG']):
-                        appendTo_DEBUG_log("\n\nNo whitetagged media items are whitelisted",2,the_dict)
-                '''
-
-                '''
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Favorited_Item_From_Blacklist']='Child_Of_Favorited_Item_From_Blacklist'
-                #data_Favorited_From_Blacklist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Blacklist,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Favorited_From_Blacklist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Favorited_Item_From_Blacklist']=getChildren_favoritedMediaItems('From_Blacklist',user_info,var_dict,the_dict)
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Favorited_Item_From_Whitelist']='Child_Of_Favorited_Item_From_Whitelist'
-                #data_Favorited_From_Whitelist_Children=getChildren_favoritedMediaItems(user_key,data_Favorited_From_Whitelist,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Favorited_From_Whitelist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Favorited_Item_From_Whitelist']=getChildren_favoritedMediaItems('From_Whitelist',user_info,var_dict,the_dict)
-
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Blacktagged_From_Blacklist']='Child_Of_Blacktagged_Item_From_Blacklist'
-                #data_Blacktagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_Blacklist,blacktags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Blacktag_From_Blacklist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Blacktagged_From_Blacklist']=getChildren_taggedMediaItems('Blacktagged_From_Blacklist',user_info,var_dict,the_dict)
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Blacktagged_From_Whitelist']='Child_Of_Blacktagged_Item_From_Whitelist'
-                #data_Blacktagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_Whitelist,blacktags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Blacktag_From_Whitelist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Blacktagged_From_Whitelist_Children']=getChildren_taggedMediaItems('Blacktagged_From_Whitelist',user_info,var_dict,the_dict)
-
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Whitetagged_From_Blacklist']='Child_Of_Whitetagged_Item_From_Blacklist'
-                #data_Whitetagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Blacklist,whitetags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Whitetag_From_Blacklist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Whitetagged_From_Blacklist_Children']=getChildren_taggedMediaItems('Whitetagged_From_Blacklist',user_info,var_dict,the_dict)
-                #Define reasoning for lookup
-                var_dict['APIDebugMsg_Child_Of_Whitetagged_From_Whitelist']='Child_Of_Whitetagged_Item_From_Whitelist'
-                #data_Whitetagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Whitetagged_From_Whitelist,whitetags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Whitetag_From_Whitelist_Child,media_played_days,media_created_days)
-                var_dict['data_Child_Of_Whitetagged_From_Whitelist_Children']=getChildren_taggedMediaItems('Whitetagged_From_Whitelist',user_info,var_dict,the_dict)
-                '''
 
                 #Combine dictionaries into list of dictionaries
                 #Order here is important
@@ -1170,7 +498,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
                                 #Get if media item is set as an advanced favorite
                                 var_dict['item_isFavorited_Advanced']=False
-                                #if (var_dict['favorited_behavior_media']['action_control'] and (advFav0_media or advFav1_media or advFav2_media or advFav3_media or advFav4_media or advFav5_media)):
                                 if (var_dict['favorited_behavior_media']['action_control'] and (any(var_dict['advFav_media']) > 0)):
                                     if (var_dict['media_type_lower'] == 'movie'):
                                         var_dict['item_isFavorited_Advanced']=get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict)
@@ -1295,26 +622,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
 ##########################################################################################################################################
 
-                                #Build output state dictionary
-                                '''
-                                output_state_dict={'isFavorited_Display':var_dict['isFavorited_Display'],
-                                                    'isWhitetagged_Display':var_dict['isWhitetagged_Display'],
-                                                    'isBlacktagged_Display':var_dict['isBlacktagged_Display'],
-                                                    'isWhitelisted_Display':var_dict['isWhitelisted_Display'],
-                                                    'isBlacklisted_Display':var_dict['isBlacklisted_Display'],
-                                                    'showItemAsDeleted':var_dict['showItemAsDeleted'],
-                                                    'print_media_delete_info':var_dict['print_media_delete_info'],
-                                                    'print_media_keep_info':var_dict['print_media_keep_info'],
-                                                    'media_delete_info_format':var_dict['media_delete_info_format'],
-                                                    'media_keep_info_format':var_dict['media_keep_info_format']}
-                                '''
-
                                 #Build and display media item output details for currently processing user
                                 build_print_media_item_details(item,var_dict,the_dict)
-                                #if (var_dict['media_type_lower'] == 'episode'):
-                                    #build_print_media_item_details(the_dict,item,var_dict['media_type_lower'],output_state_dict,get_days_since_played(item['UserData']['LastPlayedDate'],the_dict),get_days_since_created(item['DateCreated'],the_dict),get_season_episode(item['ParentIndexNumber'],item['IndexNumber'],the_dict))
-                                #else:
-                                    #build_print_media_item_details(the_dict,item,var_dict['media_type_lower'],output_state_dict,get_days_since_played(item['UserData']['LastPlayedDate'],the_dict),get_days_since_created(item['DateCreated'],the_dict))
 
 ##########################################################################################################################################
 
@@ -1323,14 +632,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
                     var_dict['data_list_pos'] += 1
 
-            #currentSubPosition += 1
-
 ############# End Media #############
 
-    #if (the_dict['DEBUG']):
-        #print_common_delete_keep_info=True
-        #appendTo_DEBUG_log("\n",1,the_dict)
-    #print_byType(the_dict['console_separator_'],print_common_delete_keep_info,the_dict,the_dict['user_header_format'])
     print_byType(the_dict['console_separator_'],the_dict['advanced_settings']['console_controls']['headers']['user']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['user']['formatting'])
 
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_Media']=var_dict['deleteItems_Media']
@@ -1349,87 +652,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isfavorited_extraInfo_byUserId_Media']=var_dict['isfavorited_extraInfo_byUserId_Media']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['mediaCounts_byUserId']=var_dict['mediaCounts_byUserId']
 
-    #media_returns['media_dict']=media_dict
     media_returns['media_dict']=the_dict[var_dict['media_dict_str']]
     media_returns['media_found']=var_dict['media_found']
 
     return media_returns
 
 
-'''
-def getMedia(the_dict):
-
-    movie_dict={}
-    episode_dict={}
-    audio_dict={}
-    audiobook_dict={}
-
-    #Get items that could be ready for deletion
-    for user_key in the_dict['user_keys_json']:
-        movie_returns=[]
-        episode_returns=[]
-        audio_returns=[]
-        audiobook_returns=[]
-        movie_dict[user_key]={}
-        episode_dict[user_key]={}
-        audio_dict[user_key]={}
-        audiobook_dict[user_key]={}
-
-        print_user_header(user_key,the_dict)
-
-        #query the server for movie media items
-        #movie_dict,movie_found=get_mediaItems('movie',the_dict,movie_dict,user_key)
-        movie_returns=get_mediaItems('movie',the_dict,movie_dict,user_key,movie_returns)
-        #query the server for episode media items
-        #episode_dict,episode_found=get_mediaItems('episode',the_dict,episode_dict,user_key)
-        episode_returns=get_mediaItems('episode',the_dict,episode_dict,user_key,episode_returns)
-        #query the server for audio media items
-        #audio_dict,audio_found=get_mediaItems('audio',the_dict,audio_dict,user_key)
-        audio_returns=get_mediaItems('audio',the_dict,audio_dict,user_key,audio_returns)
-        #query the server for audiobook media items
-         #audioBook media type only applies to jellyfin
-         #Jellyfin sets audiobooks to a media type of audioBook
-         #Emby sets audiobooks to a media type of audio (see audio section)
-        #audiobook_dict,audiobook_found=get_mediaItems('audiobook',the_dict,audiobook_dict,user_key)
-        audiobook_returns=get_mediaItems('audiobook',the_dict,audiobook_dict,user_key,audiobook_returns)
- 
-        movie_dict.update(movie_returns[0])
-        movie_found=movie_returns[1]
-        episode_dict.update(episode_returns[0])
-        episode_found=episode_returns[1]
-        audio_dict.update(audio_returns[0])
-        audio_found=audio_returns[1]
-        audiobook_dict.update(audiobook_returns[0])
-        audiobook_found=audiobook_returns[1]
- 
-        if (isEmbyServer(the_dict['server_brand'])):
-            audiobook_found=False
-
-        the_dict['currentUserPosition']+=1
-
-        media_found=(movie_found or episode_found or audio_found or audiobook_found)
-
-        if not (the_dict['all_media_disabled']):
-            if not (media_found):
-                if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\n",1,the_dict)
-                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['print_script_warning'],the_dict)
-
-    return movie_dict,episode_dict,audio_dict,audiobook_dict
-'''
-
-
 def init_getMedia(the_dict):
-
-    #movie_dict={}
-    #episode_dict={}
-    #audio_dict={}
-    #audiobook_dict={}
-
-    #movie_dict['media_type']='movie'
-    #episode_dict['media_type']='episode'
-    #audio_dict['media_type']='audio'
-    #audiobook_dict['media_type']='audiobook'
 
     the_dict['movie_dict']={}
     the_dict['movie_dict']['media_type']='movie'
@@ -1456,12 +685,9 @@ def init_getMedia(the_dict):
         the_dict['cut_off_date_played_media']['audiobook']=the_dict['date_time_now_tz_utc'] - timedelta(days=-1)
         the_dict['cut_off_date_created_media']['audiobook']=the_dict['date_time_now_tz_utc'] - timedelta(days=-1)
 
-
-    #the_dict['currentUserPosition']=the_dict['admin_settings']['users'].index(user_info)
     the_dict['currentUserPosition']=0
 
     #Get items that could be ready for deletion
-    #for user_key in the_dict['user_keys_json']:
     for user_info in the_dict['admin_settings']['users']:
         the_dict['movie_dict'][user_info['user_id']]={}
         the_dict['episode_dict'][user_info['user_id']]={}
@@ -1492,8 +718,6 @@ def init_getMedia(the_dict):
            (not (audiobook_delete or audiobook_keep)))))
            ):
 
-            #print('Start Get Media: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
-
             #create dictionary for media that can possibly be deleted
             movie_returns=multiprocessing.Manager().dict()
             episode_returns=multiprocessing.Manager().dict()
@@ -1520,7 +744,6 @@ def init_getMedia(the_dict):
                 mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join()
                 mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close()
 
-            #print('Stop Get Media: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
         else: ##when debug is enabled or any media delete/keep items are being output to the console; do not allow multiprocessing
             movie_returns={}
             episode_returns={}
@@ -1568,5 +791,4 @@ def init_getMedia(the_dict):
                     appendTo_DEBUG_log("\n",1,the_dict)
                 print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
-    #return movie_dict,episode_dict,audio_dict,audiobook_dict
     return the_dict

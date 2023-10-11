@@ -130,29 +130,14 @@ def prepare_AUDIOoutput(the_dict,item,user_info,var_dict):
     mediaType=var_dict['media_type_lower']
 
     if (mediaType == "audio"):
-        #audio_set_missing_last_played_date=audio_set_missing_last_played_date
         audio_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
         audiobook_set_missing_last_played_date=0
     elif ((isJellyfinServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == "audiobook")):
-        #audiobook_set_missing_last_played_date=audio_set_missing_last_played_date
         audiobook_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
         audio_set_missing_last_played_date=0
     else:
         audio_set_missing_last_played_date=0
         audiobook_set_missing_last_played_date=0
-
-    '''
-    if (mediaType == "audio"):
-        audio_set_missing_last_played_date=audio_set_missing_last_played_date
-        audio_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
-    else:
-        audio_set_missing_last_played_date=0
-
-    if ((isJellyfinServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == "audiobook")):
-        audiobook_set_missing_last_played_date=audio_set_missing_last_played_date
-    else:
-        audiobook_set_missing_last_played_date=0
-    '''
 
     if (the_dict['DEBUG']):
         if (mediaType == "audio"):

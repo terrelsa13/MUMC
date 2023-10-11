@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from mumc_config_defaults import get_default_config_values
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_versions import get_script_version
 
 
 def mumc_configuration_builder(cfg,the_dict):

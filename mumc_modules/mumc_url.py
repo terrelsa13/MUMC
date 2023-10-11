@@ -51,7 +51,7 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
         appendTo_DEBUG_log("\n" + str(url),3,the_dict)
 
     #first delay if needed
-        #delay value doubles each time the same API request is resent
+     #delay value doubles each time the same API request is resent
     delay = 1
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
@@ -67,7 +67,7 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
         getdata = True
 
     #try sending url request specified number of times
-        #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
+     #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
     while(getdata):
         try:
             with urlrequest.urlopen(url) as response:
@@ -120,8 +120,7 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     raise RuntimeError("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + reqeustDebugMessage + ". Server responded with code: " + str(response.getcode()))
         except Exception as err:
-            if ((err.msg == 'Unauthorized')):# or (err.msg == 'Forbidden')):
-            #if (err.reason.strerror == 'Connection refused'):
+            if ((err.msg == 'Unauthorized')):
                 if (debugState):
                     appendTo_DEBUG_log("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource",2,the_dict)
                 raise RuntimeError("\n" + str(err) + "\nAUTH_ERROR: User Not Authorized To Access Resource")

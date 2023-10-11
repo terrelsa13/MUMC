@@ -2,7 +2,6 @@
 import inspect
 import time
 from sys import getsizeof
-from mumc_config_defaults import get_default_config_values
 
 
 #Cached URL request controls

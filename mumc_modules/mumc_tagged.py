@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import uuid
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue
@@ -37,7 +36,6 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['TagItems'])):
                 taglist.add(item['TagItems'][tagpos]['Name'])
             #Check if any of the media items tags match the tags in the config file
-            #itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
             itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's tags state
             if (itemIsTagged):
@@ -55,7 +53,6 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['Tags'])):
                 taglist.add(item['Tags'][tagpos])
             #Check if any of the media items tags match the tags in the config file
-            #itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(usertags, ','.join(map(str, taglist)),the_dict)
             itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's usertags state
             if (itemIsTagged):
@@ -76,27 +73,18 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     data_dict={}
     data_Tagged=var_dict['data_' + suffix_str]
     user_tags=var_dict['blacktags']
-    #filter_played_count_comparison=var_dict['media_played_count_comparison']
-    #filter_played_count=var_dict['media_played_count']
-    #filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
-    #filter_created_played_count=var_dict['media_created_played_count']
     data_dict['APIDebugMsg_']='Find_' + var_dict['APIDebugMsg_Child_Of_' + suffix_str]
-    #played_days=var_dict['media_played_days']
-    #created_days=var_dict['media_created_days']
     server_url=the_dict['admin_settings']['server']['url']
     auth_key=the_dict['admin_settings']['server']['auth_key']
-    #parent_tag=[]
     child_dict={}
     child_list=[]
     child_itemId_isTagged=[]
     data_dict['StartIndex_']=0
 
-    #insert_tagName=user_tags.split(',')[0]
     if (user_tags):
         insert_tagName=user_tags[0]
     else:
         insert_tagName=''
-    #insert_tagId=uuid.uuid4().int
 
     #Loop thru items returned as tagged
     for data in data_Tagged['Items']:
@@ -111,7 +99,6 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
             data_dict['TotalItems_']=1
             data_dict['QueryLimit_']=1
             data_dict['QueriesRemaining_']=True
-            #APIDebugMsg='find_children_' + tag_Type + '_media_items'
 
             if not (data['Id'] == ''):
                 #Build query for child media items; check is not Movie, Episode, or Audio
@@ -203,8 +190,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     child_dict['TotalRecordCount']=len(child_list)
     child_dict['StartIndex']=data_dict['StartIndex_']
 
-    #Return dictionary of child items along with TotalRecordCount
-    #return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
+    #Return child dictionary
     return child_dict
 
 

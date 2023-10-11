@@ -170,7 +170,6 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
     #loop thru each item in the list of items that may be deleted
     for deleteItem in deleteItems:
         #verify media item is an episode
-        #if (episodeItem['Type'] == 'Episode'):
         if (deleteItem['Type'] == 'Episode'):
             #add seriesid to episode tracker if it does not already exist
             if not (deleteItem['SeriesId'] in episodeTracker):

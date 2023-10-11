@@ -6,7 +6,6 @@ from mumc_modules.mumc_versions import get_script_version,get_python_version,get
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
 from mumc_modules.mumc_delete import delete_media_item
-from mumc_modules.mumc_url import requestURL
 from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
 
 
@@ -35,13 +34,12 @@ def print_informational_header(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    #strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + get_script_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + the_dict['script_version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Config Version: ' + the_dict['version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
@@ -60,18 +58,12 @@ def print_starting_header(the_dict):
 
 #print header for specific user
 def print_user_header(user_info,the_dict):
-    #for user_key in user_keys_json:
-    #url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/?api_key=' + the_dict['admin_settings']['server']['auth_key']
-
-    #user_data=requestURL(url, the_dict['DEBUG'], 'current_user', the_dict['admin_settings']['api_controls']['attempts'],the_dict)
-
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Get List Of Media For:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,user_info['user_name'] + ' - ' + user_info['user_id'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-    #print_byType(strings_list_to_print[0],the_dict['print_user_header'],the_dict,the_dict['user_header_format'])
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['user']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['user']['formatting'])
 
 
@@ -116,7 +108,7 @@ def cache_data_to_debug(the_dict):
 def print_footer_information(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp End: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
@@ -198,8 +190,6 @@ def print_and_delete_items(deleteItems,the_dict):
     else:
         print_audiobook_summary=False
         audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
-
-    #print_common_summary = (print_summary_header or print_movie_summary or print_episode_summary or print_audio_summary or print_audiobook_summary)
 
     #List items to be deleted
     strings_list_to_print=['']

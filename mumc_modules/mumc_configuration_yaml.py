@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-import yaml
 import json
-from sys import path
-from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_output import save_yaml_config,get_current_directory
-from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
+from mumc_modules.mumc_output import save_yaml_config
+
+
+def filterYAMLConfigKeys(dirty_dict,*wanted_keys):
+
+    return {thekey:dirty_dict[thekey] for thekey in wanted_keys}
 
 
 def libConvertToYAML(user_wl_libs,user_bl_libs):
@@ -21,7 +22,6 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
         user_wl_data_dict['user_id']=wlentry['userid']
         user_wl_data_dict['user_name']=wlentry['username']
         user_wl_data_dict['whitelist']=[]
-        one_or_more_wl_entry=False
         for entry_data in wlentry:
             if (entry_data.isnumeric()):
                 user_lib_dict['lib_id']=wlentry[entry_data]['libid']
@@ -30,22 +30,13 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
                 user_lib_dict['network_path']=wlentry[entry_data]['networkpath']
                 user_lib_dict['lib_enabled']=True
                 user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
-                one_or_more_wl_entry=True
-        #if user has no whitelist entries then set template with None/null values
-        #if (one_or_more_wl_entry == False):
-            #user_lib_dict['lib_id']=''
-            #user_lib_dict['collection_type']=''
-            #user_lib_dict['path']=''
-            #user_lib_dict['network_path']=''
-            #user_lib_dict['lib_enabled']=False
-            #user_wl_data_dict['whitelist'].append(user_lib_dict.copy())
+
         user_wl_data_list.append(user_wl_data_dict.copy())
 
     for blentry in user_bl_libs_loaded:
         user_bl_data_dict['user_id']=blentry['userid']
         user_bl_data_dict['user_name']=blentry['username']
         user_bl_data_dict['blacklist']=[]
-        one_or_more_bl_entry=False
         for entry_data in blentry:
             if (entry_data.isnumeric()):
                 user_lib_dict['lib_id']=blentry[entry_data]['libid']
@@ -54,18 +45,9 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
                 user_lib_dict['network_path']=blentry[entry_data]['networkpath']
                 user_lib_dict['lib_enabled']=True
                 user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
-                one_or_more_bl_entry=True
-        #if user has no blacklist entries then set template with None/null values
-        #if (one_or_more_bl_entry == False):
-            #user_lib_dict['lib_id']=''
-            #user_lib_dict['collection_type']=''
-            #user_lib_dict['path']=''
-            #user_lib_dict['network_path']=''
-            #user_lib_dict['lib_enabled']=False
-            #user_bl_data_dict['blacklist'].append(user_lib_dict.copy())
+
         user_bl_data_list.append(user_bl_data_dict.copy())
 
-    #user_data_list=user_wl_data_list+user_bl_data_list
     for user in user_wl_data_list:
         user_data_list.append(user)
         user_data_list[user_data_list.index(user)]['blacklist']=user_bl_data_list[user_data_list.index(user)]['blacklist']
@@ -74,12 +56,11 @@ def libConvertToYAML(user_wl_libs,user_bl_libs):
 
 
 def yaml_configurationBuilder(the_dict):
-    the_dict_copy=the_dict.copy()
-    the_dict_keys=['version','basic_settings','advanced_settings','admin_settings','DEBUG']
-    config_data={thekey:the_dict_copy[thekey] for thekey in the_dict_keys}
-    #config_data={}
-    #config_data=setYAMLConfigSkeleton(config_data)
-    #config_data['version']=get_script_version()
+
+    #strip out uneccessary data
+    config_data=filterYAMLConfigKeys(the_dict,'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+
+    #start building config yaml
     config_data['basic_settings']['filter_statements']['movie']['played']['condition_days']=-1
     config_data['basic_settings']['filter_statements']['movie']['played']['count_equality']='>='
     config_data['basic_settings']['filter_statements']['movie']['played']['count']=1
@@ -304,20 +285,11 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings']['console_controls']['audiobook']['summary']['formatting']['background']['color']=''
     config_data['advanced_settings']['UPDATE_CONFIG']=False
     config_data['advanced_settings']['REMOVE_FILES']=False
-    #config_data['admin_settings']['server']['brand']=the_dict['admin_settings']['server']['brand']
-    #config_data['admin_settings']['server']['url']=the_dict['admin_settings']['server']['url']
-    #config_data['admin_settings']['server']['auth_key']=the_dict['admin_settings']['server']['auth_key']['auth_key']
-    #config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
-    #config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
-
-    #config_data['admin_settings']['users']+=libConvertToYAML(the_dict['user_wl_libs'],the_dict['user_bl_libs'])
-
     config_data['admin_settings']['api_controls']['attempts']=4
     config_data['admin_settings']['api_controls']['item_limit']=25
     config_data['admin_settings']['cache']['size']=32
     config_data['admin_settings']['cache']['fallback_behavior']='LRU'
     config_data['admin_settings']['cache']['last_accessed_time']=200
-    #config_data['DEBUG']=the_dict['DEBUG']
 
     #before saving; reorder some keys for consistency
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')

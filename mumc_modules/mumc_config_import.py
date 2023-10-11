@@ -3,10 +3,10 @@ import importlib
 import yaml
 from mumc_modules.mumc_config_check import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import build_configuration_file
-from mumc_modules.mumc_output import print_byType,getFileExtension,add_to_PATH,doesFileExist
-from mumc_modules.mumc_console_info import default_helper_menu,concat_to_console_strings_list,print_failed_to_load_config
+from mumc_modules.mumc_output import getFileExtension,add_to_PATH,doesFileExist
+from mumc_modules.mumc_console_info import default_helper_menu,print_failed_to_load_config
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
-from mumc_modules.mumc_yaml_map import yaml_mapper
+
 
 def importHasException(init_dict,cmdopt_dict):
     if (cmdopt_dict['containerized'] or cmdopt_dict['altConfigInfo']):
@@ -90,7 +90,7 @@ def importConfig(init_dict,cmdopt_dict):
                 legacy_dict=legacy_dict
 
                 #convert legacy mumc_config.py to mumc_config.yaml; output is mumc_config.yaml
-                convert_legacyConfigToYAML(cfg,init_dict['mumc_path'],init_dict['config_file_name_no_ext'])
+                convert_legacyConfigToYAML(legacy_dict,init_dict['mumc_path'],init_dict['config_file_name_no_ext'])
 
                 with open(init_dict['mumc_path'] / init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)

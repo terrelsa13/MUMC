@@ -2,10 +2,9 @@
 import json
 import yaml
 from mumc_modules.mumc_versions import get_semantic_version_parts
-from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
+from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist,return_key_value
-from mumc_modules.mumc_console_attributes import console_text_attributes
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -91,8 +90,6 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
         else:
             error_found_in_mumc_config_yaml+='NameError: In ' + config_var_name + ' the blacklist is missing for at least one user\n'
 
-        #Check if length is >2; which means a user_id, user_name, and at least one library are stored
-        #if (len(check_irt) > 2):
         #Get number of elements
         for num_elements in check_irt:
             #Ignore user_id and user_name
@@ -107,7 +104,6 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                 #Check if this num_element exists before proceeding
                 if (num_elements in check_irt):
                     for libinfo in check_irt[num_elements]:
-                        #if (libinfo == 'lib_id'):
                         if ('lib_id' in libinfo):
                             lib_id_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['lib_id']
@@ -3515,8 +3511,7 @@ def cfgCheckYAML(cfg,init_dict):
     if not (error_found_in_mumc_config_yaml == ''):
         if (init_dict['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,init_dict)
-        raise RuntimeError('\n' + error_found_in_mumc_config_yaml)
+        print('\n' + error_found_in_mumc_config_yaml)
+        exit(0)
 
 #######################################################################################################
-
-    #return config_dict

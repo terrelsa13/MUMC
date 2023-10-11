@@ -11,15 +11,8 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
     LibraryID=item['mumc']['lib_id']
     LibraryNetPath=item['mumc']['path']
     LibraryPath=item['mumc']['network_path']
-    #LibraryID=var_dict['this_' + baselist + '_lib']['lib_id']
-    #LibraryNetPath=var_dict['this_' + baselist + '_lib']['network_path']
-    #LibraryPath=var_dict['this_' + baselist + '_lib']['path']
-    #library_matching_behavior=var_dict['library_matching_behavior']
     library_matching_behavior=the_dict['admin_settings']['behavior']['matching']
 
-    #user_wllib_key_json=user_wllib_keys_json[var_dict['currentUserPosition']]
-    #user_wllib_netpath_json=user_wllib_netpath_json[var_dict['currentUserPosition']]
-    #user_wllib_path_json=user_wllib_path_json[var_dict['currentUserPosition']]
     user_wlbllib_key_json=[]
     user_wlbllib_netpath_json=[]
     user_wlbllib_path_json=[]
@@ -39,7 +32,6 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
         appendTo_DEBUG_log("\n",1,the_dict)
 
     if (library_matching_behavior.casefold() == 'byid'):
-        #item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(LibraryID,user_wlbllib_key_json,the_dict)
         item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(LibraryID,','.join(map(str, user_wlbllib_key_json)),the_dict)
     elif (library_matching_behavior.casefold() == 'bypath'):
         if ("Path" in item):
@@ -71,31 +63,13 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
     return item_isWhitelisted_isBlacklisted
 
 
-#def whitelist_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,postproc_dict):
-#def whitelist_playedPatternCleanup(prefix_str,postproc_dict,the_dict):
-    #whiteblack_dict={}
-
-    #whiteblack_dict['library_matching_behavior']=postproc_dict['library_matching_behavior']
-    #whiteblack_dict['wl_bl_user_keys_json_verify']=postproc_dict['wluser_keys_json_verify']
-    #whiteblack_dict['user_wl_bl_lib_keys_json']=postproc_dict['user_wllib_keys_json']
-    #whiteblack_dict['user_wl_bl_lib_netpath_json']=postproc_dict['user_wllib_netpath_json']
-    #whiteblack_dict['user_wl_bl_lib_path_json']=postproc_dict['user_wllib_path_json']
-
-    #return whitelist_and_blacklist_playedPatternCleanup(the_dict,itemsDictionary,itemsExtraDictionary,whiteblack_dict)
-    #return whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_dict)
-
-
 #Because we are not searching directly for unplayed black/whitelisted items; cleanup needs to happen to help the behavioral patterns make sense
 def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_dict):
     itemId_tracker=[]
 
     itemsDictionary=postproc_dict['is' + prefix_str + '_and_played_byUserId_Media']
     itemsExtraDictionary=postproc_dict['is' + prefix_str + '_extraInfo_byUserId_Media']
-    #library_matching_behavior=postproc_dict['library_matching_behavior']
     postproc_dict['user_info']=the_dict['admin_settings']['users']
-    #user_wl_bl_lib_keys_json=postproc_dict['user_bllib_keys_json']
-    #user_wl_bl_lib_netpath_json=postproc_dict['user_bllib_netpath_json']
-    #user_wl_bl_lib_path_json=postproc_dict['user_bllib_path_json']
     baselist=prefix_str[0:prefix_str.rfind("ed")]
     checklist=baselist
 
@@ -117,28 +91,14 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                             if (not('IsMeetingAction' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
 
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(checklist,item,sub_user_info,the_dict)
-                                '''
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(the_dict,item,
-                                itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryId'],
-                                itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryNetPath'],
-                                itemsExtraDictionary[userId][item['Id']]['WhitelistBlacklistLibraryPath'],
-                                prefix_str,library_matching_behavior,postproc_dict['user_info'].index(sub_user_info['user_id']),
-                                postproc_dict['user_info'].index(sub_user_info['user_id']),
-                                postproc_dict['user_info'].index(sub_user_info['user_id']))
-                                '''
+
                                 if (the_dict['DEBUG']):
                                     appendTo_DEBUG_log("\nIsMeetingAction: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']),3,the_dict)
                             if (not('IsMeetingPlayedFilter' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
-                                #if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
-                                    #itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=True
-                                #else:
+
                                 mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'playedPatternCleanup',the_dict)
                                 played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
-                                #if (not (item_matches_played_days_filter == None)):
-                                    #itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
-                                #else:
-                                    #itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=None
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']=played_created_days_counts_dict['item_matches_played_days_filter'] #meeting played X days ago?

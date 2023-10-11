@@ -1,21 +1,8 @@
 #!/usr/bin/env python3
-import multiprocessing
-import urllib.parse as urlparse
-from datetime import timedelta,datetime
-from collections import defaultdict
 from mumc_modules.mumc_url import api_query_handler
-from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
-from mumc_modules.mumc_favorited import getChildren_favoritedMediaItems,get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,list_to_urlparsed_string
-from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
-from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
-from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
-from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
+from mumc_modules.mumc_output import appendTo_DEBUG_log
+from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,list_to_urlparsed_string
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue,get_playedCreatedDays_playedCreatedCounts
-from mumc_modules.mumc_item_info import get_SERIES_itemInfo
-from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_compare_items import keys_exist
 
 
 def init_blacklist_blacktagged_query(var_dict):
@@ -116,7 +103,6 @@ def init_whitelist_blacktagged_query(var_dict):
 
 def blacklist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or blacklist are not an empty strings
-    #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_blacklist_lib']['lib_id'] == ''))):
     if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_blacklist_lib']['lib_enabled'])):
         #Built query for blacktagged from blacklist media items
         var_dict['apiQuery_Blacktagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
@@ -125,12 +111,10 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
 
         #Send the API query for for blacktagged from blacklist media items
-        #var_dict['data_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Blacklist'],var_dict['StartIndex_Blacktagged_From_Blacklist'],var_dict['TotalItems_Blacktagged_From_Blacklist'],var_dict['QueryLimit_Blacktagged_From_Blacklist'],var_dict['APIDebugMsg_Blacktagged_From_Blacklist'],the_dict)
         var_dict=api_query_handler('Blacktagged_From_Blacklist',var_dict,the_dict)
 
         #Define reasoning for lookup
         var_dict['APIDebugMsg_Child_Of_Blacktagged_From_Blacklist']='Child_Of_Blacktagged_Item_From_Blacklist'
-        #data_Blacktagged_From_Blacklist_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_Blacklist,blacktags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Blacktag_From_Blacklist_Child,media_played_days,media_created_days)
         var_dict['data_Child_Of_Blacktagged_From_Blacklist']=getChildren_taggedMediaItems('Blacktagged_From_Blacklist',user_info,var_dict,the_dict)
 
     else: #((var_dict['Blacktags_Parsed'] == '') or (var_dict['this_blacklist_lib']['lib_id'] == ''))
@@ -156,7 +140,6 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
 
 def whitelist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or whitelist are not an empty strings
-    #if (( not (var_dict['Blacktags_Parsed'] == '')) and ( not (var_dict['this_whitelist_lib']['lib_id'] == ''))):
     if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_whitelist_lib']['lib_enabled'])):
         #Built query for blacktagged from whitelist media items
         var_dict['apiQuery_Blacktagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
@@ -165,12 +148,10 @@ def whitelist_blacktagged_query(user_info,var_dict,the_dict):
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
 
         #Send the API query for for blacktagged from whitelist media items
-        #var_dict['data_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=api_query_handler(var_dict['apiQuery_Blacktagged_From_Whitelist'],var_dict['StartIndex_Blacktagged_From_Whitelist'],var_dict['TotalItems_Blacktagged_From_Whitelist'],var_dict['QueryLimit_Blacktagged_From_Whitelist'],var_dict['APIDebugMsg_Blacktagged_From_Whitelist'],the_dict)
         var_dict=api_query_handler('Blacktagged_From_Whitelist',var_dict,the_dict)
 
         #Define reasoning for lookup
         var_dict['APIDebugMsg_Child_Of_Blacktagged_From_Whitelist']='Child_Of_Blacktagged_Item_From_Whitelist'
-        #data_Blacktagged_From_Whitelist_Children=getChildren_taggedMediaItems(user_key,data_Blacktagged_From_Whitelist,blacktags,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,APIDebugMsg_Blacktag_From_Whitelist_Child,media_played_days,media_created_days)
         var_dict['data_Child_Of_Blacktagged_From_Whitelist']=getChildren_taggedMediaItems('Blacktagged_From_Whitelist',user_info,var_dict,the_dict)
 
     else: #((var_dict['Blacktags_Parsed'] == '') or (var_dict['this_whitelist_lib']['lib_id'] == ''))

@@ -56,7 +56,6 @@ def doesFileExist(filePathName):
 
 def getFileExtension(path_or_filename):
     if (doesFileExist(path_or_filename)):
-        #return os.path.splitext(path_or_filename[1])
         return Path(path_or_filename).suffix
     else:
         return None
@@ -64,7 +63,6 @@ def getFileExtension(path_or_filename):
 
 def get_current_directory():
     return Path('.').parent.resolve()
-    #return Path.cwd()
 
 
 # Delete existing mumc_DEBUG.log file
@@ -94,7 +92,6 @@ def save_yaml_config(dataInput,filePathName):
     #Save the config file
     with open(filePathName,'w') as file:
         file.write('---\n')
-        #yaml.safe_dump(config_data,file,sort_keys=False)
         yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
         file.write('...')
 
@@ -133,18 +130,7 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
                         [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes['font']['color']),
                         the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes['background']['color']),
                         the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes['font']['style'])]))
-            '''
-            string_to_print_list_len=len(string_to_print_list)
-            for x in range(string_to_print_list_len):
-                if (string_to_print_list[x] == "\n"):
-                    string_to_print_list[x]=the_dict['text_attrs'].build_ansi_escaped_newlines(string_to_print_list[x])
-                else:
-                    string_to_print_list[x]=the_dict['text_attrs'].build_ansi_escaped_string(string_to_print_list[x],
-                        the_dict['text_attrs'].build_ansi_escape_codes(
-                        [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes[0]),
-                        the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes[1]),
-                        the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes[2])]))
-            '''
+
             string_to_print=''.join(string_to_print_list).rstrip()
             print(''.join(string_to_print))
     else:

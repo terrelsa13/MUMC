@@ -12,13 +12,7 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     data_dict={}
     data_Favorited=var_dict['data_Favorited_' + suffix_str]
-    #filter_played_count_comparison=var_dict['media_played_count_comparison']
-    #filter_played_count=var_dict['media_played_count']
-    #filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
-    #filter_created_played_count=var_dict['media_created_played_count']
     data_dict['APIDebugMsg_']='Find ' + var_dict['APIDebugMsg_Child_Of_Favorited_Item_' + suffix_str]
-    #played_days=var_dict['media_played_days']
-    #created_days=var_dict['media_created_days']
     server_url=the_dict['admin_settings']['server']['url']
     auth_key=the_dict['admin_settings']['server']['auth_key']
     child_dict={}
@@ -64,7 +58,6 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                         '&CollapseBoxSetItems=' + CollapseBoxSetItems + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
 
                         #Send the API query for for watched media items in blacklists
-                        #children_data,StartIndex,TotalItems,QueryLimit,QueriesRemaining=api_query_handler(apiQuery,StartIndex,TotalItems,QueryLimit,APIDebugMsg,the_dict)
                         data_dict.update(api_query_handler('',data_dict,the_dict))
                     else:
                         #When no media items are returned; simulate an empty query being returned
@@ -103,7 +96,6 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
     child_dict['StartIndex']=data_dict['StartIndex_']
 
     #Return dictionary of child items along with TotalRecordCount
-    #return({'Items':child_list,'TotalRecordCount':len(child_list),'StartIndex':StartIndex})
     return child_dict
 
 
@@ -678,14 +670,6 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
     itemId_tracker=[]
 
     favorited_behavior_media=postproc_dict['favorited_behavior_media']
-    '''
-    advFav0=postproc_dict['advFav0_media']
-    advFav1=postproc_dict['advFav1_media']
-    advFav2=postproc_dict['advFav2_media']
-    advFav3=postproc_dict['advFav3_media']
-    advFav4=postproc_dict['advFav4_media']
-    advFav5=postproc_dict['advFav5_media']
-    '''
 
     played_created_days_counts_dict={}
 
@@ -759,17 +743,12 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
                             if (itemIsFav or itemIsAdvFav):
                                 itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=True
                             else:
-                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=None
                                 itemsExtraDictionary[subUserId][itemId]['IsMeetingAction']=False
 
                             mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(tempUserId,itemId,'playedPatternCleanup',the_dict)
-                            #played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,itemsExtraDictionary[subUserId][itemId]['PlayedDays'],itemsExtraDictionary[subUserId][itemId]['CreatedDays'],itemsExtraDictionary[subUserId][itemId]['CutOffDatePlayed'],itemsExtraDictionary[subUserId][itemId]['CutOffDateCreated'],itemsExtraDictionary[subUserId][itemId]['PlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['PlayedCount'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCountComparison'],itemsExtraDictionary[subUserId][itemId]['CreatedPlayedCount'])
+
                             played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
-                            #if (not (item_matches_played_days_filter == None)):
-                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
-                            #else:
-                                #itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']=None
                             itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
                             itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']
                             itemsExtraDictionary[subUserId][itemId]['item_matches_played_days_filter']=played_created_days_counts_dict['item_matches_played_days_filter'] #meeting played X days ago?

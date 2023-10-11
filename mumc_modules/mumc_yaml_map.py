@@ -93,6 +93,8 @@ class Action(Enum):
 class Conditional(Enum):
     ALL = "all"
     ANY = "any"
+    ALL_ALL = "all_all"
+    ANY_ANY = "any_any"
     ANY_ALL = "any_all"
     ALL_ANY = "all_any"
     ANY_PLAYED = "any_played"

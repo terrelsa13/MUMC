@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
-import multiprocessing
 import copy
 from pathlib import Path
-from datetime import datetime
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
-from mumc_modules.mumc_config_check import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import edit_configuration_file
-#from mumc_modules.mumc_userlib_builder import buildUserLibraries
-from mumc_modules.mumc_post_process import postProcessing,init_postProcessing
+from mumc_modules.mumc_post_process import init_postProcessing
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
-from mumc_modules.mumc_yaml_map import yaml_mapper
 
 
 def main():
@@ -35,9 +30,7 @@ def main():
     cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
-    #init_dict.update(cfg.copy())
     init_dict.update(copy.deepcopy(cfg))
-    #cfg=init_dict.copy()
     cfg=copy.deepcopy(init_dict)
     init_dict.clear()
 
@@ -78,11 +71,7 @@ def main():
         #output message letting user know none of the media is enabled to be monitored
         print_all_media_disabled(cfg)
     else:
-        #build the user libraries from config data
-        #cfg=buildUserLibraries(cfg)
-
         #prepare for the main event; return dictionaries of media items per monitored user
-        #movie_dict,episode_dict,audio_dict,audiobook_dict=init_getMedia(cfg)
         cfg=init_getMedia(cfg)
 
         #prepare for post processing; return list of media items to be deleted
@@ -90,9 +79,8 @@ def main():
 
         #sort lists of items to be deleted into a single list
         deleteItems=sortDeleteLists(deleteItems_dict)
-        #deleteItems=sortDeleteLists(deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook)
 
-        #output to console the items to be deleted; then delete media items        #output toto console the items to be deleted; then delete media items
+        #output to console the items to be deleted; then delete media items
 
         print_and_delete_items(deleteItems,cfg)
 

@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-import os
 from datetime import datetime,timezone
 from sys import argv,path
-from pathlib import Path
 from mumc_modules.mumc_output import add_to_PATH
 from mumc_modules.mumc_cache import cached_data_handler
-from mumc_modules.mumc_compare_items import does_index_exist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist
@@ -27,7 +24,6 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['date_time_now']=datetime.now()
     the_cfg['date_time_utc_now']=datetime.utcnow()
     the_cfg['date_time_now_tz_utc']=datetime.now(timezone.utc)
-    #the_cfg['all_media_disabled']=False
 
     #get current working directory
     the_cfg['cwd']=cwd

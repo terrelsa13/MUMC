@@ -50,8 +50,6 @@ def build_behaviorPattern(isMeeting_dict,behavior_pattern_dict,itemsDictionary,i
 def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postproc_dict):
     itemsDictionary=postproc_dict['is' + action_type + '_and_played_byUserId_Media']
     itemsExtraDictionary=postproc_dict['is' + action_type + '_extraInfo_byUserId_Media']
-    #deleteItems=postproc_dict['deleteItems_Media']
-    #deleteItemsIdTracker=postproc_dict['deleteItemsIdTracker_Media']
 
     isMeetingAction_dict={'IsMeeting':'IsMeetingAction'}
     isMeetingPlayedFilter_dict={'IsMeeting':'IsMeetingPlayedFilter'}
@@ -67,10 +65,8 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
     #removeIt='keep'
 
     if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
-        #actionFilter=itemsExtraDictionary['MonitoredUsersAction']
         methodFilter=itemsExtraDictionary['ConfiguredBehavior']
         behaviorFilter=itemsExtraDictionary['ActionBehavior']
-        #wordFilter=itemsExtraDictionary['ActionType']
 
         for userId in itemsDictionary:
             userId_tracker.append(userId)
@@ -102,7 +98,6 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                         actionControl=isMeetingAction_dict[itemId] >= 1
                     #ignore - Should never get here
                     else: #(itemsExtraDictionary['MonitoredUsersAction'] == 'ignore'):
-                        #actionControl=True
                         raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate actionControl assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
 
                     #all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
@@ -192,25 +187,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                                 postproc_dict['deleteItemsIdTracker_Media'].append(item['Id'])
                                 itemId_tracker.remove(itemId)
 
-    #return postproc_dict['deleteItems_Media'],postproc_dict['deleteItemsIdTracker_Media']
     return postproc_dict
-
-
-'''
-#add played and created data for item during pre-processing
-def update_byUserId_playedStates(extra_byUserId_Media,userKey,itemId,postproc_dict):
-
-    extra_byUserId_Media[userKey][itemId]['PlayedDays']=postproc_dict['media_played_days']
-    extra_byUserId_Media[userKey][itemId]['CreatedDays']=postproc_dict['media_created_days']
-    extra_byUserId_Media[userKey][itemId]['CutOffDatePlayed']=postproc_dict['cut_off_date_played_media']
-    extra_byUserId_Media[userKey][itemId]['CutOffDateCreated']=postproc_dict['cut_off_date_created_media']
-    extra_byUserId_Media[userKey][itemId]['PlayedCountComparison']=postproc_dict['media_played_count_comparison']
-    extra_byUserId_Media[userKey][itemId]['PlayedCount']=postproc_dict['media_played_count']
-    extra_byUserId_Media[userKey][itemId]['CreatedPlayedCountComparison']=postproc_dict['media_created_played_count_comparison']
-    extra_byUserId_Media[userKey][itemId]['CreatedPlayedCount']=postproc_dict['media_created_played_count']
-
-    return extra_byUserId_Media
-'''
 
 
 #add played and created data for item during post-processing
@@ -244,7 +221,6 @@ def add_missingItems_byUserId_playedStates(prefix_str,postproc_dict,the_dict):
 
     postproc_dict['is' + prefix_str + '_extraInfo_byUserId_Media']=itemsExtraDictionary
 
-    #return itemsExtraDictionary
     return postproc_dict
 
 
@@ -252,7 +228,6 @@ def run_postProcessing(the_dict,media_dict):
 
     postproc_dict={}
 
-    #postproc_dict['media_type']=media_dict['media_type'].casefold()
     postproc_dict['media_type_lower']=media_dict['media_type'].casefold()
     postproc_dict['media_type_upper']=media_dict['media_type'].upper()
     postproc_dict['media_type_title']=media_dict['media_type'].title()
@@ -263,22 +238,10 @@ def run_postProcessing(the_dict,media_dict):
     postproc_dict['admin_settings']['behavior']={}
     postproc_dict['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
     postproc_dict['admin_settings']['users']=the_dict['admin_settings']['users']
-    
-    '''
-    postproc_dict['bluser_keys_json_verify']=the_dict['bluser_keys_json_verify']
-    postproc_dict['user_bllib_keys_json']=the_dict['user_bllib_keys_json']
-    postproc_dict['user_bllib_netpath_json']=the_dict['user_bllib_netpath_json']
-    postproc_dict['user_bllib_path_json']=the_dict['user_bllib_path_json']
-    postproc_dict['wluser_keys_json_verify']=the_dict['wluser_keys_json_verify']
-    postproc_dict['user_wllib_keys_json']=the_dict['user_wllib_keys_json']
-    postproc_dict['user_wllib_netpath_json']=the_dict['user_wllib_netpath_json']
-    postproc_dict['user_wllib_path_json']=the_dict['user_wllib_path_json']
-    '''
 
     postproc_dict['advanced_settings']={}
     postproc_dict['advanced_settings']['episode_control']=the_dict['advanced_settings']['episode_control']
-    #postproc_dict['minimum_number_episodes']=the_dict['minimum_number_episodes']
-    #postproc_dict['minimum_number_played_episodes']=the_dict['minimum_number_played_episodes']
+
     postproc_dict['minimum_number_episodes']=the_dict['advanced_settings']['episode_control']['minimum_episodes']
     postproc_dict['minimum_number_played_episodes']=the_dict['advanced_settings']['episode_control']['minimum_played_episodes']
     postproc_dict['minimum_number_episodes_behavior']=the_dict['advanced_settings']['episode_control']['minimum_episodes_behavior']
@@ -319,145 +282,8 @@ def run_postProcessing(the_dict,media_dict):
     postproc_dict['print_media_post_processing']=the_dict['advanced_settings']['console_controls'][postproc_dict['media_type_lower']]['post_processing']['show']
     postproc_dict['media_post_processing_format']=the_dict['advanced_settings']['console_controls'][postproc_dict['media_type_lower']]['post_processing']['formatting']
 
-    '''
-    if (postproc_dict['media_type'] == 'movie'):
-        postproc_dict['advFav0_media']=the_dict['favorited_advanced_movie_genre']
-        postproc_dict['advFav1_media']=the_dict['favorited_advanced_movie_library_genre']
-        postproc_dict['advFav2_media']=0
-        postproc_dict['advFav3_media']=0
-        postproc_dict['advFav4_media']=0
-        postproc_dict['advFav5_media']=0
-        postproc_dict['print_media_post_processing']=the_dict['print_movie_post_processing_info']
-        postproc_dict['media_post_processing_format']=the_dict['movie_post_processing_format']
-    elif (postproc_dict['media_type'] == 'episode'):
-        postproc_dict['media_played_days']=the_dict['played_filter_episode'][0]
-        postproc_dict['media_created_days']=the_dict['created_filter_episode'][0]
-        postproc_dict['media_played_count_comparison']=the_dict['played_filter_episode'][1]
-        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_episode'][1]
-        postproc_dict['media_played_count']=the_dict['played_filter_episode'][2]
-        postproc_dict['media_created_played_count']=the_dict['created_filter_episode'][2]
-        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_episode'][3]
-        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_episode']
-        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_episode']
-        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_episode']
-        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_episode']
-        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_episode']
-        postproc_dict['advFav0_media']=the_dict['favorited_advanced_episode_genre']
-        postproc_dict['advFav1_media']=the_dict['favorited_advanced_season_genre']
-        postproc_dict['advFav2_media']=the_dict['favorited_advanced_series_genre']
-        postproc_dict['advFav3_media']=the_dict['favorited_advanced_tv_library_genre']
-        postproc_dict['advFav4_media']=the_dict['favorited_advanced_tv_studio_network']
-        postproc_dict['advFav5_media']=the_dict['favorited_advanced_tv_studio_network_genre']
-        postproc_dict['print_media_post_processing']=the_dict['print_episode_post_processing_info']
-        postproc_dict['media_post_processing_format']=the_dict['episode_post_processing_format']
-    elif (postproc_dict['media_type'] == 'audio'):
-        postproc_dict['media_played_days']=the_dict['played_filter_audio'][0]
-        postproc_dict['media_created_days']=the_dict['created_filter_audio'][0]
-        postproc_dict['media_played_count_comparison']=the_dict['played_filter_audio'][1]
-        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_audio'][1]
-        postproc_dict['media_played_count']=the_dict['played_filter_audio'][2]
-        postproc_dict['media_created_played_count']=the_dict['created_filter_audio'][2]
-        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_audio'][3]
-        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_audio']
-        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_audio']
-        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_audio']
-        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_audio']
-        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_audio']
-        postproc_dict['advFav0_media']=the_dict['favorited_advanced_track_genre']
-        postproc_dict['advFav1_media']=the_dict['favorited_advanced_album_genre']
-        postproc_dict['advFav2_media']=the_dict['favorited_advanced_music_library_genre']
-        postproc_dict['advFav3_media']=the_dict['favorited_advanced_track_artist']
-        postproc_dict['advFav4_media']=the_dict['favorited_advanced_album_artist']
-        postproc_dict['advFav5_media']=0
-        postproc_dict['print_media_post_processing']=the_dict['print_audio_post_processing_info']
-        postproc_dict['media_post_processing_format']=the_dict['audio_post_processing_format']
-    elif (postproc_dict['media_type'] == 'audiobook'):
-        postproc_dict['media_played_days']=the_dict['played_filter_audiobook'][0]
-        postproc_dict['media_created_days']=the_dict['created_filter_audiobook'][0]
-        postproc_dict['media_played_count_comparison']=the_dict['played_filter_audiobook'][1]
-        postproc_dict['media_created_played_count_comparison']=the_dict['created_filter_audiobook'][1]
-        postproc_dict['media_played_count']=the_dict['played_filter_audiobook'][2]
-        postproc_dict['media_created_played_count']=the_dict['created_filter_audiobook'][2]
-        postproc_dict['media_created_played_behavioral_control']=the_dict['created_filter_audiobook'][3]
-        postproc_dict['blacklisted_behavior_media']=the_dict['blacklisted_behavior_audiobook']
-        postproc_dict['whitelisted_behavior_media']=the_dict['blacklisted_behavior_audiobook']
-        postproc_dict['blacktagged_behavior_media']=the_dict['blacklisted_behavior_audiobook']
-        postproc_dict['whitetagged_behavior_media']=the_dict['blacklisted_behavior_audiobook']
-        postproc_dict['favorited_behavior_media']=the_dict['blacklisted_behavior_audiobook']
-        postproc_dict['advFav0_media']=the_dict['favorited_advanced_audiobook_track_genre']
-        postproc_dict['advFav1_media']=the_dict['favorited_advanced_audiobook_genre']
-        postproc_dict['advFav2_media']=the_dict['favorited_advanced_audiobook_library_genre']
-        postproc_dict['advFav3_media']=the_dict['favorited_advanced_audiobook_track_author']
-        postproc_dict['advFav4_media']=the_dict['favorited_advanced_audiobook_author']
-        postproc_dict['advFav5_media']=the_dict['favorited_advanced_audiobook_library_author']
-        postproc_dict['print_media_post_processing']=the_dict['print_audiobook_post_processing_info']
-        postproc_dict['media_post_processing_format']=the_dict['audiobook_post_processing_format']
-    '''
-
     postproc_dict['advFav_media']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['extra']
 
-    '''
-    postproc_dict['advFav_media']=[]
-    if (postproc_dict['media_type_lower'] == 'movie'):
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['library_genre'])
-        #advFav2_media=0
-        #advFav3_media=0
-        #advFav4_media=0
-        #advFav5_media=0
-    elif (postproc_dict['media_type_lower'] == 'episode'):
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['season_genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['series_genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['library_genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network_genre'])
-    elif (postproc_dict['media_type_lower'] == 'audio'):
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['library_genre'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['track_artist'])
-        postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_artist'])
-    elif (postproc_dict['media_type_lower'] == 'audiobook'):
-        if (isJellyfinServer(postproc_dict['server_brand'])):
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['genre'])
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['audiobook_genre'])
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_genre'])
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['track_author'])
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['author'])
-            postproc_dict['advFav_media'].append(the_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_author'])
-        else: #(isEmbyServer(the_dict)):
-            pass
-
-            media_played_days=-1
-            media_created_days=-1
-            media_played_count_comparison='=='
-            media_created_played_count_comparison='=='
-            media_played_count=1
-            media_created_played_count=0
-            print_media_delete_info=False
-            print_media_keep_info=False
-            media_delete_info_format=['','','']
-            media_keep_info_format=['','','']
-            favorited_behavior_media=['keep','any','ignore',0]
-
-            advFav0_media=0
-            advFav1_media=0
-            advFav2_media=0
-            advFav3_media=0
-            advFav4_media=0
-            advFav5_media=0
-        
-            whitetagged_behavior_media=['keep','any','ignore',0]
-            whitetags=whitetags
-            blacktagged_behavior_media=['keep','any','ignore',0]
-            blacktags=blacktags
-            whitelisted_behavior_media=['keep','any','ignore',0]
-            blacklisted_behavior_media=['keep','any','ignore',0]
-    '''
-
-    #postproc_dict['cut_off_date_played_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_played_days'])
-    #postproc_dict['cut_off_date_created_media']=the_dict['date_time_now_tz_utc'] - timedelta(postproc_dict['media_created_days'])
     postproc_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media'][postproc_dict['media_type_lower']]
     postproc_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media'][postproc_dict['media_type_lower']]
 
@@ -639,13 +465,7 @@ def run_postProcessing(the_dict,media_dict):
 def postProcessing(the_dict,media_dict,deleteItems_dict):
     if (not (the_dict['all_media_disabled'])):
         #perform post processing for each media type
-        #if (not (media_dict['media_type'] == 'audiobook')):
         deleteItems_media=run_postProcessing(the_dict,media_dict)
-        #else:
-            #if (isJellyfinServer(the_dict['server_brand'])):
-                #deleteItems_media=run_postProcessing(the_dict,media_dict)
-            #else:
-                #deleteItems_media=[]
 
         #verify the specific media_type is not already in the dictionary as a key
         #if it is not; go ahead and add it and set it == deleteItems_media
@@ -671,12 +491,8 @@ def init_postProcessing(the_dict):
 
     #when debug is disabled allow mulitprocessing
     if (not (the_dict['DEBUG'])):
-        #print('\nStart Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
 
         deleteItems_dict=multiprocessing.Manager().dict()
-
-        #prepare for post processing; return lists of media items to be deleted
-        #deleteItems_movie,deleteItems_episode,deleteItems_audio,deleteItems_audiobook=postProcessing(the_dict,movie_dict,episode_dict,audio_dict,audiobook_dict)
 
         #prepare for post processing; return dictionary of lists of media items to be deleted
         #setup for multiprocessing of the post processing of each media type
@@ -698,7 +514,6 @@ def init_postProcessing(the_dict):
             mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close()
             deleteItems_dict['audiobook']=[]
 
-        #print('Stop Post Prcoessing: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
     else: #when debug enabled do not allow multiprocessing; this will allow stepping thru debug
         deleteItems_dict={}
 

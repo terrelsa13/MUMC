@@ -2,8 +2,7 @@
 import json
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_compare_items import keys_exist,return_key_value
-from mumc_modules.mumc_console_attributes import console_text_attributes
+
 
 #Check blacklist and whitelist config variables are as expected
 def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, config_var_name):

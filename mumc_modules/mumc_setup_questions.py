@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 #!/usr/bin/env python3
 import urllib.request as urlrequest
-from collections import defaultdict
-from operator import attrgetter
-import json
-import os
 from mumc_config_defaults import get_default_config_values
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json,write_to_file,print_byType
 from mumc_modules.mumc_url import requestURL
@@ -80,7 +76,6 @@ def get_port():
 #base url?
 def get_base(brand):
     defaultbase='emby'
-    #print('If you are using emby press enter for default.')
     if (brand == defaultbase):
         print('Using "/' + defaultbase + '" as base url')
         return(defaultbase)
@@ -104,7 +99,6 @@ def get_admin_username():
 
 #admin password?
 def get_admin_password():
-    #print('Plain text password used to grab authentication key; hashed password stored in config file.')
     print('Plain text password used to grab authentication key; password is not stored.')
     password=input('Enter admin password: ')
     return(password)
@@ -150,12 +144,13 @@ def get_library_setup_behavior(library_setup_behavior=None):
         print('                All other libraries will be whitelisted.')
         print('1 - whitelist - Chosen libraries will whitelisted.')
         print('                All other libraries will be blacklisted.')
-        if (library_setup_behavior.casefold() == 'blacklist'):
-            print('')
-            print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
-        elif (library_setup_behavior.casefold() == 'whitelist'):
-            print('')
-            print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
+        if (not (library_setup_behavior == None)):
+            if (library_setup_behavior.casefold() == 'blacklist'):
+                print('')
+                print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
+            elif (library_setup_behavior.casefold() == 'whitelist'):
+                print('')
+                print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
         behavior=input('Choose how the script will use the chosen libraries. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
@@ -182,11 +177,12 @@ def get_library_matching_behavior(library_matching_behavior=None):
         print('   If your libraries do not have a \'Shared Network Folder\' you must filter byPath.')
         print('   If your libraries have a \'Shared Network Folder\' you must filter byNetworkPath.')
         print('   Filtering byId does not have the above limitations.')
-        if ((library_matching_behavior.casefold() == 'byid') or
-            (library_matching_behavior.casefold() == 'bypath') or
-            (library_matching_behavior.casefold() == 'bynetworkpath')):
-            print('')
-            print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
+        if (not (library_matching_behavior == None)):
+            if ((library_matching_behavior.casefold() == 'byid') or
+                (library_matching_behavior.casefold() == 'bypath') or
+                (library_matching_behavior.casefold() == 'bynetworkpath')):
+                print('')
+                print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
         behavior=input('Choose how the script will match media items to libraries. (default ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
@@ -217,11 +213,7 @@ def get_tag_name(tagbehavior,existingtag):
         print(' Ex: tagname,tag name,tag-name')
         print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
         inputtagname=input('Input desired ' + tagbehavior + 's: ')
-        #if (defaulttag == ''):
-            #print('Leave blank to disable the ' + tagbehavior + 'ging functionality.')
-            #inputtagname=input('Input desired ' + tagbehavior + 's: ')
-        #else:
-            #inputtagname=input('Input desired ' + tagbehavior + 's (default \'' + defaulttag + '\'): ')
+
         #Remove duplicates
         inputtagname = ','.join(set(inputtagname.split(',')))
         if (inputtagname == ''):
@@ -241,7 +233,6 @@ def get_tag_name(tagbehavior,existingtag):
                 for inputtag in inputtagname_return:
                     if (not (inputtag == '')):
                         #existingtag_split=existingtag.split(',')
-                        #for donetag in existingtag_split:
                         for donetag in existingtag:
                             if (inputtag == donetag):
                                 valid_tag=False
@@ -255,7 +246,6 @@ def get_tag_name(tagbehavior,existingtag):
                 for remove_tag in tags_to_remove:
                     inputtagname_return.remove(remove_tag)
                 if (valid_tag):
-                    #return(','.join(inputtagname_return))
                     return inputtagname_return
                 else:
                     print('\nFound already used tag(s): ' + repeat_tags)

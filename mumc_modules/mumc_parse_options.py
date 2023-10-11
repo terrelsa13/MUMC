@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper
-from mumc_modules.mumc_output import doesFileExist,getFullPathName,getFileExtension
+from mumc_modules.mumc_output import getFullPathName,getFileExtension
 from mumc_modules.mumc_console_attributes import console_text_attributes
 
 #define custom exception
@@ -109,17 +109,8 @@ def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList,the_dict
 def verifyAltConfigPathFileExist(argv,altConfigInfo,the_dict):
     try:
         if (altConfigInfo):
-            #verify alternate config path and file exist
-            #if (not(os.path.exists(argv[argv.index('-c')+1]))):
-                #raise AlternateConfigNotFoundError
-            #check if file exists in cwd (script can be run from anywhere so this could be any directory)
-            #if (doesFileExist(argv[argv.index('-c')+1])):
-                #fullPathName=getFullPathName(argv[argv.index('-c')+1])
-            #else:
-                #fullPathName=os.path.join(os.path.abspath(os.path.dirname(__file__)),argv[argv.index('-c')+1])
             fullPathName=getFullPathName(argv[argv.index('-c')+1])
             #verify alternate config path and file exist
-            #if (not(doesFileExist(fullPathName))):
             if (fullPathName == None):
                 raise AlternateConfigNotFoundError
     except (AlternateConfigNotFoundError):

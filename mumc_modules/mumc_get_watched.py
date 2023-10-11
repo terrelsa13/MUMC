@@ -1,21 +1,8 @@
 #!/usr/bin/env python3
-import multiprocessing
-import urllib.parse as urlparse
-from datetime import timedelta,datetime
-from collections import defaultdict
 from mumc_modules.mumc_url import api_query_handler
-from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
-from mumc_modules.mumc_favorited import getChildren_favoritedMediaItems,get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,list_to_urlparsed_string
-from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
-from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
-from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
-from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
+from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue,get_playedCreatedDays_playedCreatedCounts
-from mumc_modules.mumc_item_info import get_SERIES_itemInfo
-from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_compare_items import keys_exist
+from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue
 
 
 def init_blacklist_watched_query(var_dict,the_dict):
@@ -26,7 +13,6 @@ def init_blacklist_watched_query(var_dict,the_dict):
     var_dict['QueriesRemaining_Blacklist']=True
     var_dict['APIDebugMsg_Blacklist']=var_dict['media_type_lower'] + '_blacklist_media_items'
 
-    #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
     if (var_dict['this_blacklist_lib']['lib_enabled']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
@@ -67,7 +53,6 @@ def init_whitelist_watched_query(var_dict,the_dict):
     var_dict['QueriesRemaining_Whitelist']=True
     var_dict['APIDebugMsg_Whitelist']=var_dict['media_type_lower'] + '_whitelist_media_items'
 
-    #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
     if (var_dict['this_whitelist_lib']['lib_enabled']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
@@ -101,7 +86,6 @@ def init_whitelist_watched_query(var_dict,the_dict):
 
 
 def blacklist_watched_query(user_info,var_dict,the_dict):
-    #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
     if (var_dict['this_blacklist_lib']['lib_enabled']):
         #Built query for watched items in blacklists
         var_dict['apiQuery_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
@@ -110,7 +94,6 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
         '&EnableImages=' + var_dict['EnableImages_Blacklist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Blacklist'] + '&api_key=' + var_dict['auth_key'])
 
         #Send the API query for for watched media items in blacklists
-        #var_dict['data_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['QueriesRemaining_Blacklist']=api_query_handler(var_dict['apiQuery_Blacklist'],var_dict['StartIndex_Blacklist'],var_dict['TotalItems_Blacklist'],var_dict['QueryLimit_Blacklist'],var_dict['APIDebugMsg_Blacklist'],the_dict)
         var_dict=api_query_handler('Blacklist',var_dict,the_dict)
     else:
         #When no media items are blacklisted; simulate an empty query being returned
@@ -129,7 +112,6 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
 
 
 def whitelist_watched_query(user_info,var_dict,the_dict):
-    #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
     if (var_dict['this_whitelist_lib']['lib_enabled']):
         #Built query for watched items in whitelists
         var_dict['apiQuery_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +
@@ -138,7 +120,6 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
         '&EnableImages=' + var_dict['EnableImages_Whitelist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Whitelist'] + '&api_key=' + var_dict['auth_key'])
 
         #Send the API query for for watched media items in whitelists
-        #var_dict['data_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['QueriesRemaining_Whitelist']=api_query_handler(var_dict['apiQuery_Whitelist'],var_dict['StartIndex_Whitelist'],var_dict['TotalItems_Whitelist'],var_dict['QueryLimit_Whitelist'],var_dict['APIDebugMsg_Whitelist'],the_dict)
         var_dict=api_query_handler('Whitelist',var_dict,the_dict)
     else:
         #When no media items are whitelisted; simulate an empty query being returned
