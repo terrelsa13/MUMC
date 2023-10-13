@@ -1,5 +1,5 @@
 v5 README WIP
- >=python3.8 recommended
+/>=python3.8 recommended
 
 
 # Multi-User Media Cleaner
