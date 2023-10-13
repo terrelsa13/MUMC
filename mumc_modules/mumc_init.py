@@ -50,6 +50,12 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['last_accessed_time']=200 #initial default value
     the_cfg['cached_data']=cached_data_handler(the_cfg)
     the_cfg['text_attrs']=console_text_attributes()
+    the_cfg['formatting']={}
+    the_cfg['formatting']['font']={}
+    the_cfg['formatting']['font']['color']=''
+    the_cfg['formatting']['font']['style']=''
+    the_cfg['formatting']['background']={}
+    the_cfg['formatting']['background']['color']=''
 
     return the_cfg
 

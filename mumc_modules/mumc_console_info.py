@@ -250,7 +250,7 @@ def print_and_delete_items(deleteItems,the_dict):
                     print_byType(strings_list_to_print[0],print_audiobook_summary,the_dict,audiobook_summary_format)
                 else: # item['Type'] == 'Unknown':
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Not Able To Delete Unknown Media Type')
-                    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+                    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
     else:
         strings_list_to_print=['']
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'[NO ITEMS TO DELETE]')
@@ -267,15 +267,15 @@ def print_and_delete_items(deleteItems,the_dict):
 
 
 #show the command line help text
-def default_helper_menu(the_cfg):
+def default_helper_menu(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nFor help use -h or -help')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n/path/to/python3.x /path/to/mumc.py -help')
-    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #show the full help menu
-def print_full_help_menu(the_cfg):
+def print_full_help_menu(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nMUMC Version: ' + get_script_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.')
@@ -293,7 +293,7 @@ def print_full_help_menu(the_cfg):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'https://github.com/terrelsa13/MUMC/releases')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print missing argument for alternate config helper
@@ -307,11 +307,11 @@ def missing_config_argument_helper(argv,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print missing config argument format error
-def missing_config_argument_format_helper(argv,the_cfg):
+def missing_config_argument_format_helper(argv,the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'AlternateConfigArgumentError: Cannot find /path/to/alternate_config.py after -c')
@@ -321,7 +321,7 @@ def missing_config_argument_format_helper(argv,the_cfg):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_cfg,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print alt config does not exist helper
@@ -333,7 +333,7 @@ def alt_config_file_does_not_exists_helper(argv,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print alt config syntax helper
@@ -374,7 +374,7 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate_config.py')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print unable to sucessfully load the Configuration file
@@ -386,7 +386,7 @@ def print_failed_to_load_config(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'console_separator')
 
-    print_byType(strings_list_to_print[0],True,the_dict,['','',''])
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
 #print all media disabled helper
