@@ -171,6 +171,32 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=cfg['created_filter_audiobook'][3]
         except:
             config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=True
+
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
+
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
+
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
+
+    if (cfg['server_brand'] == 'jellyfin'):
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
+
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=cfg['favorited_behavior_movie'][0]
     except:

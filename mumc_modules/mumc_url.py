@@ -53,7 +53,7 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
 
     #first delay if needed
      #delay value doubles each time the same API request is resent
-    delay = 1
+    doubling_delay = 1
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
@@ -68,16 +68,17 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
         getdata = True
 
     #try sending url request specified number of times
-     #starting with a 1 second delay if an exception occurs and doubling the delay each attempt
+     #starting with a 1 second doubling_delay if an exception occurs and doubling the doubling_delay each attempt
     while(getdata):
         try:
-            with urlrequest.urlopen(url,timeout=delay) as response:
+            #with urlrequest.urlopen(url,timeout=???) as response:
+            with urlrequest.urlopen(url) as response:
                 if (debugState):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
                 #request recieved; but taking long time to return data
                 while (response.getcode() == 202):
                     #wait 20% of the delay value
-                    time.sleep(delay/5)
+                    time.sleep(doubling_delay/5)
                     if (debugState):
                         appendTo_DEBUG_log("\nWaiting for server to return data from the " + str(reqeustDebugMessage) + " Request; then trying again...",2,the_dict)
                 if (response.getcode() == 200):
@@ -98,10 +99,10 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                             print('\n  URL: ' + url + '')
                             exit(0)
                         else:
-                            #time.sleep(delay)
-                            #delay value doubles each time the same API request is resent
-                            delay += delay
-                            if (delay >= (2**retryAttempts)):
+                            time.sleep(doubling_delay)
+                            #doubling_delay value doubles each time the same API request is resent
+                            doubling_delay += doubling_delay
+                            if (doubling_delay >= (2**retryAttempts)):
                                 if (debugState):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + reqeustDebugMessage + "\" lookup.")
@@ -127,10 +128,10 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                     print('\n  URL: ' + url + '')
                     exit(0)
         except HTTPError as err:
-            #time.sleep(delay)
-            #delay value doubles each time the same API request is resent
-            delay += delay
-            if (delay >= (2**retryAttempts)):
+            time.sleep(doubling_delay)
+            #doubling_delay value doubles each time the same API request is resent
+            doubling_delay += doubling_delay
+            if (doubling_delay >= (2**retryAttempts)):
                 print('\nHTTPError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
                 print('\n  URL: ' + url + '')
                 print('\n' + str(err.status) + '\n' + str(err.reason))
@@ -140,10 +141,10 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                     appendTo_DEBUG_log('\n' + str(err.status) + '\n' + str(err.reason),2,the_dict)
                 exit(0)
         except URLError as err:
-            #time.sleep(delay)
-            #delay value doubles each time the same API request is resent
-            delay += delay
-            if (delay >= (2**retryAttempts)):
+            time.sleep(doubling_delay)
+            #doubling_delay value doubles each time the same API request is resent
+            doubling_delay += doubling_delay
+            if (doubling_delay >= (2**retryAttempts)):
                 print('\nURLError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
                 print('\n  URL: ' + url + '')
                 print('\n' + str(err.reason))
@@ -153,10 +154,10 @@ def requestURL(url, debugState, reqeustDebugMessage, retries, the_dict):
                     appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
                 exit(0)
         except TimeoutError:
-            #time.sleep(delay)
-            #delay value doubles each time the same API request is resent
-            delay += delay
-            if (delay >= (2**retryAttempts)):
+            time.sleep(doubling_delay)
+            #doubling_delay value doubles each time the same API request is resent
+            doubling_delay += doubling_delay
+            if (doubling_delay >= (2**retryAttempts)):
                 print('\nTimeoutError: Unable to get information from server during processing of: ' + reqeustDebugMessage)
                 print('\n  URL: ' + url + '')
                 print('\nTimeout - Request taking too long')

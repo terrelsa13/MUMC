@@ -13,7 +13,9 @@ def init_blacklist_favorited_query(var_dict):
     var_dict['QueriesRemaining_Favorited_From_Blacklist']=True
     var_dict['APIDebugMsg_Favorited_From_Blacklist']=var_dict['media_type_lower'] + '_Favorited_From_Blacklisted_media_items'
 
-    if (var_dict['this_blacklist_lib']['lib_enabled']):
+    if (var_dict['this_blacklist_lib']['lib_enabled'] and
+        var_dict['media_query_blacklisted'] and
+        var_dict['media_query_favorited']):
             #Build query for Favorited_From_Blacklist media items
         var_dict['IncludeItemTypes_Favorited_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
@@ -59,7 +61,9 @@ def init_whitelist_favorited_query(var_dict):
     var_dict['QueriesRemaining_Favorited_From_Whitelist']=True
     var_dict['APIDebugMsg_Favorited_From_Whitelist']=var_dict['media_type_lower'] + '_Favorited_From_Whitelisted_media_items'
 
-    if (var_dict['this_whitelist_lib']['lib_enabled']):
+    if (var_dict['this_whitelist_lib']['lib_enabled'] and
+        var_dict['media_query_whitelisted'] and
+        var_dict['media_query_favorited']):
         #Build query for Favorited_From_Whitelist media items
         var_dict['IncludeItemTypes_Favorited_From_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
@@ -98,7 +102,10 @@ def init_whitelist_favorited_query(var_dict):
 
 
 def blacklist_favorited_query(user_info,var_dict,the_dict):
-    if (var_dict['this_blacklist_lib']['lib_enabled']):
+    if (var_dict['this_blacklist_lib']['lib_enabled'] and
+        var_dict['media_query_blacklisted'] and
+        var_dict['media_query_favorited']):
+
         #Built query for Favorited from Blacklist media items
         var_dict['apiQuery_Favorited_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Blacklist'] +
@@ -136,7 +143,11 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
 
 
 def whitelist_favorited_query(user_info,var_dict,the_dict):
-    if (var_dict['this_whitelist_lib']['lib_enabled']):
+    if (var_dict['this_whitelist_lib']['lib_enabled'] and
+        var_dict['media_query_whitelisted'] and
+        var_dict['media_query_favorited']):
+
+
         #Built query for Favorited From Whitelist media items
         var_dict['apiQuery_Favorited_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Whitelist'] +

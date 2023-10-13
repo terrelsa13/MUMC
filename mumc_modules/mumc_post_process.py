@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import multiprocessing
-from datetime import timedelta
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist_whitelist import whitelist_and_blacklist_playedPatternCleanup
@@ -318,17 +317,18 @@ def run_postProcessing(the_dict,media_dict):
                 postproc_dict['deleteItemsIdTracker_Media'] = postproc_dict['deleteItemsIdTracker_Media'] + media_dict[user_key]['deleteItemsIdTracker_Media']
                 postproc_dict['deleteItems_createdMedia'] = postproc_dict['deleteItems_createdMedia'] + media_dict[user_key]['deleteItems_createdMedia']
                 postproc_dict['deleteItemsIdTracker_createdMedia'] = postproc_dict['deleteItemsIdTracker_createdMedia'] + media_dict[user_key]['deleteItemsIdTracker_createdMedia']
-                postproc_dict['isblacklisted_and_played_byUserId_Media'] |= media_dict[user_key]['isblacklisted_and_played_byUserId_Media']
-                postproc_dict['isblacklisted_extraInfo_byUserId_Media'] |= media_dict[user_key]['isblacklisted_extraInfo_byUserId_Media']
-                postproc_dict['iswhitelisted_and_played_byUserId_Media'] |= media_dict[user_key]['iswhitelisted_and_played_byUserId_Media']
-                postproc_dict['iswhitelisted_extraInfo_byUserId_Media'] |= media_dict[user_key]['iswhitelisted_extraInfo_byUserId_Media']
-                postproc_dict['isblacktagged_and_played_byUserId_Media'] |= media_dict[user_key]['isblacktagged_and_played_byUserId_Media']
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media'] |= media_dict[user_key]['isblacktagged_extraInfo_byUserId_Media']
-                postproc_dict['iswhitetagged_and_played_byUserId_Media'] |= media_dict[user_key]['iswhitetagged_and_played_byUserId_Media']
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media'] |= media_dict[user_key]['iswhitetagged_extraInfo_byUserId_Media']
-                postproc_dict['isfavorited_and_played_byUserId_Media'] |= media_dict[user_key]['isfavorited_and_played_byUserId_Media']
-                postproc_dict['isfavorited_extraInfo_byUserId_Media'] |= media_dict[user_key]['isfavorited_extraInfo_byUserId_Media']
-                postproc_dict['mediaCounts_byUserId'] |= media_dict[user_key]['mediaCounts_byUserId']
+
+                postproc_dict['isblacklisted_and_played_byUserId_Media'].update(media_dict[user_key]['isblacklisted_and_played_byUserId_Media'])
+                postproc_dict['isblacklisted_extraInfo_byUserId_Media'].update(media_dict[user_key]['isblacklisted_extraInfo_byUserId_Media'])
+                postproc_dict['iswhitelisted_and_played_byUserId_Media'].update(media_dict[user_key]['iswhitelisted_and_played_byUserId_Media'])
+                postproc_dict['iswhitelisted_extraInfo_byUserId_Media'].update(media_dict[user_key]['iswhitelisted_extraInfo_byUserId_Media'])
+                postproc_dict['isblacktagged_and_played_byUserId_Media'].update(media_dict[user_key]['isblacktagged_and_played_byUserId_Media'])
+                postproc_dict['isblacktagged_extraInfo_byUserId_Media'].update(media_dict[user_key]['isblacktagged_extraInfo_byUserId_Media'])
+                postproc_dict['iswhitetagged_and_played_byUserId_Media'].update(media_dict[user_key]['iswhitetagged_and_played_byUserId_Media'])
+                postproc_dict['iswhitetagged_extraInfo_byUserId_Media'].update(media_dict[user_key]['iswhitetagged_extraInfo_byUserId_Media'])
+                postproc_dict['isfavorited_and_played_byUserId_Media'].update(media_dict[user_key]['isfavorited_and_played_byUserId_Media'])
+                postproc_dict['isfavorited_extraInfo_byUserId_Media'].update(media_dict[user_key]['isfavorited_extraInfo_byUserId_Media'])
+                postproc_dict['mediaCounts_byUserId'].update(media_dict[user_key]['mediaCounts_byUserId'])
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nList Of Possible Created " + postproc_dict['media_type_lower'] + " Items To Be Deleted: " + str(len(postproc_dict['deleteItems_createdMedia'])),3,the_dict)

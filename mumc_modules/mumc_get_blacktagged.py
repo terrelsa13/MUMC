@@ -12,9 +12,12 @@ def init_blacklist_blacktagged_query(var_dict):
     var_dict['QueryLimit_Blacktagged_From_Blacklist']=1
     var_dict['QueriesRemaining_Blacktagged_From_Blacklist']=True
     var_dict['APIDebugMsg_Blacktagged_From_Blacklist']=var_dict['media_type_lower'] + '_blacktagged_from_blacklist_media_items'
+    #Encode blacktags so they are url acceptable
+    var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
 
-    #if not (var_dict['this_blacklist_lib']['lib_id'] == ''):
-    if (var_dict['this_blacklist_lib']['lib_enabled']):
+    if (var_dict['this_blacklist_lib']['lib_enabled'] and
+        var_dict['media_query_blacklisted'] and
+        var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from blacklist
         var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Blacktagged_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
@@ -24,8 +27,6 @@ def init_blacklist_blacktagged_query(var_dict):
         var_dict['Recursive_Blacktagged_From_Blacklist']='True'
         var_dict['EnableImages_Blacktagged_From_Blacklist']='False'
         var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist']='False'
-        #Encode blacktags so they are url acceptable
-        var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
 
         if (var_dict['media_type_lower'] == 'movie'):
             var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',BoxSet,CollectionFolder'
@@ -60,9 +61,12 @@ def init_whitelist_blacktagged_query(var_dict):
     var_dict['QueryLimit_Blacktagged_From_Whitelist']=1
     var_dict['QueriesRemaining_Blacktagged_From_Whitelist']=True
     var_dict['APIDebugMsg_Blacktagged_From_Whitelist']=var_dict['media_type_lower'] + '_blacktagged_from whitelisted_media_items'
+    #Encode blacktags so they are url acceptable
+    var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
 
-    #if not (var_dict['this_whitelist_lib']['lib_id'] == ''):
-    if (var_dict['this_whitelist_lib']['lib_enabled']):
+    if (var_dict['this_whitelist_lib']['lib_enabled'] and
+        var_dict['media_query_whitelisted'] and
+        var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from whitelist
         var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Blacktagged_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
@@ -72,8 +76,6 @@ def init_whitelist_blacktagged_query(var_dict):
         var_dict['Recursive_Blacktagged_From_Whitelist']='True'
         var_dict['EnableImages_Blacktagged_From_Whitelist']='False'
         var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist']='False'
-        #Encode blacktags so they are url acceptable
-        var_dict['Blacktags_Parsed']=list_to_urlparsed_string(var_dict['blacktags'])
 
         if (var_dict['media_type_lower'] == 'movie'):
             var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',BoxSet,CollectionFolder'
@@ -103,7 +105,11 @@ def init_whitelist_blacktagged_query(var_dict):
 
 def blacklist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or blacklist are not an empty strings
-    if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_blacklist_lib']['lib_enabled'])):
+    if ((not (var_dict['Blacktags_Parsed'] == '')) and
+        var_dict['this_blacklist_lib']['lib_enabled'] and
+        var_dict['media_query_blacklisted'] and
+        var_dict['media_query_blacktagged']):
+
         #Built query for blacktagged from blacklist media items
         var_dict['apiQuery_Blacktagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Blacklist'] +
@@ -140,7 +146,11 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
 
 def whitelist_blacktagged_query(user_info,var_dict,the_dict):
     #Check if blacktag or whitelist are not an empty strings
-    if ((not (var_dict['Blacktags_Parsed'] == '')) and (var_dict['this_whitelist_lib']['lib_enabled'])):
+    if ((not (var_dict['Blacktags_Parsed'] == '')) and
+        var_dict['this_whitelist_lib']['lib_enabled'] and
+        var_dict['media_query_whitelisted'] and
+        var_dict['media_query_blacktagged']):
+
         #Built query for blacktagged from whitelist media items
         var_dict['apiQuery_Blacktagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Whitelist'] +

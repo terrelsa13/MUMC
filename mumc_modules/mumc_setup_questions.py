@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-#!/usr/bin/env python3
 import urllib.request as urlrequest
-from mumc_config_defaults import get_default_config_values
-from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json,write_to_file,print_byType
+from mumc_modules.mumc_output import convert2json
 from mumc_modules.mumc_url import requestURL
 from mumc_modules.mumc_versions import get_script_version
-from mumc_config_defaults import get_default_config_values
 
 
 #emby or jellyfin?
@@ -202,7 +199,6 @@ def get_library_matching_behavior(library_matching_behavior=None):
 
 #Blacktagging or Whitetagging String Name?
 def get_tag_name(tagbehavior,existingtag):
-    defaulttag=get_default_config_values(tagbehavior)
     repeat_tags=''
     tags_to_remove=[]
     valid_tag=False

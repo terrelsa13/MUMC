@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import json
 import yaml
-from mumc_modules.mumc_versions import get_semantic_version_parts
+from mumc_modules.mumc_versions import get_semantic_version_parts,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist,return_key_value
+from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -164,8 +164,65 @@ def cfgCheckYAML(cfg,init_dict):
 
     #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
+    #DELETE config_dict{} not used for anything
     config_dict={}
+
+    #Start as blank error string
     error_found_in_mumc_config_yaml=''
+
+#######################################################################################################
+
+    if (keys_exist(cfg,'admin_settings','server','brand')):
+        check=return_key_value(cfg,'admin_settings','server','brand')
+        server_brand=check
+        if (
+            not ((isinstance(check,str)) and
+            ((check.casefold() == 'emby') or (check.casefold() == 'jellyfin')))
+        ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            server_brand='invalid'
+        else:
+            config_dict['server_brand']=check.casefold()
+    else:
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > brand key is missing from mumc_config.yaml\n'
+        server_brand='invalid'
+
+#######################################################################################################
+
+    #Setup for know variables that could be missing from config
+    missing_bool=False
+    missing_dict={}
+    missing_dict['advanced_settings']={}
+    missing_dict['advanced_settings']['filter_statements']={}
+    missing_dict['advanced_settings']['filter_statements']['movie']={}
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']={}
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=None
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=None
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=None
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=None
+    missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=None
+    missing_dict['advanced_settings']['filter_statements']['episode']={}
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']={}
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=None
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=None
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=None
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=None
+    missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=None
+    missing_dict['advanced_settings']['filter_statements']['audio']={}
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']={}
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=None
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=None
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=None
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=None
+    missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=None
+    if (isJellyfinServer(server_brand)):
+        missing_dict['advanced_settings']['filter_statements']['audiobook']={}
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']={}
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=None
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=None
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=None
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=None
+        missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=None
 
 #######################################################################################################
 
@@ -191,21 +248,6 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigNameError: The version key is missing from mumc_config.yaml\n'
 
 #######################################################################################################
-
-    if (keys_exist(cfg,'admin_settings','server','brand')):
-        check=return_key_value(cfg,'admin_settings','server','brand')
-        server_brand=check
-        if (
-            not ((isinstance(check,str)) and
-            ((check.casefold() == 'emby') or (check.casefold() == 'jellyfin')))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
-            server_brand='invalid'
-        else:
-            config_dict['server_brand']=check.casefold()
-    else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > brand key is missing from mumc_config.yaml\n'
-        server_brand='invalid'
 
     if (keys_exist(cfg,'admin_settings','server','url')):
         check=return_key_value(cfg,'admin_settings','server','url')
@@ -677,6 +719,275 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > created > behavioral_control is missing from mumc_config.py\n'
 
 #######################################################################################################
+
+    config_dict['query_filter_movie']=[]
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','favorited')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','favorited')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter > favorited must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_movie'].insert(0,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > movie > query_filter > favorited is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','whitetagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitetagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter > whitetagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_movie'].insert(1,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > movie > query_filter > whitetagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','blacktagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacktagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter > blacktagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_movie'].insert(2,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > movie > query_filter > blacktagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter > whitelisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_movie'].insert(3,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > movie > query_filter > whitelisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter > blacklisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_movie'].insert(4,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > movie > query_filter > blacklisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
+
+    config_dict['query_filter_episode']=[]
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter > favorited must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_episode'].insert(0,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > favorited is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','whitetagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitetagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter > whitetagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_episode'].insert(1,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > whitetagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','blacktagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacktagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter > blacktagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_episode'].insert(2,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > blacktagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter > whitelisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_episode'].insert(3,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > whitelisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter > blacklisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_episode'].insert(4,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > blacklisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
+
+    config_dict['query_filter_audio']=[]
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','favorited')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','favorited')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > favorited must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_audio'].insert(0,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audio > query_filter > favorited is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','whitetagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitetagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitetagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_audio'].insert(1,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audio > query_filter > whitetagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','blacktagged')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacktagged')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacktagged must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_audio'].insert(2,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audio > query_filter > blacktagged is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_audio'].insert(3,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audio > query_filter > whitelisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=True
+
+    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted')):
+        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted')
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['query_filter_audio'].insert(4,check)
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audio > query_filter > blacklisted is missing from mumc_config.py\n'
+        missing_bool=True
+        missing_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
+
+    if (isJellyfinServer(server_brand)):
+        config_dict['query_filter_audiobook']=[]
+
+        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','favorited')):
+            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','favorited')
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > favorited must be a boolean\n\tValid values are true or false\n'
+            else:
+                config_dict['query_filter_audiobook'].insert(0,check)
+        else:
+            #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > favorited is missing from mumc_config.py\n'
+            missing_bool=True
+            missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
+
+        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitetagged')):
+            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitetagged')
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitetagged must be a boolean\n\tValid values are true or false\n'
+            else:
+                config_dict['query_filter_audiobook'].insert(1,check)
+        else:
+            #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > whitetagged is missing from mumc_config.py\n'
+            missing_bool=True
+            missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=True
+
+        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacktagged')):
+            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacktagged')
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacktagged must be a boolean\n\tValid values are true or false\n'
+            else:
+                config_dict['query_filter_audiobook'].insert(2,check)
+        else:
+            #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > blacktagged is missing from mumc_config.py\n'
+            missing_bool=True
+            missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
+
+        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted')):
+            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted')
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted must be a boolean\n\tValid values are true or false\n'
+            else:
+                config_dict['query_filter_audiobook'].insert(3,check)
+        else:
+            #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted is missing from mumc_config.py\n'
+            missing_bool=True
+            missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=True
+
+        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted')):
+            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted')
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted must be a boolean\n\tValid values are true or false\n'
+            else:
+                config_dict['query_filter_audiobook'].insert(4,check)
+        else:
+            #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted is missing from mumc_config.py\n'
+            missing_bool=True
+            missing_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
 
     config_dict['favorited_behavior_movie']=[]
 
@@ -3515,3 +3826,16 @@ def cfgCheckYAML(cfg,init_dict):
         exit(0)
 
 #######################################################################################################
+
+    #Check if any known possible missing config values were found and silently ignored
+    if (missing_bool):
+        #update init_dict with known possible missing config values
+        cfg['advanced_settings'].update(missing_dict['advanced_settings'])
+        cfg['version']=get_script_version()
+        cfg['mumc_path']=init_dict['mumc_path']
+        cfg['config_file_name_yaml']=init_dict['config_file_name_yaml']
+        #update config yaml with known possible missing config values
+        yaml_configurationUpdater(cfg)
+
+#######################################################################################################
+    return cfg

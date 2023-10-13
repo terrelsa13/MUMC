@@ -104,9 +104,7 @@ def build_configuration_file(the_dict):
     the_dict['advanced_settings']['REMOVE_FILES']=False
 
     print('----------------------------------------------------------------------------------------')
-    #Build the legacy config file
-    #config_file=mumc_configuration_builder(cfg,the_dict)
-
+    
     #Build and save yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)

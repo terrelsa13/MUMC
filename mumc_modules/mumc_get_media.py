@@ -278,6 +278,12 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
         var_dict['minimum_number_episodes']=0
         var_dict['minimum_number_played_episodes']=0
 
+    var_dict['media_query_favorited']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['favorited']
+    var_dict['media_query_whitetagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitetagged']
+    var_dict['media_query_blacktagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacktagged']
+    var_dict['media_query_whitelisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']
+    var_dict['media_query_blacklisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']
+
     #Determine played or created time; UTC time used for media items; determine played and created date for each media type
     var_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media'][var_dict['media_type_lower']]
     var_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media'][var_dict['media_type_lower']]

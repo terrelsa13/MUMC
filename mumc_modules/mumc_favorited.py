@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue,get_playedCreatedDays_playedCreatedCounts
+from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_compare_items import does_index_exist
@@ -47,7 +47,7 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                IsPlayedState=get_isPlayedCreated_FilterValue(the_dict,var_dict)
+                IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
                 while (data_dict['QueriesRemaining_']):
 

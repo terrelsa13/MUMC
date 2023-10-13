@@ -27,7 +27,7 @@ def main():
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
     #get and check config values are what we expect them to be
-    cfgCheckYAML(cfg,init_dict)
+    cfg=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))

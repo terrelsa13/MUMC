@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayedCreated_FilterValue
+from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith,does_index_exist,keys_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
@@ -115,7 +115,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    IsPlayedState=get_isPlayedCreated_FilterValue(the_dict,var_dict)
+                    IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
                     while (data_dict['QueriesRemaining_']):
 
