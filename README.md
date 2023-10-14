@@ -1,18 +1,26 @@
 v5 README WIP
 \>=python3.8 recommended
 
-
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want taking up disk space.
 # What Files Are Included?
 ## mumc.py
-This is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around.
-## mumc_config_defaults.py
-_**Optional:**_ Before running the script for the first time; you can edit this file to customize the default values used when ```mumc_config.py``` is created. But do not worry if you forget to do this, you can always manually edit ```mumc_config.py``` after it is created.
+```mumc.py```, is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around. :D
 # Configuration
-## mumc_config.py
-```mumc_config.py```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
+## mumc_config.yaml
+```mumc_config.yaml```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 # Cool! How Do I Use This?
+Check out the MUMC (wiki)[]! **WIP**
+
+# Donation
+If you find MUMC useful and would like to show support, please consider the option below.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
+
+--------------------------------------------------------------
+
+# Everything below moving to the MUMC wiki
+
 ## Step 1: What is a Filter Statement? What is a Behavioral Statement?
 
 * A Filter Statement is a simple way to tell the script how to find media items taking up your disk space.
@@ -1244,7 +1252,4 @@ DEBUG=0
 # Schedule To Run (Other Operating Systems)
 * Consult your favorite search engine
 
-# Donation
-If you find MUMC useful and would like to show support, please consider the option below.
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=4CFFHMJV3H4M2)
