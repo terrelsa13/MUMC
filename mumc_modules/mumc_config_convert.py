@@ -1034,7 +1034,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         configPath=get_current_directory()
 
     #Save the config file
-    with open(configPath / (configFileNameNoExt + '.yaml'),'w') as file:
+    with open(configPath + '/' + (configFileNameNoExt + '.yaml'),'w') as file:
         file.write('---\n')
         #strip out uneccessary data; write remaining data to config yaml
         yaml.safe_dump(filterYAMLConfigKeys(config_data,'version','basic_settings','advanced_settings','admin_settings','DEBUG'),file,sort_keys=False)

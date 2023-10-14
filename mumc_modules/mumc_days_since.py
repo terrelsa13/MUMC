@@ -51,3 +51,16 @@ def get_days_since_played(date_last_played,the_dict):
 #Get count of days since last created
 def get_days_since_created(date_last_created,the_dict):
     return(get_days_since_played(date_last_created,the_dict).replace('Played', 'Created', 1))
+
+
+def convert_timeToString(byUserId_item):
+    for userId in byUserId_item:
+        if (not((userId == 'ActionBehavior') or (userId == 'ActionType') or (userId == 'MonitoredUsersAction') or
+                (userId == 'MonitoredUsersMeetPlayedFilter') or(userId == 'ConfiguredBehavior'))):
+            for itemId in byUserId_item[userId]:
+                if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
+                    byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
+                if ('CutOffDateCreated' in byUserId_item[userId][itemId]):
+                    byUserId_item[userId][itemId]['CutOffDateCreated']=str(byUserId_item[userId][itemId]['CutOffDateCreated'])
+
+    return(byUserId_item)

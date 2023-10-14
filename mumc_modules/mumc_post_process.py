@@ -6,19 +6,7 @@ from mumc_modules.mumc_blacklist_whitelist import whitelist_and_blacklist_played
 from mumc_modules.mumc_favorited import favorites_playedPatternCleanup
 from mumc_modules.mumc_minimum_episodes import get_minEpisodesToKeep
 from mumc_modules.mumc_console_info import print_post_processing_started,print_post_processing_verbal_progress,print_post_processing_verbal_progress_min_episode,print_post_processing_completed
-
-
-def convert_timeToString(byUserId_item):
-    for userId in byUserId_item:
-        if (not((userId == 'ActionBehavior') or (userId == 'ActionType') or (userId == 'MonitoredUsersAction') or
-                (userId == 'MonitoredUsersMeetPlayedFilter') or(userId == 'ConfiguredBehavior'))):
-            for itemId in byUserId_item[userId]:
-                if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
-                    byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
-                if ('CutOffDateCreated' in byUserId_item[userId][itemId]):
-                    byUserId_item[userId][itemId]['CutOffDateCreated']=str(byUserId_item[userId][itemId]['CutOffDateCreated'])
-
-    return(byUserId_item)
+from mumc_modules.mumc_days_since import convert_timeToString
 
 
 def build_behaviorPattern(isMeeting_dict,behavior_pattern_dict,itemsDictionary,itemsExtraDictionary):
@@ -287,7 +275,7 @@ def run_postProcessing(the_dict,media_dict):
     postproc_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media'][postproc_dict['media_type_lower']]
 
     #lists and dictionaries of items to be deleted
-    postproc_dict['deleteItems']=[]
+    #postproc_dict['deleteItems']=[]
     postproc_dict['deleteItems_Media']=[]
     postproc_dict['deleteItemsIdTracker_Media']=[]
     postproc_dict['deleteItems_createdMedia']=[]
@@ -313,10 +301,14 @@ def run_postProcessing(the_dict,media_dict):
 
         for user_key in media_dict:
             if (not(user_key == 'media_type')):
-                postproc_dict['deleteItems_Media'] = postproc_dict['deleteItems_Media'] + media_dict[user_key]['deleteItems_Media']
-                postproc_dict['deleteItemsIdTracker_Media'] = postproc_dict['deleteItemsIdTracker_Media'] + media_dict[user_key]['deleteItemsIdTracker_Media']
-                postproc_dict['deleteItems_createdMedia'] = postproc_dict['deleteItems_createdMedia'] + media_dict[user_key]['deleteItems_createdMedia']
-                postproc_dict['deleteItemsIdTracker_createdMedia'] = postproc_dict['deleteItemsIdTracker_createdMedia'] + media_dict[user_key]['deleteItemsIdTracker_createdMedia']
+                #postproc_dict['deleteItems_Media'] = postproc_dict['deleteItems_Media'] + media_dict[user_key]['deleteItems_Media']
+                #postproc_dict['deleteItemsIdTracker_Media'] = postproc_dict['deleteItemsIdTracker_Media'] + media_dict[user_key]['deleteItemsIdTracker_Media']
+                #postproc_dict['deleteItems_createdMedia'] = postproc_dict['deleteItems_createdMedia'] + media_dict[user_key]['deleteItems_createdMedia']
+                #postproc_dict['deleteItemsIdTracker_createdMedia'] = postproc_dict['deleteItemsIdTracker_createdMedia'] + media_dict[user_key]['deleteItemsIdTracker_createdMedia']
+                #postproc_dict['deleteItems_Media']+=media_dict[user_key]['deleteItems_Media']
+                #postproc_dict['deleteItemsIdTracker_Media']+=media_dict[user_key]['deleteItemsIdTracker_Media']
+                postproc_dict['deleteItems_createdMedia']+=media_dict[user_key]['deleteItems_createdMedia']
+                postproc_dict['deleteItemsIdTracker_createdMedia']+=media_dict[user_key]['deleteItemsIdTracker_createdMedia']
 
                 postproc_dict['isblacklisted_and_played_byUserId_Media'].update(media_dict[user_key]['isblacklisted_and_played_byUserId_Media'])
                 postproc_dict['isblacklisted_extraInfo_byUserId_Media'].update(media_dict[user_key]['isblacklisted_extraInfo_byUserId_Media'])
@@ -337,12 +329,16 @@ def run_postProcessing(the_dict,media_dict):
             appendTo_DEBUG_log("\n" + convert2json(postproc_dict['deleteItems_behavioralMedia']),4,the_dict)
 
         if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (postproc_dict['media_created_played_behavioral_control'])):
-            postproc_dict['deleteItems_Media']=postproc_dict['deleteItems_behavioralMedia'] + postproc_dict['deleteItems_createdMedia']
-            postproc_dict['deleteItemsIdTracker_Media']=postproc_dict['deleteItemsIdTracker_behavioralMedia'] + postproc_dict['deleteItemsIdTracker_createdMedia']
+            #postproc_dict['deleteItems_Media']=postproc_dict['deleteItems_behavioralMedia'] + postproc_dict['deleteItems_createdMedia']
+            #postproc_dict['deleteItemsIdTracker_Media']=postproc_dict['deleteItemsIdTracker_behavioralMedia'] + postproc_dict['deleteItemsIdTracker_createdMedia']
+            postproc_dict['deleteItems_Media']+=postproc_dict['deleteItems_createdMedia']
+            postproc_dict['deleteItemsIdTracker_Media']+=postproc_dict['deleteItemsIdTracker_createdMedia']
             appendTo_DEBUG_log("\nCombining List Of Possible Created media with List Of Possible Behavioral media for post processing",3,the_dict)
         else:
-            postproc_dict['deleteItems_Media']=postproc_dict['deleteItems_behavioralMedia']
-            postproc_dict['deleteItemsIdTracker_Media']=postproc_dict['deleteItemsIdTracker_behavioralMedia']
+            ##postproc_dict['deleteItems_Media']=postproc_dict['deleteItems_behavioralMedia']
+            ##postproc_dict['deleteItemsIdTracker_Media']=postproc_dict['deleteItemsIdTracker_behavioralMedia']
+            #postproc_dict['deleteItems_Media']=postproc_dict['deleteItems_Media']
+            #postproc_dict['deleteItemsIdTracker_Media']=postproc_dict['deleteItemsIdTracker_Media']
             appendTo_DEBUG_log("\nOnly using List Of Possible Behavioral media for post processing",3,the_dict)
 
         #Add blacklisted items to delete list that meet the defined played state
@@ -444,7 +440,7 @@ def run_postProcessing(the_dict,media_dict):
                     appendTo_DEBUG_log("\n" + convert2json(postproc_dict['mediaCounts_byUserId']),3,the_dict)
                     appendTo_DEBUG_log("\n",3,the_dict)
 
-        postproc_dict['deleteItems_Media']+=postproc_dict['deleteItems_Media']
+        #postproc_dict['deleteItems_Media']+=postproc_dict['deleteItems_Media']
         if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and (not (postproc_dict['media_created_played_behavioral_control']))):
             postproc_dict['deleteItems_Media']+=postproc_dict['deleteItems_createdMedia']
 

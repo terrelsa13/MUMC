@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper
+from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper,unknown_command_line_option_helper
 from mumc_modules.mumc_output import getFullPathName,getFileExtension
 from mumc_modules.mumc_console_attributes import console_text_attributes
 
@@ -41,7 +41,7 @@ def findUnknownCMDRequest(argv,optionsList):
     for cmdOption in argv:
         if (cmdOption.startswith('-')):
             if (not(cmdOption in optionsList)):
-                return True
+                return cmdOption
     return False
 
 
@@ -159,8 +159,12 @@ def parse_command_line_options(the_dict):
     findHelpCMDRequest(cmdopt_dict['argv'],the_dict)
 
     #look for unknown command line options
-    if (findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'])):
-        raise UnknownCMDOptionError
+    cmdUnknown=findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'])
+    if (cmdUnknown):
+        #raise UnknownCMDOptionError
+        unknown_command_line_option_helper(cmdUnknown,the_dict)
+        default_helper_menu(the_dict)
+        exit(0)
 
     #look for console attribute show request command line option
     findConsoleAttributeShowRequest(cmdopt_dict['argv'])
@@ -185,7 +189,7 @@ def parse_command_line_options(the_dict):
 
     if (cmdopt_dict['altConfigInfo']):
         #verify alternate config path and file follow python naming conveniton
-        cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt'],cmdopt_dict['altConfigFileExt']=parseAltConfigPathFileSyntax(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],'-c',cmdopt_dict['moduleExtension'])
+        cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt'],cmdopt_dict['altConfigFileExt']=parseAltConfigPathFileSyntax(cmdopt_dict['argv'],cmdopt_dict['altConfigInfo'],'-c',cmdopt_dict['moduleExtension'],the_dict)
     else:
         cmdopt_dict['altConfigPath']=None
         cmdopt_dict['altConfigFileNoExt']=None

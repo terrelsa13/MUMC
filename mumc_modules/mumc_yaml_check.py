@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import yaml
+import copy
 from mumc_modules.mumc_versions import get_semantic_version_parts,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
@@ -189,7 +190,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    #Setup for know variables that could be missing from config
+    #Setup for known variables that could be missing from config
     missing_bool=False
     missing_dict={}
     missing_dict['advanced_settings']={}
@@ -3829,8 +3830,25 @@ def cfgCheckYAML(cfg,init_dict):
 
     #Check if any known possible missing config values were found and silently ignored
     if (missing_bool):
-        #update init_dict with known possible missing config values
+        temp_dict=copy.deepcopy(cfg['advanced_settings'])
+        cfg['advanced_settings']={}
         cfg['advanced_settings'].update(missing_dict['advanced_settings'])
+        cfg['advanced_settings']['behavioral_statements']={}
+        cfg['advanced_settings']['behavioral_statements'].update(temp_dict['behavioral_statements'])
+        cfg['advanced_settings']['whitetags']={}
+        cfg['advanced_settings']['whitetags'].update(temp_dict['whitetags'])
+        cfg['advanced_settings']['blacktags']={}
+        cfg['advanced_settings']['blacktags'].update(temp_dict['blacktags'])
+        cfg['advanced_settings']['episode_control']={}
+        cfg['advanced_settings']['episode_control'].update(temp_dict['episode_control'])
+        cfg['advanced_settings']['trakt_fix']={}
+        cfg['advanced_settings']['trakt_fix'].update(temp_dict['trakt_fix'])
+        cfg['advanced_settings']['console_controls']={}
+        cfg['advanced_settings']['console_controls'].update(temp_dict['console_controls'])
+        cfg['advanced_settings']['UPDATE_CONFIG']=temp_dict['UPDATE_CONFIG']
+        cfg['advanced_settings']['REMOVE_FILES']=temp_dict['REMOVE_FILES']
+        #update init_dict with known possible missing config values
+        #cfg['advanced_settings'].update()
         cfg['version']=get_script_version()
         cfg['mumc_path']=init_dict['mumc_path']
         cfg['config_file_name_yaml']=init_dict['config_file_name_yaml']

@@ -51,12 +51,13 @@ def importConfig(init_dict,cmdopt_dict):
             add_to_PATH(cmdopt_dict['altConfigPath'],0)
 
             #check if yaml config
-            if ((getFileExtension(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']) == '.yaml') or
-               (getFileExtension(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']) == '.yml')):
-                with open(cmdopt_dict['altConfigPath'] / 'mumc_config.yaml', 'r') as mumc_config_yaml:
+            if ((getFileExtension(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt']) == '.yaml') or
+               (getFileExtension(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt']) == '.yml')):
+                #open alternate yaml config
+                with open(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
             #check if legacy config
-            else: #if (getFileExtension(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']) == '.py'):
+            else: #if (getFileExtension(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt']) == '.py'):
                 #Cannot do a direct import using a variable; use the importlib.import_module instead
                 #Also cannot import the whole path; add the path to path then import by filename
                 cfg = importlib.import_module(cmdopt_dict['altConfigFileNoExt'],cmdopt_dict['altConfigInfo'])
@@ -68,17 +69,17 @@ def importConfig(init_dict,cmdopt_dict):
                 #function to convert legacy config to mumc_config.yaml
                 convert_legacyConfigToYAML(cfg,cmdopt_dict['altConfigPath'],cmdopt_dict['altConfigFileNoExt'])
 
-                with open(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileNoExt'] + '.yaml', 'r') as mumc_config_yaml:
+                with open(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileNoExt'] + '.yaml', 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
 
             #make sure a few of the necessary config variables are there
             init_dict=assignVarTest(init_dict,cmdopt_dict,cfg)
 
         else:
-            if (doesFileExist(init_dict['mumc_path'] / init_dict['config_file_name_yaml'])):
+            if (doesFileExist(init_dict['mumc_path'] + '/' + init_dict['config_file_name_yaml'])):
                 #try importing the mumc_config.yaml file
                 #if mumc_config.yaml file does not exist try importing the legacy mumc_config.py file
-                with open(init_dict['mumc_path'] / init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
+                with open(init_dict['mumc_path'] + '/' + init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
             else:
                 #try importing the mumc_config.py file
@@ -92,7 +93,7 @@ def importConfig(init_dict,cmdopt_dict):
                 #convert legacy mumc_config.py to mumc_config.yaml; output is mumc_config.yaml
                 convert_legacyConfigToYAML(legacy_dict,init_dict['mumc_path'],init_dict['config_file_name_no_ext'])
 
-                with open(init_dict['mumc_path'] / init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
+                with open(init_dict['mumc_path'] + '/' + init_dict['config_file_name_yaml'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
 
             #make sure a few of the necessary config variables are there

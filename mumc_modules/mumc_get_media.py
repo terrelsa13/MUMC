@@ -307,8 +307,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['mediaCounts_byUserId']={}
 
     #lists of items to be deleted
-    var_dict['deleteItems_Media']=[]
-    var_dict['deleteItemsIdTracker_Media']=[]
+    #var_dict['deleteItems_Media']=[]
+    #var_dict['deleteItemsIdTracker_Media']=[]
     var_dict['deleteItems_createdMedia']=[]
     var_dict['deleteItemsIdTracker_createdMedia']=[]
 
@@ -481,6 +481,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
 ##########################################################################################################################################
 
+                                #If item meets created days filter, create-played days count, and created-played inequality then save for post-processing
                                 if (var_dict['item_matches_created_days_filter'] and var_dict['item_matches_created_played_count_filter']):
                                     if (not (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia'])):
                                         var_dict['deleteItemsIdTracker_createdMedia'].append(item['Id'])
@@ -642,8 +643,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
     print_byType(the_dict['console_separator_'],the_dict['advanced_settings']['console_controls']['headers']['user']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['user']['formatting'])
 
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_Media']=var_dict['deleteItems_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_Media']=var_dict['deleteItemsIdTracker_Media']
+    #the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_Media']=var_dict['deleteItems_Media']
+    #the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_Media']=var_dict['deleteItemsIdTracker_Media']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_createdMedia']=var_dict['deleteItems_createdMedia']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_createdMedia']=var_dict['deleteItemsIdTracker_createdMedia']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacklisted_and_played_byUserId_Media']=var_dict['isblacklisted_and_played_byUserId_Media']

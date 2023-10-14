@@ -296,6 +296,14 @@ def print_full_help_menu(the_dict):
     print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
 
 
+def unknown_command_line_option_helper(cmdUnknown,the_dict):
+    strings_list_to_print=['']
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nUnknownCMDOptionError: ' + str(cmdUnknown))
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
+
+    print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
+
+
 #print missing argument for alternate config helper
 def missing_config_argument_helper(argv,the_dict):
     strings_list_to_print=['']
