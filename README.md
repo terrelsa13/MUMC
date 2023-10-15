@@ -1,4 +1,4 @@
-v5 README WIP
+v5 README and [wiki](https://github.com/terrelsa13/MUMC/wiki) WIP
 \>=python3.8 recommended
 
 # Multi-User Media Cleaner
