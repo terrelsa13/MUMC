@@ -3,12 +3,7 @@ v5 README and [wiki](https://github.com/terrelsa13/MUMC/wiki) WIP
 
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want taking up disk space.
-# What Files Are Included?
-## mumc.py
-```mumc.py```, is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around. :D
-# Configuration
-## mumc_config.yaml
-```mumc_config.yaml```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
+
 # Cool! How Do I Use This?
 Check out the MUMC [wiki](https://github.com/terrelsa13/MUMC/wiki)! **WIP**
 
@@ -20,6 +15,13 @@ If you find MUMC useful and would like to show support, please consider the opti
 --------------------------------------------------------------
 
 # Everything below moving to the MUMC [wiki](https://github.com/terrelsa13/MUMC/wiki)
+
+# What Files Are Included?
+## mumc.py
+```mumc.py```, is the main file. Without it you would still be looking for ways to automatically delete the media items you no longer want hanging around. :D
+# Configuration
+## mumc_config.yaml
+```mumc_config.yaml```, also referred to as the _configuration file_, is created the first time the script runs. Once it has been cretaed it will be what you edit to configure MUMC to delete the media items you want it to delete and keep the media items you want to keep.
 
 ## Step 1: What is a Filter Statement? What is a Behavioral Statement?
 
