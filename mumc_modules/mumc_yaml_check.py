@@ -2465,6 +2465,7 @@ def cfgCheckYAML(cfg,init_dict):
         for tag in check:
             if (
                 not (((isinstance(tag,str)) and
+                    isinstance(check,list) and
                     (tag.find('\\') < 0)) or
                     (tag == None))
                 ):
@@ -2482,6 +2483,7 @@ def cfgCheckYAML(cfg,init_dict):
         for tag in check:
             if (
                 not (((isinstance(tag,str)) and
+                    isinstance(check,list) and
                     (tag.find('\\') < 0)) or
                     (tag == None))
                 ):
@@ -3836,10 +3838,10 @@ def cfgCheckYAML(cfg,init_dict):
         cfg['advanced_settings'].update(missing_dict['advanced_settings'])
         cfg['advanced_settings']['behavioral_statements']={}
         cfg['advanced_settings']['behavioral_statements'].update(temp_dict['behavioral_statements'])
-        cfg['advanced_settings']['whitetags']={}
-        cfg['advanced_settings']['whitetags'].update(temp_dict['whitetags'])
-        cfg['advanced_settings']['blacktags']={}
-        cfg['advanced_settings']['blacktags'].update(temp_dict['blacktags'])
+        cfg['advanced_settings']['whitetags']=[]
+        cfg['advanced_settings']['whitetags'].extend(temp_dict['whitetags'])
+        cfg['advanced_settings']['blacktags']=[]
+        cfg['advanced_settings']['blacktags'].extend(temp_dict['blacktags'])
         cfg['advanced_settings']['episode_control']={}
         cfg['advanced_settings']['episode_control'].update(temp_dict['episode_control'])
         cfg['advanced_settings']['trakt_fix']={}
