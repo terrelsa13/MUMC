@@ -12,6 +12,6 @@ def yaml_configurationUpdater(the_dict):
     config_data['DEBUG']=the_dict['DEBUG']
 
     #save yaml config file
-    save_yaml_config(config_data,the_dict['mumc_path'] + '/' + the_dict['config_file_name_yaml'])
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
 
     #return

@@ -3857,7 +3857,8 @@ def cfgCheckYAML(cfg,init_dict):
         cfg['config_file_name_yaml']=init_dict['config_file_name_yaml']
         #update config yaml with known possible missing config values
         yaml_configurationUpdater(cfg)
-        print_config_options_added_warning(cfg,'advanced_settings','filter_statements','etc...')
+        init_dict.update(cfg)
+        print_config_options_added_warning(init_dict,'advanced_settings','filter_statements','etc...')
 
 #######################################################################################################
     return cfg
