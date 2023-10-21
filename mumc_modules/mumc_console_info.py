@@ -114,6 +114,25 @@ def print_footer_information(the_dict):
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
 
 
+#there are times when new config option can be gracefully removed from the config yaml
+ #when this is possible, print a warning notification to the console for the user to view
+def print_config_options_removed_warning(the_dict,*yaml_sections):
+    missing_accordion=''
+    for yaml_section in yaml_sections:
+        if (missing_accordion == ''):
+            missing_accordion=yaml_section
+        else:
+            missing_accordion+=(' > ' + yaml_section)
+
+    strings_list_to_print=['']
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were removed from the yaml configuratoin file...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'   ' + missing_accordion)
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
+
+    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+
+
 #there are times when new config option can be gracefully added to the config yaml
  #when this is possible, print a warning notification to the console for the user to view
 def print_config_options_added_warning(the_dict,*yaml_sections):
@@ -126,7 +145,7 @@ def print_config_options_added_warning(the_dict,*yaml_sections):
 
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following options were added to the yaml configuratoin file...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were added to the yaml configuratoin file...')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'   ' + missing_accordion)
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 

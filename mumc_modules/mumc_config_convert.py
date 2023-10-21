@@ -1022,9 +1022,9 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     except:
         config_data['admin_settings']['cache']['fallback_behavior']='LRU'
     try:
-        config_data['admin_settings']['cache']['last_accessed_time']=cfg['api_query_cache_last_accessed_time']
+        config_data['admin_settings']['cache']['minimum_age']=cfg['api_query_cache_last_accessed_time']
     except:
-        config_data['admin_settings']['cache']['last_accessed_time']=200
+        config_data['admin_settings']['cache']['minimum_age']=200
     try:
         config_data['DEBUG']=cfg['DEBUG']
     except:

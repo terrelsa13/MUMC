@@ -275,7 +275,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['admin_settings']['api_controls']['item_limit']=25
     config_data['admin_settings']['cache']['size']=32
     config_data['admin_settings']['cache']['fallback_behavior']='LRU'
-    config_data['admin_settings']['cache']['last_accessed_time']=200
+    config_data['admin_settings']['cache']['minimum_age']=200
 
     #before saving; reorder some keys for consistency
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')

@@ -47,7 +47,7 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['cache_size']=16#MB initial default value
     the_cfg['bytes_in_megabytes']=1048576
     the_cfg['fallback_behavior']='LRU' #initial default value
-    the_cfg['last_accessed_time']=200 #initial default value
+    the_cfg['minimum_age']=200 #initial default value
     the_cfg['cached_data']=cached_data_handler(the_cfg)
     the_cfg['text_attrs']=console_text_attributes()
     the_cfg['formatting']={}

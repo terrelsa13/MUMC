@@ -35,9 +35,9 @@ class cached_data_handler:
         except:
             self.api_query_cache_fallback_behavior=cfg['fallback_behavior']
         try:
-            self.api_query_cache_last_accessed_time=cfg['admin_settings']['cache']['last_accessed_time']
+            self.api_query_cache_minimum_age=cfg['admin_settings']['cache']['minimum_age']
         except:
-            self.api_query_cache_last_accessed_time=cfg['last_accessed_time']
+            self.api_query_cache_minimum_age=cfg['minimum_age']
 
 
     def wipeCache(self):
@@ -136,7 +136,7 @@ class cached_data_handler:
 
 
     def getTimeWindow(self):
-        return (time.time() * 1000) - self.api_query_cache_last_accessed_time
+        return (time.time() * 1000) - self.api_query_cache_minimum_age
 
 
     def addEntryToCache(self,url,data):
