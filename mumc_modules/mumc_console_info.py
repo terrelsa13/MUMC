@@ -126,7 +126,7 @@ def print_config_options_removed_warning(the_dict,*yaml_sections):
 
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were removed from the yaml configuratoin file...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were removed from the yaml configuration file...')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'   ' + missing_accordion)
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
@@ -145,7 +145,7 @@ def print_config_options_added_warning(the_dict,*yaml_sections):
 
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were added to the yaml configuratoin file...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were added to the yaml configuration file...')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'   ' + missing_accordion)
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 

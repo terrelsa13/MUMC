@@ -3851,8 +3851,12 @@ def cfgCheckYAML(cfg,init_dict):
 
     #Check if known possibly missing config values were found and silently ignored
     if (minimum_age_missing_bool):
-        temp_dict=copy.deepcopy(cfg['admin_settings'])
-        cfg['admin_settings']['cache']={}
+        temp_dict={}
+        temp_dict['admin_settings']={}
+        temp_dict['admin_settings']['cache']={}
+
+        temp_dict['admin_settings']['cache']=copy.deepcopy(cfg['admin_settings']['cache'])
+
         cfg['admin_settings']['cache']={}
         cfg['admin_settings']['cache']['size']=temp_dict['admin_settings']['cache']['size']
         cfg['admin_settings']['cache']['fallback_behavior']=temp_dict['admin_settings']['cache']['fallback_behavior']
