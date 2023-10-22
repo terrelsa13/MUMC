@@ -10,7 +10,7 @@ from mumc_modules.mumc_userlib_builder import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 
 
-#get user input needed to build or edit the mumc_config.py file
+#get user input needed to build or edit the mumc_config.yaml file
 def build_configuration_file(the_dict):
 
     print('----------------------------------------------------------------------------------------')
@@ -139,12 +139,12 @@ def build_configuration_file(the_dict):
             #something went wrong
             #mumc_config.yaml should have been created by now
             #we are here because the mumc_config.yaml file does not exist
-            #this is either the first time the script is running or mumc_config.py file was deleted
+            #this is either the first time the script is running or mumc_config.yaml file was deleted
 
             #raise error
             raise RuntimeError('\nConfigError: Cannot find or open mumc_config.yaml')
 
 
-#get user input needed to edit the mumc_config.py file
+#get user input needed to edit the mumc_config.yaml file
 def edit_configuration_file(cfg):
     build_configuration_file(cfg)

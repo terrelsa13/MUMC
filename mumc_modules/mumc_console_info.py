@@ -316,7 +316,7 @@ def default_helper_menu(the_dict):
 def print_full_help_menu(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nMUMC Version: ' + get_script_version())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want to keep.')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Usage:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'/path/to/python3.x /path/to/mumc.py [-option] [arg]')
@@ -324,7 +324,7 @@ def print_full_help_menu(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Options:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-a -attrs, -attributes      Show console attribute test output')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-c [path], -config [path]   Specify alternate *.py configuration file')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-d, -container              Script is running in a container')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-d, -container              Script is running in a docker container')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-h, -help                   Show this help menu; will override all other options')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Latest Release:')
@@ -346,9 +346,9 @@ def unknown_command_line_option_helper(cmdUnknown,the_dict):
 def missing_config_argument_helper(argv,the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'CMDOptionIndexError: Cannot find /path/to/alternate_config.py after -c')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'CMDOptionIndexError: Cannot find /path/to/alternate_config.yaml after -c')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Verify the \'-c\' option looks like this: -c /path/to/alternate_config.py')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Verify the \'-c\' option looks like this: -c /path/to/alternate_config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
@@ -360,9 +360,9 @@ def missing_config_argument_helper(argv,the_dict):
 def missing_config_argument_format_helper(argv,the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'AlternateConfigArgumentError: Cannot find /path/to/alternate_config.py after -c')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'AlternateConfigArgumentError: Cannot find /path/to/alternate_config.yaml after -c')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Verify the \'-c\' option looks like this: -c /path/to/alternate_config.py')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Verify the \'-c\' option looks like this: -c /path/to/alternate_config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,' '.join(argv))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
@@ -399,10 +399,10 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate.config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate config.yaml')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate.config.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate config.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate.config.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate config.py')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate.config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate.config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'These are valid config file names:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
@@ -414,10 +414,10 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate_config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternateconfig.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate_config.yaml')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternateconfig.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate_config.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternateconfig.py')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate_config.py')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternateconfig.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\t/path/to/alternate_config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternateconfig.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\tc:\\path\\to\\alternate_config.yaml')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
 
     print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
@@ -445,17 +445,17 @@ def print_all_media_disabled(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* Open the mumc_config.yaml file in a text editor.                                     *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* Set at least one media type's condition_days >= 0.                                   *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"*                                                                                      *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - movie - played - condition_days: -1             *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - episode - played - condition_days: -1           *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audio - played - condition_days: -1             *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > movie > played > condition_days: -1             *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > episode > played > condition_days: -1           *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > audio > played > condition_days: -1             *")
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audiobook - played - condition_days: -1         *")
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > audiobook > played > condition_days: -1         *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"*                                                                                      *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - movie - created - condition_days: -1            *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - episode - created - condition_days: -1          *")
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audio - created - condition_days: -1            *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > movie > created > condition_days: -1            *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > episode > created > condition_days: -1          *")
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > audio > created > condition_days: -1            *")
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings - filter_statements - audiobook - created - condition_days: -1        *")
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > audiobook > created > condition_days: -1        *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
@@ -464,8 +464,8 @@ def print_all_media_disabled(the_dict):
 #print how to delete files info
 def remove_files_helper(strings_list_to_print,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'To delete media open mumc_config.py in a text editor:')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Set REMOVE_FILES=\'True\'')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'To delete media, open mumc_config.yaml in a text editor:')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Set advanced_settings > REMOVE_FILES: true')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
     return strings_list_to_print
@@ -490,7 +490,7 @@ def build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dic
 
     if not bool(the_dict['advanced_settings']['REMOVE_FILES']):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Dry Run Mode')
-        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* REMOVE_FILES=\'False\'')
+        strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* advanced_settings > REMOVE_FILES: false')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* No Media Deleted')
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Items = ' + str(the_dict['deleteItemsLength']))
 
