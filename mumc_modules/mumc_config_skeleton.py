@@ -29,18 +29,24 @@ def setYAMLConfigSkeleton(the_dict):
 
     the_dict['advanced_settings']={}
     the_dict['advanced_settings']['filter_statements']={}
+    the_dict['advanced_settings']['filter_statements']['movie']={}
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']={}
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=None
 
+    the_dict['advanced_settings']['filter_statements']['episode']={}
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']={}
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=None
 
+    the_dict['advanced_settings']['filter_statements']['audio']={}
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']={}
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=None
@@ -48,6 +54,8 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=None
 
     if (server_brand == 'jellyfin'):
+        the_dict['advanced_settings']['filter_statements']['audiobook']={}
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']={}
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=None
