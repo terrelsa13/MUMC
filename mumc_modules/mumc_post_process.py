@@ -79,13 +79,13 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
 
                     #all - Every monitored user must have the media item blacklisted/whitelites/blacktagged/whitetagged/favortied
                     if (itemsExtraDictionary['MonitoredUsersAction'] == andIt):
-                        actionControl=isMeetingAction_dict[itemId] == max_binary_value
+                        userConditional=isMeetingAction_dict[itemId] == max_binary_value
                     #any - One or more monitored users must have the media item blacklisted/whitelisted/favorited (does not apply to blacktagged/whitetagged)
                     elif (itemsExtraDictionary['MonitoredUsersAction'] == orIt):
-                        actionControl=isMeetingAction_dict[itemId] >= 1
+                        userConditional=isMeetingAction_dict[itemId] >= 1
                     #ignore - Should never get here
                     else: #(itemsExtraDictionary['MonitoredUsersAction'] == 'ignore'):
-                        raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate actionControl assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
+                        raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate userConditional assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
 
                     #all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
                     #all_all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
@@ -119,7 +119,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                     else: #(itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == 'ignore'):
                         playedControl=True
 
-                    behavioralControl=actionControl and playedControl
+                    behavioralControl=userConditional and playedControl
 
                     if (behavioralControl):
                         if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
