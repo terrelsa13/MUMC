@@ -94,8 +94,6 @@ def build_configuration_file(the_dict):
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
 
-    #set auth_key to allow printing username next to userkey
-    #auth_key=cfg.auth_key
     #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
     the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
     print('----------------------------------------------------------------------------------------')
@@ -110,9 +108,6 @@ def build_configuration_file(the_dict):
         yaml_configurationBuilder(the_dict)
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationUpdater(the_dict)
-
-    #Save the legacy config file
-    #write_to_file(config_file,os.path.join(the_dict['cwd'],the_dict['config_file_name']))
 
     #Check config editing was not requested
     if not (the_dict['advanced_settings']['UPDATE_CONFIG']):

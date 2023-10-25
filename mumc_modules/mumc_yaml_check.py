@@ -373,9 +373,9 @@ def cfgCheckYAML(cfg,init_dict):
         check=return_key_value(cfg,'basic_settings','filter_statements','movie','played','count')
         if (
             not (isinstance(check,int) and
-                 (check >= -1) and (check <= 730500))
+                 (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_movie'].insert(2,check)
     else:
@@ -469,9 +469,9 @@ def cfgCheckYAML(cfg,init_dict):
         check=return_key_value(cfg,'basic_settings','filter_statements','episode','played','count')
         if (
             not (isinstance(check,int) and
-                 (check >= -1) and (check <= 730500))
+                 (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_episode'].insert(2,check)
     else:
@@ -566,9 +566,9 @@ def cfgCheckYAML(cfg,init_dict):
         check=return_key_value(cfg,'basic_settings','filter_statements','audio','played','count')
         if (
             not (isinstance(check,int) and
-                 (check >= -1) and (check <= 730500))
+                 (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > played > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_audio'].insert(2,check)
     else:
@@ -664,9 +664,9 @@ def cfgCheckYAML(cfg,init_dict):
             check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','played','count')
             if (
                 not (isinstance(check,int) and
-                    (check >= -1) and (check <= 730500))
+                    (check >= -1) and (not (check == 0)) and (check <= 730500))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > played > count must be an integer\n\tValid range -1 thru 730500\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
             else:
                 config_dict['played_filter_audiobook'].insert(2,check)
         else:

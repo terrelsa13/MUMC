@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+#import re
+import emoji
 import json
 import yaml
 from pathlib import Path
@@ -70,9 +72,32 @@ def delete_debug_log(the_dict):
     Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
 
 
+def remove_emojis(dataInput: str) -> str:
+    #return ''.join(emj for emj in dataInput if emj not in emoji.UNICODE_EMOJI)
+    dataInput=emoji.replace_emoji(dataInput, replace="***emoji_removed***")
+    return dataInput
+
+
+#Remove emoticons before printing to mumc_debug.log
+#def remove_emoticons(dataInput):
+
+    #removeEmojis = re.compile(pattern =
+    #"["
+        #u"\U0001F600-\U0001F64F" # emoticons
+        #u"\U0001F300-\U0001F5FF" # symbols & pictographs
+        #u"\U0001F680-\U0001F6FF" # transport & map symbols
+        #u"\U0001F1E0-\U0001F1FF" # flags (iOS)
+    #"]+", flags = re.UNICODE)
+
+    #return removeEmojis.sub(r'',dataInput)
+
+
 #Save file to the directory this script is running from; even when the cwd is not the same
 def append_to_file(dataInput,filePathName):
     fullPathName=getFullPathName(filePathName)
+
+    #dataInput=remove_emoticons(dataInput)
+    dataInput=remove_emojis(dataInput)
 
     #Save the config file
     with open(fullPathName,'a') as file:
