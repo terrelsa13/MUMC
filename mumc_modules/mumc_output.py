@@ -72,6 +72,7 @@ def delete_debug_log(the_dict):
     Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
 
 
+#Remove emojis before printing to mumc_debug.log
 def remove_emojis(dataInput: str) -> str:
     #return ''.join(emj for emj in dataInput if emj not in emoji.UNICODE_EMOJI)
     dataInput=emoji.replace_emoji(dataInput, replace="***emoji_removed***")
@@ -96,7 +97,10 @@ def remove_emojis(dataInput: str) -> str:
 def append_to_file(dataInput,filePathName):
     fullPathName=getFullPathName(filePathName)
 
+    #remove emoticons
     #dataInput=remove_emoticons(dataInput)
+
+    #remove emojis
     dataInput=remove_emojis(dataInput)
 
     #Save the config file
