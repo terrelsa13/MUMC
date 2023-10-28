@@ -74,7 +74,6 @@ def delete_debug_log(the_dict):
 
 #Remove emojis before printing to mumc_debug.log
 def remove_emojis(dataInput: str) -> str:
-    #return ''.join(emj for emj in dataInput if emj not in emoji.UNICODE_EMOJI)
     dataInput=emoji.replace_emoji(dataInput, replace="***emoji_removed***")
     return dataInput
 
