@@ -714,7 +714,25 @@ def init_getMedia(the_dict):
             audiobook_delete=the_dict['advanced_settings']['console_controls']['audiobook']['delete']['show']
             audiobook_keep=the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']
 
-        #when debug is disabled AND no media delete/keep items are being output to the console; allow multiprocessing
+        if ((the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and 
+            (the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1)):
+            movie_delete=False
+            movie_keep=False
+        if ((the_dict['basic_settings']['filter_statements']['episode']['played']['condition_days'] == -1) and 
+            (the_dict['basic_settings']['filter_statements']['episode']['created']['condition_days'] == -1)):
+            episode_delete=False
+            episode_keep=False
+        if ((the_dict['basic_settings']['filter_statements']['audio']['played']['condition_days'] == -1) and 
+            (the_dict['basic_settings']['filter_statements']['audio']['created']['condition_days'] == -1)):
+            audio_delete=False
+            audio_keep=False
+        if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+            if ((the_dict['basic_settings']['filter_statements']['audiobook']['played']['condition_days'] == -1) and 
+                (the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)):
+                audiobook_delete=False
+                audiobook_keep=False
+
+        #when debug is disabled AND no active media delete/keep items are being output to the console; allow multiprocessing
         if (
            (not (the_dict['DEBUG'])) and
            ((not (movie_delete or movie_keep)) and
