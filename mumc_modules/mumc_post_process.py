@@ -211,7 +211,7 @@ def add_missingItems_byUserId_playedStates(prefix_str,postproc_dict,the_dict):
     return postproc_dict
 
 
-def run_postProcessing(the_dict,media_dict):
+def postProcessing(the_dict,media_dict):
 
     postproc_dict={}
 
@@ -458,10 +458,10 @@ def run_postProcessing(the_dict,media_dict):
     return postproc_dict['deleteItems_Media']
 
 
-def postProcessing(the_dict,media_dict,deleteItems_dict):
+def start_postProcessing(the_dict,media_dict,deleteItems_dict):
     if (not (the_dict['all_media_disabled'])):
         #perform post processing for each media type
-        deleteItems_media=run_postProcessing(the_dict,media_dict)
+        deleteItems_media=postProcessing(the_dict,media_dict)
 
         #verify the specific media_type is not already in the dictionary as a key
         #if it is not; go ahead and add it and set it == deleteItems_media
@@ -492,11 +492,11 @@ def init_postProcessing(the_dict):
 
         #prepare for post processing; return dictionary of lists of media items to be deleted
         #setup for multiprocessing of the post processing of each media type
-        mpp_movie_post_process=multiprocessing.Process(target=postProcessing,args=(the_dict,movie_dict,deleteItems_dict))
-        mpp_episodePostProcess=multiprocessing.Process(target=postProcessing,args=(the_dict,episode_dict,deleteItems_dict))
-        mpp_audioPostProcess=multiprocessing.Process(target=postProcessing,args=(the_dict,audio_dict,deleteItems_dict))
+        mpp_movie_post_process=multiprocessing.Process(target=start_postProcessing,args=(the_dict,movie_dict,deleteItems_dict))
+        mpp_episodePostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,episode_dict,deleteItems_dict))
+        mpp_audioPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,audio_dict,deleteItems_dict))
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            mpp_audiobookPostProcess=multiprocessing.Process(target=postProcessing,args=(the_dict,audiobook_dict,deleteItems_dict))
+            mpp_audiobookPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,audiobook_dict,deleteItems_dict))
 
         #start all multi processes
         #order intentially: Audio, Episodes, Movies, Audiobooks
@@ -513,11 +513,11 @@ def init_postProcessing(the_dict):
     else: #when debug enabled do not allow multiprocessing; this will allow stepping thru debug
         deleteItems_dict={}
 
-        deleteItems_dict=postProcessing(the_dict,movie_dict,deleteItems_dict)
-        deleteItems_dict=postProcessing(the_dict,episode_dict,deleteItems_dict)
-        deleteItems_dict=postProcessing(the_dict,audio_dict,deleteItems_dict)
+        deleteItems_dict=start_postProcessing(the_dict,movie_dict,deleteItems_dict)
+        deleteItems_dict=start_postProcessing(the_dict,episode_dict,deleteItems_dict)
+        deleteItems_dict=start_postProcessing(the_dict,audio_dict,deleteItems_dict)
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            deleteItems_dict=postProcessing(the_dict,audiobook_dict,deleteItems_dict)
+            deleteItems_dict=start_postProcessing(the_dict,audiobook_dict,deleteItems_dict)
         else:
             deleteItems_dict['audiobook']=[]
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import importlib
 import yaml
-from mumc_modules.mumc_config_check import cfgCheckLegacy
+from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import build_configuration_file
 from mumc_modules.mumc_output import getFileExtension,add_to_PATH,doesFileExist
 from mumc_modules.mumc_console_info import default_helper_menu,print_failed_to_load_config

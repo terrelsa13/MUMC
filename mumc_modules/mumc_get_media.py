@@ -676,7 +676,7 @@ def init_getMedia(the_dict):
     the_dict['audiobook_dict']={}
     the_dict['audiobook_dict']['media_type']='audiobook'
 
-    #Determine played and created date for each media type; UTC time used for media items; needed for get_mediaItems() and run_postProcessing()
+    #Determine played and created date for each media type; UTC time used for media items; needed for get_mediaItems() and postProcessing()
     the_dict['cut_off_date_played_media']={}
     the_dict['cut_off_date_created_media']={}
     the_dict['cut_off_date_played_media']['movie']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'])

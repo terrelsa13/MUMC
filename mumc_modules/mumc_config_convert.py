@@ -129,11 +129,11 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     try:
         config_data['basic_settings']['filter_statements']['audio']['created']['condition_days']=cfg['created_filter_audio'][0]
     except:
-        pass
+        config_data['basic_settings']['filter_statements']['audio']['created']['condition_days']=-1
     try:
         config_data['basic_settings']['filter_statements']['audio']['created']['count_equality']=cfg['created_filter_audio'][1]
     except:
-        pass
+        config_data['basic_settings']['filter_statements']['audio']['created']['count_equality']='>='
     try:
         config_data['basic_settings']['filter_statements']['audio']['created']['count']=cfg['created_filter_audio'][2]
     except:
@@ -360,7 +360,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']=cfg['whitelisted_behavior_episode'][0]
     except:
-        config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']=0
+        config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']='keep'
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['user_conditional']=cfg['whitelisted_behavior_episode'][1]
     except:
@@ -666,7 +666,7 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     try:
         config_data['advanced_settings']['console_controls']['headers']['summary']['show']=cfg['print_summary_header']
     except:
-        config_data['advanced_settings']['console_controls']['headers']['summary']['show']=''
+        config_data['advanced_settings']['console_controls']['headers']['summary']['show']=True
     try:
         config_data['advanced_settings']['console_controls']['headers']['summary']['formatting']['font']['color']=cfg['summary_header_format'][0]
     except:

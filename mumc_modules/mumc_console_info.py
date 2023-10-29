@@ -69,7 +69,6 @@ def print_user_header(user_info,the_dict):
 
 #print cache statistics for cache tuning
 def print_cache_stats(the_dict):
-    if (the_dict['DEBUG']):
         strings_list_to_print=['']
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Cached Data Summary:')

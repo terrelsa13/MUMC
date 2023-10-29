@@ -1,2 +1,4 @@
+emoji
 python-dateutil
 PyYAML
+six

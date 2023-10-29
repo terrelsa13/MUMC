@@ -42,8 +42,9 @@ def main():
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg)
 
-        #show cache stats
-        print_cache_stats(cfg)
+        if (cfg['DEBUG']):
+            #show cache stats
+            print_cache_stats(cfg)
 
         if (cfg['DEBUG'] == 255):
             #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
@@ -83,9 +84,10 @@ def main():
         #output to console the items to be deleted; then delete media items
 
         print_and_delete_items(deleteItems,cfg)
-
-    #show cache stats
-    print_cache_stats(cfg)
+    
+    if (cfg['DEBUG']):
+        #show cache stats
+        print_cache_stats(cfg)
 
     if (cfg['DEBUG'] == 255):
         #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
