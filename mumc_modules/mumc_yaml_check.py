@@ -4222,6 +4222,76 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    #convert tag lists to new sets
+    generic_blacktag_set=set(config_dict['blacktag'])
+    generic_whitetag_set=set(config_dict['whitetag'])
+    movie_blacktag_set=set(config_dict['movie_blacktag'])
+    movie_whitetag_set=set(config_dict['movie_whitetag'])
+    episode_blacktag_set=set(config_dict['episode_blacktag'])
+    episode_whitetag_set=set(config_dict['episode_whitetag'])
+    audio_blacktag_set=set(config_dict['audio_blacktag'])
+    audio_whitetag_set=set(config_dict['audio_whitetag'])
+    if (isJellyfinServer(server_brand)):
+        audiobook_blacktag_set=set(config_dict['audiobook_blacktag'])
+        audiobook_whitetag_set=set(config_dict['audiobook_whitetag'])
+
+    #check global blacktags and whitetags do not have a common string
+    generic_blacktag_generic_whitetag_common=generic_blacktag_set & generic_whitetag_set
+
+    #check global blacktags and media specific whitetags do not have a common string
+    generic_blacktag_movie_whitetag_common=generic_blacktag_set & movie_whitetag_set
+    generic_blacktag_episode_whitetag_common=generic_blacktag_set & episode_whitetag_set
+    generic_blacktag_audio_whitetag_common=generic_blacktag_set & audio_whitetag_set
+    if (isJellyfinServer(server_brand)):
+        generic_blacktag_audiobook_whitetag_common=generic_blacktag_set & audiobook_whitetag_set
+
+    #check global whitetags and media specific blacktags do not have a common string
+    generic_whitetag_movie_blacktag_common=generic_whitetag_set & movie_blacktag_set
+    generic_whitetag_episode_blacktag_common=generic_whitetag_set & episode_blacktag_set
+    generic_whitetag_audio_blacktag_common=generic_whitetag_set & audio_blacktag_set
+    if (isJellyfinServer(server_brand)):
+        generic_whitetag_audiobook_blacktag_common=generic_whitetag_set & audiobook_blacktag_set
+
+    #check media specific blacktags and media specific whitetags do not have a common string
+    movie_blacktag_movie_whitetag_common=movie_blacktag_set & movie_whitetag_set
+    episode_blacktag_set_blacktag_episode_whitetag_common=episode_blacktag_set & episode_whitetag_set
+    audio_blacktag_audio_whitetag_common=audio_blacktag_set & audio_whitetag_set
+    if (isJellyfinServer(server_brand)):
+        audiobook_blacktag_audiobook_whitetag_common=audiobook_blacktag_set & audiobook_whitetag_set
+
+    if (generic_blacktag_generic_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > whitetags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(list(generic_blacktag_generic_whitetag_common))  + '\n'
+
+    if (generic_blacktag_movie_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_blacktag_movie_whitetag_common)  + '\n'
+    if (generic_blacktag_episode_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_blacktag_episode_whitetag_common)  + '\n'
+    if (generic_blacktag_audio_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_blacktag_audio_whitetag_common)  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (generic_blacktag_audiobook_whitetag_common):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_blacktag_audiobook_whitetag_common)  + '\n'
+
+    if (generic_whitetag_movie_blacktag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_whitetag_movie_blacktag_common)  + '\n'
+    if (generic_whitetag_episode_blacktag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_whitetag_episode_blacktag_common)  + '\n'
+    if (generic_whitetag_audio_blacktag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_whitetag_audio_blacktag_common)  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (generic_whitetag_audiobook_blacktag_common):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(generic_whitetag_audiobook_blacktag_common)  + '\n'
+
+    if (movie_blacktag_movie_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(movie_blacktag_movie_whitetag_common)  + '\n'
+    if (episode_blacktag_set_blacktag_episode_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(episode_blacktag_set_blacktag_episode_whitetag_common)  + '\n'
+    if (audio_blacktag_audio_whitetag_common):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(audio_blacktag_audio_whitetag_common)  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (audiobook_blacktag_audiobook_whitetag_common):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the folowing tags need to be fixed:: ' +  str(audiobook_blacktag_audiobook_whitetag_common)  + '\n'
+
 #######################################################################################################
 
 #######################################################################################################

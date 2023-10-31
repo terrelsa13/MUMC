@@ -1,5 +1,4 @@
 **
 !docker/
 !mumc_modules/
-!mumc_config_defaults.py
 !mumc.py
