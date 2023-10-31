@@ -53,15 +53,18 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
 
     if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
         methodFilter=itemsExtraDictionary['ConfiguredBehavior']
-        behaviorFilter=itemsExtraDictionary['ActionBehavior']
+        behaviorFilter=itemsExtraDictionary['ActionControl']
+        dynamicBehavior=itemsExtraDictionary['DynamicBehavior']
 
         for userId in itemsDictionary:
             userId_tracker.append(userId)
 
-        max_binary_value=(2**len(userId_tracker))-1
+        max_binary_value_base=(2**len(userId_tracker))-1
 
         for userId in itemsDictionary:
             for itemId in itemsDictionary[userId]:
+
+                max_binary_value=max_binary_value_base
 
                 behavior_pattern_dict['itemId']=itemId
 
@@ -79,10 +82,32 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
 
                     #all - Every monitored user must have the media item blacklisted/whitelites/blacktagged/whitetagged/favortied
                     if (itemsExtraDictionary['MonitoredUsersAction'] == andIt):
-                        userConditional=isMeetingAction_dict[itemId] == max_binary_value
+                        if (not (dynamicBehavior)):
+                            userConditional=(isMeetingAction_dict[itemId] == max_binary_value)
+                        else:
+                            #set the new mask for dynamic_behavior
+                            max_binary_value=isMeetingAction_dict[itemId]
+                            #we are only checking users with the matching conditional_behavior
+                            if (max_binary_value):
+                                #this is automatically True if max_binary_value > 0; meaning at least one user has the matching conditional_behavior
+                                userConditional=True
+                            else:
+                                #this is automatically false if max_binary_value == 0; meaning no users have the matching conditional_behavior
+                                userConditional=False
                     #any - One or more monitored users must have the media item blacklisted/whitelisted/favorited (does not apply to blacktagged/whitetagged)
                     elif (itemsExtraDictionary['MonitoredUsersAction'] == orIt):
-                        userConditional=isMeetingAction_dict[itemId] >= 1
+                        if (not (dynamicBehavior)):
+                            userConditional=(isMeetingAction_dict[itemId] >= 1)
+                        else:
+                            #set the new mask for dynamic_behavior
+                            max_binary_value=isMeetingAction_dict[itemId]
+                            #we are only checking users with the matching conditional_behavior
+                            if (max_binary_value):
+                                #this is automatically True if max_binary_value > 0; meaning at least one user has the matching conditional_behavior
+                                userConditional=True
+                            else:
+                                #this is automatically false if max_binary_value == 0; meaning no users have the matching conditional_behavior
+                                userConditional=False
                     #ignore - Should never get here
                     else: #(itemsExtraDictionary['MonitoredUsersAction'] == 'ignore'):
                         raise RuntimeError('\nMedia Item with itemId: ' + itemId + ' does not have appropriate userConditional assigned during post processing of ' + itemsExtraDictionary['ActionType'] + ' items')
@@ -91,35 +116,59 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                     #all_all - Every monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
                     if ((itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt) or
                         (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == andIt + '_' + andIt)):
-                        playedControl=(isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value
+                        if (not (dynamicBehavior)):
+                            playedControl=((isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value)
+                        else:
+                            playedControl=(((isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) & max_binary_value) == max_binary_value)
                     #any - One or more monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
                     #any_any - One or more monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
                     elif ((itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt) or
                           (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == orIt + '_' + orIt)):
-                        playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
+                        if (not (dynamicBehavior)):
+                            playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
+                        else:
+                            playedControl=(((isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) & max_binary_value) >= 1)
                     #all_any - Every monitored user(s) must meet the Played Count and Played Count Inequality of either the played_filter_* or created_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_' + orIt)):
-                        playedControl=(isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value
+                        if (not (dynamicBehavior)):
+                            playedControl=((isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) == max_binary_value)
+                        else:
+                            playedControl=(((isMeetingPlayedFilter_dict[itemId] | isMeetingCreatedPlayedFilter_dict[itemId]) & max_binary_value) == max_binary_value)
                     #any_all - One or more monitored user(s) must meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_' + andIt)):
-                        playedControl=(isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) >= 1
+                        if (not (dynamicBehavior)):
+                            playedControl=((isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) >= 1)
+                        else:
+                            playedControl=(((isMeetingPlayedFilter_dict[itemId] & isMeetingCreatedPlayedFilter_dict[itemId]) & max_binary_value) >= 1)
                     #all_played - Every monitored user(s) must meet the Played Count and Played Count Inequality of the played_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_played')):
-                        playedControl=isMeetingPlayedFilter_dict[itemId] == max_binary_value
+                        if (not (dynamicBehavior)):
+                            playedControl=(isMeetingPlayedFilter_dict[itemId] == max_binary_value)
+                        else:
+                            playedControl=((isMeetingPlayedFilter_dict[itemId] & max_binary_value) == max_binary_value)
                     #any_played - One or more monitored user(s) must meet the Played Count and Played Count Inequality of the played_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_played')):
-                        playedControl=isMeetingPlayedFilter_dict[itemId] >= 1
+                        if (not (dynamicBehavior)):
+                            playedControl=(isMeetingPlayedFilter_dict[itemId] >= 1)
+                        else:
+                            playedControl=((isMeetingPlayedFilter_dict[itemId] & max_binary_value) >= 1)
                     #all_created - Every monitored user(s) must meet the Played Count and Played Count Inequality of the created_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (andIt + '_created')):
-                        playedControl=isMeetingCreatedPlayedFilter_dict[itemId] == max_binary_value
+                        if (not (dynamicBehavior)):
+                            playedControl=(isMeetingCreatedPlayedFilter_dict[itemId] == max_binary_value)
+                        else:
+                            playedControl=((isMeetingCreatedPlayedFilter_dict[itemId] & max_binary_value) == max_binary_value)
                     #any_created - One or more monitored user(s) must meet the Played Count and Played Count Inequality of the created_filter_*
                     elif (itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == (orIt + '_created')):
-                        playedControl=isMeetingCreatedPlayedFilter_dict[itemId] >= 1
+                        if (not (dynamicBehavior)):
+                            playedControl=(isMeetingCreatedPlayedFilter_dict[itemId] >= 1)
+                        else:
+                            playedControl=((isMeetingCreatedPlayedFilter_dict[itemId] & max_binary_value) >= 1)
                     #ignore - Ignore if monitored user(s) meet the Played Count and Played Count Inequality of both the played_filter_* and created_filter_*
                     else: #(itemsExtraDictionary['MonitoredUsersMeetPlayedFilter'] == 'ignore'):
                         playedControl=True
 
-                    behavioralControl=userConditional and playedControl
+                    behavioralControl=(userConditional and playedControl)
 
                     if (behavioralControl):
                         if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
@@ -246,26 +295,31 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['favorited_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['user_conditional']
     postproc_dict['favorited_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['played_conditional']
     postproc_dict['favorited_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['action_control']
+    postproc_dict['favorited_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['dynamic_behavior']
     postproc_dict['whitetagged_behavior_media']={}
     postproc_dict['whitetagged_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitetagged']['action']
     postproc_dict['whitetagged_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitetagged']['user_conditional']
     postproc_dict['whitetagged_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitetagged']['played_conditional']
     postproc_dict['whitetagged_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitetagged']['action_control']
+    postproc_dict['whitetagged_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitetagged']['dynamic_behavior']
     postproc_dict['blacktagged_behavior_media']={}
     postproc_dict['blacktagged_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacktagged']['action']
     postproc_dict['blacktagged_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacktagged']['user_conditional']
     postproc_dict['blacktagged_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacktagged']['played_conditional']
     postproc_dict['blacktagged_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacktagged']['action_control']
+    postproc_dict['blacktagged_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacktagged']['dynamic_behavior']
     postproc_dict['whitelisted_behavior_media']={}
     postproc_dict['whitelisted_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitelisted']['action']
     postproc_dict['whitelisted_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitelisted']['user_conditional']
     postproc_dict['whitelisted_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitelisted']['played_conditional']
     postproc_dict['whitelisted_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitelisted']['action_control']
+    postproc_dict['whitelisted_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['whitelisted']['dynamic_behavior']
     postproc_dict['blacklisted_behavior_media']={}
     postproc_dict['blacklisted_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacklisted']['action']
     postproc_dict['blacklisted_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacklisted']['user_conditional']
     postproc_dict['blacklisted_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacklisted']['played_conditional']
     postproc_dict['blacklisted_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacklisted']['action_control']
+    postproc_dict['blacklisted_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['blacklisted']['dynamic_behavior']
     postproc_dict['print_media_post_processing']=the_dict['advanced_settings']['console_controls'][postproc_dict['media_type_lower']]['post_processing']['show']
     postproc_dict['media_post_processing_format']=the_dict['advanced_settings']['console_controls'][postproc_dict['media_type_lower']]['post_processing']['formatting']
 

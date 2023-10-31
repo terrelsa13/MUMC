@@ -97,7 +97,8 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
 
     return_dict={}
 
-    isactioned_extra_byUserId['ActionBehavior']=action_behavior['action_control']
+    isactioned_extra_byUserId['DynamicBehavior']=action_behavior['dynamic_behavior']
+    isactioned_extra_byUserId['ActionControl']=action_behavior['action_control']
     isactioned_extra_byUserId['ActionType']=theActionType
     isactioned_extra_byUserId['MonitoredUsersAction']=action_behavior['user_conditional'].casefold()
     isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']=action_behavior['played_conditional'].casefold()
@@ -118,7 +119,8 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     isActioned_and_played_byUserId[user_key][item['Id']]=item
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nActionBehavior=" + str(isactioned_extra_byUserId['ActionBehavior']),3,the_dict)
+        appendTo_DEBUG_log("\nDynamicBehavior=" + str(isactioned_extra_byUserId['DynamicBehavior']),3,the_dict)
+        appendTo_DEBUG_log("\nActionControl=" + str(isactioned_extra_byUserId['ActionControl']),3,the_dict)
         appendTo_DEBUG_log("\nActionType=" + str(isactioned_extra_byUserId['ActionType']),3,the_dict)
         appendTo_DEBUG_log("\nMonitoredUsersAction=" + str(isactioned_extra_byUserId['MonitoredUsersAction']),3,the_dict)
         appendTo_DEBUG_log("\nIsMeetingAction=" + str(isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']),3,the_dict)
@@ -244,26 +246,31 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['favorited_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['favorited']['user_conditional']
     var_dict['favorited_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['favorited']['played_conditional']
     var_dict['favorited_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['favorited']['action_control']
+    var_dict['favorited_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['favorited']['dynamic_behavior']
     var_dict['whitetagged_behavior_media']={}
     var_dict['whitetagged_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['action']
     var_dict['whitetagged_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['user_conditional']
     var_dict['whitetagged_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['played_conditional']
     var_dict['whitetagged_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['action_control']
+    var_dict['whitetagged_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['dynamic_behavior']
     var_dict['blacktagged_behavior_media']={}
     var_dict['blacktagged_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['action']
     var_dict['blacktagged_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['user_conditional']
     var_dict['blacktagged_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['played_conditional']
     var_dict['blacktagged_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['action_control']
+    var_dict['blacktagged_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['dynamic_behavior']
     var_dict['whitelisted_behavior_media']={}
     var_dict['whitelisted_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitelisted']['action']
     var_dict['whitelisted_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitelisted']['user_conditional']
     var_dict['whitelisted_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitelisted']['played_conditional']
     var_dict['whitelisted_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitelisted']['action_control']
+    var_dict['whitelisted_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitelisted']['dynamic_behavior']
     var_dict['blacklisted_behavior_media']={}
     var_dict['blacklisted_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacklisted']['action']
     var_dict['blacklisted_behavior_media']['user_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacklisted']['user_conditional']
     var_dict['blacklisted_behavior_media']['played_conditional']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacklisted']['played_conditional']
     var_dict['blacklisted_behavior_media']['action_control']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacklisted']['action_control']
+    var_dict['blacklisted_behavior_media']['dynamic_behavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacklisted']['dynamic_behavior']
     var_dict['media_set_missing_last_played_date']=the_dict['advanced_settings']['trakt_fix']['set_missing_last_played_date'][var_dict['media_type_lower']]
 
     var_dict['print_common_delete_keep_info']=(var_dict['print_media_delete_info'] or var_dict['print_media_keep_info'])

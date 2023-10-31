@@ -55,8 +55,8 @@ def get_days_since_created(date_last_created,the_dict):
 
 def convert_timeToString(byUserId_item):
     for userId in byUserId_item:
-        if (not((userId == 'ActionBehavior') or (userId == 'ActionType') or (userId == 'MonitoredUsersAction') or
-                (userId == 'MonitoredUsersMeetPlayedFilter') or(userId == 'ConfiguredBehavior'))):
+        if (not((userId == 'DynamicBehavior') or (userId == 'ActionControl') or (userId == 'ActionType') or (userId == 'MonitoredUsersAction') or
+                (userId == 'MonitoredUsersMeetPlayedFilter') or (userId == 'ConfiguredBehavior'))):
             for itemId in byUserId_item[userId]:
                 if ('CutOffDatePlayed' in byUserId_item[userId][itemId]):
                     byUserId_item[userId][itemId]['CutOffDatePlayed']=str(byUserId_item[userId][itemId]['CutOffDatePlayed'])
