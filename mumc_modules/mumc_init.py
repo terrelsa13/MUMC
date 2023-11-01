@@ -44,8 +44,8 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['_console_separator']='\n----------------------------------------------------------------------------------------'
     the_cfg['_console_separator_']='\n----------------------------------------------------------------------------------------\n'
 
-    the_cfg['cache_size']=16#MB initial default value
-    the_cfg['bytes_in_megabytes']=1048576
+    the_cfg['cache_size']=4#MB initial default value
+    the_cfg['bytes_in_megabytes']=1000000 #1048576 bytes is 1 mebibyte
     the_cfg['fallback_behavior']='LRU' #initial default value
     the_cfg['minimum_age']=200 #initial default value
     the_cfg['cached_data']=cached_data_handler(the_cfg)

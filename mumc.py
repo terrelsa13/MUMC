@@ -13,7 +13,7 @@ from mumc_modules.mumc_output import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
 
 
-def main():
+def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
 
@@ -103,7 +103,7 @@ def main():
 ############# START OF SCRIPT #############
 
 if (__name__ == "__main__"):
-    main()
+    MUMC()
 
 ############# END OF SCRIPT #############
 
