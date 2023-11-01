@@ -1,3 +1,9 @@
+# Please Update To [The Lastest Branch](https://github.com/terrelsa13/MUMC) Of MUMC.
+* Only the default branch will receive updates.
+* This branch is available for reference, but is no longer maintained.
+# The v4 Legacy mumc_config.py File Will Be Automatically Updated To The v5 mumc_config.yaml format.
+# v5 Is Not Backwards Compatible With Earlier Versions Of MUMC.
+
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will go through movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media items you no longer want taking up disk space.
 # What Files Are Included?
