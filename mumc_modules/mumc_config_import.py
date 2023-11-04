@@ -51,8 +51,8 @@ def importConfig(init_dict,cmdopt_dict):
             add_to_PATH(cmdopt_dict['altConfigPath'],0)
 
             #check if yaml config
-            if ((getFileExtension(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt']) == '.yaml') or
-               (getFileExtension(cmdopt_dict['altConfigPath'] + '/' + cmdopt_dict['altConfigFileExt']) == '.yml')):
+            if ((getFileExtension(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']) == '.yaml') or
+               (getFileExtension(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']) == '.yml')):
                 #open alternate yaml config
                 with open(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'], 'r') as mumc_config_yaml:
                     cfg = yaml.safe_load(mumc_config_yaml)
