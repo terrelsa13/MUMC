@@ -3,6 +3,7 @@ import os
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper,unknown_command_line_option_helper
 from mumc_modules.mumc_output import getFullPathName,getFileExtension
 from mumc_modules.mumc_console_attributes import console_text_attributes
+from pathlib import Path
 
 #define custom exception
 class CMDOptionIndexError(Exception):
@@ -128,7 +129,7 @@ def parseAltConfigPathFileSyntax(argv,altConfigInfo,cmdOption,moduleExtension,th
                 ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(".") == 0) and
                 ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(" ") == 0)):
                 #Get path without file.name
-                altConfigPath=os.path.dirname(argv[argv.index(cmdOption)+1])
+                altConfigPath=Path(os.path.dirname(argv[argv.index(cmdOption)+1]))
                 #Get file without extension
                 altConfigFileNoExt=os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])
             else:
