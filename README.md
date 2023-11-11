@@ -1,15 +1,15 @@
 # Multi-User Media Cleaner
-Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query your Emby/Jellyfin server for the movies, tv episodes, audio tracks, and audiobooks in your libraries then delete media items you no longer want taking up disk space.
+Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query your Emby/Jellyfin server for the movies, tv episodes, audio tracks, and audiobooks in your libraries. Then delete media items you no longer want taking up disk space.
 
 # Cool! How Do I Use This?
-Check out the **MUMC [WIKI](https://github.com/terrelsa13/MUMC/wiki)**! **WIP**
+Check out the **MUMC [WIKI](https://github.com/terrelsa13/MUMC/wiki/Home#MUMC-wiki)**!
 
 # MUMC Branches
 * [MUMC_Latest](https://github.com/terrelsa13/MUMC/tree/MUMC-Latest) - MUMC_v5 is the current and latest branch
 * [MUMC_v4](https://github.com/terrelsa13/MUMC/tree/MUMC_v4) - legacy; no longer maintained
 * [MUMC_v3](https://github.com/terrelsa13/MUMC/tree/MUMC_v3) - legacy; no longer maintained
 * [MUMC_v2](https://github.com/terrelsa13/MUMC/tree/MUMC_v2) - legacy; no longer maintained
-* [MUMC_dev](https://github.com/terrelsa13/MUMC/tree/MUMC_dev) - development branch
+* [MUMC_dev](https://github.com/terrelsa13/MUMC/tree/MUMC_dev) - development branch; may or may not exist
 
 #
 If you find MUMC useful and would like to show support, please consider the option below.
