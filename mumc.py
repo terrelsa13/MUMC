@@ -82,7 +82,6 @@ def MUMC():
         deleteItems=sortDeleteLists(deleteItems_dict)
 
         #output to console the items to be deleted; then delete media items
-
         print_and_delete_items(deleteItems,cfg)
     
     if (cfg['DEBUG']):
