@@ -64,7 +64,8 @@ def parse_library_data_for_temp_reference(libFolder,subLibPath,libraryTemp_dict,
 
 #Parse library Paths For Back Slash; Replace With Forward Slash
 def cleanup_library_paths(libPath_str):
-    libPath_str=libPath_str.replace('\\','/')
+    if (not (libPath_str == None)):
+        libPath_str=libPath_str.replace('\\','/')
     return(libPath_str)
 
 
@@ -486,7 +487,7 @@ def get_users_and_libraries(the_dict):
                 stop_loop=True
                 one_user_selected=True
                 user_number_int=int(user_number)
-                userId_list.add(userId_dict[user_number_int])
+                userId_list.append(userId_dict[user_number_int])
 
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):

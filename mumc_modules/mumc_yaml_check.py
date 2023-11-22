@@ -125,7 +125,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                             path_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['path']
                             #Check path is string
-                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == ''))):
+                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
                                 error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('network_path' in libinfo):
