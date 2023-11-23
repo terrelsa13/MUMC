@@ -191,7 +191,6 @@ def add_dynamic_behavior_to_yaml(missing_dynamic_behavior_dict,server_brand,init
         cfg['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['played_conditional']=temp_dict['behavioral_statements']['audiobook']['whitelisted']['played_conditional']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action_control']=temp_dict['behavioral_statements']['audiobook']['whitelisted']['action_control']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']
-        cfg['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['extra']=temp_dict['behavioral_statements']['audiobook']['whitelisted']['extra']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']={}
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action']=temp_dict['behavioral_statements']['audiobook']['blacklisted']['action']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['user_conditional']=temp_dict['behavioral_statements']['audiobook']['blacklisted']['user_conditional']
