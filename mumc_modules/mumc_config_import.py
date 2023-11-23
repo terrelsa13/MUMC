@@ -27,12 +27,16 @@ def importHasException(init_dict,cmdopt_dict):
 #verify specified variables are avaialbe in the config
 def assignVarTest(init_dict,cmdopt_dict,cfg):
     try:
-        #removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
-        #try assigning the below variables from the mumc_config.yaml file
-        #if any do not exist go to except and rebuild the mumc_config.yaml file
-        #init_dict['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand'].casefold()
-        init_dict['version']=cfg['version']
-        init_dict['DEBUG']=cfg['DEBUG']
+        #check if mumc_config.yaml exists but is blank
+        if (not (cfg == None)):
+            #removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
+            #try assigning the below variables from the mumc_config.yaml file
+            #if any do not exist go to except and rebuild the mumc_config.yaml file
+            #init_dict['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand'].casefold()
+            init_dict['version']=cfg['version']
+            init_dict['DEBUG']=cfg['DEBUG']
+        else:
+            raise ModuleNotFoundError
 
     except (AttributeError, ModuleNotFoundError, KeyError):
         importHasException(init_dict,cmdopt_dict)

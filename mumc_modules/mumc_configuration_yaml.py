@@ -76,9 +76,9 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['user_conditional']='any'
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=False
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['genre']=0
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['library_genre']=0
-    config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=False
 
     config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['user_conditional']='all'
@@ -108,13 +108,13 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['user_conditional']='any'
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=False
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['genre']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['season_genre']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['series_genre']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['library_genre']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['studio_network_genre']=0
-    config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=False
 
     config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['user_conditional']='all'
@@ -144,12 +144,12 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['user_conditional']='any'
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=False
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['genre']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_genre']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['library_genre']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['track_artist']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['album_artist']=0
-    config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=False
 
     config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['user_conditional']='all'
@@ -180,13 +180,13 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['user_conditional']='any'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['played_conditional']='ignore'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action_control']=3
+        config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=False
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['genre']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['audiobook_genre']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_genre']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['track_author']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['author']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['library_author']=0
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=False
 
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action']='keep'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['user_conditional']='all'
