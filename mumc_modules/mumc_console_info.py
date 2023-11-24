@@ -34,12 +34,12 @@ def print_informational_header(the_dict):
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + the_dict['script_version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Config Version: ' + the_dict['version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
     print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
