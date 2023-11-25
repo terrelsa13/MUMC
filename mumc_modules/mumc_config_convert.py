@@ -55,6 +55,10 @@ def libConvertLegacyToYAML(user_wl_libs,user_bl_libs):
 
 
 def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
+    #create variable that will intentionally cause an exception
+    failvar=failvar
+
+    #create empty config dictionary
     config_data={}
     config_data=setYAMLConfigSkeleton(cfg)
     config_data['version']=get_script_version()
@@ -172,30 +176,90 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         except:
             config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=True
 
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=True
+    try:        
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
 
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
 
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=True
+    try:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=failvar
+    except:
+        config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
 
     if (cfg['server_brand'] == 'jellyfin'):
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
+        try:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=failvar
+        except:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
+        try:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=failvar
+        except:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=True
+        try:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=failvar
+        except:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
+        try:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=failvar
+        except:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=True
+        try:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=failvar
+        except:
+            config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
 
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=cfg['favorited_behavior_movie'][0]
@@ -213,9 +277,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action_control']=cfg['favorited_behavior_movie'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=False
-
+    try:
+        config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=False
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']['genre']=cfg['favorited_advanced_movie_genre']
     except:
@@ -241,8 +306,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action_control']=cfg['whitetagged_behavior_movie'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action']=cfg['blacktagged_behavior_movie'][0]
@@ -260,8 +327,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action_control']=cfg['blacktagged_behavior_movie'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action']=cfg['whitelisted_behavior_movie'][0]
@@ -279,8 +348,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action_control']=cfg['whitelisted_behavior_movie'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['action']=cfg['blacklisted_behavior_movie'][0]
@@ -298,8 +369,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['action_control']=cfg['blacklisted_behavior_movie'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['movie']['blacklisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['action']=cfg['favorited_behavior_episode'][0]
@@ -317,9 +390,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['action_control']=cfg['favorited_behavior_episode'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=False
-
+    try:
+        config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=False
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']['genre']=cfg['favorited_advanced_episode_genre']
     except:
@@ -361,8 +435,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action_control']=cfg['whitetagged_behavior_episode'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']=cfg['blacktagged_behavior_episode'][0]
@@ -380,8 +456,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action_control']=cfg['blacktagged_behavior_episode'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']=cfg['whitelisted_behavior_episode'][0]
@@ -399,8 +477,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action_control']=cfg['whitelisted_behavior_episode'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['action']=cfg['blacklisted_behavior_episode'][0]
@@ -418,8 +498,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['action_control']=cfg['blacklisted_behavior_episode'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['episode']['blacklisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['action']=cfg['favorited_behavior_audio'][0]
@@ -437,9 +519,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['action_control']=cfg['favorited_behavior_audio'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=False
-
+    try:
+        config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=False
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']['genre']=cfg['favorited_advanced_track_genre']
     except:
@@ -477,8 +560,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action_control']=cfg['whitetagged_behavior_audio'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action']=cfg['blacktagged_behavior_audio'][0]
@@ -496,8 +581,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action_control']=cfg['blacktagged_behavior_audio'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action_control']=0
-
-    config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action']=cfg['whitelisted_behavior_audio'][0]
@@ -515,8 +602,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action_control']=cfg['whitelisted_behavior_audio'][3]
     except:
         config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action_control']=3
-
-    config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['dynamic_behavior']=False
+    try:
+        config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action']=cfg['blacklisted_behavior_audio'][0]
@@ -533,7 +622,11 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     try:
         config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action_control']=cfg['blacklisted_behavior_audio'][3]
     except:
-        config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action_control']=3 
+        config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action_control']=3
+    try:
+        config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['dynamic_behavior']=failvar
+    except:
+        config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['dynamic_behavior']=False
        
     if (cfg['server_brand'] == 'jellyfin'):
         try:
@@ -552,9 +645,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action_control']=cfg['favorited_behavior_audiobook'][3]
         except:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action_control']=3
-
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=False
-
+        try:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=failvar
+        except:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=False
         try:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']['genre']=cfg['favorited_advanced_audiobook_track_genre']
         except:
@@ -596,8 +690,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action_control']=cfg['whitetagged_behavior_audiobook'][3]
         except:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action_control']=0
-
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=False
+        try:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=failvar
+        except:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=False
 
         try:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action']=cfg['blacktagged_behavior_audiobook'][0]
@@ -615,8 +711,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action_control']=cfg['blacktagged_behavior_audiobook'][3]
         except:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action_control']=0
-
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=False
+        try:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=failvar
+        except:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=False
 
         try:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action']=cfg['whitelisted_behavior_audiobook'][0]
@@ -634,8 +732,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action_control']=cfg['whitelisted_behavior_audiobook'][3]
         except:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action_control']=3
-
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']=False
+        try:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']=failvar
+        except:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']=False
 
         try:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action']=cfg['blacklisted_behavior_audiobook'][0]
@@ -653,8 +753,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=cfg['blacklisted_behavior_audiobook'][3]
         except:
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=3
-
-        config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
+        try:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=failvar
+        except:
+            config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
 
     try:
         config_data['advanced_settings']['whitetags']=cfg['whitetag'].split(',')
