@@ -56,7 +56,12 @@ def libConvertLegacyToYAML(user_wl_libs,user_bl_libs):
 
 def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
     #create variable that will intentionally cause an exception
-    failvar=failvar
+    try:
+        #will cause exception
+        failvar=failvar
+    except:
+        #nothing
+        pass
 
     #create empty config dictionary
     config_data={}
