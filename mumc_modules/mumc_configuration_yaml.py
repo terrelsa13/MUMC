@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import json
 from mumc_modules.mumc_output import save_yaml_config
 

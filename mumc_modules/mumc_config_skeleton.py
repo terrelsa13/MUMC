@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_compare_items import keys_exist
 
 #Set yaml config skeleton

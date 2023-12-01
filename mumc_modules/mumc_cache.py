@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import inspect
 import time
 from sys import getsizeof

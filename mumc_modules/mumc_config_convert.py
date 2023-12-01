@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import yaml
 import copy
 from mumc_modules.mumc_versions import get_script_version
@@ -764,13 +764,23 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
 
     try:
-        config_data['advanced_settings']['whitetags']=cfg['whitetag'].split(',')
+        legacy_whitetag_list=list(set(cfg['whitetag'].split(',')))
+        if (legacy_whitetag_list[0] == ''):
+            config_data['advanced_settings']['whitetags']=[]
+        else:
+            config_data['advanced_settings']['whitetags']=cfg['whitetag'].split(',')
     except:
         config_data['advanced_settings']['whitetags']=[]
+
     try:
-        config_data['advanced_settings']['blacktags']=cfg['blacktag'].split(',')
+        legacy_blacktag_list=list(set(cfg['blacktag'].split(',')))
+        if (legacy_blacktag_list[0] == ''):
+            config_data['advanced_settings']['blacktags']=[]
+        else:
+            config_data['advanced_settings']['blacktags']=cfg['blacktag'].split(',')
     except:
         config_data['advanced_settings']['blacktags']=[]
+
     try:
         config_data['advanced_settings']['episode_control']['minimum_episodes']=cfg['minimum_number_episodes']
     except:

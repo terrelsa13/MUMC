@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from collections import defaultdict
 import copy
 from mumc_modules.mumc_url import requestURL

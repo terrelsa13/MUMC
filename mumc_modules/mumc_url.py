@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import urllib.request as urlrequest
 from urllib.error import HTTPError,URLError
 import json

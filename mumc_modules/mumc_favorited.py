@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_url import api_query_handler

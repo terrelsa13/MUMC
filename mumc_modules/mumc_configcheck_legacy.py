@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import json
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
@@ -166,7 +166,7 @@ def cfgCheckLegacy(cfg,the_dict):
             config_dict['server_brand']=check
             server_brand=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'server_brand\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'server_brand\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
         server_brand='invalid'
 
 #######################################################################################################
@@ -199,7 +199,7 @@ def cfgCheckLegacy(cfg,the_dict):
         except:
             error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_keys\' has an unknown formatting error\n'
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_keys\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_keys\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -225,7 +225,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['played_filter_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'played_filter_episode'):
         check=cfg.played_filter_episode
@@ -249,7 +249,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['played_filter_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'played_filter_audio'):
         check=cfg.played_filter_audio
@@ -273,7 +273,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['played_filter_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'played_filter_audiobook'):
@@ -298,7 +298,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['played_filter_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'played_filter_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -326,7 +326,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['created_filter_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'created_filter_episode'):
         check=cfg.created_filter_episode
@@ -352,7 +352,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['created_filter_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'created_filter_audio'):
         check=cfg.created_filter_audio
@@ -378,7 +378,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['created_filter_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'created_filter_audiobook'):
@@ -405,7 +405,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['created_filter_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'created_filter_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -432,7 +432,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_behavior_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_behavior_episode'):
         check=cfg.favorited_behavior_episode
@@ -458,7 +458,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_behavior_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_behavior_audio'):
         check=cfg.favorited_behavior_audio
@@ -484,7 +484,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_behavior_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'favorited_behavior_audiobook'):
@@ -511,7 +511,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['favorited_behavior_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_behavior_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -528,7 +528,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_movie_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_movie_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_movie_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_movie_library_genre'):
         check=cfg.favorited_advanced_movie_library_genre
@@ -543,7 +543,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_movie_library_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_movie_library_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_movie_library_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -560,7 +560,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_episode_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_episode_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_episode_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_season_genre'):
         check=cfg.favorited_advanced_season_genre
@@ -575,7 +575,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_season_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_season_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_season_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_series_genre'):
         check=cfg.favorited_advanced_series_genre
@@ -590,7 +590,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_series_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_series_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_series_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_tv_library_gnre'):
         check=cfg.favorited_advanced_tv_library_genre
@@ -605,7 +605,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_tv_library_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_library_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_library_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_tv_studio_network'):
         check=cfg.favorited_advanced_tv_studio_network
@@ -620,7 +620,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_tv_studio_network']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_studio_network\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_studio_network\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_tv_studio_network_genre'):
         check=cfg.favorited_advanced_tv_studio_network_genre
@@ -635,7 +635,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_tv_studio_network_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_studio_network_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_tv_studio_network_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -652,7 +652,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_track_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_track_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_track_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_album_genre'):
         check=cfg.favorited_advanced_album_genre
@@ -667,7 +667,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_album_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_album_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_album_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_music_library_genre'):
         check=cfg.favorited_advanced_music_library_genre
@@ -682,7 +682,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_music_library_genre']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_music_library_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_music_library_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_track_artist'):
         check=cfg.favorited_advanced_track_artist
@@ -697,7 +697,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_track_artist']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_track_artist\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_track_artist\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'favorited_advanced_album_artist'):
         check=cfg.favorited_advanced_album_artist
@@ -712,7 +712,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['favorited_advanced_album_artist']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_album_artist\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_album_artist\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -730,7 +730,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_track_genre']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_track_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_track_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
             if hasattr(cfg, 'favorited_advanced_audiobook_genre'):
                 check=cfg.favorited_advanced_audiobook_genre
@@ -745,7 +745,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_genre']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
             if hasattr(cfg, 'favorited_advanced_audiobook_library_genre'):
                 check=cfg.favorited_advanced_audiobook_library_genre
@@ -760,7 +760,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_library_genre']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_library_genre\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_library_genre\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
             if hasattr(cfg, 'favorited_advanced_audiobook_track_author'):
                 check=cfg.favorited_advanced_audiobook_track_author
@@ -775,7 +775,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_track_author']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_track_author\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_track_author\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
             if hasattr(cfg, 'favorited_advanced_audiobook_author'):
                 check=cfg.favorited_advanced_audiobook_author
@@ -790,7 +790,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_author']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_author\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_author\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
             if hasattr(cfg, 'favorited_advanced_audiobook_library_author'):
                 check=cfg.favorited_advanced_audiobook_library_author
@@ -805,7 +805,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 else:
                     config_dict['favorited_advanced_audiobook_library_author']=check
             else:
-                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_library_author\' variable is missing from ' + the_dict['argv'][0] + '\n'
+                warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'favorited_advanced_audiobook_library_author\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -821,7 +821,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitetag']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetag\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetag\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -849,7 +849,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitetagged_behavior_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'whitetagged_behavior_episode'):
         check=cfg.whitetagged_behavior_episode
@@ -875,7 +875,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitetagged_behavior_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'whitetagged_behavior_audio'):
         check=cfg.whitetagged_behavior_audio
@@ -901,7 +901,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitetagged_behavior_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'whitetagged_behavior_audiobook'):
@@ -928,7 +928,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['whitetagged_behavior_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitetagged_behavior_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -944,7 +944,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacktag']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktag\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktag\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -972,7 +972,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacktagged_behavior_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'blacktagged_behavior_episode'):
         check=cfg.blacktagged_behavior_episode
@@ -998,7 +998,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacktagged_behavior_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'blacktagged_behavior_audio'):
         check=cfg.blacktagged_behavior_audio
@@ -1024,7 +1024,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacktagged_behavior_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'blacktagged_behavior_audiobook'):
@@ -1051,7 +1051,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['blacktagged_behavior_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacktagged_behavior_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1079,7 +1079,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitelisted_behavior_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'whitelisted_behavior_episode'):
         check=cfg.whitelisted_behavior_episode
@@ -1105,7 +1105,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitelisted_behavior_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'whitelisted_behavior_audio'):
         check=cfg.whitelisted_behavior_audio
@@ -1131,7 +1131,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['whitelisted_behavior_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'whitelisted_behavior_audiobook'):
@@ -1158,7 +1158,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['whitelisted_behavior_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'whitelisted_behavior_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1186,7 +1186,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacklisted_behavior_movie']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_movie\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_movie\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'blacklisted_behavior_episode'):
         check=cfg.blacklisted_behavior_episode
@@ -1212,7 +1212,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacklisted_behavior_episode']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_episode\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_episode\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'blacklisted_behavior_audio'):
         check=cfg.blacklisted_behavior_audio
@@ -1238,7 +1238,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['blacklisted_behavior_audio']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_audio\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_audio\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'blacklisted_behavior_audiobook'):
@@ -1265,7 +1265,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['blacklisted_behavior_audiobook']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_audiobook\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'blacklisted_behavior_audiobook\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1282,7 +1282,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['minimum_number_episodes']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_episodes\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_episodes\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'minimum_number_played_episodes'):
         check=cfg.minimum_number_played_episodes
@@ -1297,7 +1297,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['minimum_number_played_episodes']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_played_episodes\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_played_episodes\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'minimum_number_episodes_behavior'):
         check=cfg.minimum_number_episodes_behavior
@@ -1341,7 +1341,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['minimum_number_episodes_behavior']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_episodes_behavior\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'minimum_number_episodes_behavior\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1358,7 +1358,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['movie_set_missing_last_played_date']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_set_missing_last_played_date\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_set_missing_last_played_date\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'episode_set_missing_last_played_date'):
         check=cfg.episode_set_missing_last_played_date
@@ -1373,7 +1373,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['episode_set_missing_last_played_date']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_set_missing_last_played_date\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_set_missing_last_played_date\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'audio_set_missing_last_played_date'):
         check=cfg.audio_set_missing_last_played_date
@@ -1388,7 +1388,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['audio_set_missing_last_played_date']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_set_missing_last_played_date\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_set_missing_last_played_date\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_set_missing_last_played_date'):
@@ -1404,7 +1404,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['audiobook_set_missing_last_played_date']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_set_missing_last_played_date\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_set_missing_last_played_date\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1421,7 +1421,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_script_header']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_script_header\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_script_header\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_warnings'):
         check=cfg.print_warnings
@@ -1436,7 +1436,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_warnings']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_warnings\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_warnings\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_user_header'):
         check=cfg.print_user_header
@@ -1451,7 +1451,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_user_header']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_user_header\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_user_header\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_movie_delete_info'):
         check=cfg.print_movie_delete_info
@@ -1466,7 +1466,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_movie_delete_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_delete_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_delete_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_movie_keep_info'):
         check=cfg.print_movie_keep_info
@@ -1481,7 +1481,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_movie_keep_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_keep_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_keep_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_episode_delete_info'):
         check=cfg.print_episode_delete_info
@@ -1496,7 +1496,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_episode_delete_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_delete_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_delete_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_episode_keep_info'):
         check=cfg.print_episode_keep_info
@@ -1511,7 +1511,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_episode_keep_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_keep_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_keep_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_audio_delete_info'):
         check=cfg.print_audio_delete_info
@@ -1526,7 +1526,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_audio_delete_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_delete_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_delete_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_audio_keep_info'):
         check=cfg.print_audio_keep_info
@@ -1541,7 +1541,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_audio_keep_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_keep_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_keep_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_delete_info'):
@@ -1557,7 +1557,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['print_audiobook_delete_info']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_delete_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_delete_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
         if hasattr(cfg, 'print_audiobook_keep_info'):
             check=cfg.print_audiobook_keep_info
@@ -1572,7 +1572,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['print_audiobook_keep_info']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_keep_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_keep_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_movie_post_processing_info'):
         check=cfg.print_movie_post_processing_info
@@ -1587,7 +1587,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_movie_post_processing_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_post_processing_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_post_processing_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_episode_post_processing_info'):
         check=cfg.print_episode_post_processing_info
@@ -1602,7 +1602,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_episode_post_processing_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_post_processing_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_post_processing_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_audio_post_processing_info'):
         check=cfg.print_audio_post_processing_info
@@ -1617,7 +1617,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_audio_post_processing_info']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_post_processing_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_post_processing_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_post_processing_info'):
@@ -1633,7 +1633,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['print_audiobook_post_processing_info']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_post_processing_info\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_post_processing_info\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_summary_header'):
         check=cfg.print_summary_header
@@ -1648,7 +1648,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_summary_header']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_summary_header\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_summary_header\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_movie_summary'):
         check=cfg.print_movie_summary
@@ -1663,7 +1663,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_movie_summary']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_summary\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_movie_summary\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_episode_summary'):
         check=cfg.print_episode_summary
@@ -1678,7 +1678,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_episode_summary']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_summary\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_episode_summary\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_audio_summary'):
         check=cfg.print_audio_summary
@@ -1693,7 +1693,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_audio_summary']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_summary\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audio_summary\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'print_audiobook_summary'):
@@ -1709,7 +1709,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['print_audiobook_summary']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_summary\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_audiobook_summary\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'print_script_footer'):
         check=cfg.print_script_footer
@@ -1724,7 +1724,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['print_script_footer']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_script_footer\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'print_script_footer\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -1747,7 +1747,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['script_header_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_header_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_header_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'script_warnings_format'):
         check=cfg.script_warnings_format
@@ -1767,7 +1767,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['script_warnings_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_warnings_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_warnings_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'user_header_format'):
         check=cfg.user_header_format
@@ -1787,7 +1787,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['user_header_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'user_header_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'user_header_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'movie_delete_info_format'):
         check=cfg.movie_delete_info_format
@@ -1807,7 +1807,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['movie_delete_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_delete_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_delete_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'movie_keep_info_format'):
         check=cfg.movie_keep_info_format
@@ -1827,7 +1827,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['movie_keep_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_keep_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_keep_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'episode_delete_info_format'):
         check=cfg.episode_delete_info_format
@@ -1847,7 +1847,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['episode_delete_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_delete_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_delete_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'episode_keep_info_format'):
         check=cfg.episode_keep_info_format
@@ -1867,7 +1867,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['episode_keep_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_keep_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_keep_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'audio_delete_info_format'):
         check=cfg.audio_delete_info_format
@@ -1887,7 +1887,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['audio_delete_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_delete_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_delete_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'audio_keep_info_format'):
         check=cfg.audio_keep_info_format
@@ -1907,7 +1907,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['audio_keep_info_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_keep_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_keep_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_delete_info_format'):
@@ -1928,7 +1928,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['audiobook_delete_info_format']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_delete_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_delete_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
         if hasattr(cfg, 'audiobook_keep_info_format'):
             check=cfg.audiobook_keep_info_format
@@ -1948,7 +1948,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['audiobook_keep_info_format']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_keep_info_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_keep_info_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'movie_post_processing_format'):
         check=cfg.movie_post_processing_format
@@ -1968,7 +1968,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['movie_post_processing_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_post_processing_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_post_processing_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'episode_post_processing_format'):
         check=cfg.episode_post_processing_format
@@ -1988,7 +1988,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['episode_post_processing_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_post_processing_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_post_processing_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'audio_post_processing_format'):
         check=cfg.audio_post_processing_format
@@ -2008,7 +2008,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['audio_post_processing_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_post_processing_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_post_processing_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_post_processing_format'):
@@ -2029,7 +2029,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['audiobook_post_processing_format']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_post_processing_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_post_processing_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'summary_header_format'):
         check=cfg.summary_header_format
@@ -2049,7 +2049,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['summary_header_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'summary_header_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'summary_header_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'movie_summary_format'):
         check=cfg.movie_summary_format
@@ -2069,7 +2069,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['movie_summary_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_summary_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'movie_summary_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'episode_summary_format'):
         check=cfg.episode_summary_format
@@ -2089,7 +2089,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['episode_summary_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_summary_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'episode_summary_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'audio_summary_format'):
         check=cfg.audio_summary_format
@@ -2109,7 +2109,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['audio_summary_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_summary_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audio_summary_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if (isJellyfinServer(server_brand)):
         if hasattr(cfg, 'audiobook_summary_format'):
@@ -2130,7 +2130,7 @@ def cfgCheckLegacy(cfg,the_dict):
             else:
                 config_dict['audiobook_summary_format']=check
         else:
-            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_summary_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+            warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'audiobook_summary_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'script_footer_format'):
         check=cfg.script_footer_format
@@ -2150,7 +2150,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['script_footer_format']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_footer_format\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'script_footer_format\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2167,7 +2167,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['UPDATE_CONFIG']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'UPDATE_CONFIG\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'UPDATE_CONFIG\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2184,7 +2184,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['REMOVE_FILES']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'REMOVE_FILES\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'REMOVE_FILES\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2199,7 +2199,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['server_url']=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'server_url\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'server_url\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2216,7 +2216,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['auth_key']=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'auth_key\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'auth_key\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2232,7 +2232,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['library_setup_behavior']=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'library_setup_behavior\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'library_setup_behavior\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2248,7 +2248,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['library_matching_behavior']=check
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'library_matching_behavior\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'library_matching_behavior\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2269,7 +2269,7 @@ def cfgCheckLegacy(cfg,the_dict):
 
         config_dict['user_bl_libs']=check_list
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_bl_libs\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_bl_libs\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2290,7 +2290,7 @@ def cfgCheckLegacy(cfg,the_dict):
 
         config_dict['user_wl_libs']=check_list
     else:
-        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_wl_libs\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_wl_libs\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2307,7 +2307,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['api_query_attempts']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_attempts\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_attempts\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'api_query_item_limit'):
         check=cfg.api_query_item_limit
@@ -2322,7 +2322,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['api_query_item_limit']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_item_limit\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_item_limit\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2339,7 +2339,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['api_query_cache_size']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_size\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_size\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'api_query_cache_fallback_behavior'):
         check=cfg.api_query_cache_fallback_behavior.upper()
@@ -2353,7 +2353,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['api_query_cache_fallback_behavior']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_fallback_behavior\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_fallback_behavior\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
     if hasattr(cfg, 'api_query_cache_last_accessed_time'):
         check=cfg.api_query_cache_last_accessed_time
@@ -2368,7 +2368,7 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['api_query_cache_last_accessed_time']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_last_accessed_time\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'api_query_cache_last_accessed_time\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
@@ -2385,14 +2385,14 @@ def cfgCheckLegacy(cfg,the_dict):
         else:
             config_dict['DEBUG']=check
     else:
-        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'DEBUG\' variable is missing from ' + the_dict['argv'][0] + '\n'
+        warning_found_in_mumc_config_py+='LegacyConfigNameWarning: The \'DEBUG\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name']) + '\n'
 
 #######################################################################################################
 
     
     #Other config options can be assumed before converting to yaml; notify user of these; then convert to yaml
     if not (warning_found_in_mumc_config_py == ''):
-        warning_text="\nWARNING: One or more config variable(s) were missing from " + the_dict['argv'][0] + ".\n MUMC has assumed defaults values for the missing variable(s).\n Please be sure to review these variable(s) in " + str(the_dict['mumc_path']) + "/" + the_dict['config_file_name_yaml']
+        warning_text="\nWARNING: One or more config variable(s) were missing from " + str(the_dict['mumc_path'] / the_dict['config_file_name']) + ".\n MUMC has assumed defaults values for the missing variable(s).\n Please be sure to review these variable(s) in " + str(the_dict['mumc_path']) + "/" + the_dict['config_file_name_yaml']
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log(warning_text,2,the_dict)
             appendTo_DEBUG_log("\n" + warning_found_in_mumc_config_py,2,the_dict)
@@ -2401,7 +2401,7 @@ def cfgCheckLegacy(cfg,the_dict):
 
     #Some config options have to be fixed before converting to yaml; notify user of these; then stop script
     if not (error_found_in_mumc_config_py == ''):
-        error_text="\nERROR: MUMC unable to convert the legacy config to the new yaml format.\n Please add/fix the following variable(s) in: " + the_dict['argv'][0]
+        error_text="\nERROR: MUMC unable to convert the legacy config to the new yaml format.\n Please add/fix the following variable(s) in: " + str(the_dict['mumc_path'] / the_dict['config_file_name'])
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log(error_text,2,the_dict)
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2,the_dict)

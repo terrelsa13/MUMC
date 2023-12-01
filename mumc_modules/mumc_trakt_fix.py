@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import urllib.request as urlrequest
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json

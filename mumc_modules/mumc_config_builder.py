@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_output import print_byType
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_authentication_key
 from mumc_modules.mumc_versions import get_script_version

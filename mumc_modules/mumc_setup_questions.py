@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import urllib.request as urlrequest
 from mumc_modules.mumc_output import convert2json
 from mumc_modules.mumc_url import requestURL

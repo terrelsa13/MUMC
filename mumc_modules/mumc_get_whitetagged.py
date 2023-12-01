@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_url import api_query_handler
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,list_to_urlparsed_string

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 
 #sort the movie delete list

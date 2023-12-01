@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from datetime import datetime,timezone
 from sys import argv,path
 from mumc_modules.mumc_output import add_to_PATH

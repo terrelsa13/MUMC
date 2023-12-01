@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 

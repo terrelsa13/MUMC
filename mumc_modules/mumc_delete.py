@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import traceback
 import urllib.request as urlrequest
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType

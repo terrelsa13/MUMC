@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemInfo

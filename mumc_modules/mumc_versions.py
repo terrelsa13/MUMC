@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+
 import platform
 from mumc_modules.mumc_url import requestURL
 
 
 #Get the current script version
 def get_script_version():
-    return '5.3.11'
+    return '5.3.12'
 
 
 #Get the min config version

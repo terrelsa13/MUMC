@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import importlib
 import yaml
 from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy

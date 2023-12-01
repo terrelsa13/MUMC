@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import multiprocessing
 from datetime import timedelta
 from collections import defaultdict

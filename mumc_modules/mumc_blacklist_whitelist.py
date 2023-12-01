@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith
 from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts

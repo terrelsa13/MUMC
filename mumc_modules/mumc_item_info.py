@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 import urllib.parse as urlparse
 from mumc_modules.mumc_url import requestURL
 
