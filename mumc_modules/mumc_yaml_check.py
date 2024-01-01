@@ -851,6 +851,8 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
 
+#######################################################################################################
+
     config_dict['query_filter_episode']=[]
 
     if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')):
@@ -922,6 +924,8 @@ def cfgCheckYAML(cfg,init_dict):
         #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > episode > query_filter > blacklisted is missing from mumc_config.yaml\n'
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
+
+#######################################################################################################
 
     config_dict['query_filter_audio']=[]
 
@@ -995,6 +999,8 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
 
+#######################################################################################################
+
     if (isJellyfinServer(server_brand)):
         config_dict['query_filter_audiobook']=[]
 
@@ -1067,6 +1073,8 @@ def cfgCheckYAML(cfg,init_dict):
             #error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted is missing from mumc_config.yaml\n'
             query_filter_missing_bool=True
             missing_query_filter_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
+
+#######################################################################################################
 
     config_dict['favorited_behavior_movie']=[]
 

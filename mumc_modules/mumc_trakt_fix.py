@@ -8,8 +8,8 @@ from mumc_modules.mumc_url import requestURL
 #when played media item is missing the LastPlayedDate, send the current date-time to the server as a starting point
 def modify_lastPlayedDate(item,userKey,the_dict):
 
-    serverURL=the_dict['server_url']
-    authKey=the_dict['auth_key']
+    serverURL=the_dict['admin_settings']['server']['url']
+    authKey=the_dict['admin_settings']['server']['auth_key']
 
     #save current date-time with specified format to item["UserData"]["LastPlayedDate"]
     item["UserData"]["LastPlayedDate"]=str(datetime.strftime(the_dict['date_time_now'], "%Y-%m-%dT%H:%M:%S.000Z"))

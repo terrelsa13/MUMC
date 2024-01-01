@@ -104,6 +104,6 @@ def MUMC():
 if (__name__ == "__main__"):
     MUMC()
 
-############# END OF SCRIPT #############
-
 exit(0)
+
+############# END OF SCRIPT #############
