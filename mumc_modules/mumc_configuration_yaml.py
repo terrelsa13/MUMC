@@ -49,26 +49,26 @@ def yaml_configurationBuilder(the_dict):
 
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=False
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
 
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=False
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=False
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
 
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=False
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=False
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
 
     if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=False
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=False
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
 

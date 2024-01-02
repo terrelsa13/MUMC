@@ -1,40 +1,43 @@
-
-import multiprocessing
+from collections.abc import Mapping
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
-#Check if *keys (nested) exists in `element` (dict or list).
-def keys_exist(the_element, *keys_indexes):
+def is_instance(the_element):
+    if not isinstance(the_element, Mapping):
+        raise TypeError('keys_exist() expects a dict-like object as the first argument.')
 
-    if (not (isinstance(the_element, dict) or isinstance(the_element, multiprocessing.managers.DictProxy))):
-        raise AttributeError('keys_exist() expects dict as first argument.')
-    if len(keys_indexes) == 0:
-        raise AttributeError('keys_exist() expects at least two arguments, one given.')
+
+def keys_exist(the_element, *keys_indexes):
+    is_instance(the_element)
+    if not keys_indexes:
+        raise ValueError('keys_exist() expects at least one key/index argument.')
 
     temp_element = the_element
     for key_index in keys_indexes:
-        try:
-            temp_element = temp_element[key_index]
-        except KeyError:
+        if key_index not in temp_element:
             return False
+        temp_element = temp_element[key_index]
     return True
 
 
-#Check if *keys (nested) exists in `element` (dict or list).
 def return_key_value(the_element, *keys_indexes):
-
-    if not isinstance(the_element, dict):
-        raise AttributeError('return_key_value() expects dict as first argument.')
-    if len(keys_indexes) == 0:
-        raise AttributeError('return_key_value() expects at least two arguments, one given.')
+    is_instance(the_element)
+    if len(keys_indexes) < 1:
+        raise IndexError('return_key_value() expects at least one key/index argument.')
 
     temp_element = the_element
     for key_index in keys_indexes:
         try:
             temp_element = temp_element[key_index]
-        except KeyError:
+        except (KeyError, IndexError):
             return None
     return temp_element
+
+
+def keys_exist_return_value(the_element, *keys_indexes):
+    if (keys_exist(the_element, *keys_indexes)):
+        return return_key_value(the_element, *keys_indexes)
+    return None  
 
 
 #Check if json index exists
@@ -70,13 +73,13 @@ def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log('\nComparing the below two items',3,the_dict)
                     appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3,the_dict)
-                if ((not (single_item_one == '')) and (not (single_item_two == '')) and
-                    (not (single_item_one == "''")) and (not (single_item_two == "''")) and
-                    (not (single_item_one == '""')) and (not (single_item_two == '""'))):
-                    if (single_item_one == single_item_two):
-                        #found a match; return true and the matching value
-                        return True,single_item_one
-                    elif (single_item_two.startswith(single_item_one)):
+
+                #if ((not (single_item_one == '')) and (not (single_item_two == '')) and
+                    #(not (single_item_one == "''")) and (not (single_item_two == "''")) and
+                    #(not (single_item_one == '""')) and (not (single_item_two == '""'))):
+                if (single_item_one and single_item_two):
+                    if ((single_item_one == single_item_two) or
+                         single_item_two.startswith(single_item_one)):
                         #found a match; return true and the matching value
                         return True,single_item_one
 

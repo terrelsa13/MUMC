@@ -4,7 +4,7 @@ import copy
 from mumc_modules.mumc_versions import get_semantic_version_parts,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_compare_items import keys_exist,return_key_value
+from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_console_info import print_config_options_added_warning,print_config_options_removed_warning
 from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter_to_yaml,add_dynamic_behavior_to_yaml
@@ -15,14 +15,19 @@ def cfgCheckYAML_Version(cfg,init_dict):
     min_config_version=get_semantic_version_parts(init_dict['min_config_version'])
 
     config_version_ok=True
-    if ((not (config_version['major'] >= min_config_version['major'])) or
-        (not (config_version['minor'] >= min_config_version['minor'])) or
-        (not (config_version['patch'] >= min_config_version['patch']))):
+
+    if (config_version['major'] < min_config_version['major']):
         config_version_ok=False
+    elif (config_version['major'] == min_config_version['major']):
+        if (config_version['minor'] < min_config_version['minor']):
+            config_version_ok=False
+        elif (config_version['minor'] == min_config_version['minor']):
+            if (config_version['patch'] < min_config_version['patch']):
+                config_version_ok=False
 
     if (not (config_version_ok)):
         return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
-                + init_dict['script_version'] + '\n Please use a config with a version greater than: '\
+                + init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
                 + init_dict['min_config_version'] + ' or create a new config \n'
     else:
         return ''
@@ -175,8 +180,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','server','brand')):
-        check=return_key_value(cfg,'admin_settings','server','brand')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','brand')) == None)):
         server_brand=check
         if (
             not ((isinstance(check,str)) and
@@ -289,8 +293,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'version')):
-        check=return_key_value(cfg,'version')
+    if (not ((check:=keys_exist_return_value(cfg,'version')) == None)):
         check_parts=get_semantic_version_parts(check)
         if (
             not ((isinstance(check,str)) and
@@ -308,8 +311,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','server','url')):
-        check=return_key_value(cfg,'admin_settings','server','url')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','url')) == None)):
         server_url=check
         if (
             not (isinstance(check,str))
@@ -320,8 +322,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > url key is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','server','auth_key')):
-        check=return_key_value(cfg,'admin_settings','server','auth_key')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','auth_key')) == None)):
         server_auth_key=check
         if (
             not ((isinstance(check,str)) and (check.isalnum()))
@@ -334,8 +335,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','users')):
-        check=return_key_value(cfg,'admin_settings','users')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         user_id_check_list=[]
         check_dict_user_name={}
         for entry in check:
@@ -363,8 +363,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > user_id is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','users')):
-        check=return_key_value(cfg,'admin_settings','users')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         check_list=[]
         for entry in check:
             for user_data in entry:
@@ -392,20 +391,18 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['played_filter_movie']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','played','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','played','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['played_filter_movie'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > played > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > played > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','played','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','played','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -414,40 +411,37 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['played_filter_movie'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > played > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > played > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','played','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','played','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_movie'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > played > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > played > count is missing from mumc_config.yaml\n'
 
     config_dict['created_filter_movie']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','created','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','created','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_movie'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > created > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > created > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','created','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','created','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -456,52 +450,48 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['created_filter_movie'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > created > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > created > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','created','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','created','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > created > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_movie'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > created > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > created > count is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','movie','created','behavioral_control')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','movie','created','behavioral_control')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','behavioral_control')) == None)):
         if (
             not (isinstance(check,bool) and
                  (check == True) or (check == False))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
         else:
             config_dict['created_filter_movie'].insert(3,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > movie > created > behavioral_control is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > movie > created > behavioral_control is missing from mumc_config.yaml\n'
 
     config_dict['played_filter_episode']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','played','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','played','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['played_filter_episode'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > played > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > played > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','played','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','played','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -510,40 +500,37 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['played_filter_episode'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > played > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > played > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','played','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','played','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_episode'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > played > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > played > count is missing from mumc_config.yaml\n'
 
     config_dict['created_filter_episode']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','created','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','created','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','created','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_episode'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > created > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > created > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','created','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','created','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','created','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -552,53 +539,49 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['created_filter_episode'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > created > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > created > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','created','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','created','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','created','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > created > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > count must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_episode'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > created > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > created > count is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','episode','created','behavioral_control')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','episode','created','behavioral_control')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','created','behavioral_control')) == None)):
         if (
             not (isinstance(check,bool) and
                  (check == True) or (check == False))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > episode > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
         else:
             config_dict['created_filter_episode'].insert(3,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > episode > created > behavioral_control is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > episode > created > behavioral_control is missing from mumc_config.yaml\n'
 
     config_dict['played_filter_audio']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','played','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','played','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['played_filter_audio']=[]
             config_dict['played_filter_audio'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > played > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > played > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','played','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','played','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -607,40 +590,37 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['played_filter_audio'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > played > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > played > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','played','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','played','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (not (check == 0)) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
         else:
             config_dict['played_filter_audio'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > played > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > played > count is missing from mumc_config.yaml\n'
 
     config_dict['created_filter_audio']=[]
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','created','condition_days')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','created','condition_days')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','created','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_audio'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > created > condition_days is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > created > condition_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','created','count_equality')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','created','count_equality')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','created','count_equality')) == None)):
         if (
             not (isinstance(check,str) and
                 ((check == '>') or (check == '<') or
@@ -649,54 +629,50 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'not >') or (check == 'not <') or
                 (check == 'not >=') or (check == 'not <=')))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
         else:
             config_dict['created_filter_audio'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > created > count_equality is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > created > count_equality is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','created','count')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','created','count')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','created','count')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > created > count must be an integer\n\tValid range -1 thru 730500\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > count must be an integer\n\tValid range -1 thru 730500\n'
         else:
             config_dict['created_filter_audio'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > created > count is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > created > count is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'basic_settings','filter_statements','audio','created','behavioral_control')):
-        check=return_key_value(cfg,'basic_settings','filter_statements','audio','created','behavioral_control')
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','created','behavioral_control')) == None)):
         if (
             not (isinstance(check,bool) and
                  (check == True) or (check == False))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audio > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
         else:
             config_dict['created_filter_audio'].insert(3,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audio > created > behavioral_control is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audio > created > behavioral_control is missing from mumc_config.yaml\n'
 
     if (isJellyfinServer(server_brand)):
         config_dict['played_filter_audiobook']=[]
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','played','condition_days')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','played','condition_days')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','played','condition_days')) == None)):
             if (
                 not (isinstance(check,int) and
                     (check >= -1) and (check <= 730500))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
             else:
                 config_dict['played_filter_audiobook']=[]
                 config_dict['played_filter_audiobook'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > played > condition_days is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > played > condition_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','played','count_equality')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','played','count_equality')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','played','count_equality')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check == '>') or (check == '<') or
@@ -705,40 +681,37 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == 'not >') or (check == 'not <') or
                     (check == 'not >=') or (check == 'not <=')))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
             else:
                 config_dict['played_filter_audiobook'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > played > count_equality is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > played > count_equality is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','played','count')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','played','count')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','played','count')) == None)):
             if (
                 not (isinstance(check,int) and
                     (check >= -1) and (not (check == 0)) and (check <= 730500))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > played > count must be an integer\n\tValid range -1 and 1 thru 730500\n'
             else:
                 config_dict['played_filter_audiobook'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > played > count is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > played > count is missing from mumc_config.yaml\n'
 
         config_dict['created_filter_audiobook']=[]
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','created','condition_days')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','created','condition_days')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','created','condition_days')) == None)):
             if (
                 not (isinstance(check,int) and
                     (check >= -1) and (check <= 730500))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
             else:
                 config_dict['created_filter_audiobook'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > created > condition_days is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > created > condition_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','created','count_equality')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','created','count_equality')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','created','count_equality')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check == '>') or (check == '<') or
@@ -747,42 +720,39 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == 'not >') or (check == 'not <') or
                     (check == 'not >=') or (check == 'not <=')))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
             else:
                 config_dict['created_filter_audiobook'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > created > count_equality is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > created > count_equality is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','created','count')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','created','count')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','created','count')) == None)):
             if (
                 not (isinstance(check,int) and
                     (check >= -1) and (check <= 730500))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > created > count must be an integer\n\tValid range -1 thru 730500\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > count must be an integer\n\tValid range -1 thru 730500\n'
             else:
                 config_dict['created_filter_audiobook'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > created > count is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > created > count is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'basic_settings','filter_statements','audiobook','created','behavioral_control')):
-            check=return_key_value(cfg,'basic_settings','filter_statements','audiobook','created','behavioral_control')
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','created','behavioral_control')) == None)):
             if (
                 not (isinstance(check,bool) and
                     (check == True) or (check == False))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > behavioral_statements > audiobook > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
             else:
                 config_dict['created_filter_audiobook'].insert(3,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > behavioral_statements > audiobook > created > behavioral_control is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: basic_settings > filter_statements > audiobook > created > behavioral_control is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
     config_dict['query_filter_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','favorited')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','favorited')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','favorited')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -795,8 +765,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','whitetagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitetagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitetagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -809,8 +778,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','blacktagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacktagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacktagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -823,8 +791,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -837,8 +804,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -855,8 +821,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['query_filter_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','favorited')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -869,8 +834,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','whitetagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitetagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitetagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -883,8 +847,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','blacktagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacktagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacktagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -897,8 +860,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -911,8 +873,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -929,8 +890,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['query_filter_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','favorited')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','favorited')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','favorited')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -943,8 +903,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','whitetagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitetagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitetagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -957,8 +916,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','blacktagged')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacktagged')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacktagged')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -971,8 +929,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -985,8 +942,7 @@ def cfgCheckYAML(cfg,init_dict):
         query_filter_missing_bool=True
         missing_query_filter_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=True
 
-    if (keys_exist(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted')):
-        check=return_key_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted')) == None)):
         if (
             not (isinstance(check,bool))
             ):
@@ -1004,8 +960,7 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         config_dict['query_filter_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','favorited')):
-            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','favorited')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','favorited')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
@@ -1018,8 +973,7 @@ def cfgCheckYAML(cfg,init_dict):
             query_filter_missing_bool=True
             missing_query_filter_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
 
-        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitetagged')):
-            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitetagged')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitetagged')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
@@ -1032,8 +986,7 @@ def cfgCheckYAML(cfg,init_dict):
             query_filter_missing_bool=True
             missing_query_filter_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=True
 
-        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacktagged')):
-            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacktagged')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacktagged')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
@@ -1046,8 +999,7 @@ def cfgCheckYAML(cfg,init_dict):
             query_filter_missing_bool=True
             missing_query_filter_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
 
-        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted')):
-            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
@@ -1060,8 +1012,7 @@ def cfgCheckYAML(cfg,init_dict):
             query_filter_missing_bool=True
             missing_query_filter_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=True
 
-        if (keys_exist(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted')):
-            check=return_key_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
@@ -1078,8 +1029,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['favorited_behavior_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1090,8 +1040,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1102,8 +1051,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1119,8 +1067,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1131,8 +1078,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1146,8 +1092,7 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['movie']['favorited']['dynamic_behavior']=False
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1158,8 +1103,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > favorited > advanced > genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','library_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','library_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','extra','library_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1172,8 +1116,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['whitetagged_behavior_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1184,8 +1127,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitetagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -1196,8 +1138,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitetagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1213,8 +1154,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitetagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1225,10 +1165,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitetagged > action_control is missing from mumc_config.yaml\n'
 
-    config_dict['movie_whitetag']=[]
-
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1242,8 +1179,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=False
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','tags')
+    movie_whitetag_set=set()
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -1254,16 +1192,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['movie_whitetag'].append(tag)
+                        movie_whitetag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitetagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['blacktagged_behavior_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1274,8 +1211,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacktagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -1286,8 +1222,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacktagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1303,8 +1238,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacktagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1315,8 +1249,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacktagged > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1330,10 +1263,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=False
 
-    config_dict['movie_blacktag']=[]
+    movie_blacktag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','tags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -1344,16 +1276,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['movie_blacktag'].append(tag)
+                        movie_blacktag_set(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacktagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['whitelisted_behavior_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1364,8 +1295,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitelisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1376,8 +1306,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitelisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1393,8 +1322,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitelisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1405,8 +1333,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > whitelisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1422,8 +1349,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['blacklisted_behavior_movie']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1434,8 +1360,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacklisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1446,8 +1371,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacklisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1463,8 +1387,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacklisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1475,8 +1398,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > movie > blacklisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1492,8 +1414,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['favorited_behavior_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1504,8 +1425,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1516,8 +1436,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1533,8 +1452,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1545,8 +1463,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1560,8 +1477,7 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['episode']['favorited']['dynamic_behavior']=False
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1572,8 +1488,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > advanced > genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','season_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','season_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','season_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1584,8 +1499,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > advanced > season_genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','series_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','series_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','series_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1596,8 +1510,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > advanced > series_genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','library_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','library_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','library_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1608,8 +1521,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > extra > library_genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1620,8 +1532,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > favorited > advanced > studio_network is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','extra','studio_network_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -1634,8 +1545,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['whitetagged_behavior_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1646,8 +1556,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitetagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -1658,8 +1567,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitetagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1675,8 +1583,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitetagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1687,8 +1594,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitetagged > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1702,10 +1608,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=False
 
-    config_dict['episode_whitetag']=[]
+    episode_whitetag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','tags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -1716,16 +1621,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['episode_whitetag'].append(tag)
+                        episode_whitetag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitetagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['blacktagged_behavior_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1736,8 +1640,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacktagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -1748,8 +1651,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacktagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1765,8 +1667,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacktagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1777,8 +1678,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacktagged > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1792,10 +1692,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=False
 
-    config_dict['episode_blacktag']=[]
+    episode_blacktag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','tags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -1806,16 +1705,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['episode_blacktag'].append(tag)
+                        episode_blacktag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacktagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['whitelisted_behavior_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1826,8 +1724,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitelisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1838,8 +1735,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitelisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1855,8 +1751,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitelisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1867,8 +1762,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > whitelisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1884,8 +1778,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['blacklisted_behavior_episode']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1896,8 +1789,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacklisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1908,8 +1800,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacklisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1925,8 +1816,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacklisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -1937,8 +1827,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > episode > blacklisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -1954,8 +1843,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['favorited_behavior_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -1966,8 +1854,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -1978,8 +1865,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -1995,8 +1881,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -2007,8 +1892,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -2022,8 +1906,7 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audio']['favorited']['dynamic_behavior']=False
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -2034,8 +1917,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > advanced > genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -2046,8 +1928,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > advanced > album_genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','library_genre')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','library_genre')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','library_genre')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -2058,8 +1939,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > extra > library_genre is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','track_artist')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','track_artist')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','track_artist')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -2070,8 +1950,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > favorited > advanced > track_artist is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_artist')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_artist')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','extra','album_artist')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 2)))
@@ -2084,8 +1963,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['whitetagged_behavior_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2096,8 +1974,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitetagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -2108,8 +1985,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitetagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2125,8 +2001,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitetagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -2137,8 +2012,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitetagged > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -2152,10 +2026,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=False
 
-    config_dict['audio_whitetag']=[]
+    audio_whitetag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','tags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -2166,16 +2039,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['audio_whitetag'].append(tag)
+                        audio_whitetag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitetagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['blacktagged_behavior_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2186,8 +2058,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacktagged > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all')))
@@ -2198,8 +2069,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacktagged > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2215,8 +2085,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacktagged > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -2227,8 +2096,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacktagged > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -2242,10 +2110,9 @@ def cfgCheckYAML(cfg,init_dict):
         dynamic_behavior_missing_bool=True
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=False
 
-    config_dict['audio_blacktag']=[]
+    audio_blacktag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','tags')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','tags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
@@ -2256,16 +2123,15 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['audio_blacktag'].append(tag)
+                        audio_blacktag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > tags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacktagged > tags is missing from mumc_config.yaml\n'
 
     config_dict['whitelisted_behavior_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2276,8 +2142,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitelisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -2288,8 +2153,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitelisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2305,8 +2169,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitelisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -2317,8 +2180,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > whitelisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -2334,8 +2196,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['blacklisted_behavior_audio']=[]
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2346,8 +2207,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacklisted > action_days is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','user_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','user_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','user_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -2358,8 +2218,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacklisted > user_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','played_conditional')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','played_conditional')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','played_conditional')) == None)):
         if (
             not (isinstance(check,str) and
                  ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2375,8 +2234,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacklisted > played_conditional is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action_control')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action_control')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action_control')) == None)):
         if (
             not (isinstance(check,int) and
                  ((check >= 0) and (check <= 8)))
@@ -2387,8 +2245,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audio > blacklisted > action_control is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','dynamic_behavior')):
-        check=return_key_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','dynamic_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','dynamic_behavior')) == None)):
         if (
             not (isinstance(check,bool) and
                  ((check == True) or (check == False)))
@@ -2405,8 +2262,7 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         config_dict['favorited_behavior_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2417,8 +2273,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > action_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','user_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','user_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','user_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -2429,8 +2284,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > user_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','played_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','played_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','played_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2446,8 +2300,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > played_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action_control')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action_control')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action_control')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 8)))
@@ -2458,8 +2311,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > action_control is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2473,8 +2325,7 @@ def cfgCheckYAML(cfg,init_dict):
             dynamic_behavior_missing_bool=True
             missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['favorited']['dynamic_behavior']=False
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','genre')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','genre')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','genre')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2485,8 +2336,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > genre is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','audiobook_genre')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','audiobook_genre')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','audiobook_genre')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2497,8 +2347,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > audiobook_genre is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_genre')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_genre')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_genre')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2509,8 +2358,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > extra > library_genre is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','track_author')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','track_author')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','track_author')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2521,8 +2369,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > track_author is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','author')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','author')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','author')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2533,8 +2380,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > author is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_author')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_author')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','extra','library_author')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 2)))
@@ -2547,8 +2393,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['whitetagged_behavior_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2559,8 +2404,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitetagged > action_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','user_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','user_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','user_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all')))
@@ -2571,8 +2415,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitetagged > user_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','played_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','played_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','played_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2588,8 +2431,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitetagged > played_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action_control')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action_control')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action_control')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 8)))
@@ -2600,8 +2442,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitetagged > action_control is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2615,10 +2456,9 @@ def cfgCheckYAML(cfg,init_dict):
             dynamic_behavior_missing_bool=True
             missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=False
 
-        config_dict['audiobook_whitetag']=[]
+        audiobook_whitetag_set=set()
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','tags')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','tags')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','tags')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
@@ -2629,16 +2469,15 @@ def cfgCheckYAML(cfg,init_dict):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                     else:
                         if (not (tag == None)):
-                            config_dict['audiobook_whitetag'].append(tag)
+                            audiobook_whitetag_set.add(tag)
             else:
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags must be a list of strings or an empty list\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags is missing from mumc_config.yaml\n'
 
         config_dict['blacktagged_behavior_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2649,8 +2488,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacktagged > action_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','user_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','user_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','user_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all')))
@@ -2661,8 +2499,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacktagged > user_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','played_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','played_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','played_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2678,8 +2515,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacktagged > played_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action_control')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action_control')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action_control')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 8)))
@@ -2690,8 +2526,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacktagged > action_control is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2705,10 +2540,7 @@ def cfgCheckYAML(cfg,init_dict):
             dynamic_behavior_missing_bool=True
             missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=False
 
-        config_dict['audiobook_blacktag']=[]
-
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2722,8 +2554,9 @@ def cfgCheckYAML(cfg,init_dict):
             dynamic_behavior_missing_bool=True
             missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=False
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','tags')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','tags')
+        audiobook_blacktag_set=set()
+
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','tags')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
@@ -2734,16 +2567,15 @@ def cfgCheckYAML(cfg,init_dict):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                     else:
                         if (not (tag == None)):
-                            config_dict['audiobook_blacktag'].append(tag)
+                            audiobook_blacktag_set.add(tag)
             else:
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags must be a list of strings or an empty list\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags is missing from mumc_config.yaml\n'
 
         config_dict['whitelisted_behavior_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2754,8 +2586,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitelisted > action_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','user_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','user_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','user_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -2766,8 +2597,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitelisted > user_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','played_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','played_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','played_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2783,8 +2613,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitelisted > played_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action_control')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action_control')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action_control')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 8)))
@@ -2795,8 +2624,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > whitelisted > action_control is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2812,8 +2640,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['blacklisted_behavior_audiobook']=[]
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
@@ -2824,8 +2651,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacklisted > action_days is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','user_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','user_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','user_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'any') or (check.casefold() == 'all')))
@@ -2836,8 +2662,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacklisted > user_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','played_conditional')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','played_conditional')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','played_conditional')) == None)):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
@@ -2853,8 +2678,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacklisted > played_conditional is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action_control')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action_control')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action_control')) == None)):
             if (
                 not (isinstance(check,int) and
                     ((check >= 0) and (check <= 8)))
@@ -2865,8 +2689,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > behavioral_statements > audiobook > blacklisted > action_control is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','dynamic_behavior')):
-            check=return_key_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','dynamic_behavior')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','dynamic_behavior')) == None)):
             if (
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
@@ -2882,52 +2705,47 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    config_dict['whitetag']=[]
+    whitetag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','whitetags')):
-        check=return_key_value(cfg,'advanced_settings','whitetags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
                     not (((isinstance(tag,str)) and
-                        isinstance(check,list) and
                         (tag.find('\\') < 0)) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['whitetag'].append(tag)
+                        whitetag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > whitetags is missing from mumc_config.yaml\n'
 
-    config_dict['blacktag']=[]
+    blacktag_set=set()
 
-    if (keys_exist(cfg,'advanced_settings','blacktags')):
-        check=return_key_value(cfg,'advanced_settings','blacktags')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
                     not (((isinstance(tag,str)) and
-                        isinstance(check,list) and
                         (tag.find('\\') < 0)) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        config_dict['blacktag'].append(tag)
+                        blacktag_set.add(tag)
         else:
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags must be a list of strings or an empty list\n'
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > blacktags is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'advanced_settings','episode_control','minimum_episodes')):
-        check=return_key_value(cfg,'advanced_settings','episode_control','minimum_episodes')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
                 (check >= 0) and
@@ -2939,8 +2757,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_episodes variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','episode_control','minimum_played_episodes')):
-        check=return_key_value(cfg,'advanced_settings','episode_control','minimum_played_episodes')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_played_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
                 (check >= 0) and
@@ -2952,8 +2769,8 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_played_episodes variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','episode_control','minimum_episodes_behavior')):
-        check=return_key_value(cfg,'advanced_settings','episode_control','minimum_episodes_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes_behavior')) == None)):
+        
         check=check.casefold()
         usersname_usersid_match=False
         for usersname in user_name_check_list:
@@ -2996,8 +2813,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')):
-        check=return_key_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3008,8 +2824,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > movie variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','episode')):
-        check=return_key_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','episode')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','episode')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3020,8 +2835,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > episode variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audio')):
-        check=return_key_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audio')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audio')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3033,8 +2847,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > audio variable is missing from mumc_config.yaml\n'
 
     if (isJellyfinServer(server_brand)):
-        if (keys_exist(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audiobook')):
-            check=return_key_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audiobook')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audiobook')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
@@ -3047,8 +2860,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','script','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','script','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3061,8 +2873,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['script_header_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3073,8 +2884,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3085,8 +2895,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3097,8 +2906,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','user','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','user','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3111,8 +2919,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['user_header_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3123,8 +2930,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3135,8 +2941,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3147,8 +2952,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','summary','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','summary','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3161,8 +2965,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['summary_header_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3173,8 +2976,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3185,8 +2987,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3197,8 +2998,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','footers','script','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','footers','script','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3211,8 +3011,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['script_footer_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3223,8 +3022,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3235,8 +3033,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3247,8 +3044,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','warnings','script','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','warnings','script','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3261,8 +3057,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['script_warnings_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3273,8 +3068,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3285,8 +3079,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3297,8 +3090,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','delete','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','delete','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3311,8 +3103,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['movie_delete_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3323,8 +3114,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3335,8 +3125,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3347,8 +3136,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','keep','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','keep','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3361,8 +3149,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['movie_keep_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3373,8 +3160,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3385,8 +3171,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3397,8 +3182,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','post_processing','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','post_processing','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3411,8 +3195,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['movie_post_processing_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3423,8 +3206,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3435,8 +3217,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3447,8 +3228,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','summary','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','summary','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3461,8 +3241,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['movie_summary_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3473,8 +3252,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3485,8 +3263,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3497,8 +3274,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','delete','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','delete','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3511,8 +3287,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['episode_delete_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3523,8 +3298,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3535,8 +3309,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3547,8 +3320,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','keep','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','keep','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3561,8 +3333,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['episode_keep_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3573,8 +3344,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3585,8 +3355,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3597,8 +3366,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','post_processing','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','post_processing','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3611,8 +3379,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['episode_post_processing_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3623,8 +3390,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3635,8 +3401,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3647,8 +3412,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','summary','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','summary','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3661,8 +3425,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['episode_summary_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3673,8 +3436,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3685,8 +3447,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3697,8 +3458,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','delete','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','delete','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3711,8 +3471,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['audio_delete_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3723,8 +3482,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3735,8 +3493,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3747,8 +3504,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','keep','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','keep','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3761,8 +3517,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['audio_keep_info_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3773,8 +3528,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3785,8 +3539,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3797,8 +3550,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','post_processing','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','post_processing','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3811,8 +3563,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['audio_post_processing_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3823,8 +3574,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3835,8 +3585,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3847,8 +3596,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','summary','show')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','summary','show')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -3861,8 +3609,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     config_dict['audio_summary_format']=[]
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3873,8 +3620,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3885,8 +3631,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')):
-        check=return_key_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')) == None)):
         if (
             not (((isinstance(check,str)) or (check == None) or (check == '')) and
                 ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3898,8 +3643,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
 
     if (isJellyfinServer(server_brand)):
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','delete','show')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','delete','show')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','show')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
@@ -3912,8 +3656,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['audiobook_delete_info_format']=[]
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3924,8 +3667,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3936,8 +3678,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3948,8 +3689,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','keep','show')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','keep','show')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','show')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
@@ -3962,8 +3702,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['audiobook_keep_info_format']=[]
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -3974,8 +3713,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -3986,8 +3724,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -3998,8 +3735,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','post_processing','show')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','show')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','show')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
@@ -4012,8 +3748,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['audiobook_post_processing_format']=[]
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -4024,8 +3759,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -4036,8 +3770,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -4048,8 +3781,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','summary','show')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','summary','show')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','show')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
@@ -4062,8 +3794,7 @@ def cfgCheckYAML(cfg,init_dict):
 
         config_dict['audiobook_summary_format']=[]
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
@@ -4074,8 +3805,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
@@ -4086,8 +3816,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
 
-        if (keys_exist(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')):
-            check=return_key_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')) == None)):
             if (
                 not (((isinstance(check,str)) or (check == None) or (check == '')) and
                     ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
@@ -4100,8 +3829,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'advanced_settings','UPDATE_CONFIG')):
-        check=return_key_value(cfg,'advanced_settings','UPDATE_CONFIG')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','UPDATE_CONFIG')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -4114,8 +3842,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'advanced_settings','REMOVE_FILES')):
-        check=return_key_value(cfg,'advanced_settings','REMOVE_FILES')
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','REMOVE_FILES')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
@@ -4128,8 +3855,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','behavior','list')):
-        check=return_key_value(cfg,'admin_settings','behavior','list')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','list')) == None)):
         if (
             not ((isinstance(check,str)) and
                 (check.casefold() == 'whitelist') or (check.casefold() == 'blacklist'))
@@ -4140,8 +3866,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > list variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','behavior','matching')):
-        check=return_key_value(cfg,'admin_settings','behavior','matching')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','matching')) == None)):
         if (
             not ((isinstance(check,str)) and
                 (check.casefold() == 'byid') or (check.casefold() == 'bypath') or (check.casefold() == 'bynetworkpath'))
@@ -4154,8 +3879,8 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','users')):
-        check=return_key_value(cfg,'admin_settings','users')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
+        
         error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_id_check_list, user_name_check_list, 'admin_settings > users')
         if not (len(check) == check_user_keys_length):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
@@ -4167,8 +3892,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','api_controls','attempts')):
-        check=return_key_value(cfg,'admin_settings','api_controls','attempts')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','api_controls','attempts')) == None)):
         if (
             not ((isinstance(check,int)) and
                 ((check >= 0) and
@@ -4180,8 +3904,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > api_controls > attempts variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','api_controls','item_limit')):
-        check=return_key_value(cfg,'admin_settings','api_controls','item_limit')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','api_controls','item_limit')) == None)):
         if (
             not ((isinstance(check,int)) and
                 ((check >= 0) and
@@ -4195,8 +3918,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'admin_settings','cache','size')):
-        check=return_key_value(cfg,'admin_settings','cache','size')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','size')) == None)):
         if (
             not ((isinstance(check,int)) and
                 ((check >= 0) and
@@ -4208,8 +3930,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > size variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','cache','fallback_behavior')):
-        check=return_key_value(cfg,'admin_settings','cache','fallback_behavior')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','fallback_behavior')) == None)):
         if (
             not ((isinstance(check,str)) and
                 (check.upper() == 'FIFO') or (check.upper() == 'LFU') or (check.upper() == 'LRU'))
@@ -4220,8 +3941,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > fallback_behavior variable is missing from mumc_config.yaml\n'
 
-    if (keys_exist(cfg,'admin_settings','cache','minimum_age')):
-        check=return_key_value(cfg,'admin_settings','cache','minimum_age')
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','minimum_age')) == None)):
         if (
             not ((isinstance(check,int)) and
                 ((check >= 0) and
@@ -4230,8 +3950,7 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > cache > minimum_age must be an integer\n\tValid range 0 thru 60000\n'
         else:
             config_dict['api_query_cache_minimum_age']=check
-    elif (keys_exist(cfg,'admin_settings','cache','last_accessed_time')):
-        check=return_key_value(cfg,'admin_settings','cache','last_accessed_time')
+    elif (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','last_accessed_time')) == None)):
         if (
             not ((isinstance(check,int)) and
                 ((check >= 0) and
@@ -4247,8 +3966,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (keys_exist(cfg,'DEBUG')):
-        check=return_key_value(cfg,'DEBUG')
+    if (not ((check:=keys_exist_return_value(cfg,'DEBUG')) == None)):
         if (
             not ((isinstance(check,int)) and (((check >= 0) and (check <= 4)) or (check == 255)))
             ):
@@ -4261,75 +3979,43 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
     #Check for overlapping tags between blacklists and whitelists
-    #convert tag lists to new sets
-    generic_blacktag_set=set(config_dict['blacktag'])
-    generic_whitetag_set=set(config_dict['whitetag'])
-    movie_blacktag_set=set(config_dict['movie_blacktag'])
-    movie_whitetag_set=set(config_dict['movie_whitetag'])
-    episode_blacktag_set=set(config_dict['episode_blacktag'])
-    episode_whitetag_set=set(config_dict['episode_whitetag'])
-    audio_blacktag_set=set(config_dict['audio_blacktag'])
-    audio_whitetag_set=set(config_dict['audio_whitetag'])
-    if (isJellyfinServer(server_brand)):
-        audiobook_blacktag_set=set(config_dict['audiobook_blacktag'])
-        audiobook_whitetag_set=set(config_dict['audiobook_whitetag'])
 
-    #check global blacktags and whitetags do not have a common string
-    generic_blacktag_generic_whitetag_common_set=generic_blacktag_set & generic_whitetag_set
+    #check global blacktags and global whitetags do not have a common string
+    if (overlapping_tags_set:=blacktag_set.intersection(whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check global blacktags and media specific whitetags do not have a common string
-    generic_blacktag_movie_whitetag_common_set=generic_blacktag_set & movie_whitetag_set
-    generic_blacktag_episode_whitetag_common_set=generic_blacktag_set & episode_whitetag_set
-    generic_blacktag_audio_whitetag_common_set=generic_blacktag_set & audio_whitetag_set
+    if (overlapping_tags_set:=blacktag_set.intersection(movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=blacktag_set.intersection(episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=blacktag_set.intersection(audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
-        generic_blacktag_audiobook_whitetag_common_set=generic_blacktag_set & audiobook_whitetag_set
+        if (overlapping_tags_set:=blacktag_set.intersection(audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check global whitetags and media specific blacktags do not have a common string
-    generic_whitetag_movie_blacktag_common_set=generic_whitetag_set & movie_blacktag_set
-    generic_whitetag_episode_blacktag_common_set=generic_whitetag_set & episode_blacktag_set
-    generic_whitetag_audio_blacktag_common_set=generic_whitetag_set & audio_blacktag_set
+    if (overlapping_tags_set:=whitetag_set.intersection(movie_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=whitetag_set.intersection(episode_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=whitetag_set.intersection(audio_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
-        generic_whitetag_audiobook_blacktag_common_set=generic_whitetag_set & audiobook_blacktag_set
+        if (overlapping_tags_set:=whitetag_set.intersection(audiobook_blacktag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check media specific blacktags and media specific whitetags do not have a common string
-    movie_blacktag_movie_whitetag_common_set=movie_blacktag_set & movie_whitetag_set
-    episode_blacktag_set_blacktag_episode_whitetag_common_set=episode_blacktag_set & episode_whitetag_set
-    audio_blacktag_audio_whitetag_common_set=audio_blacktag_set & audio_whitetag_set
+    if (overlapping_tags_set:=movie_blacktag_set.intersection(movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=episode_blacktag_set.intersection(episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=audio_blacktag_set.intersection(audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
-        audiobook_blacktag_audiobook_whitetag_common_set=audiobook_blacktag_set & audiobook_whitetag_set
-
-    if (generic_blacktag_generic_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_blacktag_generic_whitetag_common_set))  + '\n'
-
-    if (generic_blacktag_movie_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_blacktag_movie_whitetag_common_set))  + '\n'
-    if (generic_blacktag_episode_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_blacktag_episode_whitetag_common_set))  + '\n'
-    if (generic_blacktag_audio_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_blacktag_audio_whitetag_common_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
-        if (generic_blacktag_audiobook_whitetag_common_set):
-            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_blacktag_audiobook_whitetag_common_set))  + '\n'
-
-    if (generic_whitetag_movie_blacktag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_whitetag_movie_blacktag_common_set))  + '\n'
-    if (generic_whitetag_episode_blacktag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_whitetag_episode_blacktag_common_set))  + '\n'
-    if (generic_whitetag_audio_blacktag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_whitetag_audio_blacktag_common_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
-        if (generic_whitetag_audiobook_blacktag_common_set):
-            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(generic_whitetag_audiobook_blacktag_common_set))  + '\n'
-
-    if (movie_blacktag_movie_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(movie_blacktag_movie_whitetag_common_set))  + '\n'
-    if (episode_blacktag_set_blacktag_episode_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(episode_blacktag_set_blacktag_episode_whitetag_common_set))  + '\n'
-    if (audio_blacktag_audio_whitetag_common_set):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(audio_blacktag_audio_whitetag_common_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
-        if (audiobook_blacktag_audiobook_whitetag_common_set):
-            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(audiobook_blacktag_audiobook_whitetag_common_set))  + '\n'
+        if (overlapping_tags_set:=audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 
