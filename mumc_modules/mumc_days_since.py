@@ -38,7 +38,7 @@ def get_days_since_played(date_last_played,the_dict):
             appendTo_DEBUG_log('\n\nCaptured UTC time is: ' + str(date_time_now),3,the_dict)
             appendTo_DEBUG_log('\nDate last played or date created is: ' + str(date_last_played),2,the_dict)
             appendTo_DEBUG_log('\nFormatted date last played or date created is: ' + str(date_time_last_played),3,the_dict)
-            appendTo_DEBUG_log('\nMedia item was last \'' + days_since_played + '\'',2,the_dict)
+            appendTo_DEBUG_log('\nMedia item was last played or created \'' + days_since_played + '\'',2,the_dict)
     else:
         days_since_played=date_last_played
 

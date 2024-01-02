@@ -11,14 +11,21 @@ def modify_lastPlayedDate(item,userKey,the_dict):
     serverURL=the_dict['admin_settings']['server']['url']
     authKey=the_dict['admin_settings']['server']['auth_key']
 
+    if (the_dict['DEBUG']):
+            appendTo_DEBUG_log("\n['UserData'] from server before requesting update:\n" + str(convert2json(item["UserData"])),2,the_dict)
+
     #save current date-time with specified format to item["UserData"]["LastPlayedDate"]
     item["UserData"]["LastPlayedDate"]=str(datetime.strftime(the_dict['date_time_now'], "%Y-%m-%dT%H:%M:%S.000Z"))
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nAdd missing LastPlayedDate of " + str(item["UserData"]["LastPlayedDate"]) + " to media item with Id: " + str(item["Id"]),3)
+            appendTo_DEBUG_log("\nAdd missing LastPlayedDate of " + str(item["UserData"]["LastPlayedDate"]) + " to media item with Id: " + str(item["Id"]),2,the_dict)
 
     #convert item to json element
     DATA = convert2json(item["UserData"])
+
+    if (the_dict['DEBUG']):
+            appendTo_DEBUG_log("\nPending ['UserData'] update request to be sent to server:\n" + str(convert2json(item["UserData"])),2,the_dict)
+
     #encode json element
     DATA = DATA.encode('utf-8')
 

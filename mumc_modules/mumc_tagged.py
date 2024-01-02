@@ -41,7 +41,7 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
             if (the_dict['DEBUG']):
-                appendTo_DEBUG_log('\nItem with Id ' + str(item['Id']) + 'has tag named ' + str(itemTaggedValue),2,the_dict)
+                appendTo_DEBUG_log('\nEmby tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
     #Emby and jellyfin store tags differently
     else: #(isJellyfinServer(the_dict['server_brand']))
         #Jellyfin tags
@@ -58,7 +58,7 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
             if (the_dict['DEBUG']):
-                appendTo_DEBUG_log('\nItem with Id ' + str(item['Id']) + 'has tag named: ' + str(itemTaggedValue),2,the_dict)
+                appendTo_DEBUG_log('\nJellyfin tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\nIs Media Item ' + str(item['Id']) + ' Tagged: ' + str(itemIsTagged),2,the_dict)
