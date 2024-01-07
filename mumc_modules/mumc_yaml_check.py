@@ -322,6 +322,7 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > url key is missing from mumc_config.yaml\n'
 
+
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','auth_key')) == None)):
         server_auth_key=check
         if (
@@ -331,7 +332,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['auth_key']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n\tAn Auth Key (aka API Key) can be manually created via the GUI by navigating to \'Advanced\' > \'API Keys\'\n\tManually creating an API Key via the GUI requires the App Name for the key to be MUMC\n'
 
 #######################################################################################################
 
