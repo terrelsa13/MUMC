@@ -20,7 +20,7 @@ def init_blacklist_blacktagged_query(var_dict):
         var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from blacklist
         var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacktagged_From_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacktagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
         var_dict['SortBy_Blacktagged_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacktagged_From_Blacklist']='Ascending'
         var_dict['EnableUserData_Blacktagged_From_Blacklist']='True'
@@ -69,7 +69,7 @@ def init_whitelist_blacktagged_query(var_dict):
         var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from whitelist
         var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacktagged_From_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacktagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
         var_dict['SortBy_Blacktagged_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacktagged_From_Whitelist']='Ascending'
         var_dict['EnableUserData_Blacktagged_From_Whitelist']='True'

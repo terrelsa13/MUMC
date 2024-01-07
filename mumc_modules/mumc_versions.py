@@ -1,11 +1,11 @@
-
 import platform
+import urllib.request as urlrequest
 from mumc_modules.mumc_url import requestURL
 
 
 #Get the current script version
 def get_script_version():
-    return '5.3.15'
+    return '5.3.16'
 
 
 #Get the min config version

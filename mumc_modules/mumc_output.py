@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import os
 #import re
@@ -164,9 +163,9 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
     else:
         print(the_dict['text_attrs'].build_ansi_escaped_string(string_to_print,
             the_dict['text_attrs'].build_ansi_escape_codes(
-            [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes[0]),
-            the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes[1]),
-            the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes[2])])))
+            [the_dict['text_attrs'].get_text_attribute_ansi_code('font_color',text_attributes['font']['color']),
+            the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',text_attributes['background']['color']),
+            the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',text_attributes['font']['style'])])))
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
@@ -199,4 +198,4 @@ def convert2json(rawjson):
 def print2json(rawjson,the_dict):
     #create a formatted string of the python JSON object
     ezjson = convert2json(rawjson)
-    print_byType(ezjson,True,the_dict)
+    print_byType(ezjson,True,the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])

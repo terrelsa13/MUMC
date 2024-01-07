@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
@@ -35,8 +34,8 @@ def print_informational_header(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + the_dict['script_version'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Config Version: ' + the_dict['version'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_short'] + ' Version: ' + the_dict['script_version'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
@@ -314,8 +313,8 @@ def default_helper_menu(the_dict):
 #show the full help menu
 def print_full_help_menu(the_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nMUMC Version: ' + get_script_version())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + the_dict['app_name_short'] + ' Version: ' + get_script_version())
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_long'] + ' aka ' + the_dict['app_name_short'] + ' (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Usage:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'/path/to/python3.x /path/to/mumc.py [-option] [arg]')

@@ -1,4 +1,3 @@
-
 import urllib.request as urlrequest
 from urllib.error import HTTPError,URLError
 import json
@@ -71,7 +70,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
      #starting with a 1 second doubling_delay if an exception occurs and doubling the doubling_delay each attempt
     while(getdata):
         try:
-            #with urlrequest.urlopen(url,timeout=???) as response:
+            #with urlrequest.urlopen(url,timeout=1000) as response:
             with urlrequest.urlopen(url) as response:
                 if (debugState):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
@@ -96,7 +95,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 appendTo_DEBUG_log("\n" + str(err),2,the_dict)
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
                             print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
-                            print('\n  URL: ' + url + '')
+                            print('\n  URL: ' + str(url) + '')
                             exit(0)
                         else:
                             time.sleep(doubling_delay)
@@ -106,7 +105,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 if (debugState):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.")
-                                print('\n  URL: ' + url + '')
+                                print('\n  URL: ' + str(url) + '')
                                 exit(0)
                 elif (response.getcode() == 204):
                     source = response.read()
@@ -125,7 +124,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     if (debugState):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()))
-                    print('\n  URL: ' + url + '')
+                    print('\n  URL: ' + str(url) + '')
                     exit(0)
         except HTTPError as err:
             time.sleep(doubling_delay)
@@ -133,12 +132,50 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
             doubling_delay += doubling_delay
             if (doubling_delay >= (2**retryAttempts)):
                 print('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage)
-                print('\n  URL: ' + str(url) + '')
-                print('\n' + str(err.status) + '\n' + str(err.reason))
+                try:
+                    print('  Object: ' + str(url.header_items) + '')
+                except:
+                    print('  Object:')
+                try:
+                    print('     URL: ' + str(url.full_url) + '')
+                except:
+                    print('     URL: ' + str(url) + '')
+                try:
+                    print('  Method: ' + str(url.method) + '')
+                except:
+                    print('  Method:')
+                try:
+                    print('  Header: ' + str(url.headers) + '')
+                except:
+                    print('  Header:')
+                try:
+                    print('    Data: ' + str(url.data) + '')
+                except:
+                    print('    Data:')
+                print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
                 if(debugState):
                     appendTo_DEBUG_log('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
-                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
-                    appendTo_DEBUG_log('\n' + str(err.status) + '\n' + str(err.reason),2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items) + '',2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n  Object:',2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url) + '',2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n     URL: ' + str(url) + '',2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n  Method: ' + str(url.method) + '',2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n  Method:',2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers) + '',2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n  Header:',2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n    Data: ' + str(url.data) + '',2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
+                    appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
                 exit(0)
         except URLError as err:
             time.sleep(doubling_delay)
@@ -150,7 +187,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 print('\n' + str(err.reason))
                 if(debugState):
                     appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
-                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
+                    appendTo_DEBUG_log('\n  URL: ' + str(url) + '',2,the_dict)
                     appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
                 exit(0)
         except TimeoutError:
@@ -163,7 +200,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 print('\nTimeout - Request taking too long')
                 if(debugState):
                     appendTo_DEBUG_log('\nTimeoutError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
-                    appendTo_DEBUG_log('\n  URL: ' + url + '',2,the_dict)
+                    appendTo_DEBUG_log('\n  URL: ' + str(url) + '',2,the_dict)
                     appendTo_DEBUG_log('\nTimeout - Request taking too long',2,the_dict)
                 exit(0)
 

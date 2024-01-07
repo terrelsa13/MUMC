@@ -1,6 +1,6 @@
 
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_authentication_key
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_labelled_authentication_keys,create_labelled_authentication_key,authenticate_user_by_name,get_MUMC_labelled_authentication_key
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
@@ -39,15 +39,19 @@ def build_configuration_file(the_dict):
         the_dict['port']=get_port()
         print('----------------------------------------------------------------------------------------')
         #ask user for url-base
-        the_dict['server_base']=get_base(the_dict['admin_settings']['server']['brand'])
-        if (len(the_dict['port'])):
-            the_dict['admin_settings']['server']['url']=the_dict['server'] + ':' + the_dict['port'] + '/' + the_dict['server_base']
+        the_dict['base']=get_base(the_dict['admin_settings']['server']['brand'])
+        if (len(the_dict['port']) and len(the_dict['base'])):
+            the_dict['admin_settings']['server']['url']=the_dict['server'] + ':' + the_dict['port'] + '/' + the_dict['base']
+        elif (len(the_dict['port']) and (not len(the_dict['base']))):
+            the_dict['admin_settings']['server']['url']=the_dict['server'] + ':' + the_dict['port']
+        elif ((not len(the_dict['port'])) and len(the_dict['base'])):
+            the_dict['admin_settings']['server']['url']=the_dict['server'] + '/' + the_dict['base']
         else:
-            the_dict['admin_settings']['server']['url']=the_dict['server'] + '/' + the_dict['server_base']
-        #Remove server, port, and server_base so they cannot be used later
+            the_dict['admin_settings']['server']['url']=the_dict['server']
+        #Remove server, port, and base so they cannot be used later
         the_dict.pop('server')
         the_dict.pop('port')
-        the_dict.pop('server_base')
+        the_dict.pop('base')
         print('----------------------------------------------------------------------------------------')
 
         #ask user for administrator username
@@ -56,8 +60,25 @@ def build_configuration_file(the_dict):
         #ask user for administrator password
         the_dict['password']=get_admin_password()
         print('----------------------------------------------------------------------------------------')
+
         #ask server for authentication key using administrator username and password
-        the_dict['admin_settings']['server']['auth_key']=get_authentication_key(the_dict['username'],the_dict['password'],the_dict)
+        authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
+        #get all existing labelled authentication keys
+        labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,the_dict)
+        #parse for existing labelled MUMC specific authentication key
+        the_dict['admin_settings']['server']['auth_key']=get_MUMC_labelled_authentication_key(labelled_authentication_keys,the_dict)
+
+        #if there is not already an exsiting labelled MUMC specific key then create one
+        if (not the_dict['admin_settings']['server']['auth_key']):
+            #create labelled MUMC specific authentication key
+            create_labelled_authentication_key(authenticated_user_data,the_dict)
+            #clear previously cached data from get_labelled_authentication_keys() so the same key data is not returned
+            # which would not contain the newly created labelled MUMC key
+            the_dict['cached_data'].removeCachedEntry(labelled_authentication_keys['request_url'])
+            #get all existing labelled authentication keys
+            labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,the_dict)
+            #parse for existing labelled MUMC specific authentication key
+            the_dict['admin_settings']['server']['auth_key']=get_MUMC_labelled_authentication_key(labelled_authentication_keys,the_dict)
         #Remove username and password so they cannot be used later
         the_dict.pop('username')
         the_dict.pop('password')

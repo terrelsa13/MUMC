@@ -17,7 +17,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['media_query_blacklisted']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacklist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
         var_dict['SortBy_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacklist']='Ascending'
         var_dict['EnableUserData_Blacklist']='True'
@@ -58,7 +58,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['media_query_whitelisted']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Whitelist']='Id,ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
         var_dict['SortBy_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Whitelist']='Ascending'
         var_dict['EnableUserData_Whitelist']='True'
