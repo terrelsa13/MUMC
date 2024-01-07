@@ -5,7 +5,7 @@ from mumc_modules.mumc_url import requestURL
 
 #Get the current script version
 def get_script_version():
-    return '5.3.16'
+    return '5.3.16-beta'
 
 
 #Get the min config version
