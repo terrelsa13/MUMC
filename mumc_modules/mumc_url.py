@@ -56,18 +56,23 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
+    #check if this request is cached
     try:
+        #if it is cached used cached data
         data = the_dict['cached_data'].getCachedDataFromURL(url)
     except:
+        #if it is not cached send request
         data = False
 
     if (data):
+        #request is cached no need to send request
         getdata = False
     else:
+        #request is no cached; send it
         getdata = True
 
     #try sending url request specified number of times
-     #starting with a 1 second doubling_delay if an exception occurs and doubling the doubling_delay each attempt
+     #starting with a 1 second delay if an exception occurs and doubling the doubling_delay each attempt
     while(getdata):
         try:
             #with urlrequest.urlopen(url,timeout=1000) as response:

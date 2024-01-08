@@ -18,7 +18,7 @@ def modify_lastPlayedDate(item,userKey,the_dict):
     item['UserData']['LastPlayedDate']=str(datetime.strftime(the_dict['date_time_now'], "%Y-%m-%dT%H:%M:%S.0000000Z"))
 
     #emby and jellyfin have different formatting for  ['UserData']['LastPlayedDate']
-    if (isEmbyServer()):
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         lastPlayedDate=str(datetime.strftime(the_dict['date_time_now'], "%Y%m%d%H%M%S"))
     else:
         lastPlayedDate=str(datetime.strftime(the_dict['date_time_now'], "%Y-%m-%dT%H:%M:%S.0000000Z"))

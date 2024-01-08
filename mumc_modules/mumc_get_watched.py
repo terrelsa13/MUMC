@@ -17,7 +17,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['media_query_blacklisted']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacklist']='Ascending'
         var_dict['EnableUserData_Blacklist']='True'
@@ -26,15 +26,18 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['CollapseBoxSetItems_Blacklist']='False'
         var_dict['IsPlayedState_Blacklist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
+        if (isEmbyServer(var_dict['server_brand'])):
+            var_dict['FieldsState_Blacklist']+=',UserDataPlayCount,UserDataLastPlayedDate'
+
         if (var_dict['media_type_lower'] == 'episode'):
-            var_dict['FieldsState_Blacklist']=var_dict['FieldsState_Blacklist'] + ',SeriesStudio,seriesStatus'
+            var_dict['FieldsState_Blacklist']+=',SeriesStudio,seriesStatus'
             if (isJellyfinServer(var_dict['server_brand'])):
                 var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
             else:
                 var_dict['SortBy_Blacklist']='SeriesName,' + var_dict['SortBy_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-            var_dict['FieldsState_Blacklist']=var_dict['FieldsState_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist' 
+            var_dict['FieldsState_Blacklist']+=',ArtistItems,AlbumId,AlbumArtist' 
             var_dict['SortBy_Blacklist']='Artists,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacklist']
             if (isEmbyServer(var_dict['server_brand'])):
                 if (var_dict['media_type_lower'] == 'audio'):
@@ -58,7 +61,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['media_query_whitelisted']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Whitelist']='Ascending'
         var_dict['EnableUserData_Whitelist']='True'
@@ -67,15 +70,18 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['CollapseBoxSetItems_Whitelist']='False'
         var_dict['IsPlayedState_Whitelist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
+        if (isEmbyServer(var_dict['server_brand'])):
+            var_dict['FieldsState_Whitelist']+=',UserDataPlayCount,UserDataLastPlayedDate'
+
         if (var_dict['media_type_lower'] == 'episode'):
-            var_dict['FieldsState_Whitelist']=var_dict['FieldsState_Whitelist'] + ',SeriesStudio,seriesStatus'
+            var_dict['FieldsState_Whitelist']+=',SeriesStudio,seriesStatus'
             if (isJellyfinServer(var_dict['server_brand'])):
                 var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
             else:
                 var_dict['SortBy_Whitelist']='SeriesName,' + var_dict['SortBy_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-            var_dict['FieldsState_Whitelist']=var_dict['FieldsState_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
+            var_dict['FieldsState_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'
             var_dict['SortBy_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Whitelist']
             if (isEmbyServer(var_dict['server_brand'])):
                 if (var_dict['media_type_lower'] == 'audio'):

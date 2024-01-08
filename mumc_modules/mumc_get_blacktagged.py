@@ -20,7 +20,7 @@ def init_blacklist_blacktagged_query(var_dict):
         var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from blacklist
         var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacktagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacktagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Blacktagged_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacktagged_From_Blacklist']='Ascending'
         var_dict['EnableUserData_Blacktagged_From_Blacklist']='True'
@@ -28,19 +28,22 @@ def init_blacklist_blacktagged_query(var_dict):
         var_dict['EnableImages_Blacktagged_From_Blacklist']='False'
         var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist']='False'
 
+        if (isEmbyServer(var_dict['server_brand'])):
+            var_dict['FieldsState_Blacktagged_From_Blacklist']+=',UserDataPlayCount,UserDataLastPlayedDate'
+
         if (var_dict['media_type_lower'] == 'movie'):
             var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',BoxSet,CollectionFolder'
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Blacktagged_From_Blacklist']+=',Season,Series,CollectionFolder'
-            var_dict['FieldsState_Blacktagged_From_Blacklist']=var_dict['FieldsState_Blacktagged_From_Blacklist'] + ',SeriesStudio,seriesStatus'
+            var_dict['FieldsState_Blacktagged_From_Blacklist']+=',SeriesStudio,seriesStatus'
             if (isJellyfinServer(var_dict['server_brand'])):
                 var_dict['SortBy_Blacktagged_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacktagged_From_Blacklist']
             else:
                 var_dict['SortBy_Blacktagged_From_Blacklist']='SeriesName,' + var_dict['SortBy_Blacktagged_From_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-            var_dict['FieldsState_Blacktagged_From_Blacklist']=var_dict['FieldsState_Blacktagged_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
+            var_dict['FieldsState_Blacktagged_From_Blacklist']+=',ArtistItems,AlbumId,AlbumArtist'
             var_dict['SortBy_Blacktagged_From_Blacklist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacktagged_From_Blacklist']
             if (isEmbyServer(var_dict['server_brand'])):
                 if (var_dict['media_type_lower'] == 'audio'):
@@ -69,7 +72,7 @@ def init_whitelist_blacktagged_query(var_dict):
         var_dict['media_query_blacktagged']):
         #Build query for blacktagged media items from whitelist
         var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacktagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,UserDataPlayCount,UserDataLastPlayedDate'
+        var_dict['FieldsState_Blacktagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Blacktagged_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacktagged_From_Whitelist']='Ascending'
         var_dict['EnableUserData_Blacktagged_From_Whitelist']='True'
@@ -77,19 +80,22 @@ def init_whitelist_blacktagged_query(var_dict):
         var_dict['EnableImages_Blacktagged_From_Whitelist']='False'
         var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist']='False'
 
+        if (isEmbyServer(var_dict['server_brand'])):
+            var_dict['FieldsState_Blacktagged_From_Whitelist']+=',UserDataPlayCount,UserDataLastPlayedDate'
+
         if (var_dict['media_type_lower'] == 'movie'):
             var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',BoxSet,CollectionFolder'
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Blacktagged_From_Whitelist']+=',Season,Series,CollectionFolder'
-            var_dict['FieldsState_Blacktagged_From_Whitelist']=var_dict['FieldsState_Blacktagged_From_Whitelist'] + ',SeriesStudio,seriesStatus'
+            var_dict['FieldsState_Blacktagged_From_Whitelist']+=',SeriesStudio,seriesStatus'
             if (isJellyfinServer(var_dict['server_brand'])):
                 var_dict['SortBy_Blacktagged_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Blacktagged_From_Whitelist']
             else:
                 var_dict['SortBy_Blacktagged_From_Whitelist']='SeriesName,' + var_dict['SortBy_Blacktagged_From_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-            var_dict['FieldsState_Blacktagged_From_Whitelist']=var_dict['FieldsState_Blacktagged_From_Whitelist'] + ',ArtistItems,AlbumId,AlbumArtist'
+            var_dict['FieldsState_Blacktagged_From_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'
             var_dict['SortBy_Blacktagged_From_Whitelist']='Artist,PremiereDate,ProductionYear,Album,' + var_dict['SortBy_Blacktagged_From_Whitelist']
             if (isEmbyServer(var_dict['server_brand'])):
                 if (var_dict['media_type_lower'] == 'audio'):
