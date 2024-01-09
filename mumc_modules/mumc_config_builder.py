@@ -1,6 +1,6 @@
 
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_library_selection_type
 from mumc_modules.mumc_key_authentication import get_labelled_authentication_keys,create_labelled_authentication_key,authenticate_user_by_name,get_MUMC_labelled_authentication_key
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
@@ -129,8 +129,17 @@ def build_configuration_file(the_dict):
         the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
         print('----------------------------------------------------------------------------------------')
 
+    #ask how to select users and libraries
+    the_dict['user_library_selection_type']=get_user_library_selection_type(the_dict['admin_settings']['behavior']['list'])
+    print('----------------------------------------------------------------------------------------')
+
     #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
-    the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
+    if (the_dict['user_library_selection_type'] == 0):
+        the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
+    elif (the_dict['user_library_selection_type'] == 1):
+        the_dict['admin_settings']['users']=get_users_and_all_libraries(the_dict)
+    else:
+        the_dict['admin_settings']['users']=get_all_users_and_libraries(the_dict)
     print('----------------------------------------------------------------------------------------')
 
     #set REMOVE_FILES

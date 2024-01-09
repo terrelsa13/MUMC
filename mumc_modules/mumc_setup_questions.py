@@ -72,10 +72,11 @@ def get_base(brand):
     else:
         print('If you have not explicity changed this option in jellyfin, press enter for default.')
         print('For example: http://example.com/<baseurl>')
-        if (brand == defaultbase):
-            base=input('Enter base url (default /' + defaultbase + '): ')
-        else:
-            base=input('Enter base url (default n/a): ')
+        base=input('Enter base url (default n/a): ')
+        #if (brand == defaultbase):
+            #base=input('Enter base url (default /' + defaultbase + '): ')
+        #else:
+            #base=input('Enter base url (default n/a): ')
         if (base == ''):
             return(base)
         else:
@@ -231,6 +232,30 @@ def get_show_disabled_users():
             defaultvalue=False
         elif (selection == '1'):
             valid_value = True
+        else:
+            print('\nInvalid choice. Try again.\n')
+    return(defaultvalue)
+
+
+def get_user_library_selection_type(library_setup_behavior):
+    defaultvalue=0
+    valid_value=False
+    while (valid_value == False):
+        print('Decide how to select users and/or libraries.')
+        print('0 - Select users and libraries; (i.e. Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user)')
+        print('1 - Select users; (i.e. All libraries will be ' + str(library_setup_behavior) + 'ed for the selected users)')
+        print('2 - Select libraries; (i.e. Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users)')
+        selection=input('Enter number (default ' + str(defaultvalue) + '): ')
+        if (selection == ''):
+            valid_value = True
+        elif (selection == '0'):
+            valid_value = True
+        elif (selection == '1'):
+            valid_value = True
+            defaultvalue=1
+        elif (selection == '2'):
+            valid_value = True
+            defaultvalue=2
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)

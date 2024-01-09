@@ -324,7 +324,7 @@ def get_media_libraries(the_dict):
 
 
 #Choose account(s) this script will use to delete played media
-#Choosen account(s) do NOT need to have "Allow Media Deletion From" enabled in the UI
+#Chosen account(s) do NOT need to have "Allow Media Deletion From" enabled in the UI
 def get_users_and_libraries(the_dict):
     #Get all users
     data_all_users=get_all_users(the_dict)
@@ -489,7 +489,7 @@ def get_users_and_libraries(the_dict):
         #When multiple explain how to select each user; when coming back to the user selection show this
         else: #((i >= 1) and (one_user_selected == True)):
             print('Monitoring multiple users is possible.')
-            print('When multiple users are selected; the user with the oldest last played time will determine if media can be deleted.')
+            #print('When multiple users are selected; the user with the oldest last played time will determine if media can be deleted.')
             user_number=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
             print('')
 
