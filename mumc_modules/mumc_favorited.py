@@ -661,7 +661,6 @@ def get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_info,var_dict):
 
 
 #Because we are not searching directly for non-favorited items; cleanup needs to happen to help the behavioral patterns make sense
-#def favorites_playedPatternCleanup(itemsDictionary,itemsExtraDictionary,media_played_days,media_created_days,cut_off_date_played_media,cut_off_date_created_media,media_played_count_comparison,media_played_count,media_created_played_count_comparison,media_created_played_count,favorited_behavior_media,advFav0,advFav1,advFav2=0,advFav3=0,advFav4=0,advFav5=0):
 def favorites_playedPatternCleanup(postproc_dict,the_dict):
     itemsDictionary=postproc_dict['isfavorited_and_played_byUserId_Media']
     itemsExtraDictionary=postproc_dict['isfavorited_extraInfo_byUserId_Media']

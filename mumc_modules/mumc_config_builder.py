@@ -1,6 +1,6 @@
 
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users
 from mumc_modules.mumc_key_authentication import get_labelled_authentication_keys,create_labelled_authentication_key,authenticate_user_by_name,get_MUMC_labelled_authentication_key
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
@@ -16,6 +16,7 @@ def build_configuration_file(the_dict):
 
     print('----------------------------------------------------------------------------------------')
     print('Version: ' + get_script_version())
+    the_dict['version']=get_script_version()
 
     #Building the config
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
@@ -104,16 +105,28 @@ def build_configuration_file(the_dict):
         the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
         print('----------------------------------------------------------------------------------------')
 
+        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
+        the_dict['admin_settings']['behavior']['users']={}
+        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
+        print('----------------------------------------------------------------------------------------')
+
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
         print('----------------------------------------------------------------------------------------')
+
         #ask user how they want to choose libraries/folders
         #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
         the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
         print('----------------------------------------------------------------------------------------')
+
         #ask user how they want media items to be matched to libraries/folders
         #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
+        print('----------------------------------------------------------------------------------------')
+
+        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
+        the_dict['admin_settings']['behavior']['users']={}
+        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
         print('----------------------------------------------------------------------------------------')
 
     #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each

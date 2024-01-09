@@ -4,7 +4,7 @@ def get_brand():
     valid_brand=False
     selected_brand=defaultbrand
     while (valid_brand == False):
-        print('0:emby\n1:jellyfin')
+        print('0 - emby\n1 - jellyfin')
         brand=input('Enter number for server branding (default ' + defaultbrand + '): ')
         if (brand == ''):
             valid_brand = True
@@ -215,3 +215,22 @@ def get_tag_name(tagbehavior,existingtag):
                     print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
             else:
                 print('\nDo not use backslash \'\\\'. Try again.\n')
+
+
+def get_show_disabled_users():
+    defaultvalue=True
+    valid_value=False
+    while (valid_value == False):
+        print('Decide if users disabled in the GUI should be shown.')
+        print('0 - Hide disabled users\n1 - Show disabled users')
+        selection=input('Enter number (default show disabled users): ')
+        if (selection == ''):
+            valid_value = True
+        elif (selection == '0'):
+            valid_value = True
+            defaultvalue=False
+        elif (selection == '1'):
+            valid_value = True
+        else:
+            print('\nInvalid choice. Try again.\n')
+    return(defaultvalue)

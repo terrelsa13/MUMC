@@ -69,7 +69,7 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
 
     itemsDictionary=postproc_dict['is' + prefix_str + '_and_played_byUserId_Media']
     itemsExtraDictionary=postproc_dict['is' + prefix_str + '_extraInfo_byUserId_Media']
-    postproc_dict['user_info']=the_dict['admin_settings']['users']
+    postproc_dict['user_info']=the_dict['enabled_users']
     baselist=prefix_str[0:prefix_str.rfind("ed")]
     checklist=baselist
 

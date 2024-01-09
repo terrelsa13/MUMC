@@ -6,8 +6,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
-from mumc_modules.mumc_console_info import print_config_options_added_warning,print_config_options_removed_warning
-from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter_to_yaml,add_dynamic_behavior_to_yaml
+from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter_to_yaml,add_dynamic_behavior_to_yaml,add_monitor_disabled_users_to_yaml
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -286,6 +285,13 @@ def cfgCheckYAML(cfg,init_dict):
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['dynamic_behavior']=None
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']={}
         missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=None
+
+    monitor_disabled_users_missing_bool=False
+    missing_monitor_disabled_users_dict={}
+    missing_monitor_disabled_users_dict['admin_settings']={}
+    missing_monitor_disabled_users_dict['admin_settings']['behavior']={}
+    missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']={}
+    missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
 #######################################################################################################
 
@@ -3878,6 +3884,21 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching variable is missing from mumc_config.yaml\n'
 
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','users','monitor_disabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > user > monitor_disabled must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['monitor_disabled_users_behavior']=check
+            missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=check
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > users > monitor_disabled variable is missing from mumc_config.yaml\n'
+        monitor_disabled_users_missing_bool=True
+        missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=True
+        
+
 #######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
@@ -4041,7 +4062,10 @@ def cfgCheckYAML(cfg,init_dict):
     if (dynamic_behavior_missing_bool):
         cfg=add_dynamic_behavior_to_yaml(missing_dynamic_behavior_dict,server_brand,init_dict,cfg)
 
-    if (minimum_age_missing_bool or query_filter_missing_bool or dynamic_behavior_missing_bool):
+    if (monitor_disabled_users_missing_bool):
+        cfg=add_monitor_disabled_users_to_yaml(missing_monitor_disabled_users_dict,init_dict,cfg)
+
+    if (minimum_age_missing_bool or query_filter_missing_bool or dynamic_behavior_missing_bool or monitor_disabled_users_missing_bool):
         #Update config version
         cfg['version']=get_script_version()
         #Make sure config path is used for the yaml_configurationUpdater()

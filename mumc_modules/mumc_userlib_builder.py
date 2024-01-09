@@ -1,10 +1,10 @@
-
 from collections import defaultdict
 import copy
 from mumc_modules.mumc_url import requestURL
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist
 from mumc_modules.mumc_sort import sortLibSelection
+from mumc_modules.mumc_user_queries import get_all_users
 
 
 #Create output string to show library information to user for them to choose
@@ -309,30 +309,8 @@ def removeSelectionKey(the_dict):
     return the_dict
 
 
-#API call to get all user accounts
-#Choose account(s) this script will use to delete played media
-#Choosen account(s) do NOT need to have "Allow Media Deletion From" enabled in the UI
-def get_users_and_libraries(the_dict):
-    #Get all users
-    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        #the jellyfin endpoint is /Users
-        req=(the_dict['admin_settings']['server']['url'] + '/Users?api_key=' + the_dict['admin_settings']['server']['auth_key'])
-    else:
-        #the emby endpoint is /Users/Query
-        req=(the_dict['admin_settings']['server']['url'] + '/Users/Query?api_key=' + the_dict['admin_settings']['server']['auth_key'])
-
-    #preConfigDebug = True
-    preConfigDebug = False
-
-    #api call
-    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        #jellyfin returns a list of users
-        data_all_users=requestURL(req, preConfigDebug, 'get_users', 3, the_dict)
-    else:
-        #emby returns a dictionary with a key called 'Items' with a list of users as the value
-        data_all_users=requestURL(req, preConfigDebug, 'get_users', 3, the_dict)
-        data_all_users=data_all_users['Items']
-
+#Request for libraries (i.e. movies, tvshows, audio, etc...)
+def get_media_libraries(the_dict):
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
     req_folders=(the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders?api_key=' + the_dict['admin_settings']['server']['auth_key'])
 
@@ -341,6 +319,18 @@ def get_users_and_libraries(the_dict):
 
     #api calls
     data_folders = requestURL(req_folders, preConfigDebug, 'get_media_folders', 3, the_dict)
+
+    return data_folders
+
+
+#Choose account(s) this script will use to delete played media
+#Choosen account(s) do NOT need to have "Allow Media Deletion From" enabled in the UI
+def get_users_and_libraries(the_dict):
+    #Get all users
+    data_all_users=get_all_users(the_dict)
+
+    #Request for libraries (i.e. movies, tvshows, audio, etc...)
+    data_folders=get_media_libraries(the_dict)
 
     the_dict['data_folders']=[]
 
@@ -422,10 +412,15 @@ def get_users_and_libraries(the_dict):
                 else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
                     whitelist_list.append(lib_dict.copy())
 
-    #Remove users disabled in the GUI
-    for data_user in data_all_users:
-        if (not (data_user['Policy']['IsDisabled'])):
-            data_users_list.append(data_user)
+    #Should disabled users be shown or hidden?
+    if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+        #Keep/Show users disabled in the GUI
+        data_users_list=data_all_users
+    else:
+        #Remove/Hide users disabled in the GUI
+        for data_user in data_all_users:
+            if (not (data_user['Policy']['IsDisabled'])):
+                data_users_list.append(data_user)
 
     #Build list and dictionary with mirrored userId and position information for ALL users
     for userdata in data_users_list:
