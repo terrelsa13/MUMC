@@ -3,7 +3,7 @@
 * I am working on getting MUMC updated to the authorization methods.
    * Looks like this method will work for both Emby and Jellyfin
 * Until then, there will be API calls for Jellyfin that do not work.
-* Emby API calls do not appear to be broeken at the moment.
+* Emby API calls do not appear to be broken at the moment.
 
 # Multi-User Media Cleaner
 Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query your Emby/Jellyfin server for the movies, tv episodes, audio tracks, and audiobooks in your libraries. Then delete media items you no longer want taking up disk space.
