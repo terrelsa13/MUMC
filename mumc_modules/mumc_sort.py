@@ -1,6 +1,5 @@
 
 
-
 #sort the movie delete list
 def sort_movie_deleteItems_List(item):
     return str(item['Name'])

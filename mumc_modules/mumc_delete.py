@@ -1,4 +1,3 @@
-
 import traceback
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_url import requestURL,build_request_message
@@ -6,13 +5,25 @@ from mumc_modules.mumc_url import requestURL,build_request_message
 
 #api call to delete items
 def delete_media_item(itemID,the_dict):
-    #build API delete request for specified media item
-    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items?Ids=' + str(itemID)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID)
+    #Below are the x3 ways to delete media items
 
+    #1
+    #build API delete request for specified media item  
+    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID) #DELETE
     req=build_request_message(url,the_dict,method='DELETE')
+#########################################################################################################
+
+    #2
+    #build API delete request for specified media item  
+    #url=the_dict['admin_settings']['server']['url'] + '/Items?Ids=' + str(itemID) #DELETE
+    #req=build_request_message(url,the_dict,method='DELETE')
+#########################################################################################################
+
+    #3
+    #build API delete request for specified media item  
+    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID) #POST
     #req=build_request_message(url,the_dict,method='POST')
+#########################################################################################################
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nSending Delete Request For: " + itemID,3,the_dict)

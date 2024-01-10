@@ -1,6 +1,5 @@
-from collections import defaultdict
 import copy
-import urllib.request as urlrequest
+from collections import defaultdict
 from mumc_modules.mumc_url import requestURL,build_request_message
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist

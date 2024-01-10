@@ -1,4 +1,3 @@
-
 import copy
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_console_info import print_config_options_added_warning,print_config_options_removed_warning

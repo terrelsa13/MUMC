@@ -1,4 +1,3 @@
-
 from mumc_modules.mumc_output import save_yaml_config
 
 
@@ -13,5 +12,3 @@ def yaml_configurationUpdater(the_dict):
 
     #save yaml config file
     save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
-
-    #return

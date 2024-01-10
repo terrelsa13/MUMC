@@ -1,3 +1,5 @@
+
+
 #emby or jellyfin?
 def get_brand():
     defaultbrand='emby'
@@ -73,10 +75,6 @@ def get_base(brand):
         print('If you have not explicity changed this option in jellyfin, press enter for default.')
         print('For example: http://example.com/<baseurl>')
         base=input('Enter base url (default n/a): ')
-        #if (brand == defaultbase):
-            #base=input('Enter base url (default /' + defaultbase + '): ')
-        #else:
-            #base=input('Enter base url (default n/a): ')
         if (base == ''):
             return(base)
         else:

@@ -1,4 +1,3 @@
-import urllib.request as urlrequest
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_favorited import getChildren_favoritedMediaItems

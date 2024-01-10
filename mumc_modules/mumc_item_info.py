@@ -1,4 +1,3 @@
-import urllib.request as urlrequest
 import urllib.parse as urlparse
 from mumc_modules.mumc_url import requestURL,build_request_message
 

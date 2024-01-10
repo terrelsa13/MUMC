@@ -1,4 +1,3 @@
-
 from dateutil.parser import parse
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 

@@ -1,7 +1,7 @@
-import urllib.request as urlrequest
-from urllib.error import HTTPError,URLError
 import json
 import time
+import urllib.request as urlrequest
+from urllib.error import HTTPError,URLError
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 

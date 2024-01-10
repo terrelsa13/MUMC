@@ -1,5 +1,3 @@
-
-import json
 from mumc_modules.mumc_output import save_yaml_config
 
 

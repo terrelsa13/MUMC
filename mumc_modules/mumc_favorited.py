@@ -1,4 +1,3 @@
-import urllib.request as urlrequest
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_url import api_query_handler,build_request_message
