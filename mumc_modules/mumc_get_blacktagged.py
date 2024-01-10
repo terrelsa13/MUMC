@@ -1,5 +1,5 @@
-
-from mumc_modules.mumc_url import api_query_handler
+import urllib.request as urlrequest
+from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,list_to_urlparsed_string
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
@@ -116,11 +116,12 @@ def blacklist_blacktagged_query(user_info,var_dict,the_dict):
         var_dict['media_query_blacklisted'] and
         var_dict['media_query_blacktagged']):
 
-        #Built query for blacktagged from blacklist media items
-        var_dict['apiQuery_Blacktagged_From_Blacklist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Blacklist'] +
         '&Recursive=' + var_dict['Recursive_Blacktagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Blacklist'] +
-        '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Blacklist'] + '&api_key=' + var_dict['auth_key'])
+        '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Blacklist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Blacklist'])
+
+        var_dict['apiQuery_Blacktagged_From_Blacklist']=build_request_message(url,the_dict)
 
         #Send the API query for for blacktagged from blacklist media items
         var_dict=api_query_handler('Blacktagged_From_Blacklist',var_dict,the_dict)
@@ -158,10 +159,12 @@ def whitelist_blacktagged_query(user_info,var_dict,the_dict):
         var_dict['media_query_blacktagged']):
 
         #Built query for blacktagged from whitelist media items
-        var_dict['apiQuery_Blacktagged_From_Whitelist']=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacktagged_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacktagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Blacktagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Blacktagged_From_Whitelist'] +
         '&Recursive=' + var_dict['Recursive_Blacktagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Blacktagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Blacktagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Blacktagged_From_Whitelist'] +
-        '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Whitelist'] + '&api_key=' + var_dict['auth_key'])
+        '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacktagged_From_Whitelist'] + '&Tags=' + var_dict['Blacktags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Blacktagged_From_Whitelist'])
+
+        var_dict['apiQuery_Blacktagged_From_Whitelist']=build_request_message(url,the_dict)
 
         #Send the API query for for blacktagged from whitelist media items
         var_dict=api_query_handler('Blacktagged_From_Whitelist',var_dict,the_dict)

@@ -3,6 +3,51 @@ from urllib.error import HTTPError,URLError
 import json
 import time
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
+from mumc_modules.mumc_compare_items import keys_exist_return_value
+
+
+def build_request_message(url,the_dict,authorization='Authorization',client=None,device=None,deviceId=None,version=None,token=None,data=None,method=None):
+
+    if (client == None):
+        #assume stored name if not defined
+        client=the_dict['client_name']
+
+    if (device == None):
+        #assume stored device if not defined
+        device=the_dict['app_name_long']
+
+    if (deviceId == None):
+        #assume stored deviceId if not defined
+        deviceId=the_dict['app_name_short']
+
+    if (version == None):
+        #assume stored version if not defined
+        version=the_dict['script_version']
+
+    if (not (token == None)):
+        token=token
+    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','server','auth_key')) == None)):
+        #assume stored token if not defined
+        token=token
+    else:
+        token=''
+
+    if (data == None):
+        DATA=data
+    else:
+        #encode any data passed in
+        #DATA = urlparse.urlencode(values)
+        #DATA = DATA.encode('ascii')
+        DATA = convert2json(data)
+        DATA = DATA.encode('utf-8')
+
+    #build headers
+    headers = {authorization : 'MediaBrowser Client="' + client + '", Device="' + device + '", DeviceId="' + deviceId + '", Version="' + version + '", Token="'+ token + '"', 'Content-Type' : 'application/json'}
+
+    #package url, headers, data, and method into a request message
+    req = urlrequest.Request(url=url, headers=headers, data=DATA, method=method)
+    
+    return req
 
 
 #Limit the amount of data returned for a single API call
@@ -158,6 +203,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 except:
                     print('    Data:')
                 print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
+                print('\nRemove any GUI API keys for MUMC')
                 if(debugState):
                     appendTo_DEBUG_log('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
                     try:
@@ -181,6 +227,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     except:
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
+                    appendTo_DEBUG_log('\nRemove any GUI API keys for MUMC',2,the_dict)
                 exit(0)
         except URLError as err:
             time.sleep(doubling_delay)

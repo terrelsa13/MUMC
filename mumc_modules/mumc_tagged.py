@@ -1,8 +1,8 @@
-
+import urllib.request as urlrequest
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
-from mumc_modules.mumc_url import api_query_handler
+from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith,does_index_exist,keys_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
@@ -75,7 +75,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     user_tags=var_dict['blacktags']
     data_dict['APIDebugMsg_']='Find_' + var_dict['APIDebugMsg_Child_Of_' + suffix_str]
     server_url=the_dict['admin_settings']['server']['url']
-    auth_key=the_dict['admin_settings']['server']['auth_key']
+    #auth_key=the_dict['admin_settings']['server']['auth_key']
     child_dict={}
     child_list=[]
     child_itemId_isTagged=[]
@@ -121,10 +121,12 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
                         if not (data['Id'] == ''):
                             #Built query for child media items
-                            data_dict['apiQuery_']=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
+                            url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
                             '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
-                            '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages + '&api_key=' + auth_key)
+                            '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
+
+                            data_dict['apiQuery_']=build_request_message(url,the_dict)
 
                             #Send the API query for for watched media items in blacklists
                             data_dict.update(api_query_handler('',data_dict,the_dict))

@@ -1,11 +1,11 @@
 import platform
 import urllib.request as urlrequest
-from mumc_modules.mumc_url import requestURL
+from mumc_modules.mumc_url import requestURL,build_request_message
 
 
 #Get the current script version
 def get_script_version():
-    return '5.3.21-beta'
+    return '5.3.22-beta'
 
 
 #Get the min config version
@@ -16,14 +16,15 @@ def get_min_config_version():
 #Get the current Emby/Jellyfin server version
 def get_server_version(the_dict):
 
-    server_url=the_dict['admin_settings']['server']['url']
-    auth_key=the_dict['admin_settings']['server']['auth_key']
     lookupTopic="get_server_version"
 
     #Get additonal item information
-    url=(server_url + '/System/Info?api_key=' + auth_key)
+    url=the_dict['admin_settings']['server']['url'] + '/System/Info'
 
-    ServerInfo=requestURL(url, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'],the_dict)
+    req=build_request_message(url=url,the_dict=the_dict)
+
+    #api call
+    ServerInfo=requestURL(req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'],the_dict)
 
     return(ServerInfo['Version'])
 

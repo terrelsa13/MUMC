@@ -1,15 +1,15 @@
 import urllib.request as urlrequest
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
-from mumc_modules.mumc_url import requestURL
+from mumc_modules.mumc_url import requestURL,build_request_message
 from mumc_modules.mumc_server_type import isEmbyServer
 
 
 #when played media item is missing the LastPlayedDate, send the current date-time to the server as a starting point
 def modify_lastPlayedDate(item,userKey,the_dict):
 
-    serverURL=the_dict['admin_settings']['server']['url']
-    authKey=the_dict['admin_settings']['server']['auth_key']
+    #serverURL=the_dict['admin_settings']['server']['url']
+    #authKey=the_dict['admin_settings']['server']['auth_key']
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n['UserData']['LastPlayedDate'] from server before requesting update:\n" + str(convert2json(item["UserData"])),2,the_dict)
@@ -29,11 +29,9 @@ def modify_lastPlayedDate(item,userKey,the_dict):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nPending ['UserData']['LastPlayedDate'] update request to be sent to server:\n" + str(convert2json(item['UserData'])),2,the_dict)
 
-    #specify json in header
-    headers = {'accept' : 'application/json'}
+    url = the_dict['admin_settings']['server']['url'] + '/Users/' + userKey + '/PlayedItems/' + item['Id'] + '?dateplayed=' + lastPlayedDate
 
-    #build full POST request    
-    req = urlrequest.Request(url=serverURL + '/Users/' + userKey + '/PlayedItems/' + item['Id'] + '?dateplayed=' + lastPlayedDate + '&api_key=' + authKey, method='POST', headers=headers)
+    req=build_request_message(url,the_dict,method='POST')
 
     #API POST for UserData modification
     requestURL(req, the_dict['DEBUG'], 'add_missing_LastPlayedDate', 3, the_dict)

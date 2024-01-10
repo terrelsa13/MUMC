@@ -334,7 +334,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (
             not ((isinstance(check,str)) and (check.isalnum()))
         ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > auth_key must be a string\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > auth_key must be an alphanumeric string\n'
         else:
             config_dict['auth_key']=check
     else:
@@ -1283,7 +1283,7 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        movie_blacktag_set(tag)
+                        movie_blacktag_set.add(tag)
         else:
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n'
     else:

@@ -19,6 +19,7 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
+    the_cfg['client_name']='mumc.py'
     the_cfg['config_file_name']='mumc_config.py'
     the_cfg['config_file_name_yaml']='mumc_config.yaml'
     the_cfg['config_file_name_no_ext']='mumc_config'

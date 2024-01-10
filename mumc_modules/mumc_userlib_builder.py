@@ -1,6 +1,7 @@
 from collections import defaultdict
 import copy
-from mumc_modules.mumc_url import requestURL
+import urllib.request as urlrequest
+from mumc_modules.mumc_url import requestURL,build_request_message
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist
 from mumc_modules.mumc_sort import sortLibSelection
@@ -312,13 +313,15 @@ def removeSelectionKey(the_dict):
 #Request for libraries (i.e. movies, tvshows, audio, etc...)
 def get_media_libraries(the_dict):
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
-    req_folders=(the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders?api_key=' + the_dict['admin_settings']['server']['auth_key'])
+    url=the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders'
+    
+    req=build_request_message(url,the_dict)
 
-    #preConfigDebug = True
-    preConfigDebug = False
+    #preConfigDebug = 3
+    preConfigDebug = 0
 
     #api calls
-    data_folders = requestURL(req_folders, preConfigDebug, 'get_media_folders', 3, the_dict)
+    data_folders = requestURL(req, preConfigDebug, 'get_all_media_folders', 3, the_dict)
 
     return data_folders
 

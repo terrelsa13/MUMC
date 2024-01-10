@@ -65,6 +65,9 @@ def build_configuration_file(the_dict):
 
         #ask server for authentication key using administrator username and password
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
+        the_dict['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
+        '''
+        authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         #get all existing labelled authentication keys
         labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,the_dict)
         #parse for existing labelled MUMC specific authentication key
@@ -81,6 +84,7 @@ def build_configuration_file(the_dict):
             labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,the_dict)
             #parse for existing labelled MUMC specific authentication key
             the_dict['admin_settings']['server']['auth_key']=get_MUMC_labelled_authentication_key(labelled_authentication_keys,the_dict)
+        '''
         #Remove username and password so they cannot be used later
         the_dict.pop('username')
         the_dict.pop('password')
