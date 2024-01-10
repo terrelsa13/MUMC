@@ -1,33 +1,32 @@
-
+import urllib.request as urlrequest
 import urllib.parse as urlparse
-from mumc_modules.mumc_url import requestURL
+from mumc_modules.mumc_url import requestURL,build_request_message
 
 
 #get additional item info needed to make a decision about a media item
 def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict):
-    server_url=the_dict['admin_settings']['server']['url']
-    auth_key=the_dict['admin_settings']['server']['auth_key']
-
     #Get additonal item information
-    url=(server_url + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) +
-        '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags&api_key=' + auth_key)
 
-    itemInfo=requestURL(url, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags'
+
+    req=build_request_message(url,the_dict)
+
+    itemInfo=requestURL(req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
 
     return(itemInfo)
 
 
 #get additional channel/network/studio info needed to determine if item is favorite
 def get_STUDIO_itemInfo(studioNetworkName,the_dict):
-    server_url=the_dict['server_url']
-    auth_key=the_dict['auth_key']
     #Encode studio name
     studio_network=urlparse.quote(studioNetworkName)
 
     #Get studio item information
-    url=server_url + '/Studios/' + studio_network + '&enableImages=False&enableUserData=True&api_key=' + auth_key
+    url=the_dict['admin_settings']['server']['url'] + '/Studios/' + studio_network + '&enableImages=False&enableUserData=True'
+    
+    req=build_request_message(url,the_dict)
 
-    itemInfo=requestURL(url, the_dict['DEBUG'], 'studio_network_info', the_dict['api_query_attempts'], the_dict)
+    itemInfo=requestURL(req, the_dict['DEBUG'], 'studio_network_info_for_' + str(studioNetworkName), the_dict['api_query_attempts'], the_dict)
 
     return(itemInfo)
 

@@ -1,4 +1,3 @@
-
 from mumc_modules.mumc_trakt_fix import modify_lastPlayedDate
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_output import appendTo_DEBUG_log

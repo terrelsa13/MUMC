@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
@@ -35,8 +34,8 @@ def print_informational_header(the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S'))
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Version: ' + the_dict['script_version'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'MUMC Config Version: ' + the_dict['version'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_short'] + ' Version: ' + the_dict['script_version'])
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Python Version: ' + get_python_version())
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'OS Info: ' + get_operating_system_info())
@@ -144,7 +143,7 @@ def print_config_options_added_warning(the_dict,*yaml_sections):
 
     strings_list_to_print=['']
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were added to the yaml configuration file...')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'During the configuration check, the following option(s) were added to mumc_config.yaml file...')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'   ' + missing_accordion)
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
 
@@ -314,18 +313,19 @@ def default_helper_menu(the_dict):
 #show the full help menu
 def print_full_help_menu(the_dict):
     strings_list_to_print=['']
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\nMUMC Version: ' + get_script_version())
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'\n' + the_dict['app_name_short'] + ' Version: ' + get_script_version())
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['app_name_long'] + ' aka ' + the_dict['app_name_short'] + ' (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Usage:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'/path/to/python3.x /path/to/mumc.py [-option] [arg]')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Options:')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-a, -attrs, -attributes     Show console attribute test output; will override all other options')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-a,   -attrs, -attributes     Show console attribute test output; will override all other options')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-c [path], -config [path]   Specify alternate *.py configuration file')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-d, -container              Script is running in a docker container')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-h, -help                   Show this help menu; will override all other options')
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-u, -config-updater         Modify configuration by adding users to the mumc_config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-d,   -container              Script is running in a docker container')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-h,   -help                   Show this help menu; will override all other options')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-u,   -config-updater         Modify configuration by adding users to the mumc_config.yaml')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'-rak, -remake-api-key         Delete the existing MUMC API key and make a new one.')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Latest Release:')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'https://github.com/terrelsa13/MUMC/releases')

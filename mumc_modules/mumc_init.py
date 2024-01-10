@@ -1,4 +1,3 @@
-
 from datetime import datetime,timezone
 from sys import argv,path
 from mumc_modules.mumc_output import add_to_PATH
@@ -14,10 +13,13 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg={}
 
     #Set dictionary variables
+    the_cfg['app_name_short']='MUMC'
+    the_cfg['app_name_long']='Multi-User Media Cleaner'
     the_cfg['DEBUG']=0
     the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
+    the_cfg['client_name']='mumc.py'
     the_cfg['config_file_name']='mumc_config.py'
     the_cfg['config_file_name_yaml']='mumc_config.yaml'
     the_cfg['config_file_name_no_ext']='mumc_config'

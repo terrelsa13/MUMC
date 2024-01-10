@@ -217,3 +217,25 @@ def add_dynamic_behavior_to_yaml(missing_dynamic_behavior_dict,server_brand,init
     print_config_options_added_warning(init_dict,'advanced_settings','behavioral_statements','\'media_type\'','\'conditional_behavior\'','dynamic_behavior')
 
     return cfg
+
+
+def add_monitor_disabled_users_to_yaml(missing_monitor_disabled_users_dict,init_dict,cfg):
+    temp_dict={}
+    temp_dict['admin_settings']={}
+    temp_dict['admin_settings']['behavior']={}
+
+    temp_dict['admin_settings']['behavior']=copy.deepcopy(cfg['admin_settings']['behavior'])
+
+    cfg['admin_settings']['behavior']={}
+    cfg['admin_settings']['behavior']['list']=temp_dict['admin_settings']['behavior']['list']
+    cfg['admin_settings']['behavior']['matching']=temp_dict['admin_settings']['behavior']['matching']
+    cfg['admin_settings']['behavior']['users']={}
+    cfg['admin_settings']['behavior']['users']['monitor_disabled']=missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']
+
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings'].update(cfg['advanced_settings'])
+
+    #Notify user of graceful config changes
+    print_config_options_added_warning(init_dict,'admin_settings','behavior','users','monitor_disabled')
+
+    return cfg

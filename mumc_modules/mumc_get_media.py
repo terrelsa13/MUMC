@@ -1,4 +1,3 @@
-
 import multiprocessing
 from datetime import timedelta
 from collections import defaultdict
@@ -15,6 +14,7 @@ from mumc_modules.mumc_get_watched import init_blacklist_watched_query,init_whit
 from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,init_whitelist_blacktagged_query,blacklist_blacktagged_query,whitelist_blacktagged_query
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
+from mumc_modules.mumc_user_queries import get_single_user
 
 
 #Determine if item can be monitored
@@ -701,12 +701,42 @@ def init_getMedia(the_dict):
 
     the_dict['currentUserPosition']=0
 
+    monitor_disabled_users=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+    the_dict['enabled_users']=[]
+    the_dict['enabled_user_ids']=[]
+    the_dict['disabled_users']=[]
+    the_dict['disabled_user_ids']=[]
     #Get items that could be ready for deletion
     for user_info in the_dict['admin_settings']['users']:
+
+        #get user info about this monitored_user
+        this_users_info=get_single_user(user_info['user_id'],the_dict)
+        
+        #determine if this monitored_user should be processed for get_media()
+        #remember this information for post-processing
+        #if user is disabled
+        if (this_users_info['Policy']['IsDisabled']):
+            #check the monitor_disabled_users config value
+            if (not(monitor_disabled_users)):
+                #mark the user as disabled
+                the_dict['disabled_users'].append(user_info)
+                the_dict['disabled_user_ids'].append(user_info['user_id'])
+            else:
+                #mark the user as enabled
+                the_dict['enabled_users'].append(user_info)
+                the_dict['enabled_user_ids'].append(user_info['user_id'])
+        #if user is enabled; mark the user as enabled
+        else:
+            the_dict['enabled_users'].append(user_info)
+            the_dict['enabled_user_ids'].append(user_info['user_id'])
+
+    #Get items that could be ready for deletion
+    for user_info in the_dict['enabled_users']:
+
         the_dict['movie_dict'][user_info['user_id']]={}
         the_dict['episode_dict'][user_info['user_id']]={}
         the_dict['audio_dict'][user_info['user_id']]={}
-        the_dict['audiobook_dict'][user_info['user_id']]={}
+        the_dict['audiobook_dict'][user_info['user_id']]={}            
 
         print_user_header(user_info,the_dict)
 
@@ -741,14 +771,14 @@ def init_getMedia(the_dict):
 
         #when debug is disabled AND no active media delete/keep items are being output to the console; allow multiprocessing
         if (
-           (not (the_dict['DEBUG'])) and
-           ((not (movie_delete or movie_keep)) and
-           (not (episode_delete or episode_keep)) and
-           (not (audio_delete or audio_keep)) and
-           ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) or
-           (isJellyfinServer(the_dict['admin_settings']['server']['brand']) and
-           (not (audiobook_delete or audiobook_keep)))))
-           ):
+        (not (the_dict['DEBUG'])) and
+        ((not (movie_delete or movie_keep)) and
+        (not (episode_delete or episode_keep)) and
+        (not (audio_delete or audio_keep)) and
+        ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) or
+        (isJellyfinServer(the_dict['admin_settings']['server']['brand']) and
+        (not (audiobook_delete or audiobook_keep)))))
+        ):
 
             #create dictionary for media that can possibly be deleted
             movie_returns=multiprocessing.Manager().dict()

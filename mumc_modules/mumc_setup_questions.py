@@ -1,17 +1,10 @@
-
-import urllib.request as urlrequest
-from mumc_modules.mumc_output import convert2json
-from mumc_modules.mumc_url import requestURL
-from mumc_modules.mumc_versions import get_script_version
-
-
 #emby or jellyfin?
 def get_brand():
     defaultbrand='emby'
     valid_brand=False
     selected_brand=defaultbrand
     while (valid_brand == False):
-        print('0:emby\n1:jellyfin')
+        print('0 - emby\n1 - jellyfin')
         brand=input('Enter number for server branding (default ' + defaultbrand + '): ')
         if (brand == ''):
             valid_brand = True
@@ -79,9 +72,13 @@ def get_base(brand):
     else:
         print('If you have not explicity changed this option in jellyfin, press enter for default.')
         print('For example: http://example.com/<baseurl>')
-        base=input('Enter base url (default /' + defaultbase + '): ')
+        base=input('Enter base url (default n/a): ')
+        #if (brand == defaultbase):
+            #base=input('Enter base url (default /' + defaultbase + '): ')
+        #else:
+            #base=input('Enter base url (default n/a): ')
         if (base == ''):
-            return(defaultbase)
+            return(base)
         else:
             if (base.find('/',0,1) == 0):
                 return(base[1:len(base)])
@@ -99,36 +96,6 @@ def get_admin_password():
     print('Plain text password used to grab authentication key; password is not stored.')
     password=input('Enter admin password: ')
     return(password)
-
-
-#admin account authentication token?
-def get_authentication_key(admin_username,admin_password,the_dict):
-    #login info
-    values = {'Username' : admin_username, 'Pw' : admin_password}
-    #DATA = urlparse.urlencode(values)
-    #DATA = DATA.encode('ascii')
-    DATA = convert2json(values)
-    DATA = DATA.encode('utf-8')
-
-    #works for both Emby and Jellyfin
-    xAuth = 'Authorization'
-    #assuming jellyfin will eventually change to this
-    #if (isEmbyServer()):
-        #xAuth = 'X-Emby-Authorization'
-    #else #(isJellyfinServer()):
-        #xAuth = 'X-Jellyfin-Authorization'
-
-    headers = {xAuth : 'Emby UserId="' + admin_username  + '", Client="mumc.py", Device="Multi-User Media Cleaner", DeviceId="MUMC", Version="' + get_script_version() + '", Token=""', 'Content-Type' : 'application/json'}
-
-    req = urlrequest.Request(url=the_dict['admin_settings']['server']['url'] + '/Users/AuthenticateByName', data=DATA, method='POST', headers=headers)
-
-    #preConfigDebug = 3
-    preConfigDebug = 0
-
-    #api call
-    data=requestURL(req, preConfigDebug, 'get_authentication_key', 3, the_dict)
-
-    return(data['AccessToken'])
 
 
 #Blacklisting or Whitelisting?
@@ -249,3 +216,46 @@ def get_tag_name(tagbehavior,existingtag):
                     print('Use a comma \',\' to seperate multiple tag names. Try again.\n')
             else:
                 print('\nDo not use backslash \'\\\'. Try again.\n')
+
+
+def get_show_disabled_users():
+    defaultvalue=True
+    valid_value=False
+    while (valid_value == False):
+        print('Decide if users disabled in the GUI should be shown.')
+        print('0 - Hide disabled users\n1 - Show disabled users')
+        selection=input('Enter number (default show disabled users): ')
+        if (selection == ''):
+            valid_value = True
+        elif (selection == '0'):
+            valid_value = True
+            defaultvalue=False
+        elif (selection == '1'):
+            valid_value = True
+        else:
+            print('\nInvalid choice. Try again.\n')
+    return(defaultvalue)
+
+
+def get_user_library_selection_type(library_setup_behavior):
+    defaultvalue=0
+    valid_value=False
+    while (valid_value == False):
+        print('Decide how to select users and/or libraries.')
+        print('0 - Select users and libraries; (i.e. Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user)')
+        print('1 - Select users; (i.e. All libraries will be ' + str(library_setup_behavior) + 'ed for the selected users)')
+        print('2 - Select libraries; (i.e. Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users)')
+        selection=input('Enter number (default ' + str(defaultvalue) + '): ')
+        if (selection == ''):
+            valid_value = True
+        elif (selection == '0'):
+            valid_value = True
+        elif (selection == '1'):
+            valid_value = True
+            defaultvalue=1
+        elif (selection == '2'):
+            valid_value = True
+            defaultvalue=2
+        else:
+            print('\nInvalid choice. Try again.\n')
+    return(defaultvalue)
