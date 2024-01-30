@@ -1,10 +1,10 @@
 import copy
 from collections import defaultdict
-from mumc_modules.mumc_url import requestURL,build_request_message
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist
 from mumc_modules.mumc_sort import sortLibSelection
 from mumc_modules.mumc_user_queries import get_all_users
+from mumc_modules.mumc_library_queries import get_all_libraries
 
 
 #Create output string to show library information to user for them to choose
@@ -20,7 +20,6 @@ def parse_library_data_for_display(libFolder):
         libDisplayString+=' - LibId: ' + libFolder['lib_id']
 
     return libDisplayString
-
 
 
 #Store the chosen library's data in temporary location for use when building blacklist and whitelist
@@ -309,20 +308,40 @@ def removeSelectionKey(the_dict):
     return the_dict
 
 
-#Request for libraries (i.e. movies, tvshows, audio, etc...)
-def get_media_libraries(the_dict):
-    #Request for libraries (i.e. movies, tvshows, audio, etc...)
-    url=the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders'
-    
-    req=build_request_message(url,the_dict)
+def stage_libraries_for_unprocessed_users(libraryGuid,the_dict):
+    lib_dict={}
+    generic_list=[]
+    #Build library staging dictionaries for unprocessed users
+     #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
+    for folder in the_dict['data_all_folders']:
+        #if (not (folder['CollectionType'] == 'boxsets')):
+        if (not (folder['LibraryOptions']['PathInfos'] == [])):
+            #the_dict['data_all_folders'].append(folder)
+            #libpos_list.append(folder[libraryGuid])
+            #libpos_dict[folder[libraryGuid]]=libpos_list.index(folder[libraryGuid])
+            for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
+                lib_dict['lib_id']=folder[libraryGuid]
+                if (('CollectionType' in folder) and
+                    (not (folder['CollectionType'] == ''))):
+                    lib_dict['collection_type']=folder['CollectionType']
+                else:
+                    lib_dict['collection_type']=None
+                if (('Path' in folder['LibraryOptions']['PathInfos'][libpos]) and
+                    (not (folder['LibraryOptions']['PathInfos'][libpos]['Path'] == ''))):
+                    lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
+                else:
+                    lib_dict['path']=None
+                if (('NetworkPath' in folder['LibraryOptions']['PathInfos'][libpos]) and
+                    (not (folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath'] == ''))):
+                    lib_dict['network_path']=folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath']
+                else:
+                    lib_dict['network_path']=None
+                lib_dict['lib_enabled']=True
+                lib_dict['selection']=None
 
-    #preConfigDebug = 3
-    preConfigDebug = 0
+                generic_list.append(lib_dict.copy())
 
-    #api calls
-    data_folders = requestURL(req, preConfigDebug, 'get_all_media_folders', 3, the_dict)
-
-    return data_folders
+    return generic_list
 
 
 #Choose account(s) this script will use to delete played media
@@ -332,51 +351,28 @@ def get_users_and_libraries(the_dict):
     data_all_users=get_all_users(the_dict)
 
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
-    data_folders=get_media_libraries(the_dict)
-
-    the_dict['data_folders']=[]
+    the_dict['data_all_folders']=get_all_libraries(the_dict)
 
     data_users_list=[]
     users_dict_temp={}
-    lib_dict={}
+    #lib_dict={}
     whitelist_list=[]
     blacklist_list=[]
 
-    libpos_dict={}
-    libpos_list=[]
+    #libpos_dict={}
+    #libpos_list=[]
     user_temp_list=[]
-    user_id_list=[]
-    user_id_dict={}
+    #user_id_list=[]
+    #user_id_dict={}
     user_id_existing_list=[]
-    user_id_existing_dict={}
+    #user_id_existing_dict={}
     usersdata_existing=the_dict['admin_settings']['users'].copy()
 
     #define empty userId dictionary
     userId_dict={}
-    #define empty monitored library dictionary
-    userId_bllib_dict={}
-    #define empty whitelisted library dictionary
-    userId_wllib_dict={}
     #define empty userId lists
     userId_list=[]
     userId_ReRun_list=[]
-
-    #Check if not running for the first time
-    if (the_dict['advanced_settings']['UPDATE_CONFIG']):
-        i=0
-        usernames_userkeys={}
-        for user_info in the_dict['admin_settings']['users']:
-            usernames_userkeys[user_info['user_name']]=user_info['user_id']
-            userId_list.append(user_info['user_id'])
-        #Pre-populate the existing userkeys and libraries; only new users are fully shown; existing user will display minimal info
-        for rerun_userkey in userId_list:
-            userId_bllib_dict[rerun_userkey]={}
-            userId_bllib_dict[rerun_userkey]['username']=the_dict['admin_settings']['users'][i]['user_name']
-            userId_bllib_dict[rerun_userkey]['userid']=rerun_userkey
-            userId_wllib_dict[rerun_userkey]={}
-            userId_wllib_dict[rerun_userkey]['username']=the_dict['admin_settings']['users'][i]['user_name']
-            userId_wllib_dict[rerun_userkey]['userid']=rerun_userkey
-            i += 1
 
     #Emby and Jellyfin use different key-names for their libraryId
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
@@ -384,35 +380,15 @@ def get_users_and_libraries(the_dict):
     else:
         libraryGuid='Guid'
 
-    #Build library staging dictionaries for unprocessed users
-     #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
-    for folder in data_folders:
-        #if (not (folder['CollectionType'] == 'boxsets')):
-        if (not (folder['LibraryOptions']['PathInfos'] == [])):
-            the_dict['data_folders'].append(folder)
-            libpos_list.append(folder[libraryGuid])
-            libpos_dict[folder[libraryGuid]]=libpos_list.index(folder[libraryGuid])
-            for libpos in range(len(folder['LibraryOptions']['PathInfos'])):
-                lib_dict['lib_id']=folder[libraryGuid]
-                if ('CollectionType' in folder):
-                    lib_dict['collection_type']=folder['CollectionType']
-                else:
-                    lib_dict['collection_type']=None
-                if ('Path' in folder['LibraryOptions']['PathInfos'][libpos]):
-                    lib_dict['path']=folder['LibraryOptions']['PathInfos'][libpos]['Path']
-                else:
-                    lib_dict['path']=None
-                if ('NetworkPath' in folder['LibraryOptions']['PathInfos'][libpos]):
-                    lib_dict['network_path']=folder['LibraryOptions']['PathInfos'][libpos]['NetworkPath']
-                else:
-                    lib_dict['network_path']=None
-                lib_dict['lib_enabled']=True
-                lib_dict['selection']=None
-                #put all libraries in the opposite list
-                if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                    blacklist_list.append(lib_dict.copy())
-                else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
-                    whitelist_list.append(lib_dict.copy())
+    #put all libraries in the opposite list
+    if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+        #Build library staging dictionaries for unprocessed users
+        #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
+        blacklist_list=stage_libraries_for_unprocessed_users(libraryGuid,the_dict)
+    else: #(the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+        #Build library staging dictionaries for unprocessed users
+        #for new users put the library dictionary data in the opposite blacklist/whitelist behavior list
+        whitelist_list=stage_libraries_for_unprocessed_users(libraryGuid,the_dict)
 
     #Should disabled users be shown or hidden?
     if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
@@ -425,20 +401,23 @@ def get_users_and_libraries(the_dict):
                 data_users_list.append(data_user)
 
     #Build list and dictionary with mirrored userId and position information for ALL users
-    for userdata in data_users_list:
-        user_id_list.append(userdata['Id'])
-        user_id_dict[userdata['Id']]=user_id_list.index(userdata['Id'])
+    #for userdata in data_users_list:
+        #user_id_list.append(userdata['Id'])
+        #user_id_dict[userdata['Id']]=user_id_list.index(userdata['Id'])
 
     #Build list and dictionary with mirrored userId and position information for EXISTING users
+    # then add selection number key
     for userdata in usersdata_existing:
         user_id_existing_list.append(userdata['user_id'])
-        user_id_existing_dict[userdata['user_id']]=user_id_existing_list.index(userdata['user_id'])
+        #user_id_existing_dict[userdata['user_id']]=user_id_existing_list.index(userdata['user_id'])
         #Add selection key to each whitelist entry for existing users
         for eachLib in userdata['whitelist']:
-            eachLib['selection']=None
+            #eachLib['selection']=None
+            usersdata_existing[usersdata_existing.index(userdata)]['whitelist'][userdata['whitelist'].index(eachLib)]['selection']=None
         #Add selection key to each blacklist entry for existing users
         for eachLib in userdata['blacklist']:
-            eachLib['selection']=None
+            #eachLib['selection']=None
+            usersdata_existing[usersdata_existing.index(userdata)]['blacklist'][userdata['blacklist'].index(eachLib)]['selection']=None
 
     #Update the_dict['admin_settings']['users'] with ALL users and their possible dictionaries
      #For EXISTING users update with their existing library selections
@@ -462,10 +441,10 @@ def get_users_and_libraries(the_dict):
     while (stop_loop == False):
         i=0
         #Determine if we are looking at a mulitple user setup or a single user setup
-        if (len(data_users_list) > 1):
-            for user in data_users_list:
-                data_users_list[i]['userPosition']=i
-                if not (user['Id'] in userId_list):
+        if (len(the_dict['admin_settings']['users']) > 1):
+            for user in the_dict['admin_settings']['users']:
+                the_dict['admin_settings']['users'][i]['userPosition']=i
+                if not (the_dict['admin_settings']['users'][i]['user_id'] in userId_list):
                     print(str(i) +' - '+ user['Name'] + ' - ' + user['Id'])
                     userId_dict[i]=user['Id']
                 else:
@@ -475,8 +454,8 @@ def get_users_and_libraries(the_dict):
                 i += 1
         else: #Single user setup
             single_user=True
-            for user in data_users_list:
-                data_users_list[i]['userPosition']=i
+            for user in the_dict['admin_settings']['users']:
+                the_dict['admin_settings']['users'][i]['userPosition']=i
                 userId_dict[i]=user['Id']
 
         print('')
@@ -506,10 +485,10 @@ def get_users_and_libraries(the_dict):
                 #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                 if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
                     message='Enter number of the library folder(s) to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                    the_dict=get_library_folders(message,data_users_list[user_number_int],False,the_dict)
+                    the_dict=get_library_folders(message,the_dict['admin_settings']['users'][user_number_int],False,the_dict)
                 else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
                     message='Enter number of the library folder(s) to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                    the_dict=get_library_folders(message,data_users_list[user_number_int],False,the_dict)
+                    the_dict=get_library_folders(message,the_dict['admin_settings']['users'][user_number_int],False,the_dict)
 
             #We get here when we are done selecting users to monitor
             elif ((user_number == '') and (userId_list)):
@@ -533,10 +512,10 @@ def get_users_and_libraries(the_dict):
                     #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
                     if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
                         message='Enter number of the library folder(s) to blacklist (aka monitor) for the selected user.\nMedia in blacklisted library folder(s) will be monitored for deletion.'
-                        the_dict=get_library_folders(message,data_users_list[user_number_int],False,the_dict)
+                        the_dict=get_library_folders(message,the_dict['admin_settings']['users'][user_number_int],False,the_dict)
                     else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
                         message='Enter number of the library folder(s) to whitelist (aka ignore) for the selcted user.\nMedia in whitelisted library folder(s) will be excluded from deletion.'
-                        the_dict=get_library_folders(message,data_users_list[user_number_int],False,the_dict)
+                        the_dict=get_library_folders(message,the_dict['admin_settings']['users'][user_number_int],False,the_dict)
 
                     if ((len(userId_list) >= i) and (the_dict['advanced_settings']['UPDATE_CONFIG'] == False)):
                         stop_loop=True

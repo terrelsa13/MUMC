@@ -4,6 +4,22 @@ from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreated
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 
 
+def get_opposing_listing_type(the_dict):
+    if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+        opposing_listing_type='whitelist'
+    else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+        opposing_listing_type='blacklist'
+    return opposing_listing_type
+
+
+def get_matching_listing_type(the_dict):
+    if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+        matching_listing_type='blacklist'
+    else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+        matching_listing_type='whitelist'
+    return matching_listing_type
+
+
 #Determine if media item is whitelisted/blacklisted for the current user or for another user
 def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
 
