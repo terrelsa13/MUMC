@@ -7,7 +7,6 @@ from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_co
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-#from mumc_modules.mumc_userlib_builder import get_users_and_libraries
 from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 
@@ -140,19 +139,6 @@ def build_configuration_file(the_dict):
 
     #run the user and library selector
     the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
-
-    '''
-    #run the user and library selector
-    if (the_dict['user_library_selection_type'] == 0):
-        #ask to select user and associate desired libraries to be monitored for each user
-        the_dict['admin_settings']['users']=select_users_select_libraries(the_dict)
-    elif (the_dict['user_library_selection_type'] == 1):
-        #ask to select user and automatically associate all libraries each user has access to
-        the_dict['admin_settings']['users']=select_users_all_libraries(the_dict)
-    else: #(the_dict['user_library_selection_type'] == 2):
-        #ask to select libraries and automatically associate them to users that have access
-        the_dict['admin_settings']['users']=all_users_select_libraries(the_dict)
-    '''
 
     print('----------------------------------------------------------------------------------------')
 
