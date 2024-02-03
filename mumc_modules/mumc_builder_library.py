@@ -169,7 +169,7 @@ def remove_subfolders_from_existing_users(the_dict):
 
                         for lib_info in the_dict['prev_users_dict'][user_index][matching_listing_type]:
                             lib_index=temp_the_dict['prev_users_dict'][user_index][matching_listing_type].index(lib_info)
-                            if ((lib_info['path'] == remove_path) or (lib_info[matching_listing_type] == remove_network_path)):
+                            if ((lib_info['path'] == remove_path) or (lib_info['network_path'] == remove_network_path)):
                                 temp_the_dict['prev_users_dict'][user_index][matching_listing_type].pop(lib_index)
         else:
             break

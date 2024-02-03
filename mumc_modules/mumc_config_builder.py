@@ -109,11 +109,6 @@ def build_configuration_file(the_dict):
         the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
         print('----------------------------------------------------------------------------------------')
 
-        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
-        the_dict['admin_settings']['behavior']['users']={}
-        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
-        print('----------------------------------------------------------------------------------------')
-
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
         print('----------------------------------------------------------------------------------------')
@@ -128,10 +123,10 @@ def build_configuration_file(the_dict):
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
 
-        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
-        the_dict['admin_settings']['behavior']['users']={}
-        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
-        print('----------------------------------------------------------------------------------------')
+    #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
+    the_dict['admin_settings']['behavior']['users']={}
+    the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
+    print('----------------------------------------------------------------------------------------')
 
     #ask how to select users and libraries
     the_dict['user_library_selection_type']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])

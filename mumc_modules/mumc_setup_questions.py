@@ -246,10 +246,6 @@ def get_user_and_library_selection_type(library_setup_behavior):
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
-        #print('0 - Select users and libraries; i.e. Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
-        #print('1 - Select users only i.e. Selected users will have all libraries ' + str(library_setup_behavior) + 'ed according to their access policy.')
-        #print('2 - Select libraries only i.e. Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access polity.')
-        #print('')
         print('0 - Select users and libraries.')
         print('    Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
         print('1 - Select users only.')

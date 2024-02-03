@@ -6,9 +6,8 @@ from mumc_modules.mumc_output import getFullPathName,getFileExtension,doesFileEx
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
-#from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
+from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
-#from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
 
@@ -120,7 +119,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
         config_file_full_path=cfg['mumc_path'] / cfg['config_file_name_yaml']
     else:
         print('Unable to find valid configuration file.')
-        print('The -rak,-remake-api-key command is unavaible without a valid configuration file.')
+        #print('The -rak,-remake-api-key command is unavaible without a valid configuration file.')
         exit(0)
         
     for cmdOption in argv:
@@ -135,7 +134,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             #ask server for authentication key using administrator username and password
             authenticated_user_data=authenticate_user_by_name(admin_username,admin_password,cfg)
             cfg['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
-            '''
+            
             authenticated_user_data=authenticate_user_by_name(admin_username,admin_password,cfg)
             #get all existing labelled authentication keys
             labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,cfg)
@@ -157,11 +156,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,cfg)
             #parse for existing labelled MUMC specific authentication key
             cfg['admin_settings']['server']['auth_key']=get_MUMC_labelled_authentication_key(labelled_authentication_keys,cfg)
-            #strip out uneccessary data
-            #config_data=filterYAMLConfigKeys(cfg,'version','basic_settings','advanced_settings','admin_settings','DEBUG')
-            #save config
-            #yaml_configurationUpdater(config_data)
-            '''
+
             yaml_configurationUpdater(cfg)
             #print('A new API key has been created with the App Name of MUMC.')
             #print('If there was a previous API key with the App Name MUMC it has been deleted.')
@@ -232,7 +227,7 @@ def parse_command_line_options(the_dict):
                                 '-c','-config','-configuration',
                                 '-d','-container',
                                 '-u','-updater','-config-updater','-configuration-updater',
-                                '-rak','-remake-api-key',
+                                #'-rak','-remake-api-key',
                                 '-h', '-help','-?']
 
     #look for -h or -help command line option
@@ -275,6 +270,7 @@ def parse_command_line_options(the_dict):
         cmdopt_dict['altConfigFileNoExt']=None
         cmdopt_dict['altConfigFileExt']=None
 
-    findRemakeAuthKeyRequest(cmdopt_dict,the_dict)
+    #look fo -rak or -remake-api-key command line option
+    #findRemakeAuthKeyRequest(cmdopt_dict,the_dict)
 
     return cmdopt_dict
