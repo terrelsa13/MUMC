@@ -120,14 +120,14 @@ def build_library_data_for_selected_user(the_dict):
 
     for lib_data in temp_the_dict['all_users_dict'][user_index][matching_listing_type]:
         lib_index=temp_the_dict['all_users_dict'][user_index][matching_listing_type].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index])
+        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index].copy())
         temp_the_dict['library_info_print_opposing_list'].append(None)
-        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index])
+        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index].copy())
 
     for lib_data in temp_the_dict['all_users_dict'][user_index][opposing_listing_type]:
         lib_index=temp_the_dict['all_users_dict'][user_index][opposing_listing_type].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index])
-        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index])
+        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index].copy())
+        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index].copy())
         temp_the_dict['library_info_print_matching_list'].append(None)
     
     the_dict['library_info_print_all_list']=temp_the_dict['library_info_print_all_list']
@@ -172,9 +172,15 @@ def print_library_data_for_selected_user(the_dict):
         message='Enter number of the library folder(s) to ' + str(listing_type) + ' (aka monitor) for the selected user.'
         message+='\nMedia in ' + str(listing_type) + 'ed library folder(s) will be ' + str(monitor_type) + ' deletion.'
 
-    lib_index=0
     for lib_info in the_dict['library_info_print_all_list']:
-        lib_info['selection']=lib_index
+        lib_index=the_dict['library_info_print_all_list'].index(lib_info)
+        the_dict['library_info_print_all_list'][lib_index]['selection']=lib_index
+
+        if (the_dict['library_info_print_opposing_list'][lib_index]):
+            the_dict['library_info_print_opposing_list'][lib_index]['selection']=lib_index
+
+        if (the_dict['library_info_print_matching_list'][lib_index]):
+            the_dict['library_info_print_matching_list'][lib_index]['selection']=lib_index
 
         print_string=str(lib_info['selection'])
         print_string+=' - ' + str(lib_info['collection_type'])
@@ -185,8 +191,6 @@ def print_library_data_for_selected_user(the_dict):
 
         if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
             print(print_string)
-
-        lib_index+=1
 
     if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
         print('')
@@ -241,7 +245,7 @@ def is_valid_user_selected(the_dict):
 
     if (the_dict['user_library_selection_type'] == 0):
         if (len(the_dict['user_selection_list']) > 1):
-            print_error('\nMust not select more than a single user at a time. Try again.\n')
+            print_error='Must not select more than a single user at a time. Try again.\n'
             selected_user_str=the_dict['user_selection_list']
 
     if (not (print_error == '')):
@@ -299,5 +303,24 @@ def update_fake_user_dict(the_dict):
     for lib_info in the_dict['library_info_print_matching_list']:
         if (not (lib_info == None)):
             the_dict['fake_user_dict'][fake_user_index][matching_listing_type].append(lib_info)
+
+    return the_dict
+
+
+def build_user_selection_list(the_dict):
+    for user_info in the_dict['prev_users_dict']:
+        user_index=the_dict['prev_users_dict'].index(user_info)
+        if (not (user_info == None)):
+            the_dict['user_selection_list'].append(user_index)
+
+    return the_dict
+
+
+def swap_users(the_dict):
+    for selected_user in the_dict['user_selection_list']:
+        if (the_dict['prev_users_dict'][selected_user] == None):
+            the_dict['prev_users_dict'][selected_user]=the_dict['all_users_dict'][selected_user]
+        else:
+            the_dict['prev_users_dict'][selected_user]=None
 
     return the_dict

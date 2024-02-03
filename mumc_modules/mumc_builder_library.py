@@ -285,22 +285,22 @@ def add_selection_and_selected_keys(the_dict):
     for user_info in temp_the_dict['all_users_dict']:
         user_index=temp_the_dict['all_users_dict'].index(user_info)
         for list_info in user_info[opposing_listing_type]:
-            wl_index=user_info[opposing_listing_type].index(list_info)
-            temp_the_dict['all_users_dict'][user_index][opposing_listing_type][wl_index]['selection']=None
-            temp_the_dict['all_users_dict'][user_index][opposing_listing_type][wl_index]['selected']=False
+            lib_list_index=user_info[opposing_listing_type].index(list_info)
+            temp_the_dict['all_users_dict'][user_index][opposing_listing_type][lib_list_index]['selection']=None
+            temp_the_dict['all_users_dict'][user_index][opposing_listing_type][lib_list_index]['selected']=False
 
             if (user_index < prev_users_dict_len):
-                temp_the_dict['prev_users_dict'][user_index][opposing_listing_type][wl_index]['selection']=None
-                temp_the_dict['prev_users_dict'][user_index][opposing_listing_type][wl_index]['selected']=False
+                temp_the_dict['prev_users_dict'][user_index][opposing_listing_type][lib_list_index]['selection']=None
+                temp_the_dict['prev_users_dict'][user_index][opposing_listing_type][lib_list_index]['selected']=False
 
         for list_info in user_info[matching_listing_type]:
-            bl_index=user_info[matching_listing_type].index(list_info)
-            temp_the_dict['all_users_dict'][user_index][matching_listing_type][bl_index]['selection']=None
-            temp_the_dict['all_users_dict'][user_index][matching_listing_type][bl_index]['selected']=True
+            lib_list_index=user_info[matching_listing_type].index(list_info)
+            temp_the_dict['all_users_dict'][user_index][matching_listing_type][lib_list_index]['selection']=None
+            temp_the_dict['all_users_dict'][user_index][matching_listing_type][lib_list_index]['selected']=True
 
             if (user_index < prev_users_dict_len):
-                temp_the_dict['prev_users_dict'][user_index][matching_listing_type][bl_index]['selection']=None
-                temp_the_dict['prev_users_dict'][user_index][matching_listing_type][bl_index]['selected']=True
+                temp_the_dict['prev_users_dict'][user_index][matching_listing_type][lib_list_index]['selection']=None
+                temp_the_dict['prev_users_dict'][user_index][matching_listing_type][lib_list_index]['selected']=True
 
     the_dict['all_users_dict']=temp_the_dict['all_users_dict']
     the_dict['prev_users_dict']=temp_the_dict['prev_users_dict']
