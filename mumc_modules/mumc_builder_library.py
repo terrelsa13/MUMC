@@ -381,6 +381,42 @@ def is_valid_library_selected(the_dict):
     return the_dict
 
 
+def reorder_libraries_before_printing(the_dict):
+    the_dict['library_order']=[]
+
+    for lib_info in the_dict['library_info_print_all_list']:
+        if (not (lib_info['selection'] == None)):
+            the_dict['library_order'].append(None)
+
+    for lib_info in the_dict['library_info_print_all_list']:
+        if (not (lib_info['selection'] == None)):
+            the_dict['library_order'][lib_info['selection']]=lib_info
+
+    for lib_info in the_dict['library_info_print_all_list']:
+        if (lib_info['selection'] == None):
+            lib_index=the_dict['library_info_print_all_list'].index(lib_info)
+            the_dict['library_info_print_all_list'][lib_index]['selection']=lib_index
+            if (not (the_dict['library_info_print_opposing_list'][lib_index] == None)):
+                the_dict['library_info_print_opposing_list'][lib_index]['selection']=lib_index
+            if (not (the_dict['library_info_print_matching_list'][lib_index] == None)):
+                the_dict['library_info_print_matching_list'][lib_index]['selection']=lib_index
+            the_dict['library_order'].append(lib_info)
+
+    the_dict['library_info_print_all_list'].clear()
+    the_dict['library_info_print_opposing_list'].clear()
+    the_dict['library_info_print_matching_list'].clear()
+    for lib_info in the_dict['library_order']:
+        the_dict['library_info_print_all_list'].append(lib_info)
+        if (lib_info['selected']):
+            the_dict['library_info_print_opposing_list'].append(None)
+            the_dict['library_info_print_matching_list'].append(lib_info)
+        else:
+            the_dict['library_info_print_opposing_list'].append(lib_info)
+            the_dict['library_info_print_matching_list'].append(None)
+
+    return the_dict
+
+
 def swap_libraries(the_dict):
     temp_the_dict={}
     temp_the_dict['library_info_print_opposing_list']=copy.deepcopy(the_dict['library_info_print_opposing_list'])

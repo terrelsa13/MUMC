@@ -225,7 +225,7 @@ def get_show_disabled_users():
     defaultvalue=True
     valid_value=False
     while (valid_value == False):
-        print('Decide if users disabled in the GUI should be shown.')
+        print('Decide if users disabled in the GUI should be considered.')
         print('0 - Hide disabled users')
         print('1 - Show disabled users')
         selection=input('Enter number (default 1 - Show disabled users): ')

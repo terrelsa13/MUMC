@@ -173,15 +173,6 @@ def print_library_data_for_selected_user(the_dict):
         message+='\nMedia in ' + str(listing_type) + 'ed library folder(s) will be ' + str(monitor_type) + ' deletion.'
 
     for lib_info in the_dict['library_info_print_all_list']:
-        lib_index=the_dict['library_info_print_all_list'].index(lib_info)
-        the_dict['library_info_print_all_list'][lib_index]['selection']=lib_index
-
-        if (the_dict['library_info_print_opposing_list'][lib_index]):
-            the_dict['library_info_print_opposing_list'][lib_index]['selection']=lib_index
-
-        if (the_dict['library_info_print_matching_list'][lib_index]):
-            the_dict['library_info_print_matching_list'][lib_index]['selection']=lib_index
-
         print_string=str(lib_info['selection'])
         print_string+=' - ' + str(lib_info['collection_type'])
         if (not (lib_info['selected'])):

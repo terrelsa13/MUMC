@@ -2,7 +2,7 @@ import copy
 from mumc_modules.mumc_user_queries import get_all_users
 from mumc_modules.mumc_library_queries import get_all_libraries,get_all_library_subfolders
 from mumc_modules.mumc_builder_user import create_user_dicts,reorder_all_users,show_hide_gui_disabled_users,print_users_to_console,get_user_selection,is_valid_user_selected,build_library_data_for_selected_user,print_library_data_for_selected_user,save_library_data_for_selected_user,select_all_users,filter_library_data_for_selected_user,update_fake_user_dict,swap_users,build_user_selection_list
-from mumc_modules.mumc_builder_library import create_library_dicts,create_library_path_id_dicts,update_existing_user_libraries,remove_libraries_from_existing_users,remove_subfolders_from_existing_users,add_libraries_to_existing_users,add_libraries_to_new_users,add_selection_and_selected_keys,get_library_selections,is_valid_library_selected,swap_libraries,remove_key_from_blacklist_whitelist,select_all_unselected_libraries,pre_build_all_library_data,build_all_library_data
+from mumc_modules.mumc_builder_library import create_library_dicts,create_library_path_id_dicts,update_existing_user_libraries,remove_libraries_from_existing_users,remove_subfolders_from_existing_users,add_libraries_to_existing_users,add_libraries_to_new_users,add_selection_and_selected_keys,get_library_selections,is_valid_library_selected,swap_libraries,remove_key_from_blacklist_whitelist,select_all_unselected_libraries,pre_build_all_library_data,build_all_library_data,reorder_libraries_before_printing
 
 
 #run the user and library builder
@@ -77,6 +77,7 @@ def select_users_select_libraries(the_dict):
             the_dict=build_library_data_for_selected_user(the_dict)
             the_dict['library_stop_loop']=False
             while (the_dict['library_stop_loop'] == False):
+                the_dict=reorder_libraries_before_printing(the_dict)
                 the_dict=print_library_data_for_selected_user(the_dict)
                 the_dict=get_library_selections(the_dict)
                 the_dict['library_valid_selection']=False
@@ -102,6 +103,7 @@ def select_users_all_libraries(the_dict):
                 the_dict=build_library_data_for_selected_user(the_dict)
                 the_dict['library_stop_loop']=False
                 while (the_dict['library_stop_loop'] == False):
+                    the_dict=reorder_libraries_before_printing(the_dict)
                     the_dict=print_library_data_for_selected_user(the_dict)
                     the_dict=select_all_unselected_libraries(the_dict)
                     the_dict['library_stop_loop'] = True
@@ -127,19 +129,20 @@ def all_users_select_libraries(the_dict):
 
         if ((not the_dict['user_stop_loop']) and the_dict['user_valid_selection']):
             the_dict=build_all_library_data(the_dict)
+            the_dict=reorder_libraries_before_printing(the_dict)
             the_dict=print_library_data_for_selected_user(the_dict)
             the_dict=get_library_selections(the_dict)
             the_dict['library_valid_selection']=False
             the_dict=is_valid_library_selected(the_dict)
 
-            if (the_dict['library_valid_selection']):
-                the_dict=swap_libraries(the_dict)
-                the_dict=update_fake_user_dict(the_dict)
+        if (the_dict['library_valid_selection']):
+            the_dict=swap_libraries(the_dict)
+            the_dict=update_fake_user_dict(the_dict)
 
-            for selected_user in the_dict['user_selection_list']:
-                the_dict['user_selection_int']=selected_user
-                the_dict=filter_library_data_for_selected_user(the_dict)
-                the_dict=save_library_data_for_selected_user(the_dict)
-                the_dict=build_all_library_data(the_dict)
+    for selected_user in the_dict['user_selection_list']:
+        the_dict['user_selection_int']=selected_user
+        the_dict=filter_library_data_for_selected_user(the_dict)
+        the_dict=save_library_data_for_selected_user(the_dict)
+        the_dict=build_all_library_data(the_dict)
 
     return the_dict
