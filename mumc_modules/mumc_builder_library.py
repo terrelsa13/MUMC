@@ -182,6 +182,52 @@ def remove_subfolders_from_existing_users(the_dict):
     return the_dict
 
 
+def remove_nonexisting_subfolders_from_existing_users(the_dict):
+    temp_the_dict={}
+    temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
+    temp_the_dict['prev_users_dict']=copy.deepcopy(the_dict['prev_users_dict'])
+
+    opposing_listing_type=get_opposing_listing_type(the_dict)
+    matching_listing_type=get_matching_listing_type(the_dict)
+
+    for user_info in the_dict['prev_users_dict']:
+        if (not (user_info == None)):
+            user_index=the_dict['prev_users_dict'].index(user_info)
+            temp_the_dict['all_users_dict'][user_index][opposing_listing_type].clear()
+            temp_the_dict['all_users_dict'][user_index][matching_listing_type].clear()
+            temp_the_dict['prev_users_dict'][user_index][opposing_listing_type].clear()
+            temp_the_dict['prev_users_dict'][user_index][matching_listing_type].clear()
+
+            for lib_info in user_info[opposing_listing_type]:
+                folder_index=-1
+                if (lib_info['path'] in the_dict['all_library_paths_list']):
+                    folder_index=the_dict['all_library_paths_list'].index(lib_info['path'])
+
+                if (folder_index >= 0):
+                    if ((lib_info['path'] == the_dict['all_library_paths_list'][folder_index]) and
+                        (lib_info['network_path'] == the_dict['all_library_network_paths_list'][folder_index]) and
+                        (lib_info['collection_type'] == the_dict['all_library_collection_types_list'][folder_index])):
+                        temp_the_dict['all_users_dict'][user_index][opposing_listing_type].append(lib_info)
+                        temp_the_dict['prev_users_dict'][user_index][opposing_listing_type].append(lib_info)
+
+            for lib_info in user_info[matching_listing_type]:
+                folder_index=-1
+                if (lib_info['path'] in the_dict['all_library_paths_list']):
+                    folder_index=the_dict['all_library_paths_list'].index(lib_info['path'])
+
+                if (folder_index >= 0):
+                    if ((lib_info['path'] == the_dict['all_library_paths_list'][folder_index]) and
+                        (lib_info['network_path'] == the_dict['all_library_network_paths_list'][folder_index]) and
+                        (lib_info['collection_type'] == the_dict['all_library_collection_types_list'][folder_index])):
+                        temp_the_dict['all_users_dict'][user_index][matching_listing_type].append(lib_info)
+                        temp_the_dict['prev_users_dict'][user_index][matching_listing_type].append(lib_info)
+
+    the_dict['all_users_dict']=temp_the_dict['all_users_dict']
+    the_dict['prev_users_dict']=temp_the_dict['prev_users_dict']
+
+    return the_dict
+
+
 def add_libraries_to_existing_users(the_dict):
     opposing_listing_type=get_opposing_listing_type(the_dict)
     matching_listing_type=get_matching_listing_type(the_dict)
