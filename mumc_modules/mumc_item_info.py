@@ -6,7 +6,7 @@ from mumc_modules.mumc_url import requestURL,build_request_message
 def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict):
     #Get additonal item information
 
-    url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags'
+    url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags,RecursiveItemCount'
 
     req=build_request_message(url,the_dict)
 
