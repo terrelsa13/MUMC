@@ -5,7 +5,6 @@ from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_m
 from mumc_modules.mumc_output import getFullPathName,getFileExtension,doesFileExist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
-from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_import import importConfig
@@ -134,8 +133,9 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             #ask server for authentication key using administrator username and password
             authenticated_user_data=authenticate_user_by_name(admin_username,admin_password,cfg)
             cfg['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
+            cfg['admin_settings']['server']['admin_id']=authenticated_user_data['User']['Id']
+            #authenticated_user_data=authenticate_user_by_name(admin_username,admin_password,cfg)
             
-            authenticated_user_data=authenticate_user_by_name(admin_username,admin_password,cfg)
             #get all existing labelled authentication keys
             labelled_authentication_keys=get_labelled_authentication_keys(authenticated_user_data,cfg)
             #parse for existing labelled MUMC specific authentication key

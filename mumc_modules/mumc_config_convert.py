@@ -780,6 +780,16 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['advanced_settings']['blacktags']=[]
 
     try:
+        config_data['advanced_settings']['delete_empty_folders']['episode']['season']=cfg['delete_season_folder']
+    except:
+        config_data['advanced_settings']['delete_empty_folders']['episode']['season']=False
+    try:
+        config_data['advanced_settings']['delete_empty_folders']['episode']['series']=cfg['delete_series_folder']
+    except:
+        config_data['advanced_settings']['delete_empty_folders']['episode']['series']=False
+
+
+    try:
         config_data['advanced_settings']['episode_control']['minimum_episodes']=cfg['minimum_number_episodes']
     except:
         config_data['advanced_settings']['episode_control']['minimum_episodes']=0
@@ -1167,6 +1177,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         config_data['admin_settings']['server']['auth_key']=cfg['auth_key']
     except:
         config_data['admin_settings']['server']['auth_key']='Unknown'
+    try:
+        config_data['admin_settings']['server']['admin_key']=cfg['admin_key']
+    except:
+        config_data['admin_settings']['server']['admin_key']=None
     try:
         config_data['admin_settings']['behavior']['list']=cfg['library_setup_behavior']
     except:

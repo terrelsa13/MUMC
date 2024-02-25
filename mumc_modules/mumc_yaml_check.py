@@ -3,7 +3,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
-from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter_to_yaml,add_dynamic_behavior_to_yaml,add_monitor_disabled_users_to_yaml
+from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter_to_yaml,add_dynamic_behavior_to_yaml,add_monitor_disabled_users_to_yaml,add_admin_id_to_yaml,add_delete_season_folder_to_yaml,add_delete_series_folder_to_yaml
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -290,6 +290,26 @@ def cfgCheckYAML(cfg,init_dict):
     missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']={}
     missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
+    monitor_admin_id_missing_bool=False
+    missing_admin_id_dict={}
+    missing_admin_id_dict['admin_settings']={}
+    missing_admin_id_dict['admin_settings']['server']={}
+    missing_admin_id_dict['admin_settings']['server']['admin_id']=None
+
+    monitor_delete_season_folder_missing_bool=False
+    missing_delete_season_folder_dict={}
+    missing_delete_season_folder_dict['advanced_settings']={}
+    missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']={}
+    missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']['episode']={}
+    missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']['episode']['season']=None
+
+    monitor_delete_series_folder_missing_bool=False
+    missing_delete_series_folder_dict={}
+    missing_delete_series_folder_dict['advanced_settings']={}
+    missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']={}
+    missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']['episode']={}
+    missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']['episode']['series']=None
+
 #######################################################################################################
 
     error_found_in_mumc_config_yaml+=cfgCheckYAML_Version(cfg,init_dict)
@@ -336,6 +356,20 @@ def cfgCheckYAML(cfg,init_dict):
             config_dict['auth_key']=check
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n\tAn Auth Key (aka API Key) can be manually created via the GUI by navigating to \'Advanced\' > \'API Keys\'\n\tManually creating an API Key via the GUI requires the App Name for the key to be MUMC\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','admin_id')) == None)):
+        server_admin_id=check
+        if (
+            not ((isinstance(check,str)) and (check.isalnum()))
+        ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > admin_id must be an alphanumeric string\n'
+        else:
+            config_dict['admin_id']=check
+            missing_admin_id_dict['admin_settings']['server']['admin_id']=check
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > admin_id key is missing from mumc_config.yaml\n'
+        monitor_admin_id_missing_bool=True
+        missing_admin_id_dict['admin_settings']['server']['admin_id']=None
 
 #######################################################################################################
 
@@ -2749,6 +2783,32 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','delete_empty_folders','episode','season')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > season must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['episode_delete_season_folder']=check
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > season variable is missing from mumc_config.yaml\n'
+        monitor_delete_season_folder_missing_bool=True
+        missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']['episode']['season']=False
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','delete_empty_folders','episode','series')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > series must be a boolean\n\tValid values are true or false\n'
+        else:
+            config_dict['episode_delete_series_folder']=check
+    else:
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > series variable is missing from mumc_config.yaml\n'
+        monitor_delete_series_folder_missing_bool=True
+        missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']['episode']['series']=False
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
@@ -4062,7 +4122,16 @@ def cfgCheckYAML(cfg,init_dict):
     if (monitor_disabled_users_missing_bool):
         cfg=add_monitor_disabled_users_to_yaml(missing_monitor_disabled_users_dict,init_dict,cfg)
 
-    if (minimum_age_missing_bool or query_filter_missing_bool or dynamic_behavior_missing_bool or monitor_disabled_users_missing_bool):
+    if (monitor_admin_id_missing_bool):
+        cfg=add_admin_id_to_yaml(missing_admin_id_dict,init_dict,cfg)
+
+    if (monitor_delete_season_folder_missing_bool):
+        cfg=add_delete_season_folder_to_yaml(missing_delete_season_folder_dict,init_dict,cfg)
+
+    if (monitor_delete_series_folder_missing_bool):
+        cfg=add_delete_series_folder_to_yaml(missing_delete_series_folder_dict,init_dict,cfg)
+
+    if (minimum_age_missing_bool or query_filter_missing_bool or dynamic_behavior_missing_bool or monitor_disabled_users_missing_bool or monitor_delete_season_folder_missing_bool or monitor_delete_series_folder_missing_bool):
         #Update config version
         cfg['version']=get_script_version()
         #Make sure config path is used for the yaml_configurationUpdater()

@@ -66,6 +66,7 @@ def build_configuration_file(the_dict):
         #ask server for authentication key using administrator username and password
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         the_dict['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
+        the_dict['admin_settings']['server']['admin_id']=authenticated_user_data['User']['Id']
         '''
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         #get all existing labelled authentication keys

@@ -2,20 +2,23 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
 #get season and episode numbers; pad with zeros to make them equal lengths
+def format_season_or_episode_index(IndexNumber):
+
+    #convert index number to string
+    index_num_str = str(IndexNumber)
+
+    #Add leading zero to single digit index
+    if (len(index_num_str) == 1):
+        index_num_str = '0' + index_num_str
+
+    return(index_num_str)
+
+
+#get season and episode numbers; pad with zeros to make them equal lengths
 def get_season_episode(ParentIndexNumber,IndexNumber,the_dict):
 
-    #convert season number to string
-    season_num_str = str(ParentIndexNumber)
-    #convert episode number to string
-    episode_num_str = str(IndexNumber)
-
-    #Add leading zero to single digit seasons
-    if (len(season_num_str) == 1):
-        season_num_str = '0' + season_num_str
-
-    #Add leading zero to single digit episodes
-    if (len(episode_num_str) == 1):
-        episode_num_str = '0' + episode_num_str
+    season_num_str=format_season_or_episode_index(ParentIndexNumber)
+    episode_num_str=format_season_or_episode_index(IndexNumber)
 
     #Pad the season number or episode number with zeros until they are the same length
     while not (len(season_num_str) == len(episode_num_str)):

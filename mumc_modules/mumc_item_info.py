@@ -6,13 +6,13 @@ from mumc_modules.mumc_url import requestURL,build_request_message
 def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict):
     #Get additonal item information
 
-    url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags,RecursiveItemCount'
+    url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags,RecursiveItemCount,ChildCount,Type'
 
     req=build_request_message(url,the_dict)
 
     itemInfo=requestURL(req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
 
-    return(itemInfo)
+    return itemInfo
 
 
 #get additional channel/network/studio info needed to determine if item is favorite
@@ -27,7 +27,7 @@ def get_STUDIO_itemInfo(studioNetworkName,the_dict):
 
     itemInfo=requestURL(req, the_dict['DEBUG'], 'studio_network_info_for_' + str(studioNetworkName), the_dict['api_query_attempts'], the_dict)
 
-    return(itemInfo)
+    return itemInfo
 
 
 #get series item info from episode

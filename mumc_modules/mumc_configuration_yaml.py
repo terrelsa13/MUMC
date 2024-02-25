@@ -210,6 +210,9 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=3
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
 
+    config_data['advanced_settings']['delete_empty_folders']['episode']['season']=False
+    config_data['advanced_settings']['delete_empty_folders']['episode']['series']=False
+
     config_data['advanced_settings']['episode_control']['minimum_episodes']=0
     config_data['advanced_settings']['episode_control']['minimum_played_episodes']=0
     config_data['advanced_settings']['episode_control']['minimum_episodes_behavior']='Max Played Min Unplayed'

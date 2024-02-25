@@ -33,6 +33,3 @@ def sortDeleteLists(deleteItems_dict):
                 sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List))
 
     return deleteItems
-
-def sortLibSelection(libList):
-    return libList['selection']
