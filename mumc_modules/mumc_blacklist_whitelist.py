@@ -7,21 +7,18 @@ from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 #Determine if media item is whitelisted/blacklisted for the current user or for another user
 def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
 
-    LibraryID=item['mumc']['lib_id']
-    LibraryNetPath=item['mumc']['path']
-    LibraryPath=item['mumc']['network_path']
     library_matching_behavior=the_dict['admin_settings']['behavior']['matching']
 
     user_wlbllib_key_json=[]
-    user_wlbllib_netpath_json=[]
     user_wlbllib_path_json=[]
+    user_wlbllib_netpath_json=[]
     for looplist in user_info[checklist]:
         if (library_matching_behavior.casefold() == 'byid'):
             user_wlbllib_key_json.append(looplist['lib_id'])
-        elif (library_matching_behavior.casefold() == 'bynetworkpath'):
-            user_wlbllib_netpath_json.append(looplist['network_path'])
         elif (library_matching_behavior.casefold() == 'bypath'):
             user_wlbllib_path_json.append(looplist['path'])
+        elif (library_matching_behavior.casefold() == 'bynetworkpath'):
+            user_wlbllib_netpath_json.append(looplist['network_path'])
 
     item_isWhitelisted_isBlacklisted=False
     itemWhitelistedBlacklistedValue=''
@@ -31,30 +28,18 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
         appendTo_DEBUG_log("\n",1,the_dict)
 
     if (library_matching_behavior.casefold() == 'byid'):
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(LibraryID,','.join(map(str, user_wlbllib_key_json)),the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['lib_id'],user_wlbllib_key_json,the_dict)
     elif (library_matching_behavior.casefold() == 'bypath'):
-        if ("Path" in item):
-            ItemPath = item["Path"]
-        elif (("MediaSources" in item) and ("Path" in item["MediaSources"])):
-            ItemPath = item["MediaSources"]["Path"]
-        else:
-            ItemPath = LibraryPath
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(ItemPath,user_wlbllib_path_json,the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['path'],user_wlbllib_path_json,the_dict)
     elif (library_matching_behavior.casefold() == 'bynetworkpath'):
-        if ("Path" in item):
-            ItemNetPath = item["Path"]
-        elif (("MediaSources" in item) and ("Path" in item["MediaSources"])):
-            ItemNetPath = item["MediaSources"]["Path"]
-        else:
-            ItemNetPath = LibraryNetPath
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(ItemNetPath,user_wlbllib_netpath_json,the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['network_path'],user_wlbllib_netpath_json,the_dict)
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\nItem is whitelisted/blacklisted for this user: ' + str(item_isWhitelisted_isBlacklisted),2,the_dict)
         appendTo_DEBUG_log('\nMatching whitelisted/blacklisted value for this user is: ' + str(itemWhitelistedBlacklistedValue),2,the_dict)
-        appendTo_DEBUG_log('\nLibraryId is: ' + str(LibraryID),2,the_dict)
-        appendTo_DEBUG_log('\nLibraryPath is: ' + str(LibraryPath),2,the_dict)
-        appendTo_DEBUG_log('\nLibraryNetPath is: ' + str(LibraryNetPath),2,the_dict)
+        appendTo_DEBUG_log('\nitemLibraryID is: ' + str(item['mumc']['lib_id']),2,the_dict)
+        appendTo_DEBUG_log('\nitemLibraryPath is: ' + str(item['mumc']['path']),2,the_dict)
+        appendTo_DEBUG_log('\nitemLibraryNetPath is: ' + str(item['mumc']['network_path']),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted Keys are: ' + ','.join(map(str, user_wlbllib_key_json)),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted Paths are: ' + ','.join(map(str, user_wlbllib_path_json)),2,the_dict)
         appendTo_DEBUG_log('\nWhitelisted/Blacklisted NetworkPaths are: ' + ','.join(map(str, user_wlbllib_netpath_json)),2,the_dict)
