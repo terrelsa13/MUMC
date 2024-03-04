@@ -221,6 +221,11 @@ def setYAMLConfigSkeleton(the_dict):
 
     the_dict['advanced_settings']['whitetags']=[]
     the_dict['advanced_settings']['blacktags']=[]
+    
+    the_dict['advanced_settings']['delete_empty_folders']={}
+    the_dict['advanced_settings']['delete_empty_folders']['episode']={}
+    the_dict['advanced_settings']['delete_empty_folders']['episode']['season']=False
+    the_dict['advanced_settings']['delete_empty_folders']['episode']['series']=False
 
     the_dict['advanced_settings']['episode_control']={}
 

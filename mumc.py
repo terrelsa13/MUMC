@@ -11,6 +11,7 @@ from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
+from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 
 
 def MUMC():
@@ -71,6 +72,7 @@ def MUMC():
     if (cfg['all_media_disabled']):
         #output message letting user know none of the media is enabled to be monitored
         print_all_media_disabled(cfg)
+        deleteItems=[]
     else:
         #prepare for the main event; return dictionaries of media items per monitored user
         cfg=init_getMedia(cfg)
@@ -83,7 +85,10 @@ def MUMC():
 
         #output to console the items to be deleted; then delete media items
         print_and_delete_items(deleteItems,cfg)
-    
+
+    #cleanup empty season and series folders
+    season_series_folder_cleanup(deleteItems,cfg)
+
     if (cfg['DEBUG']):
         #show cache stats
         print_cache_stats(cfg)

@@ -644,6 +644,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                             #Add media item Id to tracking list so it is not processed more than once
                             var_dict['user_processed_item_Ids'].add(item['Id'])
 
+##########################################################################################################################################
+
                     var_dict['data_list_pos'] += 1
 
 ############# End Media #############

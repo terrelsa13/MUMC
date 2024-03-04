@@ -1,5 +1,5 @@
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_library_selection_type
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 #from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,create_labelled_authentication_key,get_MUMC_labelled_authentication_key
 from mumc_modules.mumc_versions import get_script_version
@@ -7,7 +7,7 @@ from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_co
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-from mumc_modules.mumc_userlib_builder import get_users_and_libraries
+from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 
 
@@ -66,6 +66,7 @@ def build_configuration_file(the_dict):
         #ask server for authentication key using administrator username and password
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         the_dict['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
+        the_dict['admin_settings']['server']['admin_id']=authenticated_user_data['User']['Id']
         '''
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         #get all existing labelled authentication keys
@@ -109,11 +110,6 @@ def build_configuration_file(the_dict):
         the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
         print('----------------------------------------------------------------------------------------')
 
-        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
-        the_dict['admin_settings']['behavior']['users']={}
-        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
-        print('----------------------------------------------------------------------------------------')
-
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
         print('----------------------------------------------------------------------------------------')
@@ -128,27 +124,18 @@ def build_configuration_file(the_dict):
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
 
-        #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
-        the_dict['admin_settings']['behavior']['users']={}
-        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
-        print('----------------------------------------------------------------------------------------')
-
-    #ask how to select users and libraries
-    '''
-    the_dict['user_library_selection_type']=get_user_library_selection_type(the_dict['admin_settings']['behavior']['list'])
-    '''
+    #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
+    the_dict['admin_settings']['behavior']['users']={}
+    the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
     print('----------------------------------------------------------------------------------------')
 
+    #ask how to select users and libraries
+    the_dict['user_library_selection_type']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])
+    print('----------------------------------------------------------------------------------------')
+
+    #run the user and library selector
     the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
-    '''
-    #run the user and library selector; ask user to select user and associate desired libraries to be monitored for each
-    if (the_dict['user_library_selection_type'] == 0):
-        the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
-    elif (the_dict['user_library_selection_type'] == 1):
-        the_dict['admin_settings']['users']=get_users_and_all_libraries(the_dict)
-    else:
-        the_dict['admin_settings']['users']=get_all_users_and_libraries(the_dict)
-    '''
+
     print('----------------------------------------------------------------------------------------')
 
     #set REMOVE_FILES
@@ -194,5 +181,5 @@ def build_configuration_file(the_dict):
 
 
 #get user input needed to edit the mumc_config.yaml file
-def edit_configuration_file(cfg):
-    build_configuration_file(cfg)
+def edit_configuration_file(the_dict):
+    build_configuration_file(the_dict)

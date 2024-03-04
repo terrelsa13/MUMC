@@ -238,3 +238,93 @@ def add_monitor_disabled_users_to_yaml(missing_monitor_disabled_users_dict,init_
     print_config_options_added_warning(init_dict,'admin_settings','behavior','users','monitor_disabled')
 
     return cfg
+
+
+def add_admin_id_to_yaml(missing_admin_id_dict,init_dict,cfg):
+    temp_dict={}
+    temp_dict['admin_settings']={}
+    temp_dict['admin_settings']['server']={}
+
+    temp_dict['admin_settings']['server']=copy.deepcopy(cfg['admin_settings']['server'])
+
+    #cfg['admin_settings']['server']=temp_dict['admin_settings']['server']
+    cfg['admin_settings']['server']['admin_id']=missing_admin_id_dict['admin_settings']['server']['admin_id']
+
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings'].update(cfg['advanced_settings'])
+
+    #Notify user of graceful config changes
+    #print_config_options_added_warning(init_dict,'admin_settings','server','admin_id')
+
+    return cfg
+
+def add_delete_season_folder_to_yaml(missing_delete_season_folder_dict,init_dict,cfg):
+    temp_dict=copy.deepcopy(cfg['advanced_settings'])
+    cfg['advanced_settings']={}
+    cfg['advanced_settings']['filter_statements']={}
+    cfg['advanced_settings']['filter_statements'].update(temp_dict['filter_statements'])
+    cfg['advanced_settings']['behavioral_statements']={}
+    cfg['advanced_settings']['behavioral_statements'].update(temp_dict['behavioral_statements'])
+    cfg['advanced_settings']['whitetags']=[]
+    cfg['advanced_settings']['whitetags'].extend(temp_dict['whitetags'])
+    cfg['advanced_settings']['blacktags']=[]
+    cfg['advanced_settings']['blacktags'].extend(temp_dict['blacktags'])
+    cfg['advanced_settings']['delete_empty_folders']={}
+    cfg['advanced_settings']['delete_empty_folders']['episode']={}
+    cfg['advanced_settings']['delete_empty_folders']['episode']['season']=missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']['episode']['season']
+    try:
+        cfg['advanced_settings']['delete_empty_folders']['episode']['series']=temp_dict['delete_empty_folders']['episode']['series']
+    except (KeyError):
+        pass
+    cfg['advanced_settings']['episode_control']={}
+    cfg['advanced_settings']['episode_control'].update(temp_dict['episode_control'])
+    cfg['advanced_settings']['trakt_fix']={}
+    cfg['advanced_settings']['trakt_fix'].update(temp_dict['trakt_fix'])
+    cfg['advanced_settings']['console_controls']={}
+    cfg['advanced_settings']['console_controls'].update(temp_dict['console_controls'])
+    cfg['advanced_settings']['UPDATE_CONFIG']=temp_dict['UPDATE_CONFIG']
+    cfg['advanced_settings']['REMOVE_FILES']=temp_dict['REMOVE_FILES']
+
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings'].update(cfg['advanced_settings'])
+
+    #Notify user of graceful config changes
+    print_config_options_added_warning(init_dict,'advanced_settings','delete_empty_folders','episode','season')
+
+    return cfg
+
+
+def add_delete_series_folder_to_yaml(missing_delete_series_folder_dict,init_dict,cfg):
+    temp_dict=copy.deepcopy(cfg['advanced_settings'])
+    cfg['advanced_settings']={}
+    cfg['advanced_settings']['filter_statements']={}
+    cfg['advanced_settings']['filter_statements'].update(temp_dict['filter_statements'])
+    cfg['advanced_settings']['behavioral_statements']={}
+    cfg['advanced_settings']['behavioral_statements'].update(temp_dict['behavioral_statements'])
+    cfg['advanced_settings']['whitetags']=[]
+    cfg['advanced_settings']['whitetags'].extend(temp_dict['whitetags'])
+    cfg['advanced_settings']['blacktags']=[]
+    cfg['advanced_settings']['blacktags'].extend(temp_dict['blacktags'])
+    cfg['advanced_settings']['delete_empty_folders']={}
+    cfg['advanced_settings']['delete_empty_folders']['episode']={}
+    try:
+        cfg['advanced_settings']['delete_empty_folders']['episode']['season']=temp_dict['delete_empty_folders']['episode']['season']
+    except (KeyError):
+        pass
+    cfg['advanced_settings']['delete_empty_folders']['episode']['series']=missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']['episode']['series']
+    cfg['advanced_settings']['episode_control']={}
+    cfg['advanced_settings']['episode_control'].update(temp_dict['episode_control'])
+    cfg['advanced_settings']['trakt_fix']={}
+    cfg['advanced_settings']['trakt_fix'].update(temp_dict['trakt_fix'])
+    cfg['advanced_settings']['console_controls']={}
+    cfg['advanced_settings']['console_controls'].update(temp_dict['console_controls'])
+    cfg['advanced_settings']['UPDATE_CONFIG']=temp_dict['UPDATE_CONFIG']
+    cfg['advanced_settings']['REMOVE_FILES']=temp_dict['REMOVE_FILES']
+
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings'].update(cfg['advanced_settings'])
+
+    #Notify user of graceful config changes
+    print_config_options_added_warning(init_dict,'advanced_settings','delete_empty_folders','episode','series')
+
+    return cfg

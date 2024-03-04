@@ -105,6 +105,8 @@ def cache_data_to_debug(the_dict):
 #print ending footer and time to console
 def print_footer_information(the_dict):
     strings_list_to_print=['']
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Done.')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Time Stamp End: ' + datetime.now().strftime('%Y%m%d%H%M%S'))
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator_'])
@@ -239,7 +241,7 @@ def print_and_delete_items(deleteItems,the_dict):
 
     #List items to be deleted
     strings_list_to_print=['']
-    strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dict)
+    strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict)
 
     print_byType(strings_list_to_print[0],print_summary_header,the_dict,summary_header_format)
 
@@ -248,44 +250,80 @@ def print_and_delete_items(deleteItems,the_dict):
 
             strings_list_to_print=['']
 
-            if (not(item['Id'] in deleteItems_Tracker)):
+            if (not (item['Id'] in deleteItems_Tracker)):
                 deleteItems_Tracker.append(item['Id'])
-                if item['Type'] == 'Movie':
+
+                if (item['Type'] == 'Movie'):
                     item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    
                     #Delete media item
                     delete_media_item(item['Id'],the_dict)
+
                     #Print output for deleted media item
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
                     print_byType(strings_list_to_print[0],print_movie_summary,the_dict,movie_summary_format)
-                elif item['Type'] == 'Episode':
+                elif (item['Type'] == 'Episode'):
                     try:
                         item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber'],the_dict) + ' - ' + item['Name'] + ' - ' + item['Id']
                     except (KeyError, IndexError):
                         item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
                         if (the_dict['DEBUG']):
                             appendTo_DEBUG_log('Error encountered - Delete Episode: \n\n' + str(item),2,the_dict)
+
                     #Delete media item
                     delete_media_item(item['Id'],the_dict)
+
                     #Print output for deleted media item
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
                     print_byType(strings_list_to_print[0],print_episode_summary,the_dict,episode_summary_format)
-                elif item['Type'] == 'Audio':
+                elif (item['Type'] == 'Audio'):
                     item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Artists'][0] + ' ' + item['Album'] + ' ' + str(item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
+
                     #Delete media item
                     delete_media_item(item['Id'],the_dict)
+
                     #Print output for deleted media item
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
                     print_byType(strings_list_to_print[0],print_audio_summary,the_dict,audio_summary_format)
-                elif item['Type'] == 'AudioBook':
-                    #if (the_dict['DEBUG']):
+                elif (item['Type'] == 'AudioBook'):
                     item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Artists'][0] + ' ' + item['Album'] + ' ' + str(item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
+
                     #Delete media item
                     delete_media_item(item['Id'],the_dict)
+
                     #Print output for deleted media item
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
                     print_byType(strings_list_to_print[0],print_audiobook_summary,the_dict,audiobook_summary_format)
-                else: # item['Type'] == 'Unknown':
+                elif (item['Type'] == 'Season'):
+                    try:
+                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    except (KeyError, IndexError):
+                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                        if (the_dict['DEBUG']):
+                            appendTo_DEBUG_log('Error encountered - Delete Season Folder: \n\n' + str(item),2,the_dict)
+
+                    #Delete media item
+                    delete_media_item(item['Id'],the_dict)
+
+                    #Print output for deleted media item
+                    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
+                    print_byType(strings_list_to_print[0],print_episode_summary,the_dict,episode_summary_format)
+                elif (item['Type'] == 'Series'):
+                    try:
+                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    except (KeyError, IndexError):
+                        if (the_dict['DEBUG']):
+                            appendTo_DEBUG_log('Error encountered - Delete Series Folder: \n\n' + str(item),2,the_dict)
+
+                    #Delete media item
+                    delete_media_item(item['Id'],the_dict)
+
+                    #Print output for deleted media item
+                    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,item_output_details)
+                    print_byType(strings_list_to_print[0],print_episode_summary,the_dict,episode_summary_format)
+                else: #(item['Type'] == 'Unknown'):
                     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Not Able To Delete Unknown Media Type')
+
                     print_byType(strings_list_to_print[0],True,the_dict,the_dict['formatting'])
     else:
         strings_list_to_print=['']
@@ -295,8 +333,6 @@ def print_and_delete_items(deleteItems,the_dict):
     strings_list_to_print=['']
 
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Done.')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
     print_byType(strings_list_to_print[0],print_summary_header,the_dict,summary_header_format)
@@ -484,7 +520,7 @@ def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
 
 
 #print build config how to delete files info
-def build_config_setup_to_delete_media(strings_list_to_print,deleteItems,the_dict):
+def build_config_setup_to_delete_media(strings_list_to_print,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Summary Of Deleted Media:')
 

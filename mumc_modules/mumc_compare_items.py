@@ -56,7 +56,7 @@ def does_index_exist(item, indexvalue, the_dict):
 #Determine if there is a matching item or Determine if an item starts with the other
 def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
 
-    #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
+    #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
     if (isinstance(item_one,list)):
         for item1 in item_one:
             if (not (item1 == None)):
@@ -68,7 +68,7 @@ def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
         item_one_list.append(item_one)
         item_one=item_one_list
 
-    #for Ids in Microsoft Windows, replace backslashes in Ids with forward slash
+    #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
     if (isinstance(item_two,list)):
         for item2 in item_two:
             if (not (item2 == None)):

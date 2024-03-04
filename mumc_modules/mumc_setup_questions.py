@@ -113,7 +113,7 @@ def get_library_setup_behavior(library_setup_behavior=None):
             elif (library_setup_behavior.casefold() == 'whitelist'):
                 print('')
                 print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
-        behavior=input('Choose how the script will use the chosen libraries. (default ' + defaultbehavior + '): ')
+        behavior=input('Choose how the script will use the chosen libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -144,8 +144,13 @@ def get_library_matching_behavior(library_matching_behavior=None):
                 (library_matching_behavior.casefold() == 'bypath') or
                 (library_matching_behavior.casefold() == 'bynetworkpath')):
                 print('')
-                print('Script previously setup to match media items to libraries ' + library_matching_behavior + '.')
-        behavior=input('Choose how the script will match media items to libraries. (default ' + defaultbehavior + '): ')
+                if (library_matching_behavior.casefold() == 'byid'):
+                    print('Script previously setup to match media items to libraries 0 - ' + library_matching_behavior + '.')
+                elif (library_matching_behavior.casefold() == 'bypath'):
+                    print('Script previously setup to match media items to libraries 1 - ' + library_matching_behavior + '.')
+                else: #(library_matching_behavior.casefold() == 'bynetworkpath'):
+                    print('Script previously setup to match media items to libraries 2 - ' + library_matching_behavior + '.')
+        behavior=input('Choose how the script will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -220,9 +225,10 @@ def get_show_disabled_users():
     defaultvalue=True
     valid_value=False
     while (valid_value == False):
-        print('Decide if users disabled in the GUI should be shown.')
-        print('0 - Hide disabled users\n1 - Show disabled users')
-        selection=input('Enter number (default show disabled users): ')
+        print('Decide if users disabled in the GUI should be considered.')
+        print('0 - Hide disabled users')
+        print('1 - Show disabled users')
+        selection=input('Enter number (default 1 - Show disabled users): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
@@ -235,15 +241,18 @@ def get_show_disabled_users():
     return(defaultvalue)
 
 
-def get_user_library_selection_type(library_setup_behavior):
+def get_user_and_library_selection_type(library_setup_behavior):
     defaultvalue=0
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
-        print('0 - Select users and libraries; (i.e. Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user)')
-        print('1 - Select users; (i.e. All libraries will be ' + str(library_setup_behavior) + 'ed for the selected users)')
-        print('2 - Select libraries; (i.e. Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users)')
-        selection=input('Enter number (default ' + str(defaultvalue) + '): ')
+        print('0 - Select users and libraries.')
+        print('    Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
+        print('1 - Select users only.')
+        print('    Selected users will have all libraries ' + str(library_setup_behavior) + 'ed according to their access policy.')
+        print('2 - Select libraries only.')
+        print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
+        selection=input('Enter number (default 0 - Select users and libraries): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
