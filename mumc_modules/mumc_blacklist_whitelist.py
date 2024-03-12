@@ -7,7 +7,7 @@ from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 def get_opposing_listing_type(listing_type):
     if (listing_type == 'blacklist'):
         return 'whitelist'
-    else: #(the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+    else: #(listing_type == 'whitelist'):
         return 'blacklist'
 
 
