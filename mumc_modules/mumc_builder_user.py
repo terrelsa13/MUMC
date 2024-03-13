@@ -113,7 +113,7 @@ def build_library_data_for_selected_user(the_dict):
     temp_the_dict['library_info_print_opposing_list']=[]
     temp_the_dict['library_info_print_matching_list']=[]
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     user_index=the_dict['user_selection_int']
@@ -253,7 +253,7 @@ def is_valid_user_selected(the_dict):
 def save_library_data_for_selected_user(the_dict):
     temp_the_dict={}
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     user_index=the_dict['user_selection_int']
@@ -282,7 +282,7 @@ def save_library_data_for_selected_user(the_dict):
 
 def update_fake_user_dict(the_dict):
     fake_user_index=0
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
     the_dict['fake_user_dict'][fake_user_index][opposing_listing_type].clear()
     the_dict['fake_user_dict'][fake_user_index][matching_listing_type].clear()

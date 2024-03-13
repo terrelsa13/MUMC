@@ -77,7 +77,7 @@ def create_library_path_id_dicts(the_dict):
 
 
 def update_existing_user_libraries(the_dict):
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     for prev_user in the_dict['prev_users_dict']:
@@ -106,7 +106,7 @@ def update_existing_user_libraries(the_dict):
 
 
 def remove_libraries_from_existing_users(the_dict):
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     for existing_user in the_dict['prev_users_dict']:
@@ -143,7 +143,7 @@ def remove_subfolders_from_existing_users(the_dict):
 
     temp_the_dict={}
     temp_the_dict['prev_users_dict']=copy.deepcopy(the_dict['prev_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
     
     prev_users_dict_len=0
@@ -187,7 +187,7 @@ def remove_nonexisting_subfolders_from_existing_users(the_dict):
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
     temp_the_dict['prev_users_dict']=copy.deepcopy(the_dict['prev_users_dict'])
 
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     for user_info in the_dict['prev_users_dict']:
@@ -229,7 +229,7 @@ def remove_nonexisting_subfolders_from_existing_users(the_dict):
 
 
 def add_libraries_to_existing_users(the_dict):
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     for existing_user in the_dict['prev_users_dict']:
@@ -279,7 +279,7 @@ def add_libraries_to_new_users(the_dict):
 
     temp_the_dict={}
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
 
     for existing_user in the_dict['all_users_dict']:
         existing_user_index=the_dict['all_users_dict'].index(existing_user)
@@ -320,7 +320,7 @@ def add_selection_and_selected_keys(the_dict):
     temp_the_dict={}
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
     temp_the_dict['prev_users_dict']=copy.deepcopy(the_dict['prev_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     prev_users_dict_len=0
@@ -490,7 +490,7 @@ def remove_key_from_blacklist_whitelist(the_key,the_dict):
     temp_the_dict['admin_settings']={}
     temp_the_dict['admin_settings']['users']=the_dict['admin_settings']['users'].copy()
 
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     for user_data in temp_the_dict['admin_settings']['users']:
@@ -518,7 +518,7 @@ def pre_build_all_library_data(the_dict):
     temp_the_dict['fake_user_dict']=[]
     temp_the_dict['fake_user_dict'].append({'user_id':'0123456789abcdef0123456789abcdef','user_name':'fake_user','whitelist':[],'blacklist':[]})
 
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     user_index=0
 
     for lib_data in the_dict['all_libraries_list']:
@@ -545,7 +545,7 @@ def build_all_library_data(the_dict):
     temp_the_dict['library_info_print_matching_list']=[]
     temp_the_dict['fake_user_dict']=copy.deepcopy(the_dict['fake_user_dict'])
 
-    opposing_listing_type=get_opposing_listing_type(he_dict['admin_settings']['behavior']['list'])
+    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
     matching_listing_type=the_dict['admin_settings']['behavior']['list']
     user_index=0
 
