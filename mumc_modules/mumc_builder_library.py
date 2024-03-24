@@ -1,4 +1,5 @@
 import copy
+import uuid
 from mumc_modules.mumc_compare_items import keys_exist
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
@@ -12,6 +13,8 @@ def create_library_dicts(the_dict):
     the_dict['all_library_paths_list']=[]
     the_dict['all_library_network_paths_list']=[]
     the_dict['all_library_collection_types_list']=[]
+    the_dict['all_library_path_ids_list']=[]
+    guid_list=[]
 
     #Emby and Jellyfin use different key-names for their libraryId
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
@@ -42,37 +45,25 @@ def create_library_dicts(the_dict):
                 temp_lib_dict['network_path']=None
             temp_lib_dict['lib_enabled']=True
 
+            if ((not (temp_lib_dict['collection_type'] == None)) and ((not (temp_lib_dict['path'] == None)) or (not (temp_lib_dict['network_path'] == None)))):
+                #generate guid
+                guid=str(uuid.uuid4().hex)
+                #check if we have already generated this guid for a subfolder
+                while (guid in guid_list):
+                    #if we have; create a new guid and check again
+                    guid=str(uuid.uuid4().hex)
+                #save guid to tracking list
+                guid_list.append(guid)
+
             the_dict['all_libraries_list'].append(copy.deepcopy(temp_lib_dict))
             the_dict['all_library_ids_list'].append(temp_lib_dict['lib_id'])
             the_dict['all_library_paths_list'].append(temp_lib_dict['path'])
             the_dict['all_library_network_paths_list'].append(temp_lib_dict['network_path'])
             the_dict['all_library_collection_types_list'].append(temp_lib_dict['collection_type'])
+            the_dict['all_library_path_ids_list'].append(guid)
 
     the_dict.pop('all_libraries')
     
-    return the_dict
-
-
-def create_library_path_id_dicts(the_dict):
-
-    the_dict['all_library_path_ids_list']=[]
-
-    for path_str in the_dict['all_library_paths_list']:
-        path_found=False
-        for lib_data in the_dict['all_library_subfolders']:
-            if (not (path_found)):
-                for folder_data in lib_data['SubFolders']:
-                    if (folder_data['Path'] == path_str):
-                        the_dict['all_library_path_ids_list'].append(folder_data['Id'])
-                        path_found=True
-                        break
-            else:
-                break
-        if (not (path_found)):
-            the_dict['all_library_path_ids_list'].append(None)
-
-    the_dict.pop('all_library_subfolders')
-
     return the_dict
 
 
