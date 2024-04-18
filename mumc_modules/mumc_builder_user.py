@@ -1,5 +1,4 @@
 import copy
-from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
 
 
 def create_user_dicts(the_dict):
@@ -113,21 +112,19 @@ def build_library_data_for_selected_user(the_dict):
     temp_the_dict['library_info_print_opposing_list']=[]
     temp_the_dict['library_info_print_matching_list']=[]
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-    matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     user_index=the_dict['user_selection_int']
 
-    for lib_data in temp_the_dict['all_users_dict'][user_index][matching_listing_type]:
-        lib_index=temp_the_dict['all_users_dict'][user_index][matching_listing_type].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index].copy())
+    for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]:
+        lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].index(lib_data)
+        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
         temp_the_dict['library_info_print_opposing_list'].append(None)
-        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][matching_listing_type][lib_index].copy())
+        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
 
-    for lib_data in temp_the_dict['all_users_dict'][user_index][opposing_listing_type]:
-        lib_index=temp_the_dict['all_users_dict'][user_index][opposing_listing_type].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index].copy())
-        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][opposing_listing_type][lib_index].copy())
+    for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']]:
+        lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].index(lib_data)
+        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
+        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
         temp_the_dict['library_info_print_matching_list'].append(None)
     
     the_dict['library_info_print_all_list']=temp_the_dict['library_info_print_all_list']
@@ -137,7 +134,7 @@ def build_library_data_for_selected_user(the_dict):
     return the_dict
 
 
-def filter_library_data_for_selected_user(the_dict):
+def filter_library_folder_data_for_selected_user(the_dict):
 
     temp_the_dict={}
     temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])
@@ -160,6 +157,31 @@ def filter_library_data_for_selected_user(the_dict):
     return the_dict
 
 
+def jellyfin_filter_library_data_for_selected_user(the_dict):
+    #check library policy for each user
+    #if library is not enabled for user; remove said library
+    temp_the_dict={}
+    temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])
+
+    for path_id in the_dict['all_library_ids_list']:
+        path_index=temp_the_dict['all_library_ids_list'].index(path_id)
+        if (the_dict['all_users'][the_dict['user_selection_int']]['Policy']['EnableAllFolders']):
+            break
+        else:
+            if (not (path_id in the_dict['all_users'][the_dict['user_selection_int']]['Policy']['EnabledFolders'])):
+                the_dict['library_info_print_all_list'][path_index]=False
+                the_dict['library_info_print_opposing_list'][path_index]=False
+                the_dict['library_info_print_matching_list'][path_index]=False
+            temp_the_dict['all_library_ids_list'][path_index]=None        
+
+    while False in the_dict['library_info_print_all_list']:
+        the_dict['library_info_print_all_list'].remove(False)
+        the_dict['library_info_print_opposing_list'].remove(False)
+        the_dict['library_info_print_matching_list'].remove(False)
+
+    return the_dict
+
+
 def print_library_data_for_selected_user(the_dict):
 
     if (the_dict['user_valid_selection']):
@@ -169,7 +191,7 @@ def print_library_data_for_selected_user(the_dict):
             monitor_type='monitored for'
         else: #(listing_type == 'whitelist'):
             monitor_type='excluded from'
-        message='Enter number of the library folder(s) to ' + str(listing_type) + ' (aka monitor) for the selected user.'
+        message='Enter number of the library folder(s) to ' + str(listing_type) + ' for the selected user.'
         message+='\nMedia in ' + str(listing_type) + 'ed library folder(s) will be ' + str(monitor_type) + ' deletion.'
 
     for lib_info in the_dict['library_info_print_all_list']:
@@ -253,19 +275,17 @@ def is_valid_user_selected(the_dict):
 def save_library_data_for_selected_user(the_dict):
     temp_the_dict={}
     temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-    matching_listing_type=the_dict['admin_settings']['behavior']['list']
 
     user_index=the_dict['user_selection_int']
 
-    temp_the_dict['all_users_dict'][user_index][opposing_listing_type]=[]
-    temp_the_dict['all_users_dict'][user_index][matching_listing_type]=[]
+    temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']]=[]
+    temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]=[]
 
     for lib_data in the_dict['library_info_print_all_list']:
         if (lib_data['selected']):
-            temp_the_dict['all_users_dict'][user_index][matching_listing_type].append(lib_data)
+            temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].append(lib_data)
         else:
-            temp_the_dict['all_users_dict'][user_index][opposing_listing_type].append(lib_data)
+            temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].append(lib_data)
 
     the_dict['all_users_dict']=temp_the_dict['all_users_dict']
 
@@ -282,18 +302,16 @@ def save_library_data_for_selected_user(the_dict):
 
 def update_fake_user_dict(the_dict):
     fake_user_index=0
-    opposing_listing_type=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-    matching_listing_type=the_dict['admin_settings']['behavior']['list']
-    the_dict['fake_user_dict'][fake_user_index][opposing_listing_type].clear()
-    the_dict['fake_user_dict'][fake_user_index][matching_listing_type].clear()
+    the_dict['fake_user_dict'][fake_user_index][the_dict['opposing_listing_type']].clear()
+    the_dict['fake_user_dict'][fake_user_index][the_dict['matching_listing_type']].clear()
 
     for lib_info in the_dict['library_info_print_opposing_list']:
         if (not (lib_info == None)):
-            the_dict['fake_user_dict'][fake_user_index][opposing_listing_type].append(lib_info)
+            the_dict['fake_user_dict'][fake_user_index][the_dict['opposing_listing_type']].append(lib_info)
 
     for lib_info in the_dict['library_info_print_matching_list']:
         if (not (lib_info == None)):
-            the_dict['fake_user_dict'][fake_user_index][matching_listing_type].append(lib_info)
+            the_dict['fake_user_dict'][fake_user_index][the_dict['matching_listing_type']].append(lib_info)
 
     return the_dict
 

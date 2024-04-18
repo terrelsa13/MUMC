@@ -9,6 +9,7 @@ from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
+from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
 
 
 #get user input needed to build or edit the mumc_config.yaml file
@@ -117,6 +118,8 @@ def build_configuration_file(the_dict):
         #ask user how they want to choose libraries/folders
         #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
         the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
+        the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
+        the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
