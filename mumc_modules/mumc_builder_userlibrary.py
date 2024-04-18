@@ -88,6 +88,8 @@ def select_users_select_libraries(the_dict):
                 the_dict['library_valid_selection']=False
                 the_dict=is_valid_library_selected(the_dict)
                 if (the_dict['library_valid_selection']):
+                    if (not (isEmbyServer(the_dict['admin_settings']['server']['brand']))):
+                        the_dict=jellyfin_autoselect_folders_with_common_libraries(the_dict)
                     the_dict=swap_libraries(the_dict)
             the_dict=save_library_data_for_selected_user(the_dict)
 
