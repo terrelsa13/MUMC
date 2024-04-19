@@ -509,10 +509,10 @@ def remove_key_from_blacklist_whitelist(the_key,the_dict):
 
     for user_data in temp_the_dict['admin_settings']['users']:
         for library_data in user_data:
-            if (library_data == opposing_listing_type):
-                thislist=opposing_listing_type
-            elif (library_data == matching_listing_type):
-                thislist=matching_listing_type
+            if (library_data == the_dict['opposing_listing_type']):
+                thislist=the_dict['opposing_listing_type']
+            elif (library_data == the_dict['matching_listing_type']):
+                thislist=the_dict['matching_listing_type']
             else:
                 thislist=None
 
