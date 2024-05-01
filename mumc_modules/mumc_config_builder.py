@@ -93,8 +93,6 @@ def build_configuration_file(the_dict):
 
         #ask user how they want to choose libraries/folders
         the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior()
-        the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-        the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
@@ -120,14 +118,16 @@ def build_configuration_file(the_dict):
         #ask user how they want to choose libraries/folders
         #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
         the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
-        the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-        the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
         #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
+
+    #store the opposing and matching listing types to be used in get_users_and_libraries()
+    the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
+    the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
 
     #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
     the_dict['admin_settings']['behavior']['users']={}
