@@ -93,6 +93,8 @@ def build_configuration_file(the_dict):
 
         #ask user how they want to choose libraries/folders
         the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior()
+        the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
+        the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
