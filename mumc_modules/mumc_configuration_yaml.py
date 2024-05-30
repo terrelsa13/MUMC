@@ -1,3 +1,4 @@
+import copy
 from mumc_modules.mumc_output import save_yaml_config
 
 
@@ -6,10 +7,7 @@ def filterYAMLConfigKeys(dirty_dict,*clean_keys):
     return {cleanKey:dirty_dict[cleanKey] for cleanKey in clean_keys}
 
 
-def yaml_configurationBuilder(the_dict):
-
-    #strip out uneccessary data
-    config_data=filterYAMLConfigKeys(the_dict,'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+def yaml_configurationLayout(config_data,server_brand):
 
     #start building config yaml
     config_data['basic_settings']['filter_statements']['movie']['played']['condition_days']=-1
@@ -36,7 +34,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['basic_settings']['filter_statements']['audio']['created']['count']=1
     config_data['basic_settings']['filter_statements']['audio']['created']['behavioral_control']=True
 
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['basic_settings']['filter_statements']['audiobook']['played']['condition_days']=-1
         config_data['basic_settings']['filter_statements']['audiobook']['played']['count_equality']='>='
         config_data['basic_settings']['filter_statements']['audiobook']['played']['count']=1
@@ -63,7 +61,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=False
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
 
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
@@ -173,7 +171,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['action_control']=3
     config_data['advanced_settings']['behavioral_statements']['audio']['blacklisted']['dynamic_behavior']=False
 
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']='keep'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['user_conditional']='any'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['played_conditional']='ignore'
@@ -220,7 +218,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']=True
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['episode']=True
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audio']=True
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=True
 
     config_data['advanced_settings']['console_controls']['headers']['script']['show']=True
@@ -308,7 +306,7 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['font']['style']=''
     config_data['advanced_settings']['console_controls']['audio']['summary']['formatting']['background']['color']=''
 
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['console_controls']['audiobook']['delete']['show']=True
         config_data['advanced_settings']['console_controls']['audiobook']['delete']['formatting']['font']['color']=''
         config_data['advanced_settings']['console_controls']['audiobook']['delete']['formatting']['font']['style']=''
@@ -333,6 +331,10 @@ def yaml_configurationBuilder(the_dict):
 
     config_data['advanced_settings']['REMOVE_FILES']=False
 
+    config_data['admin_settings']['behavior']['list']='blacklist'
+    config_data['admin_settings']['behavior']['matching']='byId'
+    config_data['admin_settings']['behavior']['users']['monitor_disabled']=True
+
     config_data['admin_settings']['api_controls']['attempts']=4
     config_data['admin_settings']['api_controls']['item_limit']=25
 
@@ -344,8 +346,35 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['episode']['favorited'].pop('extra')
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audio']['favorited'].pop('extra')
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited'].pop('extra')
+
+    return config_data
+
+
+def yaml_configurationBuilder(the_dict):
+
+    #strip out uneccessary data
+    config_data=filterYAMLConfigKeys(the_dict,'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+
+    #start building config yaml
+    config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
+
+    config_data['basic_settings']['filter_statements'].pop('audio')
+    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+        config_data['basic_settings']['filter_statements'].pop('audiobook')
+    config_data['advanced_settings'].pop('filter_statements')
+    config_data['advanced_settings'].pop('behavioral_statements')
+    config_data['advanced_settings'].pop('whitetags')
+    config_data['advanced_settings'].pop('blacktags')
+    config_data['advanced_settings'].pop('delete_empty_folders')
+    config_data['advanced_settings'].pop('episode_control')
+    config_data['advanced_settings'].pop('trakt_fix')
+    config_data['advanced_settings'].pop('console_controls')
+    config_data['advanced_settings'].pop('UPDATE_CONFIG')
+    config_data['admin_settings'].pop('behavior')
+    config_data['admin_settings'].pop('api_controls')
+    config_data['admin_settings'].pop('cache')
 
     #save yaml config file
     save_yaml_config(config_data,str(the_dict['mumc_path']) + '/' + the_dict['config_file_name_yaml'])

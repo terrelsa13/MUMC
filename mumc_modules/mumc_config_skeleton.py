@@ -372,6 +372,10 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['admin_settings']['server']={}
 
     the_dict['admin_settings']['behavior']={}
+    the_dict['admin_settings']['behavior']['list']=None
+    the_dict['admin_settings']['behavior']['matching']=None
+    the_dict['admin_settings']['behavior']['users']={}
+    the_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
     the_dict['admin_settings']['users']=[]
 

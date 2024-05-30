@@ -10,9 +10,9 @@ from mumc_modules.mumc_console_info import print_informational_header,print_star
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_output import get_current_directory,delete_debug_log
-from mumc_modules.mumc_yaml_check import cfgCheckYAML
+from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
-
+from mumc_modules.mumc_config_default import create_default_config,merge_configuration
 
 def MUMC():
     #inital dictionary setup
@@ -27,13 +27,32 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
+    #remember original config for when user wants to update existing config file
+    cfg_orig=copy.deepcopy(cfg)
+
+    pre_cfgCheckYAML(cfg)
+
+    #create default config file
+    default_config=create_default_config(cfg['admin_settings']['server']['brand'])
+
+    default_config['mumc_path']=init_dict['mumc_path']
+    default_config['debug_file_name']=init_dict['debug_file_name']
+
+    #merge user config into default config
+    cfg=merge_configuration(default_config,cfg)
+
+    #delete unused variable
+    del default_config
+
     #get and check config values are what we expect them to be
-    cfg=cfgCheckYAML(cfg,init_dict)
+    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(init_dict)
-    init_dict.clear()
+
+    #delete unused variable
+    del init_dict
 
     #update cache variables with values specified in the config file
     cfg['cached_data'].updateCacheVariables(cfg)
@@ -41,7 +60,7 @@ def MUMC():
     #check if user wants to update the existing config file
     if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
         #check if user intentionally wants to update the config
-        edit_configuration_file(cfg)
+        edit_configuration_file(cfg,cfg_orig)
 
         if (cfg['DEBUG']):
             #show cache stats
@@ -53,6 +72,10 @@ def MUMC():
 
         #exit gracefully after updating config
         exit(0)
+    else:
+        #delete unused variables
+        del cmdopt_dict
+        del cfg_orig
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
@@ -83,11 +106,16 @@ def MUMC():
         #sort lists of items to be deleted into a single list
         deleteItems=sortDeleteLists(deleteItems_dict)
 
+        del deleteItems_dict
+
         #output to console the items to be deleted; then delete media items
         print_and_delete_items(deleteItems,cfg)
 
     #cleanup empty season and series folders
     season_series_folder_cleanup(deleteItems,cfg)
+    
+    #delete unused variable
+    del deleteItems
 
     if (cfg['DEBUG']):
         #show cache stats
@@ -102,6 +130,9 @@ def MUMC():
 
     #clear cache
     cfg['cached_data'].wipeCache()
+
+    #delete unused variable
+    del cfg
 
 
 ############# START OF SCRIPT #############

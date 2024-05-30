@@ -7,19 +7,25 @@ from mumc_modules.mumc_yaml_edits import add_minium_age_to_yaml,add_query_filter
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
-    config_version=get_semantic_version_parts(cfg['version'])
-    min_config_version=get_semantic_version_parts(init_dict['min_config_version'])
 
-    config_version_ok=True
+    if (cfg['version'] == ''):
+        return 'ConfigVersionError: Config version is blank: \'\''\
+                '\n Please use a config with a version greater than or equal to: '\
+                + init_dict['min_config_version'] + ' or create a new config \n'
+    else:
+        config_version=get_semantic_version_parts(cfg['version'])
+        min_config_version=get_semantic_version_parts(init_dict['min_config_version'])
 
-    if (config_version['major'] < min_config_version['major']):
-        config_version_ok=False
-    elif (config_version['major'] == min_config_version['major']):
-        if (config_version['minor'] < min_config_version['minor']):
+        config_version_ok=True
+
+        if (config_version['major'] < min_config_version['major']):
             config_version_ok=False
-        elif (config_version['minor'] == min_config_version['minor']):
-            if (config_version['patch'] < min_config_version['patch']):
+        else:
+            if (config_version['minor'] < min_config_version['minor']):
                 config_version_ok=False
+            else:
+                if (config_version['patch'] < min_config_version['patch']):
+                    config_version_ok=False
 
     if (not (config_version_ok)):
         return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
@@ -43,21 +49,21 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                 if (user_check in check_irt['user_id']):
                     user_found+=1
             if (user_found == 0):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' does not match any user from user_keys\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' does not match any user from user_keys\n'
             if (user_found > 1):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' is seen more than once\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' is seen more than once\n'
             #Check user_id is string
             if not (isinstance(check_irt['user_id'], str)):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' the user_id is not a string for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_id is not a string for at least one user\n'
             else:
                 #Check user_id is 32 character long alphanumeric
                 if not (
                     (check_irt['user_id'].isalnum()) and
                     (len(check_irt['user_id']) == 32)
                 ):
-                    error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' + at least one user_id is not a 32-character alphanumeric string\n'
+                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' + at least one user_id is not a 32-character alphanumeric string\n'
         else:
-            error_found_in_mumc_config_yaml+='NameError: In ' + config_var_name + ' the user_id key is missing for at least one user\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_id key is missing for at least one user\n'
 
 
         #Check if user_name exists
@@ -69,30 +75,30 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                 if (user_check in check_irt['user_name']):
                     user_found+=1
             if (user_found == 0):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' does not match any user from user_keys\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' does not match any user from user_keys\n'
             if (user_found > 1):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' is seen more than once\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' is seen more than once\n'
             #Check user_name is string
             if not (isinstance(check_irt['user_name'], str)):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' the user_name is not a string for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_name is not a string for at least one user\n'
         else:
-            error_found_in_mumc_config_yaml+='NameError: In ' + config_var_name + ' the user_name is missing for at least one user\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_name is missing for at least one user\n'
 
         #Check if whitelist exists
         if ('whitelist' in check_irt):
             #Check whitelist is string
             if not (isinstance(check_irt['whitelist'], list)):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' the whitelist is not a string for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the whitelist is not a string for at least one user\n'
         else:
-            error_found_in_mumc_config_yaml+='NameError: In ' + config_var_name + ' the whitelist is missing for at least one user\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > whitelist is missing for at least one user\n'
 
         #Check if blacklist exists
         if ('blacklist' in check_irt):
             #Check blacklist is string
             if not (isinstance(check_irt['blacklist'], list)):
-                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' the blacklist is not a string for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the blacklist is not a string for at least one user\n'
         else:
-            error_found_in_mumc_config_yaml+='NameError: In ' + config_var_name + ' the blacklist is missing for at least one user\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
 
         #Get number of elements
         for num_elements in check_irt:
@@ -113,53 +119,53 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['lib_id']
                             #Check lib_id is alphanumeric string
                             if (not (check_item.isalnum() or check_item.isnumeric() or (check_item == ''))):
-                                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > lib_id: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > lib_id: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('collection_type' in libinfo):
                             collection_type_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['collection_type']
                             #Check collection_type is string
                             if (not (isinstance(check_item,str) or (check_item == ''))):
-                                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > collection_type: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > collection_type: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('path' in libinfo):
                             path_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['path']
                             #Check path is string
                             if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('network_path' in libinfo):
                             network_path_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['network_path']
                             #Check network_path is string
                             if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('lib_enabled' in libinfo):
                             lib_enabled_found += 1
                             check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['lib_enabled']
                             #Check lib_enabled is boolean
                             if (not (isinstance(check_item,bool))):
-                                error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > enabled: ' + str(check_item) + ' is not an expected boolean value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > enabled: ' + str(check_item) + ' is not an expected boolean value\n'
 
                     if (lib_id_found == 0):
-                        error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_id is missing\n'
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_id is missing\n'
 
                     if (collection_type_found == 0):
-                        error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key collection_type is missing\n'
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key collection_type is missing\n'
 
                     if (network_path_found == 0):
-                        error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key network_path is missing\n'
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key network_path is missing\n'
 
                     if (path_found == 0):
-                        error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key path is missing\n'
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key path is missing\n'
 
                     if (lib_enabled_found == 0):
-                        error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_enabled is missing\n'
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_enabled is missing\n'
 
                 else:
-                    error_found_in_mumc_config_yaml+='ValueError: ' + config_var_name + ' user ' + check_irt['user_id'] + ' key'+ str(num_elements) +' does not exist\n'
+                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user ' + check_irt['user_id'] + ' key'+ str(num_elements) +' does not exist\n'
     return(error_found_in_mumc_config_yaml)
 
 
@@ -355,7 +361,8 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['auth_key']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n\tAn Auth Key (aka API Key) can be manually created via the GUI by navigating to \'Advanced\' > \'API Keys\'\n\tManually creating an API Key via the GUI requires the App Name for the key to be MUMC\n'
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n\tAn Auth Key (aka API Key) can be manually created via the GUI by navigating to \'Advanced\' > \'API Keys\'\n\tManually creating an API Key via the GUI requires the App Name for the key to be MUMC\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > server > auth_key key is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','admin_id')) == None)):
         server_admin_id=check
@@ -372,15 +379,17 @@ def cfgCheckYAML(cfg,init_dict):
         missing_admin_id_dict['admin_settings']['server']['admin_id']=None
 
 #######################################################################################################
-
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
-        user_id_check_list=[]
+    user_id_check_list=[]
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_id')) == None)):
+        #user_id_check_list=[]
         check_dict_user_name={}
+        check=cfg['admin_settings']['users']
         for entry in check:
             for user_data in entry:
                 if (user_data == 'user_id'):
                     user_id_check_list.append(entry[user_data])
-                    check_dict_user_name[entry[user_data]]=entry['user_name']
+                    if (not ((temp_check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_name')) == None)):
+                        check_dict_user_name[entry[user_data]]=entry['user_name']
         check_user_keys_length=len(user_id_check_list)
         user_id_user_id_check_list=[]
         if (check_user_keys_length > 0):
@@ -401,14 +410,16 @@ def cfgCheckYAML(cfg,init_dict):
     else:
         error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > user_id is missing from mumc_config.yaml\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
+    user_name_check_list=[]
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_name')) == None)):
         check_list=[]
+        check=cfg['admin_settings']['users']
         for entry in check:
             for user_data in entry:
                 if (user_data == 'user_name'):
                     check_list.append(entry[user_data])
         check_user_names_length=len(check_list)
-        user_name_check_list=[]
+        #user_name_check_list=[]
         if (check_user_names_length > 0):
             for user_info in check_list:
                 user_name_check_list.append(user_info)
@@ -2792,7 +2803,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_delete_season_folder']=check
     else:
-        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > season variable is missing from mumc_config.yaml\n'
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > season is missing from mumc_config.yaml\n'
         monitor_delete_season_folder_missing_bool=True
         missing_delete_season_folder_dict['advanced_settings']['delete_empty_folders']['episode']['season']=False
 
@@ -2805,7 +2816,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_delete_series_folder']=check
     else:
-        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > series variable is missing from mumc_config.yaml\n'
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > delete_empty_folders > episode > series is missing from mumc_config.yaml\n'
         monitor_delete_series_folder_missing_bool=True
         missing_delete_series_folder_dict['advanced_settings']['delete_empty_folders']['episode']['series']=False
 
@@ -2819,7 +2830,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['minimum_number_episodes']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_episodes variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_episodes is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_played_episodes')) == None)):
         if (
@@ -2831,23 +2842,23 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['minimum_number_played_episodes']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_played_episodes variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_played_episodes is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes_behavior')) == None)):
         
         check=check.casefold()
-        usersname_usersid_match=False
-        for usersname in user_name_check_list:
-            if (check == usersname.casefold()):
-                usersname_usersid_match=True
-        for usersid in user_id_check_list:
-            if (check == usersid.casefold()):
-                usersname_usersid_match=True
-        if (usersname_usersid_match == False):
+        users_name_users_id_match=False
+        for users_name in user_name_check_list:
+            if (check == users_name.casefold()):
+                users_name_users_id_match=True
+        for users_id in user_id_check_list:
+            if (check == users_id.casefold()):
+                users_name_users_id_match=True
+        if (users_name_users_id_match == False):
             check = check.replace(' ','')
         if (
             not ((isinstance(check,str)) and
-                ((usersname_usersid_match == True) or
+                ((users_name_users_id_match == True) or
                 (check == 'maxplayed') or
                 (check == 'maxplayedmaxplayed') or
                 (check == 'minplayed') or
@@ -2873,7 +2884,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['minimum_number_episodes_behavior']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_episodes_behavior variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > episode_control > minimum_episodes_behavior is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -2886,7 +2897,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_set_missing_last_played_date']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > movie variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > movie is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','episode')) == None)):
         if (
@@ -2897,7 +2908,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_set_missing_last_played_date']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > episode variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > episode is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audio')) == None)):
         if (
@@ -2908,7 +2919,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_set_missing_last_played_date']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > audio variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > audio is missing from mumc_config.yaml\n'
 
     if (isJellyfinServer(server_brand)):
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audiobook')) == None)):
@@ -2920,7 +2931,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_set_missing_last_played_date']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > audiobook variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > trakt_fix > set_missing_last_played_date > audiobook is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -2933,7 +2944,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_script_header']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > show is missing from mumc_config.yaml\n'
 
     config_dict['script_header_format']=[]
 
@@ -2946,7 +2957,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_header_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')) == None)):
         if (
@@ -2957,7 +2968,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_header_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')) == None)):
         if (
@@ -2968,7 +2979,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_header_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > script > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','show')) == None)):
         if (
@@ -2979,7 +2990,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_user_header']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > show is missing from mumc_config.yaml\n'
 
     config_dict['user_header_format']=[]
 
@@ -2992,7 +3003,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['user_header_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')) == None)):
         if (
@@ -3003,7 +3014,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['user_header_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')) == None)):
         if (
@@ -3014,7 +3025,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['user_header_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > user > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','show')) == None)):
         if (
@@ -3025,7 +3036,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_summary_header']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > show is missing from mumc_config.yaml\n'
 
     config_dict['summary_header_format']=[]
 
@@ -3038,7 +3049,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['summary_header_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')) == None)):
         if (
@@ -3049,7 +3060,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['summary_header_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')) == None)):
         if (
@@ -3060,7 +3071,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['summary_header_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > headers > summary > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','show')) == None)):
         if (
@@ -3071,7 +3082,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_script_footer']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > show is missing from mumc_config.yaml\n'
 
     config_dict['script_footer_format']=[]
 
@@ -3084,7 +3095,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_footer_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')) == None)):
         if (
@@ -3095,7 +3106,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_footer_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')) == None)):
         if (
@@ -3106,7 +3117,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_footer_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > footers > script > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','show')) == None)):
         if (
@@ -3117,7 +3128,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_script_warning']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > show is missing from mumc_config.yaml\n'
 
     config_dict['script_warnings_format']=[]
 
@@ -3130,7 +3141,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_warnings_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')) == None)):
         if (
@@ -3141,7 +3152,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_warnings_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')) == None)):
         if (
@@ -3152,7 +3163,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['script_warnings_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > warnings > script > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','show')) == None)):
         if (
@@ -3163,7 +3174,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_movie_delete_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > movie > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > movie > show is missing from mumc_config.yaml\n'
 
     config_dict['movie_delete_info_format']=[]
 
@@ -3176,7 +3187,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_delete_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')) == None)):
         if (
@@ -3187,7 +3198,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_delete_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')) == None)):
         if (
@@ -3198,7 +3209,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_delete_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > delete > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','show')) == None)):
         if (
@@ -3209,7 +3220,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_movie_keep_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > movie > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > movie > show is missing from mumc_config.yaml\n'
 
     config_dict['movie_keep_info_format']=[]
 
@@ -3222,7 +3233,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_keep_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')) == None)):
         if (
@@ -3233,7 +3244,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_keep_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')) == None)):
         if (
@@ -3244,7 +3255,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_keep_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > keep > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','show')) == None)):
         if (
@@ -3255,7 +3266,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_movie_post_processing_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > movie > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > movie > show is missing from mumc_config.yaml\n'
 
     config_dict['movie_post_processing_format']=[]
 
@@ -3268,7 +3279,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_post_processing_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')) == None)):
         if (
@@ -3279,7 +3290,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_post_processing_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')) == None)):
         if (
@@ -3290,7 +3301,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_post_processing_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > post_processing > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','show')) == None)):
         if (
@@ -3301,7 +3312,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_movie_summary']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > movie > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > movie > show is missing from mumc_config.yaml\n'
 
     config_dict['movie_summary_format']=[]
 
@@ -3314,7 +3325,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_summary_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')) == None)):
         if (
@@ -3325,7 +3336,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_summary_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')) == None)):
         if (
@@ -3336,7 +3347,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['movie_summary_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > movie > summary > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','show')) == None)):
         if (
@@ -3347,7 +3358,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_episode_delete_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > episode > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > episode > show is missing from mumc_config.yaml\n'
 
     config_dict['episode_delete_info_format']=[]
 
@@ -3360,7 +3371,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_delete_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')) == None)):
         if (
@@ -3371,7 +3382,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_delete_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')) == None)):
         if (
@@ -3382,7 +3393,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_delete_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > delete > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','show')) == None)):
         if (
@@ -3393,7 +3404,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_episode_keep_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > episode > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > episode > show is missing from mumc_config.yaml\n'
 
     config_dict['episode_keep_info_format']=[]
 
@@ -3406,7 +3417,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_keep_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')) == None)):
         if (
@@ -3417,7 +3428,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_keep_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')) == None)):
         if (
@@ -3428,7 +3439,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_keep_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > keep > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','show')) == None)):
         if (
@@ -3439,7 +3450,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_episode_post_processing_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > episode > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > episode > show is missing from mumc_config.yaml\n'
 
     config_dict['episode_post_processing_format']=[]
 
@@ -3452,7 +3463,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_post_processing_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')) == None)):
         if (
@@ -3463,7 +3474,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_post_processing_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')) == None)):
         if (
@@ -3474,7 +3485,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_post_processing_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > post_processing > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','show')) == None)):
         if (
@@ -3485,7 +3496,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_episode_summary']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > episode > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > episode > show is missing from mumc_config.yaml\n'
 
     config_dict['episode_summary_format']=[]
 
@@ -3498,7 +3509,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_summary_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')) == None)):
         if (
@@ -3509,7 +3520,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_summary_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')) == None)):
         if (
@@ -3520,7 +3531,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['episode_summary_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > episode > summary > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','show')) == None)):
         if (
@@ -3531,7 +3542,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_audio_delete_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > audio > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > audio > show is missing from mumc_config.yaml\n'
 
     config_dict['audio_delete_info_format']=[]
 
@@ -3544,7 +3555,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_delete_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')) == None)):
         if (
@@ -3555,7 +3566,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_delete_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')) == None)):
         if (
@@ -3566,7 +3577,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_delete_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > delete > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','show')) == None)):
         if (
@@ -3577,7 +3588,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_audio_keep_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > audio > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > audio > show is missing from mumc_config.yaml\n'
 
     config_dict['audio_keep_info_format']=[]
 
@@ -3590,7 +3601,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_keep_info_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')) == None)):
         if (
@@ -3601,7 +3612,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_keep_info_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')) == None)):
         if (
@@ -3612,7 +3623,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_keep_info_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > keep > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','show')) == None)):
         if (
@@ -3623,7 +3634,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_audio_post_processing_info']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > audio > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > audio > show is missing from mumc_config.yaml\n'
 
     config_dict['audio_post_processing_format']=[]
 
@@ -3636,7 +3647,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_post_processing_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')) == None)):
         if (
@@ -3647,7 +3658,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_post_processing_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')) == None)):
         if (
@@ -3658,7 +3669,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_post_processing_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > post_processing > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','show')) == None)):
         if (
@@ -3669,7 +3680,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['print_audio_summary']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > audio > show variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > audio > show is missing from mumc_config.yaml\n'
 
     config_dict['audio_summary_format']=[]
 
@@ -3682,7 +3693,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_summary_format'].insert(0,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > color is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')) == None)):
         if (
@@ -3693,7 +3704,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_summary_format'].insert(2,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > font > style is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')) == None)):
         if (
@@ -3704,7 +3715,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['audio_summary_format'].insert(1,check)
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audio > summary > formatting > background > color is missing from mumc_config.yaml\n'
 
     if (isJellyfinServer(server_brand)):
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','show')) == None)):
@@ -3716,7 +3727,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['print_audiobook_delete_info']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > audiobook > show variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > delete > audiobook > show is missing from mumc_config.yaml\n'
 
         config_dict['audiobook_delete_info_format']=[]
 
@@ -3729,7 +3740,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_delete_info_format'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')) == None)):
             if (
@@ -3740,7 +3751,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_delete_info_format'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > style variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > font > style is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')) == None)):
             if (
@@ -3751,7 +3762,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_delete_info_format'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > background > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > delete > formatting > background > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','show')) == None)):
             if (
@@ -3762,7 +3773,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['print_audiobook_keep_info']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > audiobook > show variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > keep > audiobook > show is missing from mumc_config.yaml\n'
 
         config_dict['audiobook_keep_info_format']=[]
 
@@ -3775,7 +3786,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_keep_info_format'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')) == None)):
             if (
@@ -3786,7 +3797,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_keep_info_format'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > style variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > font > style is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')) == None)):
             if (
@@ -3797,7 +3808,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_keep_info_format'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > background > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > keep > formatting > background > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','show')) == None)):
             if (
@@ -3808,7 +3819,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['print_audiobook_post_processing_info']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > audiobook > show variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > post_processing > audiobook > show is missing from mumc_config.yaml\n'
 
         config_dict['audiobook_post_processing_format']=[]
 
@@ -3821,7 +3832,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_post_processing_format'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')) == None)):
             if (
@@ -3832,7 +3843,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_post_processing_format'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > style variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > font > style is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')) == None)):
             if (
@@ -3843,7 +3854,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_post_processing_format'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > background > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > post_processing > formatting > background > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','show')) == None)):
             if (
@@ -3854,7 +3865,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['print_audiobook_summary']=check
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > audiobook > show variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > summary > audiobook > show is missing from mumc_config.yaml\n'
 
         config_dict['audiobook_summary_format']=[]
 
@@ -3867,7 +3878,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_summary_format'].insert(0,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > color is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')) == None)):
             if (
@@ -3878,7 +3889,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_summary_format'].insert(2,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > style variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > font > style is missing from mumc_config.yaml\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')) == None)):
             if (
@@ -3889,7 +3900,7 @@ def cfgCheckYAML(cfg,init_dict):
             else:
                 config_dict['audiobook_summary_format'].insert(1,check)
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > background > color variable is missing from mumc_config.yaml\n'
+            error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > console_controls > audiobook > summary > formatting > background > color is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -3902,7 +3913,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['UPDATE_CONFIG']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > UPDATE_CONFIG variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > UPDATE_CONFIG is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -3915,7 +3926,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['REMOVE_FILES']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > REMOVE_FILES variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The advanced_settings > REMOVE_FILES is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -3928,7 +3939,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['library_setup_behavior']=check.casefold()
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > list variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > list is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','matching')) == None)):
         if (
@@ -3939,7 +3950,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['library_matching_behavior']=check.casefold()
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','users','monitor_disabled')) == None)):
         if (
@@ -3951,7 +3962,7 @@ def cfgCheckYAML(cfg,init_dict):
             config_dict['monitor_disabled_users_behavior']=check
             missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=check
     else:
-        #error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > users > monitor_disabled variable is missing from mumc_config.yaml\n'
+        #error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > users > monitor_disabled is missing from mumc_config.yaml\n'
         monitor_disabled_users_missing_bool=True
         missing_monitor_disabled_users_dict['admin_settings']['behavior']['users']['monitor_disabled']=True
         
@@ -3967,7 +3978,7 @@ def cfgCheckYAML(cfg,init_dict):
             config_dict['user_wl_libs']=check
             config_dict['user_bl_libs']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > behavior > matching is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -3981,7 +3992,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['api_query_attempts']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > api_controls > attempts variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > api_controls > attempts is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','api_controls','item_limit')) == None)):
         if (
@@ -3993,7 +4004,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['api_query_item_limit']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > api_controls > item_limit variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > api_controls > item_limit is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -4007,7 +4018,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['api_query_cache_size']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > size variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > size is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','fallback_behavior')) == None)):
         if (
@@ -4018,7 +4029,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['api_query_cache_fallback_behavior']=check.upper()
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > fallback_behavior variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > fallback_behavior is missing from mumc_config.yaml\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','cache','minimum_age')) == None)):
         if (
@@ -4041,7 +4052,7 @@ def cfgCheckYAML(cfg,init_dict):
             minimum_age_missing_bool=True
             missing_minimum_age_dict['admin_settings']['cache']['minimum_age']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > minimum_age variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The admin_settings > cache > minimum_age is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -4053,7 +4064,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             config_dict['DEBUG']=check
     else:
-        error_found_in_mumc_config_yaml+='ConfigNameError: The DEBUG variable is missing from mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigNameError: The DEBUG is missing from mumc_config.yaml\n'
 
 #######################################################################################################
 
@@ -4143,4 +4154,39 @@ def cfgCheckYAML(cfg,init_dict):
         init_dict.update(cfg)
 
 #######################################################################################################
-    return cfg
+    return cfg,init_dict
+
+
+#admin_settings and server have to be checked early
+def pre_cfgCheckYAML(cfg):
+    error_found_in_mumc_config_yaml=''
+    try:
+        cfg['admin_settings']=cfg['admin_settings']
+    except:
+        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings is missing from the mumc_config.yaml\n'
+    try:
+        cfg['admin_settings']['server']=cfg['admin_settings']['server']
+    except:
+        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server is missing from the mumc_config.yaml\n'
+    try:
+        cfg['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand']
+    except:
+        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > brand is missing from the mumc_config.yaml\n'
+    try:
+        cfg['admin_settings']['server']['url']=cfg['admin_settings']['server']['url']
+    except:
+        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > url is missing from the mumc_config.yaml\n'
+    try:
+        cfg['admin_settings']['server']['auth_key']=cfg['admin_settings']['server']['auth_key']
+    except:
+        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > auth_key is missing from the mumc_config.yaml\n'
+    try:
+        cfg['admin_settings']['server']['admin_id']=cfg['admin_settings']['server']['admin_id']
+    except:
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > admin_id is missing from the mumc_config.yaml\n'
+
+    #Bring all errors found to users attention
+    if not (error_found_in_mumc_config_yaml == ''):
+        print('\n' + error_found_in_mumc_config_yaml)
+        exit(0)

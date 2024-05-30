@@ -14,9 +14,15 @@ def keys_exist(the_element, *keys_indexes):
 
     temp_element = the_element
     for key_index in keys_indexes:
-        if key_index not in temp_element:
-            return False
-        temp_element = temp_element[key_index]
+        if (isinstance(key_index,int)):
+            try:
+                temp_element = temp_element[key_index]
+            except:
+                return False
+        else:
+            if key_index not in temp_element:
+                return False
+            temp_element = temp_element[key_index]
     return True
 
 

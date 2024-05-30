@@ -80,14 +80,37 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['TotalEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['TotalEpisodeCount']
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['PlayedEpisodeCount']
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedEpisodeCount'] = episodeCounts_byUserId[userId][episodeItem['SeriesId']]['UnplayedEpisodeCount']
-                    #increment for played or unplayed episode counts that may be deleted
-                    if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
-                        episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
+
+                    if (('mumc' in episodeItem) and ('lib_id' in episodeItem['mumc']) and (episodeItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+                        #increment for played or unplayed episode counts that may be deleted
+                        if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
+                            episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
+                        else:
+                            episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
                     else:
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
                 else:
-                    #manually build any missing season and episode information for user's who did meet the filter criteria
-                    series_info = get_SERIES_itemInfo(episodeItem,user_info,the_dict)
+                    if (episodeItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][userId]):
+                        #manually build any missing season and episode information for user's who did meet the filter criteria
+                        series_info = get_SERIES_itemInfo(episodeItem,user_info,the_dict)
+                    else:
+                        for this_user_id in the_dict['byUserId_accessibleLibraries']:
+                            if (episodeItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][this_user_id]):
+                                break
+                        for found_user_info in users_info:
+                            if (this_user_id == found_user_info['user_id']):
+                                #manually build any missing season and episode information for user's who did meet the filter criteria
+                                series_info = get_SERIES_itemInfo(episodeItem,found_user_info,the_dict)
+                                break
+
+                        series_info['UserData']['PlayedPercentage']=None
+                        series_info['UserData']['UnplayedItemCount']=series_info['RecursiveItemCount']
+                        series_info['UserData']['PlaybackPositionTicks']=None
+                        series_info['UserData']['PlayCount']=None
+                        series_info['UserData']['IsFavorite']=None
+                        series_info['UserData']['Played']=None
+                        series_info['UserData']['Key']=None
+
                     #if seriesId has not already processed; add it so it can be
                     if not (series_info['Id'] in episodes_toBeDeletedOrRemain):
                         episodes_toBeDeletedOrRemain[series_info['Id']]={}
@@ -103,9 +126,13 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['TotalEpisodeCount'] = RecursiveItemCount
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['PlayedEpisodeCount'] = PlayedEpisodeCount
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['UnplayedEpisodeCount'] = UnplayedItemCount
-                    #increment for played or unplayed episode counts that may be deleted
-                    if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
-                        episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
+
+                    if (('mumc' in episodeItem) and ('lib_id' in episodeItem['mumc']) and (episodeItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+                        #increment for played or unplayed episode counts that may be deleted
+                        if (get_ADDITIONAL_itemInfo(user_info,episodeItem['Id'],'finding minEpisodesToKeep() play state',the_dict)['UserData']['Played']):
+                            episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] += 1
+                        else:
+                            episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
                     else:
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] += 1
 
@@ -435,8 +462,17 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
                         #skip empty grid positions
                         if not (episodeId ==  ''):
-                            #get played status for specified episodeId
-                            if (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',the_dict)['UserData']['Played']):
+
+                            played_status=False
+
+                            for deleteItem in deleteItems:
+                                if (episodeId == deleteItem['Id']):
+                                    if (deleteItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo']['user_id']]):
+                                        #get played status for specified episodeId
+                                        played_status=get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',the_dict)
+                                        break
+
+                            if (played_status['UserData']['Played']):
                                 #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 PlayedToBeDeleted_LoopControl += 1
@@ -452,8 +488,17 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                         episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeNum]
                         #skip empty grid positions
                         if not (episodeId ==  ''):
-                            #get played status for specified episodeId
-                            if not (get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for unplayed item',the_dict)['UserData']['Played']):
+
+                            unplayed_status=False
+
+                            for deleteItem in deleteItems:
+                                if (episodeId == deleteItem['Id']):
+                                    if (deleteItem['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo']['user_id']]):
+                                        #get played status for specified episodeId
+                                        unplayed_status=get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',the_dict)
+                                        break
+
+                            if (unplayed_status['UserData']['Played']):
                                 #add to list of episodes to be kept; increment tracker
                                 episodeTracker[seriesId]['TargetedEpisodeIds'].append(episodeId)
                                 UnplayedToBeDeleted_LoopControl += 1

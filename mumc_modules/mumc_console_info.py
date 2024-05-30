@@ -212,7 +212,7 @@ def build_print_media_item_details(item,var_dict,the_dict):
 
 
 #list and delete items past played threshold
-def print_and_delete_items(deleteItems,the_dict):
+def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     deleteItems_Tracker=[]
     print_summary_header=the_dict['advanced_settings']['console_controls']['headers']['summary']['show']
     print_movie_summary=the_dict['advanced_settings']['console_controls']['movie']['summary']['show']
@@ -241,7 +241,7 @@ def print_and_delete_items(deleteItems,the_dict):
 
     #List items to be deleted
     strings_list_to_print=['']
-    strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict)
+    strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type)
 
     print_byType(strings_list_to_print[0],print_summary_header,the_dict,summary_header_format)
 
@@ -494,7 +494,10 @@ def print_all_media_disabled(the_dict):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,"* basic_settings > filter_statements > audiobook > created > condition_days: -1        *")
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
-    print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+    try:
+        print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+    except:
+        print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
 
 
 #print how to delete files info
@@ -520,9 +523,9 @@ def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
 
 
 #print build config how to delete files info
-def build_config_setup_to_delete_media(strings_list_to_print,the_dict):
+def build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
-    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Summary Of Deleted Media:')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Summary Of Deleted ' + delete_item_type + ':')
 
     if not bool(the_dict['advanced_settings']['REMOVE_FILES']):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Dry Run Mode')

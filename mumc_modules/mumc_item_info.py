@@ -35,28 +35,30 @@ def get_SERIES_itemInfo(episode,user_info,the_dict):
 
     series_item_info={}
 
+    if (('mumc' in episode) and ('lib_id' in episode['mumc']) and (episode['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
 ### Series ########################################################################################
 
-    if ('SeriesId' in episode):
-        series_item_info = get_ADDITIONAL_itemInfo(user_info,episode['SeriesId'],'series_info',the_dict)
+        if ('SeriesId' in episode):
+            series_item_info = get_ADDITIONAL_itemInfo(user_info,episode['SeriesId'],'series_info',the_dict)
 
-    elif ('SeasonId' in episode):
-        season_item_info = get_ADDITIONAL_itemInfo(user_info,episode['SeasonId'],'season_info',the_dict)
+        elif ('SeasonId' in episode):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,episode['SeasonId'],'season_info',the_dict)
 
-        if ('SeriesId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
+            if ('SeriesId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
 
-        elif ('ParentId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
+            elif ('ParentId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
 
-    elif ('ParentId' in episode):
-        season_item_info = get_ADDITIONAL_itemInfo(user_info,episode['ParentId'],'season_info',the_dict)
+        elif ('ParentId' in episode):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,episode['ParentId'],'season_info',the_dict)
 
-        if ('SeriesId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
+            if ('SeriesId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
 
-        elif ('ParentId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
+            elif ('ParentId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
 
 ### End Series ####################################################################################
 

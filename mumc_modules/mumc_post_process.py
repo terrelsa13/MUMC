@@ -52,7 +52,7 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
 
     if (('MonitoredUsersAction' in itemsExtraDictionary) and ('MonitoredUsersMeetPlayedFilter' in itemsExtraDictionary)):
         methodFilter=itemsExtraDictionary['ConfiguredBehavior']
-        behaviorFilter=itemsExtraDictionary['ActionControl']
+        actioncontrol=itemsExtraDictionary['ActionControl']
         dynamicBehavior=itemsExtraDictionary['DynamicBehavior']
 
         for userId in itemsDictionary:
@@ -170,32 +170,32 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(action_type,postpr
                     behavioralControl=(userConditional and playedControl)
 
                     if (behavioralControl):
-                        if ((behaviorFilter == 0) or (behaviorFilter == 1) or (behaviorFilter == 2)):
+                        if ((actioncontrol == 0) or (actioncontrol == 1) or (actioncontrol == 2)):
                             #No action taken on True
                             addItemToDeleteList=None
-                        elif ((behaviorFilter == 3) or (behaviorFilter == 4) or (behaviorFilter == 5)):
+                        elif ((actioncontrol == 3) or (actioncontrol == 4) or (actioncontrol == 5)):
                             #Action taken on True
                             if (methodFilter == addIt):
                                 addItemToDeleteList=True
                             else: #(methodFilter == removeIt):
                                 addItemToDeleteList=False
-                        else: #((behaviorFilter == 6) or (behaviorFilter == 7) or (behaviorFilter == 8)):
+                        else: #((actioncontrol == 6) or (actioncontrol == 7) or (actioncontrol == 8)):
                             #Opposite action taken on True
                             if (methodFilter == addIt):
                                 addItemToDeleteList=False
                             else: #(methodFilter == removeIt):
                                 addItemToDeleteList=True
                     else:
-                        if ((behaviorFilter == 0) or (behaviorFilter == 3) or (behaviorFilter == 6)):
+                        if ((actioncontrol == 0) or (actioncontrol == 3) or (actioncontrol == 6)):
                             #No action taken on False
                             addItemToDeleteList=None
-                        elif ((behaviorFilter == 1) or (behaviorFilter == 4) or (behaviorFilter == 7)):
+                        elif ((actioncontrol == 1) or (actioncontrol == 4) or (actioncontrol == 7)):
                             #Action taken on False
                             if (methodFilter == addIt):
                                 addItemToDeleteList=True
                             else: #(methodFilter == removeIt):
                                 addItemToDeleteList=False
-                        else: #((behaviorFilter == 2) or (behaviorFilter == 5) or (behaviorFilter == 8)):
+                        else: #((actioncontrol == 2) or (actioncontrol == 5) or (actioncontrol == 8)):
                             #Opposite action taken on False
                             if (methodFilter == addIt):
                                 addItemToDeleteList=False

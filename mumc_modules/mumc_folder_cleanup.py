@@ -118,10 +118,10 @@ def season_series_folder_cleanup(deleteItems,the_dict):
     if (the_dict['advanced_settings']['delete_empty_folders']['episode']['season']):
         the_dict=get_empty_folders('season',the_dict)
 
-        print_and_delete_items(the_dict['parentDeleteItems'],the_dict)
+        print_and_delete_items(the_dict['parentDeleteItems'],the_dict,'Season Folders')
 
     #remove empty series folders
     if (the_dict['advanced_settings']['delete_empty_folders']['episode']['series']):
         the_dict=get_empty_folders('series',the_dict)
 
-        print_and_delete_items(the_dict['parentDeleteItems'],the_dict)
+        print_and_delete_items(the_dict['parentDeleteItems'],the_dict,'Series Folders')

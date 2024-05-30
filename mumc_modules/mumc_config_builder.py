@@ -9,10 +9,11 @@ from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
+from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
 
 
 #get user input needed to build or edit the mumc_config.yaml file
-def build_configuration_file(the_dict):
+def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
     print('Version: ' + get_script_version())
@@ -124,6 +125,10 @@ def build_configuration_file(the_dict):
         the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
 
+    #store the opposing and matching listing types to be used in get_users_and_libraries()
+    the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
+    the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
+
     #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
     the_dict['admin_settings']['behavior']['users']={}
     the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
@@ -146,28 +151,24 @@ def build_configuration_file(the_dict):
     #Build and save yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)
-    else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
-        yaml_configurationUpdater(the_dict)
 
-    #Check config editing was not requested
-    if not (the_dict['advanced_settings']['UPDATE_CONFIG']):
         try:
             the_dict=getIsAnyMediaEnabled(the_dict)
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
 
-            try:
                 strings_list_to_print=['']
                 strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
+            try:
                 print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=''
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['style']=''
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['background']['color']=''
-                strings_list_to_print=['']
-                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-                print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+                #the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
+                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=''
+                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['style']=''
+                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['background']['color']=''
+                #strings_list_to_print=['']
+                #strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
+                print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
 
         #the exception
         except (AttributeError, ModuleNotFoundError):
@@ -179,7 +180,10 @@ def build_configuration_file(the_dict):
             #raise error
             raise RuntimeError('\nConfigError: Cannot find or open mumc_config.yaml')
 
+    else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
+        yaml_configurationUpdater(the_dict,orig_dict)
+
 
 #get user input needed to edit the mumc_config.yaml file
-def edit_configuration_file(the_dict):
-    build_configuration_file(the_dict)
+def edit_configuration_file(the_dict,orig_dict):
+    build_configuration_file(the_dict,orig_dict)

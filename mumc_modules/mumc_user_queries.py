@@ -1,7 +1,7 @@
 from mumc_modules.mumc_url import requestURL,build_request_message
 
 
-#API call to get all user accounts
+#API call to get single user account
 def get_single_user(userId,the_dict):
 
     url=the_dict['admin_settings']['server']['url'] + '/Users/' + str(userId)

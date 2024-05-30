@@ -207,18 +207,20 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n",1,the_dict)
 
+    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
 ### Movie #######################################################################################
 
-    if ('Id' in item):
-        istag_MOVIE['movie'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
+        if ('Id' in item):
+            istag_MOVIE['movie'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
 
 ### End Movie ###################################################################################
 
 ### Movie Library #######################################################################################
 
-    if ('ParentId' in item):
-        movielibrary_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'movie_library_info',the_dict)
-        istag_MOVIE['movielibrary'][movielibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,movielibrary_item_info,the_dict)
+        if ('ParentId' in item):
+            movielibrary_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'movie_library_info',the_dict)
+            istag_MOVIE['movielibrary'][movielibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,movielibrary_item_info,the_dict)
 
 ### End Movie Library ###################################################################################
 
@@ -247,68 +249,70 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n",1,the_dict)
 
+    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
 ### Episode #######################################################################################
 
-    if ('Id' in item):
-        istag_EPISODE['episode'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
+        if ('Id' in item):
+            istag_EPISODE['episode'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
 
 ### End Episode ###################################################################################
 
 ### Season ########################################################################################
 
-    if ('SeasonId' in item):
-        season_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeasonId'],'season_info',the_dict)
-    elif ('ParentId' in item):
-        season_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'season_info',the_dict)
-    else:
-        season_item_info=None
+        if ('SeasonId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeasonId'],'season_info',the_dict)
+        elif ('ParentId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'season_info',the_dict)
+        else:
+            season_item_info=None
 
-    if (not (season_item_info == None)):
-        istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info,the_dict)
+        if (not (season_item_info == None)):
+            istag_EPISODE['season'][season_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,season_item_info,the_dict)
 
 ### End Season ####################################################################################
 
 ### Series ########################################################################################
 
-        if ('SeriesId' in item):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeriesId'],'series_info',the_dict)
-        elif ('SeriesId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
-        elif ('ParentId' in season_item_info):
-            series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
-        else:
-            series_item_info=None
+            if ('SeriesId' in item):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeriesId'],'series_info',the_dict)
+            elif ('SeriesId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
+            elif ('ParentId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
+            else:
+                series_item_info=None
 
-        if (not (series_item_info == None)):
-            istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info,the_dict)
+            if (not (series_item_info == None)):
+                istag_EPISODE['series'][series_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,series_item_info,the_dict)
 
 ### End Series ####################################################################################
 
 ### TV Library ########################################################################################
 
-            if ('ParentId' in series_item_info):
-                tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['ParentId'],'tv_library_info',the_dict)
-            else:
-                tvlibrary_item_info=None
+                if ('ParentId' in series_item_info):
+                    tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['ParentId'],'tv_library_info',the_dict)
+                else:
+                    tvlibrary_item_info=None
 
-            if (not (tvlibrary_item_info == None)):
-                istag_EPISODE['tvlibrary'][tvlibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvlibrary_item_info,the_dict)
+                if (not (tvlibrary_item_info == None)):
+                    istag_EPISODE['tvlibrary'][tvlibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvlibrary_item_info,the_dict)
 
 ### End TV Library ####################################################################################
 
 ### Studio Network #######################################################################################
 
-            if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0,the_dict)):
-                #Get studio network's item info
-                tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
-            elif ('SeriesStudio' in series_item_info):
-                #Get series studio network's item info
-                tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict,the_dict)
-            else:
-                tvstudionetwork_item_info=None
+                if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0,the_dict)):
+                    #Get studio network's item info
+                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
+                elif ('SeriesStudio' in series_item_info):
+                    #Get series studio network's item info
+                    tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict,the_dict)
+                else:
+                    tvstudionetwork_item_info=None
 
-            if (not (tvstudionetwork_item_info == None)):
-                istag_EPISODE['seriesstudionetwork'][tvstudionetwork_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvstudionetwork_item_info,the_dict)
+                if (not (tvstudionetwork_item_info == None)):
+                    istag_EPISODE['seriesstudionetwork'][tvstudionetwork_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,tvstudionetwork_item_info,the_dict)
 
 ### End Studio Network ###################################################################################
 
@@ -336,40 +340,40 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\n",1,the_dict)
 
+    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
 ### Track #########################################################################################
 
-    tagged_items=[]
-
-    if ('Id' in item):
-        istag_AUDIO['track'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
+        if ('Id' in item):
+            istag_AUDIO['track'][item['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,item,the_dict)
 
 ### End Track #####################################################################################
 
 ### Album/Book #########################################################################################
 
-    #Albums for music
-    if ('ParentId' in item):
-        album_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'album_info',the_dict)
-    elif ('AlbumId' in item):
-        album_item_info = get_ADDITIONAL_itemInfo(user_info,item['AlbumId'],'album_info',the_dict)
-    else:
-        album_item_info=None
+        #Albums for music
+        if ('ParentId' in item):
+            album_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'album_info',the_dict)
+        elif ('AlbumId' in item):
+            album_item_info = get_ADDITIONAL_itemInfo(user_info,item['AlbumId'],'album_info',the_dict)
+        else:
+            album_item_info=None
 
-    if (not (album_item_info == None)):
-        istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info,the_dict)
+        if (not (album_item_info == None)):
+            istag_AUDIO['album'][album_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,album_item_info,the_dict)
 
 ### End Album/Book #####################################################################################
 
 ### Library ########################################################################################
 
-        #Library
-        if ('ParentId' in album_item_info):
-            audiolibrary_item_info = get_ADDITIONAL_itemInfo(user_info,album_item_info['ParentId'],'library_info',the_dict)
-        else:
-            audiolibrary_item_info=None
+            #Library
+            if ('ParentId' in album_item_info):
+                audiolibrary_item_info = get_ADDITIONAL_itemInfo(user_info,album_item_info['ParentId'],'library_info',the_dict)
+            else:
+                audiolibrary_item_info=None
 
-        if (not (audiolibrary_item_info == None)):
-            istag_AUDIO['audiolibrary'][audiolibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,audiolibrary_item_info,the_dict)
+            if (not (audiolibrary_item_info == None)):
+                istag_AUDIO['audiolibrary'][audiolibrary_item_info['Id']],tagged_items=get_isItemTagged(usertags,tagged_items,audiolibrary_item_info,the_dict)
 
 ### End Library #####################################################################################
 

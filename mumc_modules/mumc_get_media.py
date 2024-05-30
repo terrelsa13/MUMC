@@ -732,6 +732,17 @@ def init_getMedia(the_dict):
             the_dict['enabled_users'].append(user_info)
             the_dict['enabled_user_ids'].append(user_info['user_id'])
 
+    #Create userId list of accessible libraries
+    the_dict['byUserId_accessibleLibraries']={}
+    for user_info in the_dict['admin_settings']['users']:
+        the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=set()
+        for lib_info in user_info['whitelist']:
+            if (not (lib_info['lib_id'] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info['lib_id'])
+        for lib_info in user_info['blacklist']:
+            if (not (lib_info['lib_id'] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info['lib_id'])
+
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:
 

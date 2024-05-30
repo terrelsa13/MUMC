@@ -4,7 +4,7 @@ from mumc_modules.mumc_output import add_to_PATH
 from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_compare_items import keys_exist
+from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_min_config_version,get_script_version
 
 
@@ -26,6 +26,8 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['debug_file_name']='mumc_DEBUG.log'
     the_cfg['date_time_now']=datetime.now()
     the_cfg['date_time_utc_now']=datetime.utcnow()
+    #the_cfg['date_time_utc_now']=datetime.now(datetime.UTC)
+    #the_cfg['date_time_utc_now']=datetime.now(UTC)
     the_cfg['date_time_now_tz_utc']=datetime.now(timezone.utc)
 
     #get current working directory
@@ -63,22 +65,43 @@ def initialize_mumc(cwd,mumc_path):
 
 
 def getIsAnyMediaEnabled(the_dict):
-    audiobook_played_exists=keys_exist(the_dict['basic_settings']['filter_statements'],'audiobook','played','condition_days')
-    audiobook_created_exists=keys_exist(the_dict['basic_settings']['filter_statements'],'audiobook','created','condition_days')
 
-    if (
-        (the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and
-        (the_dict['basic_settings']['filter_statements']['episode']['played']['condition_days'] == -1) and
-        (the_dict['basic_settings']['filter_statements']['audio']['played']['condition_days'] == -1) and
-        ((audiobook_played_exists and (the_dict['basic_settings']['filter_statements']['audiobook']['played']['condition_days'] == -1)) or (not audiobook_played_exists)) and
-        (the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1) and
-        (the_dict['basic_settings']['filter_statements']['episode']['created']['condition_days'] == -1) and
-        (the_dict['basic_settings']['filter_statements']['audio']['created']['condition_days'] == -1) and
-        ((audiobook_created_exists and (the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)) or (not audiobook_created_exists))
-       ):
-        the_dict['all_media_disabled']=True
-    else:
-        the_dict['all_media_disabled']=False
+    the_dict['all_media_disabled']=True
+    server_brand=isJellyfinServer(the_dict['admin_settings']['server']['brand'])
+
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','movie','played','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','movie','created','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','episode','played','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','episode','created','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','audio','played','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','audio','created','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if(server_brand):
+        if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','audiobook','played','condition_days')) == None)):
+            if (check >= 0):
+                the_dict['all_media_disabled']=False
+                return the_dict
+        if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','audiobook','created','condition_days')) == None)):
+            if (check >= 0):
+                the_dict['all_media_disabled']=False
+                return the_dict
 
     return the_dict
 

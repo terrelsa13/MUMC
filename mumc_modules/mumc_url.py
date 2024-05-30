@@ -102,18 +102,19 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     retryAttempts = int(retries)
 
     #check if this request is cached
-    try:
+    data = the_dict['cached_data'].getCachedDataFromURL(url)
+    #try:
         #if it is cached used cached data
-        data = the_dict['cached_data'].getCachedDataFromURL(url)
-    except:
+        #data = the_dict['cached_data'].getCachedDataFromURL(url)
+    #except:
         #if it is not cached send request
-        data = False
+        #data = False
 
     if (data):
-        #request is cached no need to send request
+        #request is cached; do not send request
         getdata = False
     else:
-        #request is no cached; send it
+        #request is not cached; send request
         getdata = True
 
     #try sending url request specified number of times

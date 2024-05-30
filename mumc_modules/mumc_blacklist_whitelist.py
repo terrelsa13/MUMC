@@ -1,4 +1,5 @@
-from mumc_modules.mumc_output import appendTo_DEBUG_log
+import copy
+from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith
 from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
@@ -78,7 +79,7 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                             if (not(item['Id'] in itemsDictionary[sub_user_info['user_id']])):
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]={}
                                 if (the_dict['DEBUG']):
-                                    appendTo_DEBUG_log("\nAdd missing itemid " + str(item['Id']) + " to " + str(itemsExtraDictionary[sub_user_info['user_id']]),3,the_dict)
+                                    appendTo_DEBUG_log("\nAdd missing itemid " + str(item['Id']) + " to itemsExtraDictionary for user " + str(sub_user_info['user_id']),3,the_dict)
                             if (not('IsMeetingAction' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
 
                                 itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']=get_isItemWhitelisted_Blacklisted(checklist,item,sub_user_info,the_dict)
@@ -87,31 +88,52 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                                     appendTo_DEBUG_log("\nIsMeetingAction: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingAction']),3,the_dict)
                             if (not('IsMeetingPlayedFilter' in itemsExtraDictionary[sub_user_info['user_id']][item['Id']])):
 
-                                mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'playedPatternCleanup',the_dict)
-                                played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
+                                #before getting additional item info check if user has access to the parent library of the media_item
+                                if (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][sub_user_info['user_id']]):
+                                    mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'playedPatternCleanup',the_dict)
+                                    played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']=played_created_days_counts_dict['item_matches_played_days_filter'] #meeting played X days ago?
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_days_filter']=played_created_days_counts_dict['item_matches_created_days_filter'] #meeting created X days ago?
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_count_filter']=played_created_days_counts_dict['item_matches_played_count_filter'] #played X number of times?
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_played_count_filter']=played_created_days_counts_dict['item_matches_created_played_count_filter'] #created-played X number of times?
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=(played_created_days_counts_dict['item_matches_played_days_filter'] and played_created_days_counts_dict['item_matches_played_count_filter']) #meeting complete played_filter_*?
-                                itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingCreatedPlayedFilter']=(played_created_days_counts_dict['item_matches_created_days_filter'] and played_created_days_counts_dict['item_matches_created_played_count_filter']) #meeting complete created_filter_*?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']=played_created_days_counts_dict['item_matches_played_days_filter'] #meeting played X days ago?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_days_filter']=played_created_days_counts_dict['item_matches_created_days_filter'] #meeting created X days ago?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_count_filter']=played_created_days_counts_dict['item_matches_played_count_filter'] #played X number of times?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_played_count_filter']=played_created_days_counts_dict['item_matches_created_played_count_filter'] #created-played X number of times?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=(played_created_days_counts_dict['item_matches_played_days_filter'] and played_created_days_counts_dict['item_matches_played_count_filter']) #meeting complete played_filter_*?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingCreatedPlayedFilter']=(played_created_days_counts_dict['item_matches_created_days_filter'] and played_created_days_counts_dict['item_matches_created_played_count_filter']) #meeting complete created_filter_*?
+                                else:
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']=None
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']=None
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']=None #meeting played X days ago?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_days_filter']=None #meeting created X days ago?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_count_filter']=None #played X number of times?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_played_count_filter']=None #created-played X number of times?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']=None #meeting complete played_filter_*?
+                                    itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingCreatedPlayedFilter']=None #meeting complete created_filter_*?
 
                                 if (the_dict['DEBUG']):
-                                    appendTo_DEBUG_log("\itemIsPlayed: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']),3,the_dict)
-                                    appendTo_DEBUG_log("\itemPlayedCount: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']),3,the_dict)
-                                    appendTo_DEBUG_log("\item_matches_played_days_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']),3,the_dict)
-                                    appendTo_DEBUG_log("\item_matches_created_days_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_days_filter']),3,the_dict)
-                                    appendTo_DEBUG_log("\item_matches_played_count_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_count_filter']),3,the_dict)
-                                    appendTo_DEBUG_log("\item_matches_created_played_count_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_played_count_filter']),3,the_dict)
-                                    appendTo_DEBUG_log("\IsMeetingPlayedFilter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']),3,the_dict)
-                                    appendTo_DEBUG_log("\IsMeetingCreatedPlayedFilter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingCreatedPlayedFilter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitemIsPlayed: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitemPlayedCount: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitem_matches_played_days_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_days_filter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitem_matches_created_days_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_days_filter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitem_matches_played_count_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_played_count_filter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nitem_matches_created_played_count_filter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['item_matches_created_played_count_filter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nIsMeetingPlayedFilter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingPlayedFilter']),3,the_dict)
+                                    appendTo_DEBUG_log("\nIsMeetingCreatedPlayedFilter: " + str(itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['IsMeetingCreatedPlayedFilter']) + "\n",3,the_dict)
                             if (not(item['Id'] in itemsDictionary[sub_user_info['user_id']])):
-                                itemsDictionary[sub_user_info['user_id']][item['Id']]=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'whitelist_playedPatternCleanup',the_dict)
+                                #before getting additional item info check if user has access to the parent library of the media_item
+                                if (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][sub_user_info['user_id']]):
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'whitelist_playedPatternCleanup',the_dict)
+                                else:
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]=copy.deepcopy(item)
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData']['PlaybackPositionTicks']=None
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData']['PlayCount']=None
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData']['IsFavorite']=None
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData'].pop('LastPlayedDate',None)
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData']['Played']=None
+                                    itemsDictionary[sub_user_info['user_id']][item['Id']]['UserData']['Key']=None
                                 if (the_dict['DEBUG']):
-                                    appendTo_DEBUG_log("\Add item with id: " + str(item['Id']) + "to dictionary",3,the_dict)
+                                    appendTo_DEBUG_log("\nAdd item with id: " + str(item['Id']) + " to dictionary",3,the_dict)
 
     postproc_dict['is' + prefix_str + '_and_played_byUserId_Media']=itemsDictionary
     postproc_dict['is' + prefix_str + '_extraInfo_byUserId_Media']=itemsExtraDictionary

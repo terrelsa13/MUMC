@@ -10,7 +10,4 @@ def isJellyfinServer(server_brand):
 
 #Determine if server is Emby
 def isEmbyServer(server_brand):
-    if (isJellyfinServer(server_brand)):
-        return False
-    else:
-        return True
+    return not isJellyfinServer(server_brand)
