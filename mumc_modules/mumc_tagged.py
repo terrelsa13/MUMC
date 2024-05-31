@@ -2,7 +2,7 @@ import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 from mumc_modules.mumc_url import api_query_handler,build_request_message
-from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith,does_index_exist,keys_exist
+from mumc_modules.mumc_compare_items import get_isItemMatching,does_index_exist,keys_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
@@ -35,7 +35,7 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['TagItems'])):
                 taglist.add(item['TagItems'][tagpos]['Name'])
             #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
+            itemIsTagged,itemTaggedValue=get_isItemMatching(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's tags state
             if (itemIsTagged):
                 tagged_items.append(item['Id'])
@@ -52,7 +52,7 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
             for tagpos in range(len(item['Tags'])):
                 taglist.add(item['Tags'][tagpos])
             #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching_doesItemStartWith(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
+            itemIsTagged,itemTaggedValue=get_isItemMatching(','.join(map(str, usertags)), ','.join(map(str, taglist)),the_dict)
             #Save media item's usertags state
             if (itemIsTagged):
                 tagged_items.append(item['Id'])

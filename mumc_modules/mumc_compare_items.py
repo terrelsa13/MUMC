@@ -60,7 +60,7 @@ def does_index_exist(item, indexvalue, the_dict):
 
 
 #Determine if there is a matching item or Determine if an item starts with the other
-def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
+def get_isItemMatching(item_one,item_two,the_dict):
 
     #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
     if (isinstance(item_one,list)):

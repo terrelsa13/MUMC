@@ -1,6 +1,6 @@
 import copy
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
-from mumc_modules.mumc_compare_items import get_isItemMatching_doesItemStartWith
+from mumc_modules.mumc_compare_items import get_isItemMatching
 from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 
@@ -36,11 +36,11 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
         appendTo_DEBUG_log("\n",1,the_dict)
 
     if (library_matching_behavior.casefold() == 'byid'):
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['lib_id'],user_wlbllib_key_json,the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching(item['mumc']['lib_id'],user_wlbllib_key_json,the_dict)
     elif (library_matching_behavior.casefold() == 'bypath'):
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['path'],user_wlbllib_path_json,the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching(item['mumc']['path'],user_wlbllib_path_json,the_dict)
     elif (library_matching_behavior.casefold() == 'bynetworkpath'):
-        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching_doesItemStartWith(item['mumc']['network_path'],user_wlbllib_netpath_json,the_dict)
+        item_isWhitelisted_isBlacklisted, itemWhitelistedBlacklistedValue=get_isItemMatching(item['mumc']['network_path'],user_wlbllib_netpath_json,the_dict)
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\nItem is whitelisted/blacklisted for this user: ' + str(item_isWhitelisted_isBlacklisted),2,the_dict)
