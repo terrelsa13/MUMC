@@ -101,12 +101,12 @@ def get_isItemMatching_doesItemStartWith(item_one,item_two,the_dict):
                     if (single_item_one == single_item_two):
                         #found a full match; return true and the matching value
                         return True,single_item_one
-                    elif (single_item_one.startswith(single_item_two)):
+                    #elif (single_item_one.startswith(single_item_two)):
                         #found a partial match; return true and the matching value
-                        return True,single_item_two
-                    elif (single_item_two.startswith(single_item_one)):
+                        #return True,single_item_two
+                    #elif (single_item_two.startswith(single_item_one)):
                         #found a partial match; return true and the matching value
-                        return True,single_item_one
+                        #return True,single_item_one
 
     #nothing matched; return false and empty string
     return False,''

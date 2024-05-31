@@ -504,6 +504,7 @@ def print_all_media_disabled(the_dict):
 def remove_files_helper(strings_list_to_print,the_dict):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'To delete media, open mumc_config.yaml in a text editor:')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Set advanced_settings > REMOVE_FILES: true')
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['console_separator'])
 
@@ -526,6 +527,7 @@ def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
 def build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type):
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
     strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'Summary Of Deleted ' + delete_item_type + ':')
+    strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,the_dict['_console_separator'])
 
     if not bool(the_dict['advanced_settings']['REMOVE_FILES']):
         strings_list_to_print=concat_to_console_strings_list(strings_list_to_print,'* Dry Run Mode')

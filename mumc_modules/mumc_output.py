@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
 #import re
@@ -40,7 +41,6 @@ def getFullPathName(filePathName):
 
 def doesDirectoryExist(PathName):
     pathExists=False
-
     #check if path exists
     if (Path(PathName).is_dir()):
         pathExists=True
