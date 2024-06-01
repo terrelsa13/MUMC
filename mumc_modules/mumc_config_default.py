@@ -1,3 +1,4 @@
+import sys
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_configuration_yaml import yaml_configurationLayout
@@ -1212,7 +1213,7 @@ def merge_configuration(default_base,merge):
         if (default_base['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,default_base)
         print('\n' + error_found_in_mumc_config_yaml)
-        exit(0)
+        sys.exit(0)
 
     #before saving; reorder some keys for consistency
     default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=default_base['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')

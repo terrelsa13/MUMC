@@ -1,3 +1,4 @@
+import sys
 from mumc_modules.mumc_versions import get_semantic_version_parts,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
@@ -4116,7 +4117,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (init_dict['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,init_dict)
         print('\n' + error_found_in_mumc_config_yaml)
-        exit(0)
+        sys.exit(0)
 
 #######################################################################################################
 
@@ -4189,4 +4190,4 @@ def pre_cfgCheckYAML(cfg):
     #Bring all errors found to users attention
     if not (error_found_in_mumc_config_yaml == ''):
         print('\n' + error_found_in_mumc_config_yaml)
-        exit(0)
+        sys.exit(0)

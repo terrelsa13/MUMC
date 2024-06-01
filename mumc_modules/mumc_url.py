@@ -1,3 +1,4 @@
+import sys
 import json
 import time
 import urllib.request as urlrequest
@@ -147,7 +148,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
                             print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
                             print('\n  URL: ' + str(url))
-                            exit(0)
+                            sys.exit(0)
                         else:
                             time.sleep(doubling_delay)
                             #doubling_delay value doubles each time the same API request is resent
@@ -157,7 +158,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.")
                                 print('\n  URL: ' + str(url))
-                                exit(0)
+                                sys.exit(0)
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
@@ -176,7 +177,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()))
                     print('\n  URL: ' + str(url))
-                    exit(0)
+                    sys.exit(0)
         except HTTPError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -229,7 +230,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
                     appendTo_DEBUG_log('\nCheck password and/or remove any GUI API keys for MUMC',2,the_dict)
-                exit(0)
+                sys.exit(0)
         except URLError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -284,7 +285,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
                     appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
                     appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',2,the_dict)
-                exit(0)
+                sys.exit(0)
         except TimeoutError:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -337,6 +338,6 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
                     appendTo_DEBUG_log('\nTimeout - Response taking too long',2,the_dict)
-                exit(0)
+                sys.exit(0)
 
     return(data)

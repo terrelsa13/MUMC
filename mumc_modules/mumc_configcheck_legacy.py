@@ -1,6 +1,6 @@
+import sys
 import json
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
-from mumc_modules.mumc_server_type import isJellyfinServer
 
 
 #Check blacklist and whitelist config variables are as expected
@@ -2406,7 +2406,7 @@ def cfgCheckLegacy(cfg,the_dict):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_py,2,the_dict)
         print(error_text)
         print('\n' + error_found_in_mumc_config_py)
-        exit(0)
+        sys.exit(0)
 
 #######################################################################################################
     return config_dict

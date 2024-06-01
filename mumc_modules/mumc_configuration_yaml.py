@@ -1,5 +1,5 @@
 import copy
-from mumc_modules.mumc_output import save_yaml_config
+from mumc_modules.mumc_paths import save_yaml_config
 
 
 def filterYAMLConfigKeys(dirty_dict,*clean_keys):

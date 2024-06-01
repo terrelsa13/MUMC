@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import copy
+import sys
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_options import parse_command_line_options
@@ -9,7 +10,7 @@ from mumc_modules.mumc_post_process import init_postProcessing
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
-from mumc_modules.mumc_output import get_current_directory,delete_debug_log
+from mumc_modules.mumc_paths import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_default import create_default_config,merge_configuration
@@ -35,6 +36,7 @@ def MUMC():
     #create default config file
     default_config=create_default_config(cfg['admin_settings']['server']['brand'])
 
+    #copy over path info for use later
     default_config['mumc_path']=init_dict['mumc_path']
     default_config['debug_file_name']=init_dict['debug_file_name']
 
@@ -70,8 +72,12 @@ def MUMC():
             #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
             cache_data_to_debug(cfg)
 
+        #delete unused variables
+        del cmdopt_dict
+        del cfg_orig
+
         #exit gracefully after updating config
-        exit(0)
+        sys.exit(0)
     else:
         #delete unused variables
         del cmdopt_dict
@@ -140,6 +146,6 @@ def MUMC():
 if (__name__ == "__main__"):
     MUMC()
 
-exit(0)
+sys.exit(0)
 
 ############# END OF SCRIPT #############

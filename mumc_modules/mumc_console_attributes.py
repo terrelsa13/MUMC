@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 
 
 #https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -119,6 +120,6 @@ class console_text_attributes:
 
 if (__name__ == "__main__"):
     console_text_attributes().console_attribute_test()
-    exit(0)
+    sys.exit(0)
 
 ############# END OF SCRIPT #############

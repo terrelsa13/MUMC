@@ -1,6 +1,6 @@
 from datetime import datetime,timezone
 from sys import argv,path
-from mumc_modules.mumc_output import add_to_PATH
+from mumc_modules.mumc_paths import add_to_PATH
 from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer

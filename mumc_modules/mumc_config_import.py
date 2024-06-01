@@ -1,8 +1,9 @@
 import importlib
 import yaml
+import sys
 from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import build_configuration_file
-from mumc_modules.mumc_output import getFileExtension,add_to_PATH,doesFileExist
+from mumc_modules.mumc_paths import getFileExtension,add_to_PATH,doesFileExist
 from mumc_modules.mumc_console_info import default_helper_menu,print_failed_to_load_config
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
@@ -12,7 +13,7 @@ def importHasException(init_dict,cmdopt_dict):
         print_failed_to_load_config(init_dict)
         default_helper_menu(init_dict)
         #exit gracefully
-        exit(0)
+        sys.exit(0)
     else:
         #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
         init_dict['DEBUG']=0
@@ -20,7 +21,7 @@ def importHasException(init_dict,cmdopt_dict):
         init_dict['advanced_settings']['UPDATE_CONFIG']=False
         build_configuration_file(init_dict)
         #exit gracefully
-        exit(0)
+        sys.exit(0)
 
 
 #verify specified variables are avaialbe in the config

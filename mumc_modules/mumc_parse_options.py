@@ -1,8 +1,9 @@
 import os
+import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper,unknown_command_line_option_helper
-from mumc_modules.mumc_output import getFullPathName,getFileExtension,doesFileExist
+from mumc_modules.mumc_paths import getFullPathName,getFileExtension,doesFileExist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
@@ -39,7 +40,7 @@ def findHelpCMDRequest(argv,the_dict):
     for cmdOption in argv:
         if ((cmdOption == '-h') or (cmdOption == '-help') or (cmdOption == '-?')):
             print_full_help_menu(the_dict)
-            exit(0)
+            sys.exit(0)
 
 
 #find unknown options
@@ -56,7 +57,7 @@ def findConsoleAttributeShowRequest(argv):
     for cmdOption in argv:
         if ((cmdOption == '-a') or (cmdOption == '-attr') or (cmdOption == '-attrs') or (cmdOption == '-attribute') or (cmdOption == '-attributes')):
             console_text_attributes().console_attribute_test()
-            exit(0)
+            sys.exit(0)
 
 
 #find alternate config option
@@ -78,7 +79,7 @@ def findAltConfigOptionArgument(argv,altConfigInfo,optionsList,the_dict):
     except (CMDOptionIndexError):
         missing_config_argument_helper(argv,the_dict)
         default_helper_menu(the_dict)
-        exit(0)
+        sys.exit(0)
 
 
 #find running as container option
@@ -119,7 +120,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
     else:
         print('Unable to find valid configuration file.')
         #print('The -rak,-remake-api-key command is unavaible without a valid configuration file.')
-        exit(0)
+        sys.exit(0)
         
     for cmdOption in argv:
         if ((cmdOption == '-rak') or (cmdOption == '-remake-api-key')):
@@ -162,7 +163,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             #print('If there was a previous API key with the App Name MUMC it has been deleted.')
             print('The new API key was saved to ' + str(config_file_full_path) + 'as admin_settings > server > auth_key.')
             print('\nAPI Key: ' + str(cfg['admin_settings']['server']['auth_key']))
-            exit(0)
+            sys.exit(0)
 
 
 #check if alternate config argument is missing
@@ -176,7 +177,7 @@ def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList,the_dict
     except (AlternateConfigArgumentError):
         missing_config_argument_format_helper(argv,the_dict)
         default_helper_menu(the_dict)
-        exit(0)
+        sys.exit(0)
 
 
 #verify alternate config exists
@@ -190,7 +191,7 @@ def verifyAltConfigPathFileExist(argv,altConfigInfo,the_dict):
     except (AlternateConfigNotFoundError):
         alt_config_file_does_not_exists_helper(argv,the_dict)
         default_helper_menu(the_dict)
-        exit(0)
+        sys.exit(0)
 
 
 #verify alternate config file name follows the python module naming convention
@@ -210,7 +211,7 @@ def parseAltConfigPathFileSyntax(argv,altConfigInfo,cmdOption,moduleExtension,th
     except (AlternateConfigSyntaxError):
         alt_config_syntax_helper(argv,cmdOption,the_dict)
         default_helper_menu(the_dict)
-        exit(0)
+        sys.exit(0)
 
     return altConfigPath,altConfigFileNoExt,altConfigFileNoExt+altConfigExt
 
@@ -239,7 +240,7 @@ def parse_command_line_options(the_dict):
         #raise UnknownCMDOptionError
         unknown_command_line_option_helper(cmdUnknown,the_dict)
         default_helper_menu(the_dict)
-        exit(0)
+        sys.exit(0)
 
     #look for console attribute show request command line option
     findConsoleAttributeShowRequest(cmdopt_dict['argv'])

@@ -1,5 +1,5 @@
 import copy
-from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
+from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_compare_items import get_isItemMatching
 from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo

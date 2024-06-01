@@ -1,6 +1,6 @@
 import yaml
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_output import get_current_directory
+from mumc_modules.mumc_paths import get_current_directory
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys
 
