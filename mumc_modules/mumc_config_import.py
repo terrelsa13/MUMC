@@ -9,19 +9,15 @@ from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
 def importHasException(init_dict,cmdopt_dict):
-    if (cmdopt_dict['containerized'] or cmdopt_dict['altConfigInfo']):
-        print_failed_to_load_config(init_dict)
-        default_helper_menu(init_dict)
-        #exit gracefully
-        sys.exit(0)
-    else:
-        #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
-        init_dict['DEBUG']=0
-        init_dict['advanced_settings']={}
-        init_dict['advanced_settings']['UPDATE_CONFIG']=False
-        build_configuration_file(init_dict)
-        #exit gracefully
-        sys.exit(0)
+    #config not found
+    #or
+    #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
+    init_dict['DEBUG']=0
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings']['UPDATE_CONFIG']=False
+    build_configuration_file(init_dict)
+    #exit gracefully
+    sys.exit(0)
 
 
 #verify specified variables are avaialbe in the config
