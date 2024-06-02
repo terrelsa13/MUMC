@@ -461,6 +461,19 @@ def print_failed_to_load_config(the_dict):
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
+#print unable to sucessfully load the Configuration file
+def print_containerized_config_missing(the_dict):
+    strings_list_to_print=''
+    strings_list_to_print+=the_dict['_console_separator'] + '\n'
+    strings_list_to_print+='Config file missing.' + '\n'
+    strings_list_to_print+='Config file should be located at /usr/src/app/mumc_config.yaml inside of the container.' + '\n'
+    strings_list_to_print+='\n'
+    strings_list_to_print+='To build config run: docker exec -it mumc bash' + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
+
+    print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
+
+
 #print all media disabled helper
 def print_all_media_disabled(the_dict):
     strings_list_to_print=""

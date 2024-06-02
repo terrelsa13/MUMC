@@ -5,13 +5,13 @@ import sys
 from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import build_configuration_file
 from mumc_modules.mumc_paths import getFileExtension,add_to_PATH,doesFileExist
-from mumc_modules.mumc_console_info import default_helper_menu,print_failed_to_load_config
+from mumc_modules.mumc_console_info import print_containerized_config_missing
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
 def importHasException(init_dict,cmdopt_dict):
     if (cmdopt_dict['containerized']):
-        build_configuration_file(init_dict)
+        print_containerized_config_missing(init_dict)
         time.sleep(5)
         importConfig(init_dict,cmdopt_dict)
     else:
