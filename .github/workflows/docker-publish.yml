@@ -11,7 +11,7 @@ on:
   push:
     branches: [ "MUMC-Latest", "MUMC_dev" ]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*', 'v*.*.*-*']
+    tags: [ 'v*.*.*']
   pull_request:
     branches: [ "MUMC-Latest", "MUMC_dev" ]
 
