@@ -25,10 +25,8 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['config_file_name_no_ext']='mumc_config'
     the_cfg['debug_file_name']='mumc_DEBUG.log'
     the_cfg['date_time_now']=datetime.now()
-    the_cfg['date_time_utc_now']=datetime.utcnow()
-    #the_cfg['date_time_utc_now']=datetime.now(datetime.UTC)
-    #the_cfg['date_time_utc_now']=datetime.now(UTC)
     the_cfg['date_time_now_tz_utc']=datetime.now(timezone.utc)
+    the_cfg['date_time_utc_now']=the_cfg['date_time_now_tz_utc'].replace(tzinfo=None)
 
     #get current working directory
     the_cfg['cwd']=cwd

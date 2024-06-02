@@ -97,7 +97,7 @@ def get_isItemMatching(item_one,item_two,the_dict):
                     appendTo_DEBUG_log('\nComparing the below two items',3,the_dict)
                     appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3,the_dict)
 
-                if (single_item_one and single_item_two):
+                if ((not ((single_item_one == '') or (single_item_two == ''))) and (not ((single_item_one == None) or (single_item_two == None)))):
                     if (single_item_one == single_item_two):
                         #found a full match; return true and the matching value
                         return True,single_item_one

@@ -512,7 +512,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
                                 #Get if media item is set as an advanced favorite
                                 var_dict['item_isFavorited_Advanced']=False
-                                if (var_dict['favorited_behavior_media']['action_control'] and (any(var_dict['advFav_media']) > 0)):
+                                if (var_dict['favorited_behavior_media']['action_control'] and (any(var_dict['advFav_media'].values()) > 0)):
                                     if (var_dict['media_type_lower'] == 'movie'):
                                         var_dict['item_isFavorited_Advanced']=get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict)
                                     elif (var_dict['media_type_lower'] == 'episode'):
@@ -532,7 +532,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 var_dict['item_isWhitetagged']=False
                                 if (var_dict['data_list_pos'] in var_dict['data_from_whitetagged_queries']):
                                     var_dict['item_isWhitetagged']=True
-                                elif (not (var_dict['whitetags'] == '')):
+                                elif (not (var_dict['whitetags'] == [])):
                                     if (var_dict['media_type_lower'] == 'movie'):
                                         var_dict['item_isWhitetagged']=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['whitetags'])
                                     elif (var_dict['media_type_lower'] == 'episode'):
@@ -552,7 +552,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 var_dict['item_isBlacktagged']=False
                                 if (var_dict['data_list_pos'] in var_dict['data_from_blacktagged_queries']):
                                     var_dict['item_isBlacktagged']=True
-                                elif (not (var_dict['blacktags'] == '')):
+                                elif (not (var_dict['blacktags'] == [])):
                                     if (var_dict['media_type_lower'] == 'movie'):
                                         var_dict['item_isBlacktagged']=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['blacktags'])
                                     elif (var_dict['media_type_lower'] == 'episode'):

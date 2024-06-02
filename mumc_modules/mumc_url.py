@@ -103,13 +103,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     retryAttempts = int(retries)
 
     #check if this request is cached
-    data = the_dict['cached_data'].getCachedDataFromURL(url)
-    #try:
-        #if it is cached used cached data
-        #data = the_dict['cached_data'].getCachedDataFromURL(url)
-    #except:
-        #if it is not cached send request
-        #data = False
+    data = the_dict['cached_data'].getCachedDataFromURL(url.full_url)
 
     if (data):
         #request is cached; do not send request
@@ -136,7 +130,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     try:
                         source = response.read()
                         data = json.loads(source)
-                        the_dict['cached_data'].addEntryToCache(url,data)
+                        the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         getdata = False
                         if (debugState):
                             appendTo_DEBUG_log("\nData Returned From The " + str(requestDebugMessage) + " Request:\n",2,the_dict)
@@ -163,7 +157,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     source = response.read()
                     data = source
                     if (not((response._method == 'DELETE') or (response._method == 'POST'))):
-                        the_dict['cached_data'].addEntryToCache(url,data)
+                        the_dict['cached_data'].addEntryToCache(url.full_url,data)
                     getdata = False
                     if (debugState):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(requestDebugMessage) + " request:",2,the_dict)

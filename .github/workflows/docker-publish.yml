@@ -9,11 +9,11 @@ on:
   schedule:
     - cron: '0 5 * * *'
   push:
-    branches: [ "MUMC-Latest" ]
+    branches: [ "MUMC-Latest", "MUMC_dev" ]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: [ 'v*.*.*', 'v*.*.*-*']
   pull_request:
-    branches: [ "MUMC-Latest" ]
+    branches: [ "MUMC-Latest", "MUMC_dev" ]
 
 env:
   # Use docker.io for Docker Hub if empty

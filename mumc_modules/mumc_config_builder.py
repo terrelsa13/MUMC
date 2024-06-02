@@ -157,17 +157,11 @@ def build_configuration_file(the_dict,orig_dict={}):
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
 
-                strings_list_to_print=['']
+                strings_list_to_print=''
                 strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
             try:
-                print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+                print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:
-                #the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
-                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=''
-                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['style']=''
-                #the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['background']['color']=''
-                #strings_list_to_print=['']
-                #strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
                 print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
 
         #the exception
@@ -186,4 +180,8 @@ def build_configuration_file(the_dict,orig_dict={}):
 
 #get user input needed to edit the mumc_config.yaml file
 def edit_configuration_file(the_dict,orig_dict):
+    #Did we get here from the -u command line argument?
+      #If yes, then the_dict['advanced_settings']['UPDATE_CONFIG'] needs to be manually be set to True
+    if (not (the_dict['advanced_settings']['UPDATE_CONFIG'])):
+        the_dict['advanced_settings']['UPDATE_CONFIG']=True
     build_configuration_file(the_dict,orig_dict)
