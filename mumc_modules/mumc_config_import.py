@@ -1,4 +1,5 @@
 import importlib
+import time
 import yaml
 import sys
 from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy
@@ -9,15 +10,20 @@ from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
 def importHasException(init_dict,cmdopt_dict):
-    #config not found
-    #or
-    #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
-    init_dict['DEBUG']=0
-    init_dict['advanced_settings']={}
-    init_dict['advanced_settings']['UPDATE_CONFIG']=False
-    build_configuration_file(init_dict)
-    #exit gracefully
-    sys.exit(0)
+    if (cmdopt_dict['containerized']):
+        build_configuration_file(init_dict)
+        time.sleep(5)
+        importConfig(init_dict,cmdopt_dict)
+    else:
+        #config not found
+        #or
+        #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
+        init_dict['DEBUG']=0
+        init_dict['advanced_settings']={}
+        init_dict['advanced_settings']['UPDATE_CONFIG']=False
+        build_configuration_file(init_dict)
+        #exit gracefully
+        sys.exit(0)
 
 
 #verify specified variables are avaialbe in the config
