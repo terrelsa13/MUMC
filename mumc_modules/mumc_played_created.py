@@ -185,38 +185,24 @@ def get_createdPlayedStatus(the_dict,item,media_condition,filter_count_compariso
 
 # get played status of media item
 def get_isItemPlayed(item):
+    #'Played' is set to 'True' when the 'PlayedPercentage' for the media_item is >= the 'Max Resume Percent' set in the GUI
+     #The default 'Max Resume Percent' in the GUI is '90%'
 
     '''
-    played_evaluation:
-        play_count:
-            check: true
-            optional: true
-        played_state:
-            check: true
-            optional: true
-        last_played_date:
-            check: true
-            optional: trues
-        minimum_met: 2
+    UserData	
+        PlayedPercentage: 66.8771217639365
+        PlaybackPositionTicks: 4744958540
+        PlayCount: 2
+        IsFavorite: false
+        LastPlayedDate: "2024-06-03T22:45:40.0000000Z"
+        Played: false
     '''
 
-    #there are multiple pieces of data denoting if a media item is played/unplayed
-
-    #require at least this many are True before deciding the media item is played
-    itemIsPlayedControlFloor=2
-    itemIsPlayedControlCount=0
     itemIsPlayed=False
 
     if ('UserData' in item):
-        if ('LastPlayedDate' in item['UserData']) and (not (item['UserData']['LastPlayedDate'] == 'Unplayed')):
-            itemIsPlayedControlCount += 1
-        if ('PlayCount' in item['UserData']) and (item['UserData']['PlayCount'] > 0):
-            itemIsPlayedControlCount += 1
         if ('Played' in item['UserData']) and (item['UserData']['Played']):
-            itemIsPlayedControlCount += 1
-
-    if (itemIsPlayedControlCount >= itemIsPlayedControlFloor):
-        itemIsPlayed=True
+            itemIsPlayed=item['UserData']['Played']
 
     return itemIsPlayed
 
