@@ -65,17 +65,16 @@ class cached_data_handler:
 
     def getCachedDataFromURL(self,url):
         try:
-            if (self.checkURLInCache(url)):
-                index=self.getIndexFromURL(url)
+            if (not ((index:=self.getIndexFromURL(url)) == None)):                
+                self.cached_data_hits+=1
                 self.cached_entry_hits[index]+=1
                 self.cached_entry_times[index]=time.time()*1000
-                self.cached_data_hits+=1
                 return self.cached_data[url]
             else:
                 self.cached_data_misses+=1
-                return False
+                return None
         except:
-            return None
+            raise ValueError('Error returning cached data for url: ' + url + ' at index: ' + index + '\n')
 
     #Recursively find size of data objects
     #Credit to https://github.com/bosswissam/pysize/blob/master/pysize.py

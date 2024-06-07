@@ -406,6 +406,7 @@ def is_valid_library_selected(the_dict):
 
     #remove duplicate strings
     the_dict['selected_libraries_list_of_strs']=list(set(the_dict['selected_libraries_list_of_strs']))
+    the_dict['selected_libraries_list_of_strs'].sort()
 
     try:
         if (the_dict['selected_libraries_list_of_strs']):

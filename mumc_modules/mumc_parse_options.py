@@ -98,6 +98,56 @@ def findConfigUpdaterCMDRequest(argv):
     return False
 
 
+#check if alternate config argument is missing
+def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList,the_dict):
+    try:
+        if (altConfigInfo):
+            #loop thru options and verify what comes after -c is not another option
+            for checkOption in optionsList:
+                if ((argv[argv.index('-c')+1]) == checkOption):
+                    raise AlternateConfigArgumentError
+    except (AlternateConfigArgumentError):
+        missing_config_argument_format_helper(argv,the_dict)
+        default_helper_menu(the_dict)
+        sys.exit(0)
+
+
+#verify alternate config exists
+def verifyAltConfigPathFileExist(argv,altConfigInfo,the_dict):
+    try:
+        if (altConfigInfo):
+            fullPathName=getFullPathName(argv[argv.index('-c')+1])
+            #verify alternate config path and file exist
+            if (fullPathName == None):
+                raise AlternateConfigNotFoundError
+    except (AlternateConfigNotFoundError):
+        alt_config_file_does_not_exists_helper(argv,the_dict)
+        default_helper_menu(the_dict)
+        sys.exit(0)
+
+
+#verify alternate config file name follows the python module naming convention
+def parseAltConfigPathFileSyntax(argv,altConfigInfo,cmdOption,moduleExtension,the_dict):
+    try:
+        if (altConfigInfo):
+            altConfigExt=getFileExtension(argv[argv.index(cmdOption)+1])
+            if ((altConfigExt in moduleExtension) and
+                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(".") == 0) and
+                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(" ") == 0)):
+                #Get path without file.name
+                altConfigPath=Path(os.path.dirname(argv[argv.index(cmdOption)+1]))
+                #Get file without extension
+                altConfigFileNoExt=os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])
+            else:
+                raise AlternateConfigSyntaxError
+    except (AlternateConfigSyntaxError):
+        alt_config_syntax_helper(argv,cmdOption,the_dict)
+        default_helper_menu(the_dict)
+        sys.exit(0)
+
+    return altConfigPath,altConfigFileNoExt,altConfigFileNoExt+altConfigExt
+
+
 #find option to show console attributes
 def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
 
@@ -164,56 +214,6 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             print('The new API key was saved to ' + str(config_file_full_path) + 'as admin_settings > server > auth_key.')
             print('\nAPI Key: ' + str(cfg['admin_settings']['server']['auth_key']))
             sys.exit(0)
-
-
-#check if alternate config argument is missing
-def findNoOptionAfterAltConfigCMDRequest(argv,altConfigInfo,optionsList,the_dict):
-    try:
-        if (altConfigInfo):
-            #loop thru options and verify what comes after -c is not another option
-            for checkOption in optionsList:
-                if ((argv[argv.index('-c')+1]) == checkOption):
-                    raise AlternateConfigArgumentError
-    except (AlternateConfigArgumentError):
-        missing_config_argument_format_helper(argv,the_dict)
-        default_helper_menu(the_dict)
-        sys.exit(0)
-
-
-#verify alternate config exists
-def verifyAltConfigPathFileExist(argv,altConfigInfo,the_dict):
-    try:
-        if (altConfigInfo):
-            fullPathName=getFullPathName(argv[argv.index('-c')+1])
-            #verify alternate config path and file exist
-            if (fullPathName == None):
-                raise AlternateConfigNotFoundError
-    except (AlternateConfigNotFoundError):
-        alt_config_file_does_not_exists_helper(argv,the_dict)
-        default_helper_menu(the_dict)
-        sys.exit(0)
-
-
-#verify alternate config file name follows the python module naming convention
-def parseAltConfigPathFileSyntax(argv,altConfigInfo,cmdOption,moduleExtension,the_dict):
-    try:
-        if (altConfigInfo):
-            altConfigExt=getFileExtension(argv[argv.index(cmdOption)+1])
-            if ((altConfigExt in moduleExtension) and
-                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(".") == 0) and
-                ((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(" ") == 0)):
-                #Get path without file.name
-                altConfigPath=Path(os.path.dirname(argv[argv.index(cmdOption)+1]))
-                #Get file without extension
-                altConfigFileNoExt=os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])
-            else:
-                raise AlternateConfigSyntaxError
-    except (AlternateConfigSyntaxError):
-        alt_config_syntax_helper(argv,cmdOption,the_dict)
-        default_helper_menu(the_dict)
-        sys.exit(0)
-
-    return altConfigPath,altConfigFileNoExt,altConfigFileNoExt+altConfigExt
 
 
 #parse the command line options

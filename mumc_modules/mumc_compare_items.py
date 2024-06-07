@@ -20,7 +20,7 @@ def keys_exist(the_element, *keys_indexes):
             except:
                 return False
         else:
-            if key_index not in temp_element:
+            if ((temp_element == None) or (key_index not in temp_element)):
                 return False
             temp_element = temp_element[key_index]
     return True
@@ -62,37 +62,45 @@ def does_index_exist(item, indexvalue, the_dict):
 #Determine if there is a matching item or Determine if an item starts with the other
 def get_isItemMatching(item_one,item_two,the_dict):
 
+    temp_item_one=[]
     #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
-    if (isinstance(item_one,list)):
+    if (isinstance(item_one,(list,set,tuple))):
         for item1 in item_one:
             if (not (item1 == None)):
-                itempos = item_one.index(item1)
-                item_one[itempos] = item1.replace('\\','/')
+                #itempos = item_one.index(item1)
+                #item_one[itempos] = item1.replace('\\','/')
+                temp_item_one.append(item1.replace('\\','/'))
     elif (isinstance(item_one,str)):
-        item_one = item_one.replace('\\','/')
-        item_one_list=[]
-        item_one_list.append(item_one)
-        item_one=item_one_list
+        temp_item_one = item_one.replace('\\','/')
+        #item_one_list=[]
+        #item_one_list.append(item_one)
+        #temp_item_one=item_one_list
+    else:
+        raise TypeError('ItemIsMatchingTypeError: item_one is an unexpected type; expecting list, set, tuple, or string.')
 
+    temp_item_two=[]
     #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
-    if (isinstance(item_two,list)):
+    if (isinstance(item_two,(list,set,tuple))):
         for item2 in item_two:
             if (not (item2 == None)):
-                itempos = item_two.index(item2)
-                item_two[itempos] = item2.replace('\\','/')
+                #itempos = item_two.index(item2)
+                #item_two[itempos] = item2.replace('\\','/')
+                temp_item_two.append(item2.replace('\\','/'))
     elif (isinstance(item_two,str)):
-        item_two = item_two.replace('\\','/')
-        item_two_list=[]
-        item_two_list.append(item_two)
-        item_two=item_two_list
+        temp_item_two = item_two.replace('\\','/')
+        #item_two_list=[]
+        #item_two_list.append(item_two)
+        #temp_item_two=item_two_list
+    else:
+        raise TypeError('ItemIsMatchingTypeError: item_two is an unexpected type; expecting list, set, tuple, or string.')
 
     #DEBUG log formatting
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\n',1,the_dict)
 
     #determine if media Id matches one of the other Ids
-    for single_item_one in item_one:
-            for single_item_two in item_two:
+    for single_item_one in temp_item_one:
+            for single_item_two in temp_item_two:
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log('\nComparing the below two items',3,the_dict)
                     appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3,the_dict)

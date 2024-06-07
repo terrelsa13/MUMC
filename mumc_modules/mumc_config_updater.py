@@ -1,5 +1,5 @@
 from mumc_modules.mumc_paths import save_yaml_config
-from mumc_modules.mumc_compare_items import keys_exist_return_value
+from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
 #TBD
 def yaml_configurationUpdater(the_dict,orig_dict={}):
@@ -38,6 +38,52 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         config_data['admin_settings']={}
         try:
+            try:
+                #check if default value was NOT selected during updating
+                if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+                    orig_dict['admin_settings']['behavior']['list']='whitelist'
+                else:
+                    #check if keys already exist in 
+                    if (keys_exist(orig_dict,'admin_settings','behavior','list')):
+                        orig_dict['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+
+                #before saving; reorder some keys for consistency
+                orig_dict['admin_settings']['behavior']['list']=orig_dict['admin_settings']['behavior'].pop('list')
+            except:
+                pass
+
+            try:
+                #check if default value was NOT selected during updating
+                if (the_dict['admin_settings']['behavior']['matching'] == 'byPath'):
+                    orig_dict['admin_settings']['behavior']['matching']='byPath'
+                elif (the_dict['admin_settings']['behavior']['matching'] == 'byNetworkPath'):
+                    orig_dict['admin_settings']['behavior']['matching']='byNetworkPath'
+                else:
+                    if (keys_exist(orig_dict,'admin_settings','behavior','matching')):
+                        orig_dict['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+
+                #before saving; reorder some keys for consistency
+                orig_dict['admin_settings']['behavior']['matching']=orig_dict['admin_settings']['behavior'].pop('matching')
+            except:
+                pass
+
+            try:
+                #check if default value was NOT selected during updating
+                if (the_dict['admin_settings']['behavior']['users']['monitor_disabled'] == False):
+                    orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=False
+                else:
+                    if (keys_exist(orig_dict,'admin_settings','behavior','users')):
+                        orig_dict['admin_settings']['behavior']['users']={}
+                        #if (keys_exist(orig_dict,'admin_settings','behavior','users','monitor_disabled')):
+                        orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+                        #else:
+                            #orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+
+                #before saving; reorder some keys for consistency
+                orig_dict['admin_settings']['behavior']['users']=orig_dict['admin_settings']['behavior'].pop('users')
+            except:
+                pass
+
             config_data['admin_settings']['behavior']=orig_dict['admin_settings']['behavior']
         except:
             pass

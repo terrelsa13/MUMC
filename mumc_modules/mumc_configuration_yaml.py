@@ -43,30 +43,46 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['basic_settings']['filter_statements']['audiobook']['created']['count']=1
         config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=True
 
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=False
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=False
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=False
 
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=False
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=True
 
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=False
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=False
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=False
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=False
+
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=True
+
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=False
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=False
+
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=True
 
     if (server_brand == 'jellyfin'):
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=False
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=False
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=False
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=False
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=False
+
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=False
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=True
 
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['user_conditional']='any'
@@ -355,24 +371,44 @@ def yaml_configurationLayout(config_data,server_brand):
 def yaml_configurationBuilder(the_dict):
 
     #strip out uneccessary data
-    config_data=filterYAMLConfigKeys(the_dict,'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+    config_data=filterYAMLConfigKeys(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
 
     #start building config yaml
     config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
 
     config_data['basic_settings']['filter_statements'].pop('audio')
-    if (config_data['admin_settings']['server']['brand'] == 'jellyfin'):
+    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements'].pop('audiobook')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
-    config_data['advanced_settings'].pop('whitetags')
-    config_data['advanced_settings'].pop('blacktags')
+    if (the_dict['advanced_settings']['whitetags'] == []):
+        config_data['advanced_settings'].pop('whitetags')
+    else:
+        config_data['advanced_settings']['whitetags']=the_dict['advanced_settings']['whitetags']
+    if (the_dict['advanced_settings']['blacktags'] == []):
+        config_data['advanced_settings'].pop('blacktags')
+    else:
+        config_data['advanced_settings']['blacktags']=the_dict['advanced_settings']['blacktags']
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('episode_control')
     config_data['advanced_settings'].pop('trakt_fix')
     config_data['advanced_settings'].pop('console_controls')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
-    config_data['admin_settings'].pop('behavior')
+    if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
+        config_data['admin_settings'].pop('behavior')
+    else:
+        if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+            config_data['admin_settings']['behavior'].pop('list')
+        else:
+            config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+        if (the_dict['admin_settings']['behavior']['matching'] == 'byId'):
+            config_data['admin_settings']['behavior'].pop('matching')
+        else:
+            config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+        if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+            config_data['admin_settings']['behavior'].pop('users')
+        else:
+            config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
     config_data['admin_settings'].pop('api_controls')
     config_data['admin_settings'].pop('cache')
 

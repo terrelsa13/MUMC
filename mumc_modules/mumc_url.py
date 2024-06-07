@@ -102,12 +102,12 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    #check if this request is cached
-    data = the_dict['cached_data'].getCachedDataFromURL(url.full_url)
-
-    if (data):
+    #check if this url is cached
+    if (the_dict['cached_data'].checkURLInCache(url.full_url)):
         #request is cached; do not send request
         getdata = False
+        #get cached data
+        data = the_dict['cached_data'].getCachedDataFromURL(url.full_url)
     else:
         #request is not cached; send request
         getdata = True

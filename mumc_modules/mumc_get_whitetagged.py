@@ -15,8 +15,7 @@ def init_blacklist_whitetagged_query(var_dict):
     var_dict['Whitetags_Parsed']=list_to_urlparsed_string(var_dict['whitetags'])
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_whitetagged']):
+        var_dict['enable_media_query_blacklisted_whitetagged']):
         #Build query for whitetagged media items from blacklist
         var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Whitetagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -67,8 +66,7 @@ def init_whitelist_whitetagged_query(var_dict):
     var_dict['Whitetags_Parsed']=list_to_urlparsed_string(var_dict['whitetags'])
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_whitetagged']):
+        var_dict['enable_media_query_whitelisted_whitetagged']):
         #Build query for whitetagged media items from whitelist
         var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Whitetagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -112,8 +110,7 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
     #Check if whitetag or blacklist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
         var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_whitetagged']):
+        var_dict['enable_media_query_blacklisted_whitetagged']):
 
         #Built query for whitetagged from Blacklist media items
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Blacklist'] +
@@ -158,8 +155,7 @@ def whitelist_whitetagged_query(user_info,var_dict,the_dict):
     #Check if whitetag or whitelist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
         var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_whitetagged']):
+        var_dict['enable_media_query_whitelisted_whitetagged']):
 
         #Built query for whitetagged from Whitelist media items
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Whitelist'] +

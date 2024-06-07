@@ -13,8 +13,7 @@ def init_blacklist_favorited_query(var_dict):
     var_dict['APIDebugMsg_Favorited_From_Blacklist']=var_dict['media_type_lower'] + '_Favorited_From_Blacklisted_media_items'
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_blacklisted_favorited']):
             #Build query for Favorited_From_Blacklist media items
         var_dict['IncludeItemTypes_Favorited_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -64,8 +63,7 @@ def init_whitelist_favorited_query(var_dict):
     var_dict['APIDebugMsg_Favorited_From_Whitelist']=var_dict['media_type_lower'] + '_Favorited_From_Whitelisted_media_items'
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_whitelisted_favorited']):
         #Build query for Favorited_From_Whitelist media items
         var_dict['IncludeItemTypes_Favorited_From_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -108,8 +106,7 @@ def init_whitelist_favorited_query(var_dict):
 
 def blacklist_favorited_query(user_info,var_dict,the_dict):
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_blacklisted_favorited']):
 
         #Built query for Favorited from Blacklist media items
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Blacklist'] +
@@ -151,8 +148,7 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
 
 def whitelist_favorited_query(user_info,var_dict,the_dict):
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_whitelisted_favorited']):
 
         #Built query for Favorited from Whitelist media items
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Whitelist'] +

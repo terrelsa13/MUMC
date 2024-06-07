@@ -58,6 +58,10 @@ def get_empty_folders(folder_type,the_dict):
         var_dict['QueryItemsRemaining_All']=var_dict['QueriesRemaining_Empty_Folder']
 
         for parentItem in var_dict['data_Empty_Folder']['Items']:
+            try:
+                seriesId=parentItem['SeriesId']
+            except:
+                seriesId=parentItem['ParentId']
             #When season look for parents with no children; add them to the delete list
             #When series and REMOVE_FILES is True look for parents with no children; add them to the delete list
             if (the_dict['advanced_settings']['REMOVE_FILES']):
@@ -70,10 +74,10 @@ def get_empty_folders(folder_type,the_dict):
                             else:
                                 parentItems_Tracker.append(parentItem['Id'])
                                 the_dict['parentDeleteItems'].append(parentItem)
-                            if (parentItem['ParentId'] in the_dict['child_remaining']):
-                                the_dict['child_remaining'][parentItem['ParentId']]+=1
+                            if (seriesId in the_dict['child_remaining']):
+                                the_dict['child_remaining'][seriesId]+=1
                             else:
-                                the_dict['child_remaining'][parentItem['ParentId']]=1
+                                the_dict['child_remaining'][seriesId]=1
             #When series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
             else:
                 if (not (parentItem == None)):
@@ -84,10 +88,10 @@ def get_empty_folders(folder_type,the_dict):
                             the_dict['child_remaining'][parentItem['Id']]=parentItem['ChildCount'] - the_dict['child_remaining'][parentItem['Id']]
                             if (the_dict['child_remaining'][parentItem['Id']] == 0):
                                 the_dict['parentDeleteItems'].append(parentItem)
-                                if (parentItem['ParentId'] in the_dict['pre_child_remaing']):
-                                    the_dict['pre_child_remaing'][parentItem['ParentId']]+=1
+                                if (seriesId in the_dict['pre_child_remaing']):
+                                    the_dict['pre_child_remaing'][seriesId]+=1
                                 else:
-                                    the_dict['pre_child_remaing'][parentItem['ParentId']]=1
+                                    the_dict['pre_child_remaing'][seriesId]=1
 
     the_dict['child_remaining']=the_dict['pre_child_remaing']
 
@@ -102,10 +106,15 @@ def track_episodes_when_REMOVE_FILES_false(deleteItems,the_dict):
             if (item['Type'] == 'Episode'):
                 if (not (item['Id'] in episodeTracker)):
                     episodeTracker.append(item['Id'])
-                    if (item['ParentId'] in the_dict['child_remaining']):
-                        the_dict['child_remaining'][item['ParentId']]+=1
+                    seasonId=None
+                    try:
+                        seasonId=item['SeasonId']
+                    except:
+                        seasonId=item['ParentId']
+                    if (seasonId in the_dict['child_remaining']):
+                        the_dict['child_remaining'][seasonId]+=1
                     else:
-                        the_dict['child_remaining'][item['ParentId']]=1
+                        the_dict['child_remaining'][seasonId]=1
 
     return the_dict
 

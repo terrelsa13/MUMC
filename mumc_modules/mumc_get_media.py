@@ -285,11 +285,15 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
         var_dict['minimum_number_episodes']=0
         var_dict['minimum_number_played_episodes']=0
 
-    var_dict['media_query_favorited']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['favorited']
-    var_dict['media_query_whitetagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitetagged']
-    var_dict['media_query_blacktagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacktagged']
-    var_dict['media_query_whitelisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']
-    var_dict['media_query_blacklisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']
+    var_dict['enable_media_query_whitelisted_favorited']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']['favorited']
+    var_dict['enable_media_query_whitelisted_whitetagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']['whitetagged']
+    var_dict['enable_media_query_whitelisted_blacktagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']['blacktagged']
+    var_dict['enable_media_query_whitelisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['whitelisted']['whitelisted']
+
+    var_dict['enable_media_query_blacklisted_favorited']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']['favorited']
+    var_dict['enable_media_query_blacklisted_whitetagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']['whitetagged']
+    var_dict['enable_media_query_blacklisted_blacktagged']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']['blacktagged']
+    var_dict['enable_media_query_blacklisted']=the_dict['advanced_settings']['filter_statements'][var_dict['media_type_lower']]['query_filter']['blacklisted']['blacklisted']
 
     #Determine played or created time; UTC time used for media items; determine played and created date for each media type
     var_dict['cut_off_date_played_media']=the_dict['cut_off_date_played_media'][var_dict['media_type_lower']]

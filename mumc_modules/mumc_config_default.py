@@ -9,10 +9,6 @@ def create_default_config(server_brand='emby'):
     default_config['server_brand']=server_brand
     default_config=setYAMLConfigSkeleton(default_config)
     default_config['admin_settings']['server']['brand']='emby'
-    #default_config['admin_settings']['behavior']['list']='blacklist'
-    #default_config['admin_settings']['behavior']['matching']='byId'
-    #default_config['admin_settings']['behavior']['users']={}
-    #default_config['admin_settings']['behavior']['users']['monitor_disabled']=True
     default_config=yaml_configurationLayout(default_config,default_config['server_brand'])
 
     return default_config
@@ -25,14 +21,7 @@ def merge_configuration(default_base,merge):
         default_base['version']=merge['version']
     except:
         error_found_in_mumc_config_yaml+='ConfigNameError: version is missing from the mumc_config.yaml\n'
-    #try:
-        #default_base['basic_settings']=merge['basic_settings']
-    #except:
-        #pass
-    #try:
-        #default_base['basic_settings']['filter_statements']=merge['basic_settings']['filter_statements']
-    #except:
-        #pass
+
     try:
         merge['advanced_settings']=merge['advanced_settings']
     except:
@@ -164,90 +153,234 @@ def merge_configuration(default_base,merge):
         except:
             pass
 
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
         except:
             pass
 
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
         except:
             pass
 
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
         except:
             pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']
+    except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
         except:
             pass
 
     if (server_brand == 'jellyfin'):
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+            except:
+                pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+            except:
+                pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+            except:
+                pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+            except:
+                pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+            except:
+                pass
+        try:
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']
+        except:
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+            except:
+                pass
+        try:
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']
+        except:
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+            except:
+                pass
+        try:
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']
+        except:
+            try:
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+            except:
+                pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['movie']['favorited']['action']
@@ -747,6 +880,15 @@ def merge_configuration(default_base,merge):
             pass
 
     try:
+        default_base['advanced_settings']['whitetags']=merge['advanced_settings']['whitetags']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['blacktags']=merge['advanced_settings']['blacktags']
+    except:
+        pass
+
+    try:
         default_base['advanced_settings']['delete_empty_folders']['episode']['season']=merge['advanced_settings']['delete_empty_folders']['episode']['season']
     except:
         pass
@@ -1206,7 +1348,10 @@ def merge_configuration(default_base,merge):
     try:
         default_base['admin_settings']['cache']['minimum_age']=merge['admin_settings']['cache']['minimum_age']
     except:
-        pass
+        try:
+            default_base['admin_settings']['cache']['minimum_age']=merge['admin_settings']['cache']['last_accessed_time']
+        except:
+            pass
 
     #Bring all errors found to users attention
     if not (error_found_in_mumc_config_yaml == ''):

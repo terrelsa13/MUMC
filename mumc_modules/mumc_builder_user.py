@@ -241,6 +241,7 @@ def is_valid_user_selected(the_dict):
         the_dict['selected_user_list_of_strs'].remove('')
     #remove duplicate strings
     the_dict['selected_user_list_of_strs']=list(set(the_dict['selected_user_list_of_strs']))
+    the_dict['selected_user_list_of_strs'].sort()
 
     try:
         selected_user_str=None
