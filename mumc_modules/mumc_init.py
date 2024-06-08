@@ -37,15 +37,15 @@ def initialize_mumc(cwd,mumc_path):
     if (not(str(cwd) in path)):
         add_to_PATH(cwd,0)
 
-    #save ../mumc_config.yaml directory
-    the_cfg['mumc_path']=mumc_path
-    if (not(str(mumc_path) in path)):
-        add_to_PATH(mumc_path)
-
     #save ../config/mumc_config.yaml directory
     the_cfg['mumc_path_config_dir']=mumc_path / 'config'
     if (not(str(mumc_path / 'config') in path)):
-        add_to_PATH(mumc_path / 'config')
+        add_to_PATH(mumc_path / 'config',1)
+
+    #save ../mumc_config.yaml directory
+    the_cfg['mumc_path']=mumc_path
+    if (not(str(mumc_path) in path)):
+        add_to_PATH(mumc_path,1)
 
     #save command line arguments
     the_cfg['argv']=argv
