@@ -40,7 +40,7 @@ def getFullPathName(filePathName):
         fullPathName=str(Path(filePathName).resolve())
     else:
         for directory in reversed(path):
-            if (doesFileExist(directory + '/' + filePathName)):
+            if (doesFileExist(directory / filePathName)):
                 fullPathName=str(Path(directory / filePathName))
     return fullPathName
 
