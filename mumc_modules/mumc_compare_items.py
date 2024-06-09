@@ -71,14 +71,9 @@ def get_isItemMatching(item_one,item_two,the_dict):
     if (isinstance(item_one,(list,set,tuple))):
         for item1 in item_one:
             if (not (item1 == None)):
-                #itempos = item_one.index(item1)
-                #item_one[itempos] = item1.replace('\\','/')
                 temp_item_one.append(item1.replace('\\','/'))
     elif (isinstance(item_one,str)):
-        temp_item_one = item_one.replace('\\','/')
-        #item_one_list=[]
-        #item_one_list.append(item_one)
-        #temp_item_one=item_one_list
+        temp_item_one.append(item_one.replace('\\','/'))
     else:
         raise TypeError('ItemIsMatchingTypeError: item_one is an unexpected type; expecting list, set, tuple, or string.')
 
@@ -87,14 +82,9 @@ def get_isItemMatching(item_one,item_two,the_dict):
     if (isinstance(item_two,(list,set,tuple))):
         for item2 in item_two:
             if (not (item2 == None)):
-                #itempos = item_two.index(item2)
-                #item_two[itempos] = item2.replace('\\','/')
                 temp_item_two.append(item2.replace('\\','/'))
     elif (isinstance(item_two,str)):
-        temp_item_two = item_two.replace('\\','/')
-        #item_two_list=[]
-        #item_two_list.append(item_two)
-        #temp_item_two=item_two_list
+        temp_item_two.append(item_two.replace('\\','/'))
     else:
         raise TypeError('ItemIsMatchingTypeError: item_two is an unexpected type; expecting list, set, tuple, or string.')
 
@@ -113,12 +103,6 @@ def get_isItemMatching(item_one,item_two,the_dict):
                     if (single_item_one == single_item_two):
                         #found a full match; return true and the matching value
                         return True,single_item_one
-                    #elif (single_item_one.startswith(single_item_two)):
-                        #found a partial match; return true and the matching value
-                        #return True,single_item_two
-                    #elif (single_item_two.startswith(single_item_one)):
-                        #found a partial match; return true and the matching value
-                        #return True,single_item_one
 
     #nothing matched; return false and empty string
     return False,''
