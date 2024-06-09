@@ -105,7 +105,7 @@ def get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_play
         isPlayed_Filter_Value='playedAndUnplayed'
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value + "/n",2,the_dict)
+        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value + "\n",2,the_dict)
 
     return isPlayed_Filter_Value
 

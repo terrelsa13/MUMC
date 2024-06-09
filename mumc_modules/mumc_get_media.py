@@ -723,11 +723,18 @@ def init_getMedia(the_dict):
         #if user is disabled
         if (this_users_info['Policy']['IsDisabled']):
             #check the monitor_disabled_users config value
+            '''
             if (not(monitor_disabled_users)):
                 #mark the user as disabled
                 the_dict['disabled_users'].append(user_info)
                 the_dict['disabled_user_ids'].append(user_info['user_id'])
             else:
+                #mark the user as enabled
+                the_dict['enabled_users'].append(user_info)
+                the_dict['enabled_user_ids'].append(user_info['user_id'])
+            '''
+            #check the monitor_disabled_users config value
+            if (monitor_disabled_users):
                 #mark the user as enabled
                 the_dict['enabled_users'].append(user_info)
                 the_dict['enabled_user_ids'].append(user_info['user_id'])

@@ -27,36 +27,31 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
 
     #Emby and jellyfin store tags differently
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
+
+    #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+    #Check if media item is tagged
+    if ((not (usertags == '')) and (tagData in item)):
         #Check if media item is tagged
-        if ((not (usertags == '')) and ('TagItems' in item)):
-            #Check if media item is tagged
-            taglist=set()
-            #Loop thru tags; store them for comparison to the media item
-            for tagpos in range(len(item['TagItems'])):
-                taglist.add(item['TagItems'][tagpos]['Name'])
-            #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching(usertags,taglist,the_dict)
-            #Save media item's tags state
-            if (itemIsTagged):
-                tagged_items.append(item['Id'])
-            if (the_dict['DEBUG']):
+        tag_set=set()
+        #Loop thru tags; store them for comparison to the media item
+        if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+            for tagpos in range(len(item[tagData])):
+                tag_set.add(item[tagData][tagpos]['Name'])
+        else:
+            for tagpos in range(len(item[tagData])):
+                tag_set.add(item[tagData][tagpos])
+        #Check if any of the media items tags match the tags in the config file
+        itemIsTagged,itemTaggedValue=get_isItemMatching(usertags,tag_set,the_dict)
+        #Save media item's tags state
+        if (itemIsTagged):
+            tagged_items.append(item['Id'])
+        if (the_dict['DEBUG']):
+            if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
                 appendTo_DEBUG_log('\nEmby tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
-    #Emby and jellyfin store tags differently
-    else: #(isJellyfinServer(the_dict['server_brand']))
-        #Jellyfin tags
-        #Check if media item is tagged
-        if ((not (usertags == '')) and ('Tags' in item)):
-            #Check if media item is tagged
-            taglist=set()
-            #Loop thru tags; store them for comparison to the media item
-            for tagpos in range(len(item['Tags'])):
-                taglist.add(item['Tags'][tagpos])
-            #Check if any of the media items tags match the tags in the config file
-            itemIsTagged,itemTaggedValue=get_isItemMatching(usertags,taglist,the_dict)
-            #Save media item's usertags state
-            if (itemIsTagged):
-                tagged_items.append(item['Id'])
-            if (the_dict['DEBUG']):
+            else:
                 appendTo_DEBUG_log('\nJellyfin tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
 
     if (the_dict['DEBUG']):
@@ -100,8 +95,8 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
             data_dict['QueriesRemaining_']=True
 
             if not (data['Id'] == ''):
-                #Build query for child media items; check is not Movie, Episode, or Audio
-                if not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio')):
+                #Build query for child media items; SortOrdercheck is not Movie, Episode, or Audio
+                if (not ((data['Type'] == 'Movie') and (data['Type'] == 'Episode') and (data['Type'] == 'Audio'))):
                     #include all item types; filter applied in first API calls for each media type in get_mediaItems()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
@@ -118,7 +113,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
                     while (data_dict['QueriesRemaining_']):
 
-                        if not (data['Id'] == ''):
+                        if (not (data['Id'] == '')):
                             #Built query for child media items
                             url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
                             '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
@@ -143,49 +138,52 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             child_itemIsTagged=False
                             #Check if child item has already been processed
                             if not (child_item['Id'] in user_processed_itemsId):
-                                if (does_index_exist(data['TagItems'],0,the_dict)) and (keys_exist(data['TagItems'][0],'Name')):
-                                    insert_tagName=data['TagItems'][0]['Name']
-                                    #Emby and jellyfin store tags differently
-                                    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                                        #Does 'TagItems' exist
-                                        if not ('TagItems' in child_item):
-                                            #if it does not; add desired tag to metadata
-                                            #child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
-                                            child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
-                                        #Does 'TagItems'[] exist
-                                        elif not (does_index_exist(child_item['TagItems'],0,the_dict)):
-                                            #if it does not; add desired tag to metadata
-                                            #child_item['TagItems']=[{'Name':insert_tagName,'Id':insert_tagId}]
-                                            child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
-                                        else: #Tag already exists
-                                            #Determine if the existing tags are any of the tags we are looking for
-                                            child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
-                                            #If existing tags are not ones we are lookign for then insert desired tag
-                                            if not (child_itemIsTagged):
-                                                #child_item['TagItems'].append({'Name':insert_tagName,'Id':insert_tagId})
-                                                child_item['TagItems']=[{'Name':data['TagItems'][0]['Name'],'Id':data['TagItems'][0]['Id']}]
-                                    #Emby and jellyfin store tags differently
-                                    else: #(isJellyfinServer())
-                                        #Does 'TagItems' exist
-                                        if not ('Tag' in child_item):
-                                            #if it does not; add desired tag to metadata
-                                            child_item['Tags']=[insert_tagName]
-                                        #Does 'Tags'[] exist
-                                        elif (child_item['Tags'] == []):
-                                            #if it does not; add desired tag to metadata
-                                            child_item['Tags'].append(insert_tagName)
-                                        else:
-                                            #Determine if the existing tags are any of the tags we are looking for
-                                            child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
-                                            #If existing tags are not ones we are looking for then insert desired tag
-                                            if not (child_itemIsTagged):
-                                                child_item['Tags'].append(insert_tagName)
-                                    #keep track of tagged child items
-                                    child_list.append(child_item)
-                                    user_processed_itemsId.add(child_item['Id'])
 
-                                    if (the_dict['DEBUG']):
-                                        appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),2,the_dict)
+                                #Emby and jellyfin store tags differently
+                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                    tagData='TagItems'
+                                else:
+                                    tagData='Tags'
+
+                                #Add parent tags to children
+                                if (does_index_exist(data[tagData],0,the_dict)) and (keys_exist(data[tagData][0],'Name')):
+                                    #Emby and jellyfin store tags differently
+                                    #Does tagData exist
+                                    if (not (tagData in child_item)):
+                                        #if it does not; add desired tag to metadata
+                                        child_item[tagData]=data[tagData]
+                                    #Does tagData[] exist
+                                    elif (not (does_index_exist(child_item[tagData],0,the_dict))):
+                                        #if it does not; add desired tag to metadata
+                                        child_item[tagData]=data[tagData]
+                                    else: #Tag already exists
+                                        #Determine if the existing tags are any of the tags we are looking for
+                                        child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
+                                        #If existing tags are not ones we are lookign for then insert desired tag
+                                        if not (child_itemIsTagged):
+                                            child_item[tagData].extend(data[tagData])
+                                elif (does_index_exist(data[tagData],0,the_dict)):
+                                    #Emby and jellyfin store tags differently
+                                    #Does tagData exist
+                                    if (not (tagData in child_item)):
+                                        #if it does not; add desired tag to metadata
+                                        child_item[tagData]=data[tagData]
+                                    #Does tagData[] exist
+                                    elif (child_item[tagData] == []):
+                                        #if it does not; add desired tag to metadata
+                                        child_item[tagData]=data[tagData]
+                                    else:
+                                        #Determine if the existing tags are any of the tags we are looking for
+                                        child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
+                                        #If existing tags are not ones we are looking for then insert desired tag
+                                        if (not (child_itemIsTagged)):
+                                            child_item[tagData].extend(data[tagData])
+                                #keep track of tagged child items
+                                child_list.append(child_item)
+                                user_processed_itemsId.add(child_item['Id'])
+
+                                if (the_dict['DEBUG']):
+                                    appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),2,the_dict)
 
     child_dict['Items']=child_list
     child_dict['TotalRecordCount']=len(child_list)

@@ -8,36 +8,40 @@ def is_instance(the_element):
 
 
 def keys_exist(the_element, *keys_indexes):
-    is_instance(the_element)
-    if not keys_indexes:
-        raise ValueError('keys_exist() expects at least one key/index argument.')
+    if isinstance(the_element, Mapping):
+        if not keys_indexes:
+            raise ValueError('keys_exist() expects at least one key/index argument.')
 
-    temp_element = the_element
-    for key_index in keys_indexes:
-        if (isinstance(key_index,int)):
-            try:
+        temp_element = the_element
+        for key_index in keys_indexes:
+            if (isinstance(key_index,int)):
+                try:
+                    temp_element = temp_element[key_index]
+                except:
+                    return False
+            else:
+                if ((temp_element == None) or (key_index not in temp_element)):
+                    return False
                 temp_element = temp_element[key_index]
-            except:
-                return False
-        else:
-            if ((temp_element == None) or (key_index not in temp_element)):
-                return False
-            temp_element = temp_element[key_index]
-    return True
+        return True
+    else:
+        return False
 
 
 def return_key_value(the_element, *keys_indexes):
-    is_instance(the_element)
-    if len(keys_indexes) < 1:
-        raise IndexError('return_key_value() expects at least one key/index argument.')
+    if isinstance(the_element, Mapping):
+        if len(keys_indexes) < 1:
+            raise IndexError('return_key_value() expects at least one key/index argument.')
 
-    temp_element = the_element
-    for key_index in keys_indexes:
-        try:
-            temp_element = temp_element[key_index]
-        except (KeyError, IndexError):
-            return None
-    return temp_element
+        temp_element = the_element
+        for key_index in keys_indexes:
+            try:
+                temp_element = temp_element[key_index]
+            except (KeyError, IndexError):
+                return None
+        return temp_element
+    else:
+        return None
 
 
 def keys_exist_return_value(the_element, *keys_indexes):
