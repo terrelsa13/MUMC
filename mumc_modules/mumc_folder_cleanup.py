@@ -63,7 +63,7 @@ def get_empty_folders(folder_type,the_dict):
             except:
                 seriesId=parentItem['ParentId']
             #When season look for parents with no children; add them to the delete list
-            #When series and REMOVE_FILES is True look for parents with no children; add them to the delete list
+            #When season/series and REMOVE_FILES is True look for parents with no children; add them to the delete list
             if (the_dict['advanced_settings']['REMOVE_FILES']):
                 if (not (parentItem == None)):
                     if ('ChildCount' in parentItem):
@@ -78,7 +78,7 @@ def get_empty_folders(folder_type,the_dict):
                                 the_dict['child_remaining'][seriesId]+=1
                             else:
                                 the_dict['child_remaining'][seriesId]=1
-            #When series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
+            #When season/series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
             else:
                 if (not (parentItem == None)):
                     if ('ChildCount' in parentItem):
