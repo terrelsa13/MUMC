@@ -107,13 +107,22 @@ def init_whitelist_whitetagged_query(var_dict):
 
 
 def blacklist_whitetagged_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_blacklist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_blacklist_lib']['lib_id']
+
     #Check if whitetag or blacklist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
         var_dict['this_blacklist_lib']['lib_enabled'] and
         var_dict['enable_media_query_blacklisted_whitetagged']):
 
         #Built query for whitetagged from Blacklist media items
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Blacklist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Blacklist'] +
         '&Recursive=' + var_dict['Recursive_Whitetagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Blacklist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Blacklist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Blacklist'])
@@ -127,8 +136,8 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
         var_dict['APIDebugMsg_Child_Of_Whitetagged_From_Blacklist']='Child_Of_Whitetagged_Item_From_Blacklist'
         var_dict['data_Child_Of_Whitetagged_From_Blacklist']=getChildren_taggedMediaItems('Whitetagged_From_Blacklist',user_info,var_dict,the_dict)
 
-        var_dict['data_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
-        var_dict['data_Child_Of_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+        var_dict['data_Whitetagged_From_Blacklist']['lib_id']=parent_id
+        var_dict['data_Child_Of_Whitetagged_From_Blacklist']['lib_id']=parent_id
 
     else: #(Whitetags_Tagged_From_Blacklist == '')
         var_dict['data_Whitetagged_From_Blacklist']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
@@ -141,10 +150,10 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
         var_dict['QueryLimit_Child_Of_Whitetagged_From_Blacklist']=0
         var_dict['QueriesRemaining_Child_Of_Whitetagged_From_Blacklist']=False
 
-    var_dict['data_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Whitetagged_From_Blacklist']['lib_id']=parent_id
     var_dict['data_Whitetagged_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
     var_dict['data_Whitetagged_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
-    var_dict['data_Child_Of_Whitetagged_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Child_Of_Whitetagged_From_Blacklist']['lib_id']=parent_id
     var_dict['data_Child_Of_Whitetagged_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
     var_dict['data_Child_Of_Whitetagged_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
 
@@ -152,13 +161,22 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 
 
 def whitelist_whitetagged_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_whitelist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_whitelist_lib']['lib_id']
+
     #Check if whitetag or whitelist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
         var_dict['this_whitelist_lib']['lib_enabled'] and
         var_dict['enable_media_query_whitelisted_whitetagged']):
 
         #Built query for whitetagged from Whitelist media items
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Whitelist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitetagged_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Whitetagged_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Whitetagged_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Whitetagged_From_Whitelist'] +
         '&Recursive=' + var_dict['Recursive_Whitetagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Whitelist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Whitelist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Whitelist'])
@@ -183,10 +201,10 @@ def whitelist_whitetagged_query(user_info,var_dict,the_dict):
         var_dict['QueryLimit_Child_Of_Whitetagged_From_Whitelist']=0
         var_dict['QueriesRemaining_Child_Of_Whitetagged_From_Whitelist']=False
 
-    var_dict['data_Whitetagged_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Whitetagged_From_Whitelist']['lib_id']=parent_id
     var_dict['data_Whitetagged_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
     var_dict['data_Whitetagged_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
-    var_dict['data_Child_Of_Whitetagged_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Child_Of_Whitetagged_From_Whitelist']['lib_id']=parent_id
     var_dict['data_Child_Of_Whitetagged_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
     var_dict['data_Child_Of_Whitetagged_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 

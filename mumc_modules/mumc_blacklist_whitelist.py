@@ -3,6 +3,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_compare_items import get_isItemMatching
 from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
+from mumc_modules.mumc_server_type import isEmbyServer
 
 
 def get_opposing_listing_type(listing_type):
@@ -22,7 +23,13 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
     user_wlbllib_netpath_json=[]
     for looplist in user_info[checklist]:
         if (library_matching_behavior.casefold() == 'byid'):
-            user_wlbllib_key_json.append(looplist['lib_id'])
+            if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                if (('subfolder_id' in looplist) and (not (looplist['subfolder_id'] == None))):
+                    user_wlbllib_key_json.append(looplist['subfolder_id'])
+                else:
+                    user_wlbllib_key_json.append(looplist['lib_id'])
+            else:
+                user_wlbllib_key_json.append(looplist['lib_id'])
         elif (library_matching_behavior.casefold() == 'bypath'):
             user_wlbllib_path_json.append(looplist['path'])
         elif (library_matching_behavior.casefold() == 'bynetworkpath'):

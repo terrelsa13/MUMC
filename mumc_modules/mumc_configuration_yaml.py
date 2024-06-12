@@ -413,4 +413,4 @@ def yaml_configurationBuilder(the_dict):
     config_data['admin_settings'].pop('cache')
 
     #save yaml config file
-    save_yaml_config(config_data,str(the_dict['mumc_path']) + '/' + the_dict['config_file_name_yaml'])
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])

@@ -3,7 +3,7 @@ from mumc_modules.mumc_server_type import isEmbyServer
 from mumc_modules.mumc_user_queries import get_all_users
 from mumc_modules.mumc_library_queries import get_all_libraries,get_all_library_subfolders
 from mumc_modules.mumc_builder_user import create_user_dicts,reorder_all_users,show_hide_gui_disabled_users,print_users_to_console,get_user_selection,is_valid_user_selected,build_library_data_for_selected_user,print_library_data_for_selected_user,save_library_data_for_selected_user,select_all_users,filter_library_folder_data_for_selected_user,update_fake_user_dict,swap_users,build_user_selection_list,jellyfin_filter_library_data_for_selected_user,remove_key_from_user
-from mumc_modules.mumc_builder_library import create_library_dicts,create_library_path_id_dicts,update_existing_user_libraries,remove_libraries_from_existing_users,remove_subfolders_from_existing_users,remove_nonexisting_subfolders_from_existing_users,add_libraries_to_existing_users,add_libraries_to_new_users,add_selection_and_selected_keys,get_library_selections,is_valid_library_selected,swap_libraries,remove_key_from_blacklist_whitelist,select_all_unselected_libraries,pre_build_all_library_data,build_all_library_data,reorder_libraries_before_printing,jellyfin_autoselect_folders_with_common_libraries,reorder_user_policy_libararies
+from mumc_modules.mumc_builder_library import create_library_dicts,create_library_path_id_dicts,update_existing_user_libraries,remove_libraries_from_existing_users,remove_subfolders_from_existing_users,remove_nonexisting_subfolders_from_existing_users,add_libraries_to_existing_users,add_libraries_to_new_users,add_selection_and_selected_keys,get_library_selections,is_valid_library_selected,swap_libraries,remove_key_from_blacklist_whitelist,select_all_unselected_libraries,pre_build_all_library_data,build_all_library_data,reorder_libraries_before_printing,jellyfin_autoselect_folders_with_common_libraries,reorder_user_policy_libararies,update_users_with_path_ids
 
 
 #run the user and library builder
@@ -22,6 +22,17 @@ def get_users_and_libraries(the_dict):
 
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         the_dict['all_library_subfolders']=get_all_library_subfolders(the_dict)
+
+    for user_info in the_dict['admin_settings']['users']:
+        user_index=the_dict['admin_settings']['users'].index(user_info)
+        for lib_info in user_info['blacklist']:
+            lib_index=user_info['blacklist'].index(lib_info)
+            if (not ('subfolder_id' in lib_info)):
+                the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['subfolder_id']=None
+        for lib_info in user_info['whitelist']:
+            lib_index=user_info['whitelist'].index(lib_info)
+            if (not ('subfolder_id' in lib_info)):
+                the_dict['admin_settings']['users'][user_index]['whitelist'][lib_index]['subfolder_id']=None
 
     for user_info in the_dict['admin_settings']['users']:
         user_info_index=the_dict['admin_settings']['users'].index(user_info)
@@ -53,6 +64,7 @@ def get_users_and_libraries(the_dict):
     the_dict=reorder_user_policy_libararies(the_dict)
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         the_dict=create_library_path_id_dicts(the_dict)
+        the_dict=update_users_with_path_ids(the_dict)
     the_dict=update_existing_user_libraries(the_dict)
     the_dict=remove_libraries_from_existing_users(the_dict)
     the_dict=add_libraries_to_existing_users(the_dict)

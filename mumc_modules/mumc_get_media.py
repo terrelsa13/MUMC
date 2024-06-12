@@ -362,7 +362,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
         var_dict['shortest_list']='whitelist'
 
     for listlen in range(var_dict['list_diff']):
-        user_info[var_dict['shortest_list']].insert((var_dict['shortest_list_length']+listlen),{'lib_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
+        user_info[var_dict['shortest_list']].insert((var_dict['shortest_list_length']+listlen),{'lib_id':None,'subfolder_id':None,'collection_type':None,'path':None,'network_path':None,'lib_enabled':False})
 
     var_dict['media_found']=False
 
@@ -459,7 +459,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                             var_dict['media_found']=True
 
                             var_dict['itemIsMonitored']=False
-                            if (item['Type'] == var_dict['media_type_title']):
+                            if (item['Type'].casefold() == var_dict['media_type_lower']):
                                 for var_dict['mediasource'] in item['MediaSources']:
                                     var_dict['itemIsMonitored']=get_isItemMonitored(var_dict['mediasource'],the_dict)
 
@@ -578,11 +578,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 if (var_dict['data_list_pos'] in var_dict['data_from_whitelisted_queries']):
                                     var_dict['item_isWhitelisted']=get_isItemWhitelisted_Blacklisted('whitelist',item,user_info,the_dict)
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_whitelist_lib']['lib_id']
+                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_whitelist_lib']['subfolder_id']
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_whitelist_lib']['path']
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_whitelist_lib']['network_path']
                                 else: #check if we are at a blacklist queried var_dict['data_list_pos']
                                     var_dict['item_isWhitelisted']=get_isItemWhitelisted_Blacklisted('whitelist',item,user_info,the_dict)
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_blacklist_lib']['lib_id']
+                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_blacklist_lib']['subfolder_id']
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_blacklist_lib']['path']
                                     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_blacklist_lib']['network_path']
 
@@ -598,11 +600,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 if (var_dict['data_list_pos'] in var_dict['data_from_blacklisted_queries']):
                                     var_dict['item_isBlacklisted']=get_isItemWhitelisted_Blacklisted('blacklist',item,user_info,the_dict)
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_blacklist_lib']['lib_id']
+                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_blacklist_lib']['subfolder_id']
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_blacklist_lib']['path']
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_blacklist_lib']['network_path']
                                 else: #check if we are at a whitelist queried var_dict['data_list_pos']
                                     var_dict['item_isBlacklisted']=get_isItemWhitelisted_Blacklisted('blacklist',item,user_info,the_dict)
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_whitelist_lib']['lib_id']
+                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_whitelist_lib']['subfolder_id']
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_whitelist_lib']['path']
                                     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_whitelist_lib']['network_path']
 
@@ -723,17 +727,6 @@ def init_getMedia(the_dict):
         #if user is disabled
         if (this_users_info['Policy']['IsDisabled']):
             #check the monitor_disabled_users config value
-            '''
-            if (not(monitor_disabled_users)):
-                #mark the user as disabled
-                the_dict['disabled_users'].append(user_info)
-                the_dict['disabled_user_ids'].append(user_info['user_id'])
-            else:
-                #mark the user as enabled
-                the_dict['enabled_users'].append(user_info)
-                the_dict['enabled_user_ids'].append(user_info['user_id'])
-            '''
-            #check the monitor_disabled_users config value
             if (monitor_disabled_users):
                 #mark the user as enabled
                 the_dict['enabled_users'].append(user_info)
@@ -745,14 +738,37 @@ def init_getMedia(the_dict):
 
     #Create userId list of accessible libraries
     the_dict['byUserId_accessibleLibraries']={}
+    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        parent_id='lib_id'
+    else:
+        parent_id='subfolder_id'
+
     for user_info in the_dict['admin_settings']['users']:
         the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=set()
+
         for lib_info in user_info['whitelist']:
-            if (not (lib_info['lib_id'] == None)):
-                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info['lib_id'])
+            if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                parent_id='lib_id'
+            else:
+                if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
+                    parent_id='subfolder_id'
+                else:
+                    parent_id='lib_id'
+
+            if (not (lib_info[parent_id] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info[parent_id])
+
         for lib_info in user_info['blacklist']:
-            if (not (lib_info['lib_id'] == None)):
-                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info['lib_id'])
+            if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                parent_id='lib_id'
+            else:
+                if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
+                    parent_id='subfolder_id'
+                else:
+                    parent_id='lib_id'
+
+            if (not (lib_info[parent_id] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info[parent_id])
 
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:

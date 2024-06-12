@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import yaml
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
 from mumc_modules.mumc_versions import get_script_version,get_python_version,get_server_version,get_operating_system_info
@@ -6,6 +7,7 @@ from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
 from mumc_modules.mumc_delete import delete_media_item
 from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
+from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
 #print informational header to console
@@ -581,3 +583,19 @@ def print_post_processing_completed(the_dict,postproc_dict):
     strings_list_to_print+='\n' + postproc_dict['media_type_upper'] + ' POST PROCESSING COMPLETE.' + '\n'
 
     print_byType(strings_list_to_print,postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])
+    
+    
+def print_configuration_yaml(the_dict,init_dict):
+    cfg_out={}
+    cfg_out['version']=the_dict['version']
+    cfg_out['basic_settings']=the_dict['basic_settings']
+    cfg_out['advanced_settings']=the_dict['advanced_settings']
+    cfg_out['admin_settings']=the_dict['admin_settings']
+    cfg_out['DEBUG']=the_dict['DEBUG']
+    the_dict['text_attrs']=init_dict['text_attrs']
+
+    print_byType('---\n',True,the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
+    print_byType(yaml.safe_dump(cfg_out,sort_keys=False),True,the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
+    print_byType('...\n',True,the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
+    
+    the_dict.pop('text_attrs')

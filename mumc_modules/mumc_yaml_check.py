@@ -100,53 +100,61 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
 
         #Get number of elements
-        for num_elements in check_irt:
+        for user_elements in check_irt:
             #Ignore user_id and user_name
             #Check whitelist and blacklist only if they are not empty lists
-            if (((not (num_elements == 'user_id')) and (not (num_elements == 'user_name'))) and (((num_elements == 'whitelist') or (num_elements == 'blacklist')) and check_irt[num_elements])):
+            if (((not (user_elements == 'user_id')) and (not (user_elements == 'user_name'))) and (((user_elements == 'whitelist') or (user_elements == 'blacklist')) and check_irt[user_elements])):
                 #Set library key trackers to zero
                 lib_id_found=0
                 collection_type_found=0
                 path_found=0
                 network_path_found=0
+                subfolder_id_found=0
                 lib_enabled_found=0
                 #Check if this num_element exists before proceeding
-                if (num_elements in check_irt):
-                    for libinfo in check_irt[num_elements]:
+                if (user_elements in check_irt):
+                    for libinfo in check_irt[user_elements]:
                         if ('lib_id' in libinfo):
                             lib_id_found += 1
-                            check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['lib_id']
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['lib_id']
                             #Check lib_id is alphanumeric string
-                            if (not (check_item.isalnum() or check_item.isnumeric() or (check_item == ''))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > lib_id: ' + str(check_item) + ' is not an expected string value\n'
+                            if (not (isinstance(check_item,str) and (check_item.isalpha() or check_item.isalnum() or check_item.isnumeric()))):
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > lib_id: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('collection_type' in libinfo):
                             collection_type_found += 1
-                            check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['collection_type']
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['collection_type']
                             #Check collection_type is string
                             if (not (isinstance(check_item,str) or (check_item == ''))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > collection_type: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > collection_type: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('path' in libinfo):
                             path_found += 1
-                            check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['path']
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['path']
                             #Check path is string
                             if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('network_path' in libinfo):
                             network_path_found += 1
-                            check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['network_path']
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['network_path']
                             #Check network_path is string
                             if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
+
+                        if ('subfolder_id' in libinfo):
+                            subfolder_id_found += 1
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['subfolder_id']
+                            #Check subfolder_id is alphanumeric string
+                            if (not ((check_item == None) or (isinstance(check_item,str) and (check_item.isalpha() or check_item.isalnum() or check_item.isnumeric())))):
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > subfolder_id: ' + str(check_item) + ' is not an expected string value. Try adding quotes: \'' + str(check_item) + '\' or null if Jellyfin\n'
 
                         if ('lib_enabled' in libinfo):
                             lib_enabled_found += 1
-                            check_item=check_irt[num_elements][int(check_irt[num_elements].index(libinfo))]['lib_enabled']
+                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['lib_enabled']
                             #Check lib_enabled is boolean
                             if (not (isinstance(check_item,bool))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + num_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > enabled: ' + str(check_item) + ' is not an expected boolean value\n'
+                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > enabled: ' + str(check_item) + ' is not an expected boolean value\n'
 
                     if (lib_id_found == 0):
                         error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_id is missing\n'
@@ -160,11 +168,14 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                     if (path_found == 0):
                         error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key path is missing\n'
 
+                    if (subfolder_id_found == 0):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key subfolder_id is missing\n'
+
                     if (lib_enabled_found == 0):
                         error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_enabled is missing\n'
 
                 else:
-                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user ' + check_irt['user_id'] + ' key'+ str(num_elements) +' does not exist\n'
+                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user ' + check_irt['user_id'] + ' key'+ str(user_elements) +' does not exist\n'
     return(error_found_in_mumc_config_yaml)
 
 
