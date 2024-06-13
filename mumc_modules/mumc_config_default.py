@@ -175,12 +175,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']
+            except:
+                pass
     try:
         default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']
     except:
@@ -203,12 +206,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']
+        default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']
+            except:
+                pass
 
     try:
         default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']
@@ -232,12 +238,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']
+            except:
+                pass
     try:
         default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']
     except:
@@ -260,12 +269,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']
+        default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']
+            except:
+                pass
 
     try:
         default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']
@@ -289,12 +301,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']
+            except:
+                pass
     try:
         default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']
     except:
@@ -317,12 +332,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
     try:
-        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']
+        default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']
     except:
         try:
-            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']
         except:
-            pass
+            try:
+                default_base['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']
+            except:
+                pass
 
     if (server_brand == 'jellyfin'):
         try:
@@ -347,12 +365,15 @@ def merge_configuration(default_base,merge):
             except:
                 pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']
         except:
             try:
-                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']
             except:
-                pass
+                try:
+                    default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']
+                except:
+                    pass
         try:
             default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']
         except:
@@ -375,12 +396,15 @@ def merge_configuration(default_base,merge):
             except:
                 pass
         try:
-            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']
+            default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']
         except:
             try:
-                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+                default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']
             except:
-                pass
+                try:
+                    default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
+                except:
+                    pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['movie']['favorited']['action']

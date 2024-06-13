@@ -13,7 +13,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
     var_dict['APIDebugMsg_Blacklist']=var_dict['media_type_lower'] + '_blacklist_media_items'
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_blacklisted']):
+        var_dict['enable_media_query_blacklisted_played']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -57,7 +57,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
     var_dict['APIDebugMsg_Whitelist']=var_dict['media_type_lower'] + '_whitelist_media_items'
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_whitelisted']):
+        var_dict['enable_media_query_whitelist_played']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -103,7 +103,7 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
             parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_blacklisted']):
+        var_dict['enable_media_query_blacklisted_played']):
 
         #Built query for watched items in blacklists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
@@ -142,7 +142,7 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
             parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_whitelisted']):
+        var_dict['enable_media_query_whitelist_played']):
 
         #Built query for watched items in whitelists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +

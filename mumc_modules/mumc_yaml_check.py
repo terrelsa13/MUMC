@@ -540,11 +540,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  whitelisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted','whitelisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  whitelisted > whitelisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted','whitelisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted'].pop('whitelisted')
 
 #######################################################################################################
 
@@ -566,11 +573,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted','blacklisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  blacklisted > blacklisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted','blacklisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted'].pop('blacklisted')
 
 #######################################################################################################
 
@@ -592,11 +606,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  whitelisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted','whitelisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  whitelisted > whitelisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted','whitelisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted'].pop('whitelisted')
 
 #######################################################################################################
 
@@ -618,11 +639,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted','blacklisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  blacklisted > blacklisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted','blacklisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted'].pop('blacklisted')
 
 #######################################################################################################
 
@@ -644,11 +672,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted','whitelisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted > whitelisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted','whitelisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted'].pop('whitelisted')
 
 #######################################################################################################
 
@@ -670,11 +705,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted','blacklisted')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted','played')) == None)):
         if (
             not (isinstance(check,bool))
             ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted > blacklisted must be a boolean\n\tValid values are true or false\n'
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted','blacklisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted'].pop('blacklisted')
 
 #######################################################################################################
 
@@ -698,11 +740,18 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted','whitelisted')) == None)):
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted','played')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted > whitelisted must be a boolean\n\tValid values are true or false\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+        elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted','whitelisted')) == None)):
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+            else:
+                cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted'].pop('whitelisted')
 
 #######################################################################################################
 
@@ -724,11 +773,18 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
 
-        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted','blacklisted')) == None)):
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted','played')) == None)):
             if (
                 not (isinstance(check,bool))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > blacklisted must be a boolean\n\tValid values are true or false\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+        elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted','played')) == None)):
+            if (
+                not (isinstance(check,bool))
+                ):
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+            else:
+                cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted'].pop('blacklisted')
 
 #######################################################################################################
 

@@ -46,43 +46,43 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=False
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=False
 
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=True
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=True
 
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=False
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=False
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=False
 
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=True
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=True
 
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=False
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=False
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=False
 
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=True
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=True
-    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=True
+    config_data['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=True
 
     if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=False
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=False
 
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=True
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=True
-        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=True
+        config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=True
 
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['user_conditional']='any'

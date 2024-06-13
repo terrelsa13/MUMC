@@ -34,12 +34,12 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitelisted']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']={}
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=None
 
     #the_dict['advanced_settings']={}
     #the_dict['advanced_settings']['filter_statements']={}
@@ -49,12 +49,12 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitelisted']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']={}
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=None
 
     #the_dict['advanced_settings']={}
     #the_dict['advanced_settings']['filter_statements']={}
@@ -64,12 +64,12 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitelisted']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']={}
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=None
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=None
 
     if (server_brand == 'jellyfin'):
         #the_dict['advanced_settings']={}
@@ -80,12 +80,12 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitelisted']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']={}
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacklisted']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=None
 
     the_dict['advanced_settings']['behavioral_statements']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']={}
