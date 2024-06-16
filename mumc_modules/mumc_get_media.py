@@ -407,7 +407,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         var_dict['data_Child_Of_Whitetagged_From_Whitelist'], #3
                                         var_dict['data_Blacktagged_From_Whitelist'], #4
                                         var_dict['data_Child_Of_Blacktagged_From_Whitelist'], #5
-                                        var_dict['data_Favorited_From_Blacklist'], #6APIDebugMsg_Whitetag_From_Blacklist_Child
+                                        var_dict['data_Favorited_From_Blacklist'], #6
                                         var_dict['data_Child_Of_Favorited_Item_From_Blacklist'], #7
                                         var_dict['data_Whitetagged_From_Blacklist'], #8
                                         var_dict['data_Child_Of_Whitetagged_From_Blacklist'], #9
@@ -738,37 +738,73 @@ def init_getMedia(the_dict):
 
     #Create userId list of accessible libraries
     the_dict['byUserId_accessibleLibraries']={}
-    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        parent_id='lib_id'
-    else:
-        parent_id='subfolder_id'
+    the_dict['byUserId_accessibleLibraryParents']={}
+    #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+        #library_id='lib_id'
+    #else:
+        #library_id='subfolder_id'
 
     for user_info in the_dict['admin_settings']['users']:
-        the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=set()
+        the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=[]
+        the_dict['byUserId_accessibleLibraryParents'][user_info['user_id']]=[]
 
         for lib_info in user_info['whitelist']:
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                library_id='lib_id'
                 parent_id='lib_id'
             else:
                 if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    parent_id='subfolder_id'
+                    library_id='subfolder_id'
+                    parent_id='lib_id'
                 else:
+                    library_id='lib_id'
                     parent_id='lib_id'
 
-            if (not (lib_info[parent_id] == None)):
-                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info[parent_id])
+            if (not (lib_info[library_id] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])
+                the_dict['byUserId_accessibleLibraryParents'][user_info['user_id']].append(lib_info[parent_id])
+                
 
         for lib_info in user_info['blacklist']:
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                library_id='lib_id'
                 parent_id='lib_id'
             else:
                 if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    parent_id='subfolder_id'
+                    library_id='subfolder_id'
+                    parent_id='lib_id'
                 else:
+                    library_id='lib_id'
                     parent_id='lib_id'
 
-            if (not (lib_info[parent_id] == None)):
-                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].add(lib_info[parent_id])
+            if (not (lib_info[library_id] == None)):
+                the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])
+                the_dict['byUserId_accessibleLibraryParents'][user_info['user_id']].append(lib_info[parent_id])
+
+
+    #before getting media, check if users still have access to their libraries in the config file
+    #only applies to Emby
+    #Jellyfin does not offer "excluded subfolders" data
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        for user_id in the_dict['enabled_user_ids']:
+            data_single_user=get_single_user(user_id,the_dict)
+            for lib_id in the_dict['byUserId_accessibleLibraries'][user_id]:
+                parent_id=the_dict['byUserId_accessibleLibraryParents'][user_id][the_dict['byUserId_accessibleLibraries'][user_id].index(lib_id)]
+                if ((parent_id + '_' + lib_id) in data_single_user['Policy']['ExcludedSubFolders']):
+                    for user_data in the_dict['admin_settings']['users']:
+                        if (user_data['user_id'] == user_id):
+                            user_index=the_dict['admin_settings']['users'].index(user_data)
+                            for lib_data in the_dict['admin_settings']['users'][user_index]['whitelist']:
+                                if ((lib_data['lib_id'] == parent_id) and (lib_data['subfolder_id'] == lib_id)):
+                                    lib_index=the_dict['admin_settings']['users'][user_index]['whitelist'].index(lib_data)
+                                    the_dict['admin_settings']['users'][user_index]['whitelist'][lib_index]['lib_enabled']=False
+                                    break
+                            for lib_data in the_dict['admin_settings']['users'][user_index]['blacklist']:
+                                if ((lib_data['lib_id'] == parent_id) and (lib_data['subfolder_id'] == lib_id)):
+                                    lib_index=the_dict['admin_settings']['users'][user_index]['blacklist'].index(lib_data)
+                                    the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['lib_enabled']=False
+                                    break
+
 
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:

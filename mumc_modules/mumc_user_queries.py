@@ -12,9 +12,9 @@ def get_single_user(userId,the_dict):
     preConfigDebug = 0
 
     #api call
-    data_single_users=requestURL(req, preConfigDebug, 'get_single_user_info_for_' + str(userId), 3, the_dict)
+    data_single_user=requestURL(req, preConfigDebug, 'get_single_user_info_for_' + str(userId), 3, the_dict)
 
-    return data_single_users
+    return data_single_user
 
 
 #API call to get all user accounts

@@ -66,6 +66,12 @@ def does_index_exist(item, indexvalue, the_dict):
 #Determine if there is a matching item or Determine if an item starts with the other
 def get_isItemMatching(item_one,item_two,the_dict):
 
+    match_dict={}
+    match_dict['any_match']=False
+    match_dict['all_match']=False
+    match_dict['match_state']=[]
+    match_dict['match_value']=[]
+
     temp_item_one=[]
     #for paths in Microsoft Windows, replace backslashes in Ids with forward slash
     if (isinstance(item_one,(list,set,tuple))):
@@ -102,7 +108,17 @@ def get_isItemMatching(item_one,item_two,the_dict):
                 if ((not ((single_item_one == '') or (single_item_two == ''))) and (not ((single_item_one == None) or (single_item_two == None)))):
                     if (single_item_one == single_item_two):
                         #found a full match; return true and the matching value
-                        return True,single_item_one
+                        #return True,single_item_one
+                        match_dict['match_state'].append(True)
+                        match_dict['match_value'].append(single_item_one)
+                    else:
+                        match_dict['match_state'].append(False)
+                        match_dict['match_value'].append(None)
 
     #nothing matched; return false and empty string
-    return False,''
+    #return False,''
+    
+    match_dict['any_match']=any(match_dict['match_state'])
+    match_dict['all_match']=all(match_dict['match_state'])
+    
+    return match_dict

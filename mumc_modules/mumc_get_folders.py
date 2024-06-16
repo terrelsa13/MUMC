@@ -68,6 +68,18 @@ def empty_folder_query(user_info,var_dict,the_dict):
     return var_dict
 
 
+
+def add_subfolder_id_placeholders(list_type,the_dict):
+    for user_info in the_dict['admin_settings']['users']:
+        user_index=the_dict['admin_settings']['users'].index(user_info)
+        for lib_info in user_info[list_type]:
+            lib_index=user_info[list_type].index(lib_info)
+            if (not ('subfolder_id' in lib_info)):
+                the_dict['admin_settings']['users'][user_index][list_type][lib_index]['subfolder_id']=None
+
+    return the_dict
+
+
 def populate_config_with_subfolder_ids(cfg,init_dict):
 
     #check if version number in mumc_config.yaml is < 5.8.18

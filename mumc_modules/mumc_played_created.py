@@ -2,43 +2,6 @@ from dateutil.parser import parse
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
-# Combine isPlayed value with isCreated-Played value to determine if the API query should
- # filter for played, unplayed, or neither (aka played and unplayed)
-def get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict):
-
-    played_days=var_dict['media_played_days']
-    created_days=var_dict['media_created_days']
-    filter_played_count_comparison=var_dict['media_played_count_comparison']
-    filter_played_count=var_dict['media_played_count']
-    filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
-    filter_created_played_count=var_dict['media_created_played_count']
-
-    if (played_days >= 0):
-        isPlayed_Filter_Value=get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_played_count)
-    else:
-        isPlayed_Filter_Value='disabled'
-
-    if (created_days >= 0):
-        isCreated_Filter_Value=get_isCreatedPlayed_FilterValue(the_dict,filter_created_played_count_comparison,filter_created_played_count)
-    else:
-        isCreated_Filter_Value='disabled'
-
-    if ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'unplayedOnly')):
-        return 'False'
-    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'playedOnly')):
-        return 'True'
-    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'unplayedOnly')):
-        return 'False'
-    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'playedOnly')):
-        return 'True'
-    elif ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'disabled')):
-        return 'False'
-    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'disabled')):
-        return 'True'
-    else:
-        return ''
-
-
 #Get isPlayed state for API filtering
 def get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_played_count):
 
@@ -113,6 +76,43 @@ def get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_play
 #Get isPlayed state for API filtering
 def get_isCreatedPlayed_FilterValue(the_dict,filter_created_played_count_comparison,filter_created_played_count):
     return get_isPlayed_FilterValue(the_dict,filter_created_played_count_comparison,filter_created_played_count)
+
+
+# Combine isPlayed value with isCreated-Played value to determine if the API query should
+ # filter for played, unplayed, or neither (aka played and unplayed)
+def get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict):
+
+    played_days=var_dict['media_played_days']
+    created_days=var_dict['media_created_days']
+    filter_played_count_comparison=var_dict['media_played_count_comparison']
+    filter_played_count=var_dict['media_played_count']
+    filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
+    filter_created_played_count=var_dict['media_created_played_count']
+
+    if (played_days >= 0):
+        isPlayed_Filter_Value=get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_played_count)
+    else:
+        isPlayed_Filter_Value='disabled'
+
+    if (created_days >= 0):
+        isCreated_Filter_Value=get_isCreatedPlayed_FilterValue(the_dict,filter_created_played_count_comparison,filter_created_played_count)
+    else:
+        isCreated_Filter_Value='disabled'
+
+    if ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'unplayedOnly')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'playedOnly')):
+        return 'True'
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'unplayedOnly')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'playedOnly')):
+        return 'True'
+    elif ((isPlayed_Filter_Value == 'unplayedOnly') and (isCreated_Filter_Value == 'disabled')):
+        return 'False'
+    elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'disabled')):
+        return 'True'
+    else:
+        return ''
 
 
 # determine if media item has been played specified amount of times

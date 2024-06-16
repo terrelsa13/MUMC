@@ -1328,7 +1328,7 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
-        default_base['admin_settings']['behavior']['users']['monitor_disabled']=merge['admin_settings']['behavior']['monitor_disabled']
+        default_base['admin_settings']['behavior']['users']['monitor_disabled']=merge['admin_settings']['behavior']['users']['monitor_disabled']
     except:
         pass
 

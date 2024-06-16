@@ -483,7 +483,7 @@ def is_valid_library_selected(the_dict):
     return the_dict
 
 
-def jellyfin_autoselect_folders_with_common_libraries(the_dict):
+def autoselect_subfolders_with_same_library_id(the_dict):
 
     temp_the_dict={}
     temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])

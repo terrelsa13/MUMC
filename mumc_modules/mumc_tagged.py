@@ -19,7 +19,12 @@ def list_to_urlparsed_string(the_list):
 
 
 def get_isItemTagged(usertags,tagged_items,item,the_dict):
-    itemIsTagged=False
+    #itemIsTagged=False
+    itemIsTagged={}
+    itemIsTagged['any_match']=False
+    itemIsTagged['all_match']=False
+    itemIsTagged['match_state']=[]
+    itemIsTagged['match_value']=[]
 
     #DEBUG log formatting
     if (the_dict['DEBUG']):
@@ -35,30 +40,36 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
     #Check if media item is tagged
     if ((not (usertags == '')) and (tagData in item)):
         #Check if media item is tagged
-        tag_set=set()
+        #tag_list=set()
+        tag_list=[]
         #Loop thru tags; store them for comparison to the media item
         if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
             for tagpos in range(len(item[tagData])):
-                tag_set.add(item[tagData][tagpos]['Name'])
+                #tag_list.add(item[tagData][tagpos]['Name'])
+                tag_list.append(item[tagData][tagpos]['Name'])
         else:
             for tagpos in range(len(item[tagData])):
-                tag_set.add(item[tagData][tagpos])
+                #tag_list.add(item[tagData][tagpos])
+                tag_list.append(item[tagData][tagpos])
         #Check if any of the media items tags match the tags in the config file
-        itemIsTagged,itemTaggedValue=get_isItemMatching(usertags,tag_set,the_dict)
+        #itemIsTagged,itemTaggedValue=get_isItemMatching(usertags,tag_list,the_dict)
+
+        #Check if any of the media items tags match the tags in the config file
+        itemIsTagged=get_isItemMatching(usertags,tag_list,the_dict)
+
         #Save media item's tags state
-        if (itemIsTagged):
+        if (itemIsTagged['any_match']):
             tagged_items.append(item['Id'])
         if (the_dict['DEBUG']):
             if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                appendTo_DEBUG_log('\nEmby tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
-            else:
-                appendTo_DEBUG_log('\nJellyfin tagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
+                #appendTo_DEBUG_log('\nTagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
+                appendTo_DEBUG_log('\nTagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemIsTagged['match_value']),2,the_dict)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log('\nIs Media Item ' + str(item['Id']) + ' Tagged: ' + str(itemIsTagged),2,the_dict)
+        appendTo_DEBUG_log('\nIs Media Item ' + str(item['Id']) + ' Tagged: ' + str(itemIsTagged['any_match']),2,the_dict)
 
     #parenthesis intentionally omitted to return tagged_items as a set
-    return itemIsTagged,tagged_items
+    return itemIsTagged['any_match'],tagged_items
 
 
 #Get children of tagged parents
@@ -156,12 +167,13 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                     elif (not (does_index_exist(child_item[tagData],0,the_dict))):
                                         #if it does not; add desired tag to metadata
                                         child_item[tagData]=data[tagData]
-                                    else: #Tag already exists
+                                    else: #Tags already exists
                                         #Determine if the existing tags are any of the tags we are looking for
                                         child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
                                         #If existing tags are not ones we are lookign for then insert desired tag
-                                        if not (child_itemIsTagged):
+                                        if (not (child_itemIsTagged)):
                                             child_item[tagData].extend(data[tagData])
+                                #Add parent tags to children
                                 elif (does_index_exist(data[tagData],0,the_dict)):
                                     #Emby and jellyfin store tags differently
                                     #Does tagData exist
@@ -172,7 +184,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                     elif (child_item[tagData] == []):
                                         #if it does not; add desired tag to metadata
                                         child_item[tagData]=data[tagData]
-                                    else:
+                                    else: #Tags already exists
                                         #Determine if the existing tags are any of the tags we are looking for
                                         child_itemIsTagged,child_itemId_isTagged=get_isItemTagged(user_tags,child_itemId_isTagged,child_item,the_dict)
                                         #If existing tags are not ones we are looking for then insert desired tag
