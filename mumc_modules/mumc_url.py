@@ -88,6 +88,24 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     return var_dict
 
 
+def get_http_error_code_link(error_code):
+
+    if ((error_code >= 100) and (error_code <200)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#1xx_informational_response'
+    elif ((error_code >= 200) and (error_code <300)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_success'
+    elif ((error_code >= 300) and (error_code <400)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_redirection'
+    elif ((error_code >= 400) and (error_code <500)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes##4xx_client_errors'
+    elif ((error_code >= 500) and (error_code <600)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors'
+    else:
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes'
+
+    return error_code_link
+
+
 #send url request
 def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
 
@@ -199,7 +217,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 except:
                     print('    Data:')
                 print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
-                print('\nCheck password and/or remove any GUI API keys for MUMC')
+                print('\nHTTP Error Codes: ' + get_http_error_code_link(err.status))
                 if(debugState):
                     appendTo_DEBUG_log('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
                     try:
@@ -223,7 +241,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     except:
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
-                    appendTo_DEBUG_log('\nCheck password and/or remove any GUI API keys for MUMC',2,the_dict)
+                    appendTo_DEBUG_log('\nHTTP Error Codes: ' + get_http_error_code_link(err.status),1,the_dict)
                 sys.exit(0)
         except URLError as err:
             time.sleep(doubling_delay)
@@ -251,34 +269,32 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
-                #print('\n  URL: ' + str(url))
                 print('\n' + str(err.reason))
                 print('\nCheck ip, url and/or port to server are correct')
                 if(debugState):
-                    appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + requestDebugMessage,1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),2,the_dict)
+                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Object:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Object:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url),1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),2,the_dict)
+                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Method:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Method:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),2,the_dict)
+                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Header:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
+                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
-                    #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
-                    appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
-                    appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',2,the_dict)
+                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    appendTo_DEBUG_log('\n' + str(err.reason),1,the_dict)
+                    appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',1,the_dict)
                 sys.exit(0)
         except TimeoutError:
             time.sleep(doubling_delay)
@@ -306,32 +322,30 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
-                #print('\n  URL: ' + str(url))
                 print('\nTimeout - Response taking too long')
                 if(debugState):
-                    appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),2,the_dict)
+                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Object:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Object:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url),1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),2,the_dict)
+                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Method:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Method:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),2,the_dict)
+                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Header:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
+                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
-                    #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
-                    appendTo_DEBUG_log('\nTimeout - Response taking too long',2,the_dict)
+                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    appendTo_DEBUG_log('\nTimeout - Response taking too long',1,the_dict)
                 sys.exit(0)
 
     return(data)

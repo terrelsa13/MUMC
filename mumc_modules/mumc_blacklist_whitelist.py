@@ -1,7 +1,7 @@
 import copy
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_compare_items import get_isItemMatching
-from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
+from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 from mumc_modules.mumc_server_type import isEmbyServer
 
@@ -39,8 +39,8 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
     #itemWhitelistedBlacklistedValue=''
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     '''
     if (library_matching_behavior.casefold() == 'byid'):
@@ -59,7 +59,7 @@ def get_isItemWhitelisted_Blacklisted(checklist,item,user_info,the_dict):
         item_isWhitelisted_isBlacklisted=get_isItemMatching(item['mumc']['network_path'],user_wlbllib_netpath_json,the_dict)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log('\nItem is whitelisted/blacklisted for this user: ' + str(item_isWhitelisted_isBlacklisted),2,the_dict)
+        appendTo_DEBUG_log('\n\nItem is whitelisted/blacklisted for this user: ' + str(item_isWhitelisted_isBlacklisted),2,the_dict)
         #appendTo_DEBUG_log('\nMatching whitelisted/blacklisted value for this user is: ' + str(itemWhitelistedBlacklistedValue),2,the_dict)
         appendTo_DEBUG_log('\nMatching whitelisted/blacklisted value for this user is: ' + str(item_isWhitelisted_isBlacklisted['match_value']),2,the_dict)
         appendTo_DEBUG_log('\nitemLibraryID is: ' + str(item['mumc']['lib_id']),2,the_dict)
@@ -108,7 +108,7 @@ def whitelist_and_blacklist_playedPatternCleanup(prefix_str,postproc_dict,the_di
                                 #before getting additional item info check if user has access to the parent library of the media_item
                                 if (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][sub_user_info['user_id']]):
                                     mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(sub_user_info,item['Id'],'playedPatternCleanup',the_dict)
-                                    played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
+                                    played_created_days_counts_dict=get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
                                     itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
                                     itemsExtraDictionary[sub_user_info['user_id']][item['Id']]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']

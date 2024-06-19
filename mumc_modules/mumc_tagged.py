@@ -27,8 +27,8 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
     itemIsTagged['match_value']=[]
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     #Emby and jellyfin store tags differently
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
@@ -60,10 +60,11 @@ def get_isItemTagged(usertags,tagged_items,item,the_dict):
         #Save media item's tags state
         if (itemIsTagged['any_match']):
             tagged_items.append(item['Id'])
+            
         if (the_dict['DEBUG']):
-            if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+            #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
                 #appendTo_DEBUG_log('\nTagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemTaggedValue),2,the_dict)
-                appendTo_DEBUG_log('\nTagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemIsTagged['match_value']),2,the_dict)
+            appendTo_DEBUG_log('\n\nTagged item with Id ' + str(item['Id']) + ' has tag named: ' + str(itemIsTagged['match_value']),2,the_dict)
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log('\nIs Media Item ' + str(item['Id']) + ' Tagged: ' + str(itemIsTagged['any_match']),2,the_dict)
@@ -77,19 +78,19 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     data_dict={}
     data_Tagged=var_dict['data_' + suffix_str]
-    user_tags=var_dict['blacktags']
+    #user_tags=var_dict['blacktags']
     data_dict['APIDebugMsg_']='Find_' + var_dict['APIDebugMsg_Child_Of_' + suffix_str]
     server_url=the_dict['admin_settings']['server']['url']
     #auth_key=the_dict['admin_settings']['server']['auth_key']
     child_dict={}
     child_list=[]
-    child_itemId_isTagged=[]
+    #child_itemId_isTagged=[]
     data_dict['StartIndex_']=0
 
-    if (user_tags):
-        insert_tagName=user_tags[0]
-    else:
-        insert_tagName=''
+    #if (user_tags):
+        #insert_tagName=user_tags[0]
+    #else:
+        #insert_tagName=''
 
     #Loop thru items returned as tagged
     for data in data_Tagged['Items']:
@@ -97,7 +98,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
         #Verify media item is a parent (not a child like an episode, movie, or audio)
         if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
-            user_processed_itemsId=set()
+            user_processed_itemsId=[]
 
             #Initialize api_query_handler() variables for child media items
             data_dict['StartIndex_']=0
@@ -111,11 +112,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                     #include all item types; filter applied in first API calls for each media type in get_mediaItems()
                     IncludeItemTypes=''
                     FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                        SortBy='SeriesSortName'
-                    else:
-                        SortBy='SeriesName'
-                    SortBy=SortBy + ',AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                    SortBy='SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                     SortOrder='Ascending'
                     Recursive='True'
                     EnableImages='False'
@@ -146,7 +143,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
                         #Loop thru the returned child items
                         for child_item in data_dict['data_']['Items']:
-                            child_itemIsTagged=False
+                            #child_itemIsTagged=False
                             #Check if child item has already been processed
                             if not (child_item['Id'] in user_processed_itemsId):
 
@@ -156,15 +153,37 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                 else:
                                     tagData='Tags'
 
+                                try:
+                                    #Add parent tags to children
+                                    child_item[tagData].extend(data[tagData])
+                                except:
+                                    try:
+                                        #Create child tag structure
+                                        #Add parent tags to children
+                                        child_item[tagData]=[]
+                                        child_item[tagData].extend(data[tagData])
+                                    except:
+                                        #Create parent tag structure
+                                        #Add parent tags to children
+                                        data[tagData]=[]
+                                        child_item[tagData].extend(data[tagData])
+
+                                '''
+                                #Emby and jellyfin store tags differently
+                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                    tagData='TagItems'
+                                else:
+                                    tagData='Tags'
+
                                 #Add parent tags to children
-                                if (does_index_exist(data[tagData],0,the_dict)) and (keys_exist(data[tagData][0],'Name')):
+                                if (does_index_exist(data[tagData],0)) and (keys_exist(data[tagData][0],'Name')):
                                     #Emby and jellyfin store tags differently
                                     #Does tagData exist
                                     if (not (tagData in child_item)):
                                         #if it does not; add desired tag to metadata
                                         child_item[tagData]=data[tagData]
                                     #Does tagData[] exist
-                                    elif (not (does_index_exist(child_item[tagData],0,the_dict))):
+                                    elif (not (does_index_exist(child_item[tagData],0))):
                                         #if it does not; add desired tag to metadata
                                         child_item[tagData]=data[tagData]
                                     else: #Tags already exists
@@ -174,7 +193,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                         if (not (child_itemIsTagged)):
                                             child_item[tagData].extend(data[tagData])
                                 #Add parent tags to children
-                                elif (does_index_exist(data[tagData],0,the_dict)):
+                                elif (does_index_exist(data[tagData],0)):
                                     #Emby and jellyfin store tags differently
                                     #Does tagData exist
                                     if (not (tagData in child_item)):
@@ -190,12 +209,13 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                         #If existing tags are not ones we are looking for then insert desired tag
                                         if (not (child_itemIsTagged)):
                                             child_item[tagData].extend(data[tagData])
+                                '''
                                 #keep track of tagged child items
                                 child_list.append(child_item)
-                                user_processed_itemsId.add(child_item['Id'])
+                                user_processed_itemsId.append(child_item['Id'])
 
-                                if (the_dict['DEBUG']):
-                                    appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),2,the_dict)
+                                #if (the_dict['DEBUG']):
+                                    #appendTo_DEBUG_log('\nChild item with Id: ' + str(child_item['Id']) + ' tagged with tag named: ' + str(insert_tagName),2,the_dict)
 
     child_dict['Items']=child_list
     child_dict['TotalRecordCount']=len(child_list)
@@ -203,6 +223,55 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     #Return child dictionary
     return child_dict
+
+
+def get_isControlTag(this_tag):
+
+    isControlTag=False
+    split_this_tag=this_tag.split(':')
+
+    try:
+        if (((len(split_this_tag) == 4) and ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created'))) or
+            ((len(split_this_tag) == 5) and (split_this_tag[0] == 'created'))):
+
+            #if ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created')):
+
+            if ((int(split_this_tag[1]) >= -1) and (int(split_this_tag[1]) <= 730500)):
+                split_this_tag[1]=int(split_this_tag[1])
+
+                if ((split_this_tag[2] == '>') or (split_this_tag[2] == '<') or
+                    (split_this_tag[2] == '>=') or (split_this_tag[2] == '<=') or
+                    (split_this_tag[2] == '==') or (split_this_tag[2] == 'not >') or
+                    (split_this_tag[2] == 'not <') or (split_this_tag[2] == 'not >=') or
+                    (split_this_tag[2] == 'not <=') or (split_this_tag[2] == 'not ==')):
+
+                    if ((int(split_this_tag[3]) >= 0) and (int(split_this_tag[3]) <= 730500)):
+                        split_this_tag[3]=int(split_this_tag[3])
+
+                        if (split_this_tag[0] == 'created'):
+                            if (does_index_exist(split_this_tag,4)):
+                                if (split_this_tag[4].casefold() == 'true'):
+                                    split_this_tag[4]=True
+                                    isControlTag=True
+                                elif(split_this_tag[4].casefold() == 'false'):
+                                    split_this_tag[4]=False
+                                    isControlTag=True
+                                else:
+                                    raise ValueError('Control tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
+                            else:
+                                split_this_tag.append(True) #default behavioral_control value
+                                isControlTag=True
+                        else:
+                            isControlTag=True
+        
+
+    except:
+        isControlTag=False
+
+    if (isControlTag):
+        return split_this_tag
+    else:
+        return False
 
 
 #determine if movie or library are tagged
@@ -214,8 +283,8 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
     istag_MOVIE={'movie':{},'movielibrary':{}}
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
 
@@ -238,11 +307,11 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
         for istagID in istag_MOVIE[istagkey]:
             if (istag_MOVIE[istagkey][istagID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is tagged.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nMovie " + str(item['Id']) + " is tagged.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT tagged.",2,the_dict)
+        appendTo_DEBUG_log("\n\nMovie " + str(item['Id']) + " is NOT tagged.",2,the_dict)
 
     return(False)
 
@@ -256,8 +325,8 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
     istag_EPISODE={'episode':{},'season':{},'series':{},'tvlibrary':{},'seriesstudionetwork':{}}
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
 
@@ -312,7 +381,7 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
 
 ### Studio Network #######################################################################################
 
-                if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0,the_dict)):
+                if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0)):
                     #Get studio network's item info
                     tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
                 elif ('SeriesStudio' in series_item_info):
@@ -330,11 +399,11 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
         for istagID in istag_EPISODE[istagkey]:
             if (istag_EPISODE[istagkey][istagID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is tagged.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is tagged.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT tagged.",2,the_dict)
+        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT tagged.",2,the_dict)
 
     return(False)
 
@@ -347,8 +416,8 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
     istag_AUDIO={'track':{},'album':{},'audiolibrary':{}}
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
 
@@ -391,11 +460,11 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
         for istagID in istag_AUDIO[istagkey]:
             if (istag_AUDIO[istagkey][istagID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is tagged.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nAudio/AudioBook " + str(item['Id']) + " is tagged.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.",2,the_dict)
+        appendTo_DEBUG_log("\n\nAudio/AudioBook " + str(item['Id']) + " is NOT tagged.",2,the_dict)
 
     return(False)
 

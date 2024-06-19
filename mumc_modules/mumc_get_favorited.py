@@ -34,10 +34,7 @@ def init_blacklist_favorited_query(var_dict):
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',Season,Series,CollectionFolder'
             var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Favorited_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Blacklist']
-            else:
-                var_dict['SortBy_Favorited_From_Blacklist']='SeriesName,' + var_dict['SortBy_Favorited_From_Blacklist']
+            var_dict['SortBy_Favorited_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
@@ -84,10 +81,7 @@ def init_whitelist_favorited_query(var_dict):
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',Season,Series,CollectionFolder'
             var_dict['FieldsState_Favorited_From_Whitelist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Favorited_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Whitelist']
-            else:
-                var_dict['SortBy_Favorited_From_Whitelist']='SeriesName,' + var_dict['SortBy_Favorited_From_Whitelist']
+            var_dict['SortBy_Favorited_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Favorited_From_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'

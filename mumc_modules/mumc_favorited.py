@@ -1,6 +1,6 @@
 import copy
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,get_playedCreatedDays_playedCreatedCounts
+from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_compare_items import does_index_exist
@@ -38,11 +38,7 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                 #include all item types; filter applied in first API calls for each media type in get_mediaItems()
                 IncludeItemTypes=''
                 FieldsState='Id,Path,Tags,MediaSources,DateCreated,Genres,Studios,SeriesStudio,UserData'
-                if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                    SortBy='SeriesSortName'
-                else:
-                    SortBy='SeriesName'
-                SortBy=SortBy + ',AlbumArtist,ParentIndexNumber,IndexNumber,Name'
+                SortBy=SortBy + 'SeriesSortName,AlbumArtist,ParentIndexNumber,IndexNumber,Name'
                 SortOrder='Ascending'
                 Recursive='True'
                 EnableImages='False'
@@ -106,10 +102,10 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
 def get_isGENRE_Fav(user_info,item,isfav_ITEMgenre,favorites_advanced,lookupTopic,the_dict):
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
-    if (('GenreItems' in item) and (does_index_exist(item['GenreItems'],0,the_dict))):
+    if (('GenreItems' in item) and (does_index_exist(item['GenreItems'],0))):
         #Check if bitmask for favorites by item genre is enabled
         if (favorites_advanced):
             #Check if bitmask for any or first item genre is enabled
@@ -138,7 +134,7 @@ def get_isGENRE_Fav(user_info,item,isfav_ITEMgenre,favorites_advanced,lookupTopi
                             isfav_ITEMgenre[genre_item_info['Id']] = genre_item_info['UserData']['IsFavorite']
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre),2,the_dict)
+        appendTo_DEBUG_log("\n\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMgenre),2,the_dict)
 
     return(isfav_ITEMgenre)
 
@@ -147,10 +143,10 @@ def get_isGENRE_Fav(user_info,item,isfav_ITEMgenre,favorites_advanced,lookupTopi
 def get_isARTIST_Fav(user_info,item,isfav_ITEMartist,favorites_advanced,lookupTopic,the_dict):
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
-    if (('ArtistItems' in item) and (does_index_exist(item['ArtistItems'],0,the_dict))):
+    if (('ArtistItems' in item) and (does_index_exist(item['ArtistItems'],0))):
         #Check if bitmask for favorites by artist is enabled
         if (favorites_advanced):
             #Check if bitmask for any or first artist is enabled
@@ -179,7 +175,7 @@ def get_isARTIST_Fav(user_info,item,isfav_ITEMartist,favorites_advanced,lookupTo
                             isfav_ITEMartist[artist_item_info['Id']] = artist_item_info['UserData']['IsFavorite']
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist),2,the_dict)
+        appendTo_DEBUG_log("\n\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMartist),2,the_dict)
 
     return(isfav_ITEMartist)
 
@@ -188,10 +184,10 @@ def get_isARTIST_Fav(user_info,item,isfav_ITEMartist,favorites_advanced,lookupTo
 def get_isSTUDIONETWORK_Fav(user_info,item,isfav_ITEMstdo_ntwk,favorites_advanced,lookupTopic,the_dict):
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
-    if (('Studios' in  item) and (does_index_exist(item['Studios'],0,the_dict))):
+    if (('Studios' in  item) and (does_index_exist(item['Studios'],0))):
         #Check if bitmask for favorites by item genre is enabled
         if (favorites_advanced):
             #Check if bitmask for any or first item genre is enabled
@@ -241,7 +237,7 @@ def get_isSTUDIONETWORK_Fav(user_info,item,isfav_ITEMstdo_ntwk,favorites_advance
                     isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk),2,the_dict)
+        appendTo_DEBUG_log("\n\nFavorite Info For Item: " + str(item['Id']) + "\n" + convert2json(isfav_ITEMstdo_ntwk),2,the_dict)
 
     return(isfav_ITEMstdo_ntwk)
 
@@ -250,8 +246,8 @@ def get_isSTUDIONETWORK_Fav(user_info,item,isfav_ITEMstdo_ntwk,favorites_advance
 def get_isMOVIE_Fav(the_dict,item,user_info):
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     user_info=user_info
 
@@ -270,11 +266,11 @@ def get_isMOVIE_Fav(the_dict,item,user_info):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is favorited.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nMovie Item " + str(item['Id']) + " is favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT favorited.",2,the_dict)
+        appendTo_DEBUG_log("\n\nMovie " + str(item['Id']) + " is NOT favorited.",2,the_dict)
 
     return(False)
 
@@ -285,8 +281,8 @@ def get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict):
     advFav_media=var_dict['advFav_media']
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     #define empty dictionary for favorited Movies
     isfav_MOVIE={'movielibrary':{},'moviegenre':{},'movielibrarygenre':{}}
@@ -316,11 +312,11 @@ def get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict):
         for isfavID in isfav_MOVIE[isfavkey]:
             if (isfav_MOVIE[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nMovie Item " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nMovie Item " + str(item['Id']) + " is advanced favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nMovie " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+        appendTo_DEBUG_log("\n\nMovie " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
 
     return(False)
 
@@ -329,8 +325,8 @@ def get_isMOVIE_AdvancedFav(the_dict,item,user_info,var_dict):
 def get_isEPISODE_Fav(the_dict,item,user_info):
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     isfav_EPISODE={'episode':{},'season':{},'series':{}}
 
@@ -379,11 +375,11 @@ def get_isEPISODE_Fav(the_dict,item,user_info):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
+        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
 
     return(False)
 
@@ -394,8 +390,8 @@ def get_isEPISODE_AdvancedFav(the_dict,item,user_info,var_dict):
     advFav_media=var_dict['advFav_media']
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     #define empty dictionary for favorited TV Series, Seasons, Episodes, and Channels/Networks
     isfav_EPISODE={'tvlibrary':{},'episodegenre':{},'seasongenre':{},'seriesgenre':{},'tvlibrarygenre':{},'seriesstudionetwork':{},'seriesstudionetworkgenre':{}}
@@ -461,7 +457,7 @@ def get_isEPISODE_AdvancedFav(the_dict,item,user_info,var_dict):
 
 ### Studio Network #######################################################################################
 
-                if (('Studios' in series_item_info) and (does_index_exist(series_item_info['Studios'],0,the_dict))):
+                if (('Studios' in series_item_info) and (does_index_exist(series_item_info['Studios'],0))):
                     #Get studio network's item info
                     tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
                 elif ('SeriesStudio' in series_item_info):
@@ -480,11 +476,11 @@ def get_isEPISODE_AdvancedFav(the_dict,item,user_info,var_dict):
         for isfavID in isfav_EPISODE[isfavkey]:
             if (isfav_EPISODE[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                    appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
 
     return(False)
 
@@ -502,8 +498,8 @@ def get_isAUDIO_Fav(the_dict,item,user_info,var_dict):
         raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     #define empty dictionary for favorited Tracks and Albums
     isfav_AUDIO={'track':{},'album':{}}
@@ -538,20 +534,20 @@ def get_isAUDIO_Fav(the_dict,item,user_info,var_dict):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
                     if (itemType == 'Audio'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
                     elif (itemType == 'AudioBook'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is favorited.",2,the_dict)
                     else:
-                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nUnknown Audio Type " + str(item['Id']) + " is favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
         if (itemType == 'Audio'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
         elif (itemType == 'AudioBook'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT favorited.",2,the_dict)
         else:
-            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nUnknown Audio Type " + str(item['Id']) + " is NOT favorited.",2,the_dict)
 
     return(False)
 
@@ -585,8 +581,8 @@ def get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict):
         raise ValueError('ValueError: Unknown itemType passed into get_isAUDIO_AdvancedFav')
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n",1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log("\n",1,the_dict)
 
     #define empty dictionary for favorited Tracks, Albums, Artists
     isfav_AUDIO={'track':{},'album':{},'artist':{},'composer':{},'audiolibrary':{},'trackgenre':{},'albumgenre':{},'trackartist':{},'albumartist':{},'audiolibraryartist':{},'composergenre':{},'audiolibrarygenre':{}}
@@ -647,20 +643,20 @@ def get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict):
             if (isfav_AUDIO[isfavkey][isfavID]):
                 if (the_dict['DEBUG']):
                     if (itemType == 'Audio'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
                     elif (itemType == 'AudioBook'):
-                        appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is advanced favorited.",2,the_dict)
                     else:
-                        appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                        appendTo_DEBUG_log("\n\nUnknown Audio Type " + str(item['Id']) + " is advanced favorited.",2,the_dict)
                 return(True)
 
     if (the_dict['DEBUG']):
         if (itemType == 'Audio'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
         elif (itemType == 'AudioBook'):
-            appendTo_DEBUG_log("\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nEpisode " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
         else:
-            appendTo_DEBUG_log("\nUnknown Audio Type " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+            appendTo_DEBUG_log("\n\nUnknown Audio Type " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
 
     return(False)
 
@@ -774,7 +770,7 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
                             if (('mumc' in itemsDictionary[userId][itemId]) and ('lib_id' in itemsDictionary[userId][itemId]['mumc']) and (itemsDictionary[userId][itemId]['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][subUserId])):
                                 mediaItemAdditionalInfo=get_ADDITIONAL_itemInfo(tempUserId,itemId,'playedPatternCleanup',the_dict)
 
-                                played_created_days_counts_dict=get_playedCreatedDays_playedCreatedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
+                                played_created_days_counts_dict=get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,mediaItemAdditionalInfo,postproc_dict)
 
                                 itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']=played_created_days_counts_dict['itemIsPlayed']
                                 itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']=played_created_days_counts_dict['itemPlayedCount']
@@ -795,14 +791,14 @@ def favorites_playedPatternCleanup(postproc_dict,the_dict):
                                 itemsExtraDictionary[subUserId][itemId]['IsMeetingCreatedPlayedFilter']=None #meeting complete created_filter_*?
 
                             if (the_dict['DEBUG']):
-                                appendTo_DEBUG_log("\itemIsPlayed: " + str(itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']),3,the_dict)
-                                appendTo_DEBUG_log("\itemPlayedCount: " + str(itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']),3,the_dict)
-                                appendTo_DEBUG_log("\item_matches_played_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_days_filter']),3,the_dict)
-                                appendTo_DEBUG_log("\item_matches_created_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_days_filter']),3,the_dict)
-                                appendTo_DEBUG_log("\item_matches_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_count_filter']),3,the_dict)
-                                appendTo_DEBUG_log("\item_matches_created_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_played_count_filter']),3,the_dict)
-                                appendTo_DEBUG_log("\IsMeetingPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']),3,the_dict)
-                                appendTo_DEBUG_log("\IsMeetingCreatedPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingCreatedPlayedFilter']),3,the_dict)
+                                appendTo_DEBUG_log("\nitemIsPlayed: " + str(itemsExtraDictionary[subUserId][itemId]['itemIsPlayed']),3,the_dict)
+                                appendTo_DEBUG_log("\nitemPlayedCount: " + str(itemsExtraDictionary[subUserId][itemId]['itemPlayedCount']),3,the_dict)
+                                appendTo_DEBUG_log("\nitem_matches_played_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_days_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\nitem_matches_created_days_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_days_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\nitem_matches_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_played_count_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\nitem_matches_created_played_count_filter: " + str(itemsExtraDictionary[subUserId][itemId]['item_matches_created_played_count_filter']),3,the_dict)
+                                appendTo_DEBUG_log("\nIsMeetingPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingPlayedFilter']),3,the_dict)
+                                appendTo_DEBUG_log("\nIsMeetingCreatedPlayedFilter: " + str(itemsExtraDictionary[subUserId][itemId]['IsMeetingCreatedPlayedFilter']),3,the_dict)
 
     postproc_dict['isfavorited_and_played_byUserId_Media']=itemsDictionary
     postproc_dict['isfavorited_extraInfo_byUserId_Media']=itemsExtraDictionary

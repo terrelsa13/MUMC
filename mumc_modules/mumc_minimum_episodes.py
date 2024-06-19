@@ -208,13 +208,12 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                     episodeTracker[deleteItem['SeriesId']]['MaxEpisode'] = 0
 
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log('\n',3,the_dict)
                     #Check if string or integer
                     if (isinstance(deleteItem['Id'],str)):
-                        appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is String',3,the_dict)
+                        appendTo_DEBUG_log('\n\ndeleteItem[\'Id\'] : Is String',3,the_dict)
                     elif (isinstance(deleteItem['Id'],int)):
-                        appendTo_DEBUG_log('\ndeleteItem[\'Id\'] : Is Integer',3,the_dict)
-                    appendTo_DEBUG_log('\ndeleteItem[\'Id\'] = ' + str(deleteItem['Id']),3,the_dict)
+                        appendTo_DEBUG_log('\n\ndeleteItem[\'Id\'] : Is Integer',3,the_dict)
+                    appendTo_DEBUG_log('\n\ndeleteItem[\'Id\'] = ' + str(deleteItem['Id']),3,the_dict)
 
                     #Check if string or integer
                     if (isinstance(deleteItem['ParentIndexNumber'],str)):
@@ -259,8 +258,8 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                     episodeTracker[deleteItem['SeriesId']][deleteItem['Id']]=defaultdict(dict)
                     episodeTracker[deleteItem['SeriesId']][deleteItem['Id']][deleteItem['ParentIndexNumber']]=deleteItem['IndexNumber']
                 except:
-                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to ParentIndexNumber ' + deleteItem['ParentIndexNumber'] + ' Not Being An Integer.',3,the_dict)
-                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to IndexNumber ' + deleteItem['IndexNumber'] + ' Not Being An Integer.',3,the_dict)
+                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to ParentIndexNumber ' + str(deleteItem['ParentIndexNumber']) + ' Not Being An Integer.',3,the_dict)
+                    appendTo_DEBUG_log('\nItem[\'Id\'] : ' + str(deleteItem['Id']) + ' Skipped likley due to IndexNumber ' + str(deleteItem['IndexNumber']) + ' Not Being An Integer.',3,the_dict)
 
     #loop thru each series in the episode tracker
     for seriesId in episodeTracker:

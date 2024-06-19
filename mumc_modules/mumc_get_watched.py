@@ -30,10 +30,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['FieldsState_Blacklist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
-            else:
-                var_dict['SortBy_Blacklist']='SeriesName,' + var_dict['SortBy_Blacklist']
+            var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Blacklist']+=',ArtistItems,AlbumId,AlbumArtist' 
@@ -74,10 +71,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['FieldsState_Whitelist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
-            else:
-                var_dict['SortBy_Whitelist']='SeriesName,' + var_dict['SortBy_Whitelist']
+            var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'

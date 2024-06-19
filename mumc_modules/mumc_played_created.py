@@ -68,7 +68,7 @@ def get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_play
         isPlayed_Filter_Value='playedAndUnplayed'
 
     if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nIsPlayed IsCreated Filter Value: " + isPlayed_Filter_Value + "\n",2,the_dict)
+        appendTo_DEBUG_log("IsPlayed IsCreated Filter Value: '" + isPlayed_Filter_Value + "'\n",2,the_dict)
 
     return isPlayed_Filter_Value
 
@@ -167,13 +167,12 @@ def get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filte
                 #media item play count not equal to specified value
                 item_matches_played_count_filter=True
 
-
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",2,the_dict)
-        if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and not itemIsPlayed) or (IsPlayedStatus == 'playedAndUnplayed')):
-            appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter) + "\n",2,the_dict,)
-        else:
-            appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed\n",2,the_dict,)
+        if (the_dict['DEBUG']):
+            appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",2,the_dict)
+            if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and not itemIsPlayed) or (IsPlayedStatus == 'playedAndUnplayed')):
+                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter) + "\n",2,the_dict,)
+            else:
+                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed\n",2,the_dict,)
 
     return item_matches_played_count_filter
 
@@ -220,7 +219,7 @@ def get_isItemMeetingDaysFilter(date_string,cut_off_date):
 
 
 #get played days and counts; get created days and counts
-def get_playedCreatedDays_playedCreatedCounts(the_dict,item,var_dict):
+def get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,item,var_dict):
 
     played_days=var_dict['media_played_days']
     created_days=var_dict['media_created_days']

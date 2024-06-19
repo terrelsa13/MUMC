@@ -51,14 +51,10 @@ def keys_exist_return_value(the_element, *keys_indexes):
 
 
 #Check if json index exists
-def does_index_exist(item, indexvalue, the_dict):
+def does_index_exist(item, indexvalue):
     try:
         exists = item[indexvalue]
-        if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\n" + str(indexvalue) + " exist in " + str(item),2,the_dict)
     except IndexError:
-        if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\n" + str(indexvalue) + " does NOT exist in " + str(item),2,the_dict)
         return(False)
     return(True)
 
@@ -95,14 +91,14 @@ def get_isItemMatching(item_one,item_two,the_dict):
         raise TypeError('ItemIsMatchingTypeError: item_two is an unexpected type; expecting list, set, tuple, or string.')
 
     #DEBUG log formatting
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log('\n',1,the_dict)
+    #if (the_dict['DEBUG']):
+        #appendTo_DEBUG_log('\n',1,the_dict)
 
     #determine if media Id matches one of the other Ids
     for single_item_one in temp_item_one:
             for single_item_two in temp_item_two:
                 if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log('\nComparing the below two items',3,the_dict)
+                    appendTo_DEBUG_log('\n\nComparing the below two items',3,the_dict)
                     appendTo_DEBUG_log('\n\'' + str(single_item_one) + '\'' + ':' + '\'' + str(single_item_two) + '\'',3,the_dict)
 
                 if ((not ((single_item_one == '') or (single_item_two == ''))) and (not ((single_item_one == None) or (single_item_two == None)))):

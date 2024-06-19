@@ -168,7 +168,7 @@ def prepare_AUDIOoutput(the_dict,item,user_info,var_dict):
         item['Artists']=['Unknown']
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['Artists'] Was Missing",3,the_dict)
-    if not (does_index_exist(item['Artists'],0,the_dict)):
+    if not (does_index_exist(item['Artists'],0)):
         item['Artists']=['Unknown']
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['Artists'][0] Was Missing",3,the_dict)
@@ -176,7 +176,7 @@ def prepare_AUDIOoutput(the_dict,item,user_info,var_dict):
         item['AlbumArtist']='Unknown'
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['AlbumArtist'] Was Missing",3,the_dict)
-    if not (does_index_exist(item['AlbumArtist'],0,the_dict)):
+    if not (does_index_exist(item['AlbumArtist'],0)):
         item['AlbumArtist']='Unknown'
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['AlbumArtist'] Was Missing",3,the_dict)
@@ -184,7 +184,7 @@ def prepare_AUDIOoutput(the_dict,item,user_info,var_dict):
         item['Studios']=[{'Name':'Unknown'}]
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['Studios'] Was Missing",3,the_dict)
-    if not (does_index_exist(item['Studios'],0,the_dict)):
+    if not (does_index_exist(item['Studios'],0)):
         item['Studios']=[{'Name':'Unknown'}]
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing",3,the_dict)

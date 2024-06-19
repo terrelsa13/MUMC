@@ -26,12 +26,10 @@ def init_empty_folder_query(var_dict):
 
         if (var_dict['media_type_lower'] == 'season'):
             
-            var_dict['FieldsState_Empty_Folder']='ChildCount,ParentId,SeriesId,SeriesName'
+            var_dict['FieldsState_Empty_Folder']='ChildCount,ParentId,SeriesId,SeriesSortName'
             
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Empty_Folder']='SeriesSortName,IndexNumber'
-            else:
-                var_dict['SortBy_Empty_Folder']='SeriesName,IndexNumber'
+            var_dict['SortBy_Empty_Folder']='SeriesSortName,IndexNumber'
+
         elif (var_dict['media_type_lower'] == 'series'):
 
             var_dict['FieldsState_Empty_Folder']='ChildCount,ParentId'

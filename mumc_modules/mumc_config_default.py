@@ -584,6 +584,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']
     except:
         pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']
+    except:
+        pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']
@@ -603,6 +607,10 @@ def merge_configuration(default_base,merge):
         pass
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']
     except:
         pass
 

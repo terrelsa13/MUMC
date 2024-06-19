@@ -3,12 +3,12 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,get_isControlTag
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_playedCreatedDays_playedCreatedCounts
+from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
 from mumc_modules.mumc_item_info import get_SERIES_itemInfo
 from mumc_modules.mumc_get_watched import init_blacklist_watched_query,init_whitelist_watched_query,blacklist_watched_query,whitelist_watched_query
 from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,init_whitelist_blacktagged_query,blacklist_blacktagged_query,whitelist_blacktagged_query
@@ -436,7 +436,6 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                 #track where we are in the var_dict['data_lists']
                 var_dict['data_list_pos']=0
 
-                #Determine if media item is shown as DELETE or KEEP
                 #Loop thru each dictionary in var_dict['data_lists'][#]
                 for var_dict['data_dict'] in var_dict['data_lists']:
 
@@ -488,7 +487,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 ##########################################################################################################################################
 
                                 #Determine if item meets played days, created days, played counts, and played-created counts
-                                var_dict.update(get_playedCreatedDays_playedCreatedCounts(the_dict,item,var_dict))
+                                var_dict.update(get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,item,var_dict))
 
 ##########################################################################################################################################
 
