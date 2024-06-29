@@ -1385,6 +1385,15 @@ def merge_configuration(default_base,merge):
         except:
             pass
 
+    try:
+        default_base['admin_settings']['output_controls']['character_limit']['print']=merge['admin_settings']['output_controls']['character_limit']['print']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['output_controls']['character_limit']['write']=merge['admin_settings']['output_controls']['character_limit']['write']
+    except:
+        pass
+
     #Bring all errors found to users attention
     if (not (error_found_in_mumc_config_yaml == '')):
         if (default_base['DEBUG']):

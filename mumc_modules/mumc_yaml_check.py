@@ -182,7 +182,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
 
-    #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
+    #TODO: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
     #Start as blank error string
     error_found_in_mumc_config_yaml=''
@@ -2665,6 +2665,24 @@ def cfgCheckYAML(cfg,init_dict):
                 (check <= 60000)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > cache > minimum_age must be an integer\n\tValid range 0 thru 60000\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','output_controls','character_limit','print')) == None)):
+        if (
+            not ((isinstance(check,int)) and
+                ((check >= -1) and
+                (check <= 730500)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > output_controls > character_limit > print must be an integer\n\tValid range -1 thru 730500\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','output_controls','character_limit','write')) == None)):
+        if (
+            not ((isinstance(check,int)) and
+                ((check >= -1) and
+                (check <= 730500)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > output_controls > character_limit > write must be an integer\n\tValid range -1 thru 730500\n'
 
 #######################################################################################################
 

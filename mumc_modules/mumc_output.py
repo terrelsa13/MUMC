@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from mumc_modules.mumc_paths import doesFileExist,append_to_file,append_long_string_to_file
+from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
 
 
 def parse_string_and_newlines(string_to_print):
@@ -49,20 +49,22 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
 
 
 def print_long_string_byAttributes(string_to_print,text_attributes,the_dict):
-    string_to_print_inc=131 #turn this into a config option
+    character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print']) #turn this into a config option
     string_to_print_len=len(string_to_print)
-    string_to_print_mod=string_to_print_len % string_to_print_inc
-    for string_to_print_pos in range(0,(string_to_print_len - string_to_print_mod),string_to_print_inc):
-        print_byAttributes(string_to_print[string_to_print_pos:string_to_print_pos+string_to_print_inc],text_attributes,the_dict)
+    string_to_print_mod=string_to_print_len % character_limit
+    for string_to_print_pos in range(0,(string_to_print_len - string_to_print_mod),character_limit):
+        print_byAttributes(string_to_print[string_to_print_pos:string_to_print_pos+character_limit],text_attributes,the_dict)
     else:
         if (string_to_print_mod):
-            string_to_print_pos=string_to_print_pos+string_to_print_inc
+            string_to_print_pos=string_to_print_pos + character_limit
             print_byAttributes(string_to_print[string_to_print_pos:string_to_print_pos+string_to_print_mod],text_attributes,the_dict)
 
 
 #save to mumc_DEBUG.log when DEBUG is enabled
 def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
     if (the_dict['DEBUG'] >= debugLevel):
+
+        character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
 
         #if debug file does not exist; create blank file
         if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
@@ -72,8 +74,8 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
 
         #limit number of characters in a single write to 250
         #loop thru inputs > 250 characters and write in multiple passes
-        if (len(string_to_save) > 131): #todo turn this into a config option
-            append_long_string_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
+        if (len(string_to_save) > character_limit):
+            append_long_string_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'],character_limit)
         else:
             append_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
 
@@ -82,9 +84,11 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
 def print_byType(string_to_print,ok_to_print,the_dict,text_attributes):
     if (ok_to_print):
 
+        character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+
         #limit number of characters in a single print to 250
         #loop thru inputs > 250 characters and print in multiple passes
-        if (len(string_to_print) > 131): #todo turn this into a config option
+        if (len(string_to_print) > character_limit):
             print_long_string_byAttributes(string_to_print,text_attributes,the_dict)
         else:
             print_byAttributes(string_to_print,text_attributes,the_dict)

@@ -15,7 +15,7 @@ from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,i
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
 from mumc_modules.mumc_user_queries import get_single_user
-from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys
+from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys_ToKeep
 
 
 #Determine if item can be monitored
@@ -105,7 +105,7 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
 
     if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
-        var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
+        var_dict['media_data'][item['Id']]=filterYAMLConfigKeys_ToKeep(item,*var_dict['itemKeyFilter'])
         var_dict['deleteItemsIdTracker_Media'].append(item['Id'])
 
     if (the_dict['DEBUG']):
@@ -493,11 +493,11 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     if (var_dict['media_behavioral_control']):
                                         if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
                                             var_dict['deleteItemsIdTracker_Media'].append(item['Id'])
-                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
+                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys_ToKeep(item,*var_dict['itemKeyFilter'])
                                     else:
                                         if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
                                             var_dict['deleteItemsIdTracker_createdMedia'].append(item['Id'])
-                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
+                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys_ToKeep(item,*var_dict['itemKeyFilter'])
 
 ##########################################################################################################################################
 

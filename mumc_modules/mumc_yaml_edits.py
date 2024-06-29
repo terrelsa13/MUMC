@@ -3,6 +3,9 @@ from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_console_info import print_config_options_added_warning,print_config_options_removed_warning
 
 
+#OBSOLETE MODULE; DELETE FROM PROJECT
+
+
 def add_minium_age_to_yaml(missing_minimum_age_dict,init_dict,cfg):
     temp_dict={}
     temp_dict['admin_settings']={}

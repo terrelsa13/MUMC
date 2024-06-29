@@ -1,8 +1,8 @@
 import copy
-from mumc_modules.mumc_paths import save_yaml_config
+from mumc_modules.mumc_paths_files import save_yaml_config
 
 
-def filterYAMLConfigKeys(dirty_dict,*clean_keys):
+def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
 
     return {cleanKey:dirty_dict[cleanKey] for cleanKey in clean_keys}
 
@@ -358,6 +358,9 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['cache']['fallback_behavior']='LRU'
     config_data['admin_settings']['cache']['minimum_age']=200
 
+    config_data['admin_settings']['output_controls']['character_limit']['print']=128
+    config_data['admin_settings']['output_controls']['character_limit']['write']=128
+
     #before saving; reorder some keys for consistency
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')
     config_data['advanced_settings']['behavioral_statements']['episode']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['episode']['favorited'].pop('extra')
@@ -371,7 +374,7 @@ def yaml_configurationLayout(config_data,server_brand):
 def yaml_configurationBuilder(the_dict):
 
     #strip out uneccessary data
-    config_data=filterYAMLConfigKeys(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+    config_data=filterYAMLConfigKeys_ToKeep(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
 
     #start building config yaml
     config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
@@ -411,6 +414,7 @@ def yaml_configurationBuilder(the_dict):
             config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
     config_data['admin_settings'].pop('api_controls')
     config_data['admin_settings'].pop('cache')
+    config_data['admin_settings'].pop('output_controls')
 
     #save yaml config file
-    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'],int(the_dict['admin_settings']['output_controls']['character_limit']['print']))

@@ -4,7 +4,7 @@ import yaml
 import sys
 from mumc_modules.mumc_configcheck_legacy import cfgCheckLegacy
 from mumc_modules.mumc_config_builder import build_configuration_file
-from mumc_modules.mumc_paths import getFileExtension,add_to_PATH,doesFileExist
+from mumc_modules.mumc_paths_files import getFileExtension,add_to_PATH,doesFileExist
 from mumc_modules.mumc_console_info import print_containerized_config_missing
 from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 

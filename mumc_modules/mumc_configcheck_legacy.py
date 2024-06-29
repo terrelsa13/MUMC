@@ -92,7 +92,6 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
                                     )):
                                         error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not an alphabetic string\n'
                                     else:
-                                        #TODO verify we only see specific collection types (i.e. tvshows, movies, music, books, etc...)
                                         pass
                             elif (libinfo == 'networkpath'):
                                 networkpath_found += 1
@@ -139,8 +138,6 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
 
 #Check select config variables are as expected
 def cfgCheckLegacy(cfg,the_dict):
-
-    #Todo: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
 
     config_dict={}
     error_found_in_mumc_config_py=''
