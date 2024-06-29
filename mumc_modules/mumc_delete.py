@@ -153,7 +153,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     delete_media_item(item['Id'],the_dict)
 
                     #Print output for deleted media item
-                    strings_list_to_print+=item_output_details
+                    strings_list_to_print+=item_output_details + '\n'
                     print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)
                 else: #(item['Type'] == 'Unknown'):
                     strings_list_to_print+='Not Able To Delete Unknown Media Type' + '\n'
