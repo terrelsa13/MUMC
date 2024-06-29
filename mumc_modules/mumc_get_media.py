@@ -3,7 +3,7 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,get_isControlTag
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
@@ -15,6 +15,7 @@ from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,i
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
 from mumc_modules.mumc_user_queries import get_single_user
+from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys
 
 
 #Determine if item can be monitored
@@ -57,31 +58,26 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     if (theActionType == 'favorited'):
         isactioned_extra_byUserId=var_dict['isfavorited_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
-        isActioned_and_played_byUserId=var_dict['isfavorited_and_played_byUserId_Media']
         action_behavior=var_dict['favorited_behavior_media']
         item_isActioned=(var_dict['item_isFavorited'] or var_dict['item_isFavorited_Advanced'])
     elif (theActionType == 'whitetagged'):
         isactioned_extra_byUserId=var_dict['iswhitetagged_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
-        isActioned_and_played_byUserId=var_dict['iswhitetagged_and_played_byUserId_Media']
         action_behavior=var_dict['whitetagged_behavior_media']
         item_isActioned=var_dict['item_isWhitetagged']
     elif (theActionType == 'blacktagged'):
         isactioned_extra_byUserId=var_dict['isblacktagged_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
-        isActioned_and_played_byUserId=var_dict['isblacktagged_and_played_byUserId_Media']
         action_behavior=var_dict['blacktagged_behavior_media']
         item_isActioned=var_dict['item_isBlacktagged']
     elif (theActionType == 'whitelisted'):
         isactioned_extra_byUserId=var_dict['iswhitelisted_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
-        isActioned_and_played_byUserId=var_dict['iswhitelisted_and_played_byUserId_Media']
         action_behavior=var_dict['whitelisted_behavior_media']
         item_isActioned=var_dict['item_isWhitelisted']
     elif (theActionType == 'blacklisted'):
         isactioned_extra_byUserId=var_dict['isblacklisted_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
-        isActioned_and_played_byUserId=var_dict['isblacklisted_and_played_byUserId_Media']
         action_behavior=var_dict['blacklisted_behavior_media']
         item_isActioned=var_dict['item_isBlacklisted']
     else: #(theActionType == 'unknown'):
@@ -92,8 +88,6 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     item_matches_played_count_filter=var_dict['item_matches_played_count_filter']
     item_matches_created_days_filter=var_dict['item_matches_created_days_filter']
     item_matches_created_played_count_filter=var_dict['item_matches_created_played_count_filter']
-    itemIsPlayed=var_dict['itemIsPlayed']
-    itemPlayedCount=var_dict['itemPlayedCount']
 
     return_dict={}
 
@@ -105,18 +99,14 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
     isactioned_extra_byUserId['ConfiguredBehavior']=action_behavior['action'].casefold()
 
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingAction']=item_isActioned
-    isactioned_extra_byUserId[user_key][item['Id']]['itemIsPlayed']=itemIsPlayed
-    isactioned_extra_byUserId[user_key][item['Id']]['itemPlayedCount']=itemPlayedCount
-    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_played_days_filter']=item_matches_played_days_filter
-    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_played_count_filter']=item_matches_played_count_filter
-    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_days_filter']=item_matches_created_days_filter
-    isactioned_extra_byUserId[user_key][item['Id']]['item_matches_created_played_count_filter']=item_matches_created_played_count_filter
 
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']=(item_matches_played_days_filter and item_matches_played_count_filter)
 
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
 
-    isActioned_and_played_byUserId[user_key][item['Id']]=item
+    if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
+        var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
+        var_dict['deleteItemsIdTracker_Media'].append(item['Id'])
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nDynamicBehavior=" + str(isactioned_extra_byUserId['DynamicBehavior']),3,the_dict)
@@ -130,19 +120,14 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
         appendTo_DEBUG_log("\nItemId=" + str(item['Id']),3,the_dict)
 
     if (theActionType == 'favorited'):
-        return_dict['isfavorited_and_played_byUserId_Media']=isActioned_and_played_byUserId
         return_dict['isfavorited_extraInfo_byUserId_Media']=isactioned_extra_byUserId
     elif (theActionType == 'whitetagged'):
-        return_dict['iswhitetagged_and_played_byUserId_Media']=isActioned_and_played_byUserId
         return_dict['iswhitetagged_extraInfo_byUserId_Media']=isactioned_extra_byUserId
     elif (theActionType == 'blacktagged'):
-        return_dict['isblacktagged_and_played_byUserId_Media']=isActioned_and_played_byUserId
         return_dict['isblacktagged_extraInfo_byUserId_Media']=isactioned_extra_byUserId
     elif (theActionType == 'whitelisted'):
-        return_dict['iswhitelisted_and_played_byUserId_Media']=isActioned_and_played_byUserId
         return_dict['iswhitelisted_extraInfo_byUserId_Media']=isactioned_extra_byUserId
     elif (theActionType == 'blacklisted'):
-        return_dict['isblacklisted_and_played_byUserId_Media']=isActioned_and_played_byUserId
         return_dict['isblacklisted_extraInfo_byUserId_Media']=isactioned_extra_byUserId
     else: #(theActionType == 'unknown'):
         #generate error
@@ -233,6 +218,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['media_created_played_count_comparison']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['count_equality']
     var_dict['media_played_count']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['played']['count']
     var_dict['media_created_played_count']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['count']
+    var_dict['media_behavioral_control']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['behavioral_control']
     if (the_dict['DEBUG']):
         var_dict['print_media_delete_info']=True
         var_dict['print_media_keep_info']=True
@@ -300,43 +286,55 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['cut_off_date_created_media']=the_dict['cut_off_date_created_media'][var_dict['media_type_lower']]
 
     #dictionary of favortied and played items by userId
-    var_dict['isfavorited_and_played_byUserId_Media']={}
     var_dict['isfavorited_extraInfo_byUserId_Media']={}
+    var_dict['isfavorited_extraInfo_Tracker']=the_dict[var_dict['media_dict_str']]['isfavorited_extraInfo_Tracker']
     #dictionary of whitetagged items by userId
-    var_dict['iswhitetagged_and_played_byUserId_Media']={}
     var_dict['iswhitetagged_extraInfo_byUserId_Media']={}
+    var_dict['iswhitetagged_extraInfo_Tracker']=the_dict[var_dict['media_dict_str']]['iswhitetagged_extraInfo_Tracker']
     #dictionary of blacktagged items by userId
-    var_dict['isblacktagged_and_played_byUserId_Media']={}
     var_dict['isblacktagged_extraInfo_byUserId_Media']={}
+    var_dict['isblacktagged_extraInfo_Tracker']=the_dict[var_dict['media_dict_str']]['isblacktagged_extraInfo_Tracker']
     #dictionary of whitelisted items by userId
-    var_dict['iswhitelisted_and_played_byUserId_Media']={}
     var_dict['iswhitelisted_extraInfo_byUserId_Media']={}
+    var_dict['iswhitelisted_extraInfo_Tracker']=the_dict[var_dict['media_dict_str']]['iswhitelisted_extraInfo_Tracker']
     #dictionary of blacklisted items by userId
-    var_dict['isblacklisted_and_played_byUserId_Media']={}
     var_dict['isblacklisted_extraInfo_byUserId_Media']={}
+    var_dict['isblacklisted_extraInfo_Tracker']=the_dict[var_dict['media_dict_str']]['isblacklisted_extraInfo_Tracker']
     #dictionary of media item counts by userId
     var_dict['mediaCounts_byUserId']={}
 
-    #lists of items to be deleted
-    #var_dict['deleteItems_Media']=[]
-    #var_dict['deleteItemsIdTracker_Media']=[]
-    var_dict['deleteItems_createdMedia']=[]
-    var_dict['deleteItemsIdTracker_createdMedia']=[]
+    #lists of media items
+    var_dict['media_data']=the_dict[var_dict['media_dict_str']]['media_data']
+
+    #list of possible played media items by userId
+    var_dict['deleteItemsIdTracker_Media']=[]
+
+    #list of possible created media items by userId
+    var_dict['deleteItemsIdTracker_createdMedia']=the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia']
+
+    #the tag key is different between Emby and Jellyfin
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagKey='TagItems'
+    else:
+        tagKey='Tags'
+
+    #create filter tuple for item data
+    if (var_dict['media_type_lower'] == 'movie'):
+        var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey)
+    elif (var_dict['media_type_lower'] == 'episode'):
+        var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey,'IndexNumber','ParentIndexNumber','SeriesName','SeriesId','SeasonId','SeriesStudio')
+    elif ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
+        var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey,'IndexNumber','ParentIndexNumber','ArtistItems','AlbumId','AlbumArtist')
 
     #dictionary of favortied and played items by userId
-    var_dict['isfavorited_and_played_byUserId_Media'][user_info['user_id']]={}
     var_dict['isfavorited_extraInfo_byUserId_Media'][user_info['user_id']]={}
     #dictionary of whitetagged items by userId
-    var_dict['iswhitetagged_and_played_byUserId_Media'][user_info['user_id']]={}
     var_dict['iswhitetagged_extraInfo_byUserId_Media'][user_info['user_id']]={}
     #dictionary of blacktagged items by userId
-    var_dict['isblacktagged_and_played_byUserId_Media'][user_info['user_id']]={}
     var_dict['isblacktagged_extraInfo_byUserId_Media'][user_info['user_id']]={}
     #dictionary of whitelisted items by userId
-    var_dict['iswhitelisted_and_played_byUserId_Media'][user_info['user_id']]={}
     var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']]={}
     #dictionary of blacklisted items by userId
-    var_dict['isblacklisted_and_played_byUserId_Media'][user_info['user_id']]={}
     var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']]={}
     #dictionary of media item counts by userId
     var_dict['mediaCounts_byUserId'][user_info['user_id']]=defaultdict(dict)
@@ -348,17 +346,14 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     if (var_dict['whitelist_length'] > var_dict['blacklist_length']):
         var_dict['shortest_list_length']=var_dict['blacklist_length']
         var_dict['list_diff']=var_dict['whitelist_length'] - var_dict['blacklist_length']
-        #longest_list='whitelist'
         var_dict['shortest_list']='blacklist'
     elif (var_dict['blacklist_length'] > var_dict['whitelist_length']):
         var_dict['shortest_list_length']=var_dict['whitelist_length']
         var_dict['list_diff']=var_dict['blacklist_length'] - var_dict['whitelist_length']
-        #longest_list='blacklist'
         var_dict['shortest_list']='whitelist'
     else:
         var_dict['shortest_list_length']=0
         var_dict['list_diff']=0
-        #longest_list=''
         var_dict['shortest_list']='whitelist'
 
     for listlen in range(var_dict['list_diff']):
@@ -478,6 +473,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 elif (var_dict['media_type_lower'] == 'audiobook'):
                                     item=prepare_AUDIOBOOKoutput(the_dict,item,user_info,var_dict)
 
+##########################################################################################################################################
+
                                 var_dict['isfavorited_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]={}
                                 var_dict['iswhitetagged_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]={}
                                 var_dict['isblacktagged_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]={}
@@ -493,9 +490,14 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
                                 #If item meets created days filter, create-played days count, and created-played inequality then save for post-processing
                                 if (var_dict['item_matches_created_days_filter'] and var_dict['item_matches_created_played_count_filter']):
-                                    if (not (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia'])):
-                                        var_dict['deleteItemsIdTracker_createdMedia'].append(item['Id'])
-                                        var_dict['deleteItems_createdMedia'].append(item)
+                                    if (var_dict['media_behavioral_control']):
+                                        if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
+                                            var_dict['deleteItemsIdTracker_Media'].append(item['Id'])
+                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
+                                    else:
+                                        if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
+                                            var_dict['deleteItemsIdTracker_createdMedia'].append(item['Id'])
+                                            var_dict['media_data'][item['Id']]=filterYAMLConfigKeys(item,*var_dict['itemKeyFilter'])
 
 ##########################################################################################################################################
 
@@ -529,7 +531,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 var_dict['isFavorited_Display']=(var_dict['item_isFavorited'] or var_dict['item_isFavorited_Advanced'])
 
                                 #favorite behavior enabled
-                                var_dict.update(parse_actionedConfigurationBehavior('favorited',item,user_info,var_dict,the_dict))
+                                if (var_dict['item_isFavorited'] or var_dict['item_isFavorited_Advanced']):
+                                    if (not (item['Id'] in var_dict['isfavorited_extraInfo_Tracker'])):
+                                        var_dict['isfavorited_extraInfo_Tracker'].append(item['Id'])
+                                    var_dict.update(parse_actionedConfigurationBehavior('favorited',item,user_info,var_dict,the_dict))
+                                else:
+                                    var_dict['isfavorited_extraInfo_byUserId_Media'][user_info['user_id']].pop(item['Id'])
+
 ##########################################################################################################################################
 
                                 var_dict['item_isWhitetagged']=False
@@ -548,7 +556,12 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
 
                                 #whitetag behavior enabled
-                                var_dict.update(parse_actionedConfigurationBehavior('whitetagged',item,user_info,var_dict,the_dict))
+                                if (var_dict['item_isWhitetagged']):
+                                    if (not (item['Id'] in var_dict['iswhitetagged_extraInfo_Tracker'])):
+                                        var_dict['iswhitetagged_extraInfo_Tracker'].append(item['Id'])
+                                    var_dict.update(parse_actionedConfigurationBehavior('whitetagged',item,user_info,var_dict,the_dict))
+                                else:
+                                    var_dict['iswhitetagged_extraInfo_byUserId_Media'][user_info['user_id']].pop(item['Id'])
 
 ##########################################################################################################################################
 
@@ -568,7 +581,12 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
 
                                 #blacktag behavior enabled
-                                var_dict.update(parse_actionedConfigurationBehavior('blacktagged',item,user_info,var_dict,the_dict))
+                                if (var_dict['item_isBlacktagged']):
+                                    if (not (item['Id'] in var_dict['isblacktagged_extraInfo_Tracker'])):
+                                        var_dict['isblacktagged_extraInfo_Tracker'].append(item['Id'])
+                                    var_dict.update(parse_actionedConfigurationBehavior('blacktagged',item,user_info,var_dict,the_dict))
+                                else:
+                                    var_dict['isblacktagged_extraInfo_byUserId_Media'][user_info['user_id']].pop(item['Id'])
 
 ##########################################################################################################################################
 
@@ -576,21 +594,18 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 #check if we are at a whitelist queried var_dict['data_list_pos']
                                 if (var_dict['data_list_pos'] in var_dict['data_from_whitelisted_queries']):
                                     var_dict['item_isWhitelisted']=get_isItemWhitelisted_Blacklisted('whitelist',item,user_info,the_dict)
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_whitelist_lib']['lib_id']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_whitelist_lib']['subfolder_id']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_whitelist_lib']['path']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_whitelist_lib']['network_path']
                                 else: #check if we are at a blacklist queried var_dict['data_list_pos']
                                     var_dict['item_isWhitelisted']=get_isItemWhitelisted_Blacklisted('whitelist',item,user_info,the_dict)
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_blacklist_lib']['lib_id']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_blacklist_lib']['subfolder_id']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_blacklist_lib']['path']
-                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_blacklist_lib']['network_path']
 
                                 var_dict['isWhitelisted_Display']=var_dict['item_isWhitelisted']
 
                                 #whitelist behavior enabled
-                                var_dict.update(parse_actionedConfigurationBehavior('whitelisted',item,user_info,var_dict,the_dict))
+                                if (var_dict['item_isWhitelisted']):
+                                    if (not (item['Id'] in var_dict['iswhitelisted_extraInfo_Tracker'])):
+                                        var_dict['iswhitelisted_extraInfo_Tracker'].append(item['Id'])
+                                    var_dict.update(parse_actionedConfigurationBehavior('whitelisted',item,user_info,var_dict,the_dict))
+                                else:
+                                    var_dict['iswhitelisted_extraInfo_byUserId_Media'][user_info['user_id']].pop(item['Id'])
 
 ##########################################################################################################################################
 
@@ -598,21 +613,18 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                 #check if we are at a blacklist queried var_dict['data_list_pos']
                                 if (var_dict['data_list_pos'] in var_dict['data_from_blacklisted_queries']):
                                     var_dict['item_isBlacklisted']=get_isItemWhitelisted_Blacklisted('blacklist',item,user_info,the_dict)
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_blacklist_lib']['lib_id']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_blacklist_lib']['subfolder_id']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_blacklist_lib']['path']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_blacklist_lib']['network_path']
                                 else: #check if we are at a whitelist queried var_dict['data_list_pos']
                                     var_dict['item_isBlacklisted']=get_isItemWhitelisted_Blacklisted('blacklist',item,user_info,the_dict)
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryId']=var_dict['this_whitelist_lib']['lib_id']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibrarySubFolderId']=var_dict['this_whitelist_lib']['subfolder_id']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryPath']=var_dict['this_whitelist_lib']['path']
-                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']][item['Id']]['WhitelistBlacklistLibraryNetPath']=var_dict['this_whitelist_lib']['network_path']
 
                                 var_dict['isBlacklisted_Display']=var_dict['item_isBlacklisted']
 
                                 #blacklist behavior enabled
-                                var_dict.update(parse_actionedConfigurationBehavior('blacklisted',item,user_info,var_dict,the_dict))
+                                if (var_dict['item_isBlacklisted']):
+                                    if (not (item['Id'] in var_dict['isblacklisted_extraInfo_Tracker'])):
+                                        var_dict['isblacklisted_extraInfo_Tracker'].append(item['Id'])
+                                    var_dict.update(parse_actionedConfigurationBehavior('blacklisted',item,user_info,var_dict,the_dict))
+                                else:
+                                    var_dict['isblacklisted_extraInfo_byUserId_Media'][user_info['user_id']].pop(item['Id'])
 
 ##########################################################################################################################################
 
@@ -629,16 +641,16 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         if (series_info):
                                             item['SeriesId']=series_info['Id']
 
-                                    if not (item['SeriesId'] in var_dict['mediaCounts_byUserId'][user_info['user_id']]):
+                                    if (not (item['SeriesId'] in var_dict['mediaCounts_byUserId'][user_info['user_id']])):
                                         RecursiveItemCount=int(series_info['RecursiveItemCount'])
                                         UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
                                         PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
 
-                                    if not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]):
+                                    if (not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TotalEpisodeCount']=RecursiveItemCount
-                                    if not ('UnplayedEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]):
+                                    if (not ('UnplayedEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['UnplayedEpisodeCount']=UnplayedItemCount
-                                    if not ('PlayedEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]):
+                                    if (not ('PlayedEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['PlayedEpisodeCount']=PlayedEpisodeCount
 
 ##########################################################################################################################################
@@ -659,20 +671,23 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
     print_byType(the_dict['console_separator_'],the_dict['advanced_settings']['console_controls']['headers']['user']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['user']['formatting'])
 
-    #the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_Media']=var_dict['deleteItems_Media']
-    #the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_Media']=var_dict['deleteItemsIdTracker_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItems_createdMedia']=var_dict['deleteItems_createdMedia']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_createdMedia']=var_dict['deleteItemsIdTracker_createdMedia']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacklisted_and_played_byUserId_Media']=var_dict['isblacklisted_and_played_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['media_data']|=var_dict['media_data']
+    the_dict[var_dict['media_dict_str']][user_info['user_id']]['deleteItemsIdTracker_Media']=var_dict['deleteItemsIdTracker_Media']
+    
+    the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia']=list(set(the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia'] + var_dict['deleteItemsIdTracker_createdMedia']))
+    the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia'].sort()
+    
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacklisted_extraInfo_byUserId_Media']=var_dict['isblacklisted_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitelisted_and_played_byUserId_Media']=var_dict['iswhitelisted_and_played_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['isblacklisted_extraInfo_Tracker']+=var_dict['isblacklisted_extraInfo_Tracker']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitelisted_extraInfo_byUserId_Media']=var_dict['iswhitelisted_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacktagged_and_played_byUserId_Media']=var_dict['isblacktagged_and_played_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['iswhitelisted_extraInfo_Tracker']+=var_dict['iswhitelisted_extraInfo_Tracker']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacktagged_extraInfo_byUserId_Media']=var_dict['isblacktagged_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitetagged_and_played_byUserId_Media']=var_dict['iswhitetagged_and_played_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['isblacktagged_extraInfo_Tracker']+=var_dict['isblacktagged_extraInfo_Tracker']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitetagged_extraInfo_byUserId_Media']=var_dict['iswhitetagged_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']][user_info['user_id']]['isfavorited_and_played_byUserId_Media']=var_dict['isfavorited_and_played_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['iswhitetagged_extraInfo_Tracker']+=var_dict['iswhitetagged_extraInfo_Tracker']
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isfavorited_extraInfo_byUserId_Media']=var_dict['isfavorited_extraInfo_byUserId_Media']
+    the_dict[var_dict['media_dict_str']]['isfavorited_extraInfo_Tracker']+=var_dict['isfavorited_extraInfo_Tracker']
+
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['mediaCounts_byUserId']=var_dict['mediaCounts_byUserId']
 
     media_returns['media_dict']=the_dict[var_dict['media_dict_str']]
@@ -685,12 +700,43 @@ def init_getMedia(the_dict):
 
     the_dict['movie_dict']={}
     the_dict['movie_dict']['media_type']='movie'
+    the_dict['movie_dict']['media_data']={}
+    the_dict['movie_dict']['deleteItemsIdTracker_createdMedia']=[]
+    the_dict['movie_dict']['isfavorited_extraInfo_Tracker']=[]
+    the_dict['movie_dict']['iswhitetagged_extraInfo_Tracker']=[]
+    the_dict['movie_dict']['isblacktagged_extraInfo_Tracker']=[]
+    the_dict['movie_dict']['iswhitelisted_extraInfo_Tracker']=[]
+    the_dict['movie_dict']['isblacklisted_extraInfo_Tracker']=[]
+
     the_dict['episode_dict']={}
     the_dict['episode_dict']['media_type']='episode'
+    the_dict['episode_dict']['media_data']={}
+    the_dict['episode_dict']['deleteItemsIdTracker_createdMedia']=[]
+    the_dict['episode_dict']['isfavorited_extraInfo_Tracker']=[]
+    the_dict['episode_dict']['iswhitetagged_extraInfo_Tracker']=[]
+    the_dict['episode_dict']['isblacktagged_extraInfo_Tracker']=[]
+    the_dict['episode_dict']['iswhitelisted_extraInfo_Tracker']=[]
+    the_dict['episode_dict']['isblacklisted_extraInfo_Tracker']=[]
+
     the_dict['audio_dict']={}
     the_dict['audio_dict']['media_type']='audio'
+    the_dict['audio_dict']['media_data']={}
+    the_dict['audio_dict']['deleteItemsIdTracker_createdMedia']=[]
+    the_dict['audio_dict']['isfavorited_extraInfo_Tracker']=[]
+    the_dict['audio_dict']['iswhitetagged_extraInfo_Tracker']=[]
+    the_dict['audio_dict']['isblacktagged_extraInfo_Tracker']=[]
+    the_dict['audio_dict']['iswhitelisted_extraInfo_Tracker']=[]
+    the_dict['audio_dict']['isblacklisted_extraInfo_Tracker']=[]
+
     the_dict['audiobook_dict']={}
     the_dict['audiobook_dict']['media_type']='audiobook'
+    the_dict['audiobook_dict']['media_data']={}
+    the_dict['audiobook_dict']['deleteItemsIdTracker_createdMedia']=[]
+    the_dict['audiobook_dict']['isfavorited_extraInfo_Tracker']=[]
+    the_dict['audiobook_dict']['iswhitetagged_extraInfo_Tracker']=[]
+    the_dict['audiobook_dict']['isblacktagged_extraInfo_Tracker']=[]
+    the_dict['audiobook_dict']['iswhitelisted_extraInfo_Tracker']=[]
+    the_dict['audiobook_dict']['isblacklisted_extraInfo_Tracker']=[]
 
     #Determine played and created date for each media type; UTC time used for media items; needed for get_mediaItems() and postProcessing()
     the_dict['cut_off_date_played_media']={}
@@ -738,10 +784,6 @@ def init_getMedia(the_dict):
     #Create userId list of accessible libraries
     the_dict['byUserId_accessibleLibraries']={}
     the_dict['byUserId_accessibleLibraryParents']={}
-    #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        #library_id='lib_id'
-    #else:
-        #library_id='subfolder_id'
 
     for user_info in the_dict['admin_settings']['users']:
         the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=[]
@@ -922,8 +964,8 @@ def init_getMedia(the_dict):
 
         media_found=(movie_found or episode_found or audio_found or audiobook_found)
 
-        if not (the_dict['all_media_disabled']):
-            if not (media_found):
+        if (not (the_dict['all_media_disabled'])):
+            if (not (media_found)):
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log("\n",1,the_dict)
                 print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])

@@ -68,7 +68,6 @@ def create_library_dicts(the_dict):
 
 
 def reorder_user_policy_libararies(the_dict):
-    #sortedList=copy.deepcopy(the_dict['all_library_ids_list'])
     for user_data in the_dict['all_users']:
         user_data_pos=the_dict['all_users'].index(user_data)
         if (not (user_data['Policy']['EnableAllFolders'])):
@@ -347,7 +346,6 @@ def add_libraries_to_new_users(the_dict):
             if (the_dict['all_users'][this_user_index]['Policy']['EnableAllFolders']):
                 enabled_lib_id_list=the_dict['all_library_ids_list']
             else:
-                #temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])
                 for enabled_lib_id in the_dict['all_users'][this_user_index]['Policy']['EnabledFolders']:
                     for x in range(the_dict['all_library_ids_list'].count(enabled_lib_id)):
                         enabled_lib_id_list.append(enabled_lib_id)

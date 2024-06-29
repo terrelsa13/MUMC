@@ -5,7 +5,6 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2jso
 from mumc_modules.mumc_versions import get_script_version,get_python_version,get_server_version,get_operating_system_info
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_delete import delete_media_item
 from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
@@ -192,133 +191,6 @@ def build_print_media_item_details(item,var_dict,the_dict):
         strings_list+='\n'
 
         print_byType(strings_list,print_media_info,the_dict,media_info_format)
-
-
-#list and delete items past played threshold
-def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
-    deleteItems_Tracker=[]
-    print_summary_header=the_dict['advanced_settings']['console_controls']['headers']['summary']['show']
-    print_movie_summary=the_dict['advanced_settings']['console_controls']['movie']['summary']['show']
-    print_episode_summary=the_dict['advanced_settings']['console_controls']['episode']['summary']['show']
-    print_audio_summary=the_dict['advanced_settings']['console_controls']['audio']['summary']['show']
-    summary_header_format=the_dict['advanced_settings']['console_controls']['headers']['summary']['formatting']
-    movie_summary_format=the_dict['advanced_settings']['console_controls']['movie']['summary']['formatting']
-    episode_summary_format=the_dict['advanced_settings']['console_controls']['episode']['summary']['formatting']
-    audio_summary_format=the_dict['advanced_settings']['console_controls']['audio']['summary']['formatting']
-    if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-        print_audiobook_summary=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['show']
-        audiobook_summary_format=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']
-    else:
-        print_audiobook_summary=False
-        audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
-
-    #get number of items to be deleted
-     #have to loop thru and look for item_ids because some media has almost
-      #the same data and would not be filtered out by turning this into a set
-    for item in deleteItems:
-        if (not(item['Id'] in deleteItems_Tracker)):
-            deleteItems_Tracker.append(item['Id'])
-    the_dict['deleteItemsLength']=len(deleteItems_Tracker)
-    #clear tracker so it can be used again below
-    deleteItems_Tracker.clear()
-
-    #List items to be deleted
-    strings_list_to_print=''
-    strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type)
-
-    print_byType(strings_list_to_print,print_summary_header,the_dict,summary_header_format)
-
-    if len(deleteItems) > 0:
-        for item in deleteItems:
-
-            strings_list_to_print=''
-
-            if (not (item['Id'] in deleteItems_Tracker)):
-                deleteItems_Tracker.append(item['Id'])
-
-                if (item['Type'] == 'Movie'):
-                    item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                    
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details + '\n'
-                    print_byType(strings_list_to_print,print_movie_summary,the_dict,movie_summary_format)
-                elif (item['Type'] == 'Episode'):
-                    try:
-                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + get_season_episode(item['ParentIndexNumber'],item['IndexNumber'],the_dict) + ' - ' + item['Name'] + ' - ' + item['Id']
-                    except (KeyError, IndexError):
-                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                        if (the_dict['DEBUG']):
-                            appendTo_DEBUG_log('Error encountered - Delete Episode: \n\n' + str(item),2,the_dict)
-
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details + '\n'
-                    print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)
-                elif (item['Type'] == 'Audio'):
-                    item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Artists'][0] + ' ' + item['Album'] + ' ' + str(item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
-
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details + '\n'
-                    print_byType(strings_list_to_print,print_audio_summary,the_dict,audio_summary_format)
-                elif (item['Type'] == 'AudioBook'):
-                    item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Artists'][0] + ' ' + item['Album'] + ' ' + str(item['IndexNumber']) + ' - ' + item['Name'] + ' - ' + item['Id']
-
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details + '\n'
-                    print_byType(strings_list_to_print,print_audiobook_summary,the_dict,audiobook_summary_format)
-                elif (item['Type'] == 'Season'):
-                    try:
-                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                    except (KeyError, IndexError):
-                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                        if (the_dict['DEBUG']):
-                            appendTo_DEBUG_log('Error encountered - Delete Season Folder: \n\n' + str(item),2,the_dict)
-
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details + '\n'
-                    print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)
-                elif (item['Type'] == 'Series'):
-                    try:
-                        item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
-                    except (KeyError, IndexError):
-                        if (the_dict['DEBUG']):
-                            appendTo_DEBUG_log('Error encountered - Delete Series Folder: \n\n' + str(item),2,the_dict)
-
-                    #Delete media item
-                    delete_media_item(item['Id'],the_dict)
-
-                    #Print output for deleted media item
-                    strings_list_to_print+=item_output_details
-                    print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)
-                else: #(item['Type'] == 'Unknown'):
-                    strings_list_to_print+='Not Able To Delete Unknown Media Type' + '\n'
-
-                    print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
-    else:
-        strings_list_to_print=''
-        strings_list_to_print+='[NO ITEMS TO DELETE]' + '\n'
-        print_byType(strings_list_to_print,print_summary_header,the_dict,summary_header_format)
-
-    strings_list_to_print=''
-
-    strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
-
-    print_byType(strings_list_to_print,print_summary_header,the_dict,summary_header_format)
 
 
 #show the command line help text
@@ -518,7 +390,7 @@ def remove_files_helper(strings_list_to_print,the_dict):
 
 #print new config info
 def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
-    if not (the_dict['advanced_settings']['REMOVE_FILES']):
+    if (not (the_dict['advanced_settings']['REMOVE_FILES'])):
         strings_list_to_print+=the_dict['_console_separator'] + '\n'
         strings_list_to_print+='* Config file is not setup to delete media.' + '\n'
         strings_list_to_print+='* Config file is in dry run mode to prevent deleting media.' + '\n'

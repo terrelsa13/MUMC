@@ -52,14 +52,14 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             if (user_found > 1):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' is seen more than once\n'
             #Check user_id is string
-            if not (isinstance(check_irt['user_id'], str)):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_id is not a string for at least one user\n'
+            if (not (isinstance(check_irt['user_id'], str))):
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_id is not a string or is not a list for at least one user\n'
             else:
                 #Check user_id is 32 character long alphanumeric
-                if not (
+                if (not (
                     (check_irt['user_id'].isalnum()) and
                     (len(check_irt['user_id']) == 32)
-                ):
+                )):
                     error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' + at least one user_id is not a 32-character alphanumeric string\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_id key is missing for at least one user\n'
@@ -78,24 +78,24 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             if (user_found > 1):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' is seen more than once\n'
             #Check user_name is string
-            if not (isinstance(check_irt['user_name'], str)):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_name is not a string for at least one user\n'
+            if (not (isinstance(check_irt['user_name'], str))):
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_name is not a string or is not a list for at least one user\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_name is missing for at least one user\n'
 
         #Check if whitelist exists
         if ('whitelist' in check_irt):
             #Check whitelist is string
-            if not (isinstance(check_irt['whitelist'], list)):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the whitelist is not a string for at least one user\n'
+            if (not (isinstance(check_irt['whitelist'], list))):
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the whitelist is not a string or is not a list for at least one user\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > whitelist is missing for at least one user\n'
 
         #Check if blacklist exists
         if ('blacklist' in check_irt):
             #Check blacklist is string
-            if not (isinstance(check_irt['blacklist'], list)):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the blacklist is not a string for at least one user\n'
+            if (not (isinstance(check_irt['blacklist'], list))):
+                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the blacklist is not a string or is not a list for at least one user\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
 
@@ -275,7 +275,7 @@ def cfgCheckYAML(cfg,init_dict):
                 if (user_data == 'user_name'):
                     check_list.append(entry[user_data])
         check_user_names_length=len(check_list)
-        #user_name_check_list=[]
+
         if (check_user_names_length > 0):
             for user_info in check_list:
                 user_name_check_list.append(user_info)
@@ -2620,7 +2620,7 @@ def cfgCheckYAML(cfg,init_dict):
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         
         error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_id_check_list, user_name_check_list, 'admin_settings > users')
-        if not (len(check) == check_user_keys_length):
+        if (not (len(check) == check_user_keys_length)):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
 
 #######################################################################################################
@@ -2720,7 +2720,7 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
     #Bring all errors found to users attention
-    if not (error_found_in_mumc_config_yaml == ''):
+    if (not (error_found_in_mumc_config_yaml == '')):
         if (init_dict['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,init_dict)
         print('\n' + error_found_in_mumc_config_yaml)
@@ -2764,6 +2764,6 @@ def pre_cfgCheckYAML(cfg):
         error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > users is missing from the mumc_config.yaml\n'
 
     #Bring all errors found to users attention
-    if not (error_found_in_mumc_config_yaml == ''):
+    if (not (error_found_in_mumc_config_yaml == '')):
         print('\n' + error_found_in_mumc_config_yaml)
         sys.exit(0)

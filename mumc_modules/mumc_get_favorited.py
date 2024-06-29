@@ -14,7 +14,7 @@ def init_blacklist_favorited_query(var_dict):
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
         var_dict['enable_media_query_blacklisted_favorited']):
-            #Build query for Favorited_From_Blacklist media items
+        #Build query for Favorited_From_Blacklist media items
         var_dict['IncludeItemTypes_Favorited_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Favorited_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'

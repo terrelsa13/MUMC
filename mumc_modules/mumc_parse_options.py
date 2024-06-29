@@ -159,7 +159,6 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
     #merge cfg and init_dict; goal is to preserve cfg's structure
     the_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(the_dict)
-    #the_dict.clear()
 
     if (cmdopt_dict['altConfigInfo'] and doesFileExist(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'])):
         config_file_full_path=cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']
@@ -169,7 +168,6 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
         config_file_full_path=cfg['mumc_path'] / cfg['config_file_name_yaml']
     else:
         print('Unable to find valid configuration file.')
-        #print('The -rak,-remake-api-key command is unavaible without a valid configuration file.')
         sys.exit(0)
         
     for cmdOption in argv:
@@ -209,8 +207,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
             cfg['admin_settings']['server']['auth_key']=get_MUMC_labelled_authentication_key(labelled_authentication_keys,cfg)
 
             yaml_configurationUpdater(cfg)
-            #print('A new API key has been created with the App Name of MUMC.')
-            #print('If there was a previous API key with the App Name MUMC it has been deleted.')
+
             print('The new API key was saved to ' + str(config_file_full_path) + 'as admin_settings > server > auth_key.')
             print('\nAPI Key: ' + str(cfg['admin_settings']['server']['auth_key']))
             sys.exit(0)
@@ -237,7 +234,6 @@ def parse_command_line_options(the_dict):
     #look for unknown command line options
     cmdUnknown=findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'])
     if (cmdUnknown):
-        #raise UnknownCMDOptionError
         unknown_command_line_option_helper(cmdUnknown,the_dict)
         default_helper_menu(the_dict)
         sys.exit(0)
@@ -270,8 +266,5 @@ def parse_command_line_options(the_dict):
         cmdopt_dict['altConfigPath']=None
         cmdopt_dict['altConfigFileNoExt']=None
         cmdopt_dict['altConfigFileExt']=None
-
-    #look fo -rak or -remake-api-key command line option
-    #findRemakeAuthKeyRequest(cmdopt_dict,the_dict)
 
     return cmdopt_dict

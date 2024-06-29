@@ -1,7 +1,7 @@
 from mumc_modules.mumc_paths import save_yaml_config
 from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
-#TBD
+
 def yaml_configurationUpdater(the_dict,orig_dict={}):
     config_data={}
     
@@ -74,10 +74,7 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 else:
                     if (keys_exist(orig_dict,'admin_settings','behavior','users')):
                         orig_dict['admin_settings']['behavior']['users']={}
-                        #if (keys_exist(orig_dict,'admin_settings','behavior','users','monitor_disabled')):
                         orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
-                        #else:
-                            #orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
 
                 #before saving; reorder some keys for consistency
                 orig_dict['admin_settings']['behavior']['users']=orig_dict['admin_settings']['behavior'].pop('users')

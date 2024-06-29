@@ -125,7 +125,7 @@ def get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filte
 
     item_matches_played_count_filter=False
 
-    if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and (not itemIsPlayed)) or (IsPlayedStatus == 'playedAndUnplayed')):
+    if ((not (itemPlayedCount == None)) and (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and (not itemIsPlayed)) or (IsPlayedStatus == 'playedAndUnplayed'))):
         if (filter_count_comparison == '>'):
             if (itemPlayedCount > filter_count):
                 #media item play count greater than specified value

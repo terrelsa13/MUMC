@@ -90,10 +90,6 @@ def get_isItemMatching(item_one,item_two,the_dict):
     else:
         raise TypeError('ItemIsMatchingTypeError: item_two is an unexpected type; expecting list, set, tuple, or string.')
 
-    #DEBUG log formatting
-    #if (the_dict['DEBUG']):
-        #appendTo_DEBUG_log('\n',1,the_dict)
-
     #determine if media Id matches one of the other Ids
     for single_item_one in temp_item_one:
             for single_item_two in temp_item_two:
@@ -104,15 +100,12 @@ def get_isItemMatching(item_one,item_two,the_dict):
                 if ((not ((single_item_one == '') or (single_item_two == ''))) and (not ((single_item_one == None) or (single_item_two == None)))):
                     if (single_item_one == single_item_two):
                         #found a full match; return true and the matching value
-                        #return True,single_item_one
                         match_dict['match_state'].append(True)
                         match_dict['match_value'].append(single_item_one)
                     else:
+                        #found no match; return false and the a None value
                         match_dict['match_state'].append(False)
                         match_dict['match_value'].append(None)
-
-    #nothing matched; return false and empty string
-    #return False,''
     
     match_dict['any_match']=any(match_dict['match_state'])
     match_dict['all_match']=all(match_dict['match_state'])

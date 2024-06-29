@@ -7,7 +7,7 @@ from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
-from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
+from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths import get_current_directory,delete_debug_log
@@ -15,6 +15,7 @@ from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_default import create_default_config,merge_configuration
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
+from mumc_modules.mumc_delete import print_and_delete_items
 
 
 def MUMC():
@@ -36,6 +37,7 @@ def MUMC():
     #remember original config for when user wants to update existing config file
     cfg_orig=copy.deepcopy(cfg)
 
+    #precheck the config for the minimum needed variables to run
     pre_cfgCheckYAML(cfg)
 
     #create default config file

@@ -26,18 +26,6 @@ def get_users_and_libraries(the_dict):
 
     the_dict=add_subfolder_id_placeholders('blacklist',the_dict)
     the_dict=add_subfolder_id_placeholders('whitelist',the_dict)
-    '''
-    for user_info in the_dict['admin_settings']['users']:
-        user_index=the_dict['admin_settings']['users'].index(user_info)
-        for lib_info in user_info['blacklist']:
-            lib_index=user_info['blacklist'].index(lib_info)
-            if (not ('subfolder_id' in lib_info)):
-                the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['subfolder_id']=None
-        for lib_info in user_info['whitelist']:
-            lib_index=user_info['whitelist'].index(lib_info)
-            if (not ('subfolder_id' in lib_info)):
-                the_dict['admin_settings']['users'][user_index]['whitelist'][lib_index]['subfolder_id']=None
-    '''
 
     for user_info in the_dict['admin_settings']['users']:
         user_info_index=the_dict['admin_settings']['users'].index(user_info)

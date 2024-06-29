@@ -1386,7 +1386,7 @@ def merge_configuration(default_base,merge):
             pass
 
     #Bring all errors found to users attention
-    if not (error_found_in_mumc_config_yaml == ''):
+    if (not (error_found_in_mumc_config_yaml == '')):
         if (default_base['DEBUG']):
             appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,default_base)
         print('\n' + error_found_in_mumc_config_yaml)

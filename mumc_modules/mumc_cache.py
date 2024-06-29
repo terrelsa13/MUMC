@@ -7,7 +7,7 @@ from sys import getsizeof
 class cached_data_handler:
     #Initialize and define cache variables
     def __init__(self,cfg):
-        self.cached_data={}
+        self.cached_data=[]
         self.cached_entry_urls=[]
         self.cached_entry_sizes=[]
         self.cached_entry_hits=[]
@@ -40,7 +40,7 @@ class cached_data_handler:
 
 
     def wipeCache(self):
-        self.cached_data={}
+        self.cached_data=[]
         self.cached_entry_urls=[]
         self.cached_entry_sizes=[]
         self.cached_entry_hits=[]
@@ -69,7 +69,7 @@ class cached_data_handler:
                 self.cached_data_hits+=1
                 self.cached_entry_hits[index]+=1
                 self.cached_entry_times[index]=time.time()*1000
-                return self.cached_data[url]
+                return self.cached_data[index]
             else:
                 self.cached_data_misses+=1
                 return None
@@ -117,7 +117,7 @@ class cached_data_handler:
             self.cached_entry_hits.pop(index)
             self.cached_entry_urls.pop(index)
             self.cached_entry_times.pop(index)
-            self.cached_data.pop(url)
+            self.cached_data.pop(index)
             self.total_cached_data_size-=size
             self.total_cached_data_size_removed+=size
             if (self.oldest_cached_data_entry_number == None):
@@ -178,12 +178,13 @@ class cached_data_handler:
                             temp_cached_entry_times=self.cached_entry_times.copy()
                     else:
                         self.wipeCache()
-                self.cached_data[url]=data
-                self.cached_entry_times.append(time.time() * 1000)
                 self.cached_entry_urls.append(url)
+                index=self.cached_entry_urls.index(url)
+                self.cached_data.append(data)
+                self.cached_entry_times.append(time.time() * 1000)
                 self.cached_entry_hits.append(0)
                 self.cached_entry_sizes.append(potentialEntrySize)
-                size=self.cached_entry_sizes[self.getIndexFromURL(url)]
+                size=self.cached_entry_sizes[index]
                 self.total_cached_data_size+=size
                 self.total_data_size_thru_cache+=size
                 if (self.newest_cached_data_entry_number == None):

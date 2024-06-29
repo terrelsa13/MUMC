@@ -95,15 +95,35 @@ def remove_emojis(dataInput: str) -> str:
 def append_to_file(dataInput,filePathName):
     fullPathName=getFullPathName(filePathName)
 
-    #remove emoticons
-    #dataInput=remove_emoticons(dataInput)
-
     #remove emojis
     dataInput=remove_emojis(dataInput)
 
     #Save the config file
     with open(fullPathName,'a') as file:
         file.write(dataInput)
+
+
+def append_long_string_to_file(dataInput,filePathName):
+
+    dataInput_inc=131 #todo turn this into a config option
+    dataInput_len=len(dataInput)
+    dataInput_mod=dataInput_len % dataInput_inc
+
+    #open file we being written to
+    file = open(filePathName, "a")
+
+    try:
+        #loop thru long string and write in smaller increments
+        for dataInput_pos in range(0,(dataInput_len - dataInput_mod),dataInput_inc):
+            file.write(dataInput[dataInput_pos:dataInput_pos+dataInput_inc])
+        else:
+            #for the last write only print the remaining characters
+            if (dataInput_mod):
+                dataInput_pos=dataInput_pos+dataInput_inc
+                file.write(dataInput[dataInput_pos:dataInput_pos+dataInput_mod])
+    finally:
+        #finally close the file
+        file.close()
 
 
 #Save file to the directory this script is running from; even when the cwd is not the same

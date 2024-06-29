@@ -1,5 +1,5 @@
 from mumc_modules.mumc_user_queries import get_all_users
-from mumc_modules.mumc_console_info import print_and_delete_items
+from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_query
 
 
@@ -27,6 +27,7 @@ def get_admin_user_id(the_dict):
     user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
 
     return user_info
+
 
 def get_empty_folders(folder_type,the_dict):
     var_dict={}

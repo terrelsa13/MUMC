@@ -118,7 +118,6 @@ def build_library_data_for_selected_user(the_dict):
     for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]:
         lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].index(lib_data)
         temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
-        #temp_the_dict['library_info_print_opposing_list'].append(None)
         temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
         opposing_list_pos=temp_the_dict['library_info_print_opposing_list'].index(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index])
         temp_the_dict['library_info_print_opposing_list'][opposing_list_pos]['NoneMe']=True
@@ -128,7 +127,6 @@ def build_library_data_for_selected_user(the_dict):
         lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].index(lib_data)
         temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
         temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
-        #temp_the_dict['library_info_print_matching_list'].append(None)
         temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
         matching_list_pos=temp_the_dict['library_info_print_matching_list'].index(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index])
         temp_the_dict['library_info_print_matching_list'][matching_list_pos]['NoneMe']=True

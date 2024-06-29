@@ -22,14 +22,14 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
             if (user_found > 1):
                 error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' userid ' + check_irt['userid'] + ' is seen more than once\n'
             #Check userid is string
-            if not (isinstance(check_irt['userid'], str)):
+            if (not (isinstance(check_irt['userid'], str))):
                 error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' the userid is not a string for at least one user\n'
             else:
                 #Check userid is 32 character long alphanumeric
-                if not (
+                if (not (
                     (check_irt['userid'].isalnum()) and
                     (len(check_irt['userid']) == 32)
-                ):
+                )):
                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' + at least one userid is not a 32-character alphanumeric string\n'
         else:
             error_found_in_mumc_config_py+='NameError: In ' + config_var_name + ' the userid key is missing for at least one user\n'
@@ -48,7 +48,7 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
             if (user_found > 1):
                 error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' username ' + check_irt['username'] + ' is seen more than once\n'
             #Check username is string
-            if not (isinstance(check_irt['username'], str)):
+            if (not (isinstance(check_irt['username'], str))):
                 error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' the username is not a string for at least one user\n'
         else:
             error_found_in_mumc_config_py+='NameError: In ' + config_var_name + ' the username is missing for at least one user\n'
@@ -71,25 +71,25 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
                             if (libinfo == 'libid'):
                                 libid_found += 1
                                 #Check libid is string
-                                if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
+                                if (not (isinstance(check_irt[str(num_elements)][libinfo], str))):
                                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check libid is 32 character long alphanumeric
-                                    if not (
+                                    if (not (
                                         (check_irt[str(num_elements)][libinfo].isalnum()) and
                                         (len(check_irt[str(num_elements)][libinfo]) >= 1)
-                                    ):
+                                    )):
                                         error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the libid for library with key' + num_elements + ' is not an alphanumeric string\n'
                             elif (libinfo == 'collectiontype'):
                                 collectiontype_found += 1
                                 #Check collectiontype is string
-                                if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
+                                if (not (isinstance(check_irt[str(num_elements)][libinfo], str))):
                                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check collectiontype is all alphabet characters
-                                    if not (
+                                    if (not (
                                         (check_irt[str(num_elements)][libinfo].isalpha())
-                                    ):
+                                    )):
                                         error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the collectiontype for library with key' + num_elements + ' is not an alphabetic string\n'
                                     else:
                                         #TODO verify we only see specific collection types (i.e. tvshows, movies, music, books, etc...)
@@ -97,24 +97,24 @@ def cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, co
                             elif (libinfo == 'networkpath'):
                                 networkpath_found += 1
                                 #Check networkpath is string
-                                if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
+                                if (not (isinstance(check_irt[str(num_elements)][libinfo], str))):
                                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check networkpath has no backslashes
-                                    if not (
+                                    if (not (
                                         (check_irt[str(num_elements)][libinfo].find('\\') < 0)
-                                    ):
+                                    )):
                                         error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' user ' + check_irt['userid'] + ' the networkpath for library with key' + num_elements + ' cannot have any forward slashes \'\\\'\n'
                             elif (libinfo == 'path'):
                                 path_found += 1
                                 #Check path is string
-                                if not (isinstance(check_irt[str(num_elements)][libinfo], str)):
+                                if (not (isinstance(check_irt[str(num_elements)][libinfo], str))):
                                     error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' is not a string\n'
                                 else:
                                     #Check path has no backslashes
-                                    if not (
+                                    if (not (
                                         (check_irt[str(num_elements)][libinfo].find('\\') < 0)
-                                    ):
+                                    )):
                                         error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' the path for library with key' + num_elements + ' cannot have any backslashes \'\\\'\n'
                         if (libid_found == 0):
                             error_found_in_mumc_config_py+='ValueError: In ' + config_var_name + ' for user ' + check_irt['userid'] + ' key libid is missing\n'
@@ -2259,7 +2259,7 @@ def cfgCheckLegacy(cfg,the_dict):
         check_user_bllibs_length=len(check_list)
         if (check_user_bllibs_length > 0):
             #Check number of users matches the number of blacklist entries
-            if not (check_user_bllibs_length == check_user_keys_length):
+            if (not (check_user_bllibs_length == check_user_keys_length)):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_bl_libs\' Number of configured users does not match the number of configured blacklists\n'
             else:
                 error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
@@ -2280,7 +2280,7 @@ def cfgCheckLegacy(cfg,the_dict):
         check_user_wllibs_length=len(check_list)
         if (check_user_wllibs_length > 0):
             #Check number of users matches the number of whitelist entries
-            if not (check_user_wllibs_length == check_user_keys_length):
+            if (not (check_user_wllibs_length == check_user_keys_length)):
                 error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_wl_libs\' Number of configured users does not match the number of configured whitelists\n'
             else:
                 error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
@@ -2390,7 +2390,7 @@ def cfgCheckLegacy(cfg,the_dict):
 
     
     #Other config options can be assumed before converting to yaml; notify user of these; then convert to yaml
-    if not (warning_found_in_mumc_config_py == ''):
+    if (not (warning_found_in_mumc_config_py == '')):
         warning_text="\nWARNING: One or more config variable(s) were missing from " + str(the_dict['mumc_path'] / the_dict['config_file_name_py']) + ".\n MUMC has assumed defaults values for the missing variable(s).\n Please be sure to review these variable(s) in " + str(the_dict['mumc_path']) + "/" + the_dict['config_file_name_yaml']
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log(warning_text,2,the_dict)
@@ -2399,7 +2399,7 @@ def cfgCheckLegacy(cfg,the_dict):
         print('\n' + warning_found_in_mumc_config_py)
 
     #Some config options have to be fixed before converting to yaml; notify user of these; then stop script
-    if not (error_found_in_mumc_config_py == ''):
+    if (not (error_found_in_mumc_config_py == '')):
         error_text="\nERROR: MUMC unable to convert the legacy config to the new yaml format.\n Please add/fix the following variable(s) in: " + str(the_dict['mumc_path'] / the_dict['config_file_name_py'])
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log(error_text,2,the_dict)
