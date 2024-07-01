@@ -155,6 +155,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             if (the_dict['DEBUG']):
                                 appendTo_DEBUG_log("\n\nNo " + data_dict['APIDebugMsg_'] + " media items found",2,the_dict)
 
+                        #get tags for child items
                         for child_item in data_dict['data_']['Items']:
                             matched_tags=[]
                             if (child_item['Type'].casefold() == 'movie'):
@@ -166,6 +167,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             elif (child_item['Type'].casefold() == 'audiobook'):
                                 placeholder,matched_tags=get_isAUDIOBOOK_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
 
+                            #save tags to child items
                             if (matched_tags):
                                 child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
 

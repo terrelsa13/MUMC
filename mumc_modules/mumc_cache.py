@@ -65,7 +65,7 @@ class cached_data_handler:
 
     def getCachedDataFromURL(self,url):
         try:
-            if (not ((index:=self.getIndexFromURL(url)) == None)):                
+            if (not ((index:=self.getIndexFromURL(url)) == None)):
                 self.cached_data_hits+=1
                 self.cached_entry_hits[index]+=1
                 self.cached_entry_times[index]=time.time()*1000
@@ -106,7 +106,7 @@ class cached_data_handler:
                 pass
         if hasattr(obj, '__slots__'): # can have __slots__ with __dict__
             size += sum(self.getDataSize(getattr(obj, s), seen) for s in obj.__slots__ if hasattr(obj, s))
-            
+
         return size
 
     def removeCachedEntry(self,url):
