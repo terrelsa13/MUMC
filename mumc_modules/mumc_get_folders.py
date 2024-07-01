@@ -125,6 +125,6 @@ def populate_config_with_subfolder_ids(cfg,init_dict):
 
         cfg['version']=get_script_version()
 
-        save_yaml_config(cfg,init_dict['mumc_path'] / init_dict['config_file_name_yaml'],int(cfg['admin_settings']['output_controls']['character_limit']['print']))
+        save_yaml_config(cfg,init_dict['mumc_path'] / init_dict['config_file_name_yaml'])
 
     return cfg

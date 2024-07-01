@@ -3,7 +3,7 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
@@ -540,18 +540,23 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
 ##########################################################################################################################################
 
+                                matched_tags=[]
                                 var_dict['item_isWhitetagged']=False
                                 if (var_dict['data_list_pos'] in var_dict['data_from_whitetagged_queries']):
                                     var_dict['item_isWhitetagged']=True
                                 elif (not (var_dict['whitetags'] == [])):
                                     if (var_dict['media_type_lower'] == 'movie'):
-                                        var_dict['item_isWhitetagged']=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+                                        var_dict['item_isWhitetagged'],matched_tags=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['whitetags'])
                                     elif (var_dict['media_type_lower'] == 'episode'):
-                                        var_dict['item_isWhitetagged']=get_isEPISODE_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+                                        var_dict['item_isWhitetagged'],matched_tags=get_isEPISODE_Tagged(the_dict,item,user_info,var_dict['whitetags'])
                                     elif (var_dict['media_type_lower'] == 'audio'):
-                                        var_dict['item_isWhitetagged']=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+                                        var_dict['item_isWhitetagged'],matched_tags=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['whitetags'])
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
-                                        var_dict['item_isWhitetagged']=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+                                        var_dict['item_isWhitetagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+
+                                #add matching tags to media_item
+                                if (matched_tags):
+                                    item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
                                 var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
 
@@ -565,18 +570,23 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
 ##########################################################################################################################################
 
+                                matched_tags=[]
                                 var_dict['item_isBlacktagged']=False
                                 if (var_dict['data_list_pos'] in var_dict['data_from_blacktagged_queries']):
                                     var_dict['item_isBlacktagged']=True
                                 elif (not (var_dict['blacktags'] == [])):
                                     if (var_dict['media_type_lower'] == 'movie'):
-                                        var_dict['item_isBlacktagged']=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+                                        var_dict['item_isBlacktagged'],matched_tags=get_isMOVIE_Tagged(the_dict,item,user_info,var_dict['blacktags'])
                                     elif (var_dict['media_type_lower'] == 'episode'):
-                                        var_dict['item_isBlacktagged']=get_isEPISODE_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+                                        var_dict['item_isBlacktagged'],matched_tags=get_isEPISODE_Tagged(the_dict,item,user_info,var_dict['blacktags'])
                                     elif (var_dict['media_type_lower'] == 'audio'):
-                                        var_dict['item_isBlacktagged']=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+                                        var_dict['item_isBlacktagged'],matched_tags=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['blacktags'])
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
-                                        var_dict['item_isBlacktagged']=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+                                        var_dict['item_isBlacktagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+
+                                #add matching tags to media_item
+                                if (matched_tags):
+                                    item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
                                 var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
 

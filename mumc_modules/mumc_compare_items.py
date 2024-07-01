@@ -108,6 +108,8 @@ def get_isItemMatching(item_one,item_two,the_dict):
                         match_dict['match_value'].append(None)
     
     match_dict['any_match']=any(match_dict['match_state'])
-    match_dict['all_match']=all(match_dict['match_state'])
+    #only check for all() if list is not empty
+    if (not (match_dict['match_state'] == [])):
+        match_dict['all_match']=all(match_dict['match_state'])
     
     return match_dict

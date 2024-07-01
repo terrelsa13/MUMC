@@ -61,7 +61,15 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                         data_dict['QueriesRemaining_']=False
                         if (the_dict['DEBUG']):
                             appendTo_DEBUG_log("\n\nNo " + data_dict['APIDebugMsg_'] + " media items found",2,the_dict)
-                            
+
+                    for child_item in data_dict['data_']['Items']:
+                        if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
+                            if (not ('UserData' in child_item)):
+                                child_item['UserData']={}
+                                child_item['UserData']['IsFavorite']=True
+                            else: #(('IsFavorite' in child_item['UserData']) or (not ('IsFavorite' in child_item['UserData']))):
+                                child_item['UserData']['IsFavorite']=True
+
     child_dict['Items']=data_dict['data_']['Items']
     child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
     child_dict['StartIndex']=data_dict['StartIndex_']

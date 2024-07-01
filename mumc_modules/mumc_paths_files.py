@@ -126,52 +126,9 @@ def append_long_string_to_file(dataInput,filePathName,character_limit=128):
         file.close()
 
 
-'''
-#Save file to the directory this script is running from; even when the cwd is not the same
-def write_to_file(dataInput,filePathName):
-    fullPathName=getFullPathName(filePathName)
-
-    #Save the config file
-    with open(fullPathName,'w') as file:
-        file.write(dataInput)
-
-
-
 def save_yaml_config(dataInput,filePathName):
     #Save the config file
     with open(filePathName,'w') as file:
         file.write('---\n')
         yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
         file.write('...')
-'''
-
-
-def save_yaml_config(dataInput,filePathName,character_limit=128):
-
-    dataInput_inc=character_limit
-    dataInput_len=len(dataInput)
-    dataInput_mod=dataInput_len % dataInput_inc
-
-    #open file being written to
-    file = open(filePathName, "w")
-
-    try:
-        #write yaml "start" indicator
-        file.write('---\n')
-
-        #loop thru long string and write in smaller increments
-        for dataInput_pos in range(0,(dataInput_len - dataInput_mod),dataInput_inc):
-            #file.write(dataInput[dataInput_pos:dataInput_pos+dataInput_inc])
-            yaml.dump(dataInput[dataInput_pos:dataInput_pos+dataInput_inc],file,sort_keys=False,Dumper=NoAliasDumper)
-        else:
-            #for the last write only print the remaining characters
-            if (dataInput_mod):
-                dataInput_pos=dataInput_pos+dataInput_inc
-                #file.write(dataInput[dataInput_pos:dataInput_pos+dataInput_mod])
-                yaml.dump(dataInput[dataInput_pos:dataInput_pos+dataInput_mod],file,sort_keys=False,Dumper=NoAliasDumper)
-
-        #write yaml "end" indicator
-        file.write('...')
-    finally:
-        #finally close the file
-        file.close()
