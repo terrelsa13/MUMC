@@ -158,7 +158,6 @@ def build_print_media_item_details(item,var_dict,the_dict):
     if ('Played' in item['UserData']):
         try:
 
-            #strings_list[0]=strings_list[0] + item['Type']
             strings_list+=item['Type']
 
             if (mediaType == 'movie'):

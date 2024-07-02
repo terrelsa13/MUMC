@@ -519,7 +519,7 @@ def postProcessing(the_dict,media_dict):
             postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('blacktagged',postproc_dict)
 
         if (the_dict['DEBUG']):
-            appendTo_DEBUG_log("\n---------------------[user_key]--------------------------------------",3,the_dict)
+            appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
             appendTo_DEBUG_log("\n",3,the_dict)
             if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):
                 appendTo_DEBUG_log("\nisblacktagged_Played_" + postproc_dict['media_type_lower'] + ":",3,the_dict)
