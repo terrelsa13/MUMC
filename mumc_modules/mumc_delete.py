@@ -35,7 +35,8 @@ def delete_media_item(itemID,the_dict):
     #Check if REMOVE_FILES='True'; send request to Emby/Jellyfin to delete specified media item
     if (the_dict['advanced_settings']['REMOVE_FILES']):
         try:
-            requestURL(req, the_dict['DEBUG'], 'delete_media_item_request_for_' + itemID, 3, the_dict)
+            #requestURL(req, the_dict['DEBUG'], 'delete_media_item_request_for_' + itemID, 3, the_dict)
+            pass
         except:
             print_byType('\nGeneric exception occured for media with Id: ' + str(itemID),True,the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             print_byType('\nGeneric exception occured: ' + str(traceback.format_exc()),True,the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])

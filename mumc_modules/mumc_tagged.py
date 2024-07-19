@@ -1,7 +1,7 @@
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_request_message,api_query_handler2
 from mumc_modules.mumc_compare_items import get_isItemMatching,does_index_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
@@ -94,12 +94,13 @@ def addTags_To_mediaItem(matched_tags,item,the_dict):
 def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     data_dict={}
-    data_Tagged=var_dict['data_' + suffix_str]
-    data_dict['APIDebugMsg_']='Find_' + var_dict['APIDebugMsg_Child_Of_' + suffix_str]
+    data_dict[user_info['user_id']]={}
+    data_Tagged=var_dict[user_info['user_id']]['data_' + suffix_str]
+    data_dict[user_info['user_id']]['APIDebugMsg_']='Find_' + var_dict[user_info['user_id']]['APIDebugMsg_Child_Of_' + suffix_str]
     server_url=the_dict['admin_settings']['server']['url']
     child_dict={}
-    data_dict['StartIndex_']=0
-    data_dict['data_']={'Items':[]}
+    data_dict[user_info['user_id']]['StartIndex_']=0
+    data_dict[user_info['user_id']]['data_']={'Items':[]}
 
     if ('blacktagged' in suffix_str.casefold()):
         suffix_str='blacktags'
@@ -115,10 +116,10 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
         if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
             #Initialize api_query_handler() variables for child media items
-            data_dict['StartIndex_']=0
-            data_dict['TotalItems_']=1
-            data_dict['QueryLimit_']=1
-            data_dict['QueriesRemaining_']=True
+            data_dict[user_info['user_id']]['StartIndex_']=0
+            data_dict[user_info['user_id']]['TotalItems_']=1
+            data_dict[user_info['user_id']]['QueryLimit_']=1
+            data_dict[user_info['user_id']]['QueriesRemaining_']=True
 
             if (not (data['Id'] == '')):
                 #Build query for child media items; SortOrdercheck is not Movie, Episode, or Audio
@@ -133,30 +134,30 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                     CollapseBoxSetItems='False'
                     IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
-                    while (data_dict['QueriesRemaining_']):
+                    while (data_dict[user_info['user_id']]['QueriesRemaining_']):
 
                         if (not (data['Id'] == '')):
                             #Built query for child media items
                             url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                            '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
+                            '&StartIndex=' + str(data_dict[user_info['user_id']]['StartIndex_']) + '&Limit=' + str(data_dict[user_info['user_id']]['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
 
-                            data_dict['apiQuery_']=build_request_message(url,the_dict)
+                            data_dict[user_info['user_id']]['apiQuery_']=build_request_message(url,the_dict)
 
                             #Send the API query for for watched media items in blacklists
-                            data_dict.update(api_query_handler('',data_dict,the_dict))
+                            data_dict[user_info['user_id']]=api_query_handler2('',user_info['user_id'],data_dict,the_dict)
                         else:
                             #When no media items are returned; simulate an empty query being returned
                             #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
-                            data_dict['data_']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                            data_dict['QueryLimit_']=0
-                            data_dict['QueriesRemaining_']=False
+                            data_dict[user_info['user_id']]['data_']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+                            data_dict[user_info['user_id']]['QueryLimit_']=0
+                            data_dict[user_info['user_id']]['QueriesRemaining_']=False
                             if (the_dict['DEBUG']):
-                                appendTo_DEBUG_log("\n\nNo " + data_dict['APIDebugMsg_'] + " media items found",2,the_dict)
+                                appendTo_DEBUG_log("\n\nNo " + data_dict[user_info['user_id']]['APIDebugMsg_'] + " media items found",2,the_dict)
 
                         #get tags for child items
-                        for child_item in data_dict['data_']['Items']:
+                        for child_item in data_dict[user_info['user_id']]['data_']['Items']:
                             if (child_item['Type'].casefold() == 'movie'):
                                 childIsTagged,matched_tags=get_isMOVIE_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
                             elif (child_item['Type'].casefold() == 'episode'):
@@ -172,9 +173,9 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             if (childIsTagged):
                                 child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
 
-    child_dict['Items']=data_dict['data_']['Items']
-    child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
-    child_dict['StartIndex']=data_dict['StartIndex_']
+    child_dict['Items']=data_dict[user_info['user_id']]['data_']['Items']
+    child_dict['TotalRecordCount']=len(data_dict[user_info['user_id']]['data_']['Items'])
+    child_dict['StartIndex']=data_dict[user_info['user_id']]['StartIndex_']
 
     return child_dict
 

@@ -7,8 +7,10 @@ from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
+from mumc_modules.mumc_post_process2 import init_postProcessing2
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
 from mumc_modules.mumc_get_media import init_getMedia
+from mumc_modules.mumc_get_media2 import init_getMedia2
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
@@ -30,6 +32,12 @@ def MUMC():
 
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
+
+    ############# DELETE THIS #############
+    cfg['DEBUG']=1
+    if (not ('advance_settings' in cfg)):
+        cfg['advance_settings']={}
+    cfg['advanced_settings']['REMOVE_FILES']=False
 
     #Look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
@@ -112,27 +120,29 @@ def MUMC():
     if (cfg['all_media_disabled']):
         #output message letting user know none of the media is enabled to be monitored
         print_all_media_disabled(cfg)
-        deleteItems=[]
+        #deleteItems=[]
     else:
         #prepare for the main event; return dictionaries of media items per monitored user
-        cfg=init_getMedia(cfg)
+        #cfg=init_getMedia(cfg)
+        cfg=init_getMedia2(cfg)
 
         #prepare for post processing; return list of media items to be deleted
-        deleteItems_dict=init_postProcessing(cfg)
+        #deleteItems_dict=init_postProcessing(cfg)
+        #deleteItems_dict=init_postProcessing2(cfg)
 
         #sort lists of items to be deleted into a single list
-        deleteItems=sortDeleteLists(deleteItems_dict)
+        #deleteItems=sortDeleteLists(deleteItems_dict)
 
-        del deleteItems_dict
+        #del deleteItems_dict
 
         #output to console the items to be deleted; then delete media items
-        print_and_delete_items(deleteItems,cfg)
+        #print_and_delete_items(deleteItems,cfg)
 
     #cleanup empty season and series folders
-    season_series_folder_cleanup(deleteItems,cfg)
+    #season_series_folder_cleanup(deleteItems,cfg)
     
     #delete unused variable
-    del deleteItems
+    #del deleteItems
 
     if (cfg['DEBUG']):
         #show cache stats

@@ -68,9 +68,10 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     if ((StartIndex + QueryLimit) >= (TotalItems)):
         QueryLimit = TotalItems - StartIndex
 
-    QueryItemsRemaining=False
     if (QueryLimit > 0):
         QueryItemsRemaining=True
+    else:
+        QueryItemsRemaining=False
 
     if (the_dict['DEBUG']):
         appendTo_DEBUG_log("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg),2,the_dict)
@@ -86,6 +87,44 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     var_dict['QueriesRemaining_' + suffix_str]=QueryItemsRemaining
 
     return var_dict
+
+
+#Limit the amount of data returned for a single API call
+def api_query_handler2(suffix_str,userId,var_dict,the_dict):
+
+    url=var_dict[userId]['apiQuery_' + suffix_str]
+    StartIndex=var_dict[userId]['StartIndex_' + suffix_str]
+    TotalItems=var_dict[userId]['TotalItems_' + suffix_str]
+    QueryLimit=var_dict[userId]['QueryLimit_' + suffix_str]
+    APIDebugMsg=var_dict[userId]['APIDebugMsg_' + suffix_str]
+
+    data=requestURL(url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+
+    TotalItems = data['TotalRecordCount']
+    StartIndex = StartIndex + QueryLimit
+    QueryLimit = the_dict['admin_settings']['api_controls']['item_limit']
+    if ((StartIndex + QueryLimit) >= (TotalItems)):
+        QueryLimit = TotalItems - StartIndex
+
+    if (QueryLimit > 0):
+        QueryItemsRemaining=True
+    else:
+        QueryItemsRemaining=False
+
+    if (the_dict['DEBUG']):
+        appendTo_DEBUG_log("\nAPI Query Control Data For The NEXT LOOP: " + str(APIDebugMsg),2,the_dict)
+        appendTo_DEBUG_log("\nStarting at record index: " + str(StartIndex),2,the_dict)
+        appendTo_DEBUG_log("\nAsking for " + str(QueryLimit) + " records",2,the_dict)
+        appendTo_DEBUG_log("\nTotal records for this query is: " + str(TotalItems),2,the_dict)
+        appendTo_DEBUG_log("\nAre there records remaining: " + str(QueryItemsRemaining),2,the_dict)
+
+    var_dict[userId]['data_' + suffix_str]=data
+    var_dict[userId]['StartIndex_' + suffix_str]=StartIndex
+    var_dict[userId]['TotalItems_' + suffix_str]=TotalItems
+    var_dict[userId]['QueryLimit_' + suffix_str]=QueryLimit
+    var_dict[userId]['QueriesRemaining_' + suffix_str]=QueryItemsRemaining
+
+    return var_dict[userId]
 
 
 def get_http_error_code_link(error_code):

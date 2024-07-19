@@ -16,7 +16,8 @@ def initialize_mumc(cwd,mumc_path):
     #Set dictionary variables
     the_cfg['app_name_short']='MUMC'
     the_cfg['app_name_long']='Multi-User Media Cleaner'
-    the_cfg['DEBUG']=0
+    #the_cfg['DEBUG']=0
+    the_cfg['DEBUG']=1
     the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
