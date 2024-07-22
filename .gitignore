@@ -103,7 +103,13 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# configuration
+#mumc debug
+mumc_DEBUG.log
+
+#mumc memory usage
+memoryoutput.log*
+
+#mumc configuration
 media_cleaner_config_defaults.py
 media_cleaner_config.py
 media_cleaner.py

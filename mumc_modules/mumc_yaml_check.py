@@ -45,7 +45,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             user_found=0
             #Check user from user_keys is also a user in this blacklist/whitelist
             for user_check in user_id_check_list:
-                if (user_check in check_irt['user_id']):
+                if (user_check == check_irt['user_id']):
                     user_found+=1
             if (user_found == 0):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' does not match any user from user_keys\n'
@@ -71,7 +71,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             user_found=0
             #Check user from user_name is also a user in this blacklist/whitelist
             for user_check in user_name_check_list:
-                if (user_check in check_irt['user_name']):
+                if (user_check == check_irt['user_name']):
                     user_found+=1
             if (user_found == 0):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' does not match any user from user_keys\n'
