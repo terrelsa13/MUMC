@@ -133,6 +133,7 @@ def getIsAnyMediaEnabled(the_dict):
 #force console outputs when DEBUG enabled
 def override_consoleOutputs_onDEBUG(the_dict):
 
+    #enable all output for all other DEBUG
     if (the_dict['DEBUG']):
         the_dict['advanced_settings']['console_controls']['headers']['script']['show']=True
         the_dict['advanced_settings']['console_controls']['headers']['user']['show']=True

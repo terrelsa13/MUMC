@@ -405,7 +405,5 @@ def setYAMLConfigSkeleton(the_dict):
 
     the_dict['admin_settings']['output_controls']={}
     the_dict['admin_settings']['output_controls']['character_limit']={}
-    #the_dict['admin_settings']['output_controls']['character_limit']['print']=128
-    #the_dict['admin_settings']['output_controls']['character_limit']['write']=128
 
     return the_dict

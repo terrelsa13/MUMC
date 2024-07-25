@@ -359,7 +359,7 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['cache']['minimum_age']=200
 
     config_data['admin_settings']['output_controls']['character_limit']['print']=128
-    config_data['admin_settings']['output_controls']['character_limit']['write']=128
+    #config_data['admin_settings']['output_controls']['character_limit']['write']=128
 
     #before saving; reorder some keys for consistency
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')

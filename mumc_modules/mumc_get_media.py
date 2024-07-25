@@ -16,6 +16,7 @@ from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,i
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
 from mumc_modules.mumc_user_queries import get_single_user
 from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys_ToKeep
+#from memory_profiler import profile
 
 
 #Determine if item can be monitored
@@ -183,6 +184,7 @@ def get_singleUserDeleteStatus(var_dict,the_dict):
     return okToDelete
 
 
+#@profile
 # get played, favorited, and tagged media items
 # save media items ready to be deleted
 # remove media items with exceptions (i.e. favorited, whitelisted, whitetagged, etc...)
@@ -324,7 +326,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     elif (var_dict['media_type_lower'] == 'episode'):
         var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey,'IndexNumber','ParentIndexNumber','SeriesName','SeriesId','SeasonId','SeriesStudio')
     elif ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
-        var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey,'IndexNumber','ParentIndexNumber','ArtistItems','AlbumId','AlbumArtist')
+        var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey,'IndexNumber','ParentIndexNumber','Artists','ArtistItems','Album','AlbumId','AlbumArtist')
 
     #dictionary of favortied and played items by userId
     var_dict['isfavorited_extraInfo_byUserId_Media'][user_info['user_id']]={}
@@ -686,17 +688,17 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     
     the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia']=list(set(the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia'] + var_dict['deleteItemsIdTracker_createdMedia']))
     the_dict[var_dict['media_dict_str']]['deleteItemsIdTracker_createdMedia'].sort()
-    
+
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacklisted_extraInfo_byUserId_Media']=var_dict['isblacklisted_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']]['isblacklisted_extraInfo_Tracker']+=var_dict['isblacklisted_extraInfo_Tracker']
+    the_dict[var_dict['media_dict_str']]['isblacklisted_extraInfo_Tracker']=list(set(the_dict[var_dict['media_dict_str']]['isblacklisted_extraInfo_Tracker'] + var_dict['isblacklisted_extraInfo_Tracker']))
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitelisted_extraInfo_byUserId_Media']=var_dict['iswhitelisted_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']]['iswhitelisted_extraInfo_Tracker']+=var_dict['iswhitelisted_extraInfo_Tracker']
+    the_dict[var_dict['media_dict_str']]['iswhitelisted_extraInfo_Tracker']=list(set(the_dict[var_dict['media_dict_str']]['iswhitelisted_extraInfo_Tracker'] + var_dict['iswhitelisted_extraInfo_Tracker']))
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isblacktagged_extraInfo_byUserId_Media']=var_dict['isblacktagged_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']]['isblacktagged_extraInfo_Tracker']+=var_dict['isblacktagged_extraInfo_Tracker']
+    the_dict[var_dict['media_dict_str']]['isblacktagged_extraInfo_Tracker']=list(set(the_dict[var_dict['media_dict_str']]['isblacktagged_extraInfo_Tracker'] + var_dict['isblacktagged_extraInfo_Tracker']))
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['iswhitetagged_extraInfo_byUserId_Media']=var_dict['iswhitetagged_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']]['iswhitetagged_extraInfo_Tracker']+=var_dict['iswhitetagged_extraInfo_Tracker']
+    the_dict[var_dict['media_dict_str']]['iswhitetagged_extraInfo_Tracker']=list(set(the_dict[var_dict['media_dict_str']]['iswhitetagged_extraInfo_Tracker'] + var_dict['iswhitetagged_extraInfo_Tracker']))
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['isfavorited_extraInfo_byUserId_Media']=var_dict['isfavorited_extraInfo_byUserId_Media']
-    the_dict[var_dict['media_dict_str']]['isfavorited_extraInfo_Tracker']+=var_dict['isfavorited_extraInfo_Tracker']
+    the_dict[var_dict['media_dict_str']]['isfavorited_extraInfo_Tracker']=list(set(the_dict[var_dict['media_dict_str']]['isfavorited_extraInfo_Tracker'] + var_dict['isfavorited_extraInfo_Tracker']))
 
     the_dict[var_dict['media_dict_str']][user_info['user_id']]['mediaCounts_byUserId']=var_dict['mediaCounts_byUserId']
 
@@ -706,6 +708,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     return media_returns
 
 
+#@profile
 def init_getMedia(the_dict):
 
     the_dict['movie_dict']={}
@@ -855,6 +858,8 @@ def init_getMedia(the_dict):
                                     lib_index=the_dict['admin_settings']['users'][user_index]['blacklist'].index(lib_data)
                                     the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['lib_enabled']=False
                                     break
+
+    #del the_dict['byUserId_accessibleLibraryParents']
 
 
     #Get items that could be ready for deletion

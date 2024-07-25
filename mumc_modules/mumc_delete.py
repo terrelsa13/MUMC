@@ -4,8 +4,10 @@ from mumc_modules.mumc_url import requestURL,build_request_message
 from mumc_modules.mumc_console_info import build_config_setup_to_delete_media
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
+#from memory_profiler import profile
 
 
+#@profile
 #api call to delete items
 def delete_media_item(itemID,the_dict):
     #Below are the x3 ways to delete media items
@@ -45,6 +47,7 @@ def delete_media_item(itemID,the_dict):
         return
 
 
+#@profile
 #list and delete items past played threshold
 def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     deleteItems_Tracker=[]

@@ -16,8 +16,10 @@ from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_default import create_default_config,merge_configuration
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
+#from memory_profiler import profile
 
 
+#@profile
 def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
@@ -54,18 +56,12 @@ def MUMC():
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
-    #delete unused variable
-    del default_config
-
     #get and check config values are what we expect them to be
     cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(init_dict)
-
-    #delete unused variable
-    del init_dict
 
     #update cache variables with values specified in the config file
     cfg['cached_data'].updateCacheVariables(cfg)
@@ -80,19 +76,13 @@ def MUMC():
             print_cache_stats(cfg)
 
         if (cfg['DEBUG'] == 255):
-            #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+            #show cache data (only when DEBUG == 255
             cache_data_to_debug(cfg)
 
-        #delete unused variables
-        del cmdopt_dict
-        del cfg_orig
+        #clear cache
+        cfg['cached_data'].wipeCache()
 
-        #exit gracefully after updating config
-        sys.exit(0)
-    else:
-        #delete unused variables
-        del cmdopt_dict
-        del cfg_orig
+        return
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
@@ -123,23 +113,18 @@ def MUMC():
         #sort lists of items to be deleted into a single list
         deleteItems=sortDeleteLists(deleteItems_dict)
 
-        del deleteItems_dict
-
         #output to console the items to be deleted; then delete media items
         print_and_delete_items(deleteItems,cfg)
 
     #cleanup empty season and series folders
     season_series_folder_cleanup(deleteItems,cfg)
-    
-    #delete unused variable
-    del deleteItems
 
     if (cfg['DEBUG']):
         #show cache stats
         print_cache_stats(cfg)
 
     if (cfg['DEBUG'] == 255):
-        #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+        #show cache data (only when DEBUG == 255
         cache_data_to_debug(cfg)
 
     #show footer info
@@ -148,15 +133,16 @@ def MUMC():
     #clear cache
     cfg['cached_data'].wipeCache()
 
-    #delete unused variable
-    del cfg
+    return
 
 
 ############# START OF SCRIPT #############
 
 if (__name__ == "__main__"):
+
     MUMC()
 
+#Exit Gracefully
 sys.exit(0)
 
 ############# END OF SCRIPT #############

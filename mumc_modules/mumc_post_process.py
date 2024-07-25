@@ -9,6 +9,7 @@ from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get
 from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isEPISODE_Fav,get_isAUDIO_Fav,get_isAUDIOBOOK_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_AdvancedFav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_AdvancedFav
+#from memory_profiler import profile
 
 
 def build_behaviorPattern(isMeeting_dict,behavior_pattern_dict,isbehavior_extraInfo_byUserId_Media):
@@ -355,6 +356,7 @@ def add_missingItems_byUserId_playedStates(behavior_str,postproc_dict,the_dict):
     return postproc_dict
 
 
+#@profile
 def postProcessing(the_dict,media_dict):
 
     postproc_dict={}
@@ -588,6 +590,7 @@ def postProcessing(the_dict,media_dict):
     return postproc_dict['deleteItems']
 
 
+#@profile
 def start_postProcessing(the_dict,media_dict,deleteItems_dict):
     if (not (the_dict['all_media_disabled'])):
         #perform post processing for each media type
@@ -604,6 +607,7 @@ def start_postProcessing(the_dict,media_dict,deleteItems_dict):
     return deleteItems_dict
 
 
+#@profile
 def init_postProcessing(the_dict):
 
     movie_dict=the_dict['movie_dict']
