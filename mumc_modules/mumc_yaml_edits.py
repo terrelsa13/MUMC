@@ -3,6 +3,9 @@ from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_console_info import print_config_options_added_warning,print_config_options_removed_warning
 
 
+#OBSOLETE MODULE; DELETE FROM PROJECT
+
+
 def add_minium_age_to_yaml(missing_minimum_age_dict,init_dict,cfg):
     temp_dict={}
     temp_dict['admin_settings']={}
@@ -247,14 +250,10 @@ def add_admin_id_to_yaml(missing_admin_id_dict,init_dict,cfg):
 
     temp_dict['admin_settings']['server']=copy.deepcopy(cfg['admin_settings']['server'])
 
-    #cfg['admin_settings']['server']=temp_dict['admin_settings']['server']
     cfg['admin_settings']['server']['admin_id']=missing_admin_id_dict['admin_settings']['server']['admin_id']
 
     init_dict['advanced_settings']={}
     init_dict['advanced_settings'].update(cfg['advanced_settings'])
-
-    #Notify user of graceful config changes
-    #print_config_options_added_warning(init_dict,'admin_settings','server','admin_id')
 
     return cfg
 

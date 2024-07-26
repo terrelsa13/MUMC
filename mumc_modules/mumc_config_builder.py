@@ -1,7 +1,6 @@
 from mumc_modules.mumc_output import print_byType
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
-#from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,create_labelled_authentication_key,get_MUMC_labelled_authentication_key
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
@@ -13,7 +12,7 @@ from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
 
 
 #get user input needed to build or edit the mumc_config.yaml file
-def build_configuration_file(the_dict):
+def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
     print('Version: ' + get_script_version())
@@ -151,28 +150,18 @@ def build_configuration_file(the_dict):
     #Build and save yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)
-    else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
-        yaml_configurationUpdater(the_dict)
 
-    #Check config editing was not requested
-    if not (the_dict['advanced_settings']['UPDATE_CONFIG']):
         try:
             the_dict=getIsAnyMediaEnabled(the_dict)
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
 
+                strings_list_to_print=''
+                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
             try:
-                strings_list_to_print=['']
-                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-                print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+                print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['show']=True
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['color']=''
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['font']['style']=''
-                the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting']['background']['color']=''
-                strings_list_to_print=['']
-                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-                print_byType(strings_list_to_print[0],the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+                print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
 
         #the exception
         except (AttributeError, ModuleNotFoundError):
@@ -184,7 +173,14 @@ def build_configuration_file(the_dict):
             #raise error
             raise RuntimeError('\nConfigError: Cannot find or open mumc_config.yaml')
 
+    else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
+        yaml_configurationUpdater(the_dict,orig_dict)
+
 
 #get user input needed to edit the mumc_config.yaml file
-def edit_configuration_file(the_dict):
-    build_configuration_file(the_dict)
+def edit_configuration_file(the_dict,orig_dict):
+    #Did we get here from the -u command line argument?
+      #If yes, then the_dict['advanced_settings']['UPDATE_CONFIG'] needs to be manually be set to True
+    if (not (the_dict['advanced_settings']['UPDATE_CONFIG'])):
+        the_dict['advanced_settings']['UPDATE_CONFIG']=True
+    build_configuration_file(the_dict,orig_dict)

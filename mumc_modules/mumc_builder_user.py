@@ -1,4 +1,5 @@
 import copy
+from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
 
 def create_user_dicts(the_dict):
@@ -118,19 +119,34 @@ def build_library_data_for_selected_user(the_dict):
     for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]:
         lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].index(lib_data)
         temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
-        temp_the_dict['library_info_print_opposing_list'].append(None)
+        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
+        opposing_list_pos=temp_the_dict['library_info_print_opposing_list'].index(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index])
+        temp_the_dict['library_info_print_opposing_list'][opposing_list_pos]['NoneMe']=True
         temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
 
     for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']]:
         lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].index(lib_data)
         temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
         temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
-        temp_the_dict['library_info_print_matching_list'].append(None)
-    
+        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
+        matching_list_pos=temp_the_dict['library_info_print_matching_list'].index(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index])
+        temp_the_dict['library_info_print_matching_list'][matching_list_pos]['NoneMe']=True
+
+    temp_the_dict['library_info_print_all_list']=sorted(temp_the_dict['library_info_print_all_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
+    temp_the_dict['library_info_print_opposing_list']=sorted(temp_the_dict['library_info_print_opposing_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
+    temp_the_dict['library_info_print_matching_list']=sorted(temp_the_dict['library_info_print_matching_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
+
+    for lib_data in temp_the_dict['library_info_print_all_list']:
+        lib_data_index=temp_the_dict['library_info_print_all_list'].index(lib_data)
+        if ((not ((check:=keys_exist_return_value(temp_the_dict['library_info_print_opposing_list'][lib_data_index],'NoneMe')) == None)) and (check)):
+            temp_the_dict['library_info_print_opposing_list'][lib_data_index]=None
+        if ((not ((check:=keys_exist_return_value(temp_the_dict['library_info_print_matching_list'][lib_data_index],'NoneMe')) == None)) and (check)):
+            temp_the_dict['library_info_print_matching_list'][lib_data_index]=None
+
     the_dict['library_info_print_all_list']=temp_the_dict['library_info_print_all_list']
     the_dict['library_info_print_opposing_list']=temp_the_dict['library_info_print_opposing_list']
     the_dict['library_info_print_matching_list']=temp_the_dict['library_info_print_matching_list']
-    
+
     return the_dict
 
 
@@ -224,6 +240,7 @@ def is_valid_user_selected(the_dict):
         the_dict['selected_user_list_of_strs'].remove('')
     #remove duplicate strings
     the_dict['selected_user_list_of_strs']=list(set(the_dict['selected_user_list_of_strs']))
+    the_dict['selected_user_list_of_strs'].sort()
 
     try:
         selected_user_str=None
@@ -331,5 +348,17 @@ def swap_users(the_dict):
             the_dict['prev_users_dict'][selected_user]=the_dict['all_users_dict'][selected_user]
         else:
             the_dict['prev_users_dict'][selected_user]=None
+
+    return the_dict
+
+
+def remove_key_from_user(the_key,the_dict):
+    temp_the_dict={}
+    temp_the_dict['admin_settings']={}
+    temp_the_dict['admin_settings']['users']=the_dict['admin_settings']['users'].copy()
+
+    for user_data in temp_the_dict['admin_settings']['users']:
+        if (keys_exist(user_data,the_key)):
+            the_dict['admin_settings']['users'][the_dict['admin_settings']['users'].index(user_data)].pop(the_key)
 
     return the_dict

@@ -1,3 +1,4 @@
+import sys
 import json
 import time
 import urllib.request as urlrequest
@@ -87,6 +88,24 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     return var_dict
 
 
+def get_http_error_code_link(error_code):
+
+    if ((error_code >= 100) and (error_code <200)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#1xx_informational_response'
+    elif ((error_code >= 200) and (error_code <300)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_success'
+    elif ((error_code >= 300) and (error_code <400)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_redirection'
+    elif ((error_code >= 400) and (error_code <500)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes##4xx_client_errors'
+    elif ((error_code >= 500) and (error_code <600)):
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors'
+    else:
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes'
+
+    return error_code_link
+
+
 #send url request
 def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
 
@@ -101,19 +120,12 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    #check if this request is cached
-    try:
-        #if it is cached used cached data
-        data = the_dict['cached_data'].getCachedDataFromURL(url)
-    except:
-        #if it is not cached send request
-        data = False
-
-    if (data):
-        #request is cached no need to send request
+    #check if this url is cached; return the data if it is cached
+    if (not ((data:=the_dict['cached_data'].getCachedDataFromURL(url.full_url)) == None)):
+        #request is cached; do not send request to server
         getdata = False
     else:
-        #request is no cached; send it
+        #request is not cached; send request to server
         getdata = True
 
     #try sending url request specified number of times
@@ -134,7 +146,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     try:
                         source = response.read()
                         data = json.loads(source)
-                        the_dict['cached_data'].addEntryToCache(url,data)
+                        the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         getdata = False
                         if (debugState):
                             appendTo_DEBUG_log("\nData Returned From The " + str(requestDebugMessage) + " Request:\n",2,the_dict)
@@ -146,7 +158,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
                             print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
                             print('\n  URL: ' + str(url))
-                            exit(0)
+                            sys.exit(0)
                         else:
                             time.sleep(doubling_delay)
                             #doubling_delay value doubles each time the same API request is resent
@@ -156,12 +168,12 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.")
                                 print('\n  URL: ' + str(url))
-                                exit(0)
+                                sys.exit(0)
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
                     if (not((response._method == 'DELETE') or (response._method == 'POST'))):
-                        the_dict['cached_data'].addEntryToCache(url,data)
+                        the_dict['cached_data'].addEntryToCache(url.full_url,data)
                     getdata = False
                     if (debugState):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(requestDebugMessage) + " request:",2,the_dict)
@@ -175,7 +187,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()))
                     print('\n  URL: ' + str(url))
-                    exit(0)
+                    sys.exit(0)
         except HTTPError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -203,7 +215,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 except:
                     print('    Data:')
                 print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
-                print('\nCheck password and/or remove any GUI API keys for MUMC')
+                print('\nHTTP Error Codes: ' + get_http_error_code_link(err.status))
                 if(debugState):
                     appendTo_DEBUG_log('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
                     try:
@@ -227,8 +239,8 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     except:
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
-                    appendTo_DEBUG_log('\nCheck password and/or remove any GUI API keys for MUMC',2,the_dict)
-                exit(0)
+                    appendTo_DEBUG_log('\nHTTP Error Codes: ' + get_http_error_code_link(err.status),1,the_dict)
+                sys.exit(0)
         except URLError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -255,35 +267,33 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
-                #print('\n  URL: ' + str(url))
                 print('\n' + str(err.reason))
                 print('\nCheck ip, url and/or port to server are correct')
                 if(debugState):
-                    appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + requestDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\nURLError: Unable to get information from server during processing of: ' + requestDebugMessage,1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),2,the_dict)
+                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Object:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Object:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url),1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),2,the_dict)
+                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Method:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Method:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),2,the_dict)
+                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Header:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
+                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
-                    #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
-                    appendTo_DEBUG_log('\n' + str(err.reason),2,the_dict)
-                    appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',2,the_dict)
-                exit(0)
+                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    appendTo_DEBUG_log('\n' + str(err.reason),1,the_dict)
+                    appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',1,the_dict)
+                sys.exit(0)
         except TimeoutError:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -310,32 +320,30 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
-                #print('\n  URL: ' + str(url))
                 print('\nTimeout - Response taking too long')
                 if(debugState):
-                    appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,2,the_dict)
+                    appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),2,the_dict)
+                        appendTo_DEBUG_log('\n  Object: ' + str(url.header_items),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Object:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Object:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url.full_url),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n     URL: ' + str(url),2,the_dict)
+                        appendTo_DEBUG_log('\n     URL: ' + str(url),1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),2,the_dict)
+                        appendTo_DEBUG_log('\n  Method: ' + str(url.method),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Method:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Method:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),2,the_dict)
+                        appendTo_DEBUG_log('\n  Header: ' + str(url.headers),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n  Header:',2,the_dict)
+                        appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
+                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
-                    #appendTo_DEBUG_log('\n  URL: ' + str(url),2,the_dict)
-                    appendTo_DEBUG_log('\nTimeout - Response taking too long',2,the_dict)
-                exit(0)
+                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    appendTo_DEBUG_log('\nTimeout - Response taking too long',1,the_dict)
+                sys.exit(0)
 
     return(data)

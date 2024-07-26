@@ -13,9 +13,8 @@ def init_blacklist_favorited_query(var_dict):
     var_dict['APIDebugMsg_Favorited_From_Blacklist']=var_dict['media_type_lower'] + '_Favorited_From_Blacklisted_media_items'
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_favorited']):
-            #Build query for Favorited_From_Blacklist media items
+        var_dict['enable_media_query_blacklisted_favorited']):
+        #Build query for Favorited_From_Blacklist media items
         var_dict['IncludeItemTypes_Favorited_From_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
         var_dict['SortBy_Favorited_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
@@ -35,10 +34,7 @@ def init_blacklist_favorited_query(var_dict):
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Favorited_From_Blacklist']+=',Season,Series,CollectionFolder'
             var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Favorited_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Blacklist']
-            else:
-                var_dict['SortBy_Favorited_From_Blacklist']='SeriesName,' + var_dict['SortBy_Favorited_From_Blacklist']
+            var_dict['SortBy_Favorited_From_Blacklist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Favorited_From_Blacklist']=var_dict['FieldsState_Favorited_From_Blacklist'] + ',ArtistItems,AlbumId,AlbumArtist'
@@ -64,8 +60,7 @@ def init_whitelist_favorited_query(var_dict):
     var_dict['APIDebugMsg_Favorited_From_Whitelist']=var_dict['media_type_lower'] + '_Favorited_From_Whitelisted_media_items'
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_whitelisted_favorited']):
         #Build query for Favorited_From_Whitelist media items
         var_dict['IncludeItemTypes_Favorited_From_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Favorited_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -86,10 +81,7 @@ def init_whitelist_favorited_query(var_dict):
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['IncludeItemTypes_Favorited_From_Whitelist']+=',Season,Series,CollectionFolder'
             var_dict['FieldsState_Favorited_From_Whitelist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Favorited_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Whitelist']
-            else:
-                var_dict['SortBy_Favorited_From_Whitelist']='SeriesName,' + var_dict['SortBy_Favorited_From_Whitelist']
+            var_dict['SortBy_Favorited_From_Whitelist']='SeriesSortName,' + var_dict['SortBy_Favorited_From_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Favorited_From_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'
@@ -107,12 +99,20 @@ def init_whitelist_favorited_query(var_dict):
 
 
 def blacklist_favorited_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_blacklist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_blacklist_lib']['lib_id']
+
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_blacklisted_favorited']):
 
         #Built query for Favorited from Blacklist media items
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Blacklist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Blacklist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Blacklist'] +
         '&Recursive=' + var_dict['Recursive_Favorited_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Blacklist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Blacklist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Blacklist'])
@@ -139,10 +139,10 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
         var_dict['QueryLimit_Child_Of_Favorited_Item_From_Blacklistt']=0
         var_dict['QueriesRemaining_Child_Of_Favorited_Item_From_Blacklist']=False
 
-    var_dict['data_Favorited_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Favorited_From_Blacklist']['lib_id']=parent_id
     var_dict['data_Favorited_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
     var_dict['data_Favorited_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
-    var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['lib_id']=parent_id
     var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
     var_dict['data_Child_Of_Favorited_Item_From_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
 
@@ -150,12 +150,20 @@ def blacklist_favorited_query(user_info,var_dict,the_dict):
 
 
 def whitelist_favorited_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_whitelist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_whitelist_lib']['lib_id']
+
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted'] and
-        var_dict['media_query_favorited']):
+        var_dict['enable_media_query_whitelisted_favorited']):
 
         #Built query for Favorited from Whitelist media items
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Whitelist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Favorited_From_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Favorited_From_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Favorited_From_Whitelist']) + '&Fields=' + var_dict['FieldsState_Favorited_From_Whitelist'] +
         '&Recursive=' + var_dict['Recursive_Favorited_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Favorited_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Favorited_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Favorited_From_Whitelist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Favorited_From_Whitelist'] + '&IsFavorite=' + var_dict['IsFavorite_From_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Favorited_From_Whitelist'])
@@ -182,10 +190,10 @@ def whitelist_favorited_query(user_info,var_dict,the_dict):
         var_dict['QueryLimit_Child_Of_Favorited_Item_From_Whitelistt']=0
         var_dict['QueriesRemaining_Child_Of_Favorited_Item_From_Whitelist']=False
 
-    var_dict['data_Favorited_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Favorited_From_Whitelist']['lib_id']=parent_id
     var_dict['data_Favorited_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
     var_dict['data_Favorited_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
-    var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['lib_id']=parent_id
     var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
     var_dict['data_Child_Of_Favorited_Item_From_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 

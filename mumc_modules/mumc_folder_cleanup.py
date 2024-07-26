@@ -1,5 +1,5 @@
 from mumc_modules.mumc_user_queries import get_all_users
-from mumc_modules.mumc_console_info import print_and_delete_items
+from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_query
 
 
@@ -27,6 +27,7 @@ def get_admin_user_id(the_dict):
     user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
 
     return user_info
+
 
 def get_empty_folders(folder_type,the_dict):
     var_dict={}
@@ -58,8 +59,12 @@ def get_empty_folders(folder_type,the_dict):
         var_dict['QueryItemsRemaining_All']=var_dict['QueriesRemaining_Empty_Folder']
 
         for parentItem in var_dict['data_Empty_Folder']['Items']:
+            try:
+                seriesId=parentItem['SeriesId']
+            except:
+                seriesId=parentItem['ParentId']
             #When season look for parents with no children; add them to the delete list
-            #When series and REMOVE_FILES is True look for parents with no children; add them to the delete list
+            #When season/series and REMOVE_FILES is True look for parents with no children; add them to the delete list
             if (the_dict['advanced_settings']['REMOVE_FILES']):
                 if (not (parentItem == None)):
                     if ('ChildCount' in parentItem):
@@ -70,11 +75,11 @@ def get_empty_folders(folder_type,the_dict):
                             else:
                                 parentItems_Tracker.append(parentItem['Id'])
                                 the_dict['parentDeleteItems'].append(parentItem)
-                            if (parentItem['ParentId'] in the_dict['child_remaining']):
-                                the_dict['child_remaining'][parentItem['ParentId']]+=1
+                            if (seriesId in the_dict['child_remaining']):
+                                the_dict['child_remaining'][seriesId]+=1
                             else:
-                                the_dict['child_remaining'][parentItem['ParentId']]=1
-            #When series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
+                                the_dict['child_remaining'][seriesId]=1
+            #When season/series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
             else:
                 if (not (parentItem == None)):
                     if ('ChildCount' in parentItem):
@@ -84,10 +89,10 @@ def get_empty_folders(folder_type,the_dict):
                             the_dict['child_remaining'][parentItem['Id']]=parentItem['ChildCount'] - the_dict['child_remaining'][parentItem['Id']]
                             if (the_dict['child_remaining'][parentItem['Id']] == 0):
                                 the_dict['parentDeleteItems'].append(parentItem)
-                                if (parentItem['ParentId'] in the_dict['pre_child_remaing']):
-                                    the_dict['pre_child_remaing'][parentItem['ParentId']]+=1
+                                if (seriesId in the_dict['pre_child_remaing']):
+                                    the_dict['pre_child_remaing'][seriesId]+=1
                                 else:
-                                    the_dict['pre_child_remaing'][parentItem['ParentId']]=1
+                                    the_dict['pre_child_remaing'][seriesId]=1
 
     the_dict['child_remaining']=the_dict['pre_child_remaing']
 
@@ -102,10 +107,15 @@ def track_episodes_when_REMOVE_FILES_false(deleteItems,the_dict):
             if (item['Type'] == 'Episode'):
                 if (not (item['Id'] in episodeTracker)):
                     episodeTracker.append(item['Id'])
-                    if (item['ParentId'] in the_dict['child_remaining']):
-                        the_dict['child_remaining'][item['ParentId']]+=1
+                    seasonId=None
+                    try:
+                        seasonId=item['SeasonId']
+                    except:
+                        seasonId=item['ParentId']
+                    if (seasonId in the_dict['child_remaining']):
+                        the_dict['child_remaining'][seasonId]+=1
                     else:
-                        the_dict['child_remaining'][item['ParentId']]=1
+                        the_dict['child_remaining'][seasonId]=1
 
     return the_dict
 
@@ -118,10 +128,10 @@ def season_series_folder_cleanup(deleteItems,the_dict):
     if (the_dict['advanced_settings']['delete_empty_folders']['episode']['season']):
         the_dict=get_empty_folders('season',the_dict)
 
-        print_and_delete_items(the_dict['parentDeleteItems'],the_dict)
+        print_and_delete_items(the_dict['parentDeleteItems'],the_dict,'Season Folders')
 
     #remove empty series folders
     if (the_dict['advanced_settings']['delete_empty_folders']['episode']['series']):
         the_dict=get_empty_folders('series',the_dict)
 
-        print_and_delete_items(the_dict['parentDeleteItems'],the_dict)
+        print_and_delete_items(the_dict['parentDeleteItems'],the_dict,'Series Folders')

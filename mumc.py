@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 import copy
+import sys
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
-from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_and_delete_items,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug
+from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
-from mumc_modules.mumc_output import get_current_directory,delete_debug_log
-from mumc_modules.mumc_yaml_check import cfgCheckYAML
+from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
+from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
+from mumc_modules.mumc_config_default import create_default_config,merge_configuration
+from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
+from mumc_modules.mumc_delete import print_and_delete_items
+#from memory_profiler import profile
 
 
+#@profile
 def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
@@ -27,13 +33,35 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
+    #Look for missing subfolder Ids and add them
+    cfg=populate_config_with_subfolder_ids(cfg,init_dict)
+
+    #remember original config for when user wants to update existing config file
+    cfg_orig=copy.deepcopy(cfg)
+
+    #precheck the config for the minimum needed variables to run
+    pre_cfgCheckYAML(cfg)
+
+    #create default config file
+    default_config=create_default_config(cfg['admin_settings']['server']['brand'])
+
+    #copy over path info for use later
+    default_config['mumc_path']=init_dict['mumc_path']
+    default_config['debug_file_name']=init_dict['debug_file_name']
+
+    #merge user config into default config
+    cfg=merge_configuration(default_config,cfg)
+
+    if (cfg['DEBUG']):
+        #print config when DEBUG >= 1
+        print_configuration_yaml(cfg,init_dict)
+
     #get and check config values are what we expect them to be
-    cfg=cfgCheckYAML(cfg,init_dict)
+    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(init_dict)
-    init_dict.clear()
 
     #update cache variables with values specified in the config file
     cfg['cached_data'].updateCacheVariables(cfg)
@@ -41,18 +69,20 @@ def MUMC():
     #check if user wants to update the existing config file
     if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
         #check if user intentionally wants to update the config
-        edit_configuration_file(cfg)
+        edit_configuration_file(cfg,cfg_orig)
 
         if (cfg['DEBUG']):
             #show cache stats
             print_cache_stats(cfg)
 
         if (cfg['DEBUG'] == 255):
-            #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+            #show cache data (only when DEBUG == 255
             cache_data_to_debug(cfg)
 
-        #exit gracefully after updating config
-        exit(0)
+        #clear cache
+        cfg['cached_data'].wipeCache()
+
+        return
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
@@ -94,7 +124,7 @@ def MUMC():
         print_cache_stats(cfg)
 
     if (cfg['DEBUG'] == 255):
-        #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+        #show cache data (only when DEBUG == 255
         cache_data_to_debug(cfg)
 
     #show footer info
@@ -103,12 +133,16 @@ def MUMC():
     #clear cache
     cfg['cached_data'].wipeCache()
 
+    return
+
 
 ############# START OF SCRIPT #############
 
 if (__name__ == "__main__"):
+
     MUMC()
 
-exit(0)
+#Exit Gracefully
+sys.exit(0)
 
 ############# END OF SCRIPT #############

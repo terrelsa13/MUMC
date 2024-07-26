@@ -30,36 +30,56 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['filter_statements']={}
     the_dict['advanced_settings']['filter_statements']['movie']={}
     the_dict['advanced_settings']['filter_statements']['movie']['query_filter']={}
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['favorited']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitetagged']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']=None
-    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']={}
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']={}
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=None
 
     the_dict['advanced_settings']['filter_statements']['episode']={}
     the_dict['advanced_settings']['filter_statements']['episode']['query_filter']={}
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['favorited']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitetagged']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']=None
-    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']={}
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']={}
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=None
 
     the_dict['advanced_settings']['filter_statements']['audio']={}
     the_dict['advanced_settings']['filter_statements']['audio']['query_filter']={}
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['favorited']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitetagged']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacktagged']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']=None
-    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']={}
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']={}
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['favorited']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['whitetagged']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['blacktagged']=None
+    the_dict['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=None
 
     if (server_brand == 'jellyfin'):
         the_dict['advanced_settings']['filter_statements']['audiobook']={}
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']={}
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['favorited']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitetagged']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacktagged']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']=None
-        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']={}
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['favorited']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['whitetagged']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['blacktagged']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']={}
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['favorited']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=None
+        the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=None
 
     the_dict['advanced_settings']['behavioral_statements']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']={}
@@ -372,11 +392,18 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['admin_settings']['server']={}
 
     the_dict['admin_settings']['behavior']={}
+    the_dict['admin_settings']['behavior']['list']=None
+    the_dict['admin_settings']['behavior']['matching']=None
+    the_dict['admin_settings']['behavior']['users']={}
+    the_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
     the_dict['admin_settings']['users']=[]
 
     the_dict['admin_settings']['api_controls']={}
 
     the_dict['admin_settings']['cache']={}
+
+    the_dict['admin_settings']['output_controls']={}
+    the_dict['admin_settings']['output_controls']['character_limit']={}
 
     return the_dict

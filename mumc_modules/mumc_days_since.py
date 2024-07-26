@@ -5,7 +5,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 #Get count of days since last played
 def get_days_since_played(date_last_played,the_dict):
 
-    if not ((date_last_played == 'Unplayed') or (date_last_played == 'Unknown')):
+    if (not ((date_last_played == 'Unplayed') or (date_last_played == 'Unknown'))):
 
         #Get current time
         #date_time_now = datetime.utcnow()
@@ -19,7 +19,7 @@ def get_days_since_played(date_last_played,the_dict):
         except (ValueError):
             date_time_last_played = 'unknown date time format'
 
-        if not (date_time_last_played == 'unknown date time format'):
+        if (not (date_time_last_played == 'unknown date time format')):
             date_time_delta = date_time_now - date_time_last_played
             s_date_time_delta = str(date_time_delta)
             days_since_played = s_date_time_delta.split(' day')[0]

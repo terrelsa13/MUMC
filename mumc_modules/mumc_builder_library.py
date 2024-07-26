@@ -12,6 +12,7 @@ def create_library_dicts(the_dict):
     the_dict['all_library_paths_list']=[]
     the_dict['all_library_network_paths_list']=[]
     the_dict['all_library_collection_types_list']=[]
+    the_dict['all_library_path_ids_list']=[]
 
     #Emby and Jellyfin use different key-names for their libraryId
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
@@ -19,27 +20,39 @@ def create_library_dicts(the_dict):
     else:
         libraryGuid='Guid'
 
-    for libs in the_dict['all_libraries']:
-        libpos=the_dict['all_libraries'].index(libs)
+    for lib in the_dict['all_libraries']:
+        libpos=the_dict['all_libraries'].index(lib)
 
-        for subdata in libs['LibraryOptions']['PathInfos']:
-            pathpos=libs['LibraryOptions']['PathInfos'].index(subdata)
+        for pathinfo in lib['LibraryOptions']['PathInfos']:
+            pathpos=lib['LibraryOptions']['PathInfos'].index(pathinfo)
             temp_lib_dict['lib_id']=the_dict['all_libraries'][libpos][libraryGuid]
-            if (('CollectionType' in libs) and
-                (not (libs['CollectionType'] == ''))):
-                temp_lib_dict['collection_type']=libs['CollectionType']
+            if (('CollectionType' in lib) and
+                (not (lib['CollectionType'] == ''))):
+                temp_lib_dict['collection_type']=lib['CollectionType']
             else:
                 temp_lib_dict['collection_type']=None
-            if (('Path' in libs['LibraryOptions']['PathInfos'][pathpos]) and
-                (not (libs['LibraryOptions']['PathInfos'][pathpos]['Path'] == ''))):
-                temp_lib_dict['path']=libs['LibraryOptions']['PathInfos'][pathpos]['Path']
+            if (('Path' in lib['LibraryOptions']['PathInfos'][pathpos]) and
+                (not (lib['LibraryOptions']['PathInfos'][pathpos]['Path'] == ''))):
+                temp_lib_dict['path']=lib['LibraryOptions']['PathInfos'][pathpos]['Path']
             else:
                 temp_lib_dict['path']=None
-            if (('NetworkPath' in libs['LibraryOptions']['PathInfos'][pathpos]) and
-                (not (libs['LibraryOptions']['PathInfos'][pathpos]['NetworkPath'] == ''))):
-                temp_lib_dict['network_path']=libs['LibraryOptions']['PathInfos'][pathpos]['NetworkPath']
+            if (('NetworkPath' in lib['LibraryOptions']['PathInfos'][pathpos]) and
+                (not (lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath'] == ''))):
+                temp_lib_dict['network_path']=lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath']
             else:
                 temp_lib_dict['network_path']=None
+
+            
+            if (not (isJellyfinServer(the_dict['admin_settings']['server']['brand']))):
+                for lib_info in the_dict['all_library_subfolders']:
+                    for subfolder_info in lib_info['SubFolders']:
+                        if (subfolder_info['Path'] == temp_lib_dict['path']):
+                            temp_lib_dict['subfolder_id']=subfolder_info['Id']
+                            break
+            else:
+                temp_lib_dict['subfolder_id']=None
+            
+
             temp_lib_dict['lib_enabled']=True
 
             the_dict['all_libraries_list'].append(copy.deepcopy(temp_lib_dict))
@@ -47,9 +60,27 @@ def create_library_dicts(the_dict):
             the_dict['all_library_paths_list'].append(temp_lib_dict['path'])
             the_dict['all_library_network_paths_list'].append(temp_lib_dict['network_path'])
             the_dict['all_library_collection_types_list'].append(temp_lib_dict['collection_type'])
+            the_dict['all_library_path_ids_list'].append(temp_lib_dict['subfolder_id'])
 
     the_dict.pop('all_libraries')
     
+    return the_dict
+
+
+def reorder_user_policy_libararies(the_dict):
+    for user_data in the_dict['all_users']:
+        user_data_pos=the_dict['all_users'].index(user_data)
+        if (not (user_data['Policy']['EnableAllFolders'])):
+            sorted_lib_id_list=[]
+            temp_lib_data=user_data['Policy']['EnabledFolders'].copy()
+            for sort_item in the_dict['all_library_ids_list']:
+                if (sort_item in temp_lib_data):
+                    sort_item_pos=temp_lib_data.index(sort_item)
+                    if (not (sort_item in sorted_lib_id_list)):
+                        sorted_lib_id_list.append(sort_item)
+                    temp_lib_data[sort_item_pos]=None
+            the_dict['all_users'][user_data_pos]['Policy']['EnabledFolders']=sorted_lib_id_list
+
     return the_dict
 
 
@@ -83,6 +114,30 @@ def create_library_path_id_dicts(the_dict):
 
     return the_dict
 
+
+def update_users_with_path_ids(the_dict):
+    for user_data in the_dict['admin_settings']['users']:
+        user_index=the_dict['admin_settings']['users'].index(user_data)
+        for lib_data in user_data[the_dict['matching_listing_type']]:
+            lib_index=user_data[the_dict['matching_listing_type']].index(lib_data)
+            if (lib_data['subfolder_id'] == None):
+                if (lib_data['path'] in the_dict['all_library_paths_list']):
+                    path_index=the_dict['all_library_paths_list'].index(lib_data['path'])
+                    the_dict['admin_settings']['users'][user_index][the_dict['matching_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+                    the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+                    if (not (the_dict['prev_users_dict'][user_index] == None)):
+                        the_dict['prev_users_dict'][user_index][the_dict['matching_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+        for lib_data in user_data[the_dict['opposing_listing_type']]:
+            lib_index=user_data[the_dict['opposing_listing_type']].index(lib_data)
+            if (lib_data['subfolder_id'] == None):
+                if (lib_data['path'] in the_dict['all_library_paths_list']):
+                    path_index=the_dict['all_library_paths_list'].index(lib_data['path'])
+                    the_dict['admin_settings']['users'][user_index][the_dict['opposing_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+                    the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+                    if (not (the_dict['prev_users_dict'][user_index] == None)):
+                        the_dict['prev_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index]['subfolder_id']=the_dict['all_library_path_ids_list'][path_index]
+
+    return the_dict
 
 
 def update_existing_user_libraries(the_dict):
@@ -142,7 +197,7 @@ def remove_libraries_from_existing_users(the_dict):
 
 
 #subfolder ids can be updated by doing the following:
-# Emby/Jellyfin > Manage Server > Users > Select User > Select Access > Save
+# Emby > Manage Server > Users > Select User > Select Access > Save
 # Repeat this for each user or the users with non-aligned folder ids
 def remove_subfolders_from_existing_users(the_dict):
 
@@ -292,7 +347,9 @@ def add_libraries_to_new_users(the_dict):
                 enabled_lib_id_list=the_dict['all_library_ids_list']
             else:
                 for enabled_lib_id in the_dict['all_users'][this_user_index]['Policy']['EnabledFolders']:
-                    enabled_lib_id_list.append(enabled_lib_id)
+                    for x in range(the_dict['all_library_ids_list'].count(enabled_lib_id)):
+                        enabled_lib_id_list.append(enabled_lib_id)
+                        x=x
 
             for lib_id in enabled_lib_id_list:
                 if (not (lib_id in the_dict['library_ids_per_user'][this_user['user_id']])):
@@ -385,6 +442,7 @@ def is_valid_library_selected(the_dict):
 
     #remove duplicate strings
     the_dict['selected_libraries_list_of_strs']=list(set(the_dict['selected_libraries_list_of_strs']))
+    the_dict['selected_libraries_list_of_strs'].sort()
 
     try:
         if (the_dict['selected_libraries_list_of_strs']):
@@ -423,7 +481,7 @@ def is_valid_library_selected(the_dict):
     return the_dict
 
 
-def jellyfin_autoselect_folders_with_common_libraries(the_dict):
+def autoselect_subfolders_with_same_library_id(the_dict):
 
     temp_the_dict={}
     temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])

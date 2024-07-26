@@ -13,7 +13,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
     var_dict['APIDebugMsg_Blacklist']=var_dict['media_type_lower'] + '_blacklist_media_items'
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted']):
+        var_dict['enable_media_query_blacklisted_played']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
         var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -30,10 +30,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['FieldsState_Blacklist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
-            else:
-                var_dict['SortBy_Blacklist']='SeriesName,' + var_dict['SortBy_Blacklist']
+            var_dict['SortBy_Blacklist']='SeriesSortName,' + var_dict['SortBy_Blacklist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Blacklist']+=',ArtistItems,AlbumId,AlbumArtist' 
@@ -57,7 +54,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
     var_dict['APIDebugMsg_Whitelist']=var_dict['media_type_lower'] + '_whitelist_media_items'
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted']):
+        var_dict['enable_media_query_whitelist_played']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
         var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
@@ -74,10 +71,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
 
         if (var_dict['media_type_lower'] == 'episode'):
             var_dict['FieldsState_Whitelist']+=',SeriesStudio,seriesStatus'
-            if (isJellyfinServer(var_dict['server_brand'])):
-                var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
-            else:
-                var_dict['SortBy_Whitelist']='SeriesName,' + var_dict['SortBy_Whitelist']
+            var_dict['SortBy_Whitelist']='SeriesSortName,' + var_dict['SortBy_Whitelist']
 
         if ((var_dict['media_type_lower'] == 'audio') or (var_dict['media_type_lower'] == 'audiobook')):
             var_dict['FieldsState_Whitelist']+=',ArtistItems,AlbumId,AlbumArtist'
@@ -93,11 +87,20 @@ def init_whitelist_watched_query(var_dict,the_dict):
 
 
 def blacklist_watched_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_blacklist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_blacklist_lib']['lib_id']
+
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['media_query_blacklisted']):
+        var_dict['enable_media_query_blacklisted_played']):
 
         #Built query for watched items in blacklists
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_blacklist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Blacklist']) + '&Limit=' + str(var_dict['QueryLimit_Blacklist']) + '&IsPlayed=' + var_dict['IsPlayedState_Blacklist'] +
         '&Fields=' + var_dict['FieldsState_Blacklist'] + '&Recursive=' + var_dict['Recursive_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacklist'] +
         '&EnableImages=' + var_dict['EnableImages_Blacklist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Blacklist'])
@@ -115,7 +118,7 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo watched media items are blacklisted",2,the_dict)
 
-    var_dict['data_Blacklist']['lib_id']=var_dict['this_blacklist_lib']['lib_id']
+    var_dict['data_Blacklist']['lib_id']=parent_id
     var_dict['data_Blacklist']['path']=var_dict['this_blacklist_lib']['path']
     var_dict['data_Blacklist']['network_path']=var_dict['this_blacklist_lib']['network_path']
 
@@ -123,11 +126,20 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
 
 
 def whitelist_watched_query(user_info,var_dict,the_dict):
+
+    if (isJellyfinServer(var_dict['server_brand'])):
+        parent_id=var_dict['this_whitelist_lib']['lib_id']
+    else:
+        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        else:
+            parent_id=var_dict['this_whitelist_lib']['lib_id']
+
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['media_query_whitelisted']):
+        var_dict['enable_media_query_whitelist_played']):
 
         #Built query for watched items in whitelists
-        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + var_dict['this_whitelist_lib']['lib_id'] + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +
+        url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +
         '&StartIndex=' + str(var_dict['StartIndex_Whitelist']) + '&Limit=' + str(var_dict['QueryLimit_Whitelist']) + '&IsPlayed=' + var_dict['IsPlayedState_Whitelist'] +
         '&Fields=' + var_dict['FieldsState_Whitelist'] + '&Recursive=' + var_dict['Recursive_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitelist'] +
         '&EnableImages=' + var_dict['EnableImages_Whitelist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Whitelist'])
@@ -145,7 +157,7 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nNo watched media items are whitelisted",2,the_dict)
 
-    var_dict['data_Whitelist']['lib_id']=var_dict['this_whitelist_lib']['lib_id']
+    var_dict['data_Whitelist']['lib_id']=parent_id
     var_dict['data_Whitelist']['path']=var_dict['this_whitelist_lib']['path']
     var_dict['data_Whitelist']['network_path']=var_dict['this_whitelist_lib']['network_path']
 

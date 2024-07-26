@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 
 
 #https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -61,10 +62,10 @@ class console_text_attributes:
         self.text_attribute_dict['font_style']['conceal']=8 #Not widely supported.
         self.text_attribute_dict['font_style']['strikethrough']=9 #Characters legible, but marked for deletion. Not widely supported.
         self.text_attribute_dict['font_style']['default']=10
+        #ALTERNATE_FONT = '11' thru '19' #Select alternate font n-10
         self.text_attribute_dict['font_style']['fraktur']=20 #Hardly ever supported
         self.text_attribute_dict['font_style']['double underline']=21 #Double underline hardly ever supported.
         self.text_attribute_dict['font_style']['reveal']=28 #Conceal off
-        #ALTERNATE_FONT = '11' thru '19' #Select alternate font n-10
         self.text_attribute_dict['font_style']['frame']=51 #Hardly ever supported
         self.text_attribute_dict['font_style']['encircle']=52 #Hardly ever supported
         self.text_attribute_dict['font_style']['overline']=53 #Hardly ever supported
@@ -119,6 +120,6 @@ class console_text_attributes:
 
 if (__name__ == "__main__"):
     console_text_attributes().console_attribute_test()
-    exit(0)
+    sys.exit(0)
 
 ############# END OF SCRIPT #############
