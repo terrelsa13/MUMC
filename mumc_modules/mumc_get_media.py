@@ -3,7 +3,7 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem,get_isControlTag
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
@@ -212,6 +212,21 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
     var_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
+    var_dict['control_whitetags']={}
+    var_dict['control_whitetags']['played']=[]
+    var_dict['control_whitetags']['created']=[]
+    var_dict['control_blacktags']={}
+    var_dict['control_blacktags']['played']=[]
+    var_dict['control_blacktags']['created']=[]
+
+    for this_tag in var_dict['whitetags']:
+        if (not ((controlTag:=get_isControlTag(this_tag)) == False)):
+            var_dict['control_whitetags'][controlTag['filter_type']].append(controlTag)
+
+    for this_tag in var_dict['blacktags']:
+        if (not ((controlTag:=get_isControlTag(this_tag)) == False)):
+                var_dict['control_blacktags'][controlTag['filter_type']].append(controlTag)
+
     var_dict['library_matching_behavior']=the_dict['admin_settings']['behavior']['matching'].casefold()
 
     var_dict['media_played_days']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['played']['condition_days']
@@ -221,6 +236,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['media_played_count']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['played']['count']
     var_dict['media_created_played_count']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['count']
     var_dict['media_behavioral_control']=the_dict['basic_settings']['filter_statements'][var_dict['media_type_lower']]['created']['behavioral_control']
+
     if (the_dict['DEBUG']):
         var_dict['print_media_delete_info']=True
         var_dict['print_media_keep_info']=True

@@ -182,7 +182,8 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 def get_isControlTag(this_tag):
 
     isControlTag=False
-    split_this_tag=this_tag.split(':')
+    split_this_tag=this_tag.split('|')
+    controlTag={}
 
     try:
         if (((len(split_this_tag) == 4) and ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created'))) or
@@ -219,7 +220,20 @@ def get_isControlTag(this_tag):
         isControlTag=False
 
     if (isControlTag):
-        return split_this_tag
+
+        controlTag['filter_type']=split_this_tag[0]
+
+        if (controlTag['filter_type'] == 'played'):
+            controlTag['media_played_days']=split_this_tag[1]
+            controlTag['media_played_count_comparison']=split_this_tag[2]
+            controlTag['media_played_count']=split_this_tag[3]
+        else:
+            controlTag['media_created_days']=split_this_tag[1]
+            controlTag['media_created_played_count_comparison']=split_this_tag[2]
+            controlTag['media_created_played_count']=split_this_tag[3]
+            controlTag['media_behavioral_control']=split_this_tag[4]
+
+        return controlTag
     else:
         return False
 
