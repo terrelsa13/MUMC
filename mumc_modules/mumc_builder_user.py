@@ -1,6 +1,7 @@
 import copy
 from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
+
 def create_user_dicts(the_dict):
 
     for user in the_dict['all_users']:
