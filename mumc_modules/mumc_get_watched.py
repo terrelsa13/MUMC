@@ -1,7 +1,7 @@
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
+from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 
 
 def init_blacklist_watched_query(var_dict,the_dict):
@@ -24,6 +24,8 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['EnableImages_Blacklist']='False'
         var_dict['CollapseBoxSetItems_Blacklist']='False'
         var_dict['IsPlayedState_Blacklist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
+        var_dict['IsPlayedState_Blacklist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('whitetag',the_dict,var_dict,var_dict['IsPlayedState_Blacklist'])
+        var_dict['IsPlayedState_Blacklist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('blacktag',the_dict,var_dict,var_dict['IsPlayedState_Blacklist'])
 
         if (isEmbyServer(var_dict['server_brand'])):
             var_dict['FieldsState_Blacklist']+=',UserDataPlayCount,UserDataLastPlayedDate'
@@ -65,6 +67,8 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['EnableImages_Whitelist']='False'
         var_dict['CollapseBoxSetItems_Whitelist']='False'
         var_dict['IsPlayedState_Whitelist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
+        var_dict['IsPlayedState_Whitelist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('whitetag',the_dict,var_dict,var_dict['IsPlayedState_Whitelist'])
+        var_dict['IsPlayedState_Whitelist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('blacktag',the_dict,var_dict,var_dict['IsPlayedState_Whitelist'])
 
         if (isEmbyServer(var_dict['server_brand'])):
             var_dict['FieldsState_Whitelist']+=',UserDataPlayCount,UserDataLastPlayedDate'

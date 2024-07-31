@@ -7,6 +7,7 @@ from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_min_config_version,get_script_version
+from mumc_modules.mumc_tagged import get_isFilterStatementTag
 
 
 def initialize_mumc(cwd,mumc_path):
@@ -126,6 +127,41 @@ def getIsAnyMediaEnabled(the_dict):
             if (check >= 0):
                 the_dict['all_media_disabled']=False
                 return the_dict
+
+
+    the_dict['filter_tag_played_days']=False
+    the_dict['filter_tag_created_days']=False
+
+    for mediaType in ('movie','episode','audio','audiobook'):
+        #remove whitespace(s) from the beginning and end of each tag
+        whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
+        blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
+        whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
+        blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
+        #combine tags and remove any duplicates
+        the_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
+        the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+
+        for this_tag in the_dict['whitetags']:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (this_tag.startswith('played')):
+                    tagType='played'
+                elif (this_tag.startswith('created')):
+                    tagType='created'
+                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+
+
+        for this_tag in the_dict['blacktags']:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (this_tag.startswith('played')):
+                    tagType='played'
+                elif (this_tag.startswith('created')):
+                    tagType='created'
+                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
 
     return the_dict
 

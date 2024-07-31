@@ -3,12 +3,12 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem,get_isControlTag
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem,removeTags_From_mediaItem,get_isFilterStatementTag
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
+from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts,getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
 from mumc_modules.mumc_item_info import get_SERIES_itemInfo
 from mumc_modules.mumc_get_watched import init_blacklist_watched_query,init_whitelist_watched_query,blacklist_watched_query,whitelist_watched_query
 from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,init_whitelist_blacktagged_query,blacklist_blacktagged_query,whitelist_blacktagged_query
@@ -212,20 +212,11 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
     var_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
-    var_dict['control_whitetags']={}
-    var_dict['control_whitetags']['played']=[]
-    var_dict['control_whitetags']['created']=[]
-    var_dict['control_blacktags']={}
-    var_dict['control_blacktags']['played']=[]
-    var_dict['control_blacktags']['created']=[]
+    var_dict['whitetag_filter_statements']=the_dict['basic_settings']['whitetag_filter_statements'][var_dict['media_type_lower']]
+    var_dict['blacktag_filter_statements']=the_dict['basic_settings']['blacktag_filter_statements'][var_dict['media_type_lower']]
 
-    for this_tag in var_dict['whitetags']:
-        if (not ((controlTag:=get_isControlTag(this_tag)) == False)):
-            var_dict['control_whitetags'][controlTag['filter_type']].append(controlTag)
-
-    for this_tag in var_dict['blacktags']:
-        if (not ((controlTag:=get_isControlTag(this_tag)) == False)):
-                var_dict['control_blacktags'][controlTag['filter_type']].append(controlTag)
+    var_dict['filter_tag_played_days']=the_dict['filter_tag_played_days']
+    var_dict['filter_tag_created_days']=the_dict['filter_tag_created_days']
 
     var_dict['library_matching_behavior']=the_dict['admin_settings']['behavior']['matching'].casefold()
 
@@ -381,7 +372,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
 
 ############# Media #############
 
-    if ((var_dict['media_played_days'] >= 0) or (var_dict['media_created_days'] >= 0)):
+    if ((var_dict['media_played_days'] >= 0) or (var_dict['media_created_days'] >= 0) or (var_dict['filter_tag_played_days']) or (var_dict['filter_tag_created_days'])):
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n\nProcessing " + var_dict['media_type_upper'] + " Items For UserId: " + str(user_info['user_id']),2,the_dict)
@@ -572,11 +563,16 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isWhitetagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['whitetags'])
 
-                                #add matching tags to media_item
-                                if (matched_tags):
+                                #if (matched_tags):
+                                if (var_dict['item_isWhitetagged'] and (not (var_dict['data_list_pos'] in var_dict['data_from_whitetagged_queries']))):
+                                    #remove all tags from media_item
+                                    item=removeTags_From_mediaItem(item,the_dict)
+                                    #add matching tags to media_item
                                     item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
                                 var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
+
+                                var_dict=getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts('whitetag',the_dict,item,var_dict)
 
                                 #whitetag behavior enabled
                                 if (var_dict['item_isWhitetagged']):
@@ -602,11 +598,16 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isBlacktagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['blacktags'])
 
-                                #add matching tags to media_item
-                                if (matched_tags):
+                                #if (matched_tags):
+                                if (var_dict['item_isBlacktagged'] and (not (var_dict['data_list_pos'] in var_dict['data_from_blacktagged_queries']))):
+                                    #remove all tags from media_item
+                                    item=removeTags_From_mediaItem(item,the_dict)
+                                    #add matching tags to media_item
                                     item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
                                 var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
+
+                                var_dict=getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts('blacktag',the_dict,item,var_dict)
 
                                 #blacktag behavior enabled
                                 if (var_dict['item_isBlacktagged']):
@@ -874,9 +875,84 @@ def init_getMedia(the_dict):
                                     lib_index=the_dict['admin_settings']['users'][user_index]['blacklist'].index(lib_data)
                                     the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['lib_enabled']=False
                                     break
+    
+    the_dict['basic_settings']['whitetag_filter_statements']={}
+    the_dict['basic_settings']['whitetag_filter_statements']['movie']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['movie']['played']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['movie']['created']={}
+    the_dict['basic_settings']['whitetag_filter_statements']['episode']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['episode']['played']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['episode']['created']={}
+    the_dict['basic_settings']['whitetag_filter_statements']['audio']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['audio']['played']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['audio']['created']={}
+    the_dict['basic_settings']['whitetag_filter_statements']['audiobook']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['audiobook']['played']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['audiobook']['created']={}
 
-    #del the_dict['byUserId_accessibleLibraryParents']
+    the_dict['basic_settings']['blacktag_filter_statements']={}
+    the_dict['basic_settings']['blacktag_filter_statements']['movie']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['movie']['played']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['movie']['created']={}
+    the_dict['basic_settings']['blacktag_filter_statements']['episode']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['episode']['played']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['episode']['created']={}
+    the_dict['basic_settings']['blacktag_filter_statements']['audio']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['audio']['played']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['audio']['created']={}
+    the_dict['basic_settings']['blacktag_filter_statements']['audiobook']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['played']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['created']={}
 
+    the_dict['filter_tag_played_days']=False
+    the_dict['filter_tag_created_days']=False
+
+    for mediaType in ('movie','episode','audio','audiobook'):
+        #remove whitespace(s) from the beginning and end of each tag
+        whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
+        blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
+        whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
+        blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
+        #combine tags and remove any duplicates
+        the_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
+        the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+
+        for this_tag in the_dict['whitetags']:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (not (this_tag in the_dict['basic_settings']['whitetag_filter_statements'][mediaType])):
+                    the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]={}
+                    #if (filterStatementTag['filter_type'] == 'played'):
+                        #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
+                    #else: #(filterStatementTag['filter_type'] == 'created'):
+                        #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
+                the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]=filterStatementTag
+                #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag].pop('filter_type')
+                if (this_tag.startswith('played')):
+                    tagType='played'
+                elif (this_tag.startswith('created')):
+                    tagType='created'
+                the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
+                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                    the_dict['filter_tag_' + tagType + '_days']=True
+
+
+        for this_tag in the_dict['blacktags']:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (not (this_tag in the_dict['basic_settings']['blacktag_filter_statements'][mediaType])):
+                    the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]={}
+                    #if (filterStatementTag['filter_type'] == 'played'):
+                        #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
+                    #else: #(filterStatementTag['filter_type'] == 'created'):
+                        #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
+                the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]=filterStatementTag
+                #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag].pop('filter_type')
+                if (this_tag.startswith('played')):
+                    tagType='played'
+                elif (this_tag.startswith('created')):
+                    tagType='created'
+                the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
+                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                    the_dict['filter_tag_' + tagType + '_days']=True
 
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:
@@ -941,7 +1017,7 @@ def init_getMedia(the_dict):
             mpp_episodeGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['episode_dict']['media_type'],user_info,episode_returns))
             mpp_audioGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audio_dict']['media_type'],user_info,audio_returns))
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                mpp_audiobookGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audibook_dict']['media_type'],user_info,audiobook_returns))
+                mpp_audiobookGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audiobook_dict']['media_type'],user_info,audiobook_returns))
 
             #start all multi processes
             #order intentially: Audio, Episodes, Movies, Audiobooks

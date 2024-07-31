@@ -65,6 +65,21 @@ def get_isItemTagged(usertags,matched_tags,item,the_dict):
 
 
 #add tags to media_item
+def removeTags_From_mediaItem(item,the_dict):
+
+    #Emby and jellyfin store tags differently
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
+
+    #Blank the list to remove existing tags
+    item[tagData]=[]
+
+    return item
+
+
+#add tags to media_item
 def addTags_To_mediaItem(matched_tags,item,the_dict):
 
     #Emby and jellyfin store tags differently
@@ -168,8 +183,10 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             else:
                                 childIsTagged=False
 
-                            #save tags to child items
                             if (childIsTagged):
+                                #remove all tags from media_item
+                                child_item=removeTags_From_mediaItem(child_item,the_dict)
+                                #add matching tags to media_item
                                 child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
 
     child_dict['Items']=data_dict['data_']['Items']
@@ -179,11 +196,12 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     return child_dict
 
 
-def get_isControlTag(this_tag):
+#Get if tag is formatted as a filter statement tag
+def get_isFilterStatementTag(this_tag):
 
-    isControlTag=False
+    isFilterStatementTag=False
     split_this_tag=this_tag.split('|')
-    controlTag={}
+    filterStatementTag={}
 
     try:
         if (((len(split_this_tag) == 4) and ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created'))) or
@@ -205,35 +223,36 @@ def get_isControlTag(this_tag):
                             if (does_index_exist(split_this_tag,4)):
                                 if (split_this_tag[4].casefold() == 'true'):
                                     split_this_tag[4]=True
-                                    isControlTag=True
+                                    isFilterStatementTag=True
                                 elif(split_this_tag[4].casefold() == 'false'):
                                     split_this_tag[4]=False
-                                    isControlTag=True
+                                    isFilterStatementTag=True
                                 else:
-                                    raise ValueError('Control tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
+                                    raise ValueError('Filter statement tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
                             else:
                                 split_this_tag.append(True) #default behavioral_control value
-                                isControlTag=True
+                                isFilterStatementTag=True
                         else:
-                            isControlTag=True
+                            isFilterStatementTag=True
     except:
-        isControlTag=False
+        isFilterStatementTag=False
 
-    if (isControlTag):
+    if (isFilterStatementTag):
 
-        controlTag['filter_type']=split_this_tag[0]
+        #filterStatementTag['filter_type']=split_this_tag[0]
 
-        if (controlTag['filter_type'] == 'played'):
-            controlTag['media_played_days']=split_this_tag[1]
-            controlTag['media_played_count_comparison']=split_this_tag[2]
-            controlTag['media_played_count']=split_this_tag[3]
+        #if (filterStatementTag['filter_type'] == 'played'):
+        if (split_this_tag[0] == 'played'):
+            filterStatementTag['media_played_days']=split_this_tag[1]
+            filterStatementTag['media_played_count_comparison']=split_this_tag[2]
+            filterStatementTag['media_played_count']=split_this_tag[3]
         else:
-            controlTag['media_created_days']=split_this_tag[1]
-            controlTag['media_created_played_count_comparison']=split_this_tag[2]
-            controlTag['media_created_played_count']=split_this_tag[3]
-            controlTag['media_behavioral_control']=split_this_tag[4]
+            filterStatementTag['media_created_days']=split_this_tag[1]
+            filterStatementTag['media_created_played_count_comparison']=split_this_tag[2]
+            filterStatementTag['media_created_played_count']=split_this_tag[3]
+            filterStatementTag['behavioral_control']=split_this_tag[4]
 
-        return controlTag
+        return filterStatementTag
     else:
         return False
 

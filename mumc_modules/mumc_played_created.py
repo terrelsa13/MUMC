@@ -111,8 +111,48 @@ def get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict):
         return 'False'
     elif ((isPlayed_Filter_Value == 'playedOnly') and (isCreated_Filter_Value == 'disabled')):
         return 'True'
+    elif ((isPlayed_Filter_Value == 'disabled') and (isCreated_Filter_Value == 'disabled')):
+        return 'disabled'
     else:
         return ''
+
+
+def getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(tag_type,the_dict,var_dict,prev_isPlayed_isUnplayed):
+    for this_tag in var_dict[tag_type + '_filter_statements']:
+        #todo get item tags
+        this_tag_dict=var_dict[tag_type + '_filter_statements'][this_tag]
+        if (this_tag.startswith('played')):
+            #played_days=this_tag['media_played_days']
+            this_tag_dict['media_created_days']=-1
+            #cut_off_date_played=this_tag_dict['cut_off_date_played_media']
+            this_tag_dict['cut_off_date_created_media']=None
+            #played_count_comparison=this_tag_dict['media_played_count_comparison']
+            #played_count=this_tag_dict['media_played_count']
+            this_tag_dict['media_created_played_count_comparison']=None
+            this_tag_dict['media_created_played_count']=None
+        elif (this_tag.startswith('created')):
+            this_tag_dict['media_played_days']=-1
+            #created_days=this_tag_dict['media_created_days']
+            this_tag_dict['cut_off_date_played_media']=None
+            #cut_off_date_created=this_tag_dict['cut_off_date_created_media']
+            this_tag_dict['media_played_count_comparison']=None
+            this_tag_dict['media_played_count']=None
+            #created_played_count_comparison=this_tag_dict['media_created_played_count_comparison']
+            #created_played_count=this_tag_dict['media_created_played_count']
+
+        isPlayed_isUnplayed=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,this_tag_dict)
+
+        if (prev_isPlayed_isUnplayed == 'disabled'):
+            #isPlayed_isUnplayed = isPlayed_isUnplayed
+            prev_isPlayed_isUnplayed = isPlayed_isUnplayed
+        elif (not (prev_isPlayed_isUnplayed == isPlayed_isUnplayed)):
+            #isPlayed_isUnplayed = ''
+            prev_isPlayed_isUnplayed = ''
+        else:
+            #isPlayed_isUnplayed = isPlayed_isUnplayed
+            prev_isPlayed_isUnplayed = isPlayed_isUnplayed
+
+    return isPlayed_isUnplayed
 
 
 # determine if media item has been played specified amount of times
@@ -282,3 +322,40 @@ def get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,i
     return_dict['item_matches_created_played_count_filter']=item_matches_created_played_count_filter
 
     return return_dict
+
+
+def getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(tag_type,the_dict,item,var_dict):
+
+    for this_tag in var_dict[tag_type + '_filter_statements']:
+        #todo get item tags
+        this_tag_dict=var_dict[tag_type + '_filter_statements'][this_tag]
+        if (this_tag.startswith('played')):
+            #played_days=this_tag['media_played_days']
+            this_tag_dict['media_created_days']=-1
+            #cut_off_date_played=this_tag_dict['cut_off_date_played_media']
+            this_tag_dict['cut_off_date_created_media']=None
+            #played_count_comparison=this_tag_dict['media_played_count_comparison']
+            #played_count=this_tag_dict['media_played_count']
+            this_tag_dict['media_created_played_count_comparison']=None
+            this_tag_dict['media_created_played_count']=None
+        elif (this_tag.startswith('created')):
+            this_tag_dict['media_played_days']=-1
+            #created_days=this_tag_dict['media_created_days']
+            this_tag_dict['cut_off_date_played_media']=None
+            #cut_off_date_created=this_tag_dict['cut_off_date_created_media']
+            this_tag_dict['media_played_count_comparison']=None
+            this_tag_dict['media_played_count']=None
+            #created_played_count_comparison=this_tag_dict['media_created_played_count_comparison']
+            #created_played_count=this_tag_dict['media_created_played_count']
+
+        played_created_dict=get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,item,this_tag_dict)
+
+        if (played_created_dict['item_matches_played_days_filter'] and played_created_dict['item_matches_played_count_filter']):
+            var_dict['item_matches_played_days_filter']=True
+            var_dict['item_matches_played_count_filter']=True
+
+        if (played_created_dict['item_matches_created_days_filter'] and played_created_dict['item_matches_created_played_count_filter']):
+            var_dict['item_matches_created_days_filter']=True
+            var_dict['item_matches_created_played_count_filter']=True
+
+    return var_dict
