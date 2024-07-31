@@ -97,7 +97,7 @@ def get_http_error_code_link(error_code):
     elif ((error_code >= 300) and (error_code <400)):
         error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_redirection'
     elif ((error_code >= 400) and (error_code <500)):
-        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes##4xx_client_errors'
+        error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_client_errors'
     elif ((error_code >= 500) and (error_code <600)):
         error_code_link='https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_server_errors'
     else:

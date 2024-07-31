@@ -941,7 +941,7 @@ def init_getMedia(the_dict):
             mpp_episodeGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['episode_dict']['media_type'],user_info,episode_returns))
             mpp_audioGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audio_dict']['media_type'],user_info,audio_returns))
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                mpp_audiobookGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audibook_dict']['media_type'],user_info,audiobook_returns))
+                mpp_audiobookGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audiobook_dict']['media_type'],user_info,audiobook_returns))
 
             #start all multi processes
             #order intentially: Audio, Episodes, Movies, Audiobooks
