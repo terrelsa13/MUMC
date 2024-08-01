@@ -131,14 +131,13 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
                     while (data_dict['QueriesRemaining_']):
 
                         if (not (data['Id'] == '')):
                             #Built query for child media items
                             url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                            '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
+                            '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) +
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
 

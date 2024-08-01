@@ -38,7 +38,6 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
                 while (data_dict['QueriesRemaining_']):
 
@@ -46,7 +45,7 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                         #Built query for child meida items
 
                         url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                        '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState + '&Fields=' + FieldsState +
+                        '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&Fields=' + FieldsState +
                         '&CollapseBoxSetItems=' + CollapseBoxSetItems + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages)
 
                         data_dict['apiQuery_']=build_request_message(url,the_dict)
