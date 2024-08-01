@@ -101,7 +101,8 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
             parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_blacklisted_played']):
+        var_dict['enable_media_query_blacklisted_played'] and
+        (not (var_dict['IsPlayedState_Blacklist'] == 'disabled'))):
 
         #Built query for watched items in blacklists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
@@ -140,7 +141,8 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
             parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_whitelist_played']):
+        var_dict['enable_media_query_whitelist_played'] and
+        (not (var_dict['IsPlayedState_Whitelist'] == 'disabled'))):
 
         #Built query for watched items in whitelists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +

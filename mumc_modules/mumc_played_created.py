@@ -142,17 +142,43 @@ def getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(tag_type,the_dict,
 
         isPlayed_isUnplayed=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,this_tag_dict)
 
-        if (prev_isPlayed_isUnplayed == 'disabled'):
-            #isPlayed_isUnplayed = isPlayed_isUnplayed
-            prev_isPlayed_isUnplayed = isPlayed_isUnplayed
-        elif (not (prev_isPlayed_isUnplayed == isPlayed_isUnplayed)):
-            #isPlayed_isUnplayed = ''
-            prev_isPlayed_isUnplayed = ''
-        else:
-            #isPlayed_isUnplayed = isPlayed_isUnplayed
-            prev_isPlayed_isUnplayed = isPlayed_isUnplayed
+        if ((prev_isPlayed_isUnplayed == 'disabled') and (isPlayed_isUnplayed == 'disabled')):
+            prev_isPlayed_isUnplayed='disabled'
+        elif ((prev_isPlayed_isUnplayed == 'disabled') and (isPlayed_isUnplayed == 'True')):
+            prev_isPlayed_isUnplayed='True'
+        elif ((prev_isPlayed_isUnplayed == 'disabled') and (isPlayed_isUnplayed == 'False')):
+            prev_isPlayed_isUnplayed='False'
+        elif ((prev_isPlayed_isUnplayed == 'disabled') and (isPlayed_isUnplayed == '')):
+            prev_isPlayed_isUnplayed=''
 
-    return isPlayed_isUnplayed
+        elif ((prev_isPlayed_isUnplayed == 'True') and (isPlayed_isUnplayed == 'disabled')):
+            prev_isPlayed_isUnplayed='True'
+        elif ((prev_isPlayed_isUnplayed == 'True') and (isPlayed_isUnplayed == 'True')):
+            prev_isPlayed_isUnplayed='True'
+        elif ((prev_isPlayed_isUnplayed == 'True') and (isPlayed_isUnplayed == 'False')):
+            prev_isPlayed_isUnplayed=''
+        elif ((prev_isPlayed_isUnplayed == 'True') and (isPlayed_isUnplayed == '')):
+            prev_isPlayed_isUnplayed=''
+
+        elif ((prev_isPlayed_isUnplayed == 'False') and (isPlayed_isUnplayed == 'disabled')):
+            prev_isPlayed_isUnplayed='False'
+        elif ((prev_isPlayed_isUnplayed == 'False') and (isPlayed_isUnplayed == 'True')):
+            prev_isPlayed_isUnplayed=''
+        elif ((prev_isPlayed_isUnplayed == 'False') and (isPlayed_isUnplayed == 'False')):
+            prev_isPlayed_isUnplayed='False'
+        elif ((prev_isPlayed_isUnplayed == 'False') and (isPlayed_isUnplayed == '')):
+            prev_isPlayed_isUnplayed=''
+
+        elif ((prev_isPlayed_isUnplayed == '') and (isPlayed_isUnplayed == 'disabled')):
+            prev_isPlayed_isUnplayed=''
+        elif ((prev_isPlayed_isUnplayed == '') and (isPlayed_isUnplayed == 'True')):
+            prev_isPlayed_isUnplayed=''
+        elif ((prev_isPlayed_isUnplayed == '') and (isPlayed_isUnplayed == 'False')):
+            prev_isPlayed_isUnplayed=''
+        elif ((prev_isPlayed_isUnplayed == '') and (isPlayed_isUnplayed == '')):
+            prev_isPlayed_isUnplayed=''
+
+    return prev_isPlayed_isUnplayed
 
 
 # determine if media item has been played specified amount of times
@@ -210,9 +236,9 @@ def get_playedStatus(the_dict,item,media_condition,filter_count_comparison,filte
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\nDoes Media Item " + str(item['Id']) + " Meet The " + media_condition + " Count Filter?...",2,the_dict)
             if (((IsPlayedStatus == 'playedOnly') and itemIsPlayed) or ((IsPlayedStatus == 'unplayedOnly') and not itemIsPlayed) or (IsPlayedStatus == 'playedAndUnplayed')):
-                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + str(item_matches_played_count_filter) + "\n",2,the_dict,)
+                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + str(filter_count_comparison) + " " + str(filter_count) + " : " + str(item_matches_played_count_filter) + "\n",2,the_dict,)
             else:
-                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + filter_count_comparison + " " + str(filter_count) + " : " + "N/A Unplayed\n",2,the_dict,)
+                appendTo_DEBUG_log("\n" + str(itemPlayedCount) + " " + str(filter_count_comparison) + " " + str(filter_count) + " : " + "N/A Unplayed\n",2,the_dict,)
 
     return item_matches_played_count_filter
 
