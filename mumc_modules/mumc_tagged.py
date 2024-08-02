@@ -156,20 +156,17 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
                         #get tags for child items
                         for child_item in data_dict['data_']['Items']:
-                            if (child_item['Type'].casefold() == 'movie'):
-                                childIsTagged,matched_tags=get_isMOVIE_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'episode'):
-                                childIsTagged,matched_tags=get_isEPISODE_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'audio'):
-                                childIsTagged,matched_tags=get_isAUDIO_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'audiobook'):
-                                childIsTagged,matched_tags=get_isAUDIOBOOK_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            else:
-                                childIsTagged=False
 
-                            #save tags to child items
-                            if (childIsTagged):
-                                child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
+                            if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or
+                                (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
+
+                                #Emby and jellyfin store tags differently
+                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                    tagData='TagItems'
+                                else:
+                                    tagData='Tags'
+
+                                child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
 
     child_dict['Items']=data_dict['data_']['Items']
     child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
