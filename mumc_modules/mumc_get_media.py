@@ -875,9 +875,6 @@ def init_getMedia(the_dict):
                                     the_dict['admin_settings']['users'][user_index]['blacklist'][lib_index]['lib_enabled']=False
                                     break
 
-    #del the_dict['byUserId_accessibleLibraryParents']
-
-
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:
 
