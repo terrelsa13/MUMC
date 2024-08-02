@@ -908,51 +908,52 @@ def init_getMedia(the_dict):
     the_dict['filter_tag_created_days']=False
 
     for mediaType in ('movie','episode','audio','audiobook'):
-        #remove whitespace(s) from the beginning and end of each tag
-        whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
-        blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
-        whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
-        blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
-        #combine tags and remove any duplicates
-        the_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
-        the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+        if (not ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == 'audiobook'))):
+            #remove whitespace(s) from the beginning and end of each tag
+            whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
+            blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
+            whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
+            blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
+            #combine tags and remove any duplicates
+            the_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
+            the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
-        for this_tag in the_dict['whitetags']:
-            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
-                if (not (this_tag in the_dict['basic_settings']['whitetag_filter_statements'][mediaType])):
-                    the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]={}
-                    #if (filterStatementTag['filter_type'] == 'played'):
-                        #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
-                    #else: #(filterStatementTag['filter_type'] == 'created'):
-                        #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
-                the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]=filterStatementTag
-                #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag].pop('filter_type')
-                if (this_tag.startswith('played')):
-                    tagType='played'
-                elif (this_tag.startswith('created')):
-                    tagType='created'
-                the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
-                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
-                    the_dict['filter_tag_' + tagType + '_days']=True
+            for this_tag in the_dict['whitetags']:
+                if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                    if (not (this_tag in the_dict['basic_settings']['whitetag_filter_statements'][mediaType])):
+                        the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]={}
+                        #if (filterStatementTag['filter_type'] == 'played'):
+                            #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
+                        #else: #(filterStatementTag['filter_type'] == 'created'):
+                            #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
+                    the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]=filterStatementTag
+                    #the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag].pop('filter_type')
+                    if (this_tag.startswith('played')):
+                        tagType='played'
+                    elif (this_tag.startswith('created')):
+                        tagType='created'
+                    the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
+                    if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                        the_dict['filter_tag_' + tagType + '_days']=True
 
 
-        for this_tag in the_dict['blacktags']:
-            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
-                if (not (this_tag in the_dict['basic_settings']['blacktag_filter_statements'][mediaType])):
-                    the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]={}
-                    #if (filterStatementTag['filter_type'] == 'played'):
-                        #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
-                    #else: #(filterStatementTag['filter_type'] == 'created'):
-                        #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
-                the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]=filterStatementTag
-                #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag].pop('filter_type')
-                if (this_tag.startswith('played')):
-                    tagType='played'
-                elif (this_tag.startswith('created')):
-                    tagType='created'
-                the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
-                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
-                    the_dict['filter_tag_' + tagType + '_days']=True
+            for this_tag in the_dict['blacktags']:
+                if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                    if (not (this_tag in the_dict['basic_settings']['blacktag_filter_statements'][mediaType])):
+                        the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]={}
+                        #if (filterStatementTag['filter_type'] == 'played'):
+                            #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['created']={'condition_days':-1,'count_equality':'>','count':0,'behavioral_control':False}
+                        #else: #(filterStatementTag['filter_type'] == 'created'):
+                            #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['played']={'condition_days':-1,'count_equality':'>','count':0}
+                    the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]=filterStatementTag
+                    #the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag].pop('filter_type')
+                    if (this_tag.startswith('played')):
+                        tagType='played'
+                    elif (this_tag.startswith('created')):
+                        tagType='created'
+                    the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
+                    if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+                        the_dict['filter_tag_' + tagType + '_days']=True
 
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:

@@ -80,13 +80,7 @@ def removeTags_From_mediaItem(item,the_dict):
 
 
 #add tags to media_item
-def addTags_To_mediaItem(matched_tags,item,the_dict):
-
-    #Emby and jellyfin store tags differently
-    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-        tagData='TagItems'
-    else:
-        tagData='Tags'
+def addTags_To_mediaItem(parent_tags,item,the_dict):
 
     #Check if media item is tagged
     if (not (tagData in item)):
@@ -117,11 +111,11 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     data_dict['data_']={'Items':[]}
 
     if ('blacktagged' in suffix_str.casefold()):
-        suffix_str='blacktags'
+        tagType='blacktags'
     elif ('whitetagged' in suffix_str.casefold()):
-        suffix_str='whitetags'
+        tagType='whitetags'
     else:
-        raise ValueError('Unknown tagging type; not blacktags and not whitetags.\n\tUnknown value is:' + str(suffix_str))
+        raise ValueError('Unknown tagging type; not blacktags and not whitetags.\n\tUnknown value is:' + str(tagType))
 
     #Loop thru items returned as tagged
     for data in data_Tagged['Items']:
@@ -173,22 +167,45 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
                         #get tags for child items
                         for child_item in data_dict['data_']['Items']:
-                            if (child_item['Type'].casefold() == 'movie'):
-                                childIsTagged,matched_tags=get_isMOVIE_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'episode'):
-                                childIsTagged,matched_tags=get_isEPISODE_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'audio'):
-                                childIsTagged,matched_tags=get_isAUDIO_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            elif (child_item['Type'].casefold() == 'audiobook'):
-                                childIsTagged,matched_tags=get_isAUDIOBOOK_Tagged(the_dict,child_item,user_info,var_dict[suffix_str])
-                            else:
-                                childIsTagged=False
 
-                            if (childIsTagged):
+                            if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or
+                                (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
+
+                                #if ('whitelist' in suffix_str.casefold()):
+                                    #libType='whitelist'
+                                #else: #('blacklist' in suffix_str.casefold()):
+                                    #libType='blacklist'
+
+                                #Save lib_id for each media item; needed during post processing
+                                #child_item['mumc']={}
+                                #child_item['mumc']['lib_id']=var_dict['this_' + libType + '_lib']['lib_id']
+                                #child_item['mumc']['path']=var_dict['this_' + libType + '_lib']['path']
+                                #child_item['mumc']['network_path']=var_dict['this_' + libType + '_lib']['network_path']
+
+                            #if (child_item['Type'].casefold() == 'movie'):
+                                #childIsTagged,matched_tags=get_isMOVIE_Tagged(the_dict,child_item,user_info,var_dict[tagType])
+                            #elif (child_item['Type'].casefold() == 'episode'):
+                                #childIsTagged,matched_tags=get_isEPISODE_Tagged(the_dict,child_item,user_info,var_dict[tagType])
+                            #elif (child_item['Type'].casefold() == 'audio'):
+                                #childIsTagged,matched_tags=get_isAUDIO_Tagged(the_dict,child_item,user_info,var_dict[tagType])
+                            #elif (child_item['Type'].casefold() == 'audiobook'):
+                                #childIsTagged,matched_tags=get_isAUDIOBOOK_Tagged(the_dict,child_item,user_info,var_dict[tagType])
+                            #else:
+                                #childIsTagged=False
+
+                            #if (childIsTagged):
                                 #remove all tags from media_item
-                                child_item=removeTags_From_mediaItem(child_item,the_dict)
+                                #child_item=removeTags_From_mediaItem(child_item,the_dict)
                                 #add matching tags to media_item
-                                child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
+                                #child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
+
+                                #Emby and jellyfin store tags differently
+                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                    tagData='TagItems'
+                                else:
+                                    tagData='Tags'
+
+                                child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
 
     child_dict['Items']=data_dict['data_']['Items']
     child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
@@ -201,7 +218,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 def get_isFilterStatementTag(this_tag):
 
     isFilterStatementTag=False
-    split_this_tag=this_tag.split('|')
+    split_this_tag=this_tag.split(':')
     filterStatementTag={}
 
     try:
