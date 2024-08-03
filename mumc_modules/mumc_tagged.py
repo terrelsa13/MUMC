@@ -80,23 +80,50 @@ def removeTags_From_mediaItem(item,the_dict):
 
 
 #add tags to media_item
-def addTags_To_mediaItem(parent_tags,item,the_dict):
+def addTags_To_mediaItem(matched_tags,child_item,the_dict):
+
+    #Emby and jellyfin store tags differently
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
 
     #Check if media item is tagged
-    if (not (tagData in item)):
-        item[tagData]=[]
+    if (not (tagData in child_item)):
+        child_item[tagData]=[]
 
     #Emby and jellyfin store tags differently
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         for thisTag in matched_tags:
             thisTag_dict={'Name':thisTag}
-            item[tagData].append(thisTag_dict)
-
+            child_item[tagData].append(thisTag_dict)
     else:
         for thisTag in matched_tags:
-            item[tagData].append(thisTag)
+            child_item[tagData].append(thisTag)
 
-    return item
+    #child_item[tagData]+=parent_item[tagData]
+    #child_item[tagData].extend(parent_item[tagData])
+
+    return child_item
+
+
+def getList_Of_thisItemsTags(item,the_dict):
+
+    #Emby and jellyfin store tags differently
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
+
+    matched_tags=[]
+
+    for this_tag in item[tagData]:
+        if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+            matched_tags.append(this_tag['Name'])
+        else:
+            matched_tags.append(this_tag)
+
+    return matched_tags
 
 
 #Get children of tagged parents
@@ -200,12 +227,21 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                                 #child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
 
                                 #Emby and jellyfin store tags differently
-                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                                    tagData='TagItems'
-                                else:
-                                    tagData='Tags'
+                                #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                    #tagData='TagItems'
+                                #else:
+                                    #tagData='Tags'
 
-                                child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
+                                #matched_tags=[]
+
+                                #for this_tag in data[tagData]:
+                                    #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+                                        #matched_tags.append(this_tag['Name'])
+                                    #else:
+                                        #matched_tags.append(this_tag)
+
+                                #child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
+                                child_item=addTags_To_mediaItem(getList_Of_thisItemsTags(data,the_dict),child_item,the_dict)
 
     child_dict['Items']=data_dict['data_']['Items']
     child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])

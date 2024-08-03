@@ -92,13 +92,14 @@ def init_whitelist_watched_query(var_dict,the_dict):
 
 def blacklist_watched_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_blacklist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
         var_dict['enable_media_query_blacklisted_played'] and
@@ -132,13 +133,14 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
 
 def whitelist_watched_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_whitelist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
         var_dict['enable_media_query_whitelist_played'] and

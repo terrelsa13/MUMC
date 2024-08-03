@@ -102,13 +102,14 @@ def init_whitelist_whitetagged_query(var_dict):
 
 def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_blacklist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     #Check if whitetag or blacklist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
@@ -156,13 +157,14 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 
 def whitelist_whitetagged_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_whitelist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     #Check if whitetag or whitelist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
