@@ -1,5 +1,6 @@
 import sys
 from mumc_modules.mumc_output import appendTo_DEBUG_log
+from mumc_modules.mumc_tagged import get_isPlayedCreated_FilterStatementTag
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_configuration_yaml import yaml_configurationLayout
 
@@ -406,6 +407,17 @@ def merge_configuration(default_base,merge):
                 except:
                     pass
 
+    #loop thru in reverse to preserve order
+    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['movie']):
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                temp_dict=default_base['advanced_settings']['behavioral_statements']['movie'].copy()
+                default_base['advanced_settings']['behavioral_statements']['movie'].clear()
+                default_base['advanced_settings']['behavioral_statements']['movie'][thisTag]=merge['advanced_settings']['behavioral_statements']['movie'][thisTag]
+                default_base['advanced_settings']['behavioral_statements']['movie'].update(temp_dict)
+            except:
+                default_base['advanced_settings']['behavioral_statements']['movie'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['movie']['favorited']['action']
     except:
@@ -527,6 +539,17 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
+    #loop thru in reverse to preserve order
+    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['episode']):
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                temp_dict=default_base['advanced_settings']['behavioral_statements']['episode'].copy()
+                default_base['advanced_settings']['behavioral_statements']['episode'].clear()
+                default_base['advanced_settings']['behavioral_statements']['episode'][thisTag]=merge['advanced_settings']['behavioral_statements']['episode'][thisTag]
+                default_base['advanced_settings']['behavioral_statements']['episode'].update(temp_dict)
+            except:
+                default_base['advanced_settings']['behavioral_statements']['episode'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['episode']['favorited']['action']
     except:
@@ -664,6 +687,17 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
+    #loop thru in reverse to preserve order
+    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['audio']):
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                temp_dict=default_base['advanced_settings']['behavioral_statements']['audio'].copy()
+                default_base['advanced_settings']['behavioral_statements']['audio'].clear()
+                default_base['advanced_settings']['behavioral_statements']['audio'][thisTag]=merge['advanced_settings']['behavioral_statements']['audio'][thisTag]
+                default_base['advanced_settings']['behavioral_statements']['audio'].update(temp_dict)
+            except:
+                default_base['advanced_settings']['behavioral_statements']['audio'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['audio']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['audio']['favorited']['action']
     except:
@@ -797,7 +831,18 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
+    #loop thru in reverse to preserve order
     if (server_brand == 'jellyfin'):
+        for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['audiobook']):
+            if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+                try:
+                    #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                    temp_dict=default_base['advanced_settings']['behavioral_statements']['audiobook'].copy()
+                    default_base['advanced_settings']['behavioral_statements']['audiobook'].clear()
+                    default_base['advanced_settings']['behavioral_statements']['audiobook'][thisTag]=merge['advanced_settings']['behavioral_statements']['audiobook'][thisTag]
+                    default_base['advanced_settings']['behavioral_statements']['audiobook'].update(temp_dict)
+                except:
+                    default_base['advanced_settings']['behavioral_statements']['audiobook'][thisTag]=None
         try:
             default_base['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']
         except:

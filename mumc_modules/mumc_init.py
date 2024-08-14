@@ -7,7 +7,7 @@ from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_min_config_version,get_script_version
-from mumc_modules.mumc_tagged import get_isFilterStatementTag
+from mumc_modules.mumc_tagged import get_isPlayedCreated_FilterStatementTag
 
 
 def initialize_mumc(cwd,mumc_path):
@@ -143,7 +143,7 @@ def getIsAnyMediaEnabled(the_dict):
         the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
         for this_tag in the_dict['whitetags']:
-            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+            if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                 if (this_tag.startswith('played')):
                     tagType='played'
                 elif (this_tag.startswith('created')):
@@ -154,7 +154,7 @@ def getIsAnyMediaEnabled(the_dict):
 
 
         for this_tag in the_dict['blacktags']:
-            if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+            if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                 if (this_tag.startswith('played')):
                     tagType='played'
                 elif (this_tag.startswith('created')):

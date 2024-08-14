@@ -82,12 +82,16 @@ def get_isCreatedPlayed_FilterValue(the_dict,filter_created_played_count_compari
  # filter for played, unplayed, or neither (aka played and unplayed)
 def get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict):
 
-    played_days=var_dict['media_played_days']
-    created_days=var_dict['media_created_days']
+    played_days=int(var_dict['media_played_days'])
+    created_days=int(var_dict['media_created_days'])
+
     filter_played_count_comparison=var_dict['media_played_count_comparison']
-    filter_played_count=var_dict['media_played_count']
     filter_created_played_count_comparison=var_dict['media_created_played_count_comparison']
-    filter_created_played_count=var_dict['media_created_played_count']
+
+    if (isinstance(var_dict['media_played_count'],int)):
+        filter_played_count=int(var_dict['media_played_count'])
+    if (isinstance(var_dict['media_created_played_count'],int)):
+        filter_created_played_count=int(var_dict['media_created_played_count'])
 
     if (played_days >= 0):
         isPlayed_Filter_Value=get_isPlayed_FilterValue(the_dict,filter_played_count_comparison,filter_played_count)
@@ -352,7 +356,10 @@ def get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,i
 
 def getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(tag_type,the_dict,item,var_dict):
 
-    for this_tag in var_dict[tag_type + '_filter_statements']:
+    played_created_dict={}
+
+    #for this_tag in var_dict[tag_type + '_filter_statements']:
+    for this_tag in var_dict['matched_filter_' + tag_type + 's']:
         #todo get item tags
         this_tag_dict=var_dict[tag_type + '_filter_statements'][this_tag]
         if (this_tag.startswith('played')):
@@ -364,6 +371,7 @@ def getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(tag_typ
             #played_count=this_tag_dict['media_played_count']
             this_tag_dict['media_created_played_count_comparison']=None
             this_tag_dict['media_created_played_count']=None
+            this_tag_dict['behavioral_control']=None
         elif (this_tag.startswith('created')):
             this_tag_dict['media_played_days']=-1
             #created_days=this_tag_dict['media_created_days']
@@ -374,14 +382,25 @@ def getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(tag_typ
             #created_played_count_comparison=this_tag_dict['media_created_played_count_comparison']
             #created_played_count=this_tag_dict['media_created_played_count']
 
+        
         played_created_dict=get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts(the_dict,item,this_tag_dict)
 
-        if (played_created_dict['item_matches_played_days_filter'] and played_created_dict['item_matches_played_count_filter']):
-            var_dict['item_matches_played_days_filter']=True
-            var_dict['item_matches_played_count_filter']=True
+        var_dict['matched_filter_' + tag_type + 's'][this_tag]['IsMeetingAction']=True
+        #var_dict['matched_filter_' + tag_type + 's'][this_tag]['itemIsPlayed']=played_created_dict['itemIsPlayed']
+        #var_dict['matched_filter_' + tag_type + 's'][this_tag]['itemPlayedCount']=played_created_dict['itemPlayedCount']
+        #var_dict['matched_filter_' + tag_type + 's'][this_tag][item['Id']]['IsMeetingPlayedFilter']=(played_created_dict['item_matches_played_days_filter'] and played_created_dict['item_matches_played_count_filter'])
+        #var_dict['matched_filter_' + tag_type + 's'][this_tag][item['Id']]['IsMeetingCreatedPlayedFilter']=(played_created_dict['item_matches_created_days_filter'] and played_created_dict['item_matches_created_played_count_filter'])
+        var_dict['matched_filter_' + tag_type + 's'][this_tag]['IsMeetingPlayedFilter']=(played_created_dict['item_matches_played_days_filter'] and played_created_dict['item_matches_played_count_filter'])
+        var_dict['matched_filter_' + tag_type + 's'][this_tag]['IsMeetingCreatedPlayedFilter']=(played_created_dict['item_matches_created_days_filter'] and played_created_dict['item_matches_created_played_count_filter'])
 
-        if (played_created_dict['item_matches_created_days_filter'] and played_created_dict['item_matches_created_played_count_filter']):
-            var_dict['item_matches_created_days_filter']=True
-            var_dict['item_matches_created_played_count_filter']=True
+        #if (played_created_dict['item_matches_played_days_filter'] and played_created_dict['item_matches_played_count_filter']):
+            #var_dict['item_matches_played_days_filter']=True
+            #var_dict['item_matches_played_count_filter']=True
+            #var_dict['matched_filter_' + tag_type + 's'][this_tag]['matching_played_tag']=True
+
+        #if (played_created_dict['item_matches_created_days_filter'] and played_created_dict['item_matches_created_played_count_filter']):
+            #var_dict['item_matches_created_days_filter']=True
+            #var_dict['item_matches_created_played_count_filter']=True
+            #var_dict['matched_filter_' + tag_type + 's'][this_tag]['matching_created_tag']=True
 
     return var_dict

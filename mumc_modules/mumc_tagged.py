@@ -249,13 +249,11 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     return child_dict
 
-
 #Get if tag is formatted as a filter statement tag
 def get_isFilterStatementTag(this_tag):
 
     isFilterStatementTag=False
     split_this_tag=this_tag.split(':')
-    filterStatementTag={}
 
     try:
         if (((len(split_this_tag) == 4) and ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created'))) or
@@ -292,18 +290,37 @@ def get_isFilterStatementTag(this_tag):
         isFilterStatementTag=False
 
     if (isFilterStatementTag):
+        return split_this_tag
+    else:
+        return isFilterStatementTag
+
+    #return isFilterStatementTag
+
+
+#Get if tag is formatted as a played or created filter statement tag
+def get_isPlayedCreated_FilterStatementTag(this_tag):
+
+    isFilterStatementTag=False
+    #split_this_tag=this_tag.split(':')
+    filterStatementTag={}
+
+    isFilterStatementTag=get_isFilterStatementTag(this_tag)
+
+    if (isFilterStatementTag):
+
+        split_this_tag=isFilterStatementTag
 
         #filterStatementTag['filter_type']=split_this_tag[0]
 
         #if (filterStatementTag['filter_type'] == 'played'):
         if (split_this_tag[0] == 'played'):
-            filterStatementTag['media_played_days']=split_this_tag[1]
+            filterStatementTag['media_played_days']=int(split_this_tag[1])
             filterStatementTag['media_played_count_comparison']=split_this_tag[2]
-            filterStatementTag['media_played_count']=split_this_tag[3]
+            filterStatementTag['media_played_count']=int(split_this_tag[3])
         else:
-            filterStatementTag['media_created_days']=split_this_tag[1]
+            filterStatementTag['media_created_days']=int(split_this_tag[1])
             filterStatementTag['media_created_played_count_comparison']=split_this_tag[2]
-            filterStatementTag['media_created_played_count']=split_this_tag[3]
+            filterStatementTag['media_created_played_count']=int(split_this_tag[3])
             filterStatementTag['behavioral_control']=split_this_tag[4]
 
         return filterStatementTag
@@ -326,7 +343,7 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
         if ('Id' in item):
             istag_MOVIE['movie'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
             #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
+            #matched_tags.clear()
 
 ### End Movie ###################################################################################
 
@@ -366,7 +383,7 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
         if ('Id' in item):
             istag_EPISODE['episode'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
             #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
+            #matched_tags.clear()
 
 ### End Episode ###################################################################################
 
@@ -455,7 +472,7 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
         if ('Id' in item):
             istag_AUDIO['track'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
             #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
+            #matched_tags.clear()
 
 ### End Track #####################################################################################
 

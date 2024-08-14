@@ -3,7 +3,7 @@ from datetime import timedelta
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType
 from mumc_modules.mumc_favorited import get_isMOVIE_Fav,get_isMOVIE_AdvancedFav,get_isEPISODE_Fav,get_isEPISODE_AdvancedFav,get_isAUDIO_Fav,get_isAUDIO_AdvancedFav,get_isAUDIOBOOK_Fav,get_isAUDIOBOOK_AdvancedFav
-from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem,getList_Of_thisItemsTags,get_isFilterStatementTag
+from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,addTags_To_mediaItem,getList_Of_thisItemsTags,get_isPlayedCreated_FilterStatementTag
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
 from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEoutput,prepare_AUDIOoutput,prepare_AUDIOBOOKoutput
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
@@ -66,13 +66,13 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
         user_key=user_info['user_id']
         action_behavior=var_dict['whitetagged_behavior_media']
         item_isActioned=var_dict['item_isWhitetagged']
-        matched_filter_tags=var_dict['matched_filter_whitetags']
+        isactioned_extra_byUserId[user_key][item['Id']]['IsMatchingFilterWhitetags']=var_dict['matched_filter_whitetags']
     elif (theActionType == 'blacktagged'):
         isactioned_extra_byUserId=var_dict['isblacktagged_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
         action_behavior=var_dict['blacktagged_behavior_media']
         item_isActioned=var_dict['item_isBlacktagged']
-        matched_filter_tags=var_dict['matched_filter_blacktags']
+        isactioned_extra_byUserId[user_key][item['Id']]['IsMatchingFilterBlacktags']=var_dict['matched_filter_blacktags']
     elif (theActionType == 'whitelisted'):
         isactioned_extra_byUserId=var_dict['iswhitelisted_extraInfo_byUserId_Media']
         user_key=user_info['user_id']
@@ -107,9 +107,6 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
 
     isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingCreatedPlayedFilter']=(item_matches_created_days_filter and item_matches_created_played_count_filter)
 
-    if ((theActionType == 'whitetagged') or (theActionType == 'blacktagged')):
-        isactioned_extra_byUserId[user_key][item['Id']]['matched_filter_tags']=matched_filter_tags
-
     if (not ((item['Id'] in var_dict['deleteItemsIdTracker_Media']) or (item['Id'] in var_dict['deleteItemsIdTracker_createdMedia']))):
         var_dict['media_data'][item['Id']]=filterYAMLConfigKeys_ToKeep(item,*var_dict['itemKeyFilter'])
         var_dict['deleteItemsIdTracker_Media'].append(item['Id'])
@@ -123,7 +120,7 @@ def parse_actionedConfigurationBehavior(theActionType,item,user_info,var_dict,th
         appendTo_DEBUG_log("\nMonitoredUsersMeetPlayedFilter=" + str(isactioned_extra_byUserId['MonitoredUsersMeetPlayedFilter']),3,the_dict)
         appendTo_DEBUG_log("\nIsMeetingPlayedFilter=" + str(isactioned_extra_byUserId[user_key][item['Id']]['IsMeetingPlayedFilter']),3,the_dict)
         if ((theActionType == 'whitetagged') or (theActionType == 'blacktagged')):
-            appendTo_DEBUG_log("\nMatchingFilterTags=" + str(isactioned_extra_byUserId[user_key][item['Id']]['matched_filter_tags']),3,the_dict)
+            appendTo_DEBUG_log("\nMatchingFilterTags=" + str(isactioned_extra_byUserId[user_key][item['Id']]['IsMatchingFilter'+theActionType.replace('ged','s').title()]),3,the_dict)
         appendTo_DEBUG_log("\nConfiguredBehavior=" + str(isactioned_extra_byUserId['ConfiguredBehavior']),3,the_dict)
         appendTo_DEBUG_log("\nItemId=" + str(item['Id']),3,the_dict)
 
@@ -571,6 +568,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isWhitetagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['whitetags'])
 
+                                var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
+
                                 #if (matched_tags):
                                 if (var_dict['item_isWhitetagged'] and (not (var_dict['data_list_pos'] in var_dict['data_from_whitetagged_queries']))):
                                     #remove all tags from media_item
@@ -578,12 +577,21 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     #add matching tags to media_item
                                     item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
-                                var_dict['matched_filter_whitetags']=[]
+                                var_dict['matched_filter_whitetags']={}
                                 for thisTag in matched_tags:
                                     if (thisTag in var_dict['whitetag_filter_statements']):
-                                        var_dict['matched_filter_whitetags'].append(thisTag)
-
-                                var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
+                                        var_dict['matched_filter_whitetags'][thisTag]={}
+                                        #var_dict['matched_filter_whitetags'][thisTag]['matching_played_tag']=False
+                                        #var_dict['matched_filter_whitetags'][thisTag]['matching_created_tag']=False
+                                #for thisTag in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]:
+                                    #if (get_isPlayedCreated_FilterStatementTag(thisTag)):
+                                        #if (thisTag in var_dict['whitetag_filter_statements']):
+                                            #var_dict['matched_filter_whitetags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['dynamic_behavior']
+                                            #var_dict['matched_filter_whitetags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['action_control']
+                                            #var_dict['matched_filter_whitetags'][thisTag]['ActionType']='whitetagged'
+                                            #var_dict['matched_filter_whitetags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['user_conditional']
+                                            #var_dict['matched_filter_whitetags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['played_conditional']
+                                            #var_dict['matched_filter_whitetags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['action']
 
                                 var_dict=getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts('whitetag',the_dict,item,var_dict)
 
@@ -612,6 +620,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isBlacktagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['blacktags'])
 
+                                var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
+
                                 #if (matched_tags):
                                 if (var_dict['item_isBlacktagged'] and (not (var_dict['data_list_pos'] in var_dict['data_from_blacktagged_queries']))):
                                     #remove all tags from media_item
@@ -619,12 +629,21 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     #add matching tags to media_item
                                     item=addTags_To_mediaItem(matched_tags,item,the_dict)
 
-                                var_dict['matched_filter_blacktags']=[]
+                                var_dict['matched_filter_blacktags']={}
                                 for thisTag in matched_tags:
                                     if (thisTag in var_dict['blacktag_filter_statements']):
-                                        var_dict['matched_filter_blacktags'].append(thisTag)
-
-                                var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
+                                        var_dict['matched_filter_blacktags'][thisTag]={}
+                                        #var_dict['matched_filter_blacktags'][thisTag]['matching_played_tag']=False
+                                        #var_dict['matched_filter_blacktags'][thisTag]['matching_created_tag']=False
+                                #for thisTag in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]:
+                                    #if (get_isPlayedCreated_FilterStatementTag(thisTag)):
+                                        #if (thisTag in var_dict['blacktag_filter_statements']):
+                                            #var_dict['matched_filter_blacktags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['dynamic_behavior']
+                                            #var_dict['matched_filter_blacktags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['action_control']
+                                            #var_dict['matched_filter_blacktags'][thisTag]['ActionType']='blacktagged'
+                                            #var_dict['matched_filter_blacktags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['user_conditional']
+                                            #var_dict['matched_filter_blacktags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['played_conditional']
+                                            #var_dict['matched_filter_blacktags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']][thisTag]['action']
 
                                 var_dict=getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts('blacktag',the_dict,item,var_dict)
 
@@ -839,16 +858,18 @@ def init_getMedia(the_dict):
         the_dict['byUserId_accessibleLibraryParents'][user_info['user_id']]=[]
 
         for lib_info in user_info['whitelist']:
-            if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                library_id='lib_id'
-                parent_id='lib_id'
-            else:
-                if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    library_id='subfolder_id'
-                    parent_id='lib_id'
-                else:
-                    library_id='lib_id'
-                    parent_id='lib_id'
+            #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                #library_id='lib_id'
+                #parent_id='lib_id'
+            #else:
+                #if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
+                    #library_id='subfolder_id'
+                    #parent_id='lib_id'
+                #else:
+                    #library_id='lib_id'
+                    #parent_id='lib_id'
+            library_id='lib_id'
+            parent_id='lib_id'
 
             if (not (lib_info[library_id] == None)):
                 the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])
@@ -856,16 +877,18 @@ def init_getMedia(the_dict):
                 
 
         for lib_info in user_info['blacklist']:
-            if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-                library_id='lib_id'
-                parent_id='lib_id'
-            else:
-                if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    library_id='subfolder_id'
-                    parent_id='lib_id'
-                else:
-                    library_id='lib_id'
-                    parent_id='lib_id'
+            #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                #library_id='lib_id'
+                #parent_id='lib_id'
+            #else:
+                #if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
+                    #library_id='subfolder_id'
+                    #parent_id='lib_id'
+                #else:
+                    #library_id='lib_id'
+                    #parent_id='lib_id'
+            library_id='lib_id'
+            parent_id='lib_id'
 
             if (not (lib_info[library_id] == None)):
                 the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])
@@ -938,7 +961,7 @@ def init_getMedia(the_dict):
             the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
             for this_tag in the_dict['whitetags']:
-                if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                     if (not (this_tag in the_dict['basic_settings']['whitetag_filter_statements'][mediaType])):
                         the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]={}
                         #if (filterStatementTag['filter_type'] == 'played'):
@@ -957,7 +980,7 @@ def init_getMedia(the_dict):
 
 
             for this_tag in the_dict['blacktags']:
-                if (not ((filterStatementTag:=get_isFilterStatementTag(this_tag)) == False)):
+                if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                     if (not (this_tag in the_dict['basic_settings']['blacktag_filter_statements'][mediaType])):
                         the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]={}
                         #if (filterStatementTag['filter_type'] == 'played'):
@@ -1095,6 +1118,6 @@ def init_getMedia(the_dict):
             if (not (media_found)):
                 if (the_dict['DEBUG']):
                     appendTo_DEBUG_log("\n",1,the_dict)
-                print_byType('[NO PLAYED, WHITELISTED, OR TAGGED MEDIA ITEMS]\n',the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+                print_byType('[NO PLAYED, LISTED, OR TAGGED MEDIA ITEMS MATCH FILTER STATEMENTS]\n',the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
     return the_dict
