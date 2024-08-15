@@ -1,6 +1,5 @@
-import copy
 import multiprocessing
-from datetime import timedelta
+#from datetime import timedelta
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
@@ -377,6 +376,26 @@ def behavior_playedPatternCleanup(behavior_str,postproc_dict,the_dict):
     return postproc_dict
 
 
+def process_behavioralTags(tagType,high_priority,postproc_dict,the_dict):
+
+    orig_behavioral_info=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media'].copy()
+
+    for thisFilterTag in reversed(the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]):
+        if ((thisFilterTag in postproc_dict[tagType.replace('ged','') + '_filter_statements']) and (postproc_dict['behavioral_tag_high_priority'][thisFilterTag] == high_priority)):
+            if (thisFilterTag in postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags']):
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['DynamicBehavior']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['DynamicBehavior']
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['ActionControl']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['ActionControl']
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['ActionType']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['ActionType']
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['MonitoredUsersAction']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['MonitoredUsersAction']
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['MonitoredUsersMeetPlayedFilter']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['MonitoredUsersMeetPlayedFilter']
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['ConfiguredBehavior']=postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisFilterTag]['ConfiguredBehavior']
+            else:
+                postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']=orig_behavioral_info
+            postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns(tagType,postproc_dict,thisFilterTag)
+
+    return postproc_dict
+
+
 #add played and created data for item during post-processing
 def add_missingItems_byUserId_playedStates(behavior_str,postproc_dict,the_dict):
     isbehavior_extraInfo_byUserId_Media=postproc_dict['is' + behavior_str + '_extraInfo_byUserId_Media']
@@ -621,6 +640,7 @@ def postProcessing(the_dict,media_dict):
             postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('blacktagged',postproc_dict)
 
 ########FILTER BLACKTAG#############################################################################################################################
+            '''
             orig_behavioral_info=postproc_dict['isblacktagged_extraInfo_byUserId_Media'].copy()
             for thisFilterTag in reversed(the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]):
                 if ((thisFilterTag in postproc_dict['blacktag_filter_statements']) and (not postproc_dict['behavioral_tag_high_priority'][thisFilterTag])):
@@ -634,6 +654,8 @@ def postProcessing(the_dict,media_dict):
                     else:
                         postproc_dict['isblacktagged_extraInfo_byUserId_Media']=orig_behavioral_info
                     postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('blacktagged',postproc_dict,thisFilterTag)
+            '''
+            postproc_dict=process_behavioralTags('blacktagged',False,postproc_dict,the_dict)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
@@ -652,6 +674,7 @@ def postProcessing(the_dict,media_dict):
             postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('whitetagged',postproc_dict)
 
 ########FILTER WHITETAG#############################################################################################################################
+            '''
             orig_behavioral_info=postproc_dict['iswhitetagged_extraInfo_byUserId_Media'].copy()
             for thisFilterTag in reversed(the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]):
                 if ((thisFilterTag in postproc_dict['whitetag_filter_statements']) and (not postproc_dict['behavioral_tag_high_priority'][thisFilterTag])):
@@ -665,6 +688,8 @@ def postProcessing(the_dict,media_dict):
                     else:
                         postproc_dict['iswhitetagged_extraInfo_byUserId_Media']=orig_behavioral_info
                     postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('whitetagged',postproc_dict,thisFilterTag)
+            '''
+            postproc_dict=process_behavioralTags('whitetagged',False,postproc_dict,the_dict)
 
         if (the_dict['DEBUG']):
             appendTo_DEBUG_log("\n-----------------------------------------------------------",3,the_dict)
@@ -694,6 +719,7 @@ def postProcessing(the_dict,media_dict):
 ########FILTER BLACKTAG#############################################################################################################################
         #Add blacktagged items to delete list that meet the defined played state
         if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0) or postproc_dict['filter_blacktag_enabled']) and (postproc_dict['blacktagged_behavior_media']['action_control'] >= 0)):
+            '''
             orig_behavioral_info=postproc_dict['isblacktagged_extraInfo_byUserId_Media'].copy()
             for thisFilterTag in reversed(the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]):
                 if ((thisFilterTag in postproc_dict['blacktag_filter_statements']) and postproc_dict['behavioral_tag_high_priority'][thisFilterTag]):
@@ -707,10 +733,13 @@ def postProcessing(the_dict,media_dict):
                     else:
                         postproc_dict['isblacktagged_extraInfo_byUserId_Media']=orig_behavioral_info
                     postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('blacktagged',postproc_dict,thisFilterTag)
+            '''
+            postproc_dict=process_behavioralTags('blacktagged',True,postproc_dict,the_dict)
 
 ########FILTER WHITETAG#############################################################################################################################
         #Add whitetagged items to delete list that meet the defined played state
         if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0) or postproc_dict['filter_whitetag_enabled']) and (postproc_dict['whitetagged_behavior_media']['action_control'] >= 0)):
+            '''
             orig_behavioral_info=postproc_dict['iswhitetagged_extraInfo_byUserId_Media'].copy()
             for thisFilterTag in reversed(the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]):
                 if ((thisFilterTag in postproc_dict['whitetag_filter_statements']) and postproc_dict['behavioral_tag_high_priority'][thisFilterTag]):
@@ -724,6 +753,8 @@ def postProcessing(the_dict,media_dict):
                     else:
                         postproc_dict['iswhitetagged_extraInfo_byUserId_Media']=orig_behavioral_info
                     postproc_dict=addItem_removeItem_fromDeleteList_usingBehavioralPatterns('whitetagged',postproc_dict,thisFilterTag)
+            '''
+            postproc_dict=process_behavioralTags('whitetagged',True,postproc_dict,the_dict)
 
         #only applies to episodes
         if (postproc_dict['media_type_lower'] == 'episode'):
