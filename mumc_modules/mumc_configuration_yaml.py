@@ -43,6 +43,16 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['basic_settings']['filter_statements']['audiobook']['created']['count']=1
         config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=True
 
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['basic_settings']['filter_tags']['movie']['whitetags']=[]
+    #config_data['basic_settings']['filter_tags']['movie']['blacktags']=[]
+    #config_data['basic_settings']['filter_tags']['episode']['whitetags']=[]
+    #config_data['basic_settings']['filter_tags']['episode']['blacktags']=[]
+    #config_data['basic_settings']['filter_tags']['audio']['whitetags']=[]
+    #config_data['basic_settings']['filter_tags']['audio']['blacktags']=[]
+    #config_data['basic_settings']['filter_tags']['audiobook']['whitetags']=[]
+    #config_data['basic_settings']['filter_tags']['audiobook']['blacktags']=[]
+
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['blacktagged']=True
@@ -97,12 +107,16 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action']='delete'
     config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['user_conditional']='all'
     config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['played_conditional']='any_played'
     config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['movie']['whitelisted']['user_conditional']='any'
@@ -133,12 +147,16 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']='delete'
     config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['user_conditional']='all'
     config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['played_conditional']='any_played'
     config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['episode']['whitelisted']['user_conditional']='any'
@@ -168,12 +186,16 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['played_conditional']='ignore'
     config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action']='delete'
     config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['user_conditional']='all'
     config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['played_conditional']='any_played'
     config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action_control']=0
     config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']=[]
 
     config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['audio']['whitelisted']['user_conditional']='any'
@@ -205,12 +227,16 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['played_conditional']='ignore'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action_control']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=False
+        #INTENTIONALLY COMMENTED OUT
+        #config_data['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']=[]
 
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action']='delete'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['user_conditional']='all'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['played_conditional']='any_played'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action_control']=0
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=False
+        #INTENTIONALLY COMMENTED OUT
+        #config_data['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']=[]
 
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action']='keep'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['user_conditional']='any'
@@ -223,6 +249,68 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['played_conditional']='any_played'
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=3
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
+
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['high_priority']=False
+
+    #if (server_brand == 'jellyfin'):
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['action']='keep'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['user_conditional']='all'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['played_conditional']='ignore'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['action_control']=0
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['dynamic_behavior']=False
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['high_priority']=False
+
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['action']='keep'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['user_conditional']='all'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['played_conditional']='ignore'
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['action_control']=0
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['dynamic_behavior']=False
+        #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['high_priority']=False
+
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['whitetags']=[]
+    #config_data['advanced_settings']['blacktags']=[]
 
     config_data['advanced_settings']['delete_empty_folders']['episode']['season']=False
     config_data['advanced_settings']['delete_empty_folders']['episode']['series']=False

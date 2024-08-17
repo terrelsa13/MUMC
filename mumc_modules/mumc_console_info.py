@@ -388,7 +388,7 @@ def remove_files_helper(strings_list_to_print,the_dict):
 
 
 #print new config info
-def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
+def built_new_config_not_setup_to_delete_media(strings_list_to_print,the_dict):
     if (not (the_dict['advanced_settings']['REMOVE_FILES'])):
         strings_list_to_print+=the_dict['_console_separator'] + '\n'
         strings_list_to_print+='* Config file is not setup to delete media.' + '\n'

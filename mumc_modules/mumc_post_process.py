@@ -447,8 +447,8 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['whitetag_filter_statements']=the_dict['basic_settings']['whitetag_filter_statements'][postproc_dict['media_type_lower']]
     postproc_dict['blacktag_filter_statements']=the_dict['basic_settings']['blacktag_filter_statements'][postproc_dict['media_type_lower']]
 
-    postproc_dict['filter_tag_played_days']=the_dict['filter_tag_played_days']
-    postproc_dict['filter_tag_created_days']=the_dict['filter_tag_created_days']
+    postproc_dict['filter_tag_played_days']=the_dict['filter_tag_played_days'][postproc_dict['media_type_lower']]
+    postproc_dict['filter_tag_created_days']=the_dict['filter_tag_created_days'][postproc_dict['media_type_lower']]
 
     postproc_dict['favorited_behavior_media']={}
     postproc_dict['favorited_behavior_media']['action']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]['favorited']['action']
@@ -513,24 +513,54 @@ def postProcessing(the_dict,media_dict):
 
     postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags']={}
     postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags']={}
-    for thisTag in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]:
-        if (get_isPlayedCreated_FilterStatementTag(thisTag)):
-            if (thisTag in postproc_dict['whitetag_filter_statements']):
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]={}
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['dynamic_behavior']
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action_control']
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionType']='whitetagged'
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['user_conditional']
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['played_conditional']
-                postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action']
-            elif (thisTag in postproc_dict['blacktag_filter_statements']):
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]={}
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['dynamic_behavior']
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action_control']
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionType']='blacktagged'
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['user_conditional']
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['played_conditional']
-                postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action']
+    postproc_dict['behavioral_tag_high_priority']={}
+    if (not (the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']] == None)):
+        #for thisTag in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]:
+        for thisTag in the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']]:
+            if (get_isPlayedCreated_FilterStatementTag(thisTag)):
+                #if (thisTag in postproc_dict['whitetag_filter_statements']):
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]={}
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['dynamic_behavior']
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action_control']
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionType']='whitetagged'
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['user_conditional']
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['played_conditional']
+                    #postproc_dict['iswhitetagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action']
+                #elif (thisTag in postproc_dict['blacktag_filter_statements']):
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]={}
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['dynamic_behavior']
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action_control']
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionType']='blacktagged'
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['user_conditional']
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['played_conditional']
+                    #postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['action']
+
+                if (thisTag in postproc_dict['whitetag_filter_statements']):
+                    tagType='whitetagged'
+                elif (thisTag in postproc_dict['blacktag_filter_statements']):
+                    tagType='blacktagged'
+                else:
+                    tagType=None
+
+                if (not (tagType == None)):
+                    if (thisTag in the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']]):
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]={}
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['dynamic_behavior']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionControl']=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['action_control']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ActionType']='' + tagType + ''
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['user_conditional']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['played_conditional']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][thisTag]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['action']
+                        postproc_dict['behavioral_tag_high_priority'][thisTag]=the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']][thisTag]['high_priority']
+                    else:
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]={}
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['DynamicBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][tagType]['dynamic_behavior']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['ActionControl']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][tagType]['action_control']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['ActionType']='blacktagged'
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['MonitoredUsersAction']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][tagType]['user_conditional']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['MonitoredUsersMeetPlayedFilter']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][tagType]['played_conditional']
+                        postproc_dict['is' + tagType + '_extraInfo_byUserId_Media']['behavioral_tags'][tagType]['ConfiguredBehavior']=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][tagType]['action']
+                        postproc_dict['behavioral_tag_high_priority'][thisTag]=False
 
     #episode counts
     postproc_dict['mediaCounts_byUserId']={}
@@ -562,15 +592,6 @@ def postProcessing(the_dict,media_dict):
             if (the_dict['basic_settings']['blacktag_filter_statements'][postproc_dict['media_type_lower']][filter_tag]['media_created_days'] >= 0):
                 postproc_dict['filter_blacktag_enabled']=True
                 break
-
-    postproc_dict['behavioral_tag_high_priority']={}
-    for thisTag in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]:
-        if (get_isPlayedCreated_FilterStatementTag(thisTag)):
-            if ((thisTag in postproc_dict['whitetag_filter_statements']) or (thisTag in postproc_dict['blacktag_filter_statements'])):
-                if ('high_priority' in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]):
-                    postproc_dict['behavioral_tag_high_priority'][thisTag]=the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][thisTag]['high_priority']
-                else:
-                    postproc_dict['behavioral_tag_high_priority'][thisTag]=False
 
     #check media is enabled before post-processing
     #if ((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)):

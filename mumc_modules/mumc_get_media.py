@@ -208,19 +208,22 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
     var_dict['server_brand']=the_dict['admin_settings']['server']['brand']
 
     #remove whitespace(s) from the beginning and end of each tag
-    whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
-    blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
-    whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['tags'] if tagstr.strip()]
-    blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['tags'] if tagstr.strip()]
-    #combine tags and remove any duplicates
-    var_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
-    var_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+    #whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
+    #blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
+    #whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['whitetagged']['tags'] if tagstr.strip()]
+    #blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][var_dict['media_type_lower']]['blacktagged']['tags'] if tagstr.strip()]
+    ##combine tags and remove any duplicates
+    #var_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
+    #var_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+
+    var_dict['whitetags']=the_dict['whitetags'][var_dict['media_type_lower']]
+    var_dict['blacktags']=the_dict['blacktags'][var_dict['media_type_lower']]
 
     var_dict['whitetag_filter_statements']=the_dict['basic_settings']['whitetag_filter_statements'][var_dict['media_type_lower']]
     var_dict['blacktag_filter_statements']=the_dict['basic_settings']['blacktag_filter_statements'][var_dict['media_type_lower']]
 
-    var_dict['filter_tag_played_days']=the_dict['filter_tag_played_days']
-    var_dict['filter_tag_created_days']=the_dict['filter_tag_created_days']
+    var_dict['filter_tag_played_days']=the_dict['filter_tag_played_days'][var_dict['media_type_lower']]
+    var_dict['filter_tag_created_days']=the_dict['filter_tag_created_days'][var_dict['media_type_lower']]
 
     var_dict['library_matching_behavior']=the_dict['admin_settings']['behavior']['matching'].casefold()
 
@@ -946,21 +949,37 @@ def init_getMedia(the_dict):
     #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['played']={}
     #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['created']={}
 
-    the_dict['filter_tag_played_days']=False
-    the_dict['filter_tag_created_days']=False
+    the_dict['filter_tag_played_days']={}
+    the_dict['filter_tag_created_days']={}
+    the_dict['filter_tag_played_days']['movie']=False
+    the_dict['filter_tag_created_days']['movie']=False
+    the_dict['filter_tag_played_days']['episode']=False
+    the_dict['filter_tag_created_days']['episode']=False
+    the_dict['filter_tag_played_days']['audio']=False
+    the_dict['filter_tag_created_days']['audio']=False
+    the_dict['filter_tag_played_days']['audiobook']=False
+    the_dict['filter_tag_created_days']['audiobook']=False
+
+    the_dict['whitetags']={}
+    the_dict['blacktags']={}
 
     for mediaType in ('movie','episode','audio','audiobook'):
         if (not ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == 'audiobook'))):
             #remove whitespace(s) from the beginning and end of each tag
-            whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
-            blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
+            filter_whitetags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['whitetags'] if tagstr.strip()]
+            filter_blacktags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['blacktags'] if tagstr.strip()]
             whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
             blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
-            #combine tags and remove any duplicates
-            the_dict['whitetags']=list(set(whitetags_global + whitetags_media_specific))
-            the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
+            whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
+            blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
 
-            for this_tag in the_dict['whitetags']:
+            #combine tags and remove any duplicates
+            #the_dict['whitetags'][mediaType]=list(set(filter_whitetags_media_specific + whitetags_media_specific + whitetags_global))
+            #the_dict['blacktags'][mediaType]=list(set(filter_blacktags_media_specific + blacktags_media_specific + blacktags_global))
+            the_dict['whitetags'][mediaType]=list(dict.fromkeys(filter_whitetags_media_specific + whitetags_media_specific + whitetags_global))
+            the_dict['blacktags'][mediaType]=list(dict.fromkeys(filter_blacktags_media_specific + blacktags_media_specific + blacktags_global))
+
+            for this_tag in the_dict['whitetags'][mediaType]:
                 if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                     if (not (this_tag in the_dict['basic_settings']['whitetag_filter_statements'][mediaType])):
                         the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]={}
@@ -976,10 +995,10 @@ def init_getMedia(the_dict):
                         tagType='created'
                     the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['whitetag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
                     if (filterStatementTag['media_' + tagType + '_days'] >= 0):
-                        the_dict['filter_tag_' + tagType + '_days']=True
+                        the_dict['filter_tag_' + tagType + '_days'][mediaType]=True
 
 
-            for this_tag in the_dict['blacktags']:
+            for this_tag in the_dict['blacktags'][mediaType]:
                 if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
                     if (not (this_tag in the_dict['basic_settings']['blacktag_filter_statements'][mediaType])):
                         the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]={}
@@ -995,7 +1014,7 @@ def init_getMedia(the_dict):
                         tagType='created'
                     the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['cut_off_date_' + tagType + '_media']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['blacktag_filter_statements'][mediaType][this_tag]['media_' + tagType + '_days'])
                     if (filterStatementTag['media_' + tagType + '_days'] >= 0):
-                        the_dict['filter_tag_' + tagType + '_days']=True
+                        the_dict['filter_tag_' + tagType + '_days'][mediaType]=True
 
     #Get items that could be ready for deletion
     for user_info in the_dict['enabled_users']:
@@ -1008,43 +1027,43 @@ def init_getMedia(the_dict):
         print_user_header(user_info,the_dict)
 
         #get values for media delete/keep items
-        movie_delete=the_dict['advanced_settings']['console_controls']['movie']['delete']['show']
-        movie_keep=the_dict['advanced_settings']['console_controls']['movie']['keep']['show']
-        episode_delete=the_dict['advanced_settings']['console_controls']['episode']['delete']['show']
-        episode_keep=the_dict['advanced_settings']['console_controls']['episode']['keep']['show']
-        audio_delete=the_dict['advanced_settings']['console_controls']['audio']['delete']['show']
-        audio_keep=the_dict['advanced_settings']['console_controls']['audio']['keep']['show']
+        show_movie_delete=the_dict['advanced_settings']['console_controls']['movie']['delete']['show']
+        show_movie_keep=the_dict['advanced_settings']['console_controls']['movie']['keep']['show']
+        show_episode_delete=the_dict['advanced_settings']['console_controls']['episode']['delete']['show']
+        show_episode_keep=the_dict['advanced_settings']['console_controls']['episode']['keep']['show']
+        show_audio_delete=the_dict['advanced_settings']['console_controls']['audio']['delete']['show']
+        show_audio_keep=the_dict['advanced_settings']['console_controls']['audio']['keep']['show']
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            audiobook_delete=the_dict['advanced_settings']['console_controls']['audiobook']['delete']['show']
-            audiobook_keep=the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']
+            show_audiobook_delete=the_dict['advanced_settings']['console_controls']['audiobook']['delete']['show']
+            show_audiobook_keep=the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']
 
-        if ((the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and 
-            (the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1)):
-            movie_delete=False
-            movie_keep=False
-        if ((the_dict['basic_settings']['filter_statements']['episode']['played']['condition_days'] == -1) and 
-            (the_dict['basic_settings']['filter_statements']['episode']['created']['condition_days'] == -1)):
-            episode_delete=False
-            episode_keep=False
-        if ((the_dict['basic_settings']['filter_statements']['audio']['played']['condition_days'] == -1) and 
-            (the_dict['basic_settings']['filter_statements']['audio']['created']['condition_days'] == -1)):
-            audio_delete=False
-            audio_keep=False
-        if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            if ((the_dict['basic_settings']['filter_statements']['audiobook']['played']['condition_days'] == -1) and 
-                (the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)):
-                audiobook_delete=False
-                audiobook_keep=False
+        #if ((the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and 
+            #(the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1)):
+            #show_movie_delete=False
+            #show_movie_keep=False
+        #if ((the_dict['basic_settings']['filter_statements']['episode']['played']['condition_days'] == -1) and 
+            #(the_dict['basic_settings']['filter_statements']['episode']['created']['condition_days'] == -1)):
+            #show_episode_delete=False
+            #show_episode_keep=False
+        #if ((the_dict['basic_settings']['filter_statements']['audio']['played']['condition_days'] == -1) and 
+            #(the_dict['basic_settings']['filter_statements']['audio']['created']['condition_days'] == -1)):
+            #show_audio_delete=False
+            #show_audio_keep=False
+        #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+            #if ((the_dict['basic_settings']['filter_statements']['audiobook']['played']['condition_days'] == -1) and 
+                #(the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)):
+                #show_audiobook_delete=False
+                #show_audiobook_keep=False
 
         #when debug is disabled AND no active media delete/keep items are being output to the console; allow multiprocessing
         if (
         (not (the_dict['DEBUG'])) and
-        ((not (movie_delete or movie_keep)) and
-        (not (episode_delete or episode_keep)) and
-        (not (audio_delete or audio_keep)) and
+        ((not (show_movie_delete or show_movie_keep)) and
+        (not (show_episode_delete or show_episode_keep)) and
+        (not (show_audio_delete or show_audio_keep)) and
         ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) or
         (isJellyfinServer(the_dict['admin_settings']['server']['brand']) and
-        (not (audiobook_delete or audiobook_keep)))))
+        (not (show_audiobook_delete or show_audiobook_keep)))))
         ):
 
             #create dictionary for media that can possibly be deleted

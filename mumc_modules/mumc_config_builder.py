@@ -2,7 +2,7 @@ from mumc_modules.mumc_output import print_byType
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
+from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_config_not_setup_to_delete_media
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
@@ -157,7 +157,7 @@ def build_configuration_file(the_dict,orig_dict={}):
                 print_all_media_disabled(the_dict)
 
                 strings_list_to_print=''
-                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
+                strings_list_to_print=built_new_config_not_setup_to_delete_media(strings_list_to_print,the_dict)
             try:
                 print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:

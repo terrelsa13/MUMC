@@ -280,9 +280,13 @@ def get_isFilterStatementTag(this_tag):
                                     split_this_tag[4]=False
                                     isFilterStatementTag=True
                                 else:
-                                    raise ValueError('Filter statement tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
+                                    #raise ValueError('Filter statement tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
+                                    split_this_tag[4]=None
+                                    isFilterStatementTag=False
                             else:
-                                split_this_tag.append(True) #default behavioral_control value
+                                #split_this_tag.append(True) #default behavioral_control value
+                                #isFilterStatementTag=True
+                                split_this_tag.append(False)
                                 isFilterStatementTag=True
                         else:
                             isFilterStatementTag=True

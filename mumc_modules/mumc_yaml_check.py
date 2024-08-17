@@ -3,6 +3,7 @@ from mumc_modules.mumc_versions import get_semantic_version_parts
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
+from mumc_modules.mumc_tagged import get_isFilterStatementTag
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -179,6 +180,85 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
     return(error_found_in_mumc_config_yaml)
 
 
+#Check filter_tags are formatted as expected
+def cfgCheckYAML_isFilterTag(tag,tag_list):
+    
+    no_error_found=True
+    
+    if (
+        not (isinstance(tag,str) and isinstance(tag_list,list) and
+            (isinstance(tag_list[0],str) and ((tag_list[0] == 'played') or (tag_list[0] == 'created')) and
+                isinstance(tag_list[1],int) and ((tag_list[1] >= -1) and (tag_list[1] <= 730500)) and
+                isinstance(tag_list[2],str) and
+                ((tag_list[2] == '>') or (tag_list[2] == '<') or
+                (tag_list[2] == '>=') or (tag_list[2] == '<=') or
+                (tag_list[2] == '==') or (tag_list[2] == 'not ==') or
+                (tag_list[2] == 'not >') or (tag_list[2] == 'not <') or
+                (tag_list[2] == 'not >=') or (tag_list[2] == 'not <=')) and
+                isinstance(tag_list[3],int) and ((tag_list[3] >= -1) and (tag_list[3] <= 730500)) and
+                ((tag_list[0] == 'played') or ((tag_list[0] == 'created') and isinstance(tag_list[4],bool) and ((tag_list[4] == True) or (tag_list[4] == False)))))
+            )
+        ):
+        no_error_found=False
+
+    return no_error_found
+
+
+#Check behavioral_tags config variables are as expected
+def cfgCheckYAML_isBehavioralTag(cfg,tag,media_type):
+    
+    error_found_in_mumc_config_yaml=''
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+        else:
+            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'user_conditional')) == None)):
+                if (
+                    not (isinstance(check,str) and
+                        (check.casefold() == 'all'))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
+                else:
+                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'played_conditional')) == None)):
+                        if (
+                            not (isinstance(check,str) and
+                                ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                                (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                                (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                                (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                                (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                                (check.casefold() == 'ignore')))
+                            ):
+                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+                        else:
+                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action_control')) == None)):
+                                if (
+                                    not (isinstance(check,int) and
+                                        ((check >= 0) and (check <= 8)))
+                                    ):
+                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action_control must be an integer\n\tValid range 0 thru 8\n'
+                                else:
+                                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'dynamic_behavior')) == None)):
+                                        if (
+                                            not (isinstance(check,bool) and
+                                                ((check == True) or (check == False)))
+                                            ):
+                                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+                                        else:
+                                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'high_priority')) == None)):
+                                                if (
+                                                    not (isinstance(check,bool) and
+                                                        ((check == True) or (check == False)))
+                                                    ):
+                                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > high_priority must be an boolean\n\tValid values True or False\n'
+
+    return error_found_in_mumc_config_yaml
+
+
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
 
@@ -186,6 +266,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     #Start as blank error string
     error_found_in_mumc_config_yaml=''
+    filter_tag_formatting_value_url=''
 
 #######################################################################################################
 
@@ -197,6 +278,30 @@ def cfgCheckYAML(cfg,init_dict):
         ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
             server_brand='invalid'
+
+#######################################################################################################
+
+    #sets of tags for user later
+    filter_movie_whitetag_set=set()
+    filter_movie_blacktag_set=set()
+    filter_episode_whitetag_set=set()
+    filter_episode_blacktag_set=set()
+    filter_audio_whitetag_set=set()
+    filter_audio_blacktag_set=set()
+    if (isJellyfinServer(server_brand)):
+        filter_audiobook_whitetag_set=set()
+        filter_audiobook_blacktag_set=set()
+    movie_whitetag_set=set()
+    movie_blacktag_set=set()
+    episode_whitetag_set=set()
+    episode_blacktag_set=set()
+    audio_whitetag_set=set()
+    audio_blacktag_set=set()
+    if (isJellyfinServer(server_brand)):
+        audiobook_whitetag_set=set()
+        audiobook_blacktag_set=set()
+    global_whitetag_set=set()
+    global_blacktag_set=set()
 
 #######################################################################################################
 
@@ -522,6 +627,184 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_movie_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_movie_blacktag_set.add(tag)
+
+    '''
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['movie']['whitetags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','whitetags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_movie_whitetag_set.add(thisFilterTag)
+
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['movie']['blacktags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','blacktags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_movie_blacktag_set.add(thisFilterTag)
+    '''
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_episode_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_episode_blacktag_set.add(tag)
+
+    '''
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['episode']['whitetags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','whitetags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > white_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_episode_whitetag_set.add(thisFilterTag)
+
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['episode']['blacktags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','blacktags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > black_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_episode_blacktag_set.add(thisFilterTag)
+    '''
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_audio_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_audio_blacktag_set.add(tag)
+
+    '''
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['audio']['whitetags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','whitetags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > white_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_audio_whitetag_set.add(thisFilterTag)
+
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['audio']['blacktags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','blacktags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > black_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_audio_blacktag_set.add(thisFilterTag)
+    '''
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','whitetags')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (tag == None))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        if (not (tag == None)):
+                            filter_audiobook_whitetag_set.add(tag)
+
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','blacktags')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (tag == None))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        if (not (tag == None)):
+                            filter_audiobook_blacktag_set.add(tag)
+
+        '''
+        for thisFilterTag in cfg['basic_settings']['filter_tags']['audiobook']['whitetags']:
+            if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+                if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','whitetags',thisFilterTag)) == None)):
+                    if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > white_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        filter_audiobook_whitetag_set.add(thisFilterTag)
+
+        for thisFilterTag in cfg['basic_settings']['filter_tags']['audiobook']['blacktags']:
+            if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+                if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','blacktags',thisFilterTag)) == None)):
+                    if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > black_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        filter_audiobook_blacktag_set.add(thisFilterTag)
+        '''
+
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -842,6 +1125,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -882,20 +1167,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    movie_whitetag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         movie_whitetag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')) == None)):
         if (
@@ -937,20 +1223,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    movie_blacktag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         movie_blacktag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')) == None)):
         if (
@@ -992,6 +1279,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1031,6 +1320,8 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')) == None)):
         if (
@@ -1114,6 +1405,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > advanced > studio_network_genre must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1154,20 +1447,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    episode_whitetag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         episode_whitetag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')) == None)):
         if (
@@ -1209,20 +1503,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    episode_blacktag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         episode_blacktag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')) == None)):
         if (
@@ -1264,6 +1559,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1303,6 +1600,8 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')) == None)):
         if (
@@ -1379,6 +1678,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > advanced > album_artist must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1419,20 +1720,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    audio_whitetag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         audio_whitetag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')) == None)):
         if (
@@ -1474,20 +1776,21 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    audio_blacktag_set=set()
-
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','tags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
                         audio_blacktag_set.add(tag)
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')) == None)):
         if (
@@ -1528,6 +1831,8 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')) == None)):
         if (
@@ -1571,6 +1876,8 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (isJellyfinServer(server_brand)):
 
+#######################################################################################################
+
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1589,7 +1896,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1653,6 +1960,8 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > library_author must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1671,7 +1980,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1693,20 +2002,21 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-        audiobook_whitetag_set=set()
-
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','tags')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not (((isinstance(tag,str)) and
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (((isinstance(tag,str)) and
                             (tag.find('\\') < 0)) or
-                            (tag == None))
+                            (tag == None)))
                         ):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                     else:
                         if (not (tag == None)):
                             audiobook_whitetag_set.add(tag)
+
+#######################################################################################################
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')) == None)):
             if (
@@ -1726,7 +2036,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1753,22 +2063,23 @@ def cfgCheckYAML(cfg,init_dict):
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
-
-        audiobook_blacktag_set=set()
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','tags')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not (((isinstance(tag,str)) and
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (((isinstance(tag,str)) and
                             (tag.find('\\') < 0)) or
-                            (tag == None))
+                            (tag == None)))
                         ):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                     else:
                         if (not (tag == None)):
                             audiobook_blacktag_set.add(tag)
+
+#######################################################################################################
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')) == None)):
             if (
@@ -1788,7 +2099,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1810,6 +2121,8 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1828,7 +2141,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1852,35 +2165,85 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    whitetag_set=set()
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','movie')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > movie > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'movie')
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','episode')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > episode > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'episode')
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audio')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audio > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audio')
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audiobook')) == None)):
+            if (isinstance(check,dict)):
+                for tag in check:
+                    if (
+                        not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        whitetag_set.add(tag)
+                        global_whitetag_set.add(tag)
 
-    blacktag_set=set()
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        blacktag_set.add(tag)
+                        global_blacktag_set.add(tag)
 
 #######################################################################################################
 
@@ -2694,32 +3057,34 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    #Check for overlapping tags between blacklists and whitelists
+#Check for overlapping tags between blacklists and whitelists
 
     #check global blacktags and global whitetags do not have a common string
-    if (overlapping_tags_set:=blacktag_set.intersection(whitetag_set)):
+    if (overlapping_tags_set:=global_blacktag_set.intersection(global_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
+#######################################################################################################
+
     #check global blacktags and media specific whitetags do not have a common string
-    if (overlapping_tags_set:=blacktag_set.intersection(movie_whitetag_set)):
+    if (overlapping_tags_set:=global_blacktag_set.intersection(movie_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=blacktag_set.intersection(episode_whitetag_set)):
+    if (overlapping_tags_set:=global_blacktag_set.intersection(episode_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=blacktag_set.intersection(audio_whitetag_set)):
+    if (overlapping_tags_set:=global_blacktag_set.intersection(audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
-        if (overlapping_tags_set:=blacktag_set.intersection(audiobook_whitetag_set)):
+        if (overlapping_tags_set:=global_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check global whitetags and media specific blacktags do not have a common string
-    if (overlapping_tags_set:=whitetag_set.intersection(movie_blacktag_set)):
+    if (overlapping_tags_set:=global_whitetag_set.intersection(movie_blacktag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=whitetag_set.intersection(episode_blacktag_set)):
+    if (overlapping_tags_set:=global_whitetag_set.intersection(episode_blacktag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=whitetag_set.intersection(audio_blacktag_set)):
+    if (overlapping_tags_set:=global_whitetag_set.intersection(audio_blacktag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
-        if (overlapping_tags_set:=whitetag_set.intersection(audiobook_blacktag_set)):
+        if (overlapping_tags_set:=global_whitetag_set.intersection(audiobook_blacktag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check media specific blacktags and media specific whitetags do not have a common string
@@ -2731,6 +3096,41 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+#######################################################################################################
+
+    #check global blacktags and media specific filter whitetags do not have a common string
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+    #check global whitetags and media specific filter blacktags do not have a common string
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_movie_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_episode_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audio_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audiobook_blacktag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+    #check media specific filter blacktags and media specific filter whitetags do not have a common string
+    if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(filter_movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_episode_blacktag_set.intersection(filter_episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(filter_audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################

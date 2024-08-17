@@ -7,7 +7,7 @@ from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_min_config_version,get_script_version
-from mumc_modules.mumc_tagged import get_isPlayedCreated_FilterStatementTag
+from mumc_modules.mumc_tagged import get_isFilterStatementTag
 
 
 def initialize_mumc(cwd,mumc_path):
@@ -94,6 +94,9 @@ def getIsAnyMediaEnabled(the_dict):
     the_dict['all_media_disabled']=True
     server_brand=isJellyfinServer(the_dict['admin_settings']['server']['brand'])
 
+    #the_dict['filter_tag_played_days']=False
+    #the_dict['filter_tag_created_days']=False
+
     if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','movie','played','condition_days')) == None)):
         if (check >= 0):
             the_dict['all_media_disabled']=False
@@ -128,9 +131,55 @@ def getIsAnyMediaEnabled(the_dict):
                 the_dict['all_media_disabled']=False
                 return the_dict
 
-
-    the_dict['filter_tag_played_days']=False
-    the_dict['filter_tag_created_days']=False
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','movie','whitetags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','movie','blacktags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','episode','whitetags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','episode','blacktags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','audio','whitetags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','audio','blacktags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if(server_brand):
+        if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','audiobook','whitetags')) == None)):
+            for filterTag in check:
+                if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                    if (filterStatementTag[1] >= 0):
+                        the_dict['all_media_disabled']=False
+                        return the_dict
+        if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','audiobook','blacktags')) == None)):
+            for filterTag in check:
+                if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                    if (filterStatementTag[1] >= 0):
+                        the_dict['all_media_disabled']=False
+                        return the_dict
 
     for mediaType in ('movie','episode','audio','audiobook'):
         #remove whitespace(s) from the beginning and end of each tag
@@ -143,23 +192,24 @@ def getIsAnyMediaEnabled(the_dict):
         the_dict['blacktags']=list(set(blacktags_global + blacktags_media_specific))
 
         for this_tag in the_dict['whitetags']:
-            if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
-                if (this_tag.startswith('played')):
-                    tagType='played'
-                elif (this_tag.startswith('created')):
-                    tagType='created'
-                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+            if (not ((this_filter_tag_list:=get_isFilterStatementTag(this_tag)) == False)):
+                #if (this_tag.startswith('played')):
+                    #tagType='played'
+                #elif (this_tag.startswith('created')):
+                    #tagType='created'
+                #if (this_filter_tag_list['media_' + tagType + '_days'] >= 0):
+                if (this_filter_tag_list[1] >= 0):
                     the_dict['all_media_disabled']=False
                     return the_dict
 
-
         for this_tag in the_dict['blacktags']:
-            if (not ((filterStatementTag:=get_isPlayedCreated_FilterStatementTag(this_tag)) == False)):
-                if (this_tag.startswith('played')):
-                    tagType='played'
-                elif (this_tag.startswith('created')):
-                    tagType='created'
-                if (filterStatementTag['media_' + tagType + '_days'] >= 0):
+            if (not ((this_filter_tag_list:=get_isFilterStatementTag(this_tag)) == False)):
+                #if (this_tag.startswith('played')):
+                    #tagType='played'
+                #elif (this_tag.startswith('created')):
+                    #tagType='created'
+                #if (this_filter_tag_list['media_' + tagType + '_days'] >= 0):
+                if (this_filter_tag_list[1] >= 0):
                     the_dict['all_media_disabled']=False
                     return the_dict
 

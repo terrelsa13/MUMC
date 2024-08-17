@@ -26,6 +26,24 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['basic_settings']['filter_statements']['audiobook']['played']={}
         the_dict['basic_settings']['filter_statements']['audiobook']['created']={}
 
+    the_dict['basic_settings']['filter_tags']={}
+    the_dict['basic_settings']['filter_tags']['movie']={}
+    the_dict['basic_settings']['filter_tags']['movie']['whitetags']=[]
+    the_dict['basic_settings']['filter_tags']['movie']['blacktags']=[]
+
+    the_dict['basic_settings']['filter_tags']['episode']={}
+    the_dict['basic_settings']['filter_tags']['episode']['whitetags']=[]
+    the_dict['basic_settings']['filter_tags']['episode']['blacktags']=[]
+
+    the_dict['basic_settings']['filter_tags']['audio']={}
+    the_dict['basic_settings']['filter_tags']['audio']['whitetags']=[]
+    the_dict['basic_settings']['filter_tags']['audio']['blacktags']=[]
+
+    if (server_brand == 'jellyfin'):
+        the_dict['basic_settings']['filter_tags']['audiobook']={}
+        the_dict['basic_settings']['filter_tags']['audiobook']['whitetags']=[]
+        the_dict['basic_settings']['filter_tags']['audiobook']['blacktags']=[]
+
     the_dict['advanced_settings']={}
     the_dict['advanced_settings']['filter_statements']={}
     the_dict['advanced_settings']['filter_statements']['movie']={}
@@ -238,6 +256,72 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['played_conditional']=None
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=-1
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=None
+
+    the_dict['advanced_settings']['behavioral_tags']={}
+    the_dict['advanced_settings']['behavioral_tags']['movie']={}
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']={}
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['high_priority']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']={}
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['movie']['created:-1:>=:1:true']['high_priority']=None
+
+    the_dict['advanced_settings']['behavioral_tags']['episode']={}
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']={}
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['played:-1:>=:1']['high_priority']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']={}
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['episode']['created:-1:>=:1:true']['high_priority']=None
+
+    the_dict['advanced_settings']['behavioral_tags']['audio']={}
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']={}
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['played:-1:>=:1']['high_priority']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']={}
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['action']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['user_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['played_conditional']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['action_control']=-1
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['dynamic_behavior']=None
+    #the_dict['advanced_settings']['behavioral_tags']['audio']['created:-1:>=:1:true']['high_priority']=None
+
+    if (server_brand == 'jellyfin'):
+        the_dict['advanced_settings']['behavioral_tags']['audiobook']={}
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']={}
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['action']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['user_conditional']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['played_conditional']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['action_control']=-1
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['dynamic_behavior']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['played:-1:>=:1']['high_priority']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']={}
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['action']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['user_conditional']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['played_conditional']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['action_control']=-1
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['dynamic_behavior']=None
+        #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['high_priority']=None
 
     the_dict['advanced_settings']['whitetags']=[]
     the_dict['advanced_settings']['blacktags']=[]

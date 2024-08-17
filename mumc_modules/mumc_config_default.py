@@ -8,8 +8,10 @@ def create_default_config(server_brand='emby'):
 
     default_config={}
     default_config['server_brand']=server_brand
+    #create empty config yaml
     default_config=setYAMLConfigSkeleton(default_config)
     default_config['admin_settings']['server']['brand']='emby'
+    #populate empty config yaml with default values
     default_config=yaml_configurationLayout(default_config,default_config['server_brand'])
 
     return default_config
@@ -151,6 +153,43 @@ def merge_configuration(default_base,merge):
             pass
         try:
             default_base['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=merge['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']
+        except:
+            pass
+
+    try:
+        default_base['basic_settings']['filter_tags']['movie']['whitetags']=merge['basic_settings']['filter_tags']['movie']['whitetags']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_tags']['movie']['blacktags']=merge['basic_settings']['filter_tags']['movie']['blacktags']
+    except:
+        pass
+
+    try:
+        default_base['basic_settings']['filter_tags']['episode']['whitetags']=merge['basic_settings']['filter_tags']['episode']['whitetags']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_tags']['episode']['blacktags']=merge['basic_settings']['filter_tags']['episode']['blacktags']
+    except:
+        pass
+
+    try:
+        default_base['basic_settings']['filter_tags']['audio']['whitetags']=merge['basic_settings']['filter_tags']['audio']['whitetags']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_tags']['audio']['blacktags']=merge['basic_settings']['filter_tags']['audio']['blacktags']
+    except:
+        pass
+
+    if (server_brand == 'jellyfin'):
+        try:
+            default_base['basic_settings']['filter_tags']['audiobook']['whitetags']=merge['basic_settings']['filter_tags']['audiobook']['whitetags']
+        except:
+            pass
+        try:
+            default_base['basic_settings']['filter_tags']['audiobook']['blacktags']=merge['basic_settings']['filter_tags']['audiobook']['blacktags']
         except:
             pass
 
@@ -407,17 +446,6 @@ def merge_configuration(default_base,merge):
                 except:
                     pass
 
-    #loop thru in reverse to preserve order
-    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['movie']):
-        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
-            try:
-                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
-                temp_dict=default_base['advanced_settings']['behavioral_statements']['movie'].copy()
-                default_base['advanced_settings']['behavioral_statements']['movie'].clear()
-                default_base['advanced_settings']['behavioral_statements']['movie'][thisTag]=merge['advanced_settings']['behavioral_statements']['movie'][thisTag]
-                default_base['advanced_settings']['behavioral_statements']['movie'].update(temp_dict)
-            except:
-                default_base['advanced_settings']['behavioral_statements']['movie'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['movie']['favorited']['action']
     except:
@@ -539,17 +567,6 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
-    #loop thru in reverse to preserve order
-    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['episode']):
-        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
-            try:
-                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
-                temp_dict=default_base['advanced_settings']['behavioral_statements']['episode'].copy()
-                default_base['advanced_settings']['behavioral_statements']['episode'].clear()
-                default_base['advanced_settings']['behavioral_statements']['episode'][thisTag]=merge['advanced_settings']['behavioral_statements']['episode'][thisTag]
-                default_base['advanced_settings']['behavioral_statements']['episode'].update(temp_dict)
-            except:
-                default_base['advanced_settings']['behavioral_statements']['episode'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['episode']['favorited']['action']
     except:
@@ -687,17 +704,6 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
-    #loop thru in reverse to preserve order
-    for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['audio']):
-        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
-            try:
-                #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
-                temp_dict=default_base['advanced_settings']['behavioral_statements']['audio'].copy()
-                default_base['advanced_settings']['behavioral_statements']['audio'].clear()
-                default_base['advanced_settings']['behavioral_statements']['audio'][thisTag]=merge['advanced_settings']['behavioral_statements']['audio'][thisTag]
-                default_base['advanced_settings']['behavioral_statements']['audio'].update(temp_dict)
-            except:
-                default_base['advanced_settings']['behavioral_statements']['audio'][thisTag]=None
     try:
         default_base['advanced_settings']['behavioral_statements']['audio']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['audio']['favorited']['action']
     except:
@@ -833,16 +839,6 @@ def merge_configuration(default_base,merge):
 
     #loop thru in reverse to preserve order
     if (server_brand == 'jellyfin'):
-        for thisTag in reversed(merge['advanced_settings']['behavioral_statements']['audiobook']):
-            if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
-                try:
-                    #save dictionary so behavioral tags are at the top and preserve the order they appear in the config
-                    temp_dict=default_base['advanced_settings']['behavioral_statements']['audiobook'].copy()
-                    default_base['advanced_settings']['behavioral_statements']['audiobook'].clear()
-                    default_base['advanced_settings']['behavioral_statements']['audiobook'][thisTag]=merge['advanced_settings']['behavioral_statements']['audiobook'][thisTag]
-                    default_base['advanced_settings']['behavioral_statements']['audiobook'].update(temp_dict)
-                except:
-                    default_base['advanced_settings']['behavioral_statements']['audiobook'][thisTag]=None
         try:
             default_base['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']
         except:
@@ -979,6 +975,91 @@ def merge_configuration(default_base,merge):
             default_base['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']
         except:
             pass
+
+    try:
+        default_base['advanced_settings']['behavioral_tags']['movie']=merge['advanced_settings']['behavioral_tags']['movie']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['behavioral_tags']['episode']=merge['advanced_settings']['behavioral_tags']['episode']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['behavioral_tags']['audio']=merge['advanced_settings']['behavioral_tags']['audio']
+    except:
+        pass
+
+    if (server_brand == 'jellyfin'):
+
+        try:
+            default_base['advanced_settings']['behavioral_tags']['audiobook']=merge['advanced_settings']['behavioral_tags']['audiobook']
+        except:
+            pass
+
+    '''
+    #loop thru in reverse to preserve order
+    #for thisTag in reversed(merge['advanced_settings']['behavioral_tags']['movie']):
+    for thisTag in merge['advanced_settings']['behavioral_tags']['movie']:
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                ##save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                #temp_dict=default_base['advanced_settings']['behavioral_tags']['movie'].copy()
+                #default_base['advanced_settings']['behavioral_tags']['movie'].clear()
+                #default_base['advanced_settings']['behavioral_tags']['movie'][thisTag]=merge['advanced_settings']['behavioral_tags']['movie'][thisTag]
+                #default_base['advanced_settings']['behavioral_tags']['movie'].update(temp_dict)
+                default_base['advanced_settings']['behavioral_tags']['movie'][thisTag].update(merge['advanced_settings']['behavioral_tags']['movie'][thisTag])
+            except:
+                #default_base['advanced_settings']['behavioral_tags']['movie'][thisTag]=None
+                pass
+
+    #loop thru in reverse to preserve order
+    #for thisTag in reversed(merge['advanced_settings']['behavioral_tags']['episode']):
+    for thisTag in merge['advanced_settings']['behavioral_tags']['episode']:
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                ##save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                #temp_dict=default_base['advanced_settings']['behavioral_tags']['episode'].copy()
+                #default_base['advanced_settings']['behavioral_tags']['episode'].clear()
+                #default_base['advanced_settings']['behavioral_tags']['episode'][thisTag]=merge['advanced_settings']['behavioral_tags']['episode'][thisTag]
+                #default_base['advanced_settings']['behavioral_tags']['episode'].update(temp_dict)
+                default_base['advanced_settings']['behavioral_tags']['episode'][thisTag].update(merge['advanced_settings']['behavioral_tags']['episode'][thisTag])
+            except:
+                #default_base['advanced_settings']['behavioral_tags']['episode'][thisTag]=None
+                pass
+
+    #loop thru in reverse to preserve order
+    #for thisTag in reversed(merge['advanced_settings']['behavioral_tags']['audio']):-
+    for thisTag in merge['advanced_settings']['behavioral_tags']['audio']:
+        if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+            try:
+                ##save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                #temp_dict=default_base['advanced_settings']['behavioral_tags']['audio'].copy()
+                #default_base['advanced_settings']['behavioral_tags']['audio'].clear()
+                #default_base['advanced_settings']['behavioral_tags']['audio'][thisTag]=merge['advanced_settings']['behavioral_tags']['audio'][thisTag]
+                #default_base['advanced_settings']['behavioral_tags']['audio'].update(temp_dict)
+                default_base['advanced_settings']['behavioral_tags']['audio'][thisTag].update(merge['advanced_settings']['behavioral_tags']['audio'][thisTag])
+            except:
+                #default_base['advanced_settings']['behavioral_tags']['audio'][thisTag]=None
+                pass
+
+    #loop thru in reverse to preserve order
+    if (server_brand == 'jellyfin'):
+        #for thisTag in reversed(merge['advanced_settings']['behavioral_tags']['audiobook']):
+        for thisTag in merge['advanced_settings']['behavioral_tags']['audiobook']:
+            if (_:=get_isPlayedCreated_FilterStatementTag(thisTag)):
+                try:
+                    ##save dictionary so behavioral tags are at the top and preserve the order they appear in the config
+                    #temp_dict=default_base['advanced_settings']['behavioral_tags']['audiobook'].copy()
+                    #default_base['advanced_settings']['behavioral_tags']['audiobook'].clear()
+                    #default_base['advanced_settings']['behavioral_tags']['audiobook'][thisTag]=merge['advanced_settings']['behavioral_tags']['audiobook'][thisTag]
+                    #default_base['advanced_settings']['behavioral_tags']['audiobook'].update(temp_dict)
+                    default_base['advanced_settings']['behavioral_tags']['audiobook'][thisTag].update(merge['advanced_settings']['behavioral_tags']['audiobook'][thisTag])
+                except:
+                    #default_base['advanced_settings']['behavioral_tags']['audiobook'][thisTag]=None
+                    pass
+    '''
 
     try:
         default_base['advanced_settings']['whitetags']=merge['advanced_settings']['whitetags']
