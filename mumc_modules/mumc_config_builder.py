@@ -99,15 +99,15 @@ def build_configuration_file(the_dict,orig_dict={}):
         print('----------------------------------------------------------------------------------------')
 
         #Initialize for compare with other tag to prevent using the same tag in both blacktag and whitetag
-        the_dict['advanced_settings']['blacktags']=[]
-        the_dict['advanced_settings']['whitetags']=[]
+        the_dict['advanced_settings']['blacktags']['global']=[]
+        the_dict['advanced_settings']['whitetags']['global']=[]
 
         #ask user for global blacktag(s)
-        the_dict['advanced_settings']['blacktags']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags'])
+        the_dict['advanced_settings']['blacktags']['global']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags']['global'])
         print('----------------------------------------------------------------------------------------')
 
         #ask user for global whitetag(s)
-        the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
+        the_dict['advanced_settings']['whitetags']['global']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags']['global'])
         print('----------------------------------------------------------------------------------------')
 
     #Updating the config; Prepare to run the config editor

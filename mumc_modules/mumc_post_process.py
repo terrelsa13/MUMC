@@ -247,11 +247,14 @@ def behavior_playedPatternCleanup(behavior_str,postproc_dict,the_dict):
 
         if ((ActionType == 'blacktagged') or (ActionType == 'whitetagged')):
             #remove whitespace(s) from the beginning and end of each tag
-            tags_global = [tagstr for tagstr in the_dict['advanced_settings'][ActionType.replace('ged','s')] if tagstr.strip()]
-            tags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][ActionType]['tags'] if tagstr.strip()]
+            #tags_global = [tagstr for tagstr in the_dict['advanced_settings'][ActionType.replace('ged','s')] if tagstr.strip()]
+            #tags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']][ActionType]['tags'] if tagstr.strip()]
+            tags_filter = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][postproc_dict['media_type_lower']][ActionType.replace('ged','s')] if tagstr.strip()]
+            tags_media_specific = [tagstr for tagstr in the_dict['advanced_settings'][ActionType.replace('ged','s')][postproc_dict['media_type_lower']] if tagstr.strip()]
+            tags_global = [tagstr for tagstr in the_dict['advanced_settings'][ActionType.replace('ged','s')]['global'] if tagstr.strip()]
 
             #combine tags and remove any duplicates
-            media_tags=list(set(tags_global + tags_media_specific))
+            media_tags=list(set(tags_filter + tags_media_specific + tags_global))
 
         for userInfo in postproc_dict['enabled_users']:
             #for itemId in media_data:

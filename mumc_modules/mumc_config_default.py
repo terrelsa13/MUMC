@@ -495,10 +495,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action']
@@ -520,10 +520,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action']=merge['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action']
@@ -632,10 +632,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']
@@ -657,10 +657,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']=merge['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']
@@ -765,10 +765,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action']
@@ -790,10 +790,10 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']
     except:
         pass
-    try:
-        default_base['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']
-    except:
-        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']
+    #except:
+        #pass
 
     try:
         default_base['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action']=merge['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action']
@@ -837,7 +837,6 @@ def merge_configuration(default_base,merge):
     except:
         pass
 
-    #loop thru in reverse to preserve order
     if (server_brand == 'jellyfin'):
         try:
             default_base['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['audiobook']['favorited']['action']
@@ -904,10 +903,10 @@ def merge_configuration(default_base,merge):
             default_base['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']
         except:
             pass
-        try:
-            default_base['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']
-        except:
-            pass
+        #try:
+            #default_base['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']
+        #except:
+            #pass
 
         try:
             default_base['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action']
@@ -929,10 +928,10 @@ def merge_configuration(default_base,merge):
             default_base['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']
         except:
             pass
-        try:
-            default_base['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']
-        except:
-            pass
+        #try:
+            #default_base['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']
+        #except:
+            #pass
 
         try:
             default_base['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action']=merge['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action']
@@ -1062,13 +1061,78 @@ def merge_configuration(default_base,merge):
     '''
 
     try:
-        default_base['advanced_settings']['whitetags']=merge['advanced_settings']['whitetags']
+        default_base['advanced_settings']['whitetags']['global']=merge['advanced_settings']['whitetags']['global']
     except:
-        pass
+        try:
+            default_base['advanced_settings']['whitetags']['global']=merge['advanced_settings']['whitetags']
+        except:
+            pass
     try:
-        default_base['advanced_settings']['blacktags']=merge['advanced_settings']['blacktags']
+        default_base['advanced_settings']['whitetags']['movie']=merge['advanced_settings']['whitetags']['movie']
     except:
-        pass
+        try:
+            default_base['advanced_settings']['whitetags']['movie']=merge['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['whitetags']['episode']=merge['advanced_settings']['whitetags']['episode']
+    except:
+        try:
+            default_base['advanced_settings']['whitetags']['episode']=merge['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['whitetags']['audio']=merge['advanced_settings']['whitetags']['audio']
+    except:
+        try:
+            default_base['advanced_settings']['whitetags']['audio']=merge['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']
+        except:
+            pass
+    if (server_brand == 'jellyfin'):
+        try:
+            default_base['advanced_settings']['whitetags']['audiobook']=merge['advanced_settings']['whitetags']['audiobook']
+        except:
+            try:
+                default_base['advanced_settings']['whitetags']['audiobook']=merge['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']
+            except:
+                pass
+
+    try:
+        default_base['advanced_settings']['blacktags']['global']=merge['advanced_settings']['blacktags']['global']
+    except:
+        try:
+            default_base['advanced_settings']['blacktags']['global']=merge['advanced_settings']['blacktags']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['blacktags']['movie']=merge['advanced_settings']['blacktags']['movie']
+    except:
+        try:
+            default_base['advanced_settings']['blacktags']['movie']=merge['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['blacktags']['episode']=merge['advanced_settings']['blacktags']['episode']
+    except:
+        try:
+            default_base['advanced_settings']['blacktags']['episode']=merge['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['blacktags']['audio']=merge['advanced_settings']['blacktags']['audio']
+    except:
+        try:
+            default_base['advanced_settings']['blacktags']['audio']=merge['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']
+        except:
+            pass
+    if (server_brand == 'jellyfin'):
+        try:
+            default_base['advanced_settings']['blacktags']['audiobook']=merge['advanced_settings']['blacktags']['audiobook']
+        except:
+            try:
+                default_base['advanced_settings']['blacktags']['audiobook']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']
+            except:
+                pass
 
     try:
         default_base['advanced_settings']['delete_empty_folders']['episode']['season']=merge['advanced_settings']['delete_empty_folders']['episode']['season']

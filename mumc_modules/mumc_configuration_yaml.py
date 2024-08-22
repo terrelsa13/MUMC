@@ -310,7 +310,21 @@ def yaml_configurationLayout(config_data,server_brand):
 
     #INTENTIONALLY COMMENTED OUT
     #config_data['advanced_settings']['whitetags']=[]
+    #config_data['advanced_settings']['whitetags']['global']=[]
+    #config_data['advanced_settings']['whitetags']['movie']=[]
+    #config_data['advanced_settings']['whitetags']['episode']=[]
+    #config_data['advanced_settings']['whitetags']['audio']=[]
+    #if (server_brand == 'jellyfin'):
+        #config_data['advanced_settings']['whitetags']['audiobook']=[]
+
+    #INTENTIONALLY COMMENTED OUT
     #config_data['advanced_settings']['blacktags']=[]
+    #config_data['advanced_settings']['blacktags']['global']=[]
+    #config_data['advanced_settings']['blacktags']['movie']=[]
+    #config_data['advanced_settings']['blacktags']['episode']=[]
+    #config_data['advanced_settings']['blacktags']['audio']=[]
+    #if (server_brand == 'jellyfin'):
+        #config_data['advanced_settings']['blacktags']['audiobook']=[]
 
     config_data['advanced_settings']['delete_empty_folders']['episode']['season']=False
     config_data['advanced_settings']['delete_empty_folders']['episode']['series']=False

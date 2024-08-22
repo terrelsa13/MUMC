@@ -115,7 +115,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['movie']['whitetagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action']=None
@@ -123,7 +123,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['movie']['blacktagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitelisted']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']['whitelisted']['action']=None
@@ -154,7 +154,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['episode']['whitetagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action']=None
@@ -162,7 +162,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['episode']['blacktagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitelisted']={}
     the_dict['advanced_settings']['behavioral_statements']['episode']['whitelisted']['action']=None
@@ -193,7 +193,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['audio']['whitetagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action']=None
@@ -201,7 +201,7 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['played_conditional']=None
     the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['action_control']=-1
     the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']=[]
+    #the_dict['advanced_settings']['behavioral_statements']['audio']['blacktagged']['tags']=[]
 
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitelisted']={}
     the_dict['advanced_settings']['behavioral_statements']['audio']['whitelisted']['action']=None
@@ -233,7 +233,7 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['played_conditional']=None
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['action_control']=-1
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['dynamic_behavior']=None
-        the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']=[]
+        #the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitetagged']['tags']=[]
 
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']={}
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action']=None
@@ -241,7 +241,7 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['played_conditional']=None
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['action_control']=-1
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['dynamic_behavior']=None
-        the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']=[]
+        #the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']=[]
 
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']={}
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['whitelisted']['action']=None
@@ -323,8 +323,20 @@ def setYAMLConfigSkeleton(the_dict):
         #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['dynamic_behavior']=None
         #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['high_priority']=None
 
-    the_dict['advanced_settings']['whitetags']=[]
-    the_dict['advanced_settings']['blacktags']=[]
+    the_dict['advanced_settings']['whitetags']={}
+    the_dict['advanced_settings']['whitetags']['global']=[]
+    the_dict['advanced_settings']['whitetags']['movie']=[]
+    the_dict['advanced_settings']['whitetags']['episode']=[]
+    the_dict['advanced_settings']['whitetags']['audio']=[]
+    if (server_brand == 'jellyfin'):
+        the_dict['advanced_settings']['whitetags']['audiobook']=[]
+    the_dict['advanced_settings']['blacktags']={}
+    the_dict['advanced_settings']['blacktags']['global']=[]
+    the_dict['advanced_settings']['blacktags']['movie']=[]
+    the_dict['advanced_settings']['blacktags']['episode']=[]
+    the_dict['advanced_settings']['blacktags']['audio']=[]
+    if (server_brand == 'jellyfin'):
+        the_dict['advanced_settings']['blacktags']['audiobook']=[]
     
     the_dict['advanced_settings']['delete_empty_folders']={}
     the_dict['advanced_settings']['delete_empty_folders']['episode']={}
