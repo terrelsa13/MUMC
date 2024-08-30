@@ -4,12 +4,13 @@ labels:
 - issue / bug
 body:
   - type: markdown
+    id: readit1
     attributes:
       value: Thanks for taking the time to file an issue / bug report! Please fill out this form as completely as possible.
   - type: markdown
+    id: readit2
     attributes:
-      value: |
-        If you leave out sections there is a high likelihood your issue will be closed.
+      value: If you leave out sections there is a high likelihood your issue will be closed.
   - type: textarea
     id: description
     attributes:
@@ -42,6 +43,7 @@ body:
     validations:
       required: true
   - type: dropdown
+    id: os
     attributes:
       label: What platform(s) does this occur on?
       multiple: true
@@ -49,14 +51,6 @@ body:
         - Docker
         - Windows
         - Linux
-    validations:
-      required: true
-  - type: textarea
-    id: config
-    attributes:
-      label: MUMC configiration file
-      description: This will be automatically formatted into code, so no need for backticks.
-      render: yaml
     validations:
       required: true
   - type: textarea
