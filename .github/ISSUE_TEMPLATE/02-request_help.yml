@@ -1,7 +1,7 @@
 name: "Request Help"
 description: 'In need of a helping hand with MUMC'
 labels:
-- help_wanted
+- help wanted
 body:
   - type: markdown
     attributes:
