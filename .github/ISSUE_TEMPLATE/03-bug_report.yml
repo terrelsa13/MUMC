@@ -1,5 +1,4 @@
 name: "Issue / Bug Report"
-lables: issue / bug
 description: 'Report a reproducible bug in MUMC'
 body:
   - type: markdown

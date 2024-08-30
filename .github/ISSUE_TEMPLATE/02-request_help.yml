@@ -5,10 +5,6 @@ body:
   - type: markdown
     attributes:
       value: Thanks for reaching out. First, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)?
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for reaching out. First, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)?
   - type: textarea
     id: desired
     attributes:
