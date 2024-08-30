@@ -5,22 +5,35 @@ labels:
 body:
   - type: markdown
     attributes:
-      value: Thanks for reaching out. First, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)?
+      value: Thank you for reaching out.
+  - type: dropdown
+    id: wiki
+    attributes:
+      label: "Have You Read The [Wiki](https://github.com/terrelsa13/MUMC/wiki):"
+      description: Seriously, have you read it?
+      multiple: false
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
   - type: textarea
     id: desired
     attributes:
-      label: Describe what you are trying to accomplish in non technical terms.
+      label: "Describe What You Are Trying To Accomplish:"
+      description: Please use non technical terms.
     validations:
       required: true
   - type: textarea
     id: undesired
     attributes:
-      label: Describe what is happening in non technical terms.
+      label: "Describe What Is Happening:"
+      description: Please use non technical terms.
     validations:
       required: true
   - type: textarea
     id: additional
     attributes:
-      label: Any additional information you think is useful.
+      label: "Any Additional Information You Think Is Useful:"
     validations:
       required: false

@@ -4,17 +4,15 @@ labels:
 - issue / bug
 body:
   - type: markdown
-    id: readit1
     attributes:
       value: Thanks for taking the time to file an issue / bug report! Please fill out this form as completely as possible.
   - type: markdown
-    id: readit2
     attributes:
       value: If you leave out sections there is a high likelihood your issue will be closed.
   - type: textarea
     id: description
     attributes:
-      label: Describe the problem you are having.
+      label: "Describe The Problem You Are Having:"
       description: |
         If your summary is simply, for example: "I cannot setup MUMC", then you will need to continue [debugging](https://github.com/terrelsa13/MUMC/wiki/mumc_configyaml-DEBUG/) on your own to more precisely define your issue before proceeding.
     validations:
@@ -22,7 +20,7 @@ body:
   - type: textarea
     id: mumcoutput
     attributes:
-      label: Relevant MUMC output
+      label: "Relevant MUMC Cosole Output:"
       description: Please copy and paste any relevant MUMC console output. Include console output before and after your exact error when possible. This will be automatically formatted into code, so no need for backticks.
       render: shell
     validations:
@@ -30,22 +28,23 @@ body:
   - type: textarea
     id: config
     attributes:
-      label: MUMC configiration file
-      description: This will be automatically formatted into code, so no need for backticks.
+      label: "MUMC Configiration File:"
+      description: Please copy and paste the MUMC configuration in its entirety. This will be automatically formatted into code, so no need for backticks.
       render: yaml
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: MUMC Version
+      label: "MUMC Version:"
       description: What version of MUMC are you running?
     validations:
       required: true
   - type: dropdown
     id: os
     attributes:
-      label: What platform(s) does this occur on?
+      label: "What Platform(s) Does This Occur On?:"
+      description: Choose one or more.
       multiple: true
       options:
         - Docker
@@ -54,10 +53,9 @@ body:
     validations:
       required: true
   - type: textarea
-    id: debuglog
+    id: additionalinfo
     attributes:
-      label: Relevant MUMC debug log
-      description: Please copy and paste MUMC_debug.log in it entirety.
+      label: "Any Additional Information You Think Is Useful:"
       render: shell
     validations:
       required: false

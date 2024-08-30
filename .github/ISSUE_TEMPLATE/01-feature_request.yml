@@ -13,19 +13,22 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Describe what you are trying to accomplish and why in non technical terms.
+      label: "Describe What You Are Trying To Accomplish And Why:"
+      description: Please use non technical terms.
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: A clear and concise description of what you want to happen.
+      label: "A Clear And Concise Description Of What You Want To Happen:"
+      description: Please use non technical terms.
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Describe alternatives you have considered.
+      label: "Describe Alternatives You Have Considered:"
+      description: Please use non technical terms.
     validations:
       required: false
   - type: textarea
