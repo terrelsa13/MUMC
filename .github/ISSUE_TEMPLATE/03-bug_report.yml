@@ -1,5 +1,7 @@
 name: "Issue / Bug Report"
 description: 'Report a reproducible bug in MUMC'
+labels:
+- issue / bug
 body:
   - type: markdown
     attributes:
@@ -20,18 +22,18 @@ body:
     id: mumcoutput
     attributes:
       label: Relevant MUMC output
-      description: Please copy and paste any relevant MUMC log output. Include logs before and after your exact error when possible. This will be automatically formatted into code, so no need for backticks.
+      description: Please copy and paste any relevant MUMC console output. Include console output before and after your exact error when possible. This will be automatically formatted into code, so no need for backticks.
       render: shell
     validations:
       required: true
   - type: textarea
-    id: debuglog
+    id: config
     attributes:
-      label: Relevant MUMC debug log
-      description: Please copy and paste MUMC_debug.log in it entirety.
-      render: shell
+      label: MUMC configiration file
+      description: This will be automatically formatted into code, so no need for backticks.
+      render: yaml
     validations:
-      required: false
+      required: true
   - type: input
     id: version
     attributes:
@@ -57,3 +59,11 @@ body:
       render: yaml
     validations:
       required: true
+  - type: textarea
+    id: debuglog
+    attributes:
+      label: Relevant MUMC debug log
+      description: Please copy and paste MUMC_debug.log in it entirety.
+      render: shell
+    validations:
+      required: false

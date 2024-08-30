@@ -1,6 +1,7 @@
 name: "Feature Request"
-labels: feature request
 description: 'Suggest an improvement for MUMC'
+labels:
+- feature request
 body:
   - type: markdown
     attributes:
