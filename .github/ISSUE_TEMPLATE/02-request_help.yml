@@ -1,5 +1,5 @@
-name: "\U00008672 Request Help"
-labels: help wanted
+name: "Request Help"
+labels: help_wanted
 description: 'In need of a helping hand with MUMC'
 body:
   - type: markdown
