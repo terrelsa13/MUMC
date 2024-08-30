@@ -1,0 +1,60 @@
+name: "\U00B60205 Issue / Bug Report"
+lables: issue / bug
+description: 'Report a reproducible bug in MUMC'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file an issue / bug report! Please fill out this form as completely as possible.
+  - type: markdown
+    attributes:
+      value: |
+        If you leave out sections there is a high likelihood your issue will be closed.
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the problem you are having.
+      description: |
+        If your summary is simply, for example: "I cannot setup MUMC", then you will need to continue [debugging](https://github.com/terrelsa13/MUMC/wiki/mumc_configyaml-DEBUG/) on your own to more precisely define your issue before proceeding.
+    validations:
+      required: true
+  - type: textarea
+    id: mumcoutput
+    attributes:
+      label: Relevant MUMC output
+      description: Please copy and paste any relevant MUMC log output. Include logs before and after your exact error when possible. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: debuglog
+    attributes:
+      label: Relevant MUMC debug log
+      description: Please copy and paste MUMC_debug.log in it entirety.
+      render: shell
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: MUMC Version
+      description: What version of MUMC are you running?
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: What platform(s) does this occur on?
+      multiple: true
+      options:
+        - Docker
+        - Windows
+        - Linux
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: MUMC configiration file
+      description: This will be automatically formatted into code, so no need for backticks.
+      render: yaml
+    validations:
+      required: true

@@ -1,0 +1,26 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Wiki
+    url: https://github.com/terrelsa13/MUMC/wiki
+    about: The MUMC documentation will help guide you through installation and setup as well as help resolve common problems.
+  - name: Install MUMC
+    url: https://github.com/terrelsa13/MUMC/wiki#install-mumc
+    about: Installation steps for Linux, Docker, and Windows.
+  - name: Minium configuration file example
+    url: https://github.com/terrelsa13/MUMC/wiki/Configuration_File_Examples-Minimum_Configuration_File_Example
+    about: See an example of the minium require configuration.
+  - name: Full configuration file example
+    url: https://github.com/terrelsa13/MUMC/wiki/Configuration_File_Examples-Full_Configuration_File_Example
+    about: See an example of a full configuration.
+  - name: Configuration Tree
+    url: https://github.com/terrelsa13/MUMC/wiki/mumc_configyaml
+    about: Detailed information about each configuration variable.
+  - name: OS Permissions
+    url: https://github.com/terrelsa13/MUMC/wiki/OS-Permissions
+    about: Not deleting or having permissions issues.
+  - name: Known Limitations
+    url: https://github.com/terrelsa13/MUMC/wiki/Known-Limitations
+    about: Things MUMC cannot do
+  - name: Additional Information
+    url: https://github.com/terrelsa13/MUMC/wiki/Additional_Information
+    about: Other useful information

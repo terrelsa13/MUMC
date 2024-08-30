@@ -1,0 +1,29 @@
+name: "\U00008672 Request Help"
+labels: help wanted
+description: 'In need of a helping hand with MUMC'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reaching out. First, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)?
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reaching out. First, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)?
+  - type: textarea
+    id: desired
+    attributes:
+      label: Describe what you are trying to accomplish in non technical terms.
+    validations:
+      required: true
+  - type: textarea
+    id: undesired
+    attributes:
+      label: Describe what is happening in non technical terms.
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Any additional information you think is useful.
+    validations:
+      required: false

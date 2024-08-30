@@ -1,0 +1,35 @@
+name: "\U0018A62B Feature Request"
+labels: feature request
+description: 'Suggest an improvement for MUMC'
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to help improve MUMC.
+  - type: markdown
+    attributes:
+      value: |
+        If you leave out sections there is a high likelihood your issue will be closed.
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe what you are trying to accomplish and why in non technical terms.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you have considered.
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Any additional information you think is useful.
+    validations:
+      required: false
