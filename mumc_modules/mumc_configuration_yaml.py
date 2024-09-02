@@ -1,5 +1,5 @@
 import copy
-from mumc_modules.mumc_paths_files import save_yaml_config
+from mumc_modules.mumc_output import save_yaml_config
 
 
 def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
@@ -43,6 +43,16 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['basic_settings']['filter_statements']['audiobook']['created']['count']=1
         config_data['basic_settings']['filter_statements']['audiobook']['created']['behavioral_control']=True
 
+    '''
+    config_data['basic_settings']['filter_statements']['recording']['played']['condition_days']=-1
+    config_data['basic_settings']['filter_statements']['recording']['played']['count_equality']='>='
+    config_data['basic_settings']['filter_statements']['recording']['played']['count']=1
+    config_data['basic_settings']['filter_statements']['recording']['created']['condition_days']=-1
+    config_data['basic_settings']['filter_statements']['recording']['created']['count_equality']='>='
+    config_data['basic_settings']['filter_statements']['recording']['created']['count']=1
+    config_data['basic_settings']['filter_statements']['recording']['created']['behavioral_control']=True
+    '''
+
     #INTENTIONALLY COMMENTED OUT
     #config_data['basic_settings']['filter_tags']['movie']['whitetags']=[]
     #config_data['basic_settings']['filter_tags']['movie']['blacktags']=[]
@@ -50,8 +60,11 @@ def yaml_configurationLayout(config_data,server_brand):
     #config_data['basic_settings']['filter_tags']['episode']['blacktags']=[]
     #config_data['basic_settings']['filter_tags']['audio']['whitetags']=[]
     #config_data['basic_settings']['filter_tags']['audio']['blacktags']=[]
-    #config_data['basic_settings']['filter_tags']['audiobook']['whitetags']=[]
-    #config_data['basic_settings']['filter_tags']['audiobook']['blacktags']=[]
+    #if (server_brand == 'jellyfin'):
+        #config_data['basic_settings']['filter_tags']['audiobook']['whitetags']=[]
+        #config_data['basic_settings']['filter_tags']['audiobook']['blacktags']=[]
+    #config_data['basic_settings']['filter_tags']['recording']['whitetags']=[]
+    #config_data['basic_settings']['filter_tags']['recording']['blacktags']=[]
 
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=False
     config_data['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['whitetagged']=False
@@ -93,6 +106,18 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=False
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=True
         config_data['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=True
+
+    '''
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['favorited']=False
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=False
+
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['favorited']=True
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['whitetagged']=False
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacktagged']=True
+    config_data['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=True
+    '''
 
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['action']='keep'
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['user_conditional']='any'
@@ -250,6 +275,47 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=3
         config_data['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=False
 
+    '''
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['action']='keep'
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['user_conditional']='any'
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['played_conditional']='ignore'
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']=False
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['genre']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_genre']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['library_genre']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['track_artist']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_artist']=0
+
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action']='keep'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['user_conditional']='all'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['played_conditional']='ignore'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action_control']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']=[]
+
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action']='delete'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['user_conditional']='all'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['played_conditional']='any_played'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action_control']=0
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']=False
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']=[]
+
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action']='keep'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitelisted']['user_conditional']='any'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitelisted']['played_conditional']='ignore'
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']=False
+
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action']='delete'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacklisted']['user_conditional']='any'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacklisted']['played_conditional']='any_played'
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action_control']=3
+    config_data['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']=False
+    '''
+
     #INTENTIONALLY COMMENTED OUT
     #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['action']='keep'
     #config_data['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']['user_conditional']='all'
@@ -308,6 +374,20 @@ def yaml_configurationLayout(config_data,server_brand):
         #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['dynamic_behavior']=False
         #config_data['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['high_priority']=False
 
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['high_priority']=False
+
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['action']='keep'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['user_conditional']='all'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['played_conditional']='ignore'
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['action_control']=0
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['dynamic_behavior']=False
+    #config_data['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['high_priority']=False
+
     #INTENTIONALLY COMMENTED OUT
     #config_data['advanced_settings']['whitetags']=[]
     #config_data['advanced_settings']['whitetags']['global']=[]
@@ -316,6 +396,7 @@ def yaml_configurationLayout(config_data,server_brand):
     #config_data['advanced_settings']['whitetags']['audio']=[]
     #if (server_brand == 'jellyfin'):
         #config_data['advanced_settings']['whitetags']['audiobook']=[]
+    #config_data['advanced_settings']['whitetags']['recording']=[]
 
     #INTENTIONALLY COMMENTED OUT
     #config_data['advanced_settings']['blacktags']=[]
@@ -325,6 +406,7 @@ def yaml_configurationLayout(config_data,server_brand):
     #config_data['advanced_settings']['blacktags']['audio']=[]
     #if (server_brand == 'jellyfin'):
         #config_data['advanced_settings']['blacktags']['audiobook']=[]
+    #config_data['advanced_settings']['blacktags']['recording']=[]
 
     config_data['advanced_settings']['delete_empty_folders']['episode']['season']=False
     config_data['advanced_settings']['delete_empty_folders']['episode']['series']=False
@@ -338,6 +420,7 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audio']=True
     if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=True
+    #config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['recording']=True
 
     config_data['advanced_settings']['console_controls']['headers']['script']['show']=True
     config_data['advanced_settings']['console_controls']['headers']['script']['formatting']['font']['color']=''
@@ -445,6 +528,28 @@ def yaml_configurationLayout(config_data,server_brand):
         config_data['advanced_settings']['console_controls']['audiobook']['summary']['formatting']['font']['style']=''
         config_data['advanced_settings']['console_controls']['audiobook']['summary']['formatting']['background']['color']=''
 
+    '''
+    config_data['advanced_settings']['console_controls']['recording']['delete']['show']=True
+    config_data['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['color']=''
+    config_data['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['style']=''
+    config_data['advanced_settings']['console_controls']['recording']['delete']['formatting']['background']['color']=''
+
+    config_data['advanced_settings']['console_controls']['recording']['keep']['show']=True
+    config_data['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['color']=''
+    config_data['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['style']=''
+    config_data['advanced_settings']['console_controls']['recording']['keep']['formatting']['background']['color']=''
+
+    config_data['advanced_settings']['console_controls']['recording']['post_processing']['show']=True
+    config_data['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['color']=''
+    config_data['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['style']=''
+    config_data['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['background']['color']=''
+
+    config_data['advanced_settings']['console_controls']['recording']['summary']['show']=True
+    config_data['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['color']=''
+    config_data['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['style']=''
+    config_data['advanced_settings']['console_controls']['recording']['summary']['formatting']['background']['color']=''
+    '''
+
     config_data['advanced_settings']['UPDATE_CONFIG']=False
 
     config_data['advanced_settings']['REMOVE_FILES']=False
@@ -469,6 +574,7 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audio']['favorited'].pop('extra')
     if (server_brand == 'jellyfin'):
         config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['audiobook']['favorited'].pop('extra')
+    #config_data['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['recording']['favorited'].pop('extra')
 
     return config_data
 
@@ -484,16 +590,31 @@ def yaml_configurationBuilder(the_dict):
     config_data['basic_settings']['filter_statements'].pop('audio')
     if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements'].pop('audiobook')
+    #config_data['basic_settings']['filter_statements'].pop('recording')
+    config_data['basic_settings'].pop('filter_tags')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
-    if (the_dict['advanced_settings']['whitetags'] == []):
+    config_data['advanced_settings'].pop('behavioral_tags')
+    if (the_dict['advanced_settings']['whitetags']['global'] == []):
         config_data['advanced_settings'].pop('whitetags')
     else:
-        config_data['advanced_settings']['whitetags']=the_dict['advanced_settings']['whitetags']
-    if (the_dict['advanced_settings']['blacktags'] == []):
+        config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
+    config_data['advanced_settings']['whitetags'].pop('movie')
+    config_data['advanced_settings']['whitetags'].pop('episode')
+    config_data['advanced_settings']['whitetags'].pop('audio')
+    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+        config_data['advanced_settings']['whitetags'].pop('audiobook')
+    #config_data['advanced_settings']['whitetags'].pop('recording')
+    if (the_dict['advanced_settings']['blacktags']['global'] == []):
         config_data['advanced_settings'].pop('blacktags')
     else:
-        config_data['advanced_settings']['blacktags']=the_dict['advanced_settings']['blacktags']
+        config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
+    config_data['advanced_settings']['blacktags'].pop('movie')
+    config_data['advanced_settings']['blacktags'].pop('episode')
+    config_data['advanced_settings']['blacktags'].pop('audio')
+    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+        config_data['advanced_settings']['blacktags'].pop('audiobook')
+    #config_data['advanced_settings']['blacktags'].pop('recording')
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('episode_control')
     config_data['advanced_settings'].pop('trakt_fix')

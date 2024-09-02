@@ -130,6 +130,16 @@ def getIsAnyMediaEnabled(the_dict):
             if (check >= 0):
                 the_dict['all_media_disabled']=False
                 return the_dict
+    '''
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','recording','played','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_statements','recording','created','condition_days')) == None)):
+        if (check >= 0):
+            the_dict['all_media_disabled']=False
+            return the_dict
+    '''
 
     if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','movie','whitetags')) == None)):
         for filterTag in check:
@@ -180,7 +190,22 @@ def getIsAnyMediaEnabled(the_dict):
                     if (filterStatementTag[1] >= 0):
                         the_dict['all_media_disabled']=False
                         return the_dict
+    '''
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','recording','whitetags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    if (not ((check:=keys_exist_return_value(the_dict,'basic_settings','filter_tags','recording','blacktags')) == None)):
+        for filterTag in check:
+            if (not ((filterStatementTag:=get_isFilterStatementTag(filterTag)) == False)):
+                if (filterStatementTag[1] >= 0):
+                    the_dict['all_media_disabled']=False
+                    return the_dict
+    '''
 
+    #for mediaType in ('movie','episode','audio','audiobook','recording'):
     for mediaType in ('movie','episode','audio','audiobook'):
         if (not ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == 'audiobook'))):
             #remove whitespace(s) from the beginning and end of each tag
@@ -248,5 +273,11 @@ def override_consoleOutputs_onDEBUG(the_dict):
             the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']=True
             the_dict['advanced_settings']['console_controls']['audiobook']['post_processing']['show']=True
             the_dict['advanced_settings']['console_controls']['audiobook']['summary']['show']=True
+        '''
+        the_dict['advanced_settings']['console_controls']['recording']['delete']['show']=True
+        the_dict['advanced_settings']['console_controls']['recording']['keep']['show']=True
+        the_dict['advanced_settings']['console_controls']['recording']['post_processing']['show']=True
+        the_dict['advanced_settings']['console_controls']['recording']['summary']['show']=True
+        '''
 
     return the_dict

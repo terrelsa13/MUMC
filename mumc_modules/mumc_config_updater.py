@@ -1,4 +1,4 @@
-from mumc_modules.mumc_paths_files import save_yaml_config
+from mumc_modules.mumc_output import save_yaml_config
 from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
 

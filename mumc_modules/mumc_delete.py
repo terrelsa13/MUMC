@@ -51,20 +51,28 @@ def delete_media_item(itemID,the_dict):
 #list and delete items past played threshold
 def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     deleteItems_Tracker=[]
+
     print_summary_header=the_dict['advanced_settings']['console_controls']['headers']['summary']['show']
-    print_movie_summary=the_dict['advanced_settings']['console_controls']['movie']['summary']['show']
-    print_episode_summary=the_dict['advanced_settings']['console_controls']['episode']['summary']['show']
-    print_audio_summary=the_dict['advanced_settings']['console_controls']['audio']['summary']['show']
     summary_header_format=the_dict['advanced_settings']['console_controls']['headers']['summary']['formatting']
+
+    print_movie_summary=the_dict['advanced_settings']['console_controls']['movie']['summary']['show']
     movie_summary_format=the_dict['advanced_settings']['console_controls']['movie']['summary']['formatting']
+
+    print_episode_summary=the_dict['advanced_settings']['console_controls']['episode']['summary']['show']
     episode_summary_format=the_dict['advanced_settings']['console_controls']['episode']['summary']['formatting']
+
+    print_audio_summary=the_dict['advanced_settings']['console_controls']['audio']['summary']['show']
     audio_summary_format=the_dict['advanced_settings']['console_controls']['audio']['summary']['formatting']
+
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         print_audiobook_summary=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['show']
         audiobook_summary_format=the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']
     else:
         print_audiobook_summary=False
         audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
+
+    #print_recording_summary=the_dict['advanced_settings']['console_controls']['recording']['summary']['show']
+    #recording_summary_format=the_dict['advanced_settings']['console_controls']['recording']['summary']['formatting']
 
     #get number of items to be deleted
      #have to loop thru and look for item_ids because some media has almost
@@ -131,6 +139,15 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
                     print_byType(strings_list_to_print,print_audiobook_summary,the_dict,audiobook_summary_format)
+                #elif (item['Type'] == 'Recording'):
+                    #item_output_details='[DELETED]     ' + item['Type'] + ' - ' + item['Name'] + ' - ' + item['Id']
+                    
+                    ##Delete media item
+                    #delete_media_item(item['Id'],the_dict)
+
+                    ##Print output for deleted media item
+                    #strings_list_to_print+=item_output_details + '\n'
+                    #print_byType(strings_list_to_print,print_recording_summary,the_dict,recording_summary_format)
                 elif (item['Type'] == 'Season'):
                     try:
                         item_output_details='[DELETED]   ' + item['Type'] + ' - ' + item['SeriesName'] + ' - ' + item['Name'] + ' - ' + item['Id']

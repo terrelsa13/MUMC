@@ -156,6 +156,37 @@ def merge_configuration(default_base,merge):
         except:
             pass
 
+    '''
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['played']['condition_days']=merge['basic_settings']['filter_statements']['recording']['played']['condition_days']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['played']['count_equality']=merge['basic_settings']['filter_statements']['recording']['played']['count_equality']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['played']['count']=merge['basic_settings']['filter_statements']['recording']['played']['count']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['created']['condition_days']=merge['basic_settings']['filter_statements']['recording']['created']['condition_days']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['created']['count_equality']=merge['basic_settings']['filter_statements']['recording']['created']['count_equality']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['created']['count']=merge['basic_settings']['filter_statements']['recording']['created']['count']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_statements']['recording']['created']['behavioral_control']=merge['basic_settings']['filter_statements']['recording']['created']['behavioral_control']
+    except:
+        pass
+    '''
+
     try:
         default_base['basic_settings']['filter_tags']['movie']['whitetags']=merge['basic_settings']['filter_tags']['movie']['whitetags']
     except:
@@ -192,6 +223,17 @@ def merge_configuration(default_base,merge):
             default_base['basic_settings']['filter_tags']['audiobook']['blacktags']=merge['basic_settings']['filter_tags']['audiobook']['blacktags']
         except:
             pass
+
+    '''
+    try:
+        default_base['basic_settings']['filter_tags']['recording']['whitetags']=merge['basic_settings']['filter_tags']['recording']['whitetags']
+    except:
+        pass
+    try:
+        default_base['basic_settings']['filter_tags']['recording']['blacktags']=merge['basic_settings']['filter_tags']['recording']['blacktags']
+    except:
+        pass
+    '''
 
     try:
         default_base['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['favorited']
@@ -445,6 +487,71 @@ def merge_configuration(default_base,merge):
                     default_base['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']
                 except:
                     pass
+
+    '''
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['favorited']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['favorited']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitetagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitetagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['blacktagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['blacktagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitelisted']
+        except:
+            try:
+                default_base['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']
+            except:
+                pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['favorited']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['favorited']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['favorited'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['whitetagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['whitetagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['whitetagged'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacktagged']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacktagged']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacktagged'] & merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']
+        except:
+            pass
+    try:
+        default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']
+    except:
+        try:
+            default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacklisted']
+        except:
+            try:
+                default_base['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=merge['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']
+            except:
+                pass
+    '''
 
     try:
         default_base['advanced_settings']['behavioral_statements']['movie']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['movie']['favorited']['action']
@@ -975,6 +1082,141 @@ def merge_configuration(default_base,merge):
         except:
             pass
 
+    '''
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['action']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['action']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['user_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['user_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['played_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['played_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['action_control']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['action_control']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['genre']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['genre']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_genre']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_genre']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['library_genre']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['library_genre']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['track_artist']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['track_artist']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_artist']=merge['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']['album_artist']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['user_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['user_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['played_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['played_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action_control']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action_control']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']
+    except:
+        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']
+    #except:
+        #pass
+
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['user_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['user_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['played_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['played_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action_control']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action_control']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']
+    except:
+        pass
+    #try:
+        #default_base['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']
+    #except:
+        #pass
+
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action']=merge['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitelisted']['user_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['whitelisted']['user_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitelisted']['played_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['whitelisted']['played_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action_control']=merge['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action_control']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action']=merge['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacklisted']['user_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['blacklisted']['user_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacklisted']['played_conditional']=merge['advanced_settings']['behavioral_statements']['recording']['blacklisted']['played_conditional']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action_control']=merge['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action_control']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']=merge['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']
+    except:
+        pass
+    '''
+
     try:
         default_base['advanced_settings']['behavioral_tags']['movie']=merge['advanced_settings']['behavioral_tags']['movie']
     except:
@@ -996,6 +1238,13 @@ def merge_configuration(default_base,merge):
             default_base['advanced_settings']['behavioral_tags']['audiobook']=merge['advanced_settings']['behavioral_tags']['audiobook']
         except:
             pass
+
+    '''
+    try:
+        default_base['advanced_settings']['behavioral_tags']['recording']=merge['advanced_settings']['behavioral_tags']['recording']
+    except:
+        pass
+    '''        
 
     '''
     #loop thru in reverse to preserve order
@@ -1097,6 +1346,16 @@ def merge_configuration(default_base,merge):
             except:
                 pass
 
+    '''
+    try:
+        default_base['advanced_settings']['whitetags']['recording']=merge['advanced_settings']['whitetags']['recording']
+    except:
+        try:
+            default_base['advanced_settings']['whitetags']['recording']=merge['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']
+        except:
+            pass
+    '''
+
     try:
         default_base['advanced_settings']['blacktags']['global']=merge['advanced_settings']['blacktags']['global']
     except:
@@ -1133,6 +1392,16 @@ def merge_configuration(default_base,merge):
                 default_base['advanced_settings']['blacktags']['audiobook']=merge['advanced_settings']['behavioral_statements']['audiobook']['blacktagged']['tags']
             except:
                 pass
+
+    '''
+    try:
+        default_base['advanced_settings']['blacktags']['recording']=merge['advanced_settings']['blacktags']['recording']
+    except:
+        try:
+            default_base['advanced_settings']['blacktags']['recording']=merge['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']
+        except:
+            pass
+    '''
 
     try:
         default_base['advanced_settings']['delete_empty_folders']['episode']['season']=merge['advanced_settings']['delete_empty_folders']['episode']['season']
@@ -1173,6 +1442,13 @@ def merge_configuration(default_base,merge):
             default_base['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=merge['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']
         except:
             pass
+
+    '''
+    try:
+        default_base['advanced_settings']['trakt_fix']['set_missing_last_played_date']['recording']=merge['advanced_settings']['trakt_fix']['set_missing_last_played_date']['recording']
+    except:
+        pass
+    '''
 
     try:
         default_base['advanced_settings']['console_controls']['headers']['script']['show']=merge['advanced_settings']['console_controls']['headers']['script']['show']
@@ -1532,6 +1808,76 @@ def merge_configuration(default_base,merge):
         except:
             pass
 
+    '''
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['delete']['show']=merge['advanced_settings']['console_controls']['recording']['delete']['show']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['color']=merge['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['color']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['style']=merge['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']['style']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['delete']['formatting']['background']['color']=merge['advanced_settings']['console_controls']['recording']['delete']['formatting']['background']['color']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['keep']['show']=merge['advanced_settings']['console_controls']['recording']['keep']['show']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['color']=merge['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['color']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['style']=merge['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']['style']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['keep']['formatting']['background']['color']=merge['advanced_settings']['console_controls']['recording']['keep']['formatting']['background']['color']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['post_processing']['show']=merge['advanced_settings']['console_controls']['recording']['post_processing']['show']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['color']=merge['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['color']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['style']=merge['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']['style']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['background']['color']=merge['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['background']['color']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['summary']['show']=merge['advanced_settings']['console_controls']['recording']['summary']['show']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['color']=merge['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['color']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['style']=merge['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']['style']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['console_controls']['recording']['summary']['formatting']['background']['color']=merge['advanced_settings']['console_controls']['recording']['summary']['formatting']['background']['color']
+    except:
+        pass
+    '''
+
     try:
         default_base['advanced_settings']['UPDATE_CONFIG']=merge['advanced_settings']['UPDATE_CONFIG']
     except:
@@ -1621,5 +1967,6 @@ def merge_configuration(default_base,merge):
     default_base['advanced_settings']['behavioral_statements']['audio']['favorited']['extra']=default_base['advanced_settings']['behavioral_statements']['audio']['favorited'].pop('extra')
     if (server_brand == 'jellyfin'):
         default_base['advanced_settings']['behavioral_statements']['audiobook']['favorited']['extra']=default_base['advanced_settings']['behavioral_statements']['audiobook']['favorited'].pop('extra')
+    #default_base['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']=default_base['advanced_settings']['behavioral_statements']['recording']['favorited'].pop('extra')
 
     return default_base

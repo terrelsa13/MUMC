@@ -2,7 +2,7 @@ from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_library_queries import get_all_library_subfolders
-from mumc_modules.mumc_paths_files import save_yaml_config
+from mumc_modules.mumc_output import save_yaml_config
 from mumc_modules.mumc_versions import get_script_version,get_semantic_version_parts
 
 

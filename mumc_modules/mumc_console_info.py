@@ -168,6 +168,8 @@ def build_print_media_item_details(item,var_dict,the_dict):
                 strings_list+=' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name']
             elif (mediaType == 'audiobook'):
                 strings_list+=' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' +item['Artists'][0]
+            #if (mediaType == 'recording'):
+                #strings_list+=' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name']
 
             strings_list+=' - ' + days_since_played + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + days_since_created + ' - Favorite: ' + str(isFavorited_Display) + ' - Whitetag: ' + \
                 str(isWhitetagged_Display) + ' - Blacktag: ' + str(isBlacktagged_Display) + ' - Whitelisted: ' + str(isWhitelisted_Display) + ' - Blacklisted: ' + str(isBlacklisted_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id']
@@ -362,12 +364,14 @@ def print_all_media_disabled(the_dict):
     strings_list_to_print+="* basic_settings > filter_statements > audio > played > condition_days: -1             *" + '\n'
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         strings_list_to_print+="* basic_settings > filter_statements > audiobook > played > condition_days: -1         *" + '\n'
+    #strings_list_to_print+="* basic_settings > filter_statements > recording > played > condition_days: -1        *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > movie > created > condition_days: -1            *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > episode > created > condition_days: -1          *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > audio > created > condition_days: -1            *" + '\n'
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         strings_list_to_print+="* basic_settings > filter_statements > audiobook > created > condition_days: -1        *" + '\n'
+    #strings_list_to_print+="* basic_settings > filter_statements > recording > created > condition_days: -1            *" + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     try:

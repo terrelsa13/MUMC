@@ -818,6 +818,10 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
             config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=cfg['audiobook_set_missing_last_played_date']
         except:
             config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['audiobook']=True
+    #try:
+        #config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['recording']=cfg['recording_set_missing_last_played_date']
+    #except:
+        #config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['recording']=True
     try:
         config_data['advanced_settings']['console_controls']['headers']['script']['show']=cfg['print_script_header']
     except:

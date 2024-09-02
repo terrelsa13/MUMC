@@ -35,7 +35,7 @@ def get_season_episode(ParentIndexNumber,IndexNumber,the_dict):
         appendTo_DEBUG_log('\nEpisode # is: ' + str(IndexNumber),2,the_dict)
         appendTo_DEBUG_log('\nPadded Season #: ' + ParentIndexNumber_str,2,the_dict)
         appendTo_DEBUG_log('\nPadded Episode #: ' + IndexNumber_str,2,the_dict)
-        appendTo_DEBUG_log('\nFormatted season#.episode# is: ' + str(formatted_season_episode),2,the_dict)
+        appendTo_DEBUG_log('\nFormatted season#.episode# is: ' + str(formatted_season_episode) + '\n',2,the_dict)
 
     return(formatted_season_episode)
 

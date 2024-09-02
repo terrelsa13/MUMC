@@ -20,7 +20,7 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
     for data in data_Favorited['Items']:
 
         #Verify media item is a parent (not a child like an episode, movie, or audio)
-        if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
+        if (('IsFolder' in data) and (data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
             #Initialize api_query_handler() variables for watched child media items
             data_dict['StartIndex_']=0
@@ -615,3 +615,47 @@ def get_isAUDIOBOOK_Fav(the_dict,item,user_info,var_dict):
 #determine if genres for audiobook track, book, or author are set to favorite
 def get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_info,var_dict):
     return get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict)
+
+
+'''
+#determine if genres for recording or library are set to favorite
+def get_isRECORDING_AdvancedFav(the_dict,item,user_info,var_dict):
+
+    advFav_media=var_dict['advFav_media']
+
+    #define empty dictionary for favorited Recordings
+    isfav_RECORDING={'recordinglibrary':{},'recordinggenre':{},'recordinglibrarygenre':{}}
+
+    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
+### Recording #######################################################################################
+
+        if ('Id' in item):
+
+            if ((not (item['Id'] in isfav_RECORDING['recordinggenre'])) or (isfav_RECORDING['recordinggenre'][item['Id']] == False)):
+                isfav_RECORDING['recordinggenre']=get_isGENRE_Fav(user_info,item,isfav_RECORDING['recordinggenre'],advFav_media['genre'],'recording_genre',the_dict)
+
+### End Recording ###################################################################################
+
+### Recording Library #######################################################################################
+
+        if ('ParentId' in item):
+            recordinglibrary_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'recording_library_info',the_dict)
+
+            if ((not (recordinglibrary_item_info['Id'] in isfav_RECORDING['recordinglibrarygenre'])) or (isfav_RECORDING['recordinglibrarygenre'][recordinglibrary_item_info['Id']] == False)):
+                isfav_RECORDING['recordinglibrarygenre']=get_isGENRE_Fav(user_info,recordinglibrary_item_info,isfav_RECORDING['recordinglibrarygenre'],advFav_media['library_genre'],'recording_library_genre',the_dict)
+
+### End Recording Library ###################################################################################
+
+    for isfavkey in isfav_RECORDING:
+        for isfavID in isfav_RECORDING[isfavkey]:
+            if (isfav_RECORDING[isfavkey][isfavID]):
+                if (the_dict['DEBUG']):
+                    appendTo_DEBUG_log("\n\nRecording Item " + str(item['Id']) + " is advanced favorited.",2,the_dict)
+                return(True)
+
+    if (the_dict['DEBUG']):
+        appendTo_DEBUG_log("\n\nRecording " + str(item['Id']) + " is NOT advanced favorited.",2,the_dict)
+
+    return(False)
+'''

@@ -199,6 +199,42 @@ def add_dynamic_behavior_to_yaml(missing_dynamic_behavior_dict,server_brand,init
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['played_conditional']=temp_dict['behavioral_statements']['audiobook']['blacklisted']['played_conditional']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=temp_dict['behavioral_statements']['audiobook']['blacklisted']['action_control']
         cfg['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']
+    '''
+    cfg['advanced_settings']['behavioral_statements']['recording']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['action']=temp_dict['behavioral_statements']['recording']['favorited']['action']
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['user_conditional']=temp_dict['behavioral_statements']['recording']['favorited']['user_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['played_conditional']=temp_dict['behavioral_statements']['recording']['favorited']['played_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['action_control']=temp_dict['behavioral_statements']['recording']['favorited']['action_control']
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']
+    cfg['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']=temp_dict['behavioral_statements']['recording']['favorited']['extra']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action']=temp_dict['behavioral_statements']['recording']['whitetagged']['action']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['user_conditional']=temp_dict['behavioral_statements']['recording']['whitetagged']['user_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['played_conditional']=temp_dict['behavioral_statements']['recording']['whitetagged']['played_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action_control']=temp_dict['behavioral_statements']['recording']['whitetagged']['action_control']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']=temp_dict['behavioral_statements']['recording']['whitetagged']['tags']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action']=temp_dict['behavioral_statements']['recording']['blacktagged']['action']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['user_conditional']=temp_dict['behavioral_statements']['recording']['blacktagged']['user_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['played_conditional']=temp_dict['behavioral_statements']['recording']['blacktagged']['played_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action_control']=temp_dict['behavioral_statements']['recording']['blacktagged']['action_control']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']=temp_dict['behavioral_statements']['recording']['blacktagged']['tags']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action']=temp_dict['behavioral_statements']['recording']['whitelisted']['action']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']['user_conditional']=temp_dict['behavioral_statements']['recording']['whitelisted']['user_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']['played_conditional']=temp_dict['behavioral_statements']['recording']['whitelisted']['played_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action_control']=temp_dict['behavioral_statements']['recording']['whitelisted']['action_control']
+    cfg['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']={}
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action']=temp_dict['behavioral_statements']['recording']['blacklisted']['action']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']['user_conditional']=temp_dict['behavioral_statements']['recording']['blacklisted']['user_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']['played_conditional']=temp_dict['behavioral_statements']['recording']['blacklisted']['played_conditional']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action_control']=temp_dict['behavioral_statements']['recording']['blacklisted']['action_control']
+    cfg['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']=missing_dynamic_behavior_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']
+    '''
     cfg['advanced_settings']['whitetags']=[]
     cfg['advanced_settings']['whitetags'].extend(temp_dict['whitetags'])
     cfg['advanced_settings']['blacktags']=[]

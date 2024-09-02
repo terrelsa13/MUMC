@@ -148,7 +148,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     for data in data_Tagged['Items']:
 
         #Verify media item is a parent (not a child like an episode, movie, or audio)
-        if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
+        if (('IsFolder' in data) and (data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
             #Initialize api_query_handler() variables for child media items
             data_dict['StartIndex_']=0
@@ -524,3 +524,95 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
 #determine if genres for audiobook track, book, or audio book library are tagged
 def get_isAUDIOBOOK_Tagged(the_dict,item,user_info,usertags):
     return get_isAUDIO_Tagged(the_dict,item,user_info,usertags)
+
+
+'''
+#determine if recording, season, series, or studio-network are tagged
+def get_isRECORDING_Tagged(the_dict,item,user_info,usertags):
+
+    matched_tags=[]
+
+    #define empty dictionary for tagorited TV Series, Seasons, Recordings, and Channels/Networks
+    istag_RECORDING={'recording':{},'season':{},'series':{},'tvlibrary':{},'seriesstudionetwork':{}}
+
+    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
+
+### Recording #######################################################################################
+
+        if ('Id' in item):
+            istag_RECORDING['recording'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
+            #these tags are already part of the media_item; no need to add them again
+            #matched_tags.clear()
+
+### End Recording ###################################################################################
+
+### Season ########################################################################################
+
+        if ('SeasonId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeasonId'],'season_info',the_dict)
+        elif ('ParentId' in item):
+            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'season_info',the_dict)
+        else:
+            season_item_info=None
+
+        if (not (season_item_info == None)):
+            istag_RECORDING['season'][season_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,season_item_info,the_dict)
+
+### End Season ####################################################################################
+
+### Series ########################################################################################
+
+            if ('SeriesId' in item):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeriesId'],'series_info',the_dict)
+            elif ('SeriesId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
+            elif ('ParentId' in season_item_info):
+                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
+            else:
+                series_item_info=None
+
+            if (not (series_item_info == None)):
+                istag_RECORDING['series'][series_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,series_item_info,the_dict)
+
+### End Series ####################################################################################
+
+### TV Library ########################################################################################
+
+                if ('ParentId' in series_item_info):
+                    tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['ParentId'],'tv_library_info',the_dict)
+                else:
+                    tvlibrary_item_info=None
+
+                if (not (tvlibrary_item_info == None)):
+                    istag_RECORDING['tvlibrary'][tvlibrary_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,tvlibrary_item_info,the_dict)
+
+### End TV Library ####################################################################################
+
+### Studio Network #######################################################################################
+
+                if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0)):
+                    #Get studio network's item info
+                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
+                elif ('SeriesStudio' in series_item_info):
+                    #Get series studio network's item info
+                    tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict,the_dict)
+                else:
+                    tvstudionetwork_item_info=None
+
+                if (not (tvstudionetwork_item_info == None)):
+                    istag_RECORDING['seriesstudionetwork'][tvstudionetwork_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,tvstudionetwork_item_info,the_dict)
+
+### End Studio Network ###################################################################################
+
+    for istagkey in istag_RECORDING:
+        for istagID in istag_RECORDING[istagkey]:
+            if (istag_RECORDING[istagkey][istagID]):
+                if (the_dict['DEBUG']):
+                    appendTo_DEBUG_log("\n\nRecording " + str(item['Id']) + " is tagged.",2,the_dict)
+                return True,matched_tags
+
+    if (the_dict['DEBUG']):
+        appendTo_DEBUG_log("\n\nRecording " + str(item['Id']) + " is NOT tagged.",2,the_dict)
+
+    return False,matched_tags
+'''

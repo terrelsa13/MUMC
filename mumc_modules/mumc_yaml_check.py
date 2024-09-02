@@ -291,6 +291,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         filter_audiobook_whitetag_set=set()
         filter_audiobook_blacktag_set=set()
+    #filter_recording_whitetag_set=set()
+    #filter_recording_blacktag_set=set()
     movie_whitetag_set=set()
     movie_blacktag_set=set()
     episode_whitetag_set=set()
@@ -300,6 +302,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         audiobook_whitetag_set=set()
         audiobook_blacktag_set=set()
+    #recording_whitetag_set=set()
+    #recording_blacktag_set=set()
     global_whitetag_set=set()
     global_blacktag_set=set()
 
@@ -452,6 +456,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
@@ -509,6 +515,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
@@ -565,6 +573,8 @@ def cfgCheckYAML(cfg,init_dict):
                  (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
@@ -624,6 +634,67 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == True) or (check == False))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','played','condition_days')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 (check >= -1) and (check <= 730500))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','played','count_equality')) == None)):
+        if (
+            not (isinstance(check,str) and
+                ((check == '>') or (check == '<') or
+                (check == '>=') or (check == '<=') or
+                (check == '==') or (check == 'not ==') or
+                (check == 'not >') or (check == 'not <') or
+                (check == 'not >=') or (check == 'not <=')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','played','count')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 (check >= 1) and (check <= 730500))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > played > count must be an integer\n\tValid range 1 thru 730500\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','created','condition_days')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 (check >= -1) and (check <= 730500))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','created','count_equality')) == None)):
+        if (
+            not (isinstance(check,str) and
+                ((check == '>') or (check == '<') or
+                (check == '>=') or (check == '<=') or
+                (check == '==') or (check == 'not ==') or
+                (check == 'not >') or (check == 'not <') or
+                (check == 'not >=') or (check == 'not <=')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','created','count')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 (check >= 0) and (check <= 730500))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > created > count must be an integer\n\tValid range 0 thru 730500\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','recording','created','behavioral_control')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > recording > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
@@ -802,6 +873,51 @@ def cfgCheckYAML(cfg,init_dict):
                     else:
                         filter_audiobook_blacktag_set.add(thisFilterTag)
         '''
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','recording','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > recording > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_recording_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','recording','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > recording > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_recording_blacktag_set.add(tag)
+    '''
+
+    '''
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['recording']['whitetags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','recording','whitetags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > recording > white_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_recording_whitetag_set.add(thisFilterTag)
+
+    for thisFilterTag in cfg['basic_settings']['filter_tags']['recording']['blacktags']:
+        if (tag_list:=get_isFilterStatementTag(thisFilterTag)):
+            if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','recording','blacktags',thisFilterTag)) == None)):
+                if (cfgCheckYAML_isFilterTag(tag,tag_list)):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > recording > black_tags > ' + thisFilterTag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    filter_recording_blacktag_set.add(thisFilterTag)
+    '''
 
 #######################################################################################################
 
@@ -1068,6 +1184,74 @@ def cfgCheckYAML(cfg,init_dict):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
             else:
                 cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted'].pop('blacklisted')
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','whitelisted','favorited')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > whitelisted > favorited must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','whitelisted','whitetagged')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > whitelisted > whitetagged must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','whitelisted','blacktagged')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > whitelisted > blacktagged must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','whitelisted','played')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','whitelisted','whitelisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted'].pop('whitelisted')
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','blacklisted','favorited')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > blacklisted > favorited must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','blacklisted','blacktagged')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','blacklisted','blacktagged')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > blacklisted > blacktagged must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','blacklisted','played')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+    elif (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','recording','query_filter','blacklisted','blacklisted')) == None)):
+        if (
+            not (isinstance(check,bool))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > recording > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
+        else:
+            cfg['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted'].pop('blacklisted')
+    '''
 
 #######################################################################################################
 
@@ -1886,9 +2070,9 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    if (isJellyfinServer(server_brand)):
-
 #######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')) == None)):
             if (
@@ -2181,6 +2365,289 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','user_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','played_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','action_control')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 8)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > action_control must be an integer\n\tValid range 0 thru 8\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','dynamic_behavior')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 ((check == True) or (check == False)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','extra','genre')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 2)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > advanced > genre must be an integer\n\tValid range 0 thru 2\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','extra','album_genre')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 2)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > advanced > album_genre must be an integer\n\tValid range 0 thru 2\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','extra','library_genre')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 2)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','extra','track_artist')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 2)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > advanced > track_artist must be an integer\n\tValid range 0 thru 2\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','favorited','extra','album_artist')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 2)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > favorited > advanced > album_artist must be an integer\n\tValid range 0 thru 2\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','user_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > user_conditional must be a string\n\tValid value \'all\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','played_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','action_control')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 8)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > action_control must be an integer\n\tValid range 0 thru 8\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','dynamic_behavior')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 ((check == True) or (check == False)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitetagged','tags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        recording_whitetag_set.add(tag)
+    '''
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','user_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > user_conditional must be a string\n\tValid value \'all\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','played_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','action_control')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 8)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > action_control must be an integer\n\tValid range 0 thru 8\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','dynamic_behavior')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 ((check == True) or (check == False)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacktagged','tags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        recording_blacktag_set.add(tag)
+    '''
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitelisted','action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitelisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitelisted','user_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitelisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitelisted','played_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitelisted > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitelisted','action_control')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 8)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitelisted > action_control must be an integer\n\tValid range 0 thru 8\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','whitelisted','dynamic_behavior')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 ((check == True) or (check == False)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacklisted','action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacklisted > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacklisted','user_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'any') or (check.casefold() == 'all')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacklisted > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacklisted','played_conditional')) == None)):
+        if (
+            not (isinstance(check,str) and
+                 ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                 (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                 (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                 (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                 (check.casefold() == 'ignore')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacklisted > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacklisted','action_control')) == None)):
+        if (
+            not (isinstance(check,int) and
+                 ((check >= 0) and (check <= 8)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacklisted > action_control must be an integer\n\tValid range 0 thru 8\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','recording','blacklisted','dynamic_behavior')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                 ((check == True) or (check == False)))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > recording > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
+
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','movie')) == None)):
         if (isinstance(check,dict)):
             for tag in check:
@@ -2228,6 +2695,20 @@ def cfgCheckYAML(cfg,init_dict):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                     else:
                         error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','recording')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > recording > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'recording')
+    '''
 
 #######################################################################################################
 
@@ -2332,6 +2813,24 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
     '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','recording')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > recording must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_whitetag_set.add(tag)
+    '''
+
+#######################################################################################################
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2428,6 +2927,24 @@ def cfgCheckYAML(cfg,init_dict):
                     else:
                         if (not (tag == None)):
                             global_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','recording')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > recording must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
@@ -2529,6 +3046,15 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == True) or (check == False))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > audiobook must be a boolean\n\tValid values are true or false\n'
+
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','recording')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > recording must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
@@ -3121,6 +3647,120 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
+    '''
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','delete','show')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > delete > recording > show must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','delete','formatting','font','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','delete','formatting','font','style')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','delete','formatting','background','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','keep','show')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > keep > recording > show must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','keep','formatting','font','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','keep','formatting','font','style')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','keep','formatting','background','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','post_processing','show')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > post_processing > recording > show must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','post_processing','formatting','font','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','post_processing','formatting','font','style')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','post_processing','formatting','background','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','summary','show')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > summary > recording > show must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','summary','formatting','font','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','summary','formatting','font','style')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','recording','summary','formatting','background','color')) == None)):
+        if (
+            not (((isinstance(check,str)) or (check == None) or (check == '')) and
+                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > recording > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
+
 #######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','UPDATE_CONFIG')) == None)):
@@ -3259,6 +3899,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=recording_blacktag_set.intersection(recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > recording > blacktagged > tags and advanced_settings > behavioral_statements > recording > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 
@@ -3272,6 +3914,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=filter_recording_blacktag_set.intersection(filter_recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > recording > blacktagged > tags and advanced_settings > behavioral_statements > recording > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 
@@ -3285,6 +3929,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=global_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=global_blacktag_set.intersection(recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > recording > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check global whitetags and media specific blacktags do not have a common string
     if (overlapping_tags_set:=global_whitetag_set.intersection(movie_blacktag_set)):
@@ -3296,6 +3942,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=global_whitetag_set.intersection(audiobook_blacktag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=global_whitetag_set.intersection(recording_blacktag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > recording > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 
@@ -3309,6 +3957,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=global_blacktag_set.intersection(filter_recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > recording > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check global whitetags and media specific filter blacktags do not have a common string
     if (overlapping_tags_set:=global_whitetag_set.intersection(filter_movie_blacktag_set)):
@@ -3320,6 +3970,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audiobook_blacktag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=global_whitetag_set.intersection(filter_recording_blacktag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > recording > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 
@@ -3333,6 +3985,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and basic_settings > filter_tags > audiobook > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=recording_blacktag_set.intersection(filter_recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > recording > blacktagged > tags and basic_settings > filter_tags > recording > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
     #check media specific filter blacktags and media specific whitetags do not have a common string
     if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(movie_whitetag_set)):
@@ -3344,6 +3998,8 @@ def cfgCheckYAML(cfg,init_dict):
     if (isJellyfinServer(server_brand)):
         if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audiobook > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    #if (overlapping_tags_set:=filter_recording_blacktag_set.intersection(recording_whitetag_set)):
+        #error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > recording > blacktags and advanced_settings > behavioral_statements > recording > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 

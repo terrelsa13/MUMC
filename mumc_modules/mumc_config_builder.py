@@ -147,21 +147,28 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
     
-    #Build and save yaml config file
+    #Build and save new yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)
 
         try:
             the_dict=getIsAnyMediaEnabled(the_dict)
+
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
 
-                strings_list_to_print=''
-                strings_list_to_print=built_new_config_not_setup_to_delete_media(strings_list_to_print,the_dict)
+            strings_list_to_print=built_new_config_not_setup_to_delete_media('',the_dict)
+            print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['formatting'])
+
+            '''
             try:
                 print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
             except:
-                print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
+                try:
+                    print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
+                except:
+                    pass
+            '''
 
         #the exception
         except (AttributeError, ModuleNotFoundError):

@@ -335,6 +335,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
         tagKey='Tags'
 
     #create filter tuple for item data
+    #if ((var_dict['media_type_lower'] == 'movie') or (var_dict['media_type_lower'] == 'recording')):
     if (var_dict['media_type_lower'] == 'movie'):
         var_dict['itemKeyFilter']=('Name','Id','DateCreated','Path','Genres','IsFolder','Type','Studios','GenreItems','mumc',tagKey)
     elif (var_dict['media_type_lower'] == 'episode'):
@@ -480,6 +481,7 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                     appendTo_DEBUG_log("\nProcessing " + var_dict['media_type_title'] + " Item: " + str(item['Id']),2,the_dict)
 
                                 #Fill in the blanks
+                                #if ((var_dict['media_type_lower'] == 'movie') or (var_dict['media_type_lower'] == 'recording')):
                                 if (var_dict['media_type_lower'] == 'movie'):
                                     item=prepare_MOVIEoutput(the_dict,item,user_info,var_dict)
                                 elif (var_dict['media_type_lower'] == 'episode'):
@@ -530,6 +532,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         var_dict['item_isFavorited']=get_isAUDIO_Fav(the_dict,item,user_info,var_dict)
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isFavorited']=get_isAUDIOBOOK_Fav(the_dict,item,user_info,var_dict)
+                                    #elif (var_dict['media_type_lower'] == 'recording'):
+                                        #var_dict['item_isFavorited']=get_isRECORDING_Fav(the_dict,item,user_info,var_dict)
 
                                 #Get if media item is set as an advanced favorite
                                 var_dict['item_isFavorited_Advanced']=False
@@ -542,6 +546,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         var_dict['item_isFavorited_Advanced']=get_isAUDIO_AdvancedFav(the_dict,item,user_info,var_dict)
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isFavorited_Advanced']=get_isAUDIOBOOK_AdvancedFav(the_dict,item,user_info,var_dict)
+                                    #elif (var_dict['media_type_lower'] == 'recording'):
+                                        #var_dict['item_isFavorited_Advanced']=get_isRECORDING_AdvancedFav(the_dict,item,user_info,var_dict)
 
                                 #Determine what will show as the favorite status for this user and media item
                                 var_dict['isFavorited_Display']=(var_dict['item_isFavorited'] or var_dict['item_isFavorited_Advanced'])
@@ -570,6 +576,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         var_dict['item_isWhitetagged'],matched_tags=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['whitetags'])
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isWhitetagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['whitetags'])
+                                    #elif (var_dict['media_type_lower'] == 'recording'):
+                                        #var_dict['item_isWhitetagged'],matched_tags=get_isRECORDING_Tagged(the_dict,item,user_info,var_dict['whitetags'])
 
                                 var_dict['isWhitetagged_Display']=var_dict['item_isWhitetagged']
 
@@ -622,6 +630,8 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         var_dict['item_isBlacktagged'],matched_tags=get_isAUDIO_Tagged(the_dict,item,user_info,var_dict['blacktags'])
                                     elif (var_dict['media_type_lower'] == 'audiobook'):
                                         var_dict['item_isBlacktagged'],matched_tags=get_isAUDIOBOOK_Tagged(the_dict,item,user_info,var_dict['blacktags'])
+                                    #elif (var_dict['media_type_lower'] == 'audio'):
+                                        #var_dict['item_isBlacktagged'],matched_tags=get_isRECORDING_Tagged(the_dict,item,user_info,var_dict['blacktags'])
 
                                 var_dict['isBlacktagged_Display']=var_dict['item_isBlacktagged']
 
@@ -809,6 +819,18 @@ def init_getMedia(the_dict):
     the_dict['audiobook_dict']['iswhitelisted_extraInfo_Tracker']=[]
     the_dict['audiobook_dict']['isblacklisted_extraInfo_Tracker']=[]
 
+    '''
+    the_dict['recording_dict']={}
+    the_dict['recording_dict']['media_type']='recording'
+    the_dict['recording_dict']['media_data']={}
+    the_dict['recording_dict']['deleteItemsIdTracker_createdMedia']=[]
+    the_dict['recording_dict']['isfavorited_extraInfo_Tracker']=[]
+    the_dict['recording_dict']['iswhitetagged_extraInfo_Tracker']=[]
+    the_dict['recording_dict']['isblacktagged_extraInfo_Tracker']=[]
+    the_dict['recording_dict']['iswhitelisted_extraInfo_Tracker']=[]
+    the_dict['recording_dict']['isblacklisted_extraInfo_Tracker']=[]
+    '''
+
     #Determine played and created date for each media type; UTC time used for media items; needed for get_mediaItems() and postProcessing()
     the_dict['cut_off_date_played_media']={}
     the_dict['cut_off_date_created_media']={}
@@ -824,6 +846,8 @@ def init_getMedia(the_dict):
     else:
         the_dict['cut_off_date_played_media']['audiobook']=the_dict['date_time_now_tz_utc'] - timedelta(days=-1)
         the_dict['cut_off_date_created_media']['audiobook']=the_dict['date_time_now_tz_utc'] - timedelta(days=-1)
+    #the_dict['cut_off_date_played_media']['recording']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['filter_statements']['recording']['played']['condition_days'])
+    #the_dict['cut_off_date_created_media']['recording']=the_dict['date_time_now_tz_utc'] - timedelta(days=the_dict['basic_settings']['filter_statements']['recording']['created']['condition_days'])
 
     the_dict['currentUserPosition']=0
 
@@ -934,6 +958,9 @@ def init_getMedia(the_dict):
     the_dict['basic_settings']['whitetag_filter_statements']['audiobook']={}
     #the_dict['basic_settings']['whitetag_filter_statements']['audiobook']['played']={}
     #the_dict['basic_settings']['whitetag_filter_statements']['audiobook']['created']={}
+    #the_dict['basic_settings']['whitetag_filter_statements']['recording']={}
+    ##the_dict['basic_settings']['whitetag_filter_statements']['recording']['played']={}
+    ##the_dict['basic_settings']['whitetag_filter_statements']['recording']['created']={}
 
     the_dict['basic_settings']['blacktag_filter_statements']={}
     the_dict['basic_settings']['blacktag_filter_statements']['movie']={}
@@ -948,6 +975,9 @@ def init_getMedia(the_dict):
     the_dict['basic_settings']['blacktag_filter_statements']['audiobook']={}
     #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['played']={}
     #the_dict['basic_settings']['blacktag_filter_statements']['audiobook']['created']={}
+    #the_dict['basic_settings']['blacktag_filter_statements']['recording']={}
+    ##the_dict['basic_settings']['blacktag_filter_statements']['recording']['played']={}
+    ##the_dict['basic_settings']['blacktag_filter_statements']['recording']['created']={}
 
     the_dict['filter_tag_played_days']={}
     the_dict['filter_tag_created_days']={}
@@ -959,10 +989,13 @@ def init_getMedia(the_dict):
     the_dict['filter_tag_created_days']['audio']=False
     the_dict['filter_tag_played_days']['audiobook']=False
     the_dict['filter_tag_created_days']['audiobook']=False
+    #the_dict['filter_tag_played_days']['recording']=False
+    #the_dict['filter_tag_created_days']['recording']=False
 
     the_dict['whitetags']={}
     the_dict['blacktags']={}
 
+    #for mediaType in ('movie','episode','audio','audiobook','recording'):
     for mediaType in ('movie','episode','audio','audiobook'):
         if (not ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == 'audiobook'))):
             #remove whitespace(s) from the beginning and end of each tag
@@ -1026,7 +1059,8 @@ def init_getMedia(the_dict):
         the_dict['movie_dict'][user_info['user_id']]={}
         the_dict['episode_dict'][user_info['user_id']]={}
         the_dict['audio_dict'][user_info['user_id']]={}
-        the_dict['audiobook_dict'][user_info['user_id']]={}            
+        the_dict['audiobook_dict'][user_info['user_id']]={}
+        #the_dict['recording_dict'][user_info['user_id']]={}
 
         print_user_header(user_info,the_dict)
 
@@ -1040,6 +1074,8 @@ def init_getMedia(the_dict):
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
             show_audiobook_delete=the_dict['advanced_settings']['console_controls']['audiobook']['delete']['show']
             show_audiobook_keep=the_dict['advanced_settings']['console_controls']['audiobook']['keep']['show']
+        #show_recording_delete=the_dict['advanced_settings']['console_controls']['recording']['delete']['show']
+        #show_recording_keep=the_dict['advanced_settings']['console_controls']['recording']['keep']['show']
 
         #if ((the_dict['basic_settings']['filter_statements']['movie']['played']['condition_days'] == -1) and 
             #(the_dict['basic_settings']['filter_statements']['movie']['created']['condition_days'] == -1)):
@@ -1058,8 +1094,24 @@ def init_getMedia(the_dict):
                 #(the_dict['basic_settings']['filter_statements']['audiobook']['created']['condition_days'] == -1)):
                 #show_audiobook_delete=False
                 #show_audiobook_keep=False
+        #if ((the_dict['basic_settings']['filter_statements']['recording']['played']['condition_days'] == -1) and 
+            #(the_dict['basic_settings']['filter_statements']['recording']['created']['condition_days'] == -1)):
+            #show_recording_delete=False
+            #show_recording_keep=False
 
         #when debug is disabled AND no active media delete/keep items are being output to the console; allow multiprocessing
+        '''
+        if (
+        (not (the_dict['DEBUG'])) and
+        ((not (show_movie_delete or show_movie_keep)) and
+        (not (show_episode_delete or show_episode_keep)) and
+        (not (show_audio_delete or show_audio_keep)) and
+        ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) or
+        (isJellyfinServer(the_dict['admin_settings']['server']['brand']) and
+        (not (show_audiobook_delete or show_audiobook_keep)))) and
+        (not (show_recording_delete or show_recording_keep)))
+        ):
+        '''
         if (
         (not (the_dict['DEBUG'])) and
         ((not (show_movie_delete or show_movie_keep)) and
@@ -1076,6 +1128,7 @@ def init_getMedia(the_dict):
             audio_returns=multiprocessing.Manager().dict()
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
                 audiobook_returns=multiprocessing.Manager().dict()
+            #recording_returns=multiprocessing.Manager().dict()
 
             #prepare for post processing; return dictionary of lists of media items to be deleted
             #setup for multiprocessing of the post processing of each media type
@@ -1084,14 +1137,22 @@ def init_getMedia(the_dict):
             mpp_audioGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audio_dict']['media_type'],user_info,audio_returns))
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
                 mpp_audiobookGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['audiobook_dict']['media_type'],user_info,audiobook_returns))
+            #mpp_recordingGetMedia=multiprocessing.Process(target=get_mediaItems,args=(the_dict,the_dict['recording_dict']['media_type'],user_info,recording_returns))                
 
             #start all multi processes
+            ##order intentially: Audio, Episodes, Movies, Audiobooks, Recordings
             #order intentially: Audio, Episodes, Movies, Audiobooks
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+                #mpp_audioGetMedia.start(),mpp_episodeGetMedia.start(),mpp_movieGetMedia.start(),mpp_audiobookGetMedia.start(),mpp_recordingGetMedia.start()
+                #mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join(), mpp_audiobookGetMedia.join(),mpp_recordingGetMedia.join()
+                #mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close(),mpp_audiobookGetMedia.close(),mpp_recordingGetMedia.close()
                 mpp_audioGetMedia.start(),mpp_episodeGetMedia.start(),mpp_movieGetMedia.start(),mpp_audiobookGetMedia.start()
                 mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join(), mpp_audiobookGetMedia.join()
                 mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close(),mpp_audiobookGetMedia.close()
             else:
+                #mpp_audioGetMedia.start(),mpp_episodeGetMedia.start(),mpp_movieGetMedia.start(),mpp_recordingGetMedia.start()
+                #mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join(),mpp_recordingGetMedia.join()
+                #mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close(),mpp_recordingGetMedia.close()
                 mpp_audioGetMedia.start(),mpp_episodeGetMedia.start(),mpp_movieGetMedia.start()
                 mpp_audioGetMedia.join(), mpp_episodeGetMedia.join(), mpp_movieGetMedia.join()
                 mpp_audioGetMedia.close(),mpp_episodeGetMedia.close(),mpp_movieGetMedia.close()
@@ -1102,6 +1163,7 @@ def init_getMedia(the_dict):
             audio_returns={}
             if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
                 audiobook_returns={}
+            #recording_returns={}
 
             #query the server for movie media items
             movie_returns=get_mediaItems(the_dict,the_dict['movie_dict']['media_type'],user_info,movie_returns)
@@ -1115,6 +1177,8 @@ def init_getMedia(the_dict):
                 #Jellyfin sets audiobooks to a media type of audioBook
                 #Emby sets audiobooks to a media type of audio (Emby users, see audio section)
                 audiobook_returns=get_mediaItems(the_dict,the_dict['audiobook_dict']['media_type'],user_info,audiobook_returns)
+            ##query the server for recording media items
+            #recording_returns=get_mediaItems(the_dict,the_dict['recording_dict']['media_type'],user_info,recording_returns)
 
         #if (movie_returns):
         the_dict['movie_dict'].update(movie_returns['media_dict'])
@@ -1132,9 +1196,13 @@ def init_getMedia(the_dict):
         else:
             the_dict['audiobook_dict']={}
             audiobook_found=False
+        ##if (recording_returns):
+        #the_dict['recording_dict'].update(recording_returns['media_dict'])
+        #recording_found=recording_returns['media_found']
 
         the_dict['currentUserPosition']+=1
 
+        #media_found=(movie_found or episode_found or audio_found or audiobook_found or recording_found)
         media_found=(movie_found or episode_found or audio_found or audiobook_found)
 
         if (not (the_dict['all_media_disabled'])):

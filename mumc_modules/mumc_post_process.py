@@ -839,6 +839,7 @@ def init_postProcessing(the_dict):
     else:
         audiobook_dict={}
         audiobook_dict['media_type']='audiobook'
+    #recording_dict=the_dict['recording_dict']
 
     #when debug is disabled allow mulitprocessing
     if (not (the_dict['DEBUG'])):
@@ -852,14 +853,21 @@ def init_postProcessing(the_dict):
         mpp_audioPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,audio_dict,deleteItems_dict))
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
             mpp_audiobookPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,audiobook_dict,deleteItems_dict))
+        #mpp_recordingPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,recording_dict,deleteItems_dict))
 
         #start all multi processes
         #order intentially: Audio, Episodes, Movies, Audiobooks
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
+            #mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_audiobookPostProcess.start(),mpp_recordingPostProcess.start()
+            #mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(), mpp_audiobookPostProcess.join(),mpp_recordingPostProcess.join()
+            #mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_audiobookPostProcess.close(),mpp_recordingPostProcess.close()
             mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_audiobookPostProcess.start()
             mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(), mpp_audiobookPostProcess.join()
             mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_audiobookPostProcess.close()
         else:
+            #mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_recordingPostProcess.start()
+            #mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(),mpp_recordingPostProcess.join()
+            #mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_recordingPostProcess.close()
             mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start()
             mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join()
             mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close()
@@ -875,5 +883,6 @@ def init_postProcessing(the_dict):
             deleteItems_dict=start_postProcessing(the_dict,audiobook_dict,deleteItems_dict)
         else:
             deleteItems_dict['audiobook']=[]
+        #deleteItems_dict=start_postProcessing(the_dict,recording_dict,deleteItems_dict)
 
     return deleteItems_dict

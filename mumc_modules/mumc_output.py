@@ -1,6 +1,20 @@
 import json
+import yaml
 from pathlib import Path
 from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+
+
+class NoAliasDumper(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        return True
+
+
+def save_yaml_config(dataInput,filePathName):
+    #Save the config file
+    with open(filePathName,'w') as file:
+        file.write('---\n')
+        yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
+        file.write('...')
 
 
 def parse_string_and_newlines(string_to_print):

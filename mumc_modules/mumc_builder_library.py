@@ -25,42 +25,46 @@ def create_library_dicts(the_dict):
 
         for pathinfo in lib['LibraryOptions']['PathInfos']:
             pathpos=lib['LibraryOptions']['PathInfos'].index(pathinfo)
-            temp_lib_dict['lib_id']=the_dict['all_libraries'][libpos][libraryGuid]
-            if (('CollectionType' in lib) and
-                (not (lib['CollectionType'] == ''))):
-                temp_lib_dict['collection_type']=lib['CollectionType']
-            else:
-                temp_lib_dict['collection_type']=None
-            if (('Path' in lib['LibraryOptions']['PathInfos'][pathpos]) and
-                (not (lib['LibraryOptions']['PathInfos'][pathpos]['Path'] == ''))):
-                temp_lib_dict['path']=lib['LibraryOptions']['PathInfos'][pathpos]['Path']
-            else:
-                temp_lib_dict['path']=None
-            if (('NetworkPath' in lib['LibraryOptions']['PathInfos'][pathpos]) and
-                (not (lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath'] == ''))):
-                temp_lib_dict['network_path']=lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath']
-            else:
-                temp_lib_dict['network_path']=None
 
-            
-            if (not (isJellyfinServer(the_dict['admin_settings']['server']['brand']))):
-                for lib_info in the_dict['all_library_subfolders']:
-                    for subfolder_info in lib_info['SubFolders']:
-                        if (subfolder_info['Path'] == temp_lib_dict['path']):
-                            temp_lib_dict['subfolder_id']=subfolder_info['Id']
-                            break
-            else:
-                temp_lib_dict['subfolder_id']=None
-            
+            if (not (((lib['Name'] == 'Recordings') and (lib['LibraryOptions']['PathInfos'][pathpos]['Path'].endswith('recordings'))) or
+                     ((lib['Name'] == 'Collections') and (lib['CollectionType'] == 'boxsets')))):
 
-            temp_lib_dict['lib_enabled']=True
+                temp_lib_dict['lib_id']=the_dict['all_libraries'][libpos][libraryGuid]
+                if (('CollectionType' in lib) and
+                    (not (lib['CollectionType'] == ''))):
+                    temp_lib_dict['collection_type']=lib['CollectionType']
+                else:
+                    temp_lib_dict['collection_type']=None
+                if (('Path' in lib['LibraryOptions']['PathInfos'][pathpos]) and
+                    (not (lib['LibraryOptions']['PathInfos'][pathpos]['Path'] == ''))):
+                    temp_lib_dict['path']=lib['LibraryOptions']['PathInfos'][pathpos]['Path']
+                else:
+                    temp_lib_dict['path']=None
+                if (('NetworkPath' in lib['LibraryOptions']['PathInfos'][pathpos]) and
+                    (not (lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath'] == ''))):
+                    temp_lib_dict['network_path']=lib['LibraryOptions']['PathInfos'][pathpos]['NetworkPath']
+                else:
+                    temp_lib_dict['network_path']=None
 
-            the_dict['all_libraries_list'].append(copy.deepcopy(temp_lib_dict))
-            the_dict['all_library_ids_list'].append(temp_lib_dict['lib_id'])
-            the_dict['all_library_paths_list'].append(temp_lib_dict['path'])
-            the_dict['all_library_network_paths_list'].append(temp_lib_dict['network_path'])
-            the_dict['all_library_collection_types_list'].append(temp_lib_dict['collection_type'])
-            the_dict['all_library_path_ids_list'].append(temp_lib_dict['subfolder_id'])
+                
+                if (not (isJellyfinServer(the_dict['admin_settings']['server']['brand']))):
+                    for lib_info in the_dict['all_library_subfolders']:
+                        for subfolder_info in lib_info['SubFolders']:
+                            if (subfolder_info['Path'] == temp_lib_dict['path']):
+                                temp_lib_dict['subfolder_id']=subfolder_info['Id']
+                                break
+                else:
+                    temp_lib_dict['subfolder_id']=None
+                
+
+                temp_lib_dict['lib_enabled']=True
+
+                the_dict['all_libraries_list'].append(copy.deepcopy(temp_lib_dict))
+                the_dict['all_library_ids_list'].append(temp_lib_dict['lib_id'])
+                the_dict['all_library_paths_list'].append(temp_lib_dict['path'])
+                the_dict['all_library_network_paths_list'].append(temp_lib_dict['network_path'])
+                the_dict['all_library_collection_types_list'].append(temp_lib_dict['collection_type'])
+                the_dict['all_library_path_ids_list'].append(temp_lib_dict['subfolder_id'])
 
     the_dict.pop('all_libraries')
     
