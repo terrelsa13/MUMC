@@ -890,7 +890,7 @@ def init_getMedia(the_dict):
                 #parent_id='lib_id'
             #else:
                 #if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    #library_id='subfolder_id'
+                    #library_id='lib_id'
                     #parent_id='lib_id'
                 #else:
                     #library_id='lib_id'
@@ -909,7 +909,7 @@ def init_getMedia(the_dict):
                 #parent_id='lib_id'
             #else:
                 #if (('subfolder_id' in lib_info) and (not (lib_info['subfolder_id'] == None))):
-                    #library_id='subfolder_id'
+                    #library_id='lib_id'
                     #parent_id='lib_id'
                 #else:
                     #library_id='lib_id'

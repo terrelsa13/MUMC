@@ -5,12 +5,12 @@ labels:
 body:
   - type: markdown
     attributes:
-      value: Thank you for reaching out.
+      value: Thank you for reaching out. Please fill out this form as completely as possible.
   - type: dropdown
     id: wiki
     attributes:
       label: "Have You Read The [Wiki](https://github.com/terrelsa13/MUMC/wiki):"
-      description: Seriously, have you read it?
+      description: Seriously, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)? It has a lot of helpful information.
       multiple: false
       options:
         - "Yes"
@@ -21,19 +21,19 @@ body:
     id: desired
     attributes:
       label: "Describe What You Are Trying To Accomplish:"
-      description: Please use non technical terms.
+      description: Please use non-technical terms.
     validations:
       required: true
   - type: textarea
     id: undesired
     attributes:
       label: "Describe What Is Happening:"
-      description: Please use non technical terms.
+      description: Please use non-technical terms.
     validations:
       required: true
   - type: textarea
     id: additional
     attributes:
-      label: "Any Additional Information You Think Is Useful:"
+      label: "Any Additional Information You Think Will Be Useful:"
     validations:
       required: false
