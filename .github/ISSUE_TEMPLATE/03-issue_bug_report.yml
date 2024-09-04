@@ -47,9 +47,9 @@ body:
       description: Choose one or more.
       multiple: true
       options:
-        - Docker
-        - Windows
         - Linux
+        - Windows
+        - Docker
     validations:
       required: true
   - type: textarea
