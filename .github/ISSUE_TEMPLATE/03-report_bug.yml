@@ -20,7 +20,7 @@ body:
   - type: textarea
     id: mumcoutput
     attributes:
-      label: "Relevant MUMC Cosole Output:"
+      label: "Relevant MUMC Console Output:"
       description: Please copy and paste any relevant MUMC console output. Include console output before and after your exact error when possible. This will be automatically formatted into code; no need for backticks.
       render: shell
     validations:
