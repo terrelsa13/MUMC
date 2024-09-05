@@ -1,4 +1,4 @@
-name: "Bug Report"
+name: "Report Bug"
 description: 'Report a reproducible bug in MUMC'
 labels:
 - issue / bug
