@@ -9,12 +9,12 @@ body:
   - type: dropdown
     id: wiki
     attributes:
-      label: "Have You Read The [Wiki](https://github.com/terrelsa13/MUMC/wiki):"
+      label: "Have You Read The Wiki?:"
       description: Seriously, have you read the [Wiki](https://github.com/terrelsa13/MUMC/wiki)? It has a lot of helpful information.
       multiple: false
       options:
-        - "Yes"
         - "No"
+        - "Yes"
     validations:
       required: true
   - type: textarea
