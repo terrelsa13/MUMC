@@ -1,0 +1,23 @@
+# Number of days of inactivity before an issue becomes stale
+daysUntilStale: 60
+# Number of days of inactivity before a stale issue is closed
+daysUntilClose: 7
+# Issues with these labels will never be considered stale
+exemptLabels:
+  - pinned
+  #- security
+  #- issue / bug
+  #- help wanted
+  #- feature request
+  #- planned
+  #- in progress
+  #- enhancement
+# Label to use when marking an issue as stale
+#staleLabel: wontfix
+staleLabel: beep boop beep
+# Comment to post when marking an issue as stale. Set to `false` to disable
+markComment: >
+  Stale-Bot will automatically close this issue if no further activity occurs in 7 days. Thank you
+  for your contributions.
+# Comment to post when closing a stale issue. Set to `false` to disable
+closeComment: false
