@@ -24,16 +24,16 @@ def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
 
-    #remove old DEBUG if it exists
-    delete_debug_log(init_dict)
-
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
 
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
-    #Look for missing subfolder Ids and add them
+    #after importing the config; remove old DEBUG if it exists
+    delete_debug_log(init_dict)
+
+    #look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
 
     #remember original config for when user wants to update existing config file

@@ -124,11 +124,3 @@ def append_long_string_to_file(dataInput,filePathName,character_limit=128):
     finally:
         #finally close the file
         file.close()
-
-
-#def save_yaml_config(dataInput,filePathName):
-    ##Save the config file
-    #with open(filePathName,'w') as file:
-        #file.write('---\n')
-        #yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
-        #file.write('...')

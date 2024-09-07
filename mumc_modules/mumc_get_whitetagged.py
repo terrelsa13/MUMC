@@ -1,7 +1,7 @@
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,list_to_urlparsed_string
-from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
+from mumc_modules.mumc_server_type import isEmbyServer
 
 
 def init_blacklist_whitetagged_query(var_dict):

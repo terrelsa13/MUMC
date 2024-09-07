@@ -1,6 +1,5 @@
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_compare_items import get_isItemMatching,does_index_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
@@ -167,14 +166,12 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                     Recursive='True'
                     EnableImages='False'
                     CollapseBoxSetItems='False'
-                    #IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
                     while (data_dict['QueriesRemaining_']):
 
                         if (not (data['Id'] == '')):
                             #Built query for child media items
                             url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                            #'&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&IsPlayed=' + IsPlayedState +
                             '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) +
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
@@ -198,49 +195,6 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or
                                 (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
 
-                                #if ('whitelist' in suffix_str.casefold()):
-                                    #libType='whitelist'
-                                #else: #('blacklist' in suffix_str.casefold()):
-                                    #libType='blacklist'
-
-                                #Save lib_id for each media item; needed during post processing
-                                #child_item['mumc']={}
-                                #child_item['mumc']['lib_id']=var_dict['this_' + libType + '_lib']['lib_id']
-                                #child_item['mumc']['path']=var_dict['this_' + libType + '_lib']['path']
-                                #child_item['mumc']['network_path']=var_dict['this_' + libType + '_lib']['network_path']
-
-                            #if (child_item['Type'].casefold() == 'movie'):
-                                #childIsTagged,matched_tags=get_isMOVIE_Tagged(the_dict,child_item,user_info,var_dict[tagType])
-                            #elif (child_item['Type'].casefold() == 'episode'):
-                                #childIsTagged,matched_tags=get_isEPISODE_Tagged(the_dict,child_item,user_info,var_dict[tagType])
-                            #elif (child_item['Type'].casefold() == 'audio'):
-                                #childIsTagged,matched_tags=get_isAUDIO_Tagged(the_dict,child_item,user_info,var_dict[tagType])
-                            #elif (child_item['Type'].casefold() == 'audiobook'):
-                                #childIsTagged,matched_tags=get_isAUDIOBOOK_Tagged(the_dict,child_item,user_info,var_dict[tagType])
-                            #else:
-                                #childIsTagged=False
-
-                            #if (childIsTagged):
-                                #remove all tags from media_item
-                                #child_item=removeTags_From_mediaItem(child_item,the_dict)
-                                #add matching tags to media_item
-                                #child_item=addTags_To_mediaItem(matched_tags,child_item,the_dict)
-
-                                #Emby and jellyfin store tags differently
-                                #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                                    #tagData='TagItems'
-                                #else:
-                                    #tagData='Tags'
-
-                                #matched_tags=[]
-
-                                #for this_tag in data[tagData]:
-                                    #if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                                        #matched_tags.append(this_tag['Name'])
-                                    #else:
-                                        #matched_tags.append(this_tag)
-
-                                #child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
                                 child_item=addTags_To_mediaItem(getList_Of_thisItemsTags(data,the_dict),child_item,the_dict)
 
     child_dict['Items']=data_dict['data_']['Items']
@@ -280,12 +234,9 @@ def get_isFilterStatementTag(this_tag):
                                     split_this_tag[4]=False
                                     isFilterStatementTag=True
                                 else:
-                                    #raise ValueError('Filter statement tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
                                     split_this_tag[4]=None
                                     isFilterStatementTag=False
                             else:
-                                #split_this_tag.append(True) #default behavioral_control value
-                                #isFilterStatementTag=True
                                 split_this_tag.append(False)
                                 isFilterStatementTag=True
                         else:
@@ -298,14 +249,11 @@ def get_isFilterStatementTag(this_tag):
     else:
         return isFilterStatementTag
 
-    #return isFilterStatementTag
-
 
 #Get if tag is formatted as a played or created filter statement tag
 def get_isPlayedCreated_FilterStatementTag(this_tag):
 
     isFilterStatementTag=False
-    #split_this_tag=this_tag.split(':')
     filterStatementTag={}
 
     isFilterStatementTag=get_isFilterStatementTag(this_tag)
@@ -314,9 +262,6 @@ def get_isPlayedCreated_FilterStatementTag(this_tag):
 
         split_this_tag=isFilterStatementTag
 
-        #filterStatementTag['filter_type']=split_this_tag[0]
-
-        #if (filterStatementTag['filter_type'] == 'played'):
         if (split_this_tag[0] == 'played'):
             filterStatementTag['media_played_days']=int(split_this_tag[1])
             filterStatementTag['media_played_count_comparison']=split_this_tag[2]
@@ -346,8 +291,6 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_MOVIE['movie'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            #matched_tags.clear()
 
 ### End Movie ###################################################################################
 
@@ -386,8 +329,6 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_EPISODE['episode'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            #matched_tags.clear()
 
 ### End Episode ###################################################################################
 
@@ -475,8 +416,6 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_AUDIO['track'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            #matched_tags.clear()
 
 ### End Track #####################################################################################
 
@@ -524,95 +463,3 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
 #determine if genres for audiobook track, book, or audio book library are tagged
 def get_isAUDIOBOOK_Tagged(the_dict,item,user_info,usertags):
     return get_isAUDIO_Tagged(the_dict,item,user_info,usertags)
-
-
-'''
-#determine if recording, season, series, or studio-network are tagged
-def get_isRECORDING_Tagged(the_dict,item,user_info,usertags):
-
-    matched_tags=[]
-
-    #define empty dictionary for tagorited TV Series, Seasons, Recordings, and Channels/Networks
-    istag_RECORDING={'recording':{},'season':{},'series':{},'tvlibrary':{},'seriesstudionetwork':{}}
-
-    if (('mumc' in item) and ('lib_id' in item['mumc']) and (item['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][user_info['user_id']])):
-
-### Recording #######################################################################################
-
-        if ('Id' in item):
-            istag_RECORDING['recording'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            #matched_tags.clear()
-
-### End Recording ###################################################################################
-
-### Season ########################################################################################
-
-        if ('SeasonId' in item):
-            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeasonId'],'season_info',the_dict)
-        elif ('ParentId' in item):
-            season_item_info = get_ADDITIONAL_itemInfo(user_info,item['ParentId'],'season_info',the_dict)
-        else:
-            season_item_info=None
-
-        if (not (season_item_info == None)):
-            istag_RECORDING['season'][season_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,season_item_info,the_dict)
-
-### End Season ####################################################################################
-
-### Series ########################################################################################
-
-            if ('SeriesId' in item):
-                series_item_info = get_ADDITIONAL_itemInfo(user_info,item['SeriesId'],'series_info',the_dict)
-            elif ('SeriesId' in season_item_info):
-                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['SeriesId'],'series_info',the_dict)
-            elif ('ParentId' in season_item_info):
-                series_item_info = get_ADDITIONAL_itemInfo(user_info,season_item_info['ParentId'],'series_info',the_dict)
-            else:
-                series_item_info=None
-
-            if (not (series_item_info == None)):
-                istag_RECORDING['series'][series_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,series_item_info,the_dict)
-
-### End Series ####################################################################################
-
-### TV Library ########################################################################################
-
-                if ('ParentId' in series_item_info):
-                    tvlibrary_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['ParentId'],'tv_library_info',the_dict)
-                else:
-                    tvlibrary_item_info=None
-
-                if (not (tvlibrary_item_info == None)):
-                    istag_RECORDING['tvlibrary'][tvlibrary_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,tvlibrary_item_info,the_dict)
-
-### End TV Library ####################################################################################
-
-### Studio Network #######################################################################################
-
-                if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0)):
-                    #Get studio network's item info
-                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
-                elif ('SeriesStudio' in series_item_info):
-                    #Get series studio network's item info
-                    tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict,the_dict)
-                else:
-                    tvstudionetwork_item_info=None
-
-                if (not (tvstudionetwork_item_info == None)):
-                    istag_RECORDING['seriesstudionetwork'][tvstudionetwork_item_info['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,tvstudionetwork_item_info,the_dict)
-
-### End Studio Network ###################################################################################
-
-    for istagkey in istag_RECORDING:
-        for istagID in istag_RECORDING[istagkey]:
-            if (istag_RECORDING[istagkey][istagID]):
-                if (the_dict['DEBUG']):
-                    appendTo_DEBUG_log("\n\nRecording " + str(item['Id']) + " is tagged.",2,the_dict)
-                return True,matched_tags
-
-    if (the_dict['DEBUG']):
-        appendTo_DEBUG_log("\n\nRecording " + str(item['Id']) + " is NOT tagged.",2,the_dict)
-
-    return False,matched_tags
-'''

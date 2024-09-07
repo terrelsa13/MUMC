@@ -19,25 +19,13 @@ def sort_audio_deleteItems_List(item):
 def sort_audiobook_deleteItems_List(item):
     return sort_audio_deleteItems_List(item)
 
-##sort the recording delete list
-#def sort_recording_deleteItems_List(item):
-    #return str(item['Name'])
-
 def sortDeleteLists(deleteItems_dict):
     deleteItems_movie=deleteItems_dict['movie']
     deleteItems_episode=deleteItems_dict['episode']
     deleteItems_audio=deleteItems_dict['audio']
     deleteItems_audiobook=deleteItems_dict['audiobook']
-    #deleteItems_recording=deleteItems_dict['recording']
 
     #sort and combine into single list
-    '''
-    deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) +
-                sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
-                sorted(deleteItems_audio,key=sort_audio_deleteItems_List) +
-                sorted(deleteItems_audiobook,key=sort_audiobook_deleteItems_List) +
-                sorted(deleteItems_recording,key=sort_recording_deleteItems_List))
-    '''                
     deleteItems=(sorted(deleteItems_movie,key=sort_movie_deleteItems_List) +
                 sorted(deleteItems_episode,key=sort_episode_deleteItems_List) +
                 sorted(deleteItems_audio,key=sort_audio_deleteItems_List) +

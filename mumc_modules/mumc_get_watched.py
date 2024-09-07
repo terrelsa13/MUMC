@@ -1,6 +1,6 @@
 from mumc_modules.mumc_url import api_query_handler,build_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
-from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
+from mumc_modules.mumc_server_type import isEmbyServer
 from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 
 

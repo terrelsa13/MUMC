@@ -58,8 +58,17 @@ def print_cache_stats(the_dict):
         strings_list_to_print+=the_dict['console_separator'] + '\n'
         strings_list_to_print+='Number of cache hits: ' + str(the_dict['cached_data'].cached_data_hits) + '\n'
         strings_list_to_print+='Number of cache misses: ' + str(the_dict['cached_data'].cached_data_misses) + '\n'
-        strings_list_to_print+='Percentage of cache hits: ' + str(100 - ((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100)) + '%\n'
-        strings_list_to_print+='Percentage of cache misses: ' + str((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100) + '%\n'
+        if (int(the_dict['cached_data'].cached_data_hits) > 0):
+            strings_list_to_print+='Percentage of cache hits: ' + str(100 - ((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100)) + '%\n'
+        else:
+            strings_list_to_print+='Percentage of cache hits: 0%\n'
+        if (int(the_dict['cached_data'].cached_data_hits) > 0):
+            strings_list_to_print+='Percentage of cache misses: ' + str((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100) + '%\n'
+        else:
+            if (int(the_dict['cached_data'].cached_data_misses) > 0):
+                strings_list_to_print+='Percentage of cache misses: 100%\n'
+            else:
+                strings_list_to_print+='Percentage of cache misses: 0%\n'
         strings_list_to_print+='Configured max cache size: ' + str(the_dict['cached_data'].api_query_cache_size) + '\n'
         strings_list_to_print+='Size of remaining data in cache: ' + str(the_dict['cached_data'].total_cached_data_size) + '\n'
         strings_list_to_print+='Size of all data removed from cache: ' + str(the_dict['cached_data'].total_cached_data_size_removed) + '\n'
@@ -174,8 +183,6 @@ def build_print_media_item_details(item,var_dict,the_dict):
                 strings_list+=' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Album: ' + item['Album'] + ' - Artist: ' + item['Artists'][0] + ' - Record Label: ' + item['Studios'][0]['Name']
             elif (mediaType == 'audiobook'):
                 strings_list+=' - Track #' + str(item['IndexNumber']) + ': ' + item['Name'] + ' - Book: ' + item['Album'] + ' - Author: ' +item['Artists'][0]
-            #if (mediaType == 'recording'):
-                #strings_list+=' - ' + item['Name'] + ' - ' + item['Studios'][0]['Name']
 
             strings_list+=' - ' + days_since_played + ' - Play Count: ' + str(item['UserData']['PlayCount']) + ' - ' + days_since_created + ' - Favorite: ' + str(isFavorited_Display) + ' - Whitetag: ' + \
                 str(isWhitetagged_Display) + ' - Blacktag: ' + str(isBlacktagged_Display) + ' - Whitelisted: ' + str(isWhitelisted_Display) + ' - Blacklisted: ' + str(isBlacklisted_Display) + ' - ' + item['Type'] + 'ID: ' + item['Id']
@@ -371,14 +378,12 @@ def print_all_media_disabled(the_dict):
     strings_list_to_print+="* basic_settings > filter_statements > audio > played > condition_days: -1             *" + '\n'
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         strings_list_to_print+="* basic_settings > filter_statements > audiobook > played > condition_days: -1         *" + '\n'
-    #strings_list_to_print+="* basic_settings > filter_statements > recording > played > condition_days: -1        *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > movie > created > condition_days: -1            *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > episode > created > condition_days: -1          *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > audio > created > condition_days: -1            *" + '\n'
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         strings_list_to_print+="* basic_settings > filter_statements > audiobook > created > condition_days: -1        *" + '\n'
-    #strings_list_to_print+="* basic_settings > filter_statements > recording > created > condition_days: -1            *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* OR                                                                                   *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'

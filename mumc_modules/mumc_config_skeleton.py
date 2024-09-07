@@ -26,10 +26,6 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['basic_settings']['filter_statements']['audiobook']['played']={}
         the_dict['basic_settings']['filter_statements']['audiobook']['created']={}
 
-    #the_dict['basic_settings']['filter_statements']['recording']={}
-    #the_dict['basic_settings']['filter_statements']['recording']['played']={}
-    #the_dict['basic_settings']['filter_statements']['recording']['created']={}
-
     the_dict['basic_settings']['filter_tags']={}
     the_dict['basic_settings']['filter_tags']['movie']={}
     the_dict['basic_settings']['filter_tags']['movie']['whitetags']=[]
@@ -47,10 +43,6 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['basic_settings']['filter_tags']['audiobook']={}
         the_dict['basic_settings']['filter_tags']['audiobook']['whitetags']=[]
         the_dict['basic_settings']['filter_tags']['audiobook']['blacktags']=[]
-
-    #the_dict['basic_settings']['filter_tags']['recording']={}
-    #the_dict['basic_settings']['filter_tags']['recording']['whitetags']=[]
-    #the_dict['basic_settings']['filter_tags']['recording']['blacktags']=[]
 
     the_dict['advanced_settings']={}
     the_dict['advanced_settings']['filter_statements']={}
@@ -106,19 +98,6 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['whitetagged']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['blacktagged']=None
         the_dict['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=None
-
-    #the_dict['advanced_settings']['filter_statements']['recording']={}
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']={}
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']={}
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['favorited']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['whitetagged']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['blacktagged']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['whitelisted']['played']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']={}
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['favorited']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['whitetagged']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['blacktagged']=None
-    #the_dict['advanced_settings']['filter_statements']['recording']['query_filter']['blacklisted']['played']=None
 
     the_dict['advanced_settings']['behavioral_statements']={}
     the_dict['advanced_settings']['behavioral_statements']['movie']={}
@@ -278,47 +257,6 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['action_control']=-1
         the_dict['advanced_settings']['behavioral_statements']['audiobook']['blacklisted']['dynamic_behavior']=None
 
-    '''
-    the_dict['advanced_settings']['behavioral_statements']['recording']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['action']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['user_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['played_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['action_control']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['dynamic_behavior']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['favorited']['extra']={}
-
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['user_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['played_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['action_control']=-1
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['dynamic_behavior']=None
-    #the_dict['advanced_settings']['behavioral_statements']['recording']['whitetagged']['tags']=[]
-
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['user_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['played_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['action_control']=-1
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['dynamic_behavior']=None
-    #the_dict['advanced_settings']['behavioral_statements']['recording']['blacktagged']['tags']=[]
-
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['user_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['played_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['action_control']=-1
-    the_dict['advanced_settings']['behavioral_statements']['recording']['whitelisted']['dynamic_behavior']=None
-
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']={}
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['user_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['played_conditional']=None
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['action_control']=-1
-    the_dict['advanced_settings']['behavioral_statements']['recording']['blacklisted']['dynamic_behavior']=None
-    '''
-
     the_dict['advanced_settings']['behavioral_tags']={}
     the_dict['advanced_settings']['behavioral_tags']['movie']={}
     #the_dict['advanced_settings']['behavioral_tags']['movie']['played:-1:>=:1']={}
@@ -385,24 +323,6 @@ def setYAMLConfigSkeleton(the_dict):
         #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['dynamic_behavior']=None
         #the_dict['advanced_settings']['behavioral_tags']['audiobook']['created:-1:>=:1:true']['high_priority']=None
 
-    '''
-    the_dict['advanced_settings']['behavioral_tags']['recording']={}
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']={}
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['action']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['user_conditional']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['played_conditional']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['action_control']=-1
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['dynamic_behavior']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['played:-1:>=:1']['high_priority']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']={}
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['action']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['user_conditional']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['played_conditional']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['action_control']=-1
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['dynamic_behavior']=None
-    #the_dict['advanced_settings']['behavioral_tags']['recording']['created:-1:>=:1:true']['high_priority']=None
-    '''
-
     the_dict['advanced_settings']['whitetags']={}
     the_dict['advanced_settings']['whitetags']['global']=[]
     the_dict['advanced_settings']['whitetags']['movie']=[]
@@ -410,7 +330,6 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['whitetags']['audio']=[]
     if (server_brand == 'jellyfin'):
         the_dict['advanced_settings']['whitetags']['audiobook']=[]
-    #the_dict['advanced_settings']['whitetags']['recording']=[]
     the_dict['advanced_settings']['blacktags']={}
     the_dict['advanced_settings']['blacktags']['global']=[]
     the_dict['advanced_settings']['blacktags']['movie']=[]
@@ -418,7 +337,6 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['blacktags']['audio']=[]
     if (server_brand == 'jellyfin'):
         the_dict['advanced_settings']['blacktags']['audiobook']=[]
-    #the_dict['advanced_settings']['blacktags']['recording']=[]
     
     the_dict['advanced_settings']['delete_empty_folders']={}
     the_dict['advanced_settings']['delete_empty_folders']['episode']={}
@@ -564,33 +482,6 @@ def setYAMLConfigSkeleton(the_dict):
         the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']={}
         the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']['font']={}
         the_dict['advanced_settings']['console_controls']['audiobook']['summary']['formatting']['background']={}
-
-    '''
-    the_dict['advanced_settings']['console_controls']['recording']={}
-    the_dict['advanced_settings']['console_controls']['recording']['delete']={}
-    the_dict['advanced_settings']['console_controls']['recording']['delete']['show']=True
-    the_dict['advanced_settings']['console_controls']['recording']['delete']['formatting']={}
-    the_dict['advanced_settings']['console_controls']['recording']['delete']['formatting']['font']={}
-    the_dict['advanced_settings']['console_controls']['recording']['delete']['formatting']['background']={}
-
-    the_dict['advanced_settings']['console_controls']['recording']['keep']={}
-    the_dict['advanced_settings']['console_controls']['recording']['keep']['show']=True
-    the_dict['advanced_settings']['console_controls']['recording']['keep']['formatting']={}
-    the_dict['advanced_settings']['console_controls']['recording']['keep']['formatting']['font']={}
-    the_dict['advanced_settings']['console_controls']['recording']['keep']['formatting']['background']={}
-
-    the_dict['advanced_settings']['console_controls']['recording']['post_processing']={}
-    the_dict['advanced_settings']['console_controls']['recording']['post_processing']['show']=True
-    the_dict['advanced_settings']['console_controls']['recording']['post_processing']['formatting']={}
-    the_dict['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['font']={}
-    the_dict['advanced_settings']['console_controls']['recording']['post_processing']['formatting']['background']={}
-
-    the_dict['advanced_settings']['console_controls']['recording']['summary']={}
-    the_dict['advanced_settings']['console_controls']['recording']['summary']['show']=True
-    the_dict['advanced_settings']['console_controls']['recording']['summary']['formatting']={}
-    the_dict['advanced_settings']['console_controls']['recording']['summary']['formatting']['font']={}
-    the_dict['advanced_settings']['console_controls']['recording']['summary']['formatting']['background']={}
-    '''
 
     the_dict['admin_settings']={}
 

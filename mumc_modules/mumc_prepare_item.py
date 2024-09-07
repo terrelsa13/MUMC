@@ -8,29 +8,9 @@ from mumc_modules.mumc_compare_items import does_index_exist
 # if it does not populate it with unknown
 def prepare_MOVIEoutput(the_dict,item,user_info,var_dict):
 
-    '''
-    mediaType=var_dict['media_type_lower']
-
-    if (mediaType == 'movie'):
-        movie_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
-        recording_set_missing_last_played_date=0
-    elif (mediaType == 'recording'):
-        recording_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
-        movie_set_missing_last_played_date=0
-    else:
-        movie_set_missing_last_played_date=0
-        recording_set_missing_last_played_date=0
-    '''
-
     movie_set_missing_last_played_date=var_dict['media_set_missing_last_played_date']
 
     if (the_dict['DEBUG']):
-        '''
-        if (mediaType == "movie"):
-            appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output",2,the_dict)
-        elif (mediaType == "recording"):
-            appendTo_DEBUG_log("\n\nPreparing Recording " + item['Id'] + " For Output",2,the_dict)
-        '''
         appendTo_DEBUG_log("\n\nPreparing Movie " + item['Id'] + " For Output",2,the_dict)
 
     if (not ('Type' in item)):
@@ -57,7 +37,6 @@ def prepare_MOVIEoutput(the_dict,item,user_info,var_dict):
             appendTo_DEBUG_log("\nitem['Studios'][0]{'Name':'Unknown'} Was Missing",3,the_dict)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if (not ('LastPlayedDate' in item['UserData'])):
-            #if (((mediaType == "movie") and (movie_set_missing_last_played_date == 1)) or (mediaType == "recording") and (recording_set_missing_last_played_date == 1)):
             if (movie_set_missing_last_played_date):
                 modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
