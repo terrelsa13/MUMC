@@ -132,15 +132,17 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                         if ('path' in libinfo):
                             path_found += 1
                             check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['path']
-                            #Check path is string
-                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
+                            #Check path is string; checking for backslashes does not work for windows
+                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
+                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('network_path' in libinfo):
                             network_path_found += 1
                             check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['network_path']
-                            #Check network_path is string
-                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
+                            #Check network_path is string; checking for backslashes does not work for windows
+                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
+                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('subfolder_id' in libinfo):

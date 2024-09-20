@@ -493,20 +493,20 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings'].pop('whitetags')
     else:
         config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
-    config_data['advanced_settings']['whitetags'].pop('movie')
-    config_data['advanced_settings']['whitetags'].pop('episode')
-    config_data['advanced_settings']['whitetags'].pop('audio')
-    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
-        config_data['advanced_settings']['whitetags'].pop('audiobook')
+        config_data['advanced_settings']['whitetags'].pop('movie')
+        config_data['advanced_settings']['whitetags'].pop('episode')
+        config_data['advanced_settings']['whitetags'].pop('audio')
+        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+            config_data['advanced_settings']['whitetags'].pop('audiobook')
     if (the_dict['advanced_settings']['blacktags']['global'] == []):
         config_data['advanced_settings'].pop('blacktags')
     else:
         config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
-    config_data['advanced_settings']['blacktags'].pop('movie')
-    config_data['advanced_settings']['blacktags'].pop('episode')
-    config_data['advanced_settings']['blacktags'].pop('audio')
-    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
-        config_data['advanced_settings']['blacktags'].pop('audiobook')
+        config_data['advanced_settings']['blacktags'].pop('movie')
+        config_data['advanced_settings']['blacktags'].pop('episode')
+        config_data['advanced_settings']['blacktags'].pop('audio')
+        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+            config_data['advanced_settings']['blacktags'].pop('audiobook')
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('episode_control')
     config_data['advanced_settings'].pop('trakt_fix')
