@@ -58,7 +58,7 @@ def show_hide_gui_disabled_users(the_dict):
 
 def print_users_to_console(the_dict):
 
-    if (len(the_dict['all_users_dict']) > 1):
+    if (len(the_dict['all_users_dict']) >= 1):
         for user in the_dict['all_users_dict']:
             the_dict['user_index_total']=the_dict['all_users_dict'].index(user)
             the_dict['all_users_dict'][the_dict['user_index_total']]['userPosition']=the_dict['user_index_total']
