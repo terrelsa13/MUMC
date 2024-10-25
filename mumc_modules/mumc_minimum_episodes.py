@@ -76,7 +76,6 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                     #if userId has not already been processed; add it so it can be
                     if (not (userId in episodes_toBeDeletedOrRemain[episodeItem['SeriesId']])):
                         #gather information needed to determine how many played and unplayed episodes may be deleted
-                        #episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]=defaultdict(dict)
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]={}
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['PlayedToBeDeleted'] = 0
                         episodes_toBeDeletedOrRemain[episodeItem['SeriesId']][userId]['UnplayedToBeDeleted'] = 0
@@ -121,7 +120,6 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                     #if userId has not already been processed; add it so it can be
                     if (not (userId in episodes_toBeDeletedOrRemain[episodeItem['SeriesId']])):
                         #gather information needed to determine how many played and unplayed episodes may be deleted
-                        #episodes_toBeDeletedOrRemain[series_info['Id']][userId]=defaultdict(dict)
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]={}
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['PlayedToBeDeleted'] = 0
                         episodes_toBeDeletedOrRemain[series_info['Id']][userId]['UnplayedToBeDeleted'] = 0
@@ -283,10 +281,8 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
             #ignore non-essential data
             if (not ((episodeId == 'SeriesName') or (episodeId == 'MaxSeason') or (episodeId == 'MaxEpisode') or (episodeId == 'SeasonEpisodeGrid'))):
                 #get the key for this entry, which is the season number as the first element of a list
-                #seasonNum=list(episodeTracker[seriesId][episodeId].keys())
                 seasonNum=list(episodeTracker[seriesId][episodeId].keys())[0]
                 #use the season number and the value from the season number key (aka episode number) to save the episodeId in the correct grid position
-                #episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum[0]][episodeTracker[seriesId][episodeId][seasonNum[0]]]=episodeId
                 episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNum][episodeTracker[seriesId][episodeId][seasonNum]]=episodeId
 
     #check if minimum_number_episodes_behavior is equal to any of the behaviorType keys
@@ -460,82 +456,83 @@ def get_minEpisodesToKeep(postproc_dict,the_dict):
                 episodeTracker[seriesId]['UnplayedToBeDeleted'] = episodes_toBeDeletedOrRemain[seriesId][minPlayed_ToBeDeleted[0]['user_id']]['UnplayedToBeDeleted']
 
     episodesToKeepIds = []
+    #loop thru each series
     for seriesId in episodeTracker:
-        #turnOn=False
+        #manually set seasonNumIndex from the season x episode grid because episodeTracker[seriesId]['SeasonEpisodeGrid'].index(seasonNumIndex) returns false positives when more than one season index is full of ''
         seasonNumIndex = 0
+        #loop thru each season in the season x episode grid
         for _ in episodeTracker[seriesId]['SeasonEpisodeGrid']:
-            #episodeNumIndex = 0
-            #for __ in episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex]:
+            #loop thru each episode position in the season x episode grid
             for episodeId in episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex]:
-                #if (not (episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex][episodeNumIndex] == '')):
-                    #played_status = False
-                    #episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex][episodeNumIndex]
+                #check if episode is not populated for this position of the season x episode grid
                 if (not (episodeId == '')):
+                    #check if episodeId is in the list of items to be deleted
                     if (episodeId in deleteItems_Tracker):
+                        #get the index of this episodeId from deleteItems_Tracker
                         episode_index=deleteItems_Tracker.index(episodeId)
+                        #verify this index matches the same episode and position in deleteItems list
                         if (episodeId == deleteItems[episode_index]['Id']):
+                            #veriy this use has access to the library this episode is in
                             if (deleteItems[episode_index]['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo']['user_id']]):
                                 #get played status for specified episodeId
                                 played_status=get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',the_dict)
+                                #verify info was returned and episode is played
                                 if ((not (played_status == False)) and played_status['UserData']['Played']):
+                                    #are the expected number of played episodes to be deleted > 0
                                     if (episodeTracker[seriesId]['PlayedToBeDeleted'] > 0):
+                                        #decrement the expected number of played episodes to be deleted by 1
                                         episodeTracker[seriesId]['PlayedToBeDeleted'] -= 1
-                                        #turnOn=True
-                                    else:
-                                        #if ((not (episodeId in episodesToKeepIds)) and turnOn):
+                                    else: #verify the expected number of played episodes to be deleted is == 0
+                                        #check if episodeId is already in the list of episodeIds to be kept
                                         if (not (episodeId in episodesToKeepIds)):
+                                            #add this episodeId to the list of episodeIds to be removed from the delete list later
                                             episodesToKeepIds.append(episodeId)
-                #episodeNumIndex += 1
             seasonNumIndex += 1
-
-    #episodesToKeepIds = []
+    #loop thru each series
     for seriesId in episodeTracker:
-        #turnOn=False
+        #manually set seasonNumIndex from the season x episode grid because episodeTracker[seriesId]['SeasonEpisodeGrid'].index(seasonNumIndex) returns false positives when more than one season index is full of ''
         seasonNumIndex = 0
+        #loop thru each season in the season x episode grid
         for _ in episodeTracker[seriesId]['SeasonEpisodeGrid']:
-            #episodeNumIndex = 0
-            #for __ in episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex]:
+            #loop thru each episode position in the season x episode grid
             for episodeId in episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex]:
-                #if (not (episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex][episodeNumIndex] == '')):
-                    #unplayed_status = False
-                    #episodeId = episodeTracker[seriesId]['SeasonEpisodeGrid'][seasonNumIndex][episodeNumIndex]
+                #check if episode is not populated for this position of the season x episode grid
                 if (not (episodeId == '')):
+                    #check if episodeId is in the list of items to be deleted
                     if (episodeId in deleteItems_Tracker):
+                        #get the index of this episodeId from deleteItems_Tracker
                         episode_index=deleteItems_Tracker.index(episodeId)
+                        #verify this index matches the same episode and position in deleteItems list
                         if (episodeId == deleteItems[episode_index]['Id']):
+                            #veriy this use has access to the library this episode is in
                             if (deleteItems[episode_index]['mumc']['lib_id'] in the_dict['byUserId_accessibleLibraries'][episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo']['user_id']]):
                                 #get unplayed status for specified episodeId
                                 unplayed_status=get_ADDITIONAL_itemInfo(episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for unplayed item',the_dict)
+                                #verify info was returned and episode is unplayed
                                 if ((not (unplayed_status == False)) and (not unplayed_status['UserData']['Played'])):
+                                    #are the expected number of unplayed episodes to be deleted > 0
                                     if (episodeTracker[seriesId]['UnplayedToBeDeleted'] > 0):
+                                        #decrement the expected number of unplayed episodes to be deleted by 1
                                         episodeTracker[seriesId]['UnplayedToBeDeleted'] -= 1
-                                        #turnOn=True
-                                    else:
-                                        #if ((not (episodeId in episodesToKeepIds)) and turnOn):
+                                    else: #verify the expected number of unplayed episodes to be deleted is == 0
+                                        #check if episodeId is already in the list of episodeIds to be kept
                                         if (not (episodeId in episodesToKeepIds)):
+                                            #add this episodeId to the list of episodeIds to be removed from the delete list later
                                             episodesToKeepIds.append(episodeId)
-                #episodeNumIndex += 1
             seasonNumIndex += 1
 
     #loop thru each series
     for episodeId in episodesToKeepIds:
+        #loop while the number of instances of episodeId in the deleteItems_Tracker is > 0
         while deleteItems_Tracker.count(episodeId):
+            #remove this episodeId from the deleteItems list
             deleteItems.pop(deleteItems_Tracker.index(episodeId))
-            #deleteItems_Tracker.pop(deleteItems_Tracker.index(episodeId))
+            #remove this episodeId from the deleteItems_Tracker list
             deleteItems_Tracker.remove(episodeId)
-                #check if episodeId matches and is to be deleted
 
-    ##loop thru each series
-    #for seriesId in episodeTracker:
-        ##loop thru each item that may be deleted
-            ##verify media item is an episode
-        ##loop thru each episode in the series
-        #for episodeId in episodeTracker[seriesId]['TargetedEpisodeIdsToDelete']:
-            #while deleteItems_Tracker.count(episodeId):
-                #deleteItems.pop(deleteItems_Tracker.index(episodeId))
-                #deleteItems_Tracker.pop(deleteItems_Tracker.index(episodeId))
-                    ##check if episodeId matches and is to be deleted
-
+    #update with the modifed deleteItems list
     postproc_dict['deleteItems']=deleteItems
+    #update with the modifed deleteItems_Tracker list
+    postproc_dict['deleteItems_Tracker']=deleteItems_Tracker
 
     return postproc_dict
