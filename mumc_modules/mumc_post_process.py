@@ -2,7 +2,7 @@ import multiprocessing
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
-from mumc_modules.mumc_minimum_episodes import get_minEpisodesToKeep
+from mumc_modules.mumc_minimum_episodes import minEpisodesToKeep_data_handler
 from mumc_modules.mumc_console_info import print_post_processing_started,print_post_processing_verbal_progress,print_post_processing_verbal_progress_min_episode,print_post_processing_completed
 from mumc_modules.mumc_days_since import convert_timeToString
 from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged,get_isPlayedCreated_FilterStatementTag
@@ -62,9 +62,6 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(behavior_str,postp
     #noneIt=None
 
     for itemId in isbehavior_extraInfo_Tracker:
-
-        #if (not (thisFilterTag == None)):
-            
 
         if (('MonitoredUsersAction' in isbehavior_extraInfo_byUserId_Media) and ('MonitoredUsersMeetPlayedFilter' in isbehavior_extraInfo_byUserId_Media)):
             configuredBehavior=isbehavior_extraInfo_byUserId_Media['ConfiguredBehavior']
@@ -227,7 +224,6 @@ def addItem_removeItem_fromDeleteList_usingBehavioralPatterns(behavior_str,postp
                         except:
                             raise IndexError('Unable To Remove ' + postproc_dict['media_type_upper'] + ' with Id: ' + itemId + ' From deleteItems List.')
 
-    #postproc_dict['is' + behavior_str + '_extraInfo_byUserId_Media'].pop('is' + behavior_str + '_extraInfo_Tracker')
     postproc_dict['is' + behavior_str + '_extraInfo_byUserId_Media'].pop('userId_list')
 
     return postproc_dict
@@ -410,11 +406,9 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['admin_settings']['behavior']={}
     postproc_dict['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
     postproc_dict['admin_settings']['users']=the_dict['admin_settings']['users']
-    #postproc_dict['admin_settings']=the_dict['admin_settings']
 
     postproc_dict['advanced_settings']={}
     postproc_dict['advanced_settings']['episode_control']=the_dict['advanced_settings']['episode_control']
-    #postproc_dict['advanced_settings']=the_dict['advanced_settings']
 
     postproc_dict['minimum_number_episodes']=the_dict['advanced_settings']['episode_control']['minimum_episodes']
     postproc_dict['minimum_number_played_episodes']=the_dict['advanced_settings']['episode_control']['minimum_played_episodes']
@@ -499,7 +493,6 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['isblacktagged_extraInfo_byUserId_Media']['behavioral_tags']={}
     postproc_dict['behavioral_tag_high_priority']={}
     if (not (the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']] == None)):
-        #for thisTag in the_dict['advanced_settings']['behavioral_statements'][postproc_dict['media_type_lower']]:
         for thisTag in the_dict['advanced_settings']['behavioral_tags'][postproc_dict['media_type_lower']]:
             if (get_isPlayedCreated_FilterStatementTag(thisTag)):
 
@@ -690,7 +683,16 @@ def postProcessing(the_dict,media_dict):
             if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and ((postproc_dict['minimum_number_episodes'] >= 1) or (postproc_dict['minimum_number_played_episodes'] >= 1))):
                 print_post_processing_verbal_progress_min_episode(the_dict,postproc_dict)
                 #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
-                postproc_dict=get_minEpisodesToKeep(postproc_dict,the_dict)
+                postproc_dict['minEpisodesToKeep']=minEpisodesToKeep_data_handler(postproc_dict,the_dict)
+                postproc_dict['minEpisodesToKeep'].trackEpisodes_byUserId()
+                postproc_dict['minEpisodesToKeep'].determine_playedUnplayedToRemain()
+                postproc_dict['minEpisodesToKeep'].buildSeason_byEpisodeGrid()
+                postproc_dict['minEpisodesToKeep'].determine_minimumEpisodeBehavioralType()
+                postproc_dict['minEpisodesToKeep'].calc_userSpecificBehavioralTypeData()
+                postproc_dict['minEpisodesToKeep'].find_playedEpisodesToKeep()
+                postproc_dict['minEpisodesToKeep'].find_unplayedEpisodesToKeep()
+                #get the pruned delete list
+                postproc_dict=postproc_dict['minEpisodesToKeep'].remove_episodesToKeepFromDeleteList(postproc_dict)
 
             if (the_dict['DEBUG']):
                 appendTo_DEBUG_log('-----------------------------------------------------------',2,the_dict)
@@ -700,7 +702,6 @@ def postProcessing(the_dict,media_dict):
                     appendTo_DEBUG_log("\n" + convert2json(postproc_dict['mediaCounts_byUserId']),3,the_dict)
                     appendTo_DEBUG_log("\n",3,the_dict)
 
-        #postproc_dict['deleteItems_Media']+=postproc_dict['deleteItems_Media']
         if (not (postproc_dict['media_created_behavioral_control'])):
             for itemId in postproc_dict['deleteItemsIdTracker_createdMedia']:
                 if (not (itemId in postproc_dict['deleteItems_Tracker'])):
