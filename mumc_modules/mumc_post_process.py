@@ -2,7 +2,7 @@ import multiprocessing
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_blacklist_whitelist import get_isItemWhitelisted_Blacklisted
-from mumc_modules.mumc_minimum_episodes import get_minEpisodesToKeep
+from mumc_modules.mumc_minimum_episodes import minEpisodesToKeep_data_handler
 from mumc_modules.mumc_console_info import print_post_processing_started,print_post_processing_verbal_progress,print_post_processing_verbal_progress_min_episode,print_post_processing_completed
 from mumc_modules.mumc_days_since import convert_timeToString
 from mumc_modules.mumc_tagged import get_isMOVIE_Tagged,get_isEPISODE_Tagged,get_isAUDIO_Tagged,get_isAUDIOBOOK_Tagged
@@ -565,7 +565,16 @@ def postProcessing(the_dict,media_dict):
             if (((postproc_dict['media_played_days'] >= 0) or (postproc_dict['media_created_days'] >= 0)) and ((postproc_dict['minimum_number_episodes'] >= 1) or (postproc_dict['minimum_number_played_episodes'] >= 1))):
                 print_post_processing_verbal_progress_min_episode(the_dict,postproc_dict)
                 #Remove episode from deletion list to meet miniumum number of remaining episodes in a series
-                postproc_dict=get_minEpisodesToKeep(postproc_dict,the_dict)
+                postproc_dict['minEpisodesToKeep']=minEpisodesToKeep_data_handler(postproc_dict,the_dict)
+                postproc_dict['minEpisodesToKeep'].trackEpisodes_byUserId()
+                postproc_dict['minEpisodesToKeep'].determine_playedUnplayedToRemain()
+                postproc_dict['minEpisodesToKeep'].buildSeason_byEpisodeGrid()
+                postproc_dict['minEpisodesToKeep'].determine_minimumEpisodeBehavioralType()
+                postproc_dict['minEpisodesToKeep'].calc_userSpecificBehavioralTypeData()
+                postproc_dict['minEpisodesToKeep'].find_playedEpisodesToKeep()
+                postproc_dict['minEpisodesToKeep'].find_unplayedEpisodesToKeep()
+                #get the pruned delete list
+                postproc_dict=postproc_dict['minEpisodesToKeep'].remove_episodesToKeepFromDeleteList(postproc_dict)
 
             if (the_dict['DEBUG']):
                 appendTo_DEBUG_log('-----------------------------------------------------------',2,the_dict)

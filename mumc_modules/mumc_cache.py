@@ -85,8 +85,7 @@ class cached_data_handler:
         obj_id = id(obj)
         if obj_id in seen:
             return 0
-        # Important mark as seen *before* entering recursion to gracefully handle
-        # self-referential objects
+        # Important mark as seen *before* entering recursion to gracefully handle self-referential objects
         seen.add(obj_id)
         if hasattr(obj, '__dict__'):
             for cls in obj.__class__.__mro__:
@@ -138,16 +137,16 @@ class cached_data_handler:
 
 
     def addEntryToCache(self,url,data):
-        potentialEntrySize=(self.getDataSize(url) + self.getDataSize(data))
-        if (potentialEntrySize <= self.api_query_cache_size):
+        estimatedEntryDataSize=(self.getDataSize(url) + self.getDataSize(data))
+        if (estimatedEntryDataSize <= self.api_query_cache_size):
             try:
-                if (potentialEntrySize > (self.api_query_cache_size - self.total_cached_data_size)):
+                if (estimatedEntryDataSize > (self.api_query_cache_size - self.total_cached_data_size)):
                     #LRU get time window
                     safety_time_window=self.getTimeWindow()
                     temp_cached_entry_hits=self.cached_entry_hits.copy()
                     temp_cached_entry_urls=self.cached_entry_urls.copy()
                     temp_cached_entry_times=self.cached_entry_times.copy()
-                while potentialEntrySize > (self.api_query_cache_size - self.total_cached_data_size):
+                while estimatedEntryDataSize > (self.api_query_cache_size - self.total_cached_data_size):
                     if (len(self.cached_entry_sizes) > 0):
                         #LFU get least accessed cache entry
                         least_accessed_entry_index=self.getLowestAttributeValueCacheEntryIndex(temp_cached_entry_hits)
@@ -183,7 +182,7 @@ class cached_data_handler:
                 self.cached_data.append(data)
                 self.cached_entry_times.append(time.time() * 1000)
                 self.cached_entry_hits.append(0)
-                self.cached_entry_sizes.append(potentialEntrySize)
+                self.cached_entry_sizes.append(estimatedEntryDataSize)
                 size=self.cached_entry_sizes[index]
                 self.total_cached_data_size+=size
                 self.total_data_size_thru_cache+=size
