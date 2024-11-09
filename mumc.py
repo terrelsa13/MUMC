@@ -124,7 +124,7 @@ def MUMC():
         print_cache_stats(cfg)
 
     if (cfg['DEBUG'] == 255):
-        #show cache data (only when DEBUG == 255
+        #show cache data (only when DEBUG == 255)
         cache_data_to_debug(cfg)
 
     #show footer info

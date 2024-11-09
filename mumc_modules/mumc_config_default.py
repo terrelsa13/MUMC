@@ -1091,6 +1091,54 @@ def merge_configuration(default_base,merge):
         default_base['advanced_settings']['episode_control']['minimum_episodes_behavior']=merge['advanced_settings']['episode_control']['minimum_episodes_behavior']
     except:
         pass
+    try:
+        default_base['advanced_settings']['episode_control']['series_ended']['delete_episodes']=merge['advanced_settings']['episode_control']['series_ended']['delete_episodes']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['radarr']['movie']['unmonitor']=merge['advanced_settings']['radarr']['movie']['unmonitor']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['radarr']['movie']['remove']=merge['advanced_settings']['radarr']['movie']['remove']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['sonarr']['series']['unmonitor']=merge['advanced_settings']['sonarr']['series']['unmonitor']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['sonarr']['series']['remove']=merge['advanced_settings']['sonarr']['series']['unmonitor']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['sonarr']['episode']['unmonitor']=merge['advanced_settings']['sonarr']['episode']['remove']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['lidarr']['album']['unmonitor']=merge['advanced_settings']['lidarr']['album']['unmonitor']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['lidarr']['album']['remove']=merge['advanced_settings']['album']['album']['remove']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['lidarr']['track']['unmonitor']=merge['advanced_settings']['lidarr']['track']['unmonitor']
+    except:
+        pass
+
+    try:
+        default_base['advanced_settings']['readarr']['book']['unmonitor']=merge['advanced_settings']['readarr']['readarr']['unmonitor']
+    except:
+        pass
+    try:
+        default_base['advanced_settings']['readarr']['book']['delete']=merge['advanced_settings']['readarr']['readarr']['delete']
+    except:
+        pass
 
     try:
         default_base['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']=merge['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']
@@ -1509,6 +1557,58 @@ def merge_configuration(default_base,merge):
         default_base['admin_settings']['users']=merge['admin_settings']['users']
     except:
         error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users is missing from the mumc_config.yaml\n'
+
+    try:
+        default_base['admin_settings']['media_managers']['radarr']['enabled']=merge['admin_settings']['media_managers']['radarr']['enabled']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['radarr']['url']=merge['admin_settings']['media_managers']['radarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['radarr']['api_key']=merge['admin_settings']['media_managers']['radarr']['api_key']
+    except:
+        pass
+
+    try:
+        default_base['admin_settings']['media_managers']['sonarr']['enabled']=merge['admin_settings']['media_managers']['sonarr']['enabled']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['sonarr']['url']=merge['admin_settings']['media_managers']['sonarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['sonarr']['api_key']=merge['admin_settings']['media_managers']['sonarr']['api_key']
+    except:
+        pass
+
+    try:
+        default_base['admin_settings']['media_managers']['lidarr']['enabled']=merge['admin_settings']['media_managers']['lidarr']['enabled']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['lidarr']['url']=merge['admin_settings']['media_managers']['lidarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['lidarr']['api_key']=merge['admin_settings']['media_managers']['lidarr']['api_key']
+    except:
+        pass
+
+    try:
+        default_base['admin_settings']['media_managers']['readarr']['enabled']=merge['admin_settings']['media_managers']['readarr']['enabled']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['readarr']['url']=merge['admin_settings']['media_managers']['readarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['readarr']['api_key']=merge['admin_settings']['media_managers']['readarr']['api_key']
+    except:
+        pass
 
     try:
         default_base['admin_settings']['api_controls']['attempts']=merge['admin_settings']['api_controls']['attempts']

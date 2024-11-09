@@ -2217,6 +2217,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > series must be a boolean\n\tValid values are true or false\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
@@ -2271,6 +2273,87 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > minimum_episodes_behavior must be a string\n\tValid values \'User Name\', \'User Id\', and combinations of \'Min/Max Played/Unplayed\'\n'
 
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','series_ended','delete_episodes')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > series_ended > delete_episodes must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr > movie > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr  > movie > remove must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > remove must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','episode','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > episode > unmonitor must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > remove must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','track','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > track > unmonitor must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > remove must be a boolean\n\tValid values are true or false\n'
+
 #######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')) == None)):
@@ -2313,22 +2396,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2341,22 +2424,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superuser, and subuser\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2369,22 +2452,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, supersummary, and subsummary\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2397,22 +2480,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2425,22 +2508,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2453,22 +2536,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2481,22 +2564,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2509,22 +2592,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2537,22 +2620,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2565,22 +2648,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2593,22 +2676,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2621,22 +2704,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2649,22 +2732,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2677,22 +2760,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2705,22 +2788,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2733,22 +2816,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2761,22 +2844,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2790,22 +2873,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2818,22 +2901,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2846,22 +2929,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2874,22 +2957,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2941,6 +3024,90 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_id_check_list, user_name_check_list, 'admin_settings > users')
         if (not (len(check) == check_user_keys_length)):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > api_key must be an alphanumeric string\n'
 
 #######################################################################################################
 

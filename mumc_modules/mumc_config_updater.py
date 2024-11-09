@@ -86,6 +86,155 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         config_data['admin_settings']['server']=orig_dict['admin_settings']['server']
         config_data['admin_settings']['users']=the_dict['admin_settings']['users']
+
+        try:
+            #check if radarr enabled key existed
+            if (keys_exist(orig_dict,'admin_settings','media_managers','radarr','enabled')):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
+                    config_data['admin_settings']['media_managers']['radarr']={}
+                config_data['admin_settings']['media_managers']['radarr']['enabled']=orig_dict['admin_settings']['media_managers']['radarr']['enabled']
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
+                    config_data['admin_settings']['media_managers']['radarr']={}
+                config_data['admin_settings']['media_managers']['radarr']['url']=the_dict['admin_settings']['media_managers']['radarr']['url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
+                    config_data['admin_settings']['media_managers']['radarr']={}
+                config_data['admin_settings']['media_managers']['radarr']['api_key']=the_dict['admin_settings']['media_managers']['radarr']['api_key']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None):
+                #pass
+        except:
+            pass
+
+        try:
+            #check if sonarr enabled key existed
+            if (keys_exist(orig_dict,'admin_settings','media_managers','sonarr','enabled')):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
+                    config_data['admin_settings']['media_managers']['sonarr']={}
+                config_data['admin_settings']['media_managers']['sonarr']['enabled']=orig_dict['admin_settings']['media_managers']['sonarr']['enabled']
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['sonarr']['url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
+                    config_data['admin_settings']['media_managers']['sonarr']={}
+                config_data['admin_settings']['media_managers']['sonarr']['url']=the_dict['admin_settings']['media_managers']['sonarr']['url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
+                    config_data['admin_settings']['media_managers']['sonarr']={}
+                config_data['admin_settings']['media_managers']['sonarr']['api_key']=the_dict['admin_settings']['media_managers']['sonarr']['api_key']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None):
+                #pass
+        except:
+            pass
+
+        try:
+            #check if lidarr enabled key existed
+            if (keys_exist(orig_dict,'admin_settings','media_managers','lidarr','enabled')):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
+                    config_data['admin_settings']['media_managers']['lidarr']={}
+                config_data['admin_settings']['media_managers']['lidarr']['enabled']=orig_dict['admin_settings']['media_managers']['lidarr']['enabled']
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['lidarr']['url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
+                    config_data['admin_settings']['media_managers']['lidarr']={}
+                config_data['admin_settings']['media_managers']['lidarr']['url']=the_dict['admin_settings']['media_managers']['lidarr']['url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
+                    config_data['admin_settings']['media_managers']['lidarr']={}
+                config_data['admin_settings']['media_managers']['lidarr']['api_key']=the_dict['admin_settings']['media_managers']['lidarr']['api_key']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None):
+                #pass
+        except:
+            pass
+
+        try:
+            #check if readarr enabled key existed
+            if (keys_exist(orig_dict,'admin_settings','media_managers','readarr','enabled')):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
+                    config_data['admin_settings']['media_managers']['readarr']={}
+                config_data['admin_settings']['media_managers']['readarr']['enabled']=orig_dict['admin_settings']['media_managers']['readarr']['enabled']
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['readarr']['url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
+                    config_data['admin_settings']['media_managers']['readarr']={}
+                config_data['admin_settings']['media_managers']['readarr']['url']=the_dict['admin_settings']['media_managers']['readarr']['url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['readarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
+                    config_data['admin_settings']['media_managers']['readarr']={}
+                config_data['admin_settings']['media_managers']['readarr']['api_key']=the_dict['admin_settings']['media_managers']['readarr']['api_key']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None):
+                #pass
+        except:
+            pass
+
         try:
             config_data['admin_settings']['api_controls']=orig_dict['admin_settings']['api_controls']
         except:

@@ -1,4 +1,4 @@
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_library_queries import get_all_library_subfolders
@@ -51,7 +51,7 @@ def empty_folder_query(user_info,var_dict,the_dict):
         var_dict['Recursive_Empty_Folder'] + '&SortBy=' + var_dict['SortBy_Empty_Folder'] + '&SortOrder=' + var_dict['SortOrder_Empty_Folder'] + '&EnableImages=' +
         var_dict['EnableImages_Empty_Folder'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Empty_Folder'] + '&EnableUserData=' + var_dict['EnableUserData_Empty_Folder'])
 
-        var_dict['apiQuery_Empty_Folder']=build_request_message(url,the_dict)
+        var_dict['apiQuery_Empty_Folder']=build_emby_jellyfin_request_message(url,the_dict)
 
         #Send the API query for for blacktagged from blacklist media items
         var_dict=api_query_handler('Empty_Folder',var_dict,the_dict)

@@ -20,10 +20,10 @@ def get_brand():
     return(selected_brand)
 
 
-#ip address or url?
-def get_url():
-    defaulturl='http://localhost'
-    url=input('Enter server ip or name (default ' + defaulturl + '): ')
+#ip address, hostname, or FQDN?
+def get_url(defaulturl='http://localhost'):
+    #defaulturl='http://localhost'
+    url=input('Enter server ip, hostname, or FQDN (default ' + defaulturl + '): ')
     if (url == ''):
         return(defaulturl)
     else:
@@ -31,13 +31,47 @@ def get_url():
             return(url)
         else:
            url='http://' + url
-           print('Assuming server ip or name is: ' + url)
+           print('Assuming server ip, hostname, or FQDN is: ' + url)
            return(url)
 
 
+#does user want to setup *arr?
+def proceed_arr_setup(arr):
+    #print('\nPreparing MUMC to use ' + arr + '.')
+    print('\nPreparing to add or modify ' + arr + ' API settings...')
+    choice=input('Do you want to continue? [y/N]: ').casefold()
+    if ((choice == 'y') or (choice == 'yes') or (choice == 'ye')):
+        return True
+    else:
+        print('Skipping ' + arr + '.')
+        return False
+
+
+#ip address, hostname, or FQDN for *arr?
+def get_arr_url(arr):
+    print('\nFor ' + arr + '...')
+    return get_url()
+
+
+#api key for *arr?
+def get_arr_api(arr):
+    valid_apiKey=False
+    while (valid_apiKey == False):
+        print('\nFor ' + arr + '...')
+        print('Copy the API key.')
+        print('It can be found in ' + arr + ' Settings > General > Security > API Key')
+        api_key=str(input('Paste the ' + arr + ' API Key: '))
+        #if(isinstance(api_key,str) and (api_key.isalpha() or api_key.isalnum() or api_key.isnumeric())):
+        if(api_key.isalpha() or api_key.isalnum() or api_key.isnumeric() and (len(api_key) == 32)):
+            valid_apiKey=True
+        else:
+            print('\nInvalid API Key. Try again.\n')
+    return api_key
+
+
 #http or https port?
-def get_port():
-    defaultport='8096'
+def get_port(defaultport='8096'):
+    #defaultport='8096'
     valid_port=False
     while (valid_port == False):
         print('If you have not explicity changed this option, press enter for default.')
@@ -63,6 +97,12 @@ def get_port():
                     print('\nInvalid port. Try again.\n')
             except:
                 print('\nInvalid port. Try again.\n')
+
+
+#arr http or https port?
+def get_arr_port(arr,port):
+    print('\nFor ' + arr + '...')
+    return get_port(port)
 
 
 #base url?

@@ -9,7 +9,7 @@ from mumc_modules.mumc_prepare_item import prepare_MOVIEoutput,prepare_EPISODEou
 from mumc_modules.mumc_console_info import build_print_media_item_details,print_user_header
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_played_created import get_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts,getTag_playedDays_createdPlayedDays_playedCounts_createdPlayedCounts
-from mumc_modules.mumc_item_info import get_SERIES_itemInfo
+from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemInfo
 from mumc_modules.mumc_get_watched import init_blacklist_watched_query,init_whitelist_watched_query,blacklist_watched_query,whitelist_watched_query
 from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,init_whitelist_blacktagged_query,blacklist_blacktagged_query,whitelist_blacktagged_query
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
@@ -461,6 +461,11 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                             item['mumc']['lib_id']=var_dict['data_dict']['lib_id']
                             item['mumc']['path']=var_dict['data_dict']['path']
                             item['mumc']['network_path']=var_dict['data_dict']['network_path']
+                            if ('ProviderIds' in item):
+                                item['mumc']['providerIds']=item['ProviderIds']
+                            else:
+                                additional_itemInfo=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_providerIds_for_' + item['Id'],the_dict)
+                                item['mumc']['providerIds']=additional_itemInfo['ProviderIds']
 
                             if (the_dict['DEBUG']):
                                 #Double newline for DEBUG log formatting
@@ -716,9 +721,12 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
                                         PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
                                         SeriesName=item['SeriesName']
+                                        tvdbId=series_info['ProviderIds']['Tvdb']
 
                                     if (not ('SeriesName' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['SeriesName']=SeriesName
+                                    if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                        var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=tvdbId
                                     if (not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TotalEpisodeCount']=RecursiveItemCount
                                     if (not ('UnplayedEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):

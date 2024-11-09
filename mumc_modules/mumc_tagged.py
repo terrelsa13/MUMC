@@ -1,6 +1,6 @@
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_compare_items import get_isItemMatching,does_index_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
@@ -176,7 +176,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
 
-                            data_dict['apiQuery_']=build_request_message(url,the_dict)
+                            data_dict['apiQuery_']=build_emby_jellyfin_request_message(url,the_dict)
 
                             #Send the API query for for watched media items in blacklists
                             data_dict.update(api_query_handler('',data_dict,the_dict))

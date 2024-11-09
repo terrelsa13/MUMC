@@ -3,13 +3,13 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
 def is_instance(the_element):
-    if not isinstance(the_element, Mapping):
+    if (not isinstance(the_element, Mapping)):
         raise TypeError('keys_exist() expects a dict-like object as the first argument.')
 
 
 def keys_exist(the_element, *keys_indexes):
     if isinstance(the_element, Mapping):
-        if not keys_indexes:
+        if (not keys_indexes):
             raise ValueError('keys_exist() expects at least one key/index argument.')
 
         temp_element = the_element

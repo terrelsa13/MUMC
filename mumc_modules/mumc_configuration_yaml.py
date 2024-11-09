@@ -333,6 +333,21 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['advanced_settings']['episode_control']['minimum_episodes']=0
     config_data['advanced_settings']['episode_control']['minimum_played_episodes']=0
     config_data['advanced_settings']['episode_control']['minimum_episodes_behavior']='Max Played Min Unplayed'
+    config_data['advanced_settings']['episode_control']['series_ended']['delete_episodes']=False
+
+    config_data['advanced_settings']['radarr']['movie']['unmonitor']=True
+    config_data['advanced_settings']['radarr']['movie']['remove']=False
+
+    config_data['advanced_settings']['sonarr']['series']['unmonitor']=True
+    config_data['advanced_settings']['sonarr']['series']['remove']=False
+    config_data['advanced_settings']['sonarr']['episode']['unmonitor']=True
+
+    #config_data['advanced_settings']['lidarr']['album']['unmonitor']=True
+    #config_data['advanced_settings']['lidarr']['album']['remove']=False
+    #config_data['advanced_settings']['lidarr']['track']['unmonitor']=True
+
+    #config_data['advanced_settings']['readarr']['book']['unmonitor']=True
+    #config_data['advanced_settings']['readarr']['book']['remove']=False
 
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']=True
     config_data['advanced_settings']['trakt_fix']['set_missing_last_played_date']['episode']=True
@@ -454,6 +469,138 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['behavior']['matching']='byId'
     config_data['admin_settings']['behavior']['users']['monitor_disabled']=True
 
+    #INTENTIONALLY COMMENTED OUT
+    #config_data['admin_settings']['users'][0]['user_id']=''
+    #config_data['admin_settings']['users'][0]['user_name']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['whitelist'][#]['lib_enabled']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][0]['blacklist'][#]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['user_id']=''
+    #config_data['admin_settings']['users'][1]['user_name']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['whitelist'][#]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][1]['blacklist'][#]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['user_id']=''
+    #config_data['admin_settings']['users'][#]['user_name']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['whitelist'][#]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['network_path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][0]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['network_path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][1]['lib_enabled']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['lib_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['collection_type']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['network_path']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['subfolder_id']=''
+    #config_data['admin_settings']['users'][#]['blacklist'][#]['lib_enabled']=''
+
+    config_data['admin_settings']['media_managers']['radarr']['enabled']=True
+    config_data['admin_settings']['media_managers']['radarr']['url']=None
+    config_data['admin_settings']['media_managers']['radarr']['api_key']=None
+
+    config_data['admin_settings']['media_managers']['sonarr']['enabled']=True
+    config_data['admin_settings']['media_managers']['sonarr']['url']=None
+    config_data['admin_settings']['media_managers']['sonarr']['api_key']=None
+
+    #config_data['admin_settings']['media_managers']['lidarr']['enabled']=True
+    #config_data['admin_settings']['media_managers']['lidarr']['url']=None
+    #config_data['admin_settings']['media_managers']['lidarr']['api_key']=None
+    
+    #config_data['admin_settings']['media_managers']['readarr']['enabled']=True
+    #config_data['admin_settings']['media_managers']['readarr']['url']=None
+    #config_data['admin_settings']['media_managers']['readarr']['api_key']=None
+
     config_data['admin_settings']['api_controls']['attempts']=4
     config_data['admin_settings']['api_controls']['item_limit']=25
 
@@ -462,7 +609,6 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['cache']['minimum_age']=200
 
     config_data['admin_settings']['output_controls']['character_limit']['print']=128
-    #config_data['admin_settings']['output_controls']['character_limit']['write']=128
 
     #before saving; reorder some keys for consistency
     config_data['advanced_settings']['behavioral_statements']['movie']['favorited']['extra']=config_data['advanced_settings']['behavioral_statements']['movie']['favorited'].pop('extra')
@@ -508,7 +654,10 @@ def yaml_configurationBuilder(the_dict):
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
     config_data['advanced_settings'].pop('delete_empty_folders')
-    config_data['advanced_settings'].pop('episode_control')
+    config_data['advanced_settings'].pop('radarr')
+    config_data['advanced_settings'].pop('sonarr')
+    config_data['advanced_settings'].pop('lidarr')
+    config_data['advanced_settings'].pop('readarr')
     config_data['advanced_settings'].pop('trakt_fix')
     config_data['advanced_settings'].pop('console_controls')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
@@ -527,6 +676,30 @@ def yaml_configurationBuilder(the_dict):
             config_data['admin_settings']['behavior'].pop('users')
         else:
             config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+
+    if (the_dict['admin_settings']['media_managers']['radarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('radarr')
+    else:
+        config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
+
+    if (the_dict['admin_settings']['media_managers']['sonarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('sonarr')
+    else:
+        config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
+
+    if (the_dict['admin_settings']['media_managers']['lidarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('lidarr')
+    else:
+        config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
+
+    if (the_dict['admin_settings']['media_managers']['readarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('readarr')
+    else:
+        config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
+
+    if (len(config_data['admin_settings']['media_managers']) == 0):
+        config_data['admin_settings'].pop('media_managers')
+
     config_data['admin_settings'].pop('api_controls')
     config_data['admin_settings'].pop('cache')
     config_data['admin_settings'].pop('output_controls')

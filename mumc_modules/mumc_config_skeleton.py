@@ -344,6 +344,25 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['advanced_settings']['delete_empty_folders']['episode']['series']=False
 
     the_dict['advanced_settings']['episode_control']={}
+    the_dict['advanced_settings']['episode_control']['minimum_episodes']=None
+    the_dict['advanced_settings']['episode_control']['minimum_played_episodes']=None
+    the_dict['advanced_settings']['episode_control']['minimum_episodes_behavior']=None
+    the_dict['advanced_settings']['episode_control']['series_ended']={}
+    the_dict['advanced_settings']['episode_control']['series_ended']['delete_episodes']=False
+
+    the_dict['advanced_settings']['radarr']={}
+    the_dict['advanced_settings']['radarr']['movie']={}
+
+    the_dict['advanced_settings']['sonarr']={}
+    the_dict['advanced_settings']['sonarr']['series']={}
+    the_dict['advanced_settings']['sonarr']['episode']={}
+
+    #the_dict['advanced_settings']['lidarr']={}
+    #the_dict['advanced_settings']['lidarr']['album']={}
+    #the_dict['advanced_settings']['lidarr']['track']={}
+
+    #the_dict['advanced_settings']['readarr']={}
+    #the_dict['advanced_settings']['readarr']['book']={}
 
     the_dict['advanced_settings']['trakt_fix']={}
     the_dict['advanced_settings']['trakt_fix']['set_missing_last_played_date']={}
@@ -494,6 +513,12 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
     the_dict['admin_settings']['users']=[]
+
+    the_dict['admin_settings']['media_managers']={}
+    the_dict['admin_settings']['media_managers']['radarr']={}
+    the_dict['admin_settings']['media_managers']['sonarr']={}
+    the_dict['admin_settings']['media_managers']['lidarr']={}
+    the_dict['admin_settings']['media_managers']['readarr']={}
 
     the_dict['admin_settings']['api_controls']={}
 

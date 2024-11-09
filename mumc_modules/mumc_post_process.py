@@ -406,6 +406,7 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['admin_settings']['behavior']={}
     postproc_dict['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
     postproc_dict['admin_settings']['users']=the_dict['admin_settings']['users']
+    postproc_dict['admin_settings']['media_managers']=the_dict['admin_settings']['media_managers']
 
     postproc_dict['advanced_settings']={}
     postproc_dict['advanced_settings']['episode_control']=the_dict['advanced_settings']['episode_control']
@@ -413,6 +414,7 @@ def postProcessing(the_dict,media_dict):
     postproc_dict['minimum_number_episodes']=the_dict['advanced_settings']['episode_control']['minimum_episodes']
     postproc_dict['minimum_number_played_episodes']=the_dict['advanced_settings']['episode_control']['minimum_played_episodes']
     postproc_dict['minimum_number_episodes_behavior']=the_dict['advanced_settings']['episode_control']['minimum_episodes_behavior']
+    postproc_dict['delete_episodes']=the_dict['advanced_settings']['episode_control']['series_ended']['delete_episodes']
 
     postproc_dict['media_played_days']=the_dict['basic_settings']['filter_statements'][postproc_dict['media_type_lower']]['played']['condition_days']
     postproc_dict['media_created_days']=the_dict['basic_settings']['filter_statements'][postproc_dict['media_type_lower']]['created']['condition_days']
@@ -691,8 +693,11 @@ def postProcessing(the_dict,media_dict):
                 postproc_dict['minEpisodesToKeep'].calc_userSpecificBehavioralTypeData()
                 postproc_dict['minEpisodesToKeep'].find_playedEpisodesToKeep()
                 postproc_dict['minEpisodesToKeep'].find_unplayedEpisodesToKeep()
+                if (postproc_dict['delete_episodes']):
+                    #if series has ended go ahead and delete any remaining episodes we would otherwise keep
+                    postproc_dict['minEpisodesToKeep'].has_seriesEnded_okToDeleteEpisode(the_dict)
                 #get the pruned delete list
-                postproc_dict=postproc_dict['minEpisodesToKeep'].remove_episodesToKeepFromDeleteList(postproc_dict)
+                postproc_dict=postproc_dict['minEpisodesToKeep'].remove_episodesToKeep_fromDeleteList(postproc_dict)
 
             if (the_dict['DEBUG']):
                 appendTo_DEBUG_log('-----------------------------------------------------------',2,the_dict)
