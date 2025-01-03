@@ -231,9 +231,9 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
                 if ((response.getcode() == 200) or (response.getcode() == 202)):
                     try:
-                        if (url.method == 'GET'):
-                            source = response.read()
-                            data = json.loads(source)
+                        source = response.read()
+                        data = json.loads(source)
+                        if ((url.method == 'GET')):
                             the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         getdata = False
                         if (debugState):

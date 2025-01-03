@@ -97,7 +97,7 @@ def prepare_EPISODEoutput(the_dict,item,user_info,var_dict):
             appendTo_DEBUG_log("\nitem['SeriesStudio'] Was Missing",3,the_dict)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if (not ('LastPlayedDate' in item['UserData'])):
-            if (episode_set_missing_last_played_date == 1):
+            if (episode_set_missing_last_played_date):
                 modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
                 item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
@@ -190,8 +190,8 @@ def prepare_AUDIOoutput(the_dict,item,user_info,var_dict):
             appendTo_DEBUG_log("\nitem['Studios']{'Name':'Unknown'} Was Missing",3,the_dict)
     if ((item['UserData']['Played'] == True) and (item['UserData']['PlayCount'] >= 1)):
         if (not ('LastPlayedDate' in item['UserData'])):
-            if (((mediaType == "audio") and (audio_set_missing_last_played_date == 1)) or
-               ((isJellyfinServer(the_dict['server_brand'])) and (mediaType == "audiobook") and (audiobook_set_missing_last_played_date == 1))):
+            if (((mediaType == "audio") and audio_set_missing_last_played_date) or
+               ((isJellyfinServer(the_dict['server_brand'])) and (mediaType == "audiobook") and audiobook_set_missing_last_played_date)):
                 modify_lastPlayedDate(item,user_info['user_id'],the_dict)
             else:
                 item['UserData']['LastPlayedDate']='1970-01-01T00:00:00.00Z'
