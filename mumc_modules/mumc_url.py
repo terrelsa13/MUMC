@@ -7,7 +7,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 
 
-def build_request_message(url,the_dict,authorization='Authorization',client=None,device=None,deviceId=None,version=None,token=None,data=None,method=None):
+def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorization',client=None,device=None,deviceId=None,version=None,token=None,contentType=None,data=None,method='GET'):
 
     if (client == None):
         #assume stored name if not defined
@@ -42,8 +42,101 @@ def build_request_message(url,the_dict,authorization='Authorization',client=None
         DATA = convert2json(data)
         DATA = DATA.encode('utf-8')
 
+    if (contentType == None):
+        contentType='application/json'
+    elif (contentType == ''):
+        pass
+    else:
+        contentType=contentType
+
     #build headers
-    headers = {authorization : 'MediaBrowser Client="' + client + '", Device="' + device + '", DeviceId="' + deviceId + '", Version="' + version + '", Token="'+ token + '"', 'Content-Type' : 'application/json'}
+    headers = {authorization : 'MediaBrowser Client="' + client + '", Device="' + device + '", DeviceId="' + deviceId + '", Version="' + version + '", Token="'+ token + '"', 'Content-Type' : contentType}
+
+    #package url, headers, data, and method into a request message
+    req = urlrequest.Request(url=url, headers=headers, data=DATA, method=method)
+    
+    return req
+
+
+def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
+    
+    if (not (token == None)):
+        token=token
+    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api_key')) == None)):
+        #assume stored token if not defined
+        token=token
+    else:
+        token=''
+
+    if (data == None):
+        DATA=data
+    else:
+        #encode any data passed in
+        #DATA = urlparse.urlencode(values)
+        #DATA = DATA.encode('ascii')
+        DATA = convert2json(data)
+        DATA = DATA.encode('utf-8')
+
+    headers={}
+
+    if (accept == None):
+        headers['accept']='application/json'
+    elif (accept == ''):
+        pass
+    else:
+        headers['accept']=accept
+
+    headers['X-Api-Key']=token
+
+    if (contentType == None):
+        headers['Content-Type']='application/json'
+    elif (contentType == ''):
+        pass
+    else:
+        headers['Content-Type']=contentType
+
+    #package url, headers, data, and method into a request message
+    req = urlrequest.Request(url=url, headers=headers, data=DATA, method=method)
+    
+    return req
+
+
+def build_sonarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
+    
+    if (not (token == None)):
+        token=token
+    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','sonarr','api_key')) == None)):
+        #assume stored token if not defined
+        token=token
+    else:
+        token=''
+
+    if (data == None):
+        DATA=data
+    else:
+        #encode any data passed in
+        #DATA = urlparse.urlencode(values)
+        #DATA = DATA.encode('ascii')
+        DATA = convert2json(data)
+        DATA = DATA.encode('utf-8')
+
+    headers={}
+
+    if (accept == None):
+        headers['accept']='application/json'
+    elif (accept == ''):
+        pass
+    else:
+        headers['accept']=accept
+
+    headers['X-Api-Key']=token
+
+    if (contentType == None):
+        headers['Content-Type']='application/json'
+    elif (contentType == ''):
+        pass
+    else:
+        headers['Content-Type']=contentType
 
     #package url, headers, data, and method into a request message
     req = urlrequest.Request(url=url, headers=headers, data=DATA, method=method)
@@ -120,8 +213,8 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
     #number of times after the intial API request to retry if an exception occurs
     retryAttempts = int(retries)
 
-    #check if this url is cached; return the data if it is cached
-    if (not ((data:=the_dict['cached_data'].getCachedDataFromURL(url.full_url)) == None)):
+    #check if this url is cached and is method is GET; return the cached data if true
+    if ((not ((data:=the_dict['cached_data'].getCachedDataFromURL(url.full_url)) == None)) and (url.method == 'GET')):
         #request is cached; do not send request to server
         getdata = False
     else:
@@ -136,19 +229,15 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
             with urlrequest.urlopen(url) as response:
                 if (debugState):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
-                #request recieved; but taking long time to return data
-                while (response.getcode() == 202):
-                    #wait 20% of the delay value
-                    time.sleep(doubling_delay/5)
-                    if (debugState):
-                        appendTo_DEBUG_log("\nWaiting for server to return data from the " + str(requestDebugMessage) + " Request; then trying again...",2,the_dict)
-                if (response.getcode() == 200):
+                if ((response.getcode() == 200) or (response.getcode() == 202)):
                     try:
-                        source = response.read()
-                        data = json.loads(source)
-                        the_dict['cached_data'].addEntryToCache(url.full_url,data)
+                        if (url.method == 'GET'):
+                            source = response.read()
+                            data = json.loads(source)
+                            the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         getdata = False
                         if (debugState):
+                            appendTo_DEBUG_log("\nResponse Code: " + str(response.getcode()) + " From The " + str(requestDebugMessage) + " Request:\n",2,the_dict)
                             appendTo_DEBUG_log("\nData Returned From The " + str(requestDebugMessage) + " Request:\n",2,the_dict)
                             appendTo_DEBUG_log(convert2json(data) + "\n",4,the_dict)
                     except Exception as err:
@@ -172,7 +261,7 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
-                    if (not((response._method == 'DELETE') or (response._method == 'POST'))):
+                    if (url.method == 'GET'):
                         the_dict['cached_data'].addEntryToCache(url.full_url,data)
                     getdata = False
                     if (debugState):

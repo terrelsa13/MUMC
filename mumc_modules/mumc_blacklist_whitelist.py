@@ -1,6 +1,6 @@
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_compare_items import get_isItemMatching
-from mumc_modules.mumc_server_type import isEmbyServer
+#from mumc_modules.mumc_server_type import isEmbyServer
 
 
 def get_opposing_listing_type(listing_type):

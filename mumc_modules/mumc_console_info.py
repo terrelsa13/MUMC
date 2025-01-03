@@ -15,8 +15,11 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+='Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S') + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
+    strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Version: ' + the_dict['script_version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
+    strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
     strings_list_to_print+='Python Version: ' + get_python_version() + '\n'
     strings_list_to_print+='OS Info: ' + get_operating_system_info() + '\n'
@@ -55,6 +58,17 @@ def print_cache_stats(the_dict):
         strings_list_to_print+=the_dict['console_separator'] + '\n'
         strings_list_to_print+='Number of cache hits: ' + str(the_dict['cached_data'].cached_data_hits) + '\n'
         strings_list_to_print+='Number of cache misses: ' + str(the_dict['cached_data'].cached_data_misses) + '\n'
+        if (int(the_dict['cached_data'].cached_data_hits) > 0):
+            strings_list_to_print+='Percentage of cache hits: ' + str(100 - ((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100)) + '%\n'
+        else:
+            strings_list_to_print+='Percentage of cache hits: 0%\n'
+        if (int(the_dict['cached_data'].cached_data_hits) > 0):
+            strings_list_to_print+='Percentage of cache misses: ' + str((int(the_dict['cached_data'].cached_data_misses) / int(the_dict['cached_data'].cached_data_hits)) * 100) + '%\n'
+        else:
+            if (int(the_dict['cached_data'].cached_data_misses) > 0):
+                strings_list_to_print+='Percentage of cache misses: 100%\n'
+            else:
+                strings_list_to_print+='Percentage of cache misses: 0%\n'
         strings_list_to_print+='Configured max cache size: ' + str(the_dict['cached_data'].api_query_cache_size) + '\n'
         strings_list_to_print+='Size of remaining data in cache: ' + str(the_dict['cached_data'].total_cached_data_size) + '\n'
         strings_list_to_print+='Size of all data removed from cache: ' + str(the_dict['cached_data'].total_cached_data_size_removed) + '\n'
@@ -90,6 +104,7 @@ def print_footer_information(the_dict):
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+='Time Stamp End: ' + datetime.now().strftime('%Y%m%d%H%M%S') + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
@@ -339,7 +354,7 @@ def print_containerized_config_missing(the_dict):
     strings_list_to_print=''
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+='Config file missing.' + '\n'
-    strings_list_to_print+='Config file should be located at /usr/src/app/config/mumc_config.yaml inside of the container.' + '\n'
+    strings_list_to_print+='Config file should be located at /usr/src/app/config/mumc_config.yaml of the guest OS.' + '\n'
     strings_list_to_print+='\n'
     strings_list_to_print+='To build config run: docker exec -it mumc bash' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
@@ -353,9 +368,10 @@ def print_all_media_disabled(the_dict):
 
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+="* ATTENTION!!!                                                                         *" + '\n'
+    strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* No media types are being monitored.                                                  *" + '\n'
-    strings_list_to_print+="* Open the mumc_config.yaml file in a text editor.                                     *" + '\n'
-    strings_list_to_print+="* Set at least one media type's condition_days >= 0.                                   *" + '\n'
+    strings_list_to_print+="* Open " + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + " in a text editor." + '\n'
+    strings_list_to_print+="* Enable at least one media type's Filter Statement by setting condition_days >= 0.    *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > movie > played > condition_days: -1             *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > episode > played > condition_days: -1           *" + '\n'
@@ -368,6 +384,12 @@ def print_all_media_disabled(the_dict):
     strings_list_to_print+="* basic_settings > filter_statements > audio > created > condition_days: -1            *" + '\n'
     if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
         strings_list_to_print+="* basic_settings > filter_statements > audiobook > created > condition_days: -1        *" + '\n'
+    strings_list_to_print+="*                                                                                      *" + '\n'
+    strings_list_to_print+="* OR                                                                                   *" + '\n'
+    strings_list_to_print+="*                                                                                      *" + '\n'
+    strings_list_to_print+="* Define a Filter Tag for at least one media type.                                     *" + '\n'
+    strings_list_to_print+="*                                                                                      *" + '\n'
+    strings_list_to_print+="* https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags              *" + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     try:
@@ -379,7 +401,7 @@ def print_all_media_disabled(the_dict):
 #print how to delete files info
 def remove_files_helper(strings_list_to_print,the_dict):
     strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='To delete media, open mumc_config.yaml in a text editor:' + '\n'
+    strings_list_to_print+='To delete media, open ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + ' in a text editor:' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+='* Set advanced_settings > REMOVE_FILES: true' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
@@ -388,7 +410,7 @@ def remove_files_helper(strings_list_to_print,the_dict):
 
 
 #print new config info
-def build_new_config_setup_to_delete_media(strings_list_to_print,the_dict):
+def built_new_config_not_setup_to_delete_media(strings_list_to_print,the_dict):
     if (not (the_dict['advanced_settings']['REMOVE_FILES'])):
         strings_list_to_print+=the_dict['_console_separator'] + '\n'
         strings_list_to_print+='* Config file is not setup to delete media.' + '\n'

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import os
 #import re
-import yaml
+#import yaml
 import emoji
 from sys import path
 from pathlib import Path
 
 
-class NoAliasDumper(yaml.SafeDumper):
-    def ignore_aliases(self, data):
-        return True
+#class NoAliasDumper(yaml.SafeDumper):
+    #def ignore_aliases(self, data):
+        #return True
 
 
 # Add directory to $PATH at specified position; if no position specified add to end of $PATH
@@ -124,11 +124,3 @@ def append_long_string_to_file(dataInput,filePathName,character_limit=128):
     finally:
         #finally close the file
         file.close()
-
-
-def save_yaml_config(dataInput,filePathName):
-    #Save the config file
-    with open(filePathName,'w') as file:
-        file.write('---\n')
-        yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
-        file.write('...')

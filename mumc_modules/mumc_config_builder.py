@@ -1,8 +1,8 @@
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type,proceed_arr_setup,get_arr_url,get_arr_port,get_arr_api
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
-from mumc_modules.mumc_console_info import print_all_media_disabled,build_new_config_setup_to_delete_media
+from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_config_not_setup_to_delete_media
 from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
@@ -99,15 +99,15 @@ def build_configuration_file(the_dict,orig_dict={}):
         print('----------------------------------------------------------------------------------------')
 
         #Initialize for compare with other tag to prevent using the same tag in both blacktag and whitetag
-        the_dict['advanced_settings']['blacktags']=[]
-        the_dict['advanced_settings']['whitetags']=[]
+        the_dict['advanced_settings']['blacktags']['global']=[]
+        the_dict['advanced_settings']['whitetags']['global']=[]
 
         #ask user for global blacktag(s)
-        the_dict['advanced_settings']['blacktags']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags'])
+        the_dict['advanced_settings']['blacktags']['global']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags']['global'])
         print('----------------------------------------------------------------------------------------')
 
         #ask user for global whitetag(s)
-        the_dict['advanced_settings']['whitetags']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags'])
+        the_dict['advanced_settings']['whitetags']['global']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags']['global'])
         print('----------------------------------------------------------------------------------------')
 
     #Updating the config; Prepare to run the config editor
@@ -142,26 +142,51 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
 
+    #Add Sonarr and Radarr API settings to MUMC
+    #arrDict={'Radarr':'7878','Sonarr':'8989','Lidarr':'8686','Readarr':'8787'}
+    arrDict={'Radarr':'7878','Sonarr':'8989'}
+
+    for arr in arrDict:
+        if (proceed_arr_setup(arr)):
+            #define *arr dict
+            the_dict['admin_settings']['media_managers'][arr.casefold()]={}
+            #enable *arr
+            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
+            #get *arr url
+            arr_url=get_arr_url(arr)
+            #get *arr port
+            arr_port=get_arr_port(arr,arrDict[arr])
+            #build *arr url
+            if (len(arr_port)):
+                #*arr url with port
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=arr_url + ':' + arr_port
+            else:
+                #*arr url without port
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=arr_url
+            #get *arr api
+            the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=get_arr_api(arr)
+
+        print('----------------------------------------------------------------------------------------')
+
+    print('----------------------------------------------------------------------------------------')
+
     #set REMOVE_FILES
     the_dict['advanced_settings']['REMOVE_FILES']=False
 
     print('----------------------------------------------------------------------------------------')
     
-    #Build and save yaml config file
+    #Build and save new yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)
 
         try:
             the_dict=getIsAnyMediaEnabled(the_dict)
+
             if (the_dict['all_media_disabled']):
                 print_all_media_disabled(the_dict)
 
-                strings_list_to_print=''
-                strings_list_to_print=build_new_config_setup_to_delete_media(strings_list_to_print,the_dict)
-            try:
-                print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
-            except:
-                print_byType(strings_list_to_print[0],True,the_dict,{'font':{'color':'','style':''},'background':{'color':''}})
+            strings_list_to_print=built_new_config_not_setup_to_delete_media('',the_dict)
+            print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['formatting'])
 
         #the exception
         except (AttributeError, ModuleNotFoundError):

@@ -1,7 +1,6 @@
 import urllib.parse as urlparse
 from mumc_modules.mumc_server_type import isEmbyServer
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_compare_items import get_isItemMatching,does_index_exist
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_output import appendTo_DEBUG_log
@@ -65,7 +64,22 @@ def get_isItemTagged(usertags,matched_tags,item,the_dict):
 
 
 #add tags to media_item
-def addTags_To_mediaItem(matched_tags,item,the_dict):
+def removeTags_From_mediaItem(item,the_dict):
+
+    #Emby and jellyfin store tags differently
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
+
+    #Blank the list to remove existing tags
+    item[tagData]=[]
+
+    return item
+
+
+#add tags to media_item
+def addTags_To_mediaItem(matched_tags,child_item,the_dict):
 
     #Emby and jellyfin store tags differently
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
@@ -74,20 +88,41 @@ def addTags_To_mediaItem(matched_tags,item,the_dict):
         tagData='Tags'
 
     #Check if media item is tagged
-    if (not (tagData in item)):
-        item[tagData]=[]
+    if (not (tagData in child_item)):
+        child_item[tagData]=[]
 
     #Emby and jellyfin store tags differently
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         for thisTag in matched_tags:
             thisTag_dict={'Name':thisTag}
-            item[tagData].append(thisTag_dict)
-
+            child_item[tagData].append(thisTag_dict)
     else:
         for thisTag in matched_tags:
-            item[tagData].append(thisTag)
+            child_item[tagData].append(thisTag)
 
-    return item
+    #child_item[tagData]+=parent_item[tagData]
+    #child_item[tagData].extend(parent_item[tagData])
+
+    return child_item
+
+
+def getList_Of_thisItemsTags(item,the_dict):
+
+    #Emby and jellyfin store tags differently
+    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+        tagData='TagItems'
+    else:
+        tagData='Tags'
+
+    matched_tags=[]
+
+    for this_tag in item[tagData]:
+        if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
+            matched_tags.append(this_tag['Name'])
+        else:
+            matched_tags.append(this_tag)
+
+    return matched_tags
 
 
 #Get children of tagged parents
@@ -102,17 +137,17 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
     data_dict['data_']={'Items':[]}
 
     if ('blacktagged' in suffix_str.casefold()):
-        suffix_str='blacktags'
+        tagType='blacktags'
     elif ('whitetagged' in suffix_str.casefold()):
-        suffix_str='whitetags'
+        tagType='whitetags'
     else:
-        raise ValueError('Unknown tagging type; not blacktags and not whitetags.\n\tUnknown value is:' + str(suffix_str))
+        raise ValueError('Unknown tagging type; not blacktags and not whitetags.\n\tUnknown value is:' + str(tagType))
 
     #Loop thru items returned as tagged
     for data in data_Tagged['Items']:
 
         #Verify media item is a parent (not a child like an episode, movie, or audio)
-        if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
+        if (('IsFolder' in data) and (data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
             #Initialize api_query_handler() variables for child media items
             data_dict['StartIndex_']=0
@@ -141,7 +176,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             '&Fields=' + FieldsState + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder +
                             '&CollapseBoxSet' + CollapseBoxSetItems + '&EnableImages=' + EnableImages)
 
-                            data_dict['apiQuery_']=build_request_message(url,the_dict)
+                            data_dict['apiQuery_']=build_emby_jellyfin_request_message(url,the_dict)
 
                             #Send the API query for for watched media items in blacklists
                             data_dict.update(api_query_handler('',data_dict,the_dict))
@@ -160,13 +195,7 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or
                                 (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
 
-                                #Emby and jellyfin store tags differently
-                                if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-                                    tagData='TagItems'
-                                else:
-                                    tagData='Tags'
-
-                                child_item[tagData]=list(set(child_item[tagData] + data[tagData]))
+                                child_item=addTags_To_mediaItem(getList_Of_thisItemsTags(data,the_dict),child_item,the_dict)
 
     child_dict['Items']=data_dict['data_']['Items']
     child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
@@ -174,12 +203,11 @@ def getChildren_taggedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     return child_dict
 
+#Get if tag is formatted as a filter statement tag
+def get_isFilterStatementTag(this_tag):
 
-def get_isControlTag(this_tag):
-
-    isControlTag=False
-    split_this_tag=this_tag.split('|')
-    controlTag={}
+    isFilterStatementTag=False
+    split_this_tag=this_tag.split(':')
 
     try:
         if (((len(split_this_tag) == 4) and ((split_this_tag[0] == 'played') or (split_this_tag[0] == 'created'))) or
@@ -201,35 +229,50 @@ def get_isControlTag(this_tag):
                             if (does_index_exist(split_this_tag,4)):
                                 if (split_this_tag[4].casefold() == 'true'):
                                     split_this_tag[4]=True
-                                    isControlTag=True
+                                    isFilterStatementTag=True
                                 elif(split_this_tag[4].casefold() == 'false'):
                                     split_this_tag[4]=False
-                                    isControlTag=True
+                                    isFilterStatementTag=True
                                 else:
-                                    raise ValueError('Control tag \'' + str(this_tag + '\' has an invalid value for behavior_control; valid values are true and false.'))
+                                    split_this_tag[4]=None
+                                    isFilterStatementTag=False
                             else:
-                                split_this_tag.append(True) #default behavioral_control value
-                                isControlTag=True
+                                split_this_tag.append(False)
+                                isFilterStatementTag=True
                         else:
-                            isControlTag=True
+                            isFilterStatementTag=True
     except:
-        isControlTag=False
+        isFilterStatementTag=False
 
-    if (isControlTag):
+    if (isFilterStatementTag):
+        return split_this_tag
+    else:
+        return isFilterStatementTag
 
-        controlTag['filter_type']=split_this_tag[0]
 
-        if (controlTag['filter_type'] == 'played'):
-            controlTag['media_played_days']=split_this_tag[1]
-            controlTag['media_played_count_comparison']=split_this_tag[2]
-            controlTag['media_played_count']=split_this_tag[3]
+#Get if tag is formatted as a played or created filter statement tag
+def get_isPlayedCreated_FilterStatementTag(this_tag):
+
+    isFilterStatementTag=False
+    filterStatementTag={}
+
+    isFilterStatementTag=get_isFilterStatementTag(this_tag)
+
+    if (isFilterStatementTag):
+
+        split_this_tag=isFilterStatementTag
+
+        if (split_this_tag[0] == 'played'):
+            filterStatementTag['media_played_days']=int(split_this_tag[1])
+            filterStatementTag['media_played_count_comparison']=split_this_tag[2]
+            filterStatementTag['media_played_count']=int(split_this_tag[3])
         else:
-            controlTag['media_created_days']=split_this_tag[1]
-            controlTag['media_created_played_count_comparison']=split_this_tag[2]
-            controlTag['media_created_played_count']=split_this_tag[3]
-            controlTag['media_behavioral_control']=split_this_tag[4]
+            filterStatementTag['media_created_days']=int(split_this_tag[1])
+            filterStatementTag['media_created_played_count_comparison']=split_this_tag[2]
+            filterStatementTag['media_created_played_count']=int(split_this_tag[3])
+            filterStatementTag['behavioral_control']=split_this_tag[4]
 
-        return controlTag
+        return filterStatementTag
     else:
         return False
 
@@ -248,8 +291,6 @@ def get_isMOVIE_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_MOVIE['movie'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
 
 ### End Movie ###################################################################################
 
@@ -288,8 +329,6 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_EPISODE['episode'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
 
 ### End Episode ###################################################################################
 
@@ -377,8 +416,6 @@ def get_isAUDIO_Tagged(the_dict,item,user_info,usertags):
 
         if ('Id' in item):
             istag_AUDIO['track'][item['Id']],matched_tags=get_isItemTagged(usertags,matched_tags,item,the_dict)
-            #these tags are already part of the media_item; no need to add them again
-            matched_tags.clear()
 
 ### End Track #####################################################################################
 

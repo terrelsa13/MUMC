@@ -1,6 +1,6 @@
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
-from mumc_modules.mumc_url import requestURL,build_request_message
+from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 from mumc_modules.mumc_server_type import isEmbyServer
 
 
@@ -27,7 +27,7 @@ def modify_lastPlayedDate(item,userKey,the_dict):
 
     url = the_dict['admin_settings']['server']['url'] + '/Users/' + userKey + '/PlayedItems/' + item['Id'] + '?dateplayed=' + lastPlayedDate
 
-    req=build_request_message(url,the_dict,method='POST')
+    req=build_emby_jellyfin_request_message(url,the_dict,method='POST')
 
     #API POST for UserData modification
     requestURL(req, the_dict['DEBUG'], 'add_missing_LastPlayedDate', 3, the_dict)

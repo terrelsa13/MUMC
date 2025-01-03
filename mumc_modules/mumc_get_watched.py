@@ -1,7 +1,7 @@
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
-from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
+from mumc_modules.mumc_server_type import isEmbyServer
+from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue,getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
 
 
 def init_blacklist_watched_query(var_dict,the_dict):
@@ -16,7 +16,7 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['enable_media_query_blacklisted_played']):
         #Build query for watched media items in blacklists
         var_dict['IncludeItemTypes_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+        var_dict['FieldsState_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ProviderIds'
         var_dict['SortBy_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Blacklist']='Ascending'
         var_dict['EnableUserData_Blacklist']='True'
@@ -24,6 +24,8 @@ def init_blacklist_watched_query(var_dict,the_dict):
         var_dict['EnableImages_Blacklist']='False'
         var_dict['CollapseBoxSetItems_Blacklist']='False'
         var_dict['IsPlayedState_Blacklist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
+        var_dict['IsPlayedState_Blacklist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('whitetag',the_dict,var_dict,var_dict['IsPlayedState_Blacklist'])
+        var_dict['IsPlayedState_Blacklist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('blacktag',the_dict,var_dict,var_dict['IsPlayedState_Blacklist'])
 
         if (isEmbyServer(var_dict['server_brand'])):
             var_dict['FieldsState_Blacklist']+=',UserDataPlayCount,UserDataLastPlayedDate'
@@ -57,7 +59,7 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['enable_media_query_whitelist_played']):
         #Build query for watched media items in whitelists
         var_dict['IncludeItemTypes_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+        var_dict['FieldsState_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ProviderIds'
         var_dict['SortBy_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Whitelist']='Ascending'
         var_dict['EnableUserData_Whitelist']='True'
@@ -65,6 +67,8 @@ def init_whitelist_watched_query(var_dict,the_dict):
         var_dict['EnableImages_Whitelist']='False'
         var_dict['CollapseBoxSetItems_Whitelist']='False'
         var_dict['IsPlayedState_Whitelist']=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
+        var_dict['IsPlayedState_Whitelist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('whitetag',the_dict,var_dict,var_dict['IsPlayedState_Whitelist'])
+        var_dict['IsPlayedState_Whitelist']=getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue('blacktag',the_dict,var_dict,var_dict['IsPlayedState_Whitelist'])
 
         if (isEmbyServer(var_dict['server_brand'])):
             var_dict['FieldsState_Whitelist']+=',UserDataPlayCount,UserDataLastPlayedDate'
@@ -98,7 +102,8 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
     parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     if (var_dict['this_blacklist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_blacklisted_played']):
+        var_dict['enable_media_query_blacklisted_played'] and
+        (not (var_dict['IsPlayedState_Blacklist'] == 'disabled'))):
 
         #Built query for watched items in blacklists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Blacklist'] +
@@ -106,7 +111,7 @@ def blacklist_watched_query(user_info,var_dict,the_dict):
         '&Fields=' + var_dict['FieldsState_Blacklist'] + '&Recursive=' + var_dict['Recursive_Blacklist'] + '&SortBy=' + var_dict['SortBy_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Blacklist'] +
         '&EnableImages=' + var_dict['EnableImages_Blacklist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Blacklist'] + '&EnableUserData=' + var_dict['EnableUserData_Blacklist'])
 
-        var_dict['apiQuery_Blacklist']=build_request_message(url,the_dict)
+        var_dict['apiQuery_Blacklist']=build_emby_jellyfin_request_message(url,the_dict)
 
         #Send the API query for for watched media items in blacklists
         var_dict=api_query_handler('Blacklist',var_dict,the_dict)
@@ -138,7 +143,8 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
     parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     if (var_dict['this_whitelist_lib']['lib_enabled'] and
-        var_dict['enable_media_query_whitelist_played']):
+        var_dict['enable_media_query_whitelist_played'] and
+        (not (var_dict['IsPlayedState_Whitelist'] == 'disabled'))):
 
         #Built query for watched items in whitelists
         url=(var_dict['server_url'] + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + parent_id + '&IncludeItemTypes=' + var_dict['IncludeItemTypes_Whitelist'] +
@@ -146,7 +152,7 @@ def whitelist_watched_query(user_info,var_dict,the_dict):
         '&Fields=' + var_dict['FieldsState_Whitelist'] + '&Recursive=' + var_dict['Recursive_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitelist'] +
         '&EnableImages=' + var_dict['EnableImages_Whitelist'] + '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitelist'] + '&EnableUserData=' + var_dict['EnableUserData_Whitelist'])
 
-        var_dict['apiQuery_Whitelist']=build_request_message(url,the_dict)
+        var_dict['apiQuery_Whitelist']=build_emby_jellyfin_request_message(url,the_dict)
 
         #Send the API query for for watched media items in whitelists
         var_dict=api_query_handler('Whitelist',var_dict,the_dict)

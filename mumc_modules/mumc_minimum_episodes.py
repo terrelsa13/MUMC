@@ -1,6 +1,6 @@
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log
-from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemInfo
+from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemInfo,get_SERIES_sonarrInfo
 
 
 #Minimum episodes and minimum played episodes control
@@ -17,6 +17,7 @@ class minEpisodesToKeep_data_handler:
         self.minimum_number_episodes = self.postproc_dict['minimum_number_episodes']
         self.minimum_number_played_episodes = self.postproc_dict['minimum_number_played_episodes']
         self.minimum_number_episodes_behavior = self.postproc_dict['minimum_number_episodes_behavior']
+        self.delete_episodes = self.postproc_dict['delete_episodes']
 
         self.minimum_number_episodes_behavior_modified = self.minimum_number_episodes_behavior.casefold().replace(' ','')
 
@@ -26,6 +27,8 @@ class minEpisodesToKeep_data_handler:
         self.username_userid_match = False
 
         self.episodesToKeepIds = []
+        self.episodesToKeep_bySeriesTVdBId = {}
+        self.episodes_seriesEnded = {}
 
         #Define dictionary of different behavior types
         self.behaviorTypes={
@@ -56,7 +59,7 @@ class minEpisodesToKeep_data_handler:
         #Put behavior type keys into a list
         self.behaviorTypesKeys_List=list(self.behaviorTypes.keys())
 
-        #minimum_number_episodes must be > minimum_number_played_episodes
+        #minimum_number_episodes must be >= minimum_number_played_episodes
         if (self.minimum_number_played_episodes > self.minimum_number_episodes):
             if (not (self.minimum_number_episodes == 0)):
                 self.minimum_number_episodes = self.minimum_number_played_episodes
@@ -80,6 +83,7 @@ class minEpisodesToKeep_data_handler:
                         if (not (episodeItem['SeriesId'] in self.episodes_toBeDeletedOrRemain)):
                             self.episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]={}
                             self.episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]['SeriesName'] = self.episodeCounts_byUserId[userId][episodeItem['SeriesId']]['SeriesName']
+                            self.episodes_toBeDeletedOrRemain[episodeItem['SeriesId']]['TVdBId'] = self.episodeCounts_byUserId[userId][episodeItem['SeriesId']]['TVdBId']
                         #if userId has not already been processed; add it so it can be
                         if (not (userId in self.episodes_toBeDeletedOrRemain[episodeItem['SeriesId']])):
                             #gather information needed to determine how many played and unplayed episodes may be deleted
@@ -123,7 +127,8 @@ class minEpisodesToKeep_data_handler:
                         #if seriesId has not already processed; add it so it can be
                         if (not (series_info['Id'] in self.episodes_toBeDeletedOrRemain)):
                             self.episodes_toBeDeletedOrRemain[series_info['Id']]={}
-                            self.episodes_toBeDeletedOrRemain[series_info['Id']]['SeriesName'] = self.episodeCounts_byUserId[userId][series_info['Id']]['SeriesName']
+                            self.episodes_toBeDeletedOrRemain[series_info['Id']]['SeriesName'] = series_info['Name']
+                            self.episodes_toBeDeletedOrRemain[series_info['Id']]['TVdBId'] = series_info['ProviderIds']['Tvdb']
                         #if userId has not already been processed; add it so it can be
                         if (not (userId in self.episodes_toBeDeletedOrRemain[episodeItem['SeriesId']])):
                             #gather information needed to determine how many played and unplayed episodes may be deleted
@@ -153,7 +158,7 @@ class minEpisodesToKeep_data_handler:
             #loop thru the userIds under each seriesId
             for userId in self.episodes_toBeDeletedOrRemain[seriesId]:
                 #ignore if this value
-                if (not (userId == 'SeriesName')):
+                if (not ((userId == 'SeriesName') or (userId == 'TVdBId'))):
                     #determine the number of played and unplayed episodes for this series that will remain specifically for this user
                     self.episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToRemain'] = self.episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedEpisodeCount'] - self.episodes_toBeDeletedOrRemain[seriesId][userId]['PlayedToBeDeleted']
                     self.episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToRemain'] = self.episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedEpisodeCount'] - self.episodes_toBeDeletedOrRemain[seriesId][userId]['UnplayedToBeDeleted']
@@ -223,6 +228,8 @@ class minEpisodesToKeep_data_handler:
                 if (not (deleteItem['Id'] in self.episodeTracker[deleteItem['SeriesId']])):
                     if (not ('SeriesName' in self.episodeTracker[deleteItem['SeriesId']])):
                         self.episodeTracker[deleteItem['SeriesId']]['SeriesName'] = self.episodes_toBeDeletedOrRemain[deleteItem['SeriesId']]['SeriesName']
+                    if (not ('TVdBId' in self.episodeTracker[deleteItem['SeriesId']])):
+                        self.episodeTracker[deleteItem['SeriesId']]['TVdBId'] = self.episodes_toBeDeletedOrRemain[deleteItem['SeriesId']]['TVdBId']
                     if (not ('MaxSeason' in self.episodeTracker[deleteItem['SeriesId']])):
                         self.episodeTracker[deleteItem['SeriesId']]['MaxSeason'] = 0
                     if (not ('MaxEpisode' in self.episodeTracker[deleteItem['SeriesId']])):
@@ -290,7 +297,7 @@ class minEpisodesToKeep_data_handler:
             #loop thru each episode for the series
             for episodeId in self.episodeTracker[seriesId]:
                 #ignore non-essential data
-                if (not ((episodeId == 'SeriesName') or (episodeId == 'MaxSeason') or (episodeId == 'MaxEpisode') or (episodeId == 'SeasonEpisodeGrid'))):
+                if (not ((episodeId == 'SeriesName') or (episodeId == 'TVdBId') or (episodeId == 'MaxSeason') or (episodeId == 'MaxEpisode') or (episodeId == 'SeasonEpisodeGrid'))):
                     #get the key for this entry, which is the season number as the first element of a list
                     seasonNum=list(self.episodeTracker[seriesId][episodeId].keys())[0]
                     #use the season number and the value from the season number key (aka episode number) to save the episodeId in the correct grid position
@@ -351,7 +358,7 @@ class minEpisodesToKeep_data_handler:
                 #loop thru each user
                 for userId in self.episodes_toBeDeletedOrRemain[seriesId]:
                     user_enabled = False
-                    if (not (userId == 'SeriesName')):
+                    if (not ((userId == 'SeriesName') or (userId == 'TVdBId'))):
                         for users_info in self.postproc_dict['enabled_users']:
                             if (userId == users_info['user_id']):
                                 #user_info=users_info
@@ -493,7 +500,8 @@ class minEpisodesToKeep_data_handler:
                                     #get played status for specified episodeId
                                     played_status=get_ADDITIONAL_itemInfo(self.episodeTracker[seriesId]['PlayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for played item',self.the_dict)
                                     #verify info was returned and episode is played
-                                    if ((not (played_status == False)) and played_status['UserData']['Played']):
+                                    #if ((not (played_status == False)) and played_status['UserData']['Played']):
+                                    if (played_status['UserData']['Played']):
                                         #are the expected number of played episodes to be deleted > 0
                                         if (self.episodeTracker[seriesId]['PlayedToBeDeleted'] > 0):
                                             #decrement the expected number of played episodes to be deleted by 1
@@ -503,6 +511,7 @@ class minEpisodesToKeep_data_handler:
                                             if (not (episodeId in self.episodesToKeepIds)):
                                                 #add this episodeId to the list of episodeIds to be removed from the delete list later
                                                 self.episodesToKeepIds.append(episodeId)
+                                                self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
                 seasonNumIndex += 1    
 
 
@@ -528,7 +537,8 @@ class minEpisodesToKeep_data_handler:
                                     #get unplayed status for specified episodeId
                                     unplayed_status=get_ADDITIONAL_itemInfo(self.episodeTracker[seriesId]['UnplayedToBeDeleted_UserInfo'],episodeId,'filtering episode tracker grid for unplayed item',self.the_dict)
                                     #verify info was returned and episode is unplayed
-                                    if ((not (unplayed_status == False)) and (not unplayed_status['UserData']['Played'])):
+                                    #if ((not (unplayed_status == False)) and (not unplayed_status['UserData']['Played'])):
+                                    if (not unplayed_status['UserData']['Played']):
                                         #are the expected number of unplayed episodes to be deleted > 0
                                         if (self.episodeTracker[seriesId]['UnplayedToBeDeleted'] > 0):
                                             #decrement the expected number of unplayed episodes to be deleted by 1
@@ -538,10 +548,22 @@ class minEpisodesToKeep_data_handler:
                                             if (not (episodeId in self.episodesToKeepIds)):
                                                 #add this episodeId to the list of episodeIds to be removed from the delete list later
                                                 self.episodesToKeepIds.append(episodeId)
+                                                self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
                 seasonNumIndex += 1
 
 
-    def remove_episodesToKeepFromDeleteList(self,postproc_dict):
+    def has_seriesEnded_okToDeleteEpisode(self,the_dict):
+        #loop thru self.episodesToKeep_bySeriesTVdBId
+        for episodeId in self.episodesToKeep_bySeriesTVdBId:
+            seriesTVdBId=self.episodesToKeep_bySeriesTVdBId[episodeId]
+            seriesInfo = get_SERIES_sonarrInfo(seriesTVdBId,self.postproc_dict,the_dict)
+            #check the "status" value and "ended" value
+            if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
+                while (episodeId in self.episodesToKeepIds):
+                    self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
+
+
+    def remove_episodesToKeep_fromDeleteList(self,postproc_dict):
         #loop thru each series
         for episodeId in self.episodesToKeepIds:
             #loop while the number of instances of episodeId in the deleteItems_Tracker is > 0
