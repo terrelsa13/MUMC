@@ -2,6 +2,56 @@ from mumc_modules.mumc_output import save_yaml_config
 from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
 
 
+def userLib_configurationUpdater(the_dict):
+
+    for userInfo in the_dict['admin_settings']['users']:
+        whitelist_libId_List=[]
+        blacklist_libId_List=[]
+        whitelist_pos_List=[]
+        blacklist_pos_List=[]
+        userIndex = the_dict['admin_settings']['users'].index(userInfo)
+        for libInfo in the_dict['admin_settings']['users'][userIndex]['whitelist']:
+            libIndex=the_dict['admin_settings']['users'][userIndex]['whitelist'].index(libInfo)
+            whitelist_libId_List.append(the_dict['admin_settings']['users'][userIndex]['whitelist'][libIndex]['lib_id'])
+        for libInfo in the_dict['admin_settings']['users'][userIndex]['blacklist']:
+            libIndex=the_dict['admin_settings']['users'][userIndex]['blacklist'].index(libInfo)
+            blacklist_libId_List.append(the_dict['admin_settings']['users'][userIndex]['blacklist'][libIndex]['lib_id'])
+
+        whitelist_libId_List.reverse()
+        for libInfo in whitelist_libId_List:
+            libIndex=whitelist_libId_List.index(libInfo)
+            if (whitelist_libId_List.count(whitelist_libId_List[libIndex]) > 1):
+                whitelist_libId_List[libIndex]=None
+        whitelist_libId_List.reverse()
+
+        blacklist_libId_List.reverse()
+        for libInfo in blacklist_libId_List:
+            libIndex=blacklist_libId_List.index(libInfo)
+            if (blacklist_libId_List.count(blacklist_libId_List[libIndex]) > 1):
+                blacklist_libId_List[libIndex]=None
+        blacklist_libId_List.reverse()
+
+        for libId in whitelist_libId_List:
+            if (libId == None):
+                libIndex=whitelist_libId_List.index(libId)
+                whitelist_pos_List.append(libIndex)
+                whitelist_libId_List[libIndex]=0
+
+        for libId in blacklist_libId_List:
+            if (libId == None):
+                libIndex=blacklist_libId_List.index(libId)
+                blacklist_pos_List.append(libIndex)
+                blacklist_libId_List[libIndex]=0
+
+        for libIndex in reversed(whitelist_pos_List):
+            the_dict['admin_settings']['users'][userIndex]['whitelist'].pop(libIndex)
+
+        for libIndex in reversed(blacklist_pos_List):
+            the_dict['admin_settings']['users'][userIndex]['blacklist'].pop(libIndex)
+
+    return the_dict['admin_settings']['users']
+
+
 def yaml_configurationUpdater(the_dict,orig_dict={}):
     config_data={}
     
@@ -85,7 +135,8 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
         except:
             pass
         config_data['admin_settings']['server']=orig_dict['admin_settings']['server']
-        config_data['admin_settings']['users']=the_dict['admin_settings']['users']
+
+        config_data['admin_settings']['users']=userLib_configurationUpdater(the_dict)
 
         try:
             #check if radarr enabled key existed

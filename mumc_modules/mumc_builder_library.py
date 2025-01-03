@@ -318,9 +318,26 @@ def add_libraries_to_existing_users(the_dict):
                             the_dict['all_users_dict'][the_dict['prev_users_dict'].index(existing_user)][the_dict['opposing_listing_type']].append(the_dict['all_libraries_list'][all_lib_id_pos])
                 else:
                     for existing_lib_id in existing_lib_id_list:
+                        exisiting_lib_id_index=existing_lib_id_list.index(existing_lib_id)
                         for all_lib_pos in range(len(the_dict['all_library_ids_list'])):
                             if (existing_lib_id == the_dict['all_library_ids_list'][all_lib_pos]):
-                                if (not (the_dict['all_libraries_list'][all_lib_pos] in existing_lib_info_list)):
+                                #remove "lib_enabled" before comparison
+                                #"lib_enabled" is expected to be manually changed in the config and therefore should be ignored for the comparison
+                                all_libraries_list_lib_enabled=the_dict['all_libraries_list'][all_lib_pos].pop('lib_enabled',None)
+                                existing_lib_info_list_lib_enabled=existing_lib_info_list[exisiting_lib_id_index].pop('lib_enabled',None)
+
+                                libraries_match=True
+                                if (not (the_dict['all_libraries_list'][all_lib_pos] == existing_lib_info_list[exisiting_lib_id_index])):
+                                    libraries_match=False
+
+                                #re-add "lib_enabled" after comparison
+                                if (not (all_libraries_list_lib_enabled == None)):
+                                    the_dict['all_libraries_list'][all_lib_pos]['lib_enabled']=all_libraries_list_lib_enabled
+                                if (not (existing_lib_info_list_lib_enabled == None)):
+                                    existing_lib_info_list[exisiting_lib_id_index]['lib_enabled']=existing_lib_info_list_lib_enabled
+
+                                #if libraries do not match; add the "new" library for this user
+                                if (not (libraries_match)):
                                     the_dict['all_users_dict'][the_dict['prev_users_dict'].index(existing_user)][the_dict['opposing_listing_type']].append(the_dict['all_libraries_list'][all_lib_pos])
                                     existing_lib_info_list.append(the_dict['all_libraries_list'][all_lib_pos])
                                     existing_lib_id_list.append(the_dict['all_library_ids_list'][all_lib_pos])
