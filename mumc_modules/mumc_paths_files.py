@@ -53,7 +53,6 @@ def doesDirectoryExist(PathName):
     return pathExists
 
 
-
 def getFileExtension(path_or_filename):
     if (doesFileExist(path_or_filename)):
         return Path(path_or_filename).suffix

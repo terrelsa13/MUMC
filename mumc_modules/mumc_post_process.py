@@ -688,7 +688,7 @@ def postProcessing(the_dict,media_dict):
                 postproc_dict['minEpisodesToKeep']=minEpisodesToKeep_data_handler(postproc_dict,the_dict)
                 postproc_dict['minEpisodesToKeep'].trackEpisodes_byUserId()
                 postproc_dict['minEpisodesToKeep'].determine_playedUnplayedToRemain()
-                postproc_dict['minEpisodesToKeep'].buildSeason_byEpisodeGrid()
+                postproc_dict['minEpisodesToKeep'].buildSeason_x_EpisodeGrid()
                 postproc_dict['minEpisodesToKeep'].determine_minimumEpisodeBehavioralType()
                 postproc_dict['minEpisodesToKeep'].calc_userSpecificBehavioralTypeData()
                 postproc_dict['minEpisodesToKeep'].find_playedEpisodesToKeep()

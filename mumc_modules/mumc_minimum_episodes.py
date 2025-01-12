@@ -217,7 +217,7 @@ class minEpisodesToKeep_data_handler:
 
 
     #loop thru each item in the list of items that may be deleted
-    def buildSeason_byEpisodeGrid(self):
+    def buildSeason_x_EpisodeGrid(self):
         for deleteItem in self.deleteItems:
             #verify media item is an episode
             if (deleteItem['Type'] == 'Episode'):
