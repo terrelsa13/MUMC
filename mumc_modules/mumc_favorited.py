@@ -1,5 +1,4 @@
-from mumc_modules.mumc_played_created import get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue
-from mumc_modules.mumc_url import api_query_handler,build_request_message,api_query_handler2
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_STUDIO_itemInfo
 from mumc_modules.mumc_compare_items import does_index_exist
 from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
@@ -9,25 +8,24 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log,convert2json
 def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
 
     data_dict={}
-    data_dict[user_info['user_id']]={}
-    data_Favorited=var_dict[user_info['user_id']]['data_Favorited_' + suffix_str]
-    data_dict[user_info['user_id']]['APIDebugMsg_']='Find ' + var_dict[user_info['user_id']]['APIDebugMsg_Child_Of_Favorited_Item_' + suffix_str]
+    data_Favorited=var_dict['data_Favorited_' + suffix_str]
+    data_dict['APIDebugMsg_']='Find ' + var_dict['APIDebugMsg_Child_Of_Favorited_Item_' + suffix_str]
     server_url=the_dict['admin_settings']['server']['url']
     child_dict={}
-    data_dict[user_info['user_id']]['StartIndex_']=0
-    data_dict[user_info['user_id']]['data_']={'Items':[]}
+    data_dict['StartIndex_']=0
+    data_dict['data_']={'Items':[]}
 
     #Loop thru items returned as favorited
     for data in data_Favorited['Items']:
 
         #Verify media item is a parent (not a child like an episode, movie, or audio)
-        if ((data['IsFolder'] == True) or (data['Type'] == 'Book')):
+        if (('IsFolder' in data) and (data['IsFolder'] == True) or (data['Type'] == 'Book')):
 
             #Initialize api_query_handler() variables for watched child media items
-            data_dict[user_info['user_id']]['StartIndex_']=0
-            data_dict[user_info['user_id']]['TotalItems_']=1
-            data_dict[user_info['user_id']]['QueryLimit_']=1
-            data_dict[user_info['user_id']]['QueriesRemaining_']=True
+            data_dict['StartIndex_']=0
+            data_dict['TotalItems_']=1
+            data_dict['QueryLimit_']=1
+            data_dict['QueriesRemaining_']=True
 
             if (not (data['Id'] == '')):
                 #Build query for child media items
@@ -39,32 +37,31 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                 Recursive='True'
                 EnableImages='False'
                 CollapseBoxSetItems='False'
-                IsPlayedState=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,var_dict)
 
-                while (data_dict[user_info['user_id']]['QueriesRemaining_']):
+                while (data_dict['QueriesRemaining_']):
 
                     if (not (data['Id'] == '')):
                         #Built query for child meida items
 
                         url=(server_url + '/Users/' + user_info['user_id']  + '/Items?ParentID=' + data['Id'] + '&IncludeItemTypes=' + IncludeItemTypes +
-                        '&StartIndex=' + str(data_dict[user_info['user_id']]['StartIndex_']) + '&Limit=' + str(data_dict[user_info['user_id']]['QueryLimit_']) + '&IsPlayed=' + IsPlayedState + '&Fields=' + FieldsState +
+                        '&StartIndex=' + str(data_dict['StartIndex_']) + '&Limit=' + str(data_dict['QueryLimit_']) + '&Fields=' + FieldsState +
                         '&CollapseBoxSetItems=' + CollapseBoxSetItems + '&Recursive=' + Recursive + '&SortBy=' + SortBy + '&SortOrder=' + SortOrder + '&EnableImages=' + EnableImages)
 
-                        data_dict[user_info['user_id']]['apiQuery_']=build_request_message(url,the_dict)
+                        data_dict['apiQuery_']=build_emby_jellyfin_request_message(url,the_dict)
 
                         #Send the API query for for watched media items in blacklists
-                        data_dict[user_info['user_id']]=api_query_handler2('',user_info['user_id'],data_dict,the_dict)
+                        data_dict.update(api_query_handler('',data_dict,the_dict))
                     else:
                         #When no media items are returned; simulate an empty query being returned
                         #this will prevent trying to compare to an empty string '' to the whitelist libraries later on
-                        data_dict[user_info['user_id']]['data_']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
-                        data_dict[user_info['user_id']]['QueryLimit_']=0
-                        data_dict[user_info['user_id']]['QueriesRemaining_']=False
+                        data_dict['data_']={'Items':[],'TotalRecordCount':0,'StartIndex':0}
+                        data_dict['QueryLimit_']=0
+                        data_dict['QueriesRemaining_']=False
                         if (the_dict['DEBUG']):
-                            appendTo_DEBUG_log("\n\nNo " + data_dict[user_info['user_id']]['APIDebugMsg_'] + " media items found",2,the_dict)
+                            appendTo_DEBUG_log("\n\nNo " + data_dict['APIDebugMsg_'] + " media items found",2,the_dict)
 
                     #save favorites to child items
-                    for child_item in data_dict[user_info['user_id']]['data_']['Items']:
+                    for child_item in data_dict['data_']['Items']:
                         if ((child_item['Type'].casefold() == 'movie') or (child_item['Type'].casefold() == 'episode') or (child_item['Type'].casefold() == 'audio') or (child_item['Type'].casefold() == 'audiobook')):
                             if (not ('UserData' in child_item)):
                                 child_item['UserData']={}
@@ -72,9 +69,9 @@ def getChildren_favoritedMediaItems(suffix_str,user_info,var_dict,the_dict):
                             else: #(('IsFavorite' in child_item['UserData']) or (not ('IsFavorite' in child_item['UserData']))):
                                 child_item['UserData']['IsFavorite']=True
 
-    child_dict['Items']=data_dict[user_info['user_id']]['data_']['Items']
-    child_dict['TotalRecordCount']=len(data_dict[user_info['user_id']]['data_']['Items'])
-    child_dict['StartIndex']=data_dict[user_info['user_id']]['StartIndex_']
+    child_dict['Items']=data_dict['data_']['Items']
+    child_dict['TotalRecordCount']=len(data_dict['data_']['Items'])
+    child_dict['StartIndex']=data_dict['StartIndex_']
 
     #Return dictionary of child items along with TotalRecordCount
     return child_dict

@@ -1,4 +1,4 @@
-from mumc_modules.mumc_url import requestURL,build_request_message
+from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 
 #API call to get single user account
@@ -6,7 +6,7 @@ def get_single_user(userId,the_dict):
 
     url=the_dict['admin_settings']['server']['url'] + '/Users/' + str(userId)
 
-    req=build_request_message(url,the_dict)
+    req=build_emby_jellyfin_request_message(url,the_dict)
 
     #preConfigDebug = 3
     preConfigDebug = 0
@@ -22,7 +22,7 @@ def get_all_users(the_dict):
 
     url=the_dict['admin_settings']['server']['url'] + '/Users'
     
-    req=build_request_message(url,the_dict)
+    req=build_emby_jellyfin_request_message(url,the_dict)
 
     #preConfigDebug = 3
     preConfigDebug = 0

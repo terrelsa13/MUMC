@@ -7,10 +7,8 @@ from mumc_modules.mumc_parse_options import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
-from mumc_modules.mumc_post_process2 import init_postProcessing2
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
 from mumc_modules.mumc_get_media import init_getMedia
-from mumc_modules.mumc_get_media2 import init_getMedia2
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
@@ -18,14 +16,13 @@ from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_default import create_default_config,merge_configuration
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
+#from memory_profiler import profile
 
 
+#@profile
 def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
-
-    #remove old DEBUG if it exists
-    delete_debug_log(init_dict)
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
@@ -33,13 +30,10 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
-    ############# DELETE THIS #############
-    cfg['DEBUG']=1
-    if (not ('advance_settings' in cfg)):
-        cfg['advance_settings']={}
-    cfg['advanced_settings']['REMOVE_FILES']=False
+    #after importing the config; remove old DEBUG if it exists
+    delete_debug_log(init_dict)
 
-    #Look for missing subfolder Ids and add them
+    #look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
 
     #remember original config for when user wants to update existing config file
@@ -62,18 +56,12 @@ def MUMC():
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
-    #delete unused variable
-    del default_config
-
     #get and check config values are what we expect them to be
     cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(init_dict)
-
-    #delete unused variable
-    del init_dict
 
     #update cache variables with values specified in the config file
     cfg['cached_data'].updateCacheVariables(cfg)
@@ -88,19 +76,13 @@ def MUMC():
             print_cache_stats(cfg)
 
         if (cfg['DEBUG'] == 255):
-            #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+            #show cache data (only when DEBUG == 255
             cache_data_to_debug(cfg)
 
-        #delete unused variables
-        del cmdopt_dict
-        del cfg_orig
+        #clear cache
+        cfg['cached_data'].wipeCache()
 
-        #exit gracefully after updating config
-        sys.exit(0)
-    else:
-        #delete unused variables
-        del cmdopt_dict
-        del cfg_orig
+        return
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
@@ -120,36 +102,29 @@ def MUMC():
     if (cfg['all_media_disabled']):
         #output message letting user know none of the media is enabled to be monitored
         print_all_media_disabled(cfg)
-        #deleteItems=[]
+        deleteItems=[]
     else:
         #prepare for the main event; return dictionaries of media items per monitored user
-        #cfg=init_getMedia(cfg)
-        cfg=init_getMedia2(cfg)
+        cfg=init_getMedia(cfg)
 
         #prepare for post processing; return list of media items to be deleted
-        #deleteItems_dict=init_postProcessing(cfg)
-        #deleteItems_dict=init_postProcessing2(cfg)
+        deleteItems_dict=init_postProcessing(cfg)
 
         #sort lists of items to be deleted into a single list
-        #deleteItems=sortDeleteLists(deleteItems_dict)
-
-        #del deleteItems_dict
+        deleteItems=sortDeleteLists(deleteItems_dict)
 
         #output to console the items to be deleted; then delete media items
-        #print_and_delete_items(deleteItems,cfg)
+        print_and_delete_items(deleteItems,cfg)
 
     #cleanup empty season and series folders
-    #season_series_folder_cleanup(deleteItems,cfg)
-    
-    #delete unused variable
-    #del deleteItems
+    season_series_folder_cleanup(deleteItems,cfg)
 
     if (cfg['DEBUG']):
         #show cache stats
         print_cache_stats(cfg)
 
     if (cfg['DEBUG'] == 255):
-        #show cache data (only when DEBUG=255; yes tihs is a "secret" DEBUG level)
+        #show cache data (only when DEBUG == 255)
         cache_data_to_debug(cfg)
 
     #show footer info
@@ -158,15 +133,16 @@ def MUMC():
     #clear cache
     cfg['cached_data'].wipeCache()
 
-    #delete unused variable
-    del cfg
+    return
 
 
 ############# START OF SCRIPT #############
 
 if (__name__ == "__main__"):
+
     MUMC()
 
+#Exit Gracefully
 sys.exit(0)
 
 ############# END OF SCRIPT #############

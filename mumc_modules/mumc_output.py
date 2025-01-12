@@ -1,6 +1,20 @@
 import json
+import yaml
 from pathlib import Path
 from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+
+
+class NoAliasDumper(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        return True
+
+
+def save_yaml_config(dataInput,filePathName):
+    #Save the config file
+    with open(filePathName,'w') as file:
+        file.write('---\n')
+        yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
+        file.write('...')
 
 
 def parse_string_and_newlines(string_to_print):
@@ -49,7 +63,11 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
 
 
 def print_long_string_byAttributes(string_to_print,text_attributes,the_dict):
-    character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print']) #turn this into a config option
+    try:
+        character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+    except:
+        character_limit=128
+
     string_to_print_len=len(string_to_print)
     string_to_print_mod=string_to_print_len % character_limit
     for string_to_print_pos in range(0,(string_to_print_len - string_to_print_mod),character_limit):
@@ -64,7 +82,10 @@ def print_long_string_byAttributes(string_to_print,text_attributes,the_dict):
 def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
     if (the_dict['DEBUG'] >= debugLevel):
 
-        character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+        try:
+            character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+        except:
+            character_limit=128
 
         #if debug file does not exist; create blank file
         if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
@@ -84,7 +105,10 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
 def print_byType(string_to_print,ok_to_print,the_dict,text_attributes):
     if (ok_to_print):
 
-        character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+        try:
+            character_limit=int(the_dict['admin_settings']['output_controls']['character_limit']['print'])
+        except:
+            character_limit=128
 
         #limit number of characters in a single print to 250
         #loop thru inputs > 250 characters and print in multiple passes

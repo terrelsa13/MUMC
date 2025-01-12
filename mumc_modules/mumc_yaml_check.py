@@ -3,6 +3,7 @@ from mumc_modules.mumc_versions import get_semantic_version_parts
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
+from mumc_modules.mumc_tagged import get_isFilterStatementTag
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -45,7 +46,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             user_found=0
             #Check user from user_keys is also a user in this blacklist/whitelist
             for user_check in user_id_check_list:
-                if (user_check in check_irt['user_id']):
+                if (user_check == check_irt['user_id']):
                     user_found+=1
             if (user_found == 0):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' does not match any user from user_keys\n'
@@ -71,7 +72,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             user_found=0
             #Check user from user_name is also a user in this blacklist/whitelist
             for user_check in user_name_check_list:
-                if (user_check in check_irt['user_name']):
+                if (user_check == check_irt['user_name']):
                     user_found+=1
             if (user_found == 0):
                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' does not match any user from user_keys\n'
@@ -131,15 +132,17 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
                         if ('path' in libinfo):
                             path_found += 1
                             check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['path']
-                            #Check path is string
-                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
+                            #Check path is string; checking for backslashes does not work for windows
+                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
+                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('network_path' in libinfo):
                             network_path_found += 1
                             check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['network_path']
-                            #Check network_path is string
-                            if (not ((isinstance(check_item,str) and check_item.find('\\') < 0) or (check_item == '') or (check_item == None))):
+                            #Check network_path is string; checking for backslashes does not work for windows
+                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
+                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                 error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
 
                         if ('subfolder_id' in libinfo):
@@ -179,6 +182,85 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
     return(error_found_in_mumc_config_yaml)
 
 
+#Check filter_tags are formatted as expected
+def cfgCheckYAML_isFilterTag(tag,tag_list):
+    
+    no_error_found=True
+    
+    if (
+        not (isinstance(tag,str) and isinstance(tag_list,list) and
+            (isinstance(tag_list[0],str) and ((tag_list[0] == 'played') or (tag_list[0] == 'created')) and
+                isinstance(tag_list[1],int) and ((tag_list[1] >= -1) and (tag_list[1] <= 730500)) and
+                isinstance(tag_list[2],str) and
+                ((tag_list[2] == '>') or (tag_list[2] == '<') or
+                (tag_list[2] == '>=') or (tag_list[2] == '<=') or
+                (tag_list[2] == '==') or (tag_list[2] == 'not ==') or
+                (tag_list[2] == 'not >') or (tag_list[2] == 'not <') or
+                (tag_list[2] == 'not >=') or (tag_list[2] == 'not <=')) and
+                isinstance(tag_list[3],int) and ((tag_list[3] >= -1) and (tag_list[3] <= 730500)) and
+                ((tag_list[0] == 'played') or ((tag_list[0] == 'created') and isinstance(tag_list[4],bool) and ((tag_list[4] == True) or (tag_list[4] == False)))))
+            )
+        ):
+        no_error_found=False
+
+    return no_error_found
+
+
+#Check behavioral_tags config variables are as expected
+def cfgCheckYAML_isBehavioralTag(cfg,tag,media_type):
+    
+    error_found_in_mumc_config_yaml=''
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action')) == None)):
+        if (
+            not (isinstance(check,str) and
+                ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
+        else:
+            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'user_conditional')) == None)):
+                if (
+                    not (isinstance(check,str) and
+                        (check.casefold() == 'all'))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
+                else:
+                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'played_conditional')) == None)):
+                        if (
+                            not (isinstance(check,str) and
+                                ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
+                                (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                                (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
+                                (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
+                                (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
+                                (check.casefold() == 'ignore')))
+                            ):
+                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
+                        else:
+                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action_control')) == None)):
+                                if (
+                                    not (isinstance(check,int) and
+                                        ((check >= 0) and (check <= 8)))
+                                    ):
+                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action_control must be an integer\n\tValid range 0 thru 8\n'
+                                else:
+                                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'dynamic_behavior')) == None)):
+                                        if (
+                                            not (isinstance(check,bool) and
+                                                ((check == True) or (check == False)))
+                                            ):
+                                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+                                        else:
+                                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'high_priority')) == None)):
+                                                if (
+                                                    not (isinstance(check,bool) and
+                                                        ((check == True) or (check == False)))
+                                                    ):
+                                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > high_priority must be an boolean\n\tValid values True or False\n'
+
+    return error_found_in_mumc_config_yaml
+
+
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
 
@@ -186,6 +268,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     #Start as blank error string
     error_found_in_mumc_config_yaml=''
+    filter_tag_formatting_value_url=''
 
 #######################################################################################################
 
@@ -197,6 +280,30 @@ def cfgCheckYAML(cfg,init_dict):
         ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
             server_brand='invalid'
+
+#######################################################################################################
+
+    #sets of tags for user later
+    filter_movie_whitetag_set=set()
+    filter_movie_blacktag_set=set()
+    filter_episode_whitetag_set=set()
+    filter_episode_blacktag_set=set()
+    filter_audio_whitetag_set=set()
+    filter_audio_blacktag_set=set()
+    if (isJellyfinServer(server_brand)):
+        filter_audiobook_whitetag_set=set()
+        filter_audiobook_blacktag_set=set()
+    movie_whitetag_set=set()
+    movie_blacktag_set=set()
+    episode_whitetag_set=set()
+    episode_blacktag_set=set()
+    audio_whitetag_set=set()
+    audio_blacktag_set=set()
+    if (isJellyfinServer(server_brand)):
+        audiobook_whitetag_set=set()
+        audiobook_blacktag_set=set()
+    global_whitetag_set=set()
+    global_blacktag_set=set()
 
 #######################################################################################################
 
@@ -347,6 +454,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
@@ -404,6 +513,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
@@ -460,6 +571,8 @@ def cfgCheckYAML(cfg,init_dict):
                  (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
@@ -519,6 +632,112 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == True) or (check == False))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_movie_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_movie_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_episode_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_episode_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','whitetags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_audio_whitetag_set.add(tag)
+
+    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','blacktags')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (tag == None))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    if (not (tag == None)):
+                        filter_audio_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','whitetags')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (tag == None))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        if (not (tag == None)):
+                            filter_audiobook_whitetag_set.add(tag)
+
+        if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','blacktags')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (tag == None))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        if (not (tag == None)):
+                            filter_audiobook_blacktag_set.add(tag)
 
 #######################################################################################################
 
@@ -842,6 +1061,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -882,20 +1103,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    movie_whitetag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        movie_whitetag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')) == None)):
         if (
@@ -937,20 +1145,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    movie_blacktag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        movie_blacktag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')) == None)):
         if (
@@ -992,6 +1187,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1031,6 +1228,8 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')) == None)):
         if (
@@ -1114,6 +1313,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > advanced > studio_network_genre must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1154,20 +1355,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    episode_whitetag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        episode_whitetag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')) == None)):
         if (
@@ -1209,20 +1397,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    episode_blacktag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        episode_blacktag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')) == None)):
         if (
@@ -1264,6 +1439,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1303,6 +1480,8 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')) == None)):
         if (
@@ -1379,6 +1558,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > advanced > album_artist must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1419,20 +1600,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    audio_whitetag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        audio_whitetag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')) == None)):
         if (
@@ -1474,20 +1642,7 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-    audio_blacktag_set=set()
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','tags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not (((isinstance(tag,str)) and
-                        (tag.find('\\') < 0)) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                else:
-                    if (not (tag == None)):
-                        audio_blacktag_set.add(tag)
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')) == None)):
         if (
@@ -1529,6 +1684,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1569,6 +1726,8 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
     if (isJellyfinServer(server_brand)):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')) == None)):
@@ -1589,7 +1748,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1653,6 +1812,8 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > library_author must be an integer\n\tValid range 0 thru 2\n'
 
+#######################################################################################################
+
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1671,7 +1832,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1693,20 +1854,7 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-        audiobook_whitetag_set=set()
-
-        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','tags')) == None)):
-            if (isinstance(check,list)):
-                for tag in check:
-                    if (
-                        not (((isinstance(tag,str)) and
-                            (tag.find('\\') < 0)) or
-                            (tag == None))
-                        ):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                    else:
-                        if (not (tag == None)):
-                            audiobook_whitetag_set.add(tag)
+#######################################################################################################
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')) == None)):
             if (
@@ -1726,7 +1874,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1753,22 +1901,9 @@ def cfgCheckYAML(cfg,init_dict):
                 not (isinstance(check,bool) and
                     ((check == True) or (check == False)))
                 ):
-                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+                error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
-        audiobook_blacktag_set=set()
-
-        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','tags')) == None)):
-            if (isinstance(check,list)):
-                for tag in check:
-                    if (
-                        not (((isinstance(tag,str)) and
-                            (tag.find('\\') < 0)) or
-                            (tag == None))
-                        ):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > tags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
-                    else:
-                        if (not (tag == None)):
-                            audiobook_blacktag_set.add(tag)
+#######################################################################################################
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')) == None)):
             if (
@@ -1788,7 +1923,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1810,6 +1945,8 @@ def cfgCheckYAML(cfg,init_dict):
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
 
+#######################################################################################################
+
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1828,7 +1965,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (
                 not (isinstance(check,str) and
                     ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                 (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
+                    (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
                     (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
                     (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
                     (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
@@ -1852,35 +1989,217 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    whitetag_set=set()
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','movie')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > movie > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'movie')
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags')) == None)):
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','episode')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > episode > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'episode')
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audio')) == None)):
+        if (isinstance(check,dict)):
+            for tag in check:
+                if (
+                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audio > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                else:
+                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audio')
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audiobook')) == None)):
+            if (isinstance(check,dict)):
+                for tag in check:
+                    if (
+                        not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                    else:
+                        error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','global')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > global must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        whitetag_set.add(tag)
+                        global_whitetag_set.add(tag)
 
-    blacktag_set=set()
+#######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags')) == None)):
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','movie')) == None)):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not (((isinstance(tag,str)) and
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
-                        (tag == None))
+                        (tag == None)))
                     ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > movie must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
                 else:
                     if (not (tag == None)):
-                        blacktag_set.add(tag)
+                        global_whitetag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','episode')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > episode must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_whitetag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','audio')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > audio must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_whitetag_set.add(tag)
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','audiobook')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (((isinstance(tag,str)) and
+                            (tag.find('\\') < 0)) or
+                            (tag == None)))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > whitetags > audiobook must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                    else:
+                        if (not (tag == None)):
+                            global_whitetag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','global')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > global must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','movie')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > movie must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','episode')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > episode must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','audio')) == None)):
+        if (isinstance(check,list)):
+            for tag in check:
+                if (
+                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        (((isinstance(tag,str)) and
+                        (tag.find('\\') < 0)) or
+                        (tag == None)))
+                    ):
+                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > audio must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                else:
+                    if (not (tag == None)):
+                        global_blacktag_set.add(tag)
+
+#######################################################################################################
+
+    if (isJellyfinServer(server_brand)):
+
+        if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','audiobook')) == None)):
+            if (isinstance(check,list)):
+                for tag in check:
+                    if (
+                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                            (((isinstance(tag,str)) and
+                            (tag.find('\\') < 0)) or
+                            (tag == None)))
+                        ):
+                        error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > blacktags > audiobook must be a list of strings or an empty list\n\tBacklashes \'\\\' are not an allowed character\n'
+                    else:
+                        if (not (tag == None)):
+                            global_blacktag_set.add(tag)
 
 #######################################################################################################
 
@@ -1897,6 +2216,8 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > series must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes')) == None)):
         if (
@@ -1952,6 +2273,87 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > minimum_episodes_behavior must be a string\n\tValid values \'User Name\', \'User Id\', and combinations of \'Min/Max Played/Unplayed\'\n'
 
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','series_ended','delete_episodes')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > series_ended > delete_episodes must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr > movie > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr  > movie > remove must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > remove must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','episode','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > episode > unmonitor must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > remove must be a boolean\n\tValid values are true or false\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','track','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > track > unmonitor must be a boolean\n\tValid values are true or false\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','unmonitor')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > unmonitor must be a boolean\n\tValid values are true or false\n'
+    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','remove')) == None)):
+        if (
+            not ((isinstance(check,bool)) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > remove must be a boolean\n\tValid values are true or false\n'
+
 #######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')) == None)):
@@ -1994,22 +2396,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2022,22 +2424,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superuser, and subuser\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2050,22 +2452,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, supersummary, and subsummary\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2078,22 +2480,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2106,22 +2508,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2134,22 +2536,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2162,22 +2564,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2190,22 +2592,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2218,22 +2620,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2246,22 +2648,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2274,22 +2676,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2302,22 +2704,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2330,22 +2732,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2358,22 +2760,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','delete','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2386,22 +2788,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','keep','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2414,22 +2816,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','post_processing','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2442,22 +2844,22 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','font','style')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audio','summary','formatting','background','color')) == None)):
         if (
-            not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+            not ((isinstance(check,str) or (check == None) or (check == '')) and
+                (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audio > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2471,22 +2873,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','delete','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2499,22 +2901,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','keep','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2527,22 +2929,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','post_processing','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2555,22 +2957,22 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','font','style')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
 
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','audiobook','summary','formatting','background','color')) == None)):
             if (
-                not (((isinstance(check,str)) or (check == None) or (check == '')) and
-                    ((isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int)) or (check == None) or (check == '')))
+                not ((isinstance(check,str) or (check == None) or (check == '')) and
+                    (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > audiobook > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
 
@@ -2622,6 +3024,90 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_id_check_list, user_name_check_list, 'admin_settings > users')
         if (not (len(check) == check_user_keys_length)):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > api_key must be an alphanumeric string\n'
+
+#######################################################################################################
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','enabled')) == None)):
+        if (
+            not (isinstance(check,bool) and
+                (check == True) or (check == False))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > enabled must be a boolean\n\tValid values True or False\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','api_key')) == None)):
+        if (
+            not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > api_key must be an alphanumeric string\n'
 
 #######################################################################################################
 
@@ -2694,33 +3180,13 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    #Check for overlapping tags between blacklists and whitelists
+#Check for overlapping tags between blacklists and whitelists
 
     #check global blacktags and global whitetags do not have a common string
-    if (overlapping_tags_set:=blacktag_set.intersection(whitetag_set)):
+    if (overlapping_tags_set:=global_blacktag_set.intersection(global_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
-    #check global blacktags and media specific whitetags do not have a common string
-    if (overlapping_tags_set:=blacktag_set.intersection(movie_whitetag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=blacktag_set.intersection(episode_whitetag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=blacktag_set.intersection(audio_whitetag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
-        if (overlapping_tags_set:=blacktag_set.intersection(audiobook_whitetag_set)):
-            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-
-    #check global whitetags and media specific blacktags do not have a common string
-    if (overlapping_tags_set:=whitetag_set.intersection(movie_blacktag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=whitetag_set.intersection(episode_blacktag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (overlapping_tags_set:=whitetag_set.intersection(audio_blacktag_set)):
-        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
-        if (overlapping_tags_set:=whitetag_set.intersection(audiobook_blacktag_set)):
-            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+#######################################################################################################
 
     #check media specific blacktags and media specific whitetags do not have a common string
     if (overlapping_tags_set:=movie_blacktag_set.intersection(movie_whitetag_set)):
@@ -2734,6 +3200,89 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
+
+    #check media specific filter blacktags and media specific filter whitetags do not have a common string
+    if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(filter_movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_episode_blacktag_set.intersection(filter_episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(filter_audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+#######################################################################################################
+
+    #check global blacktags and media specific whitetags do not have a common string
+    if (overlapping_tags_set:=global_blacktag_set.intersection(movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_blacktag_set.intersection(audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+    #check global whitetags and media specific blacktags do not have a common string
+    if (overlapping_tags_set:=global_whitetag_set.intersection(movie_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(episode_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(audio_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_whitetag_set.intersection(audiobook_blacktag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+#######################################################################################################
+
+    #check global blacktags and media specific filter whitetags do not have a common string
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+    #check global whitetags and media specific filter blacktags do not have a common string
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_movie_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > movie > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_episode_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audio_blacktag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audiobook_blacktag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+#######################################################################################################
+
+    #check media specific blacktags and media specific filter whitetags do not have a common string
+    if (overlapping_tags_set:=movie_blacktag_set.intersection(filter_movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > movie > blacktagged > tags and basic_settings > filter_tags > movie > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=episode_blacktag_set.intersection(filter_episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and basic_settings > filter_tags > episode > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=audio_blacktag_set.intersection(filter_audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and basic_settings > filter_tags > audio > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and basic_settings > filter_tags > audiobook > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+
+    #check media specific filter blacktags and media specific whitetags do not have a common string
+    if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(movie_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > movie > blacktags and advanced_settings > behavioral_statements > movie > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_episode_blacktag_set.intersection(episode_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > episode > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(audio_whitetag_set)):
+        error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audio > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
+    if (isJellyfinServer(server_brand)):
+        if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
+            error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audiobook > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
 #######################################################################################################
 

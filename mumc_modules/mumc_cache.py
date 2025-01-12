@@ -51,17 +51,20 @@ class cached_data_handler:
         self.oldest_cached_data_entry_number=None
         self.total_cumulative_cached_data_entry_number=None
 
+
     def checkURLInCache(self,url):
         if (url in self.cached_entry_urls):
             return True
         else:
             return False
 
+
     def getIndexFromURL(self,url):
         if (self.checkURLInCache(url)):
             return self.cached_entry_urls.index(url)
         else:
             return None
+
 
     def getCachedDataFromURL(self,url):
         try:
@@ -76,6 +79,7 @@ class cached_data_handler:
         except:
             raise ValueError('Error returning cached data for url: ' + url + ' at index: ' + index + '\n')
 
+
     #Recursively find size of data objects
     #Credit to https://github.com/bosswissam/pysize/blob/master/pysize.py
     def getDataSize(self,obj,seen=None):
@@ -85,8 +89,7 @@ class cached_data_handler:
         obj_id = id(obj)
         if obj_id in seen:
             return 0
-        # Important mark as seen *before* entering recursion to gracefully handle
-        # self-referential objects
+        # Important mark as seen *before* entering recursion to gracefully handle self-referential objects
         seen.add(obj_id)
         if hasattr(obj, '__dict__'):
             for cls in obj.__class__.__mro__:
@@ -109,6 +112,7 @@ class cached_data_handler:
 
         return size
 
+
     def removeCachedEntry(self,url):
         try:
             index=self.getIndexFromURL(url)
@@ -129,6 +133,10 @@ class cached_data_handler:
             return False
 
 
+    def getHighestAttributeValueCacheEntryIndex(self,cached_data_list):
+        return cached_data_list.index(max(cached_data_list))
+
+
     def getLowestAttributeValueCacheEntryIndex(self,cached_data_list):
         return cached_data_list.index(min(cached_data_list))
 
@@ -138,21 +146,21 @@ class cached_data_handler:
 
 
     def addEntryToCache(self,url,data):
-        potentialEntrySize=(self.getDataSize(url) + self.getDataSize(data))
-        if (potentialEntrySize <= self.api_query_cache_size):
+        estimatedEntryDataSize=(self.getDataSize(url) + self.getDataSize(data))
+        if (estimatedEntryDataSize <= self.api_query_cache_size):
             try:
-                if (potentialEntrySize > (self.api_query_cache_size - self.total_cached_data_size)):
+                if (estimatedEntryDataSize > (self.api_query_cache_size - self.total_cached_data_size)):
                     #LRU get time window
                     safety_time_window=self.getTimeWindow()
                     temp_cached_entry_hits=self.cached_entry_hits.copy()
                     temp_cached_entry_urls=self.cached_entry_urls.copy()
                     temp_cached_entry_times=self.cached_entry_times.copy()
-                while potentialEntrySize > (self.api_query_cache_size - self.total_cached_data_size):
+                while estimatedEntryDataSize > (self.api_query_cache_size - self.total_cached_data_size):
                     if (len(self.cached_entry_sizes) > 0):
-                        #LFU get least accessed cache entry
+                        #LFU; get least accessed cache entry
                         least_accessed_entry_index=self.getLowestAttributeValueCacheEntryIndex(temp_cached_entry_hits)
 
-                        #Verify entry is outside of the safety window
+                        #LRU; verify entry is outside of the safety window
                         if (temp_cached_entry_times[least_accessed_entry_index] < safety_time_window):
                             self.removeCachedEntry(self.cached_entry_urls[self.getIndexFromURL(temp_cached_entry_urls[least_accessed_entry_index])])
                             temp_cached_entry_hits=self.cached_entry_hits.copy()
@@ -164,12 +172,15 @@ class cached_data_handler:
                             temp_cached_entry_times.pop(least_accessed_entry_index)
 
                         if (len(temp_cached_entry_hits) == 0):
+                            #First In First Out
                             if (self.api_query_cache_fallback_behavior == 'FIFO'):
                                 #FIFO Remove oldest cached entry
                                 self.removeCachedEntry(self.cached_entry_urls[0])
+                            #Least Frequently Used
                             elif (self.api_query_cache_fallback_behavior == 'LFU'):
                                 #LFU Remove oldest and least accessed cache entry
                                 self.removeCachedEntry(self.cached_entry_urls[self.getLowestAttributeValueCacheEntryIndex(self.cached_entry_hits)])
+                            #Last Recently Used
                             else: #(self.api_query_cache_fallback_behavior == 'LRU'):
                                 #LRU Remove cache entry with oldest access time
                                 self.removeCachedEntry(self.cached_entry_urls[self.getLowestAttributeValueCacheEntryIndex(self.cached_entry_times)])
@@ -183,7 +194,7 @@ class cached_data_handler:
                 self.cached_data.append(data)
                 self.cached_entry_times.append(time.time() * 1000)
                 self.cached_entry_hits.append(0)
-                self.cached_entry_sizes.append(potentialEntrySize)
+                self.cached_entry_sizes.append(estimatedEntryDataSize)
                 size=self.cached_entry_sizes[index]
                 self.total_cached_data_size+=size
                 self.total_data_size_thru_cache+=size

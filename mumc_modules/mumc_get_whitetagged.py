@@ -1,7 +1,7 @@
-from mumc_modules.mumc_url import api_query_handler,build_request_message
+from mumc_modules.mumc_url import api_query_handler,build_emby_jellyfin_request_message
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_tagged import getChildren_taggedMediaItems,list_to_urlparsed_string
-from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
+from mumc_modules.mumc_server_type import isEmbyServer
 
 
 def init_blacklist_whitetagged_query(var_dict):
@@ -18,7 +18,7 @@ def init_blacklist_whitetagged_query(var_dict):
         var_dict['enable_media_query_blacklisted_whitetagged']):
         #Build query for whitetagged media items from blacklist
         var_dict['IncludeItemTypes_Whitetagged_From_Blacklist']=var_dict['media_type_title']
-        var_dict['FieldsState_Whitetagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+        var_dict['FieldsState_Whitetagged_From_Blacklist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ProviderIds'
         var_dict['SortBy_Whitetagged_From_Blacklist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Whitetagged_From_Blacklist']='Ascending'
         var_dict['EnableUserData_Whitetagged_From_Blacklist']='True'
@@ -66,7 +66,7 @@ def init_whitelist_whitetagged_query(var_dict):
         var_dict['enable_media_query_whitelisted_whitetagged']):
         #Build query for whitetagged media items from whitelist
         var_dict['IncludeItemTypes_Whitetagged_From_Whitelist']=var_dict['media_type_title']
-        var_dict['FieldsState_Whitetagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios'
+        var_dict['FieldsState_Whitetagged_From_Whitelist']='ParentId,Path,Tags,MediaSources,DateCreated,Genres,Studios,ProviderIds'
         var_dict['SortBy_Whitetagged_From_Whitelist']='ParentIndexNumber,IndexNumber,Name'
         var_dict['SortOrder_Whitetagged_From_Whitelist']='Ascending'
         var_dict['EnableUserData_Whitetagged_From_Whitelist']='True'
@@ -102,13 +102,14 @@ def init_whitelist_whitetagged_query(var_dict):
 
 def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_blacklist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_blacklist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_blacklist_lib']) and (not (var_dict['this_blacklist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_blacklist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_blacklist_lib']['lib_id']
+    parent_id=var_dict['this_blacklist_lib']['lib_id']
 
     #Check if whitetag or blacklist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
@@ -121,7 +122,7 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
         '&Recursive=' + var_dict['Recursive_Whitetagged_From_Blacklist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Blacklist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Blacklist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Blacklist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Blacklist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Blacklist'])
 
-        var_dict['apiQuery_Whitetagged_From_Blacklist']=build_request_message(url,the_dict)
+        var_dict['apiQuery_Whitetagged_From_Blacklist']=build_emby_jellyfin_request_message(url,the_dict)
 
         #Send the API query for for whitetagged from Blacklist= media items
         var_dict=api_query_handler('Whitetagged_From_Blacklist',var_dict,the_dict)
@@ -156,13 +157,14 @@ def blacklist_whitetagged_query(user_info,var_dict,the_dict):
 
 def whitelist_whitetagged_query(user_info,var_dict,the_dict):
 
-    if (isJellyfinServer(var_dict['server_brand'])):
-        parent_id=var_dict['this_whitelist_lib']['lib_id']
-    else:
-        if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
-            parent_id=var_dict['this_whitelist_lib']['subfolder_id']
-        else:
-            parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #if (isJellyfinServer(var_dict['server_brand'])):
+        #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    #else:
+        #if (('subfolder_id' in var_dict['this_whitelist_lib']) and (not (var_dict['this_whitelist_lib']['subfolder_id'] == None))):
+            #parent_id=var_dict['this_whitelist_lib']['subfolder_id']
+        #else:
+            #parent_id=var_dict['this_whitelist_lib']['lib_id']
+    parent_id=var_dict['this_whitelist_lib']['lib_id']
 
     #Check if whitetag or whitelist are not an empty strings
     if ((not (var_dict['Whitetags_Parsed'] == '')) and
@@ -175,7 +177,7 @@ def whitelist_whitetagged_query(user_info,var_dict,the_dict):
         '&Recursive=' + var_dict['Recursive_Whitetagged_From_Whitelist'] + '&SortBy=' + var_dict['SortBy_Whitetagged_From_Whitelist'] + '&SortOrder=' + var_dict['SortOrder_Whitetagged_From_Whitelist'] + '&EnableImages=' + var_dict['EnableImages_Whitetagged_From_Whitelist'] +
         '&CollapseBoxSetItems=' + var_dict['CollapseBoxSetItems_Whitetagged_From_Whitelist'] + '&Tags=' + var_dict['Whitetags_Parsed'] + '&EnableUserData=' + var_dict['EnableUserData_Whitetagged_From_Whitelist'])
 
-        var_dict['apiQuery_Whitetagged_From_Whitelist']=build_request_message(url,the_dict)
+        var_dict['apiQuery_Whitetagged_From_Whitelist']=build_emby_jellyfin_request_message(url,the_dict)
 
         #Send the API query for for whitetagged from Whitelist= media items
         var_dict=api_query_handler('Whitetagged_From_Whitelist',var_dict,the_dict)
