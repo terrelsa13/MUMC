@@ -622,37 +622,52 @@ def yaml_configurationLayout(config_data,server_brand):
 
 def yaml_configurationBuilder(the_dict):
 
+    print('0000')
     #strip out uneccessary data
     config_data=filterYAMLConfigKeys_ToKeep(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
 
+    print('0001')
     #start building config yaml
     config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
 
+    print('0002')
     config_data['basic_settings']['filter_statements'].pop('audio')
+    print('0003')
     if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements'].pop('audiobook')
+    print('0004')
     config_data['basic_settings'].pop('filter_tags')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
     config_data['advanced_settings'].pop('behavioral_tags')
+    print('0005')
     if (the_dict['advanced_settings']['whitetags']['global'] == []):
+        print('0006')
         config_data['advanced_settings'].pop('whitetags')
+        print('0007')
     else:
+        print('0008')
         config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
         config_data['advanced_settings']['whitetags'].pop('movie')
         config_data['advanced_settings']['whitetags'].pop('episode')
         config_data['advanced_settings']['whitetags'].pop('audio')
+        print('0009')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['whitetags'].pop('audiobook')
     if (the_dict['advanced_settings']['blacktags']['global'] == []):
+        print('000A')
         config_data['advanced_settings'].pop('blacktags')
+        print('000B')
     else:
+        print('000C')
         config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
         config_data['advanced_settings']['blacktags'].pop('movie')
         config_data['advanced_settings']['blacktags'].pop('episode')
         config_data['advanced_settings']['blacktags'].pop('audio')
+        print('000D')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
+    print('000E')
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('radarr')
     config_data['advanced_settings'].pop('sonarr')
@@ -661,48 +676,87 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings'].pop('trakt_fix')
     config_data['advanced_settings'].pop('console_controls')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
+    print('000F')
     if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
+        print('000G')
         config_data['admin_settings'].pop('behavior')
+        print('000H')
     else:
+        print('000I')
         if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+            print('000J')
             config_data['admin_settings']['behavior'].pop('list')
+            print('000K')
         else:
+            print('000L')
             config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+            print('000M')
         if (the_dict['admin_settings']['behavior']['matching'] == 'byId'):
+            print('000N')
             config_data['admin_settings']['behavior'].pop('matching')
+            print('000O')
         else:
+            print('000P')
             config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+            print('000Q')
         if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+            print('000R')
             config_data['admin_settings']['behavior'].pop('users')
+            print('000S')
         else:
+            print('000T')
             config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+            print('000U')
 
+    print('000V')
     if (the_dict['admin_settings']['media_managers']['radarr'] == {}):
+        print('000W')
         config_data['admin_settings']['media_managers'].pop('radarr')
+        print('000X')
     else:
+        print('000Y')
         config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
+        print('000Z')
 
     if (the_dict['admin_settings']['media_managers']['sonarr'] == {}):
+        print('0010')
         config_data['admin_settings']['media_managers'].pop('sonarr')
+        print('0011')
     else:
+        print('0012')
         config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
+        print('0013')
 
     if (the_dict['admin_settings']['media_managers']['lidarr'] == {}):
+        print('0014')
         config_data['admin_settings']['media_managers'].pop('lidarr')
+        print('0015')
     else:
+        print('0016')
         config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
+        print('0017')
 
     if (the_dict['admin_settings']['media_managers']['readarr'] == {}):
+        print('0018')
         config_data['admin_settings']['media_managers'].pop('readarr')
+        print('0019')
     else:
+        print('001A')
         config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
+        print('001B')
 
     if (len(config_data['admin_settings']['media_managers']) == 0):
+        print('001C')
         config_data['admin_settings'].pop('media_managers')
+        print('001D')
 
     config_data['admin_settings'].pop('api_controls')
+    print('001E')
     config_data['admin_settings'].pop('cache')
+    print('001F')
     config_data['admin_settings'].pop('output_controls')
+    print('001G')
 
     #save yaml config file
     save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+    print('001M')
