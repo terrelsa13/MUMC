@@ -669,94 +669,63 @@ def yaml_configurationBuilder(the_dict):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
     print('000E')
     config_data['advanced_settings'].pop('delete_empty_folders')
-    config_data['advanced_settings'].pop('radarr')
-    config_data['advanced_settings'].pop('sonarr')
-    config_data['advanced_settings'].pop('lidarr')
-    config_data['advanced_settings'].pop('readarr')
-    config_data['advanced_settings'].pop('trakt_fix')
-    config_data['advanced_settings'].pop('console_controls')
-    config_data['advanced_settings'].pop('UPDATE_CONFIG')
     print('000F')
+    config_data['advanced_settings'].pop('radarr')
+    print('000G')
+    config_data['advanced_settings'].pop('sonarr')
+    print('000H')
+    config_data['advanced_settings'].pop('lidarr')
+    print('000I')
+    config_data['advanced_settings'].pop('readarr')
+    print('000J')
+    config_data['advanced_settings'].pop('trakt_fix')
+    print('000K')
+    config_data['advanced_settings'].pop('console_controls')
+    print('000L')
+    config_data['advanced_settings'].pop('UPDATE_CONFIG')
+    print('000M')
     if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
-        print('000G')
         config_data['admin_settings'].pop('behavior')
-        print('000H')
     else:
-        print('000I')
         if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
-            print('000J')
             config_data['admin_settings']['behavior'].pop('list')
-            print('000K')
         else:
-            print('000L')
             config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
-            print('000M')
         if (the_dict['admin_settings']['behavior']['matching'] == 'byId'):
-            print('000N')
             config_data['admin_settings']['behavior'].pop('matching')
-            print('000O')
         else:
-            print('000P')
             config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
-            print('000Q')
         if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
-            print('000R')
             config_data['admin_settings']['behavior'].pop('users')
-            print('000S')
         else:
-            print('000T')
             config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
-            print('000U')
 
-    print('000V')
     if (the_dict['admin_settings']['media_managers']['radarr'] == {}):
-        print('000W')
         config_data['admin_settings']['media_managers'].pop('radarr')
-        print('000X')
     else:
-        print('000Y')
         config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
-        print('000Z')
 
     if (the_dict['admin_settings']['media_managers']['sonarr'] == {}):
-        print('0010')
         config_data['admin_settings']['media_managers'].pop('sonarr')
-        print('0011')
     else:
-        print('0012')
         config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
-        print('0013')
 
     if (the_dict['admin_settings']['media_managers']['lidarr'] == {}):
-        print('0014')
         config_data['admin_settings']['media_managers'].pop('lidarr')
-        print('0015')
     else:
-        print('0016')
         config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
-        print('0017')
 
     if (the_dict['admin_settings']['media_managers']['readarr'] == {}):
-        print('0018')
         config_data['admin_settings']['media_managers'].pop('readarr')
-        print('0019')
     else:
-        print('001A')
         config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
-        print('001B')
 
     if (len(config_data['admin_settings']['media_managers']) == 0):
-        print('001C')
         config_data['admin_settings'].pop('media_managers')
-        print('001D')
 
     config_data['admin_settings'].pop('api_controls')
-    print('001E')
     config_data['admin_settings'].pop('cache')
-    print('001F')
     config_data['admin_settings'].pop('output_controls')
-    print('001G')
 
     #save yaml config file
     save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
-    print('001M')
