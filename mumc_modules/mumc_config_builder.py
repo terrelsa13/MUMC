@@ -169,36 +169,24 @@ def build_configuration_file(the_dict,orig_dict={}):
         print('----------------------------------------------------------------------------------------')
 
     print('----------------------------------------------------------------------------------------')
-    print('000')
 
     #set REMOVE_FILES
     the_dict['advanced_settings']['REMOVE_FILES']=False
-    print('001')
 
     print('----------------------------------------------------------------------------------------')
-    print('002')
 
     #Build and save new yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
-        print('003')
         yaml_configurationBuilder(the_dict)
-        print('004')
 
         try:
-            print('005')
             the_dict=getIsAnyMediaEnabled(the_dict)
-            print('006')
 
             if (the_dict['all_media_disabled']):
-                print('007')
                 print_all_media_disabled(the_dict)
-                print('008')
 
-            print('009')
             strings_list_to_print=built_new_config_not_setup_to_delete_media('',the_dict)
-            print('00A')
             print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['formatting'])
-            print('00B')
 
         #the exception
         except (AttributeError, ModuleNotFoundError):
