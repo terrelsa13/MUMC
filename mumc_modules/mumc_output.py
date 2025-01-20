@@ -11,15 +11,10 @@ class NoAliasDumper(yaml.SafeDumper):
 
 def save_yaml_config(dataInput,filePathName):
     #Save the config file
-    print('001H')
     with open(filePathName,'w') as file:
-        print('001I')
         file.write('---\n')
-        print('001J')
         yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
-        print('001K')
         file.write('...')
-        print('001L')
 
 
 def parse_string_and_newlines(string_to_print):

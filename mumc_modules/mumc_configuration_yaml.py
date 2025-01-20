@@ -622,69 +622,50 @@ def yaml_configurationLayout(config_data,server_brand):
 
 def yaml_configurationBuilder(the_dict):
 
-    print('0000')
     #strip out uneccessary data
     config_data=filterYAMLConfigKeys_ToKeep(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
 
-    print('0001')
     #start building config yaml
     config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
 
-    print('0002')
     config_data['basic_settings']['filter_statements'].pop('audio')
-    print('0003')
+
     if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements'].pop('audiobook')
-    print('0004')
+
     config_data['basic_settings'].pop('filter_tags')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
     config_data['advanced_settings'].pop('behavioral_tags')
-    print('0005')
+
     if (the_dict['advanced_settings']['whitetags']['global'] == []):
-        print('0006')
         config_data['advanced_settings'].pop('whitetags')
-        print('0007')
     else:
-        print('0008')
         config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
         config_data['advanced_settings']['whitetags'].pop('movie')
         config_data['advanced_settings']['whitetags'].pop('episode')
         config_data['advanced_settings']['whitetags'].pop('audio')
-        print('0009')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['whitetags'].pop('audiobook')
     if (the_dict['advanced_settings']['blacktags']['global'] == []):
-        print('000A')
         config_data['advanced_settings'].pop('blacktags')
-        print('000B')
     else:
-        print('000C')
         config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
         config_data['advanced_settings']['blacktags'].pop('movie')
         config_data['advanced_settings']['blacktags'].pop('episode')
         config_data['advanced_settings']['blacktags'].pop('audio')
-        print('000D')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
-    print(config_data)
-    print('000E')
+
     config_data['advanced_settings'].pop('delete_empty_folders')
-    print('000F')
     config_data['advanced_settings'].pop('radarr')
-    print('000G')
     config_data['advanced_settings'].pop('sonarr')
-    print('000H')
-    config_data['advanced_settings'].pop('lidarr')
-    print('000I')
-    config_data['advanced_settings'].pop('readarr')
-    print('000J')
+    #config_data['advanced_settings'].pop('lidarr')
+    #config_data['advanced_settings'].pop('readarr')
     config_data['advanced_settings'].pop('trakt_fix')
-    print('000K')
     config_data['advanced_settings'].pop('console_controls')
-    print('000L')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
-    print('000M')
+
     if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
         config_data['admin_settings'].pop('behavior')
     else:
