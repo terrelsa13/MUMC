@@ -1,5 +1,5 @@
 import copy
-from mumc_modules.mumc_output import save_yaml_config
+from mumc_modules.mumc_output import save_yaml_config,print2json
 
 
 def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
@@ -667,8 +667,8 @@ def yaml_configurationBuilder(the_dict):
         print('000D')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
+    print2json(config_data,the_dict)
     print('000E')
-    print(config_data)
     config_data['advanced_settings'].pop('delete_empty_folders')
     print('000F')
     config_data['advanced_settings'].pop('radarr')
