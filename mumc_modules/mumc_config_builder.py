@@ -174,7 +174,7 @@ def build_configuration_file(the_dict,orig_dict={}):
     the_dict['advanced_settings']['REMOVE_FILES']=False
 
     print('----------------------------------------------------------------------------------------')
-    
+
     #Build and save new yaml config file
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
         yaml_configurationBuilder(the_dict)

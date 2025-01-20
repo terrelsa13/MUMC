@@ -629,12 +629,15 @@ def yaml_configurationBuilder(the_dict):
     config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
 
     config_data['basic_settings']['filter_statements'].pop('audio')
+
     if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
         config_data['basic_settings']['filter_statements'].pop('audiobook')
+
     config_data['basic_settings'].pop('filter_tags')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
     config_data['advanced_settings'].pop('behavioral_tags')
+
     if (the_dict['advanced_settings']['whitetags']['global'] == []):
         config_data['advanced_settings'].pop('whitetags')
     else:
@@ -653,14 +656,16 @@ def yaml_configurationBuilder(the_dict):
         config_data['advanced_settings']['blacktags'].pop('audio')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
+
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('radarr')
     config_data['advanced_settings'].pop('sonarr')
-    config_data['advanced_settings'].pop('lidarr')
-    config_data['advanced_settings'].pop('readarr')
+    #config_data['advanced_settings'].pop('lidarr')
+    #config_data['advanced_settings'].pop('readarr')
     config_data['advanced_settings'].pop('trakt_fix')
     config_data['advanced_settings'].pop('console_controls')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
+
     if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
         config_data['admin_settings'].pop('behavior')
     else:
