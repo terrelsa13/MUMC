@@ -667,7 +667,7 @@ def yaml_configurationBuilder(the_dict):
         print('000D')
         if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
             config_data['advanced_settings']['blacktags'].pop('audiobook')
-    print2json(config_data,the_dict)
+    print(config_data)
     print('000E')
     config_data['advanced_settings'].pop('delete_empty_folders')
     print('000F')
