@@ -3,7 +3,7 @@ import copy
 import sys
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
-from mumc_modules.mumc_parse_options import parse_command_line_options
+from mumc_modules.mumc_parse_commands import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing

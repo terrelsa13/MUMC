@@ -8,7 +8,7 @@ from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_min_config_version,get_script_version
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
-
+from sys import exit
 
 def initialize_mumc(cwd,mumc_path):
 
@@ -50,23 +50,134 @@ def initialize_mumc(cwd,mumc_path):
 
     #save command line arguments
     the_cfg['argv']=argv
-    #save container environmental variable
+
+    print()
+    print(the_cfg['argv'])
+    print()
+
+    #need to parse to take into account all the ways people can enter/format these commands/environmental variables
+
+    #save container environmental variables
+    #save environmental variable - A,ATTR,ATTRS,ATTRIBUTE,ATTRIBUTES
     try:
-        the_cfg['argv'].extend(envar.get('CMDLINE_ARGS').replace(' ','').split(','))
+        the_cfg['argv'].extend(envar.get('A').replace(' ','').split(','))
     except:
         pass
     try:
-        the_cfg['argv'].extend(envar.get('CMD_LINE_ARGS').replace(' ','').split(','))
+        the_cfg['argv'].extend(envar.get('ATTRS').replace(' ','').split(','))
     except:
         pass
     try:
-        the_cfg['argv'].extend(envar.get('COMMANDLINE_ARGUMENTS').replace(' ','').split(','))
+        the_cfg['argv'].extend(envar.get('ATTRIBUTES').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - C,CONFIG,CONFIGURATION
+    try:
+        the_cfg['argv'].extend(envar.get('C').replace(' ','').split(','))
     except:
         pass
     try:
-        the_cfg['argv'].extend(envar.get('COMMAND_LINE_ARGUMENTS').replace(' ','').split(','))
+        the_cfg['argv'].extend(envar.get('CONFIG').replace(' ','').split(','))
     except:
         pass
+
+    #save environmental variable - D,CONTAINER
+    try:
+        the_cfg['argv'].extend(envar.get('D').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('CONTAINER').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - A,ATTR,ATTRS,ATTRIBUTE,ATTRIBUTES
+    try:
+        the_cfg['argv'].extend(envar.get('U').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('CONFIG_UPDATER').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - SB,SERVER_BRAND
+    try:
+        the_cfg['argv'].extend(envar.get('SB').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('SERVER_BRAND').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - SU,SERVER_URL
+    try:
+        the_cfg['argv'].extend(envar.get('SU').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('SERVER_URL').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - AU,ADMIN_USERNAME
+    try:
+        the_cfg['argv'].extend(envar.get('AU').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('ADMIN_USERNAME').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - AP,ADMIN_PASSWORD
+    try:
+        the_cfg['argv'].extend(envar.get('AP').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('ADMIN_PASSWORD').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - SAK,SERVER_AUTH_KEY
+    try:
+        the_cfg['argv'].extend(envar.get('SAK').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('SERVER_AUTH_KEY').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - SAI,SERVER_ADMIN_ID
+    try:
+        the_cfg['argv'].extend(envar.get('SAI').replace(' ','').split(','))
+    except:
+        pass
+    try:
+        the_cfg['argv'].extend(envar.get('SERVER_ADMIN_ID').replace(' ','').split(','))
+    except:
+        pass
+
+    #save environmental variable - LIST_BEHAVIOR
+    #save environmental variable - MATCHING_BEHAVIOR
+    #save environmental variable - MONITOR_DISABLED_USERS
+    #save environmental variable - RADARR_URL
+    #save environmental variable - RADARR_API
+    #save environmental variable - SONARR_URL
+    #save environmental variable - SONARR_API
+    #save environmental variable - LIDARR_URL
+    #save environmental variable - LIDARR_API
+    #save environmental variable - READARR_URL
+    #save environmental variable - READARR_API
+
+    print()
+    print(the_cfg['argv'])
+    print()
+    exit(0)
 
     the_cfg['console_separator']='----------------------------------------------------------------------------------------'
     the_cfg['console_separator_']='----------------------------------------------------------------------------------------\n'
