@@ -52,6 +52,7 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['argv']=argv
 
     print()
+    print(envar)
     print(the_cfg['argv'])
     print()
 
