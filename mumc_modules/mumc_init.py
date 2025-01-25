@@ -65,93 +65,63 @@ def initialize_mumc(cwd,mumc_path):
 #['./mumc.py', '-d']
 #['./mumc.py', '-d', '/usr/src/app/config', 'EMBYFIN', 'https://embyfin.com', 'you-and_me', 'abc123zyx987', 'somehexvalue', 'someotherhexvalue']
 
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': '45938294e2ef', 'CONFIG': '/usr/src/app/config', 'ADMIN_PASSWORD': '  abc  123  zyx  987  ', 'TZ': 'America/New_York', 'SERVER_BRAND': 'EMBYFIN', 'SERVER_ADMIN_ID': 'some other hex value', 'SERVER_URL': 'https://embyfin.com', 'SERVER_AUTH_KEY': 'some  hex  value', 'ADMIN_USERNAME': 'you-and_me', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d']
+
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': '7aa5285f6318', 'SERVER_URL': 'https://embyfin.com', 'SERVER_ADMIN_ID': 'some other hex value', 'ATTRS': 'false', 'SERVER_AUTH_KEY': 'some  hex  value', 'SERVER_BRAND': 'EMBYFIN', 'TZ': 'America/New_York', 'ADMIN_USERNAME': 'you-and_me', 'CONFIG': '/usr/src/app/config', 'CONTAINER': 'true', 'ADMIN_PASSWORD': '  abc  123  zyx  987  ', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d']
+
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': '6ee9f3fba24f', 'CONFIG': '/usr/src/app/config', 'SERVER_URL': 'https://embyfin.com', 'SERVER_BRAND': 'EMBYFIN', 'SERVER_AUTH_KEY': 'some  hex  value', 'ATTRS': 'False', 'SERVER_ADMIN_ID': 'some other hex value', 'TZ': 'America/New_York', 'CONTAINER': 'true', 'ADMIN_USERNAME': 'you-and_me', 'ADMIN_PASSWORD': '  abc  123  zyx  987  ', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d']
+
     #need to parse to take into account all the ways people can enter/format these commands/environmental variables
 
     #save container environmental variables
     #save environmental variable - ATTRS,ATTRIBUTES
-    try:
-        #the_cfg['argv'].extend(envar.get('ATTRS').replace(' ','').split(','))
-        index=envar.index('ATTRS')
-        the_cfg['argv'].extend(envar[index])
-    except:
-        pass
-    try:
-        #the_cfg['argv'].extend(envar.get('ATTRIBUTES').replace(' ','').split(','))
-        index=envar.index('ATTRIBUTES')
-        the_cfg['argv'].extend(envar[index])
-    except:
-        pass
+    if (not (envar.get('ATTRS') == None)):
+        the_cfg['argv'].append('-attrs')
+        the_cfg['argv'].append(envar['ATTRS'])
+    if (not (envar.get('ATTRIBUTES') == None)):
+        the_cfg['argv'].append('-attributes')
+        the_cfg['argv'].append(envar['ATTRIBUTES'])
 
     #save environmental variable - CONFIG
-    try:
-        #the_cfg['argv'].extend(envar.get('CONFIG').replace(' ','').split(','))
-        index=envar.index('CONFIG')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
-
-    #save environmental variable - CONTAINER
-    try:
-        #the_cfg['argv'].extend(envar.get('CONTAINER').replace(' ','').split(','))
-        index=envar.index('CONTAINER')
-        the_cfg['argv'].extend(envar[index])
-    except:
-        pass
+    if (not (envar.get('CONFIG') == None)):
+        the_cfg['argv'].append('-config')
+        the_cfg['argv'].append(envar['CONFIG'])
 
     #save environmental variable - SERVER_BRAND
-    try:
-        #the_cfg['argv'].extend(envar.get('SERVER_BRAND').replace(' ','').split(','))
-        index=envar.index('SERVER_BRAND')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('SERVER_BRAND') == None)):
+        the_cfg['argv'].append('-server_brand')
+        the_cfg['argv'].append(envar['SERVER_BRAND'])
 
     #save environmental variable - SERVER_URL
-    try:
-        #the_cfg['argv'].extend(envar.get('SERVER_URL').replace(' ','').split(','))
-        index=envar.index('SERVER_URL')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('SERVER_URL') == None)):
+        the_cfg['argv'].append('-server_url')
+        the_cfg['argv'].append(envar['SERVER_URL'])
 
     #save environmental variable - ADMIN_USERNAME
-    try:
-        #the_cfg['argv'].extend(envar.get('ADMIN_USERNAME').replace(' ','').split(','))
-        index=envar.index('ADMIN_USERNAME')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('ADMIN_USERNAME') == None)):
+        the_cfg['argv'].append('-admin_username')
+        the_cfg['argv'].append(envar['ADMIN_USERNAME'])
 
     #save environmental variable - ADMIN_PASSWORD
-    try:
-        #the_cfg['argv'].extend(envar.get('AP').replace(' ','').split(','))
-        index=envar.index('ADMIN_PASSWORD')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('ADMIN_PASSWORD') == None)):
+        the_cfg['argv'].append('-admin_password')
+        the_cfg['argv'].append(envar['ADMIN_PASSWORD'])
 
     #save environmental variable - SERVER_AUTH_KEY
-    try:
-        #the_cfg['argv'].extend(envar.get('SAK').replace(' ','').split(','))
-        index=envar.index('SERVER_AUTH_KEY')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('SERVER_AUTH_KEY') == None)):
+        the_cfg['argv'].append('-server_auth_key')
+        the_cfg['argv'].append(envar['SERVER_AUTH_KEY'])
 
     #save environmental variable - SERVER_ADMIN_ID
-    try:
-        #the_cfg['argv'].extend(envar.get('SAI').replace(' ','').split(','))
-        index=envar.index('SERVER_ADMIN_ID')
-        the_cfg['argv'].extend(envar[index])
-        the_cfg['argv'].extend(envar[index + 1])
-    except:
-        pass
+    if (not (envar.get('SERVER_ADMIN_ID') == None)):
+        the_cfg['argv'].append('-server_admin_id')
+        the_cfg['argv'].append(envar['SERVER_ADMIN_ID'])
 
     #save environmental variable - LIST_BEHAVIOR
     #save environmental variable - MATCHING_BEHAVIOR
