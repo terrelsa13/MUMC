@@ -296,13 +296,86 @@ def findCMD_getArgument(argv,optionsList,the_dict,*queriedcommands):
         return cmdOption
 
 
+def convertEnvironmentalVariablesToCMDOptions(argv,envar):
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': 'e725d238c8cc', 'SERVER_ADMIN_ID': 'some other hex value', 'SERVER_URL': 'https://embyfin.com', 'SERVER_AUTH_KEY': 'some  hex  value', 'ADMIN_USERNAME': 'you-and_me', 'TZ': 'America/New_York', 'ADMIN_PASSWORD': '  abc  123  zyx  987  ', 'CONTAINER': 'true', 'CONFIG': '/usr/src/app/config', 'ATTRS': 'False', 'SERVER_BRAND': 'EMBYFIN', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d', '-attrs', 'False', '-config', '/usr/src/app/config', '-server_brand', 'EMBYFIN', '-server_url', 'https://embyfin.com', '-admin_username', 'you-and_me', '-admin_password', '  abc  123  zyx  987  ', '-server_auth_key', 'some  hex  value', '-server_admin_id', 'some other hex value']
+
+    #need to parse to take into account all the ways people can enter/format these commands/environmental variables
+
+    #save container environmental variables
+    #save environmental variable - ATTRS,ATTRIBUTES
+    if (not (envar.get('ATTRS') == None)):
+        if (not ('-attrs' in argv)):
+            argv.append('-attrs')
+            argv.append(envar['ATTRS'])
+    if (not (envar.get('ATTRIBUTES') == None)):
+        if (not ('-attributes' in argv)):
+            argv.append('-attributes')
+            argv.append(envar['ATTRIBUTES'])
+
+    #save environmental variable - CONFIG
+    if (not (envar.get('CONFIG') == None)):
+        if (not ('-config' in argv)):
+            argv.append('-config')
+            argv.append(envar['CONFIG'])
+
+    #save environmental variable - SERVER_BRAND
+    if (not (envar.get('SERVER_BRAND') == None)):
+        if (not ('-server_brand' in argv)):
+            argv.append('-server_brand')
+            argv.append(envar['SERVER_BRAND'])
+
+    #save environmental variable - SERVER_URL
+    if (not (envar.get('SERVER_URL') == None)):
+        if (not ('-server_url' in argv)):
+            argv.append('-server_url')
+            argv.append(envar['SERVER_URL'])
+
+    #save environmental variable - ADMIN_USERNAME
+    if (not (envar.get('ADMIN_USERNAME') == None)):
+        if (not ('-admin_username' in argv)):
+            argv.append('-admin_username')
+            argv.append(envar['ADMIN_USERNAME'])
+
+    #save environmental variable - ADMIN_PASSWORD
+    if (not (envar.get('ADMIN_PASSWORD') == None)):
+        if (not ('-admin_password' in argv)):
+            argv.append('-admin_password')
+            argv.append(envar['ADMIN_PASSWORD'])
+
+    #save environmental variable - SERVER_AUTH_KEY
+    if (not (envar.get('SERVER_AUTH_KEY') == None)):
+        if (not ('-server_auth_key' in argv)):
+            argv.append('-server_auth_key')
+            argv.append(envar['SERVER_AUTH_KEY'])
+
+    #save environmental variable - SERVER_ADMIN_ID
+    if (not (envar.get('SERVER_ADMIN_ID') == None)):
+        if (not ('-server_admin_id' in argv)):
+            argv.append('-server_admin_id')
+            argv.append(envar['SERVER_ADMIN_ID'])
+
+    #save environmental variable - LIST_BEHAVIOR
+    #save environmental variable - MATCHING_BEHAVIOR
+    #save environmental variable - MONITOR_DISABLED_USERS
+    #save environmental variable - RADARR_URL
+    #save environmental variable - RADARR_API
+    #save environmental variable - SONARR_URL
+    #save environmental variable - SONARR_API
+    #save environmental variable - LIDARR_URL
+    #save environmental variable - LIDARR_API
+    #save environmental variable - READARR_URL
+    #save environmental variable - READARR_API
+    return argv
+
+
 #parse the command line options
 def parse_command_line_options(the_dict):
 
     cmdopt_dict={}
-    #cmdopt_dict['argv']=the_dict['argv']
-    cmdopt_dict['argv_temp']=copy.deepcopy(the_dict['argv'])
-    cmdopt_dict['argv']=[]
+    cmdopt_dict['argv']=the_dict['argv']
+    cmdopt_dict['envar']=the_dict['envar']
     cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
 
@@ -344,6 +417,16 @@ def parse_command_line_options(the_dict):
                                 #'-da','-readarr_api',
                                 '-h','-help','-?'
                                 ]
+
+    print()
+    print(cmdopt_dict['envar'])
+    print()
+    cmdopt_dict['argv']
+    cmdopt_dict['argv']=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
+    print()
+    cmdopt_dict['argv']
+    print()
+    sys.exit(0)
 
     #look for unknown command line options
     findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'],the_dict)
