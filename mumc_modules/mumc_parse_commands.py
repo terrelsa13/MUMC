@@ -423,12 +423,12 @@ def parse_command_line_options(the_dict):
     print()
     print('a')
     print()
-    cmdopt_dict['argv']
+    print(cmdopt_dict['argv'])
     cmdopt_dict['argv']=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
     print()
     print('b')
     print()
-    cmdopt_dict['argv']
+    print(cmdopt_dict['argv'])
     print()
     sys.exit(0)
 
