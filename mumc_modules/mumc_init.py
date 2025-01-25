@@ -56,110 +56,100 @@ def initialize_mumc(cwd,mumc_path):
     print(the_cfg['argv'])
     print()
 
+
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': '4d119a6a129f', 'C': '/usr/src/app/config', 'SERVER_BRAND': 'EMBYFIN', 'SU': 'https://embyfin.com', 'ADMIN_USERNAME': 'you-and_me', 'AP': '  abc  123  zyx  987  ', 'SERVER_AUTH_KEY': 'some  hex  value', 'SAI': '\\\\ some\\\\ other\\\\ hex\\\\ value\\\\', 'TZ': 'America/New_York', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d', '/usr/src/app/config', 'EMBYFIN', 'https://embyfin.com', 'you-and_me', 'abc123zyx987', 'somehexvalue', '\\\\some\\\\other\\\\hex\\\\value\\\\']
+
+#environ({'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'HOSTNAME': 'e288cad6ec98', 'SERVER_AUTH_KEY': 'some  hex  value', 'SAI': 'some other hex value', 'TZ': 'America/New_York', 'C': '/usr/src/app/config', 'SERVER_BRAND': 'EMBYFIN', 'SU': 'https://embyfin.com', 'ADMIN_USERNAME': 'you-and_me', 'AP': '  abc  123  zyx  987  ', 'LANG': 'C.UTF-8', 'GPG_KEY': 'A035C8C19219BA821ECEA86B64E628F8D684696D', 'PYTHON_VERSION': '3.11.11', 'PYTHON_SHA256': '2a9920c7a0cd236de33644ed980a13cbbc21058bfdc528febb6081575ed73be3', 'HOME': '/root'})
+#['./mumc.py', '-d']
+#['./mumc.py', '-d', '/usr/src/app/config', 'EMBYFIN', 'https://embyfin.com', 'you-and_me', 'abc123zyx987', 'somehexvalue', 'someotherhexvalue']
+
     #need to parse to take into account all the ways people can enter/format these commands/environmental variables
 
     #save container environmental variables
-    #save environmental variable - A,ATTR,ATTRS,ATTRIBUTE,ATTRIBUTES
+    #save environmental variable - ATTRS,ATTRIBUTES
     try:
-        the_cfg['argv'].extend(envar.get('A').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('ATTRS').replace(' ','').split(','))
+        index=envar.index('ATTRS')
+        the_cfg['argv'].extend(envar[index])
     except:
         pass
     try:
-        the_cfg['argv'].extend(envar.get('ATTRS').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('ATTRIBUTES').replace(' ','').split(','))
-    except:
-        pass
-
-    #save environmental variable - C,CONFIG,CONFIGURATION
-    try:
-        the_cfg['argv'].extend(envar.get('C').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('CONFIG').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('ATTRIBUTES').replace(' ','').split(','))
+        index=envar.index('ATTRIBUTES')
+        the_cfg['argv'].extend(envar[index])
     except:
         pass
 
-    #save environmental variable - D,CONTAINER
+    #save environmental variable - CONFIG
     try:
-        the_cfg['argv'].extend(envar.get('D').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('CONTAINER').replace(' ','').split(','))
-    except:
-        pass
-
-    #save environmental variable - A,ATTR,ATTRS,ATTRIBUTE,ATTRIBUTES
-    try:
-        the_cfg['argv'].extend(envar.get('U').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('CONFIG_UPDATER').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('CONFIG').replace(' ','').split(','))
+        index=envar.index('CONFIG')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
     except:
         pass
 
-    #save environmental variable - SB,SERVER_BRAND
+    #save environmental variable - CONTAINER
     try:
-        the_cfg['argv'].extend(envar.get('SB').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('SERVER_BRAND').replace(' ','').split(','))
-    except:
-        pass
-
-    #save environmental variable - SU,SERVER_URL
-    try:
-        the_cfg['argv'].extend(envar.get('SU').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('SERVER_URL').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('CONTAINER').replace(' ','').split(','))
+        index=envar.index('CONTAINER')
+        the_cfg['argv'].extend(envar[index])
     except:
         pass
 
-    #save environmental variable - AU,ADMIN_USERNAME
+    #save environmental variable - SERVER_BRAND
     try:
-        the_cfg['argv'].extend(envar.get('AU').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('ADMIN_USERNAME').replace(' ','').split(','))
-    except:
-        pass
-
-    #save environmental variable - AP,ADMIN_PASSWORD
-    try:
-        the_cfg['argv'].extend(envar.get('AP').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('ADMIN_PASSWORD').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('SERVER_BRAND').replace(' ','').split(','))
+        index=envar.index('SERVER_BRAND')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
     except:
         pass
 
-    #save environmental variable - SAK,SERVER_AUTH_KEY
+    #save environmental variable - SERVER_URL
     try:
-        the_cfg['argv'].extend(envar.get('SAK').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('SERVER_AUTH_KEY').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('SERVER_URL').replace(' ','').split(','))
+        index=envar.index('SERVER_URL')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
     except:
         pass
 
-    #save environmental variable - SAI,SERVER_ADMIN_ID
+    #save environmental variable - ADMIN_USERNAME
     try:
-        the_cfg['argv'].extend(envar.get('SAI').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('ADMIN_USERNAME').replace(' ','').split(','))
+        index=envar.index('ADMIN_USERNAME')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
     except:
         pass
+
+    #save environmental variable - ADMIN_PASSWORD
     try:
-        the_cfg['argv'].extend(envar.get('SERVER_ADMIN_ID').replace(' ','').split(','))
+        #the_cfg['argv'].extend(envar.get('AP').replace(' ','').split(','))
+        index=envar.index('ADMIN_PASSWORD')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
+    except:
+        pass
+
+    #save environmental variable - SERVER_AUTH_KEY
+    try:
+        #the_cfg['argv'].extend(envar.get('SAK').replace(' ','').split(','))
+        index=envar.index('SERVER_AUTH_KEY')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
+    except:
+        pass
+
+    #save environmental variable - SERVER_ADMIN_ID
+    try:
+        #the_cfg['argv'].extend(envar.get('SAI').replace(' ','').split(','))
+        index=envar.index('SERVER_ADMIN_ID')
+        the_cfg['argv'].extend(envar[index])
+        the_cfg['argv'].extend(envar[index + 1])
     except:
         pass
 
