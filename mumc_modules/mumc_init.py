@@ -54,9 +54,12 @@ def initialize_mumc(cwd,mumc_path):
     print(argv)
     print('\n')
     #save environmental variables
-    the_cfg['envar']=envar
+    #test_envar=envar._data
+    the_cfg['envar']=envar._data
+    #the_cfg['envar']=test_envar
     print('print envar\n')
     print(envar)
+    #print(test_envar)
     print('\n')
 
     the_cfg['console_separator']='----------------------------------------------------------------------------------------'
