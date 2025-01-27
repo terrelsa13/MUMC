@@ -58,11 +58,11 @@ def build_configuration_file(the_dict,orig_dict={}):
         else:
             the_dict['base']=get_base(the_dict['admin_settings']['server']['brand'])
         #contruct FQDN
-        if (len(the_dict['port']) and len(the_dict['base'])):
-            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + the_dict['port'] + '/' + the_dict['base']
-        elif (len(the_dict['port']) and (not len(the_dict['base']))):
-            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + the_dict['port']
-        elif ((not len(the_dict['port'])) and len(the_dict['base'])):
+        if (len(str(the_dict['port'])) and len(the_dict['base'])):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + str(the_dict['port']) + '/' + the_dict['base']
+        elif (len(str(the_dict['port'])) and (not len(the_dict['base']))):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + str(the_dict['port'])
+        elif ((not len(str(the_dict['port']))) and len(the_dict['base'])):
             the_dict['admin_settings']['server']['url']=the_dict['url'] + '/' + the_dict['base']
         else:
             the_dict['admin_settings']['server']['url']=the_dict['url']
@@ -241,9 +241,9 @@ def build_configuration_file(the_dict,orig_dict={}):
 
         if (the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']):
             #build *arr url
-            if (len(the_dict[arr.casefold() + '_port'])):
+            if (len(str(the_dict[arr.casefold() + '_port']))):
                 #*arr url with port
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + ':' + the_dict[arr.casefold() + '_port']
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + ':' + str(the_dict[arr.casefold() + '_port'])
             else:
                 #*arr url without port
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url']
