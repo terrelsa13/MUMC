@@ -10,7 +10,8 @@ from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
 def cannotFindConfig(init_dict,cmdopt_dict):
-    if (cmdopt_dict['containerized']):
+    #if (cmdopt_dict['containerized']):
+    if (('-container' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-container'])):
         print_containerized_config_missing(init_dict)
         time.sleep(5)
         importConfig(init_dict,cmdopt_dict)

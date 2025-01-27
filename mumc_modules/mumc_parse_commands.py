@@ -563,7 +563,7 @@ def parse_command_line_options(the_dict):
     cmdopt_dict={}
     cmdopt_dict['argv']={}
     cmdopt_dict['envar']=the_dict['envar']
-    cmdopt_dict['containerized']=False
+    #cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
 
     cmdopt_dict['optionsList']=['-a','-attrs','-attributes',
@@ -619,6 +619,7 @@ def parse_command_line_options(the_dict):
     print('print argv after converting envar to argv\n')
     print(cmdopt_dict['argv'])
     print('\n')
+
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
     cmdopt_dict['argv']|=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
     print('print argv after converting argv to dictionary\n')
@@ -630,8 +631,8 @@ def parse_command_line_options(the_dict):
     #look for unknown command line options
     findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'],the_dict)
 
-    cmdopt_dict['containerized']=cmdopt_dict['argv']['-container']
-    cmdopt_dict['configUpdater']=cmdopt_dict['argv']['-config_updater']
+    #cmdopt_dict['containerized']=cmdopt_dict['argv']['-container']
+    #cmdopt_dict['configUpdater']=cmdopt_dict['argv']['-config_updater']
 
     #look for -h or -help command line option
     if (cmdOption:=findCMDRequest(cmdopt_dict['argv'],'-help')):

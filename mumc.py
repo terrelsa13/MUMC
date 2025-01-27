@@ -68,7 +68,8 @@ def MUMC():
     cfg['cached_data'].updateCacheVariables(cfg)
 
     #check if user wants to update the existing config file
-    if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
+    #if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
+    if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (('-config_updater' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-config_updater']))):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg,cfg_orig)
 
