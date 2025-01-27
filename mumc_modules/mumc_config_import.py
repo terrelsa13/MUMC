@@ -55,7 +55,8 @@ def importConfig(init_dict,cmdopt_dict):
     try:
         #Attempt to import the alternate config file as cfg
         #Check for the .py extension and no spaces or periods in the module name
-        if (cmdopt_dict['altConfigInfo']):
+        #if (cmdopt_dict['altConfigInfo']):
+        if (cmdopt_dict['altConfigFileExt']):
             #Insert alternate config to path at the top of the path list so it can be searched and imported first
             #We want the alternate config path to be searched first incase the the alternate config is also named mumc_config.yaml
             #Searching the alternate config path first will allow the alternate config file to be found first

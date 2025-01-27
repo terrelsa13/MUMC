@@ -26,6 +26,7 @@ def MUMC():
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
+    init_dict['argv']=cmdopt_dict['argv']
 
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)

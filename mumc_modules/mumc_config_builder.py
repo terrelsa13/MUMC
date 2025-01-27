@@ -24,8 +24,14 @@ def build_configuration_file(the_dict,orig_dict={}):
         #ask user for server brand (i.e. emby or jellyfin)
         the_dict['admin_settings']={}
         the_dict['admin_settings']['server']={}
-        the_dict['admin_settings']['server']['brand']=get_brand()
+        if ('-server_brand' in the_dict['argv']):
+            the_dict['admin_settings']['server']['brand']=the_dict['argv']['-server_brand']
+        else:
+            the_dict['admin_settings']['server']['brand']=get_brand()
         the_dict['server_brand']=the_dict['admin_settings']['server']['brand']
+
+        if ('-config_updater' in the_dict['argv']):
+            the_dict['advanced_settings']['UPDATE_CONFIG']=the_dict['argv']['-config_updater']
         the_dict['UPDATE_CONFIG']=the_dict['advanced_settings']['UPDATE_CONFIG']
         the_dict=setYAMLConfigSkeleton(the_dict)
         the_dict['admin_settings']['server']['brand']=the_dict['server_brand']
@@ -35,38 +41,67 @@ def build_configuration_file(the_dict,orig_dict={}):
 
         print('----------------------------------------------------------------------------------------')
         #ask user for server's url
-        the_dict['server']=get_url()
+        if ('-server_url' in the_dict['argv']):
+            the_dict['url']=the_dict['argv']['-server_url']
+        else:
+            the_dict['url']=get_url()
         print('----------------------------------------------------------------------------------------')
         #ask user for the emby or jellyfin port number
-        the_dict['port']=get_port()
-        print('----------------------------------------------------------------------------------------')
-        #ask user for url-base
-        the_dict['base']=get_base(the_dict['admin_settings']['server']['brand'])
-        if (len(the_dict['port']) and len(the_dict['base'])):
-            the_dict['admin_settings']['server']['url']=the_dict['server'] + ':' + the_dict['port'] + '/' + the_dict['base']
-        elif (len(the_dict['port']) and (not len(the_dict['base']))):
-            the_dict['admin_settings']['server']['url']=the_dict['server'] + ':' + the_dict['port']
-        elif ((not len(the_dict['port'])) and len(the_dict['base'])):
-            the_dict['admin_settings']['server']['url']=the_dict['server'] + '/' + the_dict['base']
+        if ('-server_port' in the_dict['argv']):
+            the_dict['port']=the_dict['argv']['-server_port']
         else:
-            the_dict['admin_settings']['server']['url']=the_dict['server']
+            the_dict['port']=get_port()
+        print('----------------------------------------------------------------------------------------')
+        #ask user for base-url
+        if ('-server_base_url' in the_dict['argv']):
+            the_dict['base']=the_dict['argv']['-server_base_url']
+        else:
+            the_dict['base']=get_base(the_dict['admin_settings']['server']['brand'])
+        #contruct FQDN
+        if (len(the_dict['port']) and len(the_dict['base'])):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + the_dict['port'] + '/' + the_dict['base']
+        elif (len(the_dict['port']) and (not len(the_dict['base']))):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + the_dict['port']
+        elif ((not len(the_dict['port'])) and len(the_dict['base'])):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + '/' + the_dict['base']
+        else:
+            the_dict['admin_settings']['server']['url']=the_dict['url']
         #Remove server, port, and base so they cannot be used later
-        the_dict.pop('server')
+        the_dict.pop('url')
         the_dict.pop('port')
         the_dict.pop('base')
         print('----------------------------------------------------------------------------------------')
 
-        #ask user for administrator username
-        the_dict['username']=get_admin_username()
-        print('----------------------------------------------------------------------------------------')
-        #ask user for administrator password
-        the_dict['password']=get_admin_password()
-        print('----------------------------------------------------------------------------------------')
+        #define username and password so it can be popped later without generating an error
+        the_dict['username']=None
+        the_dict['password']=None
 
-        #ask server for authentication key using administrator username and password
-        authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
-        the_dict['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
-        the_dict['admin_settings']['server']['admin_id']=authenticated_user_data['User']['Id']
+        #check if server_auth_key CMD option exists
+        if ('-server_auth_key' in the_dict['argv']):
+            the_dict['admin_settings']['server']['auth_key']=the_dict['argv']['-server_auth_key']
+
+            if ('-server_admin_id' in the_dict['argv']):
+                the_dict['admin_settings']['server']['admin_id']=the_dict['argv']['-server_admin_id']
+        else:
+            #ask user for administrator username
+            if ('-admin_username' in the_dict['argv']):
+                the_dict['username']=the_dict['argv']['-admin_username']
+            else:
+                the_dict['username']=get_admin_username()
+            print('----------------------------------------------------------------------------------------')
+            #ask user for administrator password
+            if ('-admin_password' in the_dict['argv']):
+                the_dict['password']=the_dict['argv']['-admin_password']
+            else:
+                the_dict['password']=get_admin_password()
+            print('----------------------------------------------------------------------------------------')
+
+            #ask server for authentication key and administrator id using administrator username/password
+            authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
+
+            the_dict['admin_settings']['server']['auth_key']=authenticated_user_data['AccessToken']
+            the_dict['admin_settings']['server']['admin_id']=authenticated_user_data['User']['Id']
+
         '''
         authenticated_user_data=authenticate_user_by_name(the_dict['username'],the_dict['password'],the_dict)
         #get all existing labelled authentication keys
@@ -91,11 +126,17 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict.pop('password')
 
         #ask user how they want to choose libraries/folders
-        the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior()
+        if ('-list_behavior' in the_dict['argv']):
+            the_dict['admin_settings']['behavior']['list']=the_dict['argv']['-list_behavior']
+        else:
+            the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior()
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
-        the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior()
+        if ('-matching_behavior' in the_dict['argv']):
+            the_dict['admin_settings']['behavior']['matching']=the_dict['argv']['-matching_behavior']
+        else:
+            the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior()
         print('----------------------------------------------------------------------------------------')
 
         #Initialize for compare with other tag to prevent using the same tag in both blacktag and whitetag
@@ -103,11 +144,17 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict['advanced_settings']['whitetags']['global']=[]
 
         #ask user for global blacktag(s)
-        the_dict['advanced_settings']['blacktags']['global']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags']['global'])
+        if ('-global_blacktags' in the_dict['argv']):
+            the_dict['advanced_settings']['blacktags']['global']=the_dict['argv']['-global_blacktags']
+        else:
+            the_dict['advanced_settings']['blacktags']['global']=get_tag_name('blacktag',the_dict['advanced_settings']['whitetags']['global'])
         print('----------------------------------------------------------------------------------------')
 
         #ask user for global whitetag(s)
-        the_dict['advanced_settings']['whitetags']['global']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags']['global'])
+        if ('-global_whitetags' in the_dict['argv']):
+            the_dict['advanced_settings']['whitetags']['global']=the_dict['argv']['-global_whitetags']
+        else:
+            the_dict['advanced_settings']['whitetags']['global']=get_tag_name('whitetag',the_dict['advanced_settings']['blacktags']['global'])
         print('----------------------------------------------------------------------------------------')
 
     #Updating the config; Prepare to run the config editor
@@ -115,14 +162,19 @@ def build_configuration_file(the_dict,orig_dict={}):
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want to choose libraries/folders
-        #library_setup_behavior=get_library_setup_behavior(cfg.library_setup_behavior)
-        the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
+        if ('-list_behavior' in the_dict['argv']):
+            the_dict['admin_settings']['behavior']['list']=the_dict['argv']['-list_behavior']
+        else:
+            the_dict['admin_settings']['behavior']['list']=get_library_setup_behavior(the_dict['admin_settings']['behavior']['list'])
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want media items to be matched to libraries/folders
-        #library_matching_behavior=get_library_matching_behavior(cfg.library_matching_behavior.casefold())
-        the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
+        if ('-matching_behavior' in the_dict['argv']):
+            the_dict['admin_settings']['behavior']['matching']=the_dict['argv']['-matching_behavior']
+        else:
+            the_dict['admin_settings']['behavior']['matching']=get_library_matching_behavior(the_dict['admin_settings']['behavior']['matching'])
         print('----------------------------------------------------------------------------------------')
+
 
     #store the opposing and matching listing types to be used in get_users_and_libraries()
     the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
@@ -130,11 +182,17 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
     the_dict['admin_settings']['behavior']['users']={}
-    the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
+    if ('-monitor_disabled_users' in the_dict['argv']):
+        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['argv']['-monitor_disabled_users']
+    else:
+        the_dict['admin_settings']['behavior']['users']['monitor_disabled']=get_show_disabled_users()
     print('----------------------------------------------------------------------------------------')
 
     #ask how to select users and libraries
-    the_dict['user_library_selection_type']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])
+    if ('-user_library_selection' in the_dict['argv']):
+        the_dict['user_library_selection_type']=the_dict['argv']['-user_library_selection']
+    else:
+        the_dict['user_library_selection_type']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])
     print('----------------------------------------------------------------------------------------')
 
     #run the user and library selector
@@ -147,24 +205,60 @@ def build_configuration_file(the_dict,orig_dict={}):
     arrDict={'Radarr':'7878','Sonarr':'8989'}
 
     for arr in arrDict:
-        if (proceed_arr_setup(arr)):
-            #define *arr dict
-            the_dict['admin_settings']['media_managers'][arr.casefold()]={}
-            #enable *arr
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
-            #get *arr url
-            arr_url=get_arr_url(arr)
-            #get *arr port
-            arr_port=get_arr_port(arr,arrDict[arr])
+        #define *arr dict
+        the_dict['admin_settings']['media_managers'][arr.casefold()]={}
+        the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
+        the_dict[arr.casefold() + '_url']=None
+        the_dict[arr.casefold() + '_port']=None
+        the_dict[arr.casefold() + '_api']=None
+
+        if ('-' + arr.casefold() + '_url' in the_dict['argv']):
+            #save *arr url command option
+            the_dict[arr.casefold() + '_url']=the_dict['argv']['-' + arr.casefold() + '_url']
+
+            if ('-' + arr.casefold() + '_port' in the_dict['argv']):
+                #save *arr port command option
+                the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+            else:
+                #save *arr manual port input
+                the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
+            
+        elif ('-' + arr.casefold() + '_port' in the_dict['argv']):
+            #save *arr port command option
+            the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+            #save *arr manual url input
+            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
+
+        elif ((not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))) and (proceed_arr_setup(arr))):
+            #save *arr manual url input
+            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
+            #save *arr manual port input
+            the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
+
+        else:
+            #disable *arr
+            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
+
+        if (the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']):
             #build *arr url
-            if (len(arr_port)):
+            if (len(the_dict[arr.casefold() + '_port'])):
                 #*arr url with port
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=arr_url + ':' + arr_port
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + ':' + the_dict[arr.casefold() + '_port']
             else:
                 #*arr url without port
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=arr_url
-            #get *arr api
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=get_arr_api(arr)
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url']
+
+            if ('-' + arr.casefold() + '_api' in the_dict['argv']):
+                #save *arr api command option
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['api']=the_dict['argv']['-' + arr.casefold() + '_api']
+            elif (not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))):
+                #save *arr manual apiinput
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=get_arr_api(arr)
+
+        #Remove *arr_url, *arr_port, and *arr_api so they cannot be used later
+        the_dict.pop(arr.casefold() + '_api')
+        the_dict.pop(arr.casefold() + '_port')
+        the_dict.pop(arr.casefold() + '_url')
 
         print('----------------------------------------------------------------------------------------')
 
