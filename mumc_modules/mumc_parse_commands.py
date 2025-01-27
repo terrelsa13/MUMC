@@ -311,11 +311,11 @@ def convertCMDOptionsToDict(argv,optionsList):
                (argv[argv.index(cmd) + 1].strip().casefold() == 'false')):
                 #check if next list item is boolean
                 #if (argv[argv.index(cmd) + 1].strip().casefold() == 'false'):
-                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]=False
+                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='false'
                 #else:
-                #cmd_dict[cmd.replace('-','')]=True
+                #cmd_dict[cmd.replace('-','')]='True'
             else:
-                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]=True
+                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='true'
         elif (cmd  in optionsList):
             cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]=argv[argv.index(cmd) + 1]
 
@@ -620,7 +620,7 @@ def parse_command_line_options(the_dict):
     print(cmdopt_dict['argv'])
     print('\n')
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
-    cmdopt_dict['argv']=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
+    cmdopt_dict['argv']|=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
     print('print argv after converting argv to dictionary\n')
     print(cmdopt_dict['argv'])
     print('\n')
