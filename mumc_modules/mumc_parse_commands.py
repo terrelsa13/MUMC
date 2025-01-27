@@ -616,8 +616,12 @@ def parse_command_line_options(the_dict):
 
     #first covert environmental variables to command line arguements; environamental variables have a lower priority
     cmdopt_dict['argv']=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
+    print(cmdopt_dict['argv'])
+    print()
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
     cmdopt_dict['argv']=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
+    print(cmdopt_dict['argv'])
+    print()
 
     #cmdopt_dict['argv']=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
 
