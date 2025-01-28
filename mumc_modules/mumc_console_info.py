@@ -293,7 +293,9 @@ def missing_config_argument_helper(argv,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='Verify the -c option looks like this: -c c:\\path\\to\\alternate_config.yaml' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    #strings_list_to_print+=' '.join(argv) + '\n'
+    for key, value in argv.items():
+        strings_list_to_print+=str(key) + ': ' + str(value)
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -311,19 +313,22 @@ def missing_config_argument_format_helper(argv,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='Verify the -c option looks like this: -c c:\\path\\to\\alternate_config.yaml' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    #strings_list_to_print+=' '.join(argv) + '\n'
+    for key, value in argv.items():
+        strings_list_to_print+=str(key) + ': ' + str(value)
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
 #print alt config does not exist helper
-def alt_config_file_does_not_exists_helper(argv,the_dict):
+def alt_config_file_does_not_exist_helper(argv,the_dict):
     strings_list_to_print=''
     strings_list_to_print+='\n'
     strings_list_to_print+='AlternateConfigNotFoundError: Alternate config path or file does not exist; check for typo, create config file, or move existing config to this location' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    #strings_list_to_print+=' '.join(argv) + '\n'
+    strings_list_to_print+='\t-config: ' + argv['-config'] + '\n'
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -337,7 +342,7 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='These are NOT valid config file names:' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='\t' + argv[argv.index(cmdOption)+1] + '\n'
+    strings_list_to_print+='\t-config: ' + argv['-config'] + '\n'
     strings_list_to_print+='\t/path/to/alternate.config.yml' + '\n'
     strings_list_to_print+='\t/path/to/alternate config.yml' + '\n'
     strings_list_to_print+='\tc:\\path\\to\\alternate.config.yml' + '\n'

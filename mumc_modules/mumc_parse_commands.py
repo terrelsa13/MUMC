@@ -2,7 +2,7 @@ import os
 import sys
 import copy
 from pathlib import Path
-from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exists_helper,alt_config_syntax_helper,unknown_command_line_option_helper
+from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
 from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
@@ -129,7 +129,7 @@ def verifyPathFileExist(file_path,argv,the_dict):
         else:
             raise CMDArgumentMissingNotFoundError
     except (CMDArgumentNotFoundError,CMDArgumentMissingNotFoundError):
-        alt_config_file_does_not_exists_helper(argv,the_dict)
+        alt_config_file_does_not_exist_helper(argv,the_dict)
         default_helper_menu(the_dict)
         sys.exit(0)
 
@@ -196,9 +196,8 @@ def findAlternateConfigCMDAndArgument(argv,optionsList,moduleExtension,the_dict,
         #if (cmdOption:=findCMDNotLast(cmdOption,argv,the_dict)):
         if (cmdOption:=findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict)):
             #if (cmdArgument:=getCMDArgument(cmdOption,argv)):
-            cmdArgument=argv[cmdOption]
-            if(verifyPathFileExist(cmdArgument,argv,the_dict)):
-                [argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,cmdArgument,cmdOption,moduleExtension,the_dict)
+            if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
+                [argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
                 return argumentPath,argumentFileNoExt,argumentFileExt
             #else:
                 #return cmdArgument
@@ -454,7 +453,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if (envar.get('AUTHKEY')):
         argv['-server_auth_key']=envar.get('AUTHKEY')
     if (envar.get('SERVER_AUTH_KEY')):
-        argv['-server_auth_key']='SERVER_AUTH_KEY'
+        argv['-server_auth_key']=envar.get('SERVER_AUTH_KEY')
 
     #save environmental variable - ADMINID,SERVER_ADMIN_ID
     #if (not ('-server_admin_id' in argv)):
@@ -554,10 +553,6 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - REPRT,READARR_PORT
     #save environmental variable - REAPI,READARR_API
 
-    print('print argv before leaving convert envar to argv function\n')
-    print(argv)
-    print('\n')
-
     return argv
 
 
@@ -636,6 +631,8 @@ def parse_command_line_options(the_dict):
     print(cmdopt_dict['argv'])
     print('\n')
 
+    #normalize all 'true'/'false' strings as booleans
+    #normalize all '#' as intergers
     for cmd in cmdopt_dict['argv']:
         if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
             cmdopt_dict['argv'][cmd]=True
@@ -665,6 +662,14 @@ def parse_command_line_options(the_dict):
             console_text_attributes().console_attribute_test()
             sys.exit(0)
 
+    #if -config not input as a command line option or environmental variable
+    #and we are running as a docker container
+    #then set the default config location: '/usr/src/app/config/mumc_config.yaml'
+    if ((not ('-config' in cmdopt_dict['argv'])) and
+       ('-container' in cmdopt_dict['argv']) and
+       (cmdopt_dict['argv']['-container'])):
+        cmdopt_dict['argv']['-config']='/usr/src/app/config/mumc_config.yaml'
+
     #look for -c or -attributesconfig command line option and argument
     if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
         cmdopt_dict['altConfigPath']=alternatePathInfo[0]
@@ -673,74 +678,5 @@ def parse_command_line_options(the_dict):
     else:
         cmdopt_dict['altConfigPath']=None
         cmdopt_dict['altConfigFileNoExt']=None
-        cmdopt_dict['altConfigFileExt']=None
-
-    '''
-    #look for -d or -container command line option
-    cmdopt_dict['argv']['containerized']=findCMDRequest(cmdopt_dict['argv'],'-container')
-
-    #look for -u, -config_updater, or -config_updater command line option
-    cmdopt_dict['argv']['configUpdater']=findCMDRequest(cmdopt_dict['argv'],'-config_updater')
-
-    #look for -sb or -server_brand command line option and argument
-    cmdopt_dict['argv']['server_brand']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_brand',the_dict)
-
-    #look for -su or -server_url command line option and argument
-    cmdopt_dict['argv']['server_url']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_url',the_dict)
-
-    #look for -sp or -server_port command line option and argument
-    cmdopt_dict['argv']['server_port']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_port',the_dict)
-
-    #look for -sbu or -server_base_url command line option and argument
-    cmdopt_dict['argv']['server_base_url']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_base_url',the_dict)
-
-    #look for -au or -admin_username command line option and argument
-    cmdopt_dict['argv']['admin_username']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-admin_username',the_dict)
-
-    #look for -ap or -admin_password command line option and argument
-    cmdopt_dict['argv']['admin_password']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-admin_password',the_dict)
-    
-    #look for -sak or -server_auth_key command line option and argument
-    cmdopt_dict['argv']['server_auth_key']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_auth_key',the_dict)
-
-    #look for -sai or -server_admin_id command line option and argument
-    cmdopt_dict['argv']['server_admin_id']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-server_admin_id',the_dict)
-
-    #look for -lb or -list_behavior command line option and argument
-    cmdopt_dict['argv']['list_behavior']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-list_behavior',the_dict)
-
-    #look for -mb or -matching_behavior command line option and argument
-    cmdopt_dict['argv']['matching_behavior']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-matching_behavior',the_dict)
-
-    #look for -gb or -global_blacktags command line option and argument
-    cmdopt_dict['argv']['global_blacktags']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-global_blacktags',the_dict)
-
-    #look for -gb or -global_whitetags command line option and argument
-    cmdopt_dict['argv']['global_whitetags']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-global_whitetags',the_dict)
-
-    #look for -mdu or -monitor_disabled_users command line option and argument
-    cmdopt_dict['argv']['monitor_disabled_users']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-monitor_disabled_users',the_dict)
-
-    #look for -uls or -user_library_selection command line option and argument
-    cmdopt_dict['argv']['user_library_selection']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-user_library_selection',the_dict)
-
-    #look for -ru or -radarr_url command line option and argument
-    cmdopt_dict['argv']['radarr_url']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-radarr_url',the_dict)
-
-    #look for -ru or -radarr_port command line option and argument
-    cmdopt_dict['argv']['radarr_port']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-radarr_port',the_dict)
-
-    #look for -ra or -radarr_api command line option and argument
-    cmdopt_dict['argv']['radarr_api']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-radarr_api',the_dict)
-
-    #look for -nu or -sonarr_url command line option and argument
-    cmdopt_dict['argv']['sonarr_url']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-sonarr_url',the_dict)
-
-    #look for -np or -sonarr_port command line option and argument
-    cmdopt_dict['argv']['sonarr_port']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-sonarr_port',the_dict)
-
-    #look for -sa or -sonarr_api command line option and argument
-    cmdopt_dict['argv']['sonarr_api']=findCMD_getArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],'-sonarr_api',the_dict)
-    '''
 
     return cmdopt_dict
