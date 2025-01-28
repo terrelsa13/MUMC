@@ -566,7 +566,13 @@ def parse_command_line_options(the_dict):
 
     cmdopt_dict={}
     cmdopt_dict['argv']={}
+    print('print the_dict[envar]\n')
+    print(the_dict['envar'])
+    print('\n')
     cmdopt_dict['envar']=the_dict['envar']
+    print('print cmdopt_dict[envar]\n')
+    print(cmdopt_dict['envar'])
+    print('\n')
     #cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
 
