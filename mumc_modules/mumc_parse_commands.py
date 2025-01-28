@@ -561,13 +561,7 @@ def parse_command_line_options(the_dict):
 
     cmdopt_dict={}
     cmdopt_dict['argv']={}
-    print('print the_dict[envar]\n')
-    print(the_dict['envar'])
-    print('\n')
     cmdopt_dict['envar']=the_dict['envar']
-    print('print cmdopt_dict[envar]\n')
-    print(cmdopt_dict['envar'])
-    print('\n')
     #cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
 
@@ -621,15 +615,9 @@ def parse_command_line_options(the_dict):
 
     #first covert environmental variables to command line arguements; environamental variables have a lower priority
     cmdopt_dict['argv']|=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
-    print('print argv after converting envar to argv\n')
-    print(cmdopt_dict['argv'])
-    print('\n')
 
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
     cmdopt_dict['argv']|=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
-    print('print argv after converting argv to dictionary\n')
-    print(cmdopt_dict['argv'])
-    print('\n')
 
     #normalize all 'true'/'false' strings as booleans
     #normalize all '#' as intergers
@@ -678,5 +666,6 @@ def parse_command_line_options(the_dict):
     else:
         cmdopt_dict['altConfigPath']=None
         cmdopt_dict['altConfigFileNoExt']=None
+        cmdopt_dict['altConfigFileExt']=None
 
     return cmdopt_dict
