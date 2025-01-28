@@ -554,6 +554,10 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - REPRT,READARR_PORT
     #save environmental variable - REAPI,READARR_API
 
+    print('print argv before leaving convert envar to argv function\n')
+    print(argv)
+    print('\n')
+
     return argv
 
 
