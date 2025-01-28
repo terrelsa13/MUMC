@@ -636,7 +636,16 @@ def parse_command_line_options(the_dict):
     print(cmdopt_dict['argv'])
     print('\n')
 
-    #cmdopt_dict['argv']=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
+    for cmd in cmdopt_dict['argv']:
+        if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
+            cmdopt_dict['argv'][cmd]=True
+        elif (cmdopt_dict['argv'][cmd].casefold() == 'false'):
+            cmdopt_dict['argv'][cmd]=False
+        else:
+            try:
+                cmdopt_dict['argv'][cmd]=int(cmdopt_dict['argv'][cmd])
+            except:
+                pass
 
     #look for unknown command line options
     findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'],the_dict)
