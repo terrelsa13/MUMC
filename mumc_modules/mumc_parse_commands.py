@@ -379,89 +379,89 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
 def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - A,ATTRS,ATTRIBUTES
     #if (not ('-attributes' in argv)):
-    if ('A' in envar):
-        argv['-attributes']=envar['A']
-    if ('ATTRS' in envar):
-        argv['-attributes']=envar['ATTRS']
-    if ('ATTRIBUTES' in envar):
-        argv['-attributes']=envar['ATTRIBUTES']
+    if (envar.get('A')):
+        argv['-attributes']=envar.get('A')
+    if (envar.get('ATTRS')):
+        argv['-attributes']=envar.get('ATTRS')
+    if (envar.get('ATTRIBUTES')):
+        argv['-attributes']=envar.get('ATTRIBUTES')
 
     #save environmental variable - C,CONFIG
     #if (not ('-config' in argv)):
-    if ('C' in envar):
-        argv['-config']=envar['C']
-    if ('CONFIG' in envar):
-        argv['-config']=envar['CONFIG']
+    if (envar.get('C')):
+        argv['-config']=envar.get('C')
+    if (envar.get('CONFIG')):
+        argv['-config']=envar.get('CONFIG')
 
     #save environmental variable - D,CONTAINER
     #if (not ('-container' in argv)):
-    if ('D' in envar):
-        argv['-container']=envar['D']
-    if ('CONTAINER' in envar):
-        argv['-container']=envar['CONTAINER']
+    if (envar.get('D')):
+        argv['-container']=envar.get('D')
+    if (envar.get('CONTAINER')):
+        argv['-container']=envar.get('CONTAINER')
 
     #save environmental variable - U,CONFIG_UPDATER
     #if (not ('-config_updater' in argv)):
-    if ('U' in envar):
-        argv['-config_updater']=envar['U']
-    if ('CONFIG_UPDATER' in envar):
-        argv['-config_updater']=envar['CONFIG_UPDATER']
+    if (envar.get('U')):
+        argv['-config_updater']=envar.get('U')
+    if (envar.get('CONFIG_UPDATER')):
+        argv['-config_updater']=envar.get('CONFIG_UPDATER')
 
     #save environmental variable - BRAND,SERVER_BRAND
     #if (not ('-server_brand' in argv)):
-    if ('BRAND' in envar):
-        argv['-server_brand']=envar['BRAND']
-    if ('SERVER_BRAND' in envar):
-        argv['-server_brand']=envar['SERVER_BRAND']
+    if (envar.get('BRAND')):
+        argv['-server_brand']=envar.get('BRAND')
+    if (envar.get('SERVER_BRAND')):
+        argv['-server_brand']=envar.get('SERVER_BRAND')
 
     #save environmental variable - URL,SERVER_URL
     #if (not ('-server_url' in argv)):
-    if ('URL' in envar):
-        argv['-server_url']=envar['URL']
-    if ('SERVER_URL' in envar):
-        argv['-server_url']=envar['SERVER_URL']
+    if (envar.get('URL')):
+        argv['-server_url']=envar.get('URL')
+    if (envar.get('SERVER_URL')):
+        argv['-server_url']=envar.get('SERVER_URL')
 
     #save environmental variable - PORT,SERVER_PORT
     #if (not ('-server_port' in argv)):
-    if ('PORT' in envar):
-        argv['-server_port']=envar['PORT']
-    if ('SERVER_PORT' in envar):
-        argv['-server_port']=envar['SERVER_PORT']
+    if (envar.get('PORT')):
+        argv['-server_port']=envar.get('PORT')
+    if (envar.get('SERVER_PORT')):
+        argv['-server_port']=envar.get('SERVER_PORT')
 
     #save environmental variable - BASE,SERVER_BASE_URL
     #if (not ('-server_base_url' in argv)):
-    if ('BASE' in envar):
-        argv['-server_base_url']=envar['BASE']
-    if ('SERVER_BASE_URL' in envar):
-        argv['-server_base_url']=envar['SERVER_BASE_URL']
+    if (envar.get('BASE')):
+        argv['-server_base_url']=envar.ge('BASE')
+    if (envar.get('SERVER_BASE_URL')):
+        argv['-server_base_url']=envar.get('SERVER_BASE_URL')
 
     #save environmental variable - USERNAME,ADMIN_USERNAME
     #if (not ('-admin_username' in argv)):
-    if ('USERNAME' in envar):
-        argv['-admin_username']=envar['USERNAME']
-    if ('SERVER_BASE_URL' in envar):
-        argv['-admin_username']=envar['ADMIN_USERNAME']
+    if (envar.get('USERNAME')):
+        argv['-admin_username']=envar.get('USERNAME')
+    if (envar.get('ADMIN_USERNAME')):
+        argv['-admin_username']=envar.get('ADMIN_USERNAME')
 
     #save environmental variable - PASSWORD,ADMIN_PASSWORD
     #if (not ('-admin_password' in argv)):
-    if ('PASSWORD' in envar):
-        argv['-admin_password']=envar['PASSWORD']
-    if ('ADMIN_PASSWORD' in envar):
-        argv['-admin_password']=envar['ADMIN_PASSWORD']
+    if (envar.get('PASSWORD')):
+        argv['-admin_password']=envar.get('PASSWORD')
+    if (envar.get('ADMIN_PASSWORD')):
+        argv['-admin_password']=envar.get('ADMIN_PASSWORD')
 
     #save environmental variable - AUTHKEY,SERVER_AUTH_KEY
     #if (not ('-server_auth_key' in argv)):
-    if ('AUTHKEY' in envar):
-        argv['-server_auth_key']=envar['AUTHKEY']
-    if ('SERVER_AUTH_KEY' in envar):
-        argv['-server_auth_key']=envar['SERVER_AUTH_KEY']
+    if (envar.get('AUTHKEY')):
+        argv['-server_auth_key']=envar.get('AUTHKEY')
+    if (envar.get('SERVER_AUTH_KEY')):
+        argv['-server_auth_key']='SERVER_AUTH_KEY'
 
     #save environmental variable - ADMINID,SERVER_ADMIN_ID
     #if (not ('-server_admin_id' in argv)):
-    if ('ADMINID' in envar):
-        argv['-server_admin_id']=envar['ADMINID']
-    if ('SERVER_ADMIN_ID' in envar):
-        argv['-server_admin_id']=envar['SERVER_ADMIN_ID']
+    if (envar.get('ADMINID')):
+        argv['-server_admin_id']=envar.get('ADMINID')
+    if (envar.get('SERVER_ADMIN_ID')):
+        argv['-server_admin_id']=envar.get('SERVER_ADMIN_ID')
 
     #save environmental variable - LSTBEH,LIST_BEHAVIOR
     #if (not ('-list_behavior' in argv)):
