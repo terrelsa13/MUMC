@@ -63,7 +63,7 @@ def print_users_to_console(the_dict):
             the_dict['user_index_total']=the_dict['all_users_dict'].index(user)
             the_dict['all_users_dict'][the_dict['user_index_total']]['userPosition']=the_dict['user_index_total']
 
-            if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 1)):
+            if ((the_dict['user_library_selection'] == 0) or (the_dict['user_library_selection'] == 1)):
                 try:
                     print(str(the_dict['user_index_total']) +' - '+ the_dict['prev_users_dict'][the_dict['user_index_total']]['user_name'] + ' - ')
                 except (IndexError,TypeError):
@@ -76,21 +76,21 @@ def print_users_to_console(the_dict):
 
 def get_user_selection(the_dict):
     if (the_dict['atleast_one_user_selected'] == False):
-        if (the_dict['user_library_selection_type'] == 0):
+        if (the_dict['user_library_selection'] == 0):
             the_dict['user_selection_str']=input('Select one user at a time.\nEnter number of the user to monitor: ')
-        elif (the_dict['user_library_selection_type'] == 1):
+        elif (the_dict['user_library_selection'] == 1):
             the_dict['user_selection_str']=input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
-        else: #(the_dict['user_library_selection_type'] == 2):
+        else: #(the_dict['user_library_selection'] == 2):
             pass
     #When multiple explain how to select each user; when coming back to the user selection show this
     else: #((i >= 1) and (the_dict['atleast_one_user_selected'] == True)):
         if (the_dict['user_index_total'] >= 1):
             print('Monitoring multiple users is possible.')
-        if (the_dict['user_library_selection_type'] == 0):
+        if (the_dict['user_library_selection'] == 0):
             the_dict['user_selection_str']=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
-        elif (the_dict['user_library_selection_type'] == 1):
+        elif (the_dict['user_library_selection'] == 1):
             the_dict['user_selection_str']=input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
-        else: #(the_dict['user_library_selection_type'] == 2):
+        else: #(the_dict['user_library_selection'] == 2):
             pass
     
     print('')
@@ -218,10 +218,10 @@ def print_library_data_for_selected_user(the_dict):
             print_string+=' - NetPath: ' + str(lib_info['network_path'])
             print_string+=' - LibId: ' + str(lib_info['lib_id'])
 
-        if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
+        if ((the_dict['user_library_selection'] == 0) or (the_dict['user_library_selection'] == 2)):
             print(print_string)
 
-    if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
+    if ((the_dict['user_library_selection'] == 0) or (the_dict['user_library_selection'] == 2)):
         print('')
 
     return the_dict
@@ -273,7 +273,7 @@ def is_valid_user_selected(the_dict):
     except:
         print_error+='Error When Selecting library. Try again.\n'
 
-    if (the_dict['user_library_selection_type'] == 0):
+    if (the_dict['user_library_selection'] == 0):
         if (len(the_dict['user_selection_list']) > 1):
             print_error='Must not select more than a single user at a time. Try again.\n'
             selected_user_str=the_dict['user_selection_list']

@@ -484,9 +484,9 @@ def is_valid_library_selected(the_dict):
                         print_error+='Value Out Of Range. Try again.\n'
 
         else:
-            if (not (the_dict['user_library_selection_type'] == 2)):
+            if (not (the_dict['user_library_selection'] == 2)):
                 the_dict['library_stop_loop']=True
-            else: #(the_dict['user_library_selection_type'] == 2):
+            else: #(the_dict['user_library_selection'] == 2):
                 the_dict['user_stop_loop']=True
     except:
         print_error+='Error When Selecting library. Try again.\n'

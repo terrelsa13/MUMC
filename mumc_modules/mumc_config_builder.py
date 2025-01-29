@@ -1,5 +1,5 @@
 from mumc_modules.mumc_output import print_byType
-from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type,proceed_arr_setup,get_arr_url,get_arr_port,get_arr_api
+from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type,proceed_arr_setup,get_arr_url,get_arr_port,get_arr_base_url,get_arr_api
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_config_not_setup_to_delete_media
@@ -58,12 +58,12 @@ def build_configuration_file(the_dict,orig_dict={}):
         else:
             the_dict['base']=get_base(the_dict['admin_settings']['server']['brand'])
         #contruct FQDN
-        if (len(str(the_dict['port'])) and len(the_dict['base'])):
-            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + str(the_dict['port']) + '/' + the_dict['base']
-        elif (len(str(the_dict['port'])) and (not len(the_dict['base']))):
+        if (len(str(the_dict['port'])) and len(str(the_dict['base']))):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + str(the_dict['port']) + '/' + str(the_dict['base'])
+        elif (len(str(the_dict['port'])) and (not len(str(the_dict['base'])))):
             the_dict['admin_settings']['server']['url']=the_dict['url'] + ':' + str(the_dict['port'])
-        elif ((not len(str(the_dict['port']))) and len(the_dict['base'])):
-            the_dict['admin_settings']['server']['url']=the_dict['url'] + '/' + the_dict['base']
+        elif ((not len(str(the_dict['port']))) and len(str(the_dict['base']))):
+            the_dict['admin_settings']['server']['url']=the_dict['url'] + '/' + str(the_dict['base'])
         else:
             the_dict['admin_settings']['server']['url']=the_dict['url']
         #Remove server, port, and base so they cannot be used later
@@ -190,9 +190,9 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     #ask how to select users and libraries
     if ('-user_library_selection' in the_dict['argv']):
-        the_dict['user_library_selection_type']=the_dict['argv']['-user_library_selection']
+        the_dict['user_library_selection']=the_dict['argv']['-user_library_selection']
     else:
-        the_dict['user_library_selection_type']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])
+        the_dict['user_library_selection']=get_user_and_library_selection_type(the_dict['admin_settings']['behavior']['list'])
     print('----------------------------------------------------------------------------------------')
 
     #run the user and library selector
@@ -210,6 +210,7 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
         the_dict[arr.casefold() + '_url']=None
         the_dict[arr.casefold() + '_port']=None
+        the_dict[arr.casefold() + '_base_url']=None
         the_dict[arr.casefold() + '_api']=None
 
         if ('-' + arr.casefold() + '_url' in the_dict['argv']):
@@ -222,32 +223,69 @@ def build_configuration_file(the_dict,orig_dict={}):
             else:
                 #save *arr manual port input
                 the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
-            
+
+            if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
+                #save *arr base_url command option
+                the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
+            else:
+                #save *arr manual base_url input
+                the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
+
         elif ('-' + arr.casefold() + '_port' in the_dict['argv']):
-            #save *arr port command option
-            the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
             #save *arr manual url input
             the_dict[arr.casefold() + '_url']=get_arr_url(arr)
+
+            #save *arr port command option
+            the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+
+            if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
+                #save *arr base_url command option
+                the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
+            else:
+                #save *arr manual base_url input
+                the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
+
+        elif ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
+            #save *arr manual url input
+            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
+
+            #save *arr manual port input
+            the_dict[arr.casefold() + '_port']=get_arr_port(arr)
+
+            #save *arr base_url command option
+            the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
 
         elif ((not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))) and (proceed_arr_setup(arr))):
             #save *arr manual url input
             the_dict[arr.casefold() + '_url']=get_arr_url(arr)
+
             #save *arr manual port input
             the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
+
+            #save *arr manual base_url input
+            the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
 
         else:
             #disable *arr
             the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
 
         if (the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']):
-            #build *arr url
-            if (len(str(the_dict[arr.casefold() + '_port']))):
+
+            #contruct *arr FQDN
+            if (len(str(the_dict[arr.casefold() + '_port'])) and len(str(the_dict[arr.casefold() + '_base_url']))):
+                #*arr url with port and base url
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + ':' + str(the_dict[arr.casefold() + '_port']) + '/' + str(the_dict[arr.casefold() + '_base_url'])
+            elif (len(str(the_dict[arr.casefold() + '_port'])) and (not len(str(the_dict[arr.casefold() + '_base_url'])))):
                 #*arr url with port
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + ':' + str(the_dict[arr.casefold() + '_port'])
+            elif ((not len(str(the_dict[arr.casefold() + '_port']))) and len(str(the_dict[arr.casefold() + '_base_url']))):
+                #*arr url with base url
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url'] + '/' + str(the_dict[arr.casefold() + '_base_url'])
             else:
-                #*arr url without port
+                #*arr url
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url']
 
+            #get *arr API key
             if ('-' + arr.casefold() + '_api' in the_dict['argv']):
                 #save *arr api command option
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['api']=the_dict['argv']['-' + arr.casefold() + '_api']
@@ -257,6 +295,7 @@ def build_configuration_file(the_dict,orig_dict={}):
 
         #Remove *arr_url, *arr_port, and *arr_api so they cannot be used later
         the_dict.pop(arr.casefold() + '_api')
+        the_dict.pop(arr.casefold() + '_base_url')
         the_dict.pop(arr.casefold() + '_port')
         the_dict.pop(arr.casefold() + '_url')
 

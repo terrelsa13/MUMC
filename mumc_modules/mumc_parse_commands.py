@@ -57,44 +57,18 @@ class CMDArgumentMissingSyntaxError(Exception):
     pass
 
 
-#find command "-?"
-#verify we do not end with a "-?"
-#verify another "-?" not come after this "-?"
-#get the argument related to the "-?" command
-#verify argument after "-?" exists and/or is formatted correctly
-
-
 #find command
 def findCMDRequest(argv,expectedCMD):
     for cmdOption in argv:
-        #if ((cmdOption.casefold() == '-sb') or (cmdOption.casefold() == '-server_brand')):
         if (cmdOption == expectedCMD):
             return cmdOption
     return False
-
-
-#verify the -command is not the last item; we are expecting a argument to come after it
-#def findCMDNotLast(cmdOption,argv,the_dict):
-    #try:
-        #if (cmdOption):
-            ##for checkOption in argv:
-            #if ((argv.index(cmdOption) + 1) >= len(argv)):
-                #raise CMDOptionIndexError
-            #else:
-                #return cmdOption.casefold()
-        #else:
-            #raise CMDOptionMissingIndexError
-    #except (CMDOptionIndexError,CMDOptionMissingIndexError):
-        #missing_config_argument_helper(argv,the_dict)
-        #default_helper_menu(the_dict)
-        #sys.exit(0)
 
 
 #verify the -command is not equal to another -command; we are expecting an argument to come after it
 def findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict):
     try:
         if (cmdOption):
-            #for checkOption in optionsList:
             if (argv[cmdOption] in optionsList):
                 raise CMDArgumentError
             else:
@@ -115,7 +89,6 @@ def getCMDArgument(cmdOption,argv):
         return None
 
 
-##wip
 #verify alternate config exists
 def verifyPathFileExist(file_path,argv,the_dict):
     try:
@@ -134,15 +107,12 @@ def verifyPathFileExist(file_path,argv,the_dict):
         sys.exit(0)
 
 
-##wip
 #verify alternate config file name follows the python module naming convention
 def parsePathFileSyntax(argv,file_path,cmdOption,moduleExtension,the_dict):
     try:
         if (file_path):
             argExt=getFileExtension(file_path)
             if ((argExt in moduleExtension) and
-                #((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(".") == 0) and
-                #((os.path.basename(os.path.splitext(argv[argv.index(cmdOption)+1])[0])).count(" ") == 0)):
                 ((os.path.basename(os.path.splitext(file_path)[0])).count(".") == 0) and
                 ((os.path.basename(os.path.splitext(file_path)[0])).count(" ") == 0)):
                 #Get path without file.name
@@ -159,8 +129,6 @@ def parsePathFileSyntax(argv,file_path,cmdOption,moduleExtension,the_dict):
         default_helper_menu(the_dict)
         sys.exit(0)
 
-    #return argPath,argFileNoExt,argFileNoExt+argExt
-
 
 #find unknown command line options
 def findUnknownCMDRequest(argv,optionsList,the_dict):
@@ -176,47 +144,15 @@ def findUnknownCMDRequest(argv,optionsList,the_dict):
         sys.exit(0)
 
 
-#find the show help command
-#def findHelpCMDRequest(argv,the_dict):
-    #if (findCMDRequest(argv,'-h','-help','-?')):
-        #print_full_help_menu(the_dict)
-        #sys.exit(0)
-
-
-#find command to show console attributes
-#def findConsoleAttributeShowRequest(argv):
-    #if (findCMDRequest(argv,'-a','-attr','-attrs','-attribute','-attributes')):
-        #console_text_attributes().console_attribute_test()
-        #sys.exit(0)
-
-
 #find alternate configuration command and argument
 def findAlternateConfigCMDAndArgument(argv,optionsList,moduleExtension,the_dict,expectedCMD):
     if (cmdOption:=findCMDRequest(argv,expectedCMD)):
-        #if (cmdOption:=findCMDNotLast(cmdOption,argv,the_dict)):
         if (cmdOption:=findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict)):
-            #if (cmdArgument:=getCMDArgument(cmdOption,argv)):
             if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
                 [argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
                 return argumentPath,argumentFileNoExt,argumentFileExt
-            #else:
-                #return cmdArgument
     else:
         return cmdOption
-
-
-#find running as container command
-#def findContainerCMDRequest(argv):
-    #if (findCMDRequest(argv,'-d','-container')):
-        #return True
-    #return False
-
-
-#find configuration updater command
-#def findConfigUpdaterCMDRequest(argv):
-    #if (findCMDRequest(argv,'-u','-updater','-config-updater','-configuration-updater')):
-        #return True
-    #return False
 
 
 #find option to remake authentication key in the GUI
@@ -242,7 +178,6 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
         sys.exit(0)
         
     #for cmdOption in argv:
-    #if ((cmdOption == '-rak') or (cmdOption == '-remake-api-key')):
     if (findCMDRequest(argv,'-rak','-remake-api-key')):
         print('')
         #admin username?
@@ -288,9 +223,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
 #find command and get argument
 def findCMD_getArgument(argv,optionsList,expectedCMD,the_dict):
     if (cmdOption:=findCMDRequest(argv,expectedCMD)):
-        #if (cmdOption:=findCMDNotLast(cmdOption,argv,the_dict)):
         if (cmdOption:=findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict)):
-            #return getCMDArgument(cmdOption,argv)
             return argv[cmdOption]
     else:
         return cmdOption
@@ -309,10 +242,7 @@ def convertCMDOptionsToDict(argv,optionsList):
             if (((argv.index(cmd) + 1) < len(argv)) and
                (argv[argv.index(cmd) + 1].strip().casefold() == 'false')):
                 #check if next list item is boolean
-                #if (argv[argv.index(cmd) + 1].strip().casefold() == 'false'):
                 cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='false'
-                #else:
-                #cmd_dict[cmd.replace('-','')]='True'
             else:
                 cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='true'
         elif (cmd  in optionsList):
@@ -322,14 +252,9 @@ def convertCMDOptionsToDict(argv,optionsList):
 
 
 def convertShortCMDOptionsToLongCMDOptions(cmd):
-    if ((cmd.casefold() == '-a') or (cmd.casefold() == '-attrs')):
-        return '-attributes'
-    elif (cmd.casefold() == '-c'):
+
+    if (cmd.casefold() == '-c'):
         return '-config'
-    elif (cmd.casefold() == '-d'):
-        return '-container'
-    elif (cmd.casefold() == '-u'):
-        return '-config_updater'
     elif (cmd.casefold() == '-brand'):
         return '-server_brand'
     elif (cmd.casefold() == '-url'):
@@ -356,18 +281,30 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
         return '-global_whitetags'
     elif (cmd.casefold() == '-disusrs'):
         return '-monitor_disabled_users'
+    elif (cmd.casefold() == '-libsel'):
+        return '-user_library_selection'
     elif (cmd.casefold() == '-rdurl'):
         return '-radarr_url'
     elif (cmd.casefold() == '-rdprt'):
         return '-radarr_port'
+    elif (cmd.casefold() == '-rdburl'):
+        return '-radarr_base_url'
     elif (cmd.casefold() == '-rdapi'):
         return '-radarr_api'
     elif (cmd.casefold() == '-snurl'):
         return '-sonarr_url'
     elif (cmd.casefold() == '-snprt'):
         return '-sonarr_port'
+    elif (cmd.casefold() == '-snburl'):
+        return '-sonarr_base_url'
     elif (cmd.casefold() == '-snapi'):
         return '-sonarr_api'
+    elif ((cmd.casefold() == '-a') or (cmd.casefold() == '-attrs')):
+        return '-attributes'
+    elif (cmd.casefold() == '-d'):
+        return '-container'
+    elif (cmd.casefold() == '-u'):
+        return '-config_updater'
     elif ((cmd.casefold() == '-h') or (cmd.casefold() == '-?') or (cmd.casefold() == '--h') or (cmd.casefold() == '--help') or (cmd.casefold() == '--?')):
         return '-help'
     else:
@@ -376,171 +313,140 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
 
 #convert container environmental variables into CMD options
 def convertEnvironmentalVariablesToCMDOptions(argv,envar):
-    #save environmental variable - A,ATTRS,ATTRIBUTES
-    #if (not ('-attributes' in argv)):
-    if (envar.get('A')):
-        argv['-attributes']=envar.get('A')
-    if (envar.get('ATTRS')):
-        argv['-attributes']=envar.get('ATTRS')
-    if (envar.get('ATTRIBUTES')):
-        argv['-attributes']=envar.get('ATTRIBUTES')
 
     #save environmental variable - C,CONFIG
-    #if (not ('-config' in argv)):
     if (envar.get('C')):
         argv['-config']=envar.get('C')
     if (envar.get('CONFIG')):
         argv['-config']=envar.get('CONFIG')
 
-    #save environmental variable - D,CONTAINER
-    #if (not ('-container' in argv)):
-    if (envar.get('D')):
-        argv['-container']=envar.get('D')
-    if (envar.get('CONTAINER')):
-        argv['-container']=envar.get('CONTAINER')
-
-    #save environmental variable - U,CONFIG_UPDATER
-    #if (not ('-config_updater' in argv)):
-    if (envar.get('U')):
-        argv['-config_updater']=envar.get('U')
-    if (envar.get('CONFIG_UPDATER')):
-        argv['-config_updater']=envar.get('CONFIG_UPDATER')
-
     #save environmental variable - BRAND,SERVER_BRAND
-    #if (not ('-server_brand' in argv)):
     if (envar.get('BRAND')):
         argv['-server_brand']=envar.get('BRAND')
     if (envar.get('SERVER_BRAND')):
         argv['-server_brand']=envar.get('SERVER_BRAND')
 
     #save environmental variable - URL,SERVER_URL
-    #if (not ('-server_url' in argv)):
     if (envar.get('URL')):
         argv['-server_url']=envar.get('URL')
     if (envar.get('SERVER_URL')):
         argv['-server_url']=envar.get('SERVER_URL')
 
     #save environmental variable - PORT,SERVER_PORT
-    #if (not ('-server_port' in argv)):
     if (envar.get('PORT')):
         argv['-server_port']=envar.get('PORT')
     if (envar.get('SERVER_PORT')):
         argv['-server_port']=envar.get('SERVER_PORT')
 
     #save environmental variable - BASE,SERVER_BASE_URL
-    #if (not ('-server_base_url' in argv)):
     if (envar.get('BASE')):
         argv['-server_base_url']=envar.ge('BASE')
     if (envar.get('SERVER_BASE_URL')):
         argv['-server_base_url']=envar.get('SERVER_BASE_URL')
 
     #save environmental variable - USERNAME,ADMIN_USERNAME
-    #if (not ('-admin_username' in argv)):
     if (envar.get('USERNAME')):
         argv['-admin_username']=envar.get('USERNAME')
     if (envar.get('ADMIN_USERNAME')):
         argv['-admin_username']=envar.get('ADMIN_USERNAME')
 
     #save environmental variable - PASSWORD,ADMIN_PASSWORD
-    #if (not ('-admin_password' in argv)):
     if (envar.get('PASSWORD')):
         argv['-admin_password']=envar.get('PASSWORD')
     if (envar.get('ADMIN_PASSWORD')):
         argv['-admin_password']=envar.get('ADMIN_PASSWORD')
 
     #save environmental variable - AUTHKEY,SERVER_AUTH_KEY
-    #if (not ('-server_auth_key' in argv)):
     if (envar.get('AUTHKEY')):
         argv['-server_auth_key']=envar.get('AUTHKEY')
     if (envar.get('SERVER_AUTH_KEY')):
         argv['-server_auth_key']=envar.get('SERVER_AUTH_KEY')
 
     #save environmental variable - ADMINID,SERVER_ADMIN_ID
-    #if (not ('-server_admin_id' in argv)):
     if (envar.get('ADMINID')):
         argv['-server_admin_id']=envar.get('ADMINID')
     if (envar.get('SERVER_ADMIN_ID')):
         argv['-server_admin_id']=envar.get('SERVER_ADMIN_ID')
 
     #save environmental variable - LSTBEH,LIST_BEHAVIOR
-    #if (not ('-list_behavior' in argv)):
     if ('LSTBEH' in envar):
         argv['-list_behavior']=envar['LSTBEH']
     if ('LIST_BEHAVIOR' in envar):
         argv['-list_behavior']=envar['LIST_BEHAVIOR']
 
     #save environmental variable - MATBEH,MATCHING_BEHAVIOR
-    #if (not ('-matching_behavior' in argv)):
     if ('MATBEH' in envar):
         argv['-matching_behavior']=envar['MATBEH']
     if ('MATCHING_BEHAVIOR' in envar):
         argv['-matching_behavior']=envar['MATCHING_BEHAVIOR']
 
     #save environmental variable - BLACKTAGS,GLOBAL_BLACKTAGS
-    #if (not ('-global_blacktags' in argv)):
     if ('BLACKTAGS' in envar):
         argv['-global_blacktags']=envar['BLACKTAGS']
     if ('GLOBAL_BLACKTAGS' in envar):
         argv['-global_blacktags']=envar['GLOBAL_BLACKTAGS']
 
     #save environmental variable - WHITETAGS,GLOBAL_WHITETAGS
-    #if (not ('-global_whitetags' in argv)):
     if ('WHITETAGS' in envar):
         argv['-global_whitetags']=envar['WHITETAGS']
     if ('GLOBAL_WHITETAGS' in envar):
         argv['-global_whitetags']=envar['GLOBAL_WHITETAGS']
 
     #save environmental variable - DISUSRS,MONITOR_DISABLED_USERS
-    #if (not ('-monitor_disabled_users' in argv)):
     if ('DISUSRS' in envar):
         argv['-monitor_disabled_users']=envar['DISUSRS']
     if ('MONITOR_DISABLED_USERS' in envar):
         argv['-monitor_disabled_users']=envar['MONITOR_DISABLED_USERS']
 
     #save environmental variable - LIBSEL,USER_LIBRARY_SELECTION
-    #if (not ('-library_selection' in argv)):
-    #if ('LIBSEL' in envar):
-        #argv['-library_selection']=envar['LIBSEL']
-    #if ('USER_LIBRARY_SELECTION' in envar):
-        #argv['-library_selection']=envar['USER_LIBRARY_SELECTION']
+    if ('LIBSEL' in envar):
+        argv['-user_library_selection']=envar['LIBSEL']
+    if ('USER_LIBRARY_SELECTION' in envar):
+        argv['-user_library_selection']=envar['USER_LIBRARY_SELECTION']
 
     #save environmental variable - RDURL,RADARR_URL
-    #if (not ('-radarr_url' in argv)):
     if ('RDURL' in envar):
         argv['-radarr_url']=envar['RDURL']
     if ('RADARR_URL' in envar):
         argv['-radarr_url']=envar['RADARR_URL']
 
     #save environmental variable - RDPRT,RADARR_PORT
-    #if (not ('-radarr_port' in argv)):
     if ('RDPRT' in envar):
         argv['-radarr_port']=envar['RDPRT']
     if ('RADARR_PORT' in envar):
         argv['-radarr_port']=envar['RADARR_PORT']
 
+    #save environmental variable - RDBURL,RADARR_BASE_URL
+    if ('RDBURL' in envar):
+        argv['-radarr_base_url']=envar['RDBURL']
+    if ('RADARR_BASE_URL' in envar):
+        argv['-radarr_base_url']=envar['RADARR_BASE_URL']
+
     #save environmental variable - RDAPI,RADARR_API
-    #if (not ('-radarr_api' in argv)):
     if ('RDAPI' in envar):
         argv['-radarr_api']=envar['RDAPI']
     if ('RADARR_API' in envar):
         argv['-radarr_api']=envar['RADARR_API']
 
     #save environmental variable - SNURL,SONARR_URL
-    #if (not ('-sonarr_url' in argv)):
     if ('SNURL' in envar):
         argv['-sonarr_url']=envar['SNURL']
     if ('SONARR_URL' in envar):
         argv['-sonarr_url']=envar['SONARR_URL']
 
-    #save environmental variable - SNPrT,SONARR_PORT
-    #if (not ('-sonarr_port' in argv)):
+    #save environmental variable - SNPRT,SONARR_PORT
     if ('SNPRT' in envar):
         argv['-sonarr_port']=envar['SNPRT']
     if ('SONARR_PORT' in envar):
         argv['-sonarr_port']=envar['SONARR_PORT']
 
+    #save environmental variable - SNBURL,SONARR_BASE_URL
+    if ('SNBURL' in envar):
+        argv['-sonarr_base_url']=envar['SNBURL']
+    if ('SONARR_BASE_URL' in envar):
+        argv['-sonarr_base_url']=envar['SONARR_BASE_URL']
+
     #save environmental variable - SNAPI,SONARR_API
-    #if (not ('-sonarr_api' in argv)):
     if ('SNAPI' in envar):
         argv['-sonarr_api']=envar['SNAPI']
     if ('SONARR_API' in envar):
@@ -548,10 +454,33 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
 
     #save environmental variable - LDURL,LIDARR_URL
     #save environmental variable - LDPRT,LIDARR_PORT
+    #save environmental variable - LDBURL,LIDARR_BASE_URL
     #save environmental variable - LDAPI,LIDARR_API
+
     #save environmental variable - REURL,READARR_URL
     #save environmental variable - REPRT,READARR_PORT
+    #save environmental variable - REBURL,READARR_BASE_URL
     #save environmental variable - REAPI,READARR_API
+
+    #save environmental variable - A,ATTRS,ATTRIBUTES
+    if (envar.get('A')):
+        argv['-attributes']=envar.get('A')
+    if (envar.get('ATTRS')):
+        argv['-attributes']=envar.get('ATTRS')
+    if (envar.get('ATTRIBUTES')):
+        argv['-attributes']=envar.get('ATTRIBUTES')
+
+    #save environmental variable - D,CONTAINER
+    if (envar.get('D')):
+        argv['-container']=envar.get('D')
+    if (envar.get('CONTAINER')):
+        argv['-container']=envar.get('CONTAINER')
+
+    #save environmental variable - U,CONFIG_UPDATER
+    if (envar.get('U')):
+        argv['-config_updater']=envar.get('U')
+    if (envar.get('CONFIG_UPDATER')):
+        argv['-config_updater']=envar.get('CONFIG_UPDATER')
 
     return argv
 
@@ -565,11 +494,7 @@ def parse_command_line_options(the_dict):
     #cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
 
-    cmdopt_dict['optionsList']=['-a','-attrs','-attributes',
-                                '-c','-config',
-                                '-d','-container',
-                                '-u','-config_updater',
-                                #'-rak','-remake-api-key',
+    cmdopt_dict['optionsList']=['-c','-config',
                                 '-brand','-server_brand',
                                 '-url','-server_url',
                                 '-port','-server_port',
@@ -584,32 +509,26 @@ def parse_command_line_options(the_dict):
                                 '-whitetags','-global_whitetags',
                                 '-disusrs','-monitor_disabled_users',
                                 '-libsel','-user_library_selection',
-                                #'-uids','-user_ids',
-                                #'-unames','-user_names',
-                                #'-wlids','-whitelist_*_lib_ids',
-                                #'-blids','-blacklist_*_lib_ids',
-                                #'-wlctyps','-whitelist_*_collection_types',
-                                #'-blctyps','-blacklist_*_collection_types',
-                                #'-wlpths','-whitelist_*_paths',
-                                #'-blpths','-blacklist_*_paths',
-                                #'-wlnetpths','-whitelist_*_network_paths',
-                                #'-blnetpths','-blacklist_*_network_paths',
-                                #'-wlsids','-whitelist_*_subfolder_ids',
-                                #'-blsids','-blacklist_*_subfolder_ids',
-                                #'-wlen','-whitelist_*_libs_enabled',
-                                #'-blen','-blacklist_*_libs_enabled',
                                 '-rdurl','-radarr_url',
                                 '-rdprt','-radarr_port',
+                                '-rdburl','-radarr_base_url',
                                 '-rdapi','-radarr_api',
                                 '-snurl','-sonarr_url',
                                 '-snprt','-sonarr_port',
+                                '-snburl','-sonarr_base_url',
                                 '-snapi','-sonarr_api',
                                 #'-ldurl','-lidarr_url',
                                 #'-ldprt','-lidarr_port',
+                                #'-ldburl','-lidarr_base_url',
                                 #'-ldapi','-lidarr_api',
                                 #'-reurl','-readarr_url',
                                 #'-reprt','-readarr_port',
+                                #'-reburl','-readarr_base_url',
                                 #'-reapi','-readarr_api',
+                                '-a','-attrs','-attributes',
+                                '-d','-container',
+                                '-u','-config_updater',
+                                #'-rak','-remake-api-key',
                                 '-h','-help','-?','--h','--help','--?'
                                 ]
 
@@ -635,8 +554,6 @@ def parse_command_line_options(the_dict):
     #look for unknown command line options
     findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'],the_dict)
 
-    #cmdopt_dict['containerized']=cmdopt_dict['argv']['-container']
-    #cmdopt_dict['configUpdater']=cmdopt_dict['argv']['-config_updater']
 
     #look for -h or -help command line option
     if (cmdOption:=findCMDRequest(cmdopt_dict['argv'],'-help')):

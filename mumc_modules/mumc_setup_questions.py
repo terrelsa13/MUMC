@@ -106,6 +106,20 @@ def get_arr_port(arr,port):
 
 
 #base url?
+def get_arr_base_url(arr):
+    print('If you have not explicity changed this option in ' + arr + ', press enter for default.')
+    print('For example: http://example.com/<baseurl>')
+    base=input('Enter base url (default n/a): ')
+    if (base == ''):
+        return(base)
+    else:
+        if (base.find('/',0,1) == 0):
+            return(base[1:len(base)])
+        else:
+            return(base)
+
+
+#base url?
 def get_base(brand):
     defaultbase='emby'
     if (brand == defaultbase):

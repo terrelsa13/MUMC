@@ -71,13 +71,13 @@ def get_users_and_libraries(the_dict):
     the_dict['atleast_one_user_selected']=False
 
     #choose user and/or library selector types
-    if (the_dict['user_library_selection_type'] == 0):
+    if (the_dict['user_library_selection'] == 0):
         #select user and associate desired libraries to be monitored for each user
         the_dict=select_users_select_libraries(the_dict)
-    elif (the_dict['user_library_selection_type'] == 1):
+    elif (the_dict['user_library_selection'] == 1):
         #select user and automatically associate all libraries each user has access to
         the_dict=select_users_all_libraries(the_dict)
-    else: #(the_dict['user_library_selection_type'] == 2):
+    else: #(the_dict['user_library_selection'] == 2):
         #select libraries and automatically associate them to users that have access
         the_dict=all_users_select_libraries(the_dict)
 

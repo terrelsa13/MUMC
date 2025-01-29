@@ -10,7 +10,6 @@ from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 
 
 def cannotFindConfig(init_dict,cmdopt_dict):
-    #if (cmdopt_dict['containerized']):
     if (('-container' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-container'])):
         print_containerized_config_missing(init_dict)
         time.sleep(5)
@@ -56,7 +55,6 @@ def importConfig(init_dict,cmdopt_dict):
     try:
         #Attempt to import the alternate config file as cfg
         #Check for the .py extension and no spaces or periods in the module name
-        #if (cmdopt_dict['altConfigInfo']):
         if (cmdopt_dict['altConfigFileExt']):
             #Insert alternate config to path at the top of the path list so it can be searched and imported first
             #We want the alternate config path to be searched first incase the the alternate config is also named mumc_config.yaml
