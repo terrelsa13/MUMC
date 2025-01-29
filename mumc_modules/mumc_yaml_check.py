@@ -3040,6 +3040,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > url must be a string\n'
 
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','port')) == None)):
+        if (
+            not (isinstance(check,int) and (check >= 1) and (check <= 65535))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > port must be a integer\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','base_url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > base_url must be a string\n'
+
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','api_key')) == None)):
         if (
             not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
@@ -3060,6 +3072,18 @@ def cfgCheckYAML(cfg,init_dict):
             not (isinstance(check,str))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','port')) == None)):
+        if (
+            not (isinstance(check,int) and (check >= 1) and (check <= 65535))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > port must be a integer\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','base_url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > base_url must be a string\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','api_key')) == None)):
         if (
@@ -3082,6 +3106,18 @@ def cfgCheckYAML(cfg,init_dict):
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > url must be a string\n'
 
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','port')) == None)):
+        if (
+            not (isinstance(check,int) and (check >= 1) and (check <= 65535))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > port must be a integer\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','base_url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > base_url must be a string\n'
+
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','api_key')) == None)):
         if (
             not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
@@ -3102,6 +3138,18 @@ def cfgCheckYAML(cfg,init_dict):
             not (isinstance(check,str))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > url must be a string\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','port')) == None)):
+        if (
+            not (isinstance(check,int) and (check >= 1) and (check <= 65535))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > port must be a integer\n'
+
+    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','base_url')) == None)):
+        if (
+            not (isinstance(check,str))
+            ):
+            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > base_url must be a string\n'
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','api_key')) == None)):
         if (

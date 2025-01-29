@@ -163,6 +163,32 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['port'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
+                    config_data['admin_settings']['media_managers']['radarr']={}
+                config_data['admin_settings']['media_managers']['radarr']['port']=the_dict['admin_settings']['media_managers']['radarr']['port']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['port'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['base_url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
+                    config_data['admin_settings']['media_managers']['radarr']={}
+                config_data['admin_settings']['media_managers']['radarr']['base_url']=the_dict['admin_settings']['media_managers']['radarr']['base_url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['base_url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
             if (not (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
@@ -195,6 +221,32 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 config_data['admin_settings']['media_managers']['sonarr']['url']=the_dict['admin_settings']['media_managers']['sonarr']['url']
             #non-existant unchanged
             #else: #(the_dict['admin_settings']['media_managers']['sonarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['sonarr']['port'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
+                    config_data['admin_settings']['media_managers']['sonarr']={}
+                config_data['admin_settings']['media_managers']['sonarr']['port']=the_dict['admin_settings']['media_managers']['sonarr']['port']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['port'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['sonarr']['base_url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
+                    config_data['admin_settings']['media_managers']['sonarr']={}
+                config_data['admin_settings']['media_managers']['sonarr']['base_url']=the_dict['admin_settings']['media_managers']['sonarr']['base_url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['base_url'] == None):
                 #pass
         except:
             pass
@@ -237,6 +289,32 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['lidarr']['port'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
+                    config_data['admin_settings']['media_managers']['lidarr']={}
+                config_data['admin_settings']['media_managers']['lidarr']['port']=the_dict['admin_settings']['media_managers']['lidarr']['port']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['port'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['lidarr']['base_url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
+                    config_data['admin_settings']['media_managers']['lidarr']={}
+                config_data['admin_settings']['media_managers']['lidarr']['base_url']=the_dict['admin_settings']['media_managers']['lidarr']['base_url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['base_url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
             if (not (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
@@ -269,6 +347,32 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 config_data['admin_settings']['media_managers']['readarr']['url']=the_dict['admin_settings']['media_managers']['readarr']['url']
             #non-existant unchanged
             #else: #(the_dict['admin_settings']['media_managers']['readarr']['url'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['readarr']['port'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
+                    config_data['admin_settings']['media_managers']['readarr']={}
+                config_data['admin_settings']['media_managers']['readarr']['port']=the_dict['admin_settings']['media_managers']['readarr']['port']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['readarr']['port'] == None):
+                #pass
+        except:
+            pass
+        try:
+            #existed and unchanged, existed and unchanged, or non-existant and added
+            if (not (the_dict['admin_settings']['media_managers']['readarr']['base_url'] == None)):
+                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
+                    config_data['admin_settings']['media_managers']={}
+                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
+                    config_data['admin_settings']['media_managers']['readarr']={}
+                config_data['admin_settings']['media_managers']['readarr']['base_url']=the_dict['admin_settings']['media_managers']['readarr']['base_url']
+            #non-existant unchanged
+            #else: #(the_dict['admin_settings']['media_managers']['readarr']['base_url'] == None):
                 #pass
         except:
             pass

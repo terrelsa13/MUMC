@@ -1567,6 +1567,14 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
+        default_base['admin_settings']['media_managers']['radarr']['port']=merge['admin_settings']['media_managers']['radarr']['port']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['radarr']['base_url']=merge['admin_settings']['media_managers']['radarr']['base_url']
+    except:
+        pass
+    try:
         default_base['admin_settings']['media_managers']['radarr']['api_key']=merge['admin_settings']['media_managers']['radarr']['api_key']
     except:
         pass
@@ -1577,6 +1585,14 @@ def merge_configuration(default_base,merge):
         pass
     try:
         default_base['admin_settings']['media_managers']['sonarr']['url']=merge['admin_settings']['media_managers']['sonarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['sonarr']['port']=merge['admin_settings']['media_managers']['sonarr']['port']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['sonarr']['base_url']=merge['admin_settings']['media_managers']['sonarr']['base_url']
     except:
         pass
     try:
@@ -1593,6 +1609,14 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
+        default_base['admin_settings']['media_managers']['lidarr']['port']=merge['admin_settings']['media_managers']['lidarr']['port']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['lidarr']['base_url']=merge['admin_settings']['media_managers']['lidarr']['base_url']
+    except:
+        pass
+    try:
         default_base['admin_settings']['media_managers']['lidarr']['api_key']=merge['admin_settings']['media_managers']['lidarr']['api_key']
     except:
         pass
@@ -1603,6 +1627,14 @@ def merge_configuration(default_base,merge):
         pass
     try:
         default_base['admin_settings']['media_managers']['readarr']['url']=merge['admin_settings']['media_managers']['readarr']['url']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['readarr']['port']=merge['admin_settings']['media_managers']['readarr']['port']
+    except:
+        pass
+    try:
+        default_base['admin_settings']['media_managers']['readarr']['base_url']=merge['admin_settings']['media_managers']['readarr']['base_url']
     except:
         pass
     try:
