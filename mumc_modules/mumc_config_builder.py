@@ -288,10 +288,10 @@ def build_configuration_file(the_dict,orig_dict={}):
             #get *arr API key
             if ('-' + arr.casefold() + '_api' in the_dict['argv']):
                 #save *arr api command option
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=the_dict['argv']['-' + arr.casefold() + '_api']
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['api']=the_dict['argv']['-' + arr.casefold() + '_api']
             elif (not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))):
                 #save *arr manual apiinput
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=get_arr_api(arr)
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['api']=get_arr_api(arr)
 
         #Remove *arr_url, *arr_port, and *arr_api so they cannot be used later
         the_dict.pop(arr.casefold() + '_api')

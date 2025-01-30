@@ -189,14 +189,14 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None)):
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['api'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
                 if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
                     config_data['admin_settings']['media_managers']['radarr']={}
-                config_data['admin_settings']['media_managers']['radarr']['api_key']=the_dict['admin_settings']['media_managers']['radarr']['api_key']
+                config_data['admin_settings']['media_managers']['radarr']['api']=the_dict['admin_settings']['media_managers']['radarr']['api']
             #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None):
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api'] == None):
                 #pass
         except:
             pass
@@ -252,14 +252,14 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
+            if (not (the_dict['admin_settings']['media_managers']['sonarr']['api'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
                 if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
                     config_data['admin_settings']['media_managers']['sonarr']={}
-                config_data['admin_settings']['media_managers']['sonarr']['api_key']=the_dict['admin_settings']['media_managers']['sonarr']['api_key']
+                config_data['admin_settings']['media_managers']['sonarr']['api']=the_dict['admin_settings']['media_managers']['sonarr']['api']
             #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None):
+            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['api'] == None):
                 #pass
         except:
             pass
@@ -315,14 +315,14 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
+            if (not (the_dict['admin_settings']['media_managers']['lidarr']['api'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
                 if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
                     config_data['admin_settings']['media_managers']['lidarr']={}
-                config_data['admin_settings']['media_managers']['lidarr']['api_key']=the_dict['admin_settings']['media_managers']['lidarr']['api_key']
+                config_data['admin_settings']['media_managers']['lidarr']['api']=the_dict['admin_settings']['media_managers']['lidarr']['api']
             #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None):
+            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['api'] == None):
                 #pass
         except:
             pass
@@ -378,14 +378,14 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
+            if (not (the_dict['admin_settings']['media_managers']['readarr']['api'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
                 if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
                     config_data['admin_settings']['media_managers']['readarr']={}
-                config_data['admin_settings']['media_managers']['readarr']['api_key']=the_dict['admin_settings']['media_managers']['readarr']['api_key']
+                config_data['admin_settings']['media_managers']['readarr']['api']=the_dict['admin_settings']['media_managers']['readarr']['api']
             #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None):
+            #else: #(the_dict['admin_settings']['media_managers']['readarr']['api'] == None):
                 #pass
         except:
             pass
