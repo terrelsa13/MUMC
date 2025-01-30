@@ -492,7 +492,7 @@ def parse_command_line_options(the_dict):
     cmdopt_dict['argv']={}
     cmdopt_dict['envar']=the_dict['envar']
     #cmdopt_dict['containerized']=False
-    cmdopt_dict['moduleExtension']=['.yml','.yaml','.py']
+    cmdopt_dict['moduleExtension']=['.yaml','.yml','.py']
 
     cmdopt_dict['optionsList']=['-c','-config',
                                 '-brand','-server_brand',
@@ -569,11 +569,20 @@ def parse_command_line_options(the_dict):
 
     #if -config not input as a command line option or environmental variable
     #and we are running as a docker container
-    #then set the default config location: '/usr/src/app/config/mumc_config.yaml'
+    #then set the default config location: '/usr/src/app/config/mumc_config.yaml/.yml/.py'
+    #file_ext=None
     if ((not ('-config' in cmdopt_dict['argv'])) and
-       ('-container' in cmdopt_dict['argv']) and
-       (cmdopt_dict['argv']['-container'])):
-        cmdopt_dict['argv']['-config']='/usr/src/app/config/mumc_config.yaml'
+    ('-container' in cmdopt_dict['argv']) and
+    (cmdopt_dict['argv']['-container'])):
+        for ext in cmdopt_dict['moduleExtension']:
+            configStr='/usr/src/app/config/mumc_config' + ext
+            if(getFullPathName(configStr)):
+                cmdopt_dict['argv']['-config']=configStr
+                break
+
+    #if (file_ext == None):
+        #cmdopt_dict['argv']['-config']='/usr/src/app/config/mumc_config.yaml'
+        
 
     #look for -c or -attributesconfig command line option and argument
     if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):

@@ -322,7 +322,7 @@ def alt_config_file_does_not_exist_helper(argv,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='AlternateConfigNotFoundError: Alternate config path or file does not exist; check for typo, create config file, or move existing config to this location' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='\t-config: ' + argv['-config'] + '\n'
+    strings_list_to_print+='\t' + argv['-config'] + '\n'
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -370,15 +370,15 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
 
 
 #print unable to sucessfully load the Configuration file
-def print_failed_to_load_config(the_dict):
-    strings_list_to_print=''
-    strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    strings_list_to_print+='Config file missing or cannot find alternate Config file.' + '\n'
-    strings_list_to_print+='Or Config file missing \'DEBUG\' and/or \'version\' variables.' + '\n'
-    strings_list_to_print+='Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py' + '\n'
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
+#def print_failed_to_load_config(the_dict):
+    #strings_list_to_print=''
+    #strings_list_to_print+=the_dict['_console_separator'] + '\n'
+    #strings_list_to_print+='Config file missing or cannot find alternate Config file.' + '\n'
+    #strings_list_to_print+='Or Config file missing \'DEBUG\' and/or \'version\' variables.' + '\n'
+    #strings_list_to_print+='Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py' + '\n'
+    #strings_list_to_print+=the_dict['console_separator'] + '\n'
 
-    print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
+    #print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
 #print unable to sucessfully load the Configuration file
@@ -386,12 +386,9 @@ def print_containerized_config_missing(the_dict):
     strings_list_to_print=''
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+='Config file missing or not setup.' + '\n'
-    strings_list_to_print+='Config file should be located at /usr/src/app/config/mumc_config.yaml of the guest OS.' + '\n'
+    strings_list_to_print+='Config file should be located at ' + str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + ' of the guest OS.' + '\n'
     strings_list_to_print+='\n'
-    if ('-config' in the_dict['argv']):
-        strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c '+ the_dict['argv']['-config'] + '\n'
-    else:
-        strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c /usr/src/app/config/mumc_config.yaml' + '\n'
+    strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c '+ str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
