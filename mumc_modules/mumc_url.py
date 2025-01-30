@@ -59,10 +59,7 @@ def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorizatio
 
 
 def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
-    
-    print(str(token) + '\n')
-    print(str(the_dict['admin_settings']['media_managers']['radarr']['api']) + '\n')
-    print(str(keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api')) + '\n')
+
     if (not (token == None)):
         token=token
     elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api')) == None)):
