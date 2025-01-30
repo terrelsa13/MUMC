@@ -60,7 +60,7 @@ def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorizatio
 
 def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
     
-    print(token + '\n')
+    print(str(token) + '\n')
     print(the_dict['admin_settings']['media_managers']['radarr']['api_key'] + '\n')
     print(str(keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api_key') + '\n'))
 
