@@ -1,9 +1,10 @@
 import sys
-from mumc_modules.mumc_versions import get_semantic_version_parts
+from mumc_modules.mumc_versions import get_semantic_version_parts,checkSemanticVersion
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
+from mumc_modules.mumc_data_checks import data_checker
 
 
 def cfgCheckYAML_Version(cfg,init_dict):
@@ -13,19 +14,7 @@ def cfgCheckYAML_Version(cfg,init_dict):
                 '\n Please use a config with a version greater than or equal to: '\
                 + init_dict['min_config_version'] + ' or create a new config \n'
     else:
-        config_version=get_semantic_version_parts(cfg['version'])
-        min_config_version=get_semantic_version_parts(init_dict['min_config_version'])
-
-        config_version_ok=True
-
-        if (config_version['major'] < min_config_version['major']):
-            config_version_ok=False
-        else:
-            if (config_version['minor'] < min_config_version['minor']):
-                config_version_ok=False
-            else:
-                if (config_version['patch'] < min_config_version['patch']):
-                    config_version_ok=False
+        config_version_ok=checkSemanticVersion(cfg['version'],init_dict['min_config_version'])
 
     if (not (config_version_ok)):
         return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
@@ -35,7 +24,7 @@ def cfgCheckYAML_Version(cfg,init_dict):
         return ''
 
 #Check blacklist and whitelist config variables are as expected
-def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_list, config_var_name):
+def cfgCheckYAML_forLibraries(check_list, user_ids_check_list, user_names_check_list, config_var_name):
 
     error_found_in_mumc_config_yaml=''
 
@@ -45,7 +34,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             #Set user tracker to zero
             user_found=0
             #Check user from user_keys is also a user in this blacklist/whitelist
-            for user_check in user_id_check_list:
+            for user_check in user_ids_check_list:
                 if (user_check == check_irt['user_id']):
                     user_found+=1
             if (user_found == 0):
@@ -71,7 +60,7 @@ def cfgCheckYAML_forLibraries(check_list, user_id_check_list, user_name_check_li
             #Set user tracker to zero
             user_found=0
             #Check user from user_name is also a user in this blacklist/whitelist
-            for user_check in user_name_check_list:
+            for user_check in user_names_check_list:
                 if (user_check == check_irt['user_name']):
                     user_found+=1
             if (user_found == 0):
@@ -261,6 +250,9 @@ def cfgCheckYAML_isBehavioralTag(cfg,tag,media_type):
     return error_found_in_mumc_config_yaml
 
 
+#dictionary={'inputString':'some_string_here','cfgLocation':('tuple','of','config','locations'),'comparisonString':('some','stings','to','compare','to')}
+
+
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
 
@@ -272,14 +264,20 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','brand')) == None)):
+    cfgChecker=data_checker(cfg,init_dict)
+
+    server_brand='invalid'
+    if (not ((check:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
         server_brand=check
-        if (
-            not ((isinstance(check,str)) and
-            ((check.casefold() == 'emby') or (check.casefold() == 'jellyfin')))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
-            server_brand='invalid'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','brand')) == None)):
+        #server_brand=check
+        #if (
+            #not ((isinstance(check,str)) and
+            #((check.casefold() == 'emby') or (check.casefold() == 'jellyfin')))
+        #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > brand must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            #server_brand='invalid'
 
 #######################################################################################################
 
@@ -311,60 +309,117 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'version')) == None)):
+    errorFlag=True
+    if (not ((check:=cfgChecker.checkString('version',value=None,instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=None)) == None)):
         check_parts=get_semantic_version_parts(check)
-        if (
-            not ((isinstance(check,str)) and
-            (isinstance(check_parts['major'],int)) and
-            (isinstance(check_parts['minor'],int)) and
-            (isinstance(check_parts['patch'],int)) and
-            (isinstance(check_parts['release'],str)))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR.MINOR.PATCH (e.g. 1.22.333)'
+        if (not (cfgChecker.checkInteger(*(),value=check_parts['major'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+            if (not (cfgChecker.checkInteger(*(),value=check_parts['minor'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+                if (not (cfgChecker.checkInteger(*(),value=check_parts['patch'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+                    if (not (cfgChecker.checkString(*(),value=check_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
+                        errorFlag=False
+    if (errorFlag):
+        cfgChecker.setCustomErrorText('ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + get_script_version() +')')
+
+    #if (not ((check:=keys_exist_return_value(cfg,'version')) == None)):
+        #check_parts=get_semantic_version_parts(check)
+        #if (
+            #not ((isinstance(check,str)) and
+            #(isinstance(check_parts['major'],int)) and
+            #(isinstance(check_parts['minor'],int)) and
+            #(isinstance(check_parts['patch'],int)) and
+            #(isinstance(check_parts['release'],str)))
+        #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR.MINOR.PATCH (e.g. 1.22.333)'
 
 #######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','url')) == None)):
-        server_url=check
-        if (
-            not (isinstance(check,str))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > url must be a string\n'
+    cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+    #if (not (cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None)):
+        #pass
 
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','auth_key')) == None)):
-        server_auth_key=check
-        if (
-            not ((isinstance(check,str)) and (check.isalnum()))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > auth_key must be an alphanumeric string\n'
+    #if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','url')) == None)):
+        #server_url=check
+        #if (
+            #not (isinstance(check,str))
+        #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > url must be a string\n'
 
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','admin_id')) == None)):
-        server_admin_id=check
-        if (
-            not ((isinstance(check,str)) and (check.isalnum()))
-        ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > admin_id must be an alphanumeric string\n'
+    cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,minLength=32,maxLength=32,errOut=True,comparisonValues=None)
+    #if (not (cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,minLength=32,maxLength=32,errOut=True,comparisonValues=None) == None)):
+        #pass
+
+    #if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','auth_key')) == None)):
+        #server_auth_key=check
+        #if (
+            #not ((isinstance(check,str)) and (check.isalnum()))
+        #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > auth_key must be an alphanumeric string\n'
+
+    cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None
+    #if (not (cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None)):
+        #pass
+
+    #if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','admin_id')) == None)):
+        #server_admin_id=check
+        #if (
+            #not ((isinstance(check,str)) and (check.isalnum()))
+        #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > server > admin_id must be an alphanumeric string\n'
 
 #######################################################################################################
-    user_id_check_list=[]
+    user_ids_check_list=[]
+    user_names_check_list=[]
+    if (not ((userList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        for userInfo in userList:
+            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),value=None,instanceType=cfgChecker.dict,minLength=4,maxLength=4,errOut=True,comparisonValues=None)) == None)):
+                if (not ((user_id:=cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'user_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)) == None)):
+                    user_ids_check_list.append(user_id)
+                    if (not ((user_name:=cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'user_name',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        user_names_check_list.append(user_name)
+                        if (not ((userWhitelist:=cfgChecker.checkList('admin_settings','users',userList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+                            for userWhitelistInfo in userWhitelist:
+                                if (not ((userWhitelistInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                                    cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                    #cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkBoolean('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+                        if (not ((userblacklist:=cfgChecker.checkList('admin_settings','users',userList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+                            for userblacklistInfo in userblacklist:
+                                if (not ((userblacklistInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                                    cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                    #cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                    cfgChecker.checkBoolean('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+
+
+    '''
+    user_ids_check_list=[]
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_id')) == None)):
-        #user_id_check_list=[]
+        #user_ids_check_list=[]
         check_dict_user_name={}
         check=cfg['admin_settings']['users']
         for entry in check:
+            checkIndex=check.index(entry)
             for user_data in entry:
                 if (user_data == 'user_id'):
-                    user_id_check_list.append(entry[user_data])
-                    if (not ((temp_check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_name')) == None)):
-                        check_dict_user_name[entry[user_data]]=entry['user_name']
-        check_user_keys_length=len(user_id_check_list)
-        user_id_user_id_check_list=[]
+                    user_ids_check_list.append(entry[user_data])
+                    if (not ((name_check:=cfgChecker.checkString('admin_settings','users',checkIndex,'user_name',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    #if (not ((name_check:=keys_exist_return_value(cfg,'admin_settings','users',checkIndex,'user_name')) == None)):
+                        #check_dict_user_name[entry[user_data]]=entry['user_name']
+                        check_dict_user_name[entry[user_data]]=name_check
+        check_user_keys_length=len(user_ids_check_list)
+        user_id_user_ids_check_list=[]
         if (check_user_keys_length > 0):
-            for user_info in user_id_check_list:
-                user_id_user_id_check_list.append(user_info)
-                for check_irt in user_id_user_id_check_list:
+            for user_info in user_ids_check_list:
+                user_id_user_ids_check_list.append(user_info)
+                for check_irt in user_id_user_ids_check_list:
                     if (
-                        not ((isinstance(user_id_check_list,list)) and
+                        not ((isinstance(user_ids_check_list,list)) and
                             (isinstance(check_irt,str)) and
                             (len(check_irt) == 32) and
                             (str(check_irt).isalnum()))
@@ -373,7 +428,7 @@ def cfgCheckYAML(cfg,init_dict):
         else:
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users > user_id cannot be empty\n'
 
-    user_name_check_list=[]
+    user_names_check_list=[]
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users',0,'user_name')) == None)):
         check_list=[]
         check=cfg['admin_settings']['users']
@@ -385,8 +440,8 @@ def cfgCheckYAML(cfg,init_dict):
 
         if (check_user_names_length > 0):
             for user_info in check_list:
-                user_name_check_list.append(user_info)
-                for check_irt in user_name_check_list:
+                user_names_check_list.append(user_info)
+                for check_irt in user_names_check_list:
                     if (
                         not ((isinstance(check_list,list)) and
                             (isinstance(check_irt,str)))
@@ -394,74 +449,92 @@ def cfgCheckYAML(cfg,init_dict):
                         error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users > user_name there must be an entry for each monitored user\n\tEach user\'s name must be a string\n'
         else:
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users > user_name cannot be empty\n'
+    '''
+#######################################################################################################
+
+    cfgChecker.checkInteger('basic_settings','filter_statements','movie','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','movie','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','movie','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','movie','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('basic_settings','filter_statements','movie','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','condition_days')) == None)):
+        #if (
+            #not (isinstance(check,int) and
+                 #(check >= -1) and (check <= 730500))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count_equality')) == None)):
+        #if (
+            #not (isinstance(check,str) and
+                #((check == '>') or (check == '<') or
+                #(check == '>=') or (check == '<=') or
+                #(check == '==') or (check == 'not ==') or
+                #(check == 'not >') or (check == 'not <') or
+                #(check == 'not >=') or (check == 'not <=')))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count')) == None)):
+        #if (
+            #not (isinstance(check,int) and
+                 #(check >= 1) and (check <= 730500))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count must be an integer\n\tValid range 1 thru 730500\n'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','condition_days')) == None)):
+        #if (
+            #not (isinstance(check,int) and
+                 #(check >= -1) and (check <= 730500))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count_equality')) == None)):
+        #if (
+            #not (isinstance(check,str) and
+                #((check == '>') or (check == '<') or
+                #(check == '>=') or (check == '<=') or
+                #(check == '==') or (check == 'not ==') or
+                #(check == 'not >') or (check == 'not <') or
+                #(check == 'not >=') or (check == 'not <=')))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count')) == None)):
+        #if (
+            #not (isinstance(check,int) and
+                 #(check >= 0) and (check <= 730500))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count must be an integer\n\tValid range 0 thru 730500\n'
+
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','behavioral_control')) == None)):
+        #if (
+            #not (isinstance(check,bool) and
+                 #(check == True) or (check == False))
+            #):
+            #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
 
 #######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','condition_days')) == None)):
-        if (
-            not (isinstance(check,int) and
-                 (check >= -1) and (check <= 730500))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+    cfgChecker.checkInteger('basic_settings','filter_statements','episode','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','episode','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','episode','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','episode','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('basic_settings','filter_statements','episode','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count_equality')) == None)):
-        if (
-            not (isinstance(check,str) and
-                ((check == '>') or (check == '<') or
-                (check == '>=') or (check == '<=') or
-                (check == '==') or (check == 'not ==') or
-                (check == 'not >') or (check == 'not <') or
-                (check == 'not >=') or (check == 'not <=')))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
-
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','played','count')) == None)):
-        if (
-            not (isinstance(check,int) and
-                 (check >= 1) and (check <= 730500))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > played > count must be an integer\n\tValid range 1 thru 730500\n'
-
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','condition_days')) == None)):
-        if (
-            not (isinstance(check,int) and
-                 (check >= -1) and (check <= 730500))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > condition_days must be an integer\n\tValid range -1 thru 730500\n'
-
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count_equality')) == None)):
-        if (
-            not (isinstance(check,str) and
-                ((check == '>') or (check == '<') or
-                (check == '>=') or (check == '<=') or
-                (check == '==') or (check == 'not ==') or
-                (check == 'not >') or (check == 'not <') or
-                (check == 'not >=') or (check == 'not <=')))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count_equality must be a string\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n'
-
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','count')) == None)):
-        if (
-            not (isinstance(check,int) and
-                 (check >= 0) and (check <= 730500))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > count must be an integer\n\tValid range 0 thru 730500\n'
-
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','movie','created','behavioral_control')) == None)):
-        if (
-            not (isinstance(check,bool) and
-                 (check == True) or (check == False))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > movie > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
-
-#######################################################################################################
-
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
                  (check >= -1) and (check <= 730500))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > played > condition_days must be an integer\n\tValid range -1 thru 730500\n'
+
 
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','episode','played','count_equality')) == None)):
         if (
@@ -512,9 +585,19 @@ def cfgCheckYAML(cfg,init_dict):
                  (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > episode > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkInteger('basic_settings','filter_statements','audio','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','audio','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','audio','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkString('basic_settings','filter_statements','audio','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+    cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('basic_settings','filter_statements','audio','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','played','condition_days')) == None)):
         if (
             not (isinstance(check,int) and
@@ -560,7 +643,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audio','created','count')) == None)):
         if (
-            not (isinstance(check,int) and
+            not (isinstance(check,int) andhttps://www.w3schools.com/python/python_strings.asp
                  (check >= 0) and (check <= 730500))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > count must be an integer\n\tValid range 0 thru 730500\n'
@@ -571,11 +654,21 @@ def cfgCheckYAML(cfg,init_dict):
                  (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audio > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+        cfgChecker.checkString('basic_settings','filter_statements','audiobook','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+        cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+        cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+        cfgChecker.checkString('basic_settings','filter_statements','audiobook','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+        cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('basic_settings','filter_statements','audiobook','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_statements','audiobook','played','condition_days')) == None)):
             if (
                 not (isinstance(check,int) and
@@ -632,35 +725,101 @@ def cfgCheckYAML(cfg,init_dict):
                     (check == True) or (check == False))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_statements > audiobook > created > behavioral_control must be a boolean\n\tValid values are true or false\n'
+        '''
 
 #######################################################################################################
 
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','whitetags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
-                else:
-                    if (not (tag == None)):
-                        filter_movie_whitetag_set.add(tag)
+    storedFilterTags={}
+    storedFilterTags['movie']={}
+    storedFilterTags['episode']={}
+    storedFilterTags['audio']={}
+    if (isJellyfinServer(server_brand)):
+        storedFilterTags['audiobook']={}
+    storedFilterTags['movie']['whitetags']=[]
+    storedFilterTags['movie']['blacktags']=[]
+    storedFilterTags['episode']['whitetags']=[]
+    storedFilterTags['episode']['blacktags']=[]
+    storedFilterTags['audio']['whitetags']=[]
+    storedFilterTags['audio']['blacktags']=[]
+    if (isJellyfinServer(server_brand)):
+        storedFilterTags['audibook']['whitetags']=[]
+        storedFilterTags['audibook']['blacktags']=[]
 
-    if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','blacktags')) == None)):
-        if (isinstance(check,list)):
-            for tag in check:
-                if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
-                        (tag == None))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
-                else:
-                    if (not (tag == None)):
-                        filter_movie_blacktag_set.add(tag)
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','movie','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['movie']['whitetags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','movie','whitetags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','movie','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['movie']['blacktags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','movie','blacktags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','whitetags')) == None)):
+        #if (isinstance(check,list)):
+            #for tag in check:
+                #if (
+                    #not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        #(tag == None))
+                    #):
+                    #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                #else:
+                    #if (not (tag == None)):
+                        #filter_movie_whitetag_set.add(tag)
+
+    #if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','movie','blacktags')) == None)):
+        #if (isinstance(check,list)):
+            #for tag in check:
+                #if (
+                    #not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        #(tag == None))
+                    #):
+                    #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
+                #else:
+                    #if (not (tag == None)):
+                        #filter_movie_blacktag_set.add(tag)
 
 #######################################################################################################
 
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','episode','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['episode']['whitetags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','episode','whitetags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','episode','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['episode']['blacktags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','episode','blacktags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','episode','whitetags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -684,9 +843,35 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         filter_episode_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','audio','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['audio']['whitetags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','audio','whitetags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','audio','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        storedFilterTags['audio']['blacktags']=filterTagList
+        for tag in filterTagList:
+            cfgChecker.checkString('basic_settings','filter_tags','audio','blacktags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+            if (tagPartList:=get_isFilterStatementTag(tag)):
+                tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                if (tagType == 'created'):
+                    cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audio','whitetags')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -710,11 +895,37 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         filter_audio_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            storedFilterTags['audiobook']['whitetags']=filterTagList
+            for tag in filterTagList:
+                cfgChecker.checkString('basic_settings','filter_tags','audiobook','whitetags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                if (tagPartList:=get_isFilterStatementTag(tag)):
+                    tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                    cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                    if (tagType == 'created'):
+                        cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+        if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            storedFilterTags['audiobook']['blacktags']=filterTagList
+            for tag in filterTagList:
+                cfgChecker.checkString('basic_settings','filter_tags','audiobook','blacktags',filterTagList.index(tag),value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                if (tagPartList:=get_isFilterStatementTag(tag)):
+                    tagType=cfgChecker.checkString(*(),value=tagPartList[0],instanceType=cfgChecker.str,minLength=6,maxLength=7,errOut=True,comparisonValues=['played','created'])
+                    cfgChecker.checkInteger(*(),value=tagPartList[1],instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    cfgChecker.checkString(*(),value=tagPartList[2],instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    cfgChecker.checkInteger(*(),value=tagPartList[3],instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                    if (tagType == 'created'):
+                        cfgChecker.checkBoolean(*(),value=tagPartList[4],instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'basic_settings','filter_tags','audiobook','whitetags')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
@@ -738,9 +949,19 @@ def cfgCheckYAML(cfg,init_dict):
                     else:
                         if (not (tag == None)):
                             filter_audiobook_blacktag_set.add(tag)
+        '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','whitelisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','whitelisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','whitelisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','whitelisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','whitelisted','whitelisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+    
+
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','whitelisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -771,9 +992,17 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['movie']['query_filter']['whitelisted'].pop('whitelisted')
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','blacklisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','blacklisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','blacklisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','blacklisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','movie','query_filter','blacklisted','blacklisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','movie','query_filter','blacklisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -804,9 +1033,17 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > movie > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['movie']['query_filter']['blacklisted'].pop('blacklisted')
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','whitelisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','whitelisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','whitelisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','whitelisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','whitelisted','whitelisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','whitelisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -837,9 +1074,17 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  whitelisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['episode']['query_filter']['whitelisted'].pop('whitelisted')
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','blacklisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','blacklisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','blacklisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','blacklisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','episode','query_filter','blacklisted','blacklisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','episode','query_filter','blacklisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -870,9 +1115,17 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > episode > query_filter >  blacklisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['episode']['query_filter']['blacklisted'].pop('blacklisted')
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','whitelisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','whitelisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','whitelisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','whitelisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','whitelisted','whitelisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','whitelisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -903,9 +1156,17 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['audio']['query_filter']['whitelisted'].pop('whitelisted')
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','blacklisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','blacklisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','blacklisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','blacklisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+    #cfgChecker.checkBoolean('advanced_settings','filter_statements','audio','query_filter','blacklisted','blacklisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audio','query_filter','blacklisted','favorited')) == None)):
         if (
             not (isinstance(check,bool))
@@ -936,11 +1197,19 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audio > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
         else:
             cfg['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['audio']['query_filter']['blacklisted'].pop('blacklisted')
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+        #cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','whitelisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','whitelisted','favorited')) == None)):
             if (
                 not (isinstance(check,bool))
@@ -971,9 +1240,17 @@ def cfgCheckYAML(cfg,init_dict):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > whitelisted > played must be a boolean\n\tValid values are true or false\n'
             else:
                 cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted']['played']=cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['whitelisted'].pop('whitelisted')
+        '''
 
 #######################################################################################################
 
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','blacklisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','blacklisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','blacklisted','blacktagged',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','blacklisted','played',value=None,instanceType=cfgChecker.bool,errOut=True)
+        #cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','blacklisted','blacklisted',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','filter_statements','audiobook','query_filter','blacklisted','favorited')) == None)):
             if (
                 not (isinstance(check,bool))
@@ -1004,9 +1281,19 @@ def cfgCheckYAML(cfg,init_dict):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > filter_statements > audiobook > query_filter > blacklisted > played must be a boolean\n\tValid values are true or false\n'
             else:
                 cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted']['played']=cfg['advanced_settings']['filter_statements']['audiobook']['query_filter']['blacklisted'].pop('blacklisted')
+        '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','favorited','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','favorited','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','favorited','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','favorited','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','favorited','extra','library_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1060,9 +1347,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check >= 0) and (check <= 2)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > favorited > extra > library_genre must be an integer\n\tValid range 0 thru 2\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitetagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitetagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitetagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','whitetagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','whitetagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1102,9 +1397,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacktagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacktagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacktagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','blacktagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','blacktagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1144,9 +1447,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitelisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitelisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','whitelisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','whitelisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','whitelisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1186,9 +1497,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacklisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacklisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','movie','blacklisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','blacklisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','blacklisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','movie','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1228,9 +1547,23 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > movie > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','favorited','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','favorited','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','favorited','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','season_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','series_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','library_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','studio_network',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','studio_network_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1312,9 +1645,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check >= 0) and (check <= 2)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > favorited > advanced > studio_network_genre must be an integer\n\tValid range 0 thru 2\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitetagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitetagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitetagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','whitetagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','whitetagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1354,9 +1695,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacktagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacktagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacktagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','blacktagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','blacktagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1396,9 +1745,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitelisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitelisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','whitelisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','whitelisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','whitelisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1438,9 +1795,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacklisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacklisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','episode','blacklisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','blacklisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','blacklisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','episode','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1480,9 +1845,22 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > episode > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','favorited','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','favorited','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','favorited','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audio','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','extra','album_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','extra','library_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','extra','track_artist',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','favorited','extra','album_artist',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','favorited','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1557,9 +1935,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check >= 0) and (check <= 2)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > favorited > advanced > album_artist must be an integer\n\tValid range 0 thru 2\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitetagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitetagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitetagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','whitetagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audio','whitetagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitetagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1599,9 +1985,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacktagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacktagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacktagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','blacktagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audio','blacktagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacktagged','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1641,9 +2035,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitelisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitelisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','whitelisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','whitelisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audio','whitelisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','whitelisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1683,9 +2085,17 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacklisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacklisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+    cfgChecker.checkString('advanced_settings','behavioral_statements','audio','blacklisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+    cfgChecker.checkInteger('advanced_settings','behavioral_statements','audio','blacklisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+    cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audio','blacklisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audio','blacklisted','action')) == None)):
         if (
             not (isinstance(check,str) and
@@ -1725,11 +2135,24 @@ def cfgCheckYAML(cfg,init_dict):
                  ((check == True) or (check == False)))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audio > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','favorited','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','favorited','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','favorited','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','audiobook_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','library_genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','track_artist',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','album_artist',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','favorited','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1811,9 +2234,17 @@ def cfgCheckYAML(cfg,init_dict):
                     ((check >= 0) and (check <= 2)))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > favorited > advanced > library_author must be an integer\n\tValid range 0 thru 2\n'
+        '''
 
 #######################################################################################################
 
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitetagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitetagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitetagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','whitetagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','whitetagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitetagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1853,9 +2284,17 @@ def cfgCheckYAML(cfg,init_dict):
                     ((check == True) or (check == False)))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitetagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+        '''
 
 #######################################################################################################
 
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacktagged','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacktagged','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacktagged','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','blacktagged','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','blacktagged','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacktagged','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1902,9 +2341,17 @@ def cfgCheckYAML(cfg,init_dict):
                     ((check == True) or (check == False)))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacktagged > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+        '''
 
 #######################################################################################################
 
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitelisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitelisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','whitelisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','whitelisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','whitelisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','whitelisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1944,9 +2391,17 @@ def cfgCheckYAML(cfg,init_dict):
                     ((check == True) or (check == False)))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > whitelisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+        '''
 
 #######################################################################################################
 
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacklisted','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacklisted','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','blacklisted','played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all','any','all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','blacklisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','blacklisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_statements','audiobook','blacklisted','action')) == None)):
             if (
                 not (isinstance(check,str) and
@@ -1986,9 +2441,22 @@ def cfgCheckYAML(cfg,init_dict):
                     ((check == True) or (check == False)))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_statements > audiobook > blacklisted > dynamic_behavior must be an boolean\n\tValid values True or False\n'
+        '''
 
 #######################################################################################################
 
+    behavioral_tags=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+    for behavioral_tag in behavioral_tags:
+        cfgChecker.checkString(*(),value=behavioral_tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=storedFilterTags['movie']['whitetags'] + storedFilterTags['movie']['blacktags'])
+        behavioral_tag_contents=cfgChecker.checkDict(*(),value=behavioral_tags[behavioral_tag],instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=['action','user_conditional','played_conditional','action_conditional','action_control','dynamic_behavior','high_priority'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['action'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['user_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['played_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger(*(),value=behavioral_tag_contents['action_control'],instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['dynamic_behavior'],instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['high_priority'],instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','movie')) == None)):
         if (isinstance(check,dict)):
             for tag in check:
@@ -1998,9 +2466,22 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > movie > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
                     error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'movie')
+    '''
 
 #######################################################################################################
 
+    behavioral_tags=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+    for behavioral_tag in behavioral_tags:
+        cfgChecker.checkString(*(),value=behavioral_tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=storedFilterTags['episode']['whitetags'] + storedFilterTags['episode']['blacktags'])
+        behavioral_tag_contents=cfgChecker.checkDict(*(),value=behavioral_tags[behavioral_tag],instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=['action','user_conditional','played_conditional','action_conditional','action_control','dynamic_behavior','high_priority'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['action'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['user_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['played_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger(*(),value=behavioral_tag_contents['action_control'],instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['dynamic_behavior'],instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['high_priority'],instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','episode')) == None)):
         if (isinstance(check,dict)):
             for tag in check:
@@ -2010,9 +2491,22 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > episode > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
                     error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'episode')
+    '''
 
 #######################################################################################################
 
+    behavioral_tags=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+    for behavioral_tag in behavioral_tags:
+        cfgChecker.checkString(*(),value=behavioral_tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=storedFilterTags['audio']['whitetags'] + storedFilterTags['audio']['blacktags'])
+        behavioral_tag_contents=cfgChecker.checkDict(*(),value=behavioral_tags[behavioral_tag],instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=['action','user_conditional','played_conditional','action_conditional','action_control','dynamic_behavior','high_priority'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['action'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['user_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+        cfgChecker.checkString(*(),value=behavioral_tag_contents['played_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+        cfgChecker.checkInteger(*(),value=behavioral_tag_contents['action_control'],instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['dynamic_behavior'],instanceType=cfgChecker.bool,errOut=True)
+        cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['high_priority'],instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audio')) == None)):
         if (isinstance(check,dict)):
             for tag in check:
@@ -2022,11 +2516,24 @@ def cfgCheckYAML(cfg,init_dict):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audio > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
                     error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audio')
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        behavioral_tags=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        for behavioral_tag in behavioral_tags:
+            cfgChecker.checkString(*(),value=behavioral_tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=storedFilterTags['audiobook']['whitetags'] + storedFilterTags['audiobook']['blacktags'])
+            behavioral_tag_contents=cfgChecker.checkDict(*(),value=behavioral_tags[behavioral_tag],instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=['action','user_conditional','played_conditional','action_conditional','action_control','dynamic_behavior','high_priority'])
+            cfgChecker.checkString(*(),value=behavioral_tag_contents['action'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+            cfgChecker.checkString(*(),value=behavioral_tag_contents['user_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
+            cfgChecker.checkString(*(),value=behavioral_tag_contents['played_conditional'],instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+            cfgChecker.checkInteger(*(),value=behavioral_tag_contents['action_control'],instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=False,comparisonValues=None)
+            cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['dynamic_behavior'],instanceType=cfgChecker.bool,errOut=True)
+            cfgChecker.checkBoolean(*(),value=behavioral_tag_contents['high_priority'],instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags','audiobook')) == None)):
             if (isinstance(check,dict)):
                 for tag in check:
@@ -2036,9 +2543,17 @@ def cfgCheckYAML(cfg,init_dict):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                     else:
                         error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
+        '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','whitetags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_whitetag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','global')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2052,9 +2567,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_whitetag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','whitetags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_whitetag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','movie')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2068,9 +2591,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_whitetag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','whitetags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_whitetag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','episode')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2084,9 +2615,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_whitetag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','whitetags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_whitetag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','audio')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2100,11 +2639,19 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_whitetag_set.add(tag)
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        tags=cfgChecker.checkList('advanced_settings','whitetags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+        for tag in tags:
+            cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+            if ((tag.find('\\') < 0) or (tag == None)):
+                global_whitetag_set.add(tag)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','whitetags','audiobook')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
@@ -2118,9 +2665,17 @@ def cfgCheckYAML(cfg,init_dict):
                     else:
                         if (not (tag == None)):
                             global_whitetag_set.add(tag)
+        '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','blacktags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_blacktag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','global')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2134,9 +2689,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','blacktags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_blacktag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','movie')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2150,9 +2713,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','blacktags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_blacktag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','episode')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2166,9 +2737,17 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
+    tags=cfgChecker.checkList('advanced_settings','blacktags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+    for tag in tags:
+        cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+        if ((tag.find('\\') < 0) or (tag == None)):
+            global_blacktag_set.add(tag)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','audio')) == None)):
         if (isinstance(check,list)):
             for tag in check:
@@ -2182,11 +2761,19 @@ def cfgCheckYAML(cfg,init_dict):
                 else:
                     if (not (tag == None)):
                         global_blacktag_set.add(tag)
+    '''
 
 #######################################################################################################
 
     if (isJellyfinServer(server_brand)):
 
+        tags=cfgChecker.checkList('advanced_settings','blacktags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
+        for tag in tags:
+            cfgChecker.checkString(*(),value=tag,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+            if ((tag.find('\\') < 0) or (tag == None)):
+                global_blacktag_set.add(tag)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','blacktags','audiobook')) == None)):
             if (isinstance(check,list)):
                 for tag in check:
@@ -2200,25 +2787,37 @@ def cfgCheckYAML(cfg,init_dict):
                     else:
                         if (not (tag == None)):
                             global_blacktag_set.add(tag)
+        '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','delete_empty_folders','episode','season',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','delete_empty_folders','episode','season')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > season must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','delete_empty_folders','episode','series',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','delete_empty_folders','episode','series')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > delete_empty_folders > episode > series must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkInteger('advanced_settings','episode_control','minimum_episodes',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
@@ -2226,7 +2825,11 @@ def cfgCheckYAML(cfg,init_dict):
                 (check <= 730500))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > minimum_episodes must be an integer\n\tValid range 0 thru 730500\n'
+    '''
 
+    cfgChecker.checkInteger('advanced_settings','episode_control','minimum_played_episodes',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_played_episodes')) == None)):
         if (
             not ((isinstance(check,int)) and
@@ -2234,15 +2837,23 @@ def cfgCheckYAML(cfg,init_dict):
                 (check <= 730500))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > minimum_played_episodes must be an integer\n\tValid range 0 thru 730500\n'
+    '''
 
+    behavior_values_list=['maxplayed','maxplayedmaxplayed','minplayed','minplayedminplayed','maxunplayed','maxunplayedmaxunplayed','minunplayed','minunplayedminunplayed',
+                          'maxplayedmaxunplayed','minplayedminunplayed','maxplayedminunplayed','minplayedmaxunplayed','minunplayedminplayed','minunplayedmaxunplayed',
+                          'minunplayedmaxplayed','minplayedmaxplayed','maxunplayedminunplayed','maxunplayedminplayed','maxunplayedmaxplayed','maxplayedminplayed']
+
+    cfgChecker.checkString('advanced_settings','episode_control','minimum_episodes_behavior',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=user_ids_check_list + user_names_check_list + behavior_values_list)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','minimum_episodes_behavior')) == None)):
         
         check=check.casefold()
         users_name_users_id_match=False
-        for users_name in user_name_check_list:
+        for users_name in user_names_check_list:
             if (check == users_name.casefold()):
                 users_name_users_id_match=True
-        for users_id in user_id_check_list:
+        for users_id in user_ids_check_list:
             if (check == users_id.casefold()):
                 users_name_users_id_match=True
         if (users_name_users_id_match == False):
@@ -2272,351 +2883,549 @@ def cfgCheckYAML(cfg,init_dict):
                 (check == 'maxplayedminplayed')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > minimum_episodes_behavior must be a string\n\tValid values \'User Name\', \'User Id\', and combinations of \'Min/Max Played/Unplayed\'\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','episode_control','series_ended','delete_episodes',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','episode_control','series_ended','delete_episodes')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > episode_control > series_ended > delete_episodes must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','radarr','movie','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr > movie > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
+
+    cfgChecker.checkBoolean('advanced_settings','radarr','movie','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','radarr','movie','remove')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > radarr  > movie > remove must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','sonarr','series','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
+
+    cfgChecker.checkBoolean('advanced_settings','sonarr','series','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','series','remove')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > series > remove must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','sonarr','episode','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','sonarr','episode','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > sonarr > episode > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','lidarr','album','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
+
+    cfgChecker.checkBoolean('advanced_settings','lidarr','album','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','album','remove')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > album > remove must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','lidarr','track','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','lidarr','track','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > lidarr > track > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','readarr','book','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','unmonitor')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > unmonitor must be a boolean\n\tValid values are true or false\n'
+    '''
+
+    cfgChecker.checkBoolean('advanced_settings','readarr','book','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','readarr','book','remove')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > readarr > book > remove must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','movie',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','movie')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > movie must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','episode',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','episode')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > episode must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','audio',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audio')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > audio must be a boolean\n\tValid values are true or false\n'
+    '''
 
     if (isJellyfinServer(server_brand)):
+
+        cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','audiobook',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+        '''
         if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','trakt_fix','set_missing_last_played_date','audiobook')) == None)):
             if (
                 not ((isinstance(check,bool)) and
                     (check == True) or (check == False))
                 ):
                 error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > trakt_fix > set_missing_last_played_date > audiobook must be a boolean\n\tValid values are true or false\n'
+        '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','headers','script','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','script','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','script','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','script','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','script','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','user','show',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','user','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','user','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superuser, and subuser\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','user','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','user','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > user > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','summary','show',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','summary','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','summary','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, supersummary, and subsummary\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','headers','summary','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','headers','summary','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > headers > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','footers','script','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','footers','script','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','footers','script','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','footers','script','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','footers','script','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > footers > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','warnings','script','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','warnings','script','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','warnings','script','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','warnings','script','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','warnings','script','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > warnings > script > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','movie','delete','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > delete > movie > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','delete','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','delete','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','delete','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','delete','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','movie','keep','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > keep > movie > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','keep','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','keep','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','keep','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','keep','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','movie','post_processing','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > post_processing > movie > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','post_processing','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','post_processing','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','post_processing','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','post_processing','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','movie','summary','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > summary > movie > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')) == None)):
         if (
@@ -3021,7 +3830,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         
-        error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_id_check_list, user_name_check_list, 'admin_settings > users')
+        error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_ids_check_list, user_names_check_list, 'admin_settings > users')
         if (not (len(check) == check_user_keys_length)):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
 

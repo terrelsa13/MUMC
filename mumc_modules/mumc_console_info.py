@@ -21,8 +21,10 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
-    strings_list_to_print+='Python Version: ' + get_python_version() + '\n'
-    strings_list_to_print+='OS Info: ' + get_operating_system_info() + '\n'
+    #strings_list_to_print+='Python Version: ' + get_python_version() + '\n'
+    strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
+    #strings_list_to_print+='OS Info: ' + get_operating_system_info() + '\n'
+    strings_list_to_print+='OS Info: ' + the_dict['os_info'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])

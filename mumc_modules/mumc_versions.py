@@ -12,6 +12,11 @@ def get_min_config_version():
     return '5.0.0'
 
 
+#Get the min Python version
+def get_min_python_version():
+    return '3.10.0'
+
+
 #Get the current Emby/Jellyfin server version
 def get_server_version(the_dict):
 
@@ -80,3 +85,33 @@ def get_prerelease_semantic_version(version):
         return verPreRel[1]
     else:
         return "stable"
+
+
+def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
+    current_version=get_semantic_version_parts(currentVersion)
+    min_version=get_semantic_version_parts(minVersion)
+    if (not (maxVersion == None)):
+        max_version=get_semantic_version_parts(maxVersion)
+
+    version_ok=True
+
+    if (current_version['major'] < min_version['major']):
+        version_ok=False
+    else:
+        if (current_version['minor'] < min_version['minor']):
+            version_ok=False
+        else:
+            if (current_version['patch'] < min_version['patch']):
+                version_ok=False
+
+    if (not (maxVersion == None)):
+        if (current_version['major'] > min_version['major']):
+            version_ok=False
+        else:
+            if (current_version['minor'] > min_version['minor']):
+                version_ok=False
+            else:
+                if (current_version['patch'] >   min_version['patch']):
+                    version_ok=False
+
+    return version_ok

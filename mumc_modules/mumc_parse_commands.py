@@ -554,7 +554,6 @@ def parse_command_line_options(the_dict):
     #look for unknown command line options
     findUnknownCMDRequest(cmdopt_dict['argv'],cmdopt_dict['optionsList'],the_dict)
 
-
     #look for -h or -help command line option
     if (cmdOption:=findCMDRequest(cmdopt_dict['argv'],'-help')):
         if (cmdopt_dict['argv'][cmdOption]):
@@ -570,7 +569,6 @@ def parse_command_line_options(the_dict):
     #if -config not input as a command line option or environmental variable
     #and we are running as a docker container
     #then set the default config location: '/usr/src/app/config/mumc_config.yaml/.yml/.py'
-    #file_ext=None
     if ((not ('-config' in cmdopt_dict['argv'])) and
     ('-container' in cmdopt_dict['argv']) and
     (cmdopt_dict['argv']['-container'])):
@@ -579,10 +577,6 @@ def parse_command_line_options(the_dict):
             if(getFullPathName(configStr)):
                 cmdopt_dict['argv']['-config']=configStr
                 break
-
-    #if (file_ext == None):
-        #cmdopt_dict['argv']['-config']='/usr/src/app/config/mumc_config.yaml'
-        
 
     #look for -c or -attributesconfig command line option and argument
     if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
