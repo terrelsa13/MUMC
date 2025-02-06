@@ -3427,117 +3427,181 @@ def cfgCheckYAML(cfg,init_dict):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > summary > movie > show must be a boolean\n\tValid values are true or false\n'
     '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','summary','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','summary','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','movie','summary','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','movie','summary','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > movie > summary > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','episode','delete','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > delete > episode > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','delete','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','delete','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','delete','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','delete','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > delete > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','episode','keep','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > keep > episode > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','keep','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','keep','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','keep','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','keep','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > keep > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','post_processing','show',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > post_processing > episode > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','post_processing','formatting','font','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','post_processing','formatting','font','style',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','font','style')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > font > style must be a string\n\tValid values are bold, faint, italic, underline, slow blink, fast blink, swap, conceal, strikethrough, default, fraktur, double underline, reveal, frame, encircle, overline, ideogram underline, ideogram double underline, ideogram overline, ideogram double overline, ideogram stress mark, superscript, and subscript\n'
+    '''
 
+    cfgChecker.checkString('advanced_settings','console_controls','episode','post_processing','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','post_processing','formatting','background','color')) == None)):
         if (
             not ((isinstance(check,str) or (check == None) or (check == '')) and
                 (isinstance(init_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check),int) or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > episode > post_processing > formatting > background > color must be a string\n\tValid values are black, red, green, yellow, blue, magenta, cyan, white, default, bright black, bright red, bright green, bright yellow, bright blue, bright magenta, bright cyan, and bright white\n'
+    '''
 
+    cfgChecker.checkBoolean('advanced_settings','console_controls','episode','summary','show',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','show')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > console_controls > summary > episode > show must be a boolean\n\tValid values are true or false\n'
+    '''
 
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','console_controls','episode','summary','formatting','font','color')) == None)):
         if (
