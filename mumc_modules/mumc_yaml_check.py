@@ -1,5 +1,5 @@
 import sys
-from mumc_modules.mumc_versions import get_semantic_version_parts,cfgCheckYAML_Version,get_script_version
+from mumc_modules.mumc_versions import get_semantic_version_parts,checkYAMLVersion,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
@@ -59,7 +59,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    error_found_in_mumc_config_yaml+=cfgCheckYAML_Version(cfg,init_dict)
+    error_found_in_mumc_config_yaml+=checkYAMLVersion(cfg,init_dict)
 
 #######################################################################################################
 

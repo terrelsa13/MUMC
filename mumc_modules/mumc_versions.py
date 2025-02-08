@@ -117,7 +117,7 @@ def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
     return version_ok
 
 
-def cfgCheckYAML_Version(cfg,init_dict):
+def checkYAMLVersion(cfg,init_dict):
 
     if (cfg['version'] == ''):
         return 'ConfigVersionError: Config version is blank: \'\''\
