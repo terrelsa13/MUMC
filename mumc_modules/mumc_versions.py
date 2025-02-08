@@ -115,3 +115,20 @@ def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
                     version_ok=False
 
     return version_ok
+
+
+def cfgCheckYAML_Version(cfg,init_dict):
+
+    if (cfg['version'] == ''):
+        return 'ConfigVersionError: Config version is blank: \'\''\
+                '\n Please use a config with a version greater than or equal to: '\
+                + init_dict['min_config_version'] + ' or create a new config \n'
+    else:
+        config_version_ok=checkSemanticVersion(cfg['version'],init_dict['min_config_version'])
+
+    if (not (config_version_ok)):
+        return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
+                + init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
+                + init_dict['min_config_version'] + ' or create a new config \n'
+    else:
+        return ''

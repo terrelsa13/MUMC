@@ -1,256 +1,10 @@
 import sys
-from mumc_modules.mumc_versions import get_semantic_version_parts,checkSemanticVersion
+from mumc_modules.mumc_versions import get_semantic_version_parts,cfgCheckYAML_Version,get_script_version
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
 from mumc_modules.mumc_data_checks import data_checker
-
-
-def cfgCheckYAML_Version(cfg,init_dict):
-
-    if (cfg['version'] == ''):
-        return 'ConfigVersionError: Config version is blank: \'\''\
-                '\n Please use a config with a version greater than or equal to: '\
-                + init_dict['min_config_version'] + ' or create a new config \n'
-    else:
-        config_version_ok=checkSemanticVersion(cfg['version'],init_dict['min_config_version'])
-
-    if (not (config_version_ok)):
-        return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
-                + init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
-                + init_dict['min_config_version'] + ' or create a new config \n'
-    else:
-        return ''
-
-#Check blacklist and whitelist config variables are as expected
-def cfgCheckYAML_forLibraries(check_list, user_ids_check_list, user_names_check_list, config_var_name):
-
-    error_found_in_mumc_config_yaml=''
-
-    for check_irt in check_list:
-        #Check if user_id exists
-        if ('user_id' in check_irt):
-            #Set user tracker to zero
-            user_found=0
-            #Check user from user_keys is also a user in this blacklist/whitelist
-            for user_check in user_ids_check_list:
-                if (user_check == check_irt['user_id']):
-                    user_found+=1
-            if (user_found == 0):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' does not match any user from user_keys\n'
-            if (user_found > 1):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_id ' + check_irt['user_id'] + ' is seen more than once\n'
-            #Check user_id is string
-            if (not (isinstance(check_irt['user_id'], str))):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_id is not a string or is not a list for at least one user\n'
-            else:
-                #Check user_id is 32 character long alphanumeric
-                if (not (
-                    (check_irt['user_id'].isalnum()) and
-                    (len(check_irt['user_id']) == 32)
-                )):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' + at least one user_id is not a 32-character alphanumeric string\n'
-        else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_id key is missing for at least one user\n'
-
-
-        #Check if user_name exists
-        if ('user_name' in check_irt):
-            #Set user tracker to zero
-            user_found=0
-            #Check user from user_name is also a user in this blacklist/whitelist
-            for user_check in user_names_check_list:
-                if (user_check == check_irt['user_name']):
-                    user_found+=1
-            if (user_found == 0):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' does not match any user from user_keys\n'
-            if (user_found > 1):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user_name ' + check_irt['user_name'] + ' is seen more than once\n'
-            #Check user_name is string
-            if (not (isinstance(check_irt['user_name'], str))):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the user_name is not a string or is not a list for at least one user\n'
-        else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_name is missing for at least one user\n'
-
-        #Check if whitelist exists
-        if ('whitelist' in check_irt):
-            #Check whitelist is string
-            if (not (isinstance(check_irt['whitelist'], list))):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the whitelist is not a string or is not a list for at least one user\n'
-        else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > whitelist is missing for at least one user\n'
-
-        #Check if blacklist exists
-        if ('blacklist' in check_irt):
-            #Check blacklist is string
-            if (not (isinstance(check_irt['blacklist'], list))):
-                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' the blacklist is not a string or is not a list for at least one user\n'
-        else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
-
-        #Get number of elements
-        for user_elements in check_irt:
-            #Ignore user_id and user_name
-            #Check whitelist and blacklist only if they are not empty lists
-            if (((not (user_elements == 'user_id')) and (not (user_elements == 'user_name'))) and (((user_elements == 'whitelist') or (user_elements == 'blacklist')) and check_irt[user_elements])):
-                #Set library key trackers to zero
-                lib_id_found=0
-                collection_type_found=0
-                path_found=0
-                network_path_found=0
-                subfolder_id_found=0
-                lib_enabled_found=0
-                #Check if this num_element exists before proceeding
-                if (user_elements in check_irt):
-                    for libinfo in check_irt[user_elements]:
-                        if ('lib_id' in libinfo):
-                            lib_id_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['lib_id']
-                            #Check lib_id is alphanumeric string
-                            if (not (isinstance(check_item,str) and (check_item.isalpha() or check_item.isalnum() or check_item.isnumeric()))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > lib_id: ' + str(check_item) + ' is not an expected string value\n'
-
-                        if ('collection_type' in libinfo):
-                            collection_type_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['collection_type']
-                            #Check collection_type is string
-                            if (not (isinstance(check_item,str) or (check_item == ''))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > collection_type: ' + str(check_item) + ' is not an expected string value\n'
-
-                        if ('path' in libinfo):
-                            path_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['path']
-                            #Check path is string; checking for backslashes does not work for windows
-                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
-                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
-
-                        if ('network_path' in libinfo):
-                            network_path_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['network_path']
-                            #Check network_path is string; checking for backslashes does not work for windows
-                            #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
-                            if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
-
-                        if ('subfolder_id' in libinfo):
-                            subfolder_id_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['subfolder_id']
-                            #Check subfolder_id is alphanumeric string
-                            if (not ((check_item == None) or (isinstance(check_item,str) and (check_item.isalpha() or check_item.isalnum() or check_item.isnumeric())))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > subfolder_id: ' + str(check_item) + ' is not an expected string value. Try adding quotes: \'' + str(check_item) + '\' or null if Jellyfin\n'
-
-                        if ('lib_enabled' in libinfo):
-                            lib_enabled_found += 1
-                            check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['lib_enabled']
-                            #Check lib_enabled is boolean
-                            if (not (isinstance(check_item,bool))):
-                                error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > enabled: ' + str(check_item) + ' is not an expected boolean value\n'
-
-                    if (lib_id_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_id is missing\n'
-
-                    if (collection_type_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key collection_type is missing\n'
-
-                    if (network_path_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key network_path is missing\n'
-
-                    if (path_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key path is missing\n'
-
-                    if (subfolder_id_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key subfolder_id is missing\n'
-
-                    if (lib_enabled_found == 0):
-                        error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' for user ' + check_irt['user_id'] + ' key lib_enabled is missing\n'
-
-                else:
-                    error_found_in_mumc_config_yaml+='ConfigValueError: ' + config_var_name + ' user ' + check_irt['user_id'] + ' key'+ str(user_elements) +' does not exist\n'
-    return(error_found_in_mumc_config_yaml)
-
-
-#Check filter_tags are formatted as expected
-def cfgCheckYAML_isFilterTag(tag,tag_list):
-    
-    no_error_found=True
-    
-    if (
-        not (isinstance(tag,str) and isinstance(tag_list,list) and
-            (isinstance(tag_list[0],str) and ((tag_list[0] == 'played') or (tag_list[0] == 'created')) and
-                isinstance(tag_list[1],int) and ((tag_list[1] >= -1) and (tag_list[1] <= 730500)) and
-                isinstance(tag_list[2],str) and
-                ((tag_list[2] == '>') or (tag_list[2] == '<') or
-                (tag_list[2] == '>=') or (tag_list[2] == '<=') or
-                (tag_list[2] == '==') or (tag_list[2] == 'not ==') or
-                (tag_list[2] == 'not >') or (tag_list[2] == 'not <') or
-                (tag_list[2] == 'not >=') or (tag_list[2] == 'not <=')) and
-                isinstance(tag_list[3],int) and ((tag_list[3] >= -1) and (tag_list[3] <= 730500)) and
-                ((tag_list[0] == 'played') or ((tag_list[0] == 'created') and isinstance(tag_list[4],bool) and ((tag_list[4] == True) or (tag_list[4] == False)))))
-            )
-        ):
-        no_error_found=False
-
-    return no_error_found
-
-
-#Check behavioral_tags config variables are as expected
-def cfgCheckYAML_isBehavioralTag(cfg,tag,media_type):
-    
-    error_found_in_mumc_config_yaml=''
-
-    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action')) == None)):
-        if (
-            not (isinstance(check,str) and
-                ((check.casefold() == 'delete') or (check.casefold() == 'keep')))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action must be a string\n\tValid values \'delete\' and \'keep\'\n'
-        else:
-            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'user_conditional')) == None)):
-                if (
-                    not (isinstance(check,str) and
-                        (check.casefold() == 'all'))
-                    ):
-                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > user_conditional must be a string\n\tValid values \'any\' and \'all\'\n'
-                else:
-                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'played_conditional')) == None)):
-                        if (
-                            not (isinstance(check,str) and
-                                ((check.casefold() == 'all') or (check.casefold() == 'any') or #legacy values
-                                (check.casefold() == 'all_all') or (check.casefold() == 'any_any') or
-                                (check.casefold() == 'any_all') or (check.casefold() == 'all_any') or
-                                (check.casefold() == 'any_played') or (check.casefold() == 'all_played') or
-                                (check.casefold() == 'any_created') or (check.casefold() == 'all_created') or
-                                (check.casefold() == 'ignore')))
-                            ):
-                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > played_conditional must be a string\n\tValid values \'any_any\', \'all_all\', \'any_all\', \'all_any\', \'any_played\', \'all_played\', \'any_created\', and \'all_created\'\n'
-                        else:
-                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'action_control')) == None)):
-                                if (
-                                    not (isinstance(check,int) and
-                                        ((check >= 0) and (check <= 8)))
-                                    ):
-                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > action_control must be an integer\n\tValid range 0 thru 8\n'
-                                else:
-                                    if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'dynamic_behavior')) == None)):
-                                        if (
-                                            not (isinstance(check,bool) and
-                                                ((check == True) or (check == False)))
-                                            ):
-                                            error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > dynamic_behavior must be an boolean\n\tValid values True or False\n'
-                                        else:
-                                            if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','behavioral_tags',media_type,tag,'high_priority')) == None)):
-                                                if (
-                                                    not (isinstance(check,bool) and
-                                                        ((check == True) or (check == False)))
-                                                    ):
-                                                    error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > high_priority must be an boolean\n\tValid values True or False\n'
-
-    return error_found_in_mumc_config_yaml
-
-
-#dictionary={'inputString':'some_string_here','cfgLocation':('tuple','of','config','locations'),'comparisonString':('some','stings','to','compare','to')}
 
 
 #Check select config variables are as expected
@@ -267,7 +21,7 @@ def cfgCheckYAML(cfg,init_dict):
     cfgChecker=data_checker(cfg,init_dict)
 
     server_brand='invalid'
-    if (not ((check:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+    if (not ((check:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['emby','jellyfin'])) == None)):
         server_brand=check
 
     #if (not ((check:=keys_exist_return_value(cfg,'admin_settings','server','brand')) == None)):
@@ -773,7 +527,7 @@ def cfgCheckYAML(cfg,init_dict):
         #if (isinstance(check,list)):
             #for tag in check:
                 #if (
-                    #not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    #not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         #(tag == None))
                     #):
                     #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -785,7 +539,7 @@ def cfgCheckYAML(cfg,init_dict):
         #if (isinstance(check,list)):
             #for tag in check:
                 #if (
-                    #not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    #not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         #(tag == None))
                     #):
                     #error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > movie > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -824,7 +578,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -836,7 +590,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > episode > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -876,7 +630,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -888,7 +642,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (tag == None))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audio > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -930,7 +684,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                             (tag == None))
                         ):
                         error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > white_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -942,7 +696,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                             (tag == None))
                         ):
                         error_found_in_mumc_config_yaml+='ConfigValueError: basic_settings > filter_tags > audiobook > black_tags > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
@@ -2461,11 +2215,11 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,dict)):
             for tag in check:
                 if (
-                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    not (data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > movie > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
-                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'movie')
+                    error_found_in_mumc_config_yaml+=data_checker.cfgCheckYAML_isBehavioralTag(cfg,tag,'movie')
     '''
 
 #######################################################################################################
@@ -2486,11 +2240,11 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,dict)):
             for tag in check:
                 if (
-                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    not (data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > episode > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
-                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'episode')
+                    error_found_in_mumc_config_yaml+=data_checker.cfgCheckYAML_isBehavioralTag(cfg,tag,'episode')
     '''
 
 #######################################################################################################
@@ -2511,11 +2265,11 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,dict)):
             for tag in check:
                 if (
-                    not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                    not (data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
                     ):
                     error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audio > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                 else:
-                    error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audio')
+                    error_found_in_mumc_config_yaml+=data_checker.cfgCheckYAML_isBehavioralTag(cfg,tag,'audio')
     '''
 
 #######################################################################################################
@@ -2538,11 +2292,11 @@ def cfgCheckYAML(cfg,init_dict):
             if (isinstance(check,dict)):
                 for tag in check:
                     if (
-                        not (cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
+                        not (data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag)))
                         ):
                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + tag + ' is either formatted incorrectly or has invalid value(s)\n\tValid formatting and values can be found here: ' + filter_tag_formatting_value_url + '\n'
                     else:
-                        error_found_in_mumc_config_yaml+=cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
+                        error_found_in_mumc_config_yaml+=data_checker.cfgCheckYAML_isBehavioralTag(cfg,tag,'audiobook')
         '''
 
 #######################################################################################################
@@ -2558,7 +2312,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2582,7 +2336,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2606,7 +2360,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2630,7 +2384,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2656,7 +2410,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                             (((isinstance(tag,str)) and
                             (tag.find('\\') < 0)) or
                             (tag == None)))
@@ -2680,7 +2434,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2704,7 +2458,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2728,7 +2482,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2752,7 +2506,7 @@ def cfgCheckYAML(cfg,init_dict):
         if (isinstance(check,list)):
             for tag in check:
                 if (
-                    not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                    not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                         (((isinstance(tag,str)) and
                         (tag.find('\\') < 0)) or
                         (tag == None)))
@@ -2778,7 +2532,7 @@ def cfgCheckYAML(cfg,init_dict):
             if (isinstance(check,list)):
                 for tag in check:
                     if (
-                        not ((cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
+                        not ((data_checker.cfgCheckYAML_isFilterTag(tag,get_isFilterStatementTag(tag))) or
                             (((isinstance(tag,str)) and
                             (tag.find('\\') < 0)) or
                             (tag == None)))
@@ -3991,87 +3745,125 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    print(str(cfgChecker.errorString))
+    cfgChecker.checkBoolean('advanced_settings','UPDATE_CONFIG',value=None,instanceType=cfgChecker.bool,errOut=True)
 
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','UPDATE_CONFIG')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > UPDATE_CONFIG must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('advanced_settings','REMOVE_FILES',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','REMOVE_FILES')) == None)):
         if (
             not ((isinstance(check,bool)) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > REMOVE_FILES must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
+    cfgChecker.checkString('admin_settings','behavior','list',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['whitelist','blacklist'])
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','list')) == None)):
         if (
             not ((isinstance(check,str)) and
                 (check.casefold() == 'whitelist') or (check.casefold() == 'blacklist'))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > list must be a string\n\tValid values are whitelist or blacklist\n'
+    '''
 
+    cfgChecker.checkString('admin_settings','behavior','matching',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['byid','bypath','bynetworkpath'])
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','matching')) == None)):
         if (
             not ((isinstance(check,str)) and
                 (check.casefold() == 'byid') or (check.casefold() == 'bypath') or (check.casefold() == 'bynetworkpath'))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > matching must be a string\n\tValid values are whitelist or blacklist\n'
+    '''
 
+    cfgChecker.checkBoolean('admin_settings','behavior','users','monitor_disabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','behavior','users','monitor_disabled')) == None)):
         if (
             not (isinstance(check,bool) and
                  (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > behavior > user > monitor_disabled must be a boolean\n\tValid values are true or false\n'
+    '''
 
 #######################################################################################################
 
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         
-        error_found_in_mumc_config_yaml+=cfgCheckYAML_forLibraries(check, user_ids_check_list, user_names_check_list, 'admin_settings > users')
-        if (not (len(check) == check_user_keys_length)):
+        error_found_in_mumc_config_yaml+=cfgChecker.cfgCheckYAML_forLibraries(check, user_ids_check_list, user_names_check_list, 'admin_settings > users')
+        if (not (len(check) == len(user_ids_check_list))):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
 
 #######################################################################################################
 
+    cfgChecker.checkBoolean('admin_settings','media_managers','radarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+    ''''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','enabled')) == None)):
         if (
             not (isinstance(check,bool) and
                 (check == True) or (check == False))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > enabled must be a boolean\n\tValid values True or False\n'
+    '''
 
+    cfgChecker.checkString('admin_settings','media_managers','radarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','url')) == None)):
         if (
             not (isinstance(check,str))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > url must be a string\n'
+    '''
 
+    cfgChecker.checkInteger('admin_settings','media_managers','radarr','port',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=65535,errOut=False,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','port')) == None)):
         if (
             not (isinstance(check,int) and (check >= 1) and (check <= 65535))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > port must be a integer\n'
+    '''
 
+    cfgChecker.checkString('admin_settings','media_managers','radarr','base_url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','base_url')) == None)):
         if (
             not (isinstance(check,str))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > base_url must be a string\n'
+    '''
 
+    cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+
+    '''
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','radarr','api_key')) == None)):
         if (
             not (isinstance(check,str) and (check.isalnum() or (check == None) or (check == '')))
             ):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > radarr > api_key must be an alphanumeric string\n'
+    '''
 
 #######################################################################################################
 
