@@ -104,15 +104,15 @@ class data_checker:
     def setErrorText(self,type,comparisonValues=None,minValue=None,maxValue=None,*cfgLocationTuple):
         self.wasErrorFlag=True
         if (not (comparisonValues == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + 'or is missing\n\tValid values are ' + ', '.join(str(element) for element in comparisonValues) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + ', '.join(str(element) for element in comparisonValues) + '\n'
         elif (not (minValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + 'or is missing\n\tValid values are ' + str(minValue) + ' thru 730500\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru 730500\n'
         elif (not (maxValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + 'or is missing\n\tValid values are -730500 thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are -730500 thru ' + str(maxValue) + '\n'
         elif ((not (minValue == None)) and (not (maxValue == None))):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + 'or is missing\n\tValid values are ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
         else:
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + 'or is missing\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n'
 
 
     def setCustomErrorText(self,customErrText):

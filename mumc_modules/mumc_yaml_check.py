@@ -3991,6 +3991,8 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    print(str(cfgChecker.errorString))
+
     if (not ((check:=keys_exist_return_value(cfg,'advanced_settings','UPDATE_CONFIG')) == None)):
         if (
             not ((isinstance(check,bool)) and
