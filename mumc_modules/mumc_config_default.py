@@ -1575,7 +1575,7 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
-        default_base['admin_settings']['media_managers']['radarr']['api']=merge['admin_settings']['media_managers']['radarr']['api']
+        default_base['admin_settings']['media_managers']['radarr']['api_key']=merge['admin_settings']['media_managers']['radarr']['api_key']
     except:
         pass
 

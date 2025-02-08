@@ -589,7 +589,7 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['media_managers']['radarr']['url']=None
     config_data['admin_settings']['media_managers']['radarr']['port']=None
     config_data['admin_settings']['media_managers']['radarr']['base_url']=None
-    config_data['admin_settings']['media_managers']['radarr']['api']=None
+    config_data['admin_settings']['media_managers']['radarr']['api_key']=None
 
     config_data['admin_settings']['media_managers']['sonarr']['enabled']=True
     config_data['admin_settings']['media_managers']['sonarr']['url']=None

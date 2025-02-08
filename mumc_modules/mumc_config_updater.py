@@ -189,14 +189,14 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             pass
         try:
             #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['radarr']['api'] == None)):
+            if (not (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None)):
                 if (not (keys_exist(config_data,'admin_settings','media_managers'))):
                     config_data['admin_settings']['media_managers']={}
                 if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
                     config_data['admin_settings']['media_managers']['radarr']={}
-                config_data['admin_settings']['media_managers']['radarr']['api']=the_dict['admin_settings']['media_managers']['radarr']['api']
+                config_data['admin_settings']['media_managers']['radarr']['api_key']=the_dict['admin_settings']['media_managers']['radarr']['api_key']
             #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api'] == None):
+            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None):
                 #pass
         except:
             pass
