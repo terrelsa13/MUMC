@@ -120,15 +120,15 @@ class data_checker:
     def setErrorText(self,type,comparisonValues=None,minValue=None,maxValue=None,*cfgLocationTuple):
         self.wasErrorFlag=True
         if (not (comparisonValues == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + ', '.join(str(element) for element in comparisonValues) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + ', '.join(str(element) for element in comparisonValues) + '\n'
         elif (not (minValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru 730500\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru 730500\n'
         elif (not (maxValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are -730500 thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are -730500 thru ' + str(maxValue) + '\n'
         elif ((not (minValue == None)) and (not (maxValue == None))):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
         else:
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a ' + type + ' or is missing\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n'
 
 
     def setCustomErrorText(self,customErrText):
@@ -136,13 +136,11 @@ class data_checker:
         self.errorString+=customErrText
 
 
-    def checkBoolean(self,*cfgLocationTuple,value=None,instanceType=None,required=False,errOut=True):
+    def checkBoolean(self,*cfgLocationTuple,value=None,instanceType=None,required=False,caseSensitive=False,errOut=True):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
 
         if (not (value == None)):
-            if ((not (cfgLocationTuple == ())) and ((value:=self.getValue(*cfgLocationTuple)) == None)):
-                isError=True
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
         elif (required):
@@ -157,13 +155,14 @@ class data_checker:
 
 
     #value=value.casefold()
-    def checkString(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
+    def checkString(self,*cfgLocationTuple,value=None,instanceType=None,required=False,caseSensitive=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
+
+        if ((not (caseSensitive)) and (not (value == None))):
+            value=value.casefold()
 
         if (not (value == None)):
-            if ((not (cfgLocationTuple == ())) and ((value:=self.getValue(*cfgLocationTuple)) == None)):
-                isError=True
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
             if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
@@ -185,11 +184,9 @@ class data_checker:
 
     def checkInteger(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minValue=None,maxValue=None,errOut=True,comparisonValues=None):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
 
         if (not (value == None)):
-            if ((not (cfgLocationTuple == ())) and ((value:=self.getValue(*cfgLocationTuple)) == None)):
-                isError=True
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
             if ((not (value == None)) and (not (minValue == None)) and (not (self.compareMinValue(value,minValue)))):
@@ -209,9 +206,12 @@ class data_checker:
             return value
 
 
-    def checkAlphaNumeric(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
+    def checkAlphaNumeric(self,*cfgLocationTuple,value=None,instanceType=None,required=False,caseSensitive=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
+
+        if ((not (caseSensitive)) and (not (value == None))):
+            value=value.casefold()
 
         if (not (value == None)):
             if ((self.checkString(*(),value=value,instanceType=instanceType,minLength=minLength,maxLength=maxLength,errOut=False,comparisonValues=comparisonValues)) == None):
@@ -231,11 +231,9 @@ class data_checker:
 
     def checkList(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
 
         if (not (value == None)):
-            if ((not (cfgLocationTuple == ())) and ((value:=self.getValue(*cfgLocationTuple)) == None)):
-                isError=True
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
             if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
@@ -261,11 +259,9 @@ class data_checker:
 
     def checkDict(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
         isError=False
-        value=self.whichValue(self,*cfgLocationTuple,value)
+        value=self.whichValue(*cfgLocationTuple,value=value)
 
         if (not (value == None)):
-            if ((not (cfgLocationTuple == ())) and ((value:=self.getValue(*cfgLocationTuple)) == None)):
-                isError=True
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
             if ((not (minLength == None)) and (not (self.compareMinLength(value,minLength))) and (not (value == None))):

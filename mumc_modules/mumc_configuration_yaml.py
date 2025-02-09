@@ -595,19 +595,19 @@ def yaml_configurationLayout(config_data,server_brand):
     config_data['admin_settings']['media_managers']['sonarr']['url']=None
     config_data['admin_settings']['media_managers']['sonarr']['port']=None
     config_data['admin_settings']['media_managers']['sonarr']['base_url']=None
-    config_data['admin_settings']['media_managers']['sonarr']['api']=None
+    config_data['admin_settings']['media_managers']['sonarr']['api_key']=None
 
     #config_data['admin_settings']['media_managers']['lidarr']['enabled']=True
     #config_data['admin_settings']['media_managers']['lidarr']['url']=None
     #config_data['admin_settings']['media_managers']['lidarr']['port']=None
     #config_data['admin_settings']['media_managers']['lidarr']['base_url']=None
-    #config_data['admin_settings']['media_managers']['lidarr']['api']=None
+    #config_data['admin_settings']['media_managers']['lidarr']['api_key']=None
     
     #config_data['admin_settings']['media_managers']['readarr']['enabled']=True
     #config_data['admin_settings']['media_managers']['readarr']['url']=None
     #config_data['admin_settings']['media_managers']['readarr']['port']=None
     #config_data['admin_settings']['media_managers']['readarr']['base_url']=None
-    #config_data['admin_settings']['media_managers']['readarr']['api']=None
+    #config_data['admin_settings']['media_managers']['readarr']['api_key']=None
 
     config_data['admin_settings']['api_controls']['attempts']=4
     config_data['admin_settings']['api_controls']['item_limit']=25

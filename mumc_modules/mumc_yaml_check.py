@@ -10,98 +10,204 @@ from mumc_modules.mumc_data_checks import data_checker
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
 
-    #TODO: find clean way to put cfg.variable_names in a dict/list/etc... and use the dict/list/etc... to call the varibles by name in a for loop
-
     #Start as blank error string
     error_found_in_mumc_config_yaml=''
-    filter_tag_formatting_value_url=''
 
 #######################################################################################################
 
     cfgChecker=data_checker(cfg,init_dict)
 
-    server_brand='invalid'
-    if (not ((check:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['emby','jellyfin'])) == None)):
-        server_brand=check
-
-#######################################################################################################
-
-    #sets of tags for user later
-    filter_movie_whitetag_set=set()
-    filter_movie_blacktag_set=set()
-    filter_episode_whitetag_set=set()
-    filter_episode_blacktag_set=set()
-    filter_audio_whitetag_set=set()
-    filter_audio_blacktag_set=set()
-    if (isJellyfinServer(server_brand)):
-        filter_audiobook_whitetag_set=set()
-        filter_audiobook_blacktag_set=set()
-    movie_whitetag_set=set()
-    movie_blacktag_set=set()
-    episode_whitetag_set=set()
-    episode_blacktag_set=set()
-    audio_whitetag_set=set()
-    audio_blacktag_set=set()
-    if (isJellyfinServer(server_brand)):
-        audiobook_whitetag_set=set()
-        audiobook_blacktag_set=set()
-    global_whitetag_set=set()
-    global_blacktag_set=set()
-
-#######################################################################################################
-
-    error_found_in_mumc_config_yaml+=checkYAMLVersion(cfg,init_dict)
-
 #######################################################################################################
 
     errorFlag=True
-    if (not ((check:=cfgChecker.checkString('version',value=None,instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=None)) == None)):
-        check_parts=get_semantic_version_parts(check)
-        if (not (cfgChecker.checkInteger(*(),value=check_parts['major'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
-            if (not (cfgChecker.checkInteger(*(),value=check_parts['minor'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
-                if (not (cfgChecker.checkInteger(*(),value=check_parts['patch'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
-                    if (not (cfgChecker.checkString(*(),value=check_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
+    if (not ((version:=cfgChecker.checkString('version',value=None,instanceType=cfgChecker.str,required=True,minLength=5,maxLength=None,errOut=False,comparisonValues=None)) == None)):
+        version_parts=get_semantic_version_parts(version)
+        if (not (cfgChecker.checkInteger(*(),value=version_parts['major'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+            if (not (cfgChecker.checkInteger(*(),value=version_parts['minor'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+                if (not (cfgChecker.checkInteger(*(),value=version_parts['patch'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
+                    if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
                         errorFlag=False
     if (errorFlag):
         cfgChecker.setCustomErrorText('ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + get_script_version() +')')
 
 #######################################################################################################
 
-    cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+    debug=cfgChecker.checkInteger('DEBUG',value=None,instanceType=cfgChecker.int,required=True,minValue=None,maxValue=None,errOut=True,comparisonValues=[0,1,2,3,4,255])
 
-    cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,minLength=32,maxLength=32,errOut=True,comparisonValues=None)
+#######################################################################################################
 
-    cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None
+    if (not ((admin_settings:=cfgChecker.checkDict('admin_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=2,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+        if (not ((server:=cfgChecker.checkDict('admin_settings','server',value=None,instanceType=cfgChecker.dict,required=True,minLength=3,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            brand=None
+            if ((brand:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=False,comparisonValues=['emby','jellyfin'])) == None):
+                cfgChecker.setCustomErrorText('ConfigValueError: admin_settings > server > brand must be a string or is missing\n\tValid values are emby, jellyfin\n')
+            else:
+                #sets of tags for user later
+                filter_movie_whitetag_set=set()
+                filter_movie_blacktag_set=set()
+                filter_episode_whitetag_set=set()
+                filter_episode_blacktag_set=set()
+                filter_audio_whitetag_set=set()
+                filter_audio_blacktag_set=set()
+                if (isJellyfinServer(brand)):
+                    filter_audiobook_whitetag_set=set()
+                    filter_audiobook_blacktag_set=set()
+                movie_whitetag_set=set()
+                movie_blacktag_set=set()
+                episode_whitetag_set=set()
+                episode_blacktag_set=set()
+                audio_whitetag_set=set()
+                audio_blacktag_set=set()
+                if (isJellyfinServer(brand)):
+                    audiobook_whitetag_set=set()
+                    audiobook_blacktag_set=set()
+                global_whitetag_set=set()
+                global_blacktag_set=set()
+
+            url=cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+            auth_key=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=32,maxLength=32,errOut=True,comparisonValues=None)
+
+            admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None
+
+#######################################################################################################
+
+        if (not ((behavior:=cfgChecker.checkDict('admin_settings','behavior',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            behaviorList=cfgChecker.checkString('admin_settings','behavior','list',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['whitelist','blacklist'])
+
+            matching=cfgChecker.checkString('admin_settings','behavior','matching',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['byid','bypath','bynetworkpath'])
+
+#######################################################################################################
+
+            if (not ((users:=cfgChecker.checkDict('admin_settings','behavior','users',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                monitor_disabled=cfgChecker.checkBoolean('admin_settings','behavior','users','monitor_disabled',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
     user_ids_check_list=[]
     user_names_check_list=[]
-    if (not ((userList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-        for userInfo in userList:
-            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),value=None,instanceType=cfgChecker.dict,minLength=4,maxLength=4,errOut=True,comparisonValues=None)) == None)):
-                if (not ((user_id:=cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'user_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)) == None)):
+    if (not ((usersList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,required=True,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+        for userInfo in usersList:
+            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=4,maxLength=4,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                if (not ((user_id:=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'user_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)) == None)):
                     user_ids_check_list.append(user_id)
-                    if (not ((user_name:=cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'user_name',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        user_names_check_list.append(user_name)
-                        if (not ((userWhitelist:=cfgChecker.checkList('admin_settings','users',userList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                            for userWhitelistInfo in userWhitelist:
-                                if (not ((userWhitelistInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                                    cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-                                    #cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkBoolean('admin_settings','users',userList.index(userInfo),'whitelist',userWhitelist.index(userWhitelistInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
-                        if (not ((userblacklist:=cfgChecker.checkList('admin_settings','users',userList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                            for userblacklistInfo in userblacklist:
-                                if (not ((userblacklistInfo:=cfgChecker.checkDict('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                                    cfgChecker.checkAlphaNumeric('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-                                    #cfgChecker.checkString('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-                                    cfgChecker.checkBoolean('admin_settings','users',userList.index(userInfo),'blacklist',userblacklist.index(userblacklistInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                if (not ((user_name:=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'user_name',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    user_names_check_list.append(user_name)
+
+                if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                    for userWhitelistListInfo in whitelistList:
+                        if (not ((userWhitelistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+
+                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+
+                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                            network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                            subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                            lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+#######################################################################################################
+
+                if (not ((blacklistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                    for userBlacklistListInfo in blacklistList:
+                        if (not ((userBlacklistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+
+                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+
+                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                            network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                            subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                            lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+#######################################################################################################
+
+        if (not ((media_managers:=cfgChecker.checkDict('admin_settings','media_managers',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            if (not ((radarr:=cfgChecker.checkDict('admin_settings','media_managers','radarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                enabled=cfgChecker.checkBoolean('admin_settings','media_managers','radarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                url=cfgChecker.checkString('admin_settings','media_managers','radarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+
+#######################################################################################################
+
+            if (not ((sonarr:=cfgChecker.checkDict('admin_settings','media_managers','sonarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                enabled=cfgChecker.checkBoolean('admin_settings','media_managers','sonarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                url=cfgChecker.checkString('admin_settings','media_managers','sonarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                api_key=cfgChecker.checkString('admin_settings','media_managers','sonarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+#######################################################################################################
+
+            if (not ((sonarr:=cfgChecker.checkDict('admin_settings','media_managers','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                enabled=cfgChecker.checkBoolean('admin_settings','media_managers','lidarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                url=cfgChecker.checkString('admin_settings','media_managers','lidarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                api_key=cfgChecker.checkString('admin_settings','media_managers','lidarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+#######################################################################################################
+
+            if (not ((sonarr:=cfgChecker.checkDict('admin_settings','media_managers','readarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                enabled=cfgChecker.checkBoolean('admin_settings','media_managers','readarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                url=cfgChecker.checkString('admin_settings','media_managers','readarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                api_key=cfgChecker.checkString('admin_settings','media_managers','readarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+#######################################################################################################
+
+        #api_controls
 
 #######################################################################################################
 
@@ -135,7 +241,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
         cfgChecker.checkString('basic_settings','filter_statements','audiobook','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
@@ -151,7 +257,7 @@ def cfgCheckYAML(cfg,init_dict):
     storedFilterTags['movie']={}
     storedFilterTags['episode']={}
     storedFilterTags['audio']={}
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         storedFilterTags['audiobook']={}
     storedFilterTags['movie']['whitetags']=[]
     storedFilterTags['movie']['blacktags']=[]
@@ -159,7 +265,7 @@ def cfgCheckYAML(cfg,init_dict):
     storedFilterTags['episode']['blacktags']=[]
     storedFilterTags['audio']['whitetags']=[]
     storedFilterTags['audio']['blacktags']=[]
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         storedFilterTags['audibook']['whitetags']=[]
         storedFilterTags['audibook']['blacktags']=[]
 
@@ -241,7 +347,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         if (not ((filterTagList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
             storedFilterTags['audiobook']['whitetags']=filterTagList
@@ -317,7 +423,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','favorited',value=None,instanceType=cfgChecker.bool,errOut=True)
         cfgChecker.checkBoolean('advanced_settings','filter_statements','audiobook','query_filter','whitelisted','whitetagged',value=None,instanceType=cfgChecker.bool,errOut=True)
@@ -468,7 +574,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','favorited','action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['delete','keep'])
         cfgChecker.checkString('advanced_settings','behavioral_statements','audiobook','favorited','user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['any','all'])
@@ -554,7 +660,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         behavioral_tags=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
         for behavioral_tag in behavioral_tags:
@@ -601,7 +707,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         tags=cfgChecker.checkList('advanced_settings','whitetags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
         for tag in tags:
@@ -643,7 +749,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         tags=cfgChecker.checkList('advanced_settings','blacktags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)
         for tag in tags:
@@ -708,7 +814,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','audio',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         cfgChecker.checkBoolean('advanced_settings','trakt_fix','set_missing_last_played_date','audiobook',value=None,instanceType=cfgChecker.bool,errOut=True)
 
@@ -850,7 +956,7 @@ def cfgCheckYAML(cfg,init_dict):
 
     cfgChecker.checkString('advanced_settings','console_controls','audio','summary','formatting','background','color',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
 
         cfgChecker.checkBoolean('advanced_settings','console_controls','audiobook','delete','show',value=None,instanceType=cfgChecker.bool,errOut=True)
 
@@ -894,82 +1000,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    cfgChecker.checkString('admin_settings','behavior','list',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['whitelist','blacklist'])
-
-    cfgChecker.checkString('admin_settings','behavior','matching',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['byid','bypath','bynetworkpath'])
-
-    cfgChecker.checkBoolean('admin_settings','behavior','users','monitor_disabled',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
     if (not ((check:=keys_exist_return_value(cfg,'admin_settings','users')) == None)):
         
         error_found_in_mumc_config_yaml+=cfgChecker.cfgCheckYAML_forLibraries(check, user_ids_check_list, user_names_check_list, 'admin_settings > users')
         if (not (len(check) == len(user_ids_check_list))):
             error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > users Number of configured users does not match the expected value\n'
-
-#######################################################################################################
-
-    cfgChecker.checkBoolean('admin_settings','media_managers','radarr','enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-    cfgChecker.checkString('admin_settings','media_managers','radarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkInteger('admin_settings','media_managers','radarr','port',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=65535,errOut=False,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','radarr','base_url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
-
-#######################################################################################################
-
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','sonarr','enabled')) == None)):
-        if (
-            not (isinstance(check,bool) and
-                (check == True) or (check == False))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > sonarr > enabled must be a boolean\n\tValid values True or False\n'
-
-    cfgChecker.checkString('admin_settings','media_managers','sonarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkInteger('admin_settings','media_managers','sonarr','port',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=65535,errOut=False,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','sonarr','base_url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','sonarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-#######################################################################################################
-
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','lidarr','enabled')) == None)):
-        if (
-            not (isinstance(check,bool) and
-                (check == True) or (check == False))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > lidarr > enabled must be a boolean\n\tValid values True or False\n'
-
-    cfgChecker.checkString('admin_settings','media_managers','lidarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkInteger('admin_settings','media_managers','lidarr','port',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=65535,errOut=False,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','lidarr','base_url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-    
-    cfgChecker.checkString('admin_settings','media_managers','lidarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-#######################################################################################################
-
-    if (not ((check:=keys_exist_return_value(cfg,'admin_settings','media_managers','readarr','enabled')) == None)):
-        if (
-            not (isinstance(check,bool) and
-                (check == True) or (check == False))
-            ):
-            error_found_in_mumc_config_yaml+='ConfigValueError: admin_settings > media_managers > readarr > enabled must be a boolean\n\tValid values True or False\n'
-
-    cfgChecker.checkString('admin_settings','media_managers','readarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkInteger('admin_settings','media_managers','readarr','port',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=65535,errOut=False,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','readarr','base_url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-    cfgChecker.checkString('admin_settings','media_managers','readarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -1012,7 +1047,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=audio_blacktag_set.intersection(audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1025,7 +1060,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(filter_audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1038,7 +1073,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=global_blacktag_set.intersection(audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=global_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1049,7 +1084,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=global_whitetag_set.intersection(audio_blacktag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=global_whitetag_set.intersection(audiobook_blacktag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1062,7 +1097,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1073,7 +1108,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > episode > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audio_blacktag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audio > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audiobook_blacktag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags and advanced_settings > behavioral_statements > audiobook > blacktagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1086,7 +1121,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > episode > blacktagged > tags and basic_settings > filter_tags > episode > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=audio_blacktag_set.intersection(filter_audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audio > blacktagged > tags and basic_settings > filter_tags > audio > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both advanced_settings > behavioral_statements > audiobook > blacktagged > tags and basic_settings > filter_tags > audiobook > whitetags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 
@@ -1097,7 +1132,7 @@ def cfgCheckYAML(cfg,init_dict):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > episode > blacktags and advanced_settings > behavioral_statements > episode > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
     if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(audio_whitetag_set)):
         error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audio > blacktags and advanced_settings > behavioral_statements > audio > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
-    if (isJellyfinServer(server_brand)):
+    if (isJellyfinServer(brand)):
         if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
             error_found_in_mumc_config_yaml+='ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audiobook > blacktags and advanced_settings > behavioral_statements > audiobook > whitetagged > tags\n\tTo proceed the following tags need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n'
 

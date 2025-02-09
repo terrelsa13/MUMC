@@ -1596,7 +1596,7 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
-        default_base['admin_settings']['media_managers']['sonarr']['api']=merge['admin_settings']['media_managers']['sonarr']['api']
+        default_base['admin_settings']['media_managers']['sonarr']['api_key']=merge['admin_settings']['media_managers']['sonarr']['api_key']
     except:
         pass
 
@@ -1617,7 +1617,7 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
-        default_base['admin_settings']['media_managers']['lidarr']['api']=merge['admin_settings']['media_managers']['lidarr']['api']
+        default_base['admin_settings']['media_managers']['lidarr']['api_key']=merge['admin_settings']['media_managers']['lidarr']['api_key']
     except:
         pass
 
@@ -1638,7 +1638,7 @@ def merge_configuration(default_base,merge):
     except:
         pass
     try:
-        default_base['admin_settings']['media_managers']['readarr']['api']=merge['admin_settings']['media_managers']['readarr']['api']
+        default_base['admin_settings']['media_managers']['readarr']['api_key']=merge['admin_settings']['media_managers']['readarr']['api_key']
     except:
         pass
 

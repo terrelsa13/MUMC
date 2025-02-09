@@ -9,7 +9,7 @@ def get_script_version():
 
 #Get the min config version
 def get_min_config_version():
-    return '5.0.0'
+    return '5.0.1'
 
 
 #Get the min Python version
@@ -47,9 +47,9 @@ def get_operating_system_info():
 def get_semantic_version_parts(version):
     semVersionDict={}
     try:
-        semVersionDict['major']=int(get_major_semantic_version(version))
-        semVersionDict['minor']=int(get_minor_semantic_version(version))
-        semVersionDict['patch']=int(get_patch_semantic_version(version))
+        semVersionDict['major']=abs(int(get_major_semantic_version(version)))
+        semVersionDict['minor']=abs(int(get_minor_semantic_version(version)))
+        semVersionDict['patch']=abs(int(get_patch_semantic_version(version)))
         semVersionDict['release']=str(get_prerelease_semantic_version(version))
         return semVersionDict
     except:
@@ -89,30 +89,83 @@ def get_prerelease_semantic_version(version):
 
 def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
     current_version=get_semantic_version_parts(currentVersion)
+    currentMajorStr=str(current_version['major'])
+    currentMinorStr=str(current_version['minor'])
+    currentPatchStr=str(current_version['patch'])
+    currentMajorStrLen=len(currentMajorStr)
+    currentMinorStrLen=len(currentMinorStr)
+    currentPatchStrLen=len(currentPatchStr)
+
     min_version=get_semantic_version_parts(minVersion)
+    minMajorStr=str(min_version['major'])
+    minMinorStr=str(min_version['minor'])
+    minPatchStr=str(min_version['patch'])
+    minMajorStrLen=len(minMajorStr)
+    minMinorStrLen=len(minMinorStr)
+    minPatchStrLen=len(minPatchStr)
+
     if (not (maxVersion == None)):
         max_version=get_semantic_version_parts(maxVersion)
+        maxMajorStr=str(max_version['major'])
+        maxMinorStr=str(max_version['minor'])
+        maxPatchStr=str(max_version['patch'])
+        maxMajorStrLen=len(maxMajorStr)
+        maxMinorStrLen=len(maxMinorStr)
+        maxPatchStrLen=len(maxPatchStr)
+
+    if (currentMajorStrLen < minMajorStrLen):
+        currentMajorStr=currentMajorStr.zfill(minMajorStrLen)
+    elif (currentMajorStrLen > minMajorStrLen):
+        minMajorStr=minMajorStr.zfill(currentMajorStrLen)
+
+    if (currentMinorStrLen < minMinorStrLen):
+        currentMinorStr=currentMinorStr.zfill(minMinorStrLen)
+    elif (currentMinorStrLen > minMinorStrLen):
+        minMinorStr=minMinorStr.zfill(currentMinorStrLen)
+
+    if (currentPatchStrLen < minPatchStrLen):
+        currentPatchStr=currentPatchStr.zfill(minPatchStrLen)
+    elif (currentPatchStrLen > minPatchStrLen):
+        minPatchStr=minPatchStr.zfill(currentPatchStrLen)
+
+    if (not (maxVersion == None)):
+        if (currentMajorStrLen < maxMajorStrLen):
+            currentMajorStr=currentMajorStr.zfill(maxMajorStrLen)
+        elif (currentMajorStrLen > maxMajorStrLen):
+            maxMajorStr=maxMajorStr.zfill(currentMajorStrLen)
+
+        if (currentMinorStrLen < maxMinorStrLen):
+            currentMinorStr=currentMinorStr.zfill(maxMinorStrLen)
+        elif (currentMinorStrLen > maxMinorStrLen):
+            maxMinorStr=maxMinorStr.zfill(currentMinorStrLen)
+
+        if (currentPatchStrLen < maxPatchStrLen):
+            currentPatchStr=currentPatchStr.zfill(maxPatchStrLen)
+        elif (currentPatchStrLen > maxPatchStrLen):
+            maxPatchStr=maxPatchStr.zfill(currentPatchStrLen)
+
+        if (minMajorStrLen < maxMajorStrLen):
+            minMajorStr=minMajorStr.zfill(maxMajorStrLen)
+
+        if (minMinorStrLen < maxMinorStrLen):
+            minMinorStr=minMinorStr.zfill(maxMinorStrLen)
+
+        if (minPatchStrLen < maxPatchStrLen):
+            minPatchStr=minPatchStr.zfill(maxPatchStrLen)
+
+    currentVersion=int('1' + currentMajorStr + currentMinorStr + currentPatchStr)
+    minVersion=int('1' + minMajorStr + minMinorStr + minPatchStr)
+    if (not (maxVersion == None)):
+        maxVersion=int('1' + maxMajorStr + maxMinorStr + maxPatchStr)
 
     version_ok=True
 
-    if (current_version['major'] < min_version['major']):
+    if (currentVersion < minVersion):
         version_ok=False
-    else:
-        if (current_version['minor'] < min_version['minor']):
-            version_ok=False
-        else:
-            if (current_version['patch'] < min_version['patch']):
-                version_ok=False
 
     if (not (maxVersion == None)):
-        if (current_version['major'] > min_version['major']):
+        if (currentVersion > maxVersion):
             version_ok=False
-        else:
-            if (current_version['minor'] > min_version['minor']):
-                version_ok=False
-            else:
-                if (current_version['patch'] >   min_version['patch']):
-                    version_ok=False
 
     return version_ok
 

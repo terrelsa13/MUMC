@@ -290,7 +290,7 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
     elif (cmd.casefold() == '-rdburl'):
         return '-radarr_base_url'
     elif (cmd.casefold() == '-rdapi'):
-        return '-radarr_api'
+        return '-radarr_api_key'
     elif (cmd.casefold() == '-snurl'):
         return '-sonarr_url'
     elif (cmd.casefold() == '-snprt'):
@@ -298,7 +298,7 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
     elif (cmd.casefold() == '-snburl'):
         return '-sonarr_base_url'
     elif (cmd.casefold() == '-snapi'):
-        return '-sonarr_api'
+        return '-sonarr_api_key'
     elif ((cmd.casefold() == '-a') or (cmd.casefold() == '-attrs')):
         return '-attributes'
     elif (cmd.casefold() == '-d'):
@@ -422,11 +422,11 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if ('RADARR_BASE_URL' in envar):
         argv['-radarr_base_url']=envar['RADARR_BASE_URL']
 
-    #save environmental variable - RDAPI,RADARR_API
+    #save environmental variable - RDAPI,radarr_api_key
     if ('RDAPI' in envar):
-        argv['-radarr_api']=envar['RDAPI']
-    if ('RADARR_API' in envar):
-        argv['-radarr_api']=envar['RADARR_API']
+        argv['-radarr_api_key']=envar['RDAPI']
+    if ('radarr_api_key' in envar):
+        argv['-radarr_api_key']=envar['radarr_api_key']
 
     #save environmental variable - SNURL,SONARR_URL
     if ('SNURL' in envar):
@@ -446,11 +446,11 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if ('SONARR_BASE_URL' in envar):
         argv['-sonarr_base_url']=envar['SONARR_BASE_URL']
 
-    #save environmental variable - SNAPI,SONARR_API
+    #save environmental variable - SNAPI,sonarr_api_key
     if ('SNAPI' in envar):
-        argv['-sonarr_api']=envar['SNAPI']
-    if ('SONARR_API' in envar):
-        argv['-sonarr_api']=envar['SONARR_API']
+        argv['-sonarr_api_key']=envar['SNAPI']
+    if ('sonarr_api_key' in envar):
+        argv['-sonarr_api_key']=envar['sonarr_api_key']
 
     #save environmental variable - LDURL,LIDARR_URL
     #save environmental variable - LDPRT,LIDARR_PORT
@@ -512,11 +512,11 @@ def parse_command_line_options(the_dict):
                                 '-rdurl','-radarr_url',
                                 '-rdprt','-radarr_port',
                                 '-rdburl','-radarr_base_url',
-                                '-rdapi','-radarr_api',
+                                '-rdapi','-radarr_api_key',
                                 '-snurl','-sonarr_url',
                                 '-snprt','-sonarr_port',
                                 '-snburl','-sonarr_base_url',
-                                '-snapi','-sonarr_api',
+                                '-snapi','-sonarr_api_key',
                                 #'-ldurl','-lidarr_url',
                                 #'-ldprt','-lidarr_port',
                                 #'-ldburl','-lidarr_base_url',
