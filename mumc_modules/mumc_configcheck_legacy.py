@@ -2343,7 +2343,7 @@ def cfgCheckLegacy(cfg,the_dict):
             appendTo_DEBUG_log("\napi_query_cache_fallback_behavior='" + str(check) + "'",2,the_dict)
         if (
             not (isinstance(check,str)) and
-                ((check == 'FIFO') or (check == 'LFU') or (check == 'LRU'))
+                ((check.casefold() == 'fifo') or (check.casefold() == 'lfu') or (check.casefold() == 'lru'))
        ):
             error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_cache_fallback_behavior\' must be a string; valid values \'FIFO\', \'LFU\', or \'LRU\'\n'
         else:

@@ -1,15 +1,17 @@
 import sys
 from collections.abc import Mapping
 from mumc_modules.mumc_output import appendTo_DEBUG_log
+from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 
 
 #Data checker class
 class data_checker:
     #Initialize and define data checker variables
-    def __init__(self,cfg,init_dict):
+    def __init__(self,cfg=(),init_dict=()):
         self.cfg=cfg
         self.init_dict=init_dict
+        self.brand=None
         self.wasErrorFlag=False
         self.errorString=''
         self.bool=bool
@@ -21,16 +23,22 @@ class data_checker:
         self.dict=dict
 
 
-    def printError(self,errorString):
-        #Bring all errors found to users attention
-        if (self.init_dict['DEBUG']):
-            appendTo_DEBUG_log("\n" + errorString,2,self.init_dict)
-        print('\n' + errorString)
+    def wasError(self):
+        return self.wasErrorFlag
 
 
     def wasErrorExit(self):
-        if (self.wasErrorFlag):
+        if (self.wasError()):
             sys.exit(0)
+
+
+    def printError(self):
+        if (self.wasError()):
+            #Bring all errors found to users attention
+            if (self.init_dict['DEBUG']):
+                appendTo_DEBUG_log("\n" + self.errorString,2,self.init_dict)
+            print('\n' + self.errorString)
+            self.wasErrorExit()
 
 
     def getValue(self,*cfgLocationTuple):
@@ -102,31 +110,31 @@ class data_checker:
  
     
     def setStringErrorText(self,comparisonValues,*cfgLocationTuple):
-        return self.setErrorText('string',comparisonValues,*cfgLocationTuple)
+        return self.setErrorText(*cfgLocationTuple,itemType='string',comparisonValues=comparisonValues)
 
 
     def setIntegerErrorText(self,comparisonValues,minValue,maxValue,*cfgLocationTuple):
-        return self.setErrorText('integer',comparisonValues,minValue,maxValue,*cfgLocationTuple)
+        return self.setErrorText(*cfgLocationTuple,itemType='integer',comparisonValues=comparisonValues,minValue=minValue,maxValue=maxValue)
 
 
     def setAlphaNumericErrorText(self,comparisonValues,*cfgLocationTuple):
-        return self.setErrorText('alphanumeric string',comparisonValues,*cfgLocationTuple)
+        return self.setErrorText(*cfgLocationTuple,itemType='alphanumeric string',comparisonValues=comparisonValues)
 
 
     def setListErrorText(self,comparisonValues,*cfgLocationTuple):
-        return self.setErrorText('list',comparisonValues,*cfgLocationTuple)
+        return self.setErrorText(*cfgLocationTuple,itemType='list',comparisonValues=comparisonValues)
 
 
-    def setErrorText(self,type,comparisonValues=None,minValue=None,maxValue=None,*cfgLocationTuple):
+    def setErrorText(self,*cfgLocationTuple,itemType,comparisonValues=None,minValue=None,maxValue=None):
         self.wasErrorFlag=True
         if (not (comparisonValues == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + ', '.join(str(element) for element in comparisonValues) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + ', '.join(str(element) for element in comparisonValues) + '\n'
         elif (not (minValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru 730500\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru 730500\n'
         elif (not (maxValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are -730500 thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: -730500 thru ' + str(maxValue) + '\n'
         elif ((not (minValue == None)) and (not (maxValue == None))):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid values are ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
         else:
             return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n'
 
@@ -508,3 +516,109 @@ class data_checker:
                                                         error_found_in_mumc_config_yaml+='ConfigValueError: advanced_settings > behavioral_tags > ' +  media_type + ' > ' + tag + ' > high_priority must be an boolean\n\tValid values True or False\n'
 
         return error_found_in_mumc_config_yaml
+
+
+    #Check for overlapping tags between blacklists and whitelists
+    def checkOverlappingTags(self,global_whitetag_set,global_blacktag_set,movie_whitetag_set,movie_blacktag_set,filter_movie_whitetag_set,filter_movie_blacktag_set,episode_whitetag_set,episode_blacktag_set,filter_episode_whitetag_set,filter_episode_blacktag_set,audio_whitetag_set,audio_blacktag_set,filter_audio_whitetag_set,filter_audio_blacktag_set,audiobook_whitetag_set=(),audiobook_blacktag_set=(),filter_audiobook_whitetag_set=(),filter_audiobook_blacktag_set=()):
+
+            #check global blacktags and global whitetags do not have a common string
+            if (overlapping_tags_set:=global_blacktag_set.intersection(global_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > global\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+        #######################################################################################################
+
+            #check media specific blacktags and media specific whitetags do not have a common string
+            if (overlapping_tags_set:=movie_blacktag_set.intersection(movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > movie and advanced_settings > whitetags > movie\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=episode_blacktag_set.intersection(episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > episode and advanced_settings > whitetags > episode\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=audio_blacktag_set.intersection(audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audio and advanced_settings > whitetags > audoio\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audiobook and advanced_settings > whitetags > audiobook\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+        #######################################################################################################
+
+            #check media specific filter blacktags and media specific filter whitetags do not have a common string
+            if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(filter_movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > movie > blacktags and basic_settings > filter_tags > movie > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=filter_episode_blacktag_set.intersection(filter_episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > episode > blacktags and basic_settings > filter_tags > episode > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(filter_audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audio > blacktags and basic_settings > filter_tags > audio > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both basic_settings > filter_tags > audiobook > blacktags and basic_settings > filter_tags > audiobook > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+        #######################################################################################################
+
+            #check global blacktags and media specific whitetags do not have a common string
+            if (overlapping_tags_set:=global_blacktag_set.intersection(movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > movie\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_blacktag_set.intersection(episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > episode\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_blacktag_set.intersection(audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > audio\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=global_blacktag_set.intersection(audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > audiobook\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+            #check global whitetags and media specific blacktags do not have a common string
+            if (overlapping_tags_set:=global_whitetag_set.intersection(movie_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and advanced_settings > blacktags > movie\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_whitetag_set.intersection(episode_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and advanced_settings > blacktags > episode\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_whitetag_set.intersection(audio_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and advanced_settings > blacktags > audio\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=global_whitetag_set.intersection(audiobook_blacktag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and advanced_settings > blacktags > audiobook\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+        #######################################################################################################
+
+            #check global blacktags and media specific filter whitetags do not have a common string
+            if (overlapping_tags_set:=global_blacktag_set.intersection(filter_movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and basic_settings > filter_tags > movie > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_blacktag_set.intersection(filter_episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and basic_settings > filter_tags > episode > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and basic_settings > filter_tags > audio > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=global_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > global and basic_settings > filter_tags > audiobook > whitetags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+            #check global whitetags and media specific filter blacktags do not have a common string
+            if (overlapping_tags_set:=global_whitetag_set.intersection(filter_movie_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and basic_settings > filter_tags > movie > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_whitetag_set.intersection(filter_episode_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and basic_settings > filter_tags > episode > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audio_blacktag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and basic_settings > filter_tags > audio > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=global_whitetag_set.intersection(filter_audiobook_blacktag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > whitetags > global and basic_settings > filter_tags > audiobook > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+        #######################################################################################################
+
+            #check media specific blacktags and media specific filter whitetags do not have a common string
+            if (overlapping_tags_set:=movie_blacktag_set.intersection(filter_movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > movie and basic_settings > filter_tags > movie > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=episode_blacktag_set.intersection(filter_episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > episode and basic_settings > filter_tags > episode > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=audio_blacktag_set.intersection(filter_audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audio and basic_settings > filter_tags > audio > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=audiobook_blacktag_set.intersection(filter_audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audiobook and basic_settings > filter_tags > audiobook > blacktags\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+            #check media specific filter blacktags and media specific whitetags do not have a common string
+            if (overlapping_tags_set:=filter_movie_blacktag_set.intersection(movie_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > movie and advanced_settings > whitetags > movie\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=filter_episode_blacktag_set.intersection(episode_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > episode and advanced_settings > whitetags > episode\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (overlapping_tags_set:=filter_audio_blacktag_set.intersection(audio_whitetag_set)):
+                self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audio and advanced_settings > whitetags > audio\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            if (isJellyfinServer(self.brand)):
+                if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
+                    self.setCustomErrorText('ConfigValueError: The same tag cannot be used for both advanced_settings > blacktags > audiobook and advanced_settings > whitetags > audiobook\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
