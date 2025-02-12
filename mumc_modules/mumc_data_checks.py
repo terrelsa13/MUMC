@@ -128,15 +128,15 @@ class data_checker:
     def setErrorText(self,*cfgLocationTuple,itemType,comparisonValues=None,minValue=None,maxValue=None):
         self.wasErrorFlag=True
         if (not (comparisonValues == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + ', '.join(str(element) for element in comparisonValues) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + itemType + ' or is missing\n\tValid value(s) are: ' + ', '.join(str(element) for element in comparisonValues) + '\n'
         elif (not (minValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru 730500\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + itemType + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru 730500\n'
         elif (not (maxValue == None)):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: -730500 thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + itemType + ' or is missing\n\tValid value(s) are: -730500 thru ' + str(maxValue) + '\n'
         elif ((not (minValue == None)) and (not (maxValue == None))):
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + itemType + ' or is missing\n\tValid value(s) are: ' + str(minValue) + ' thru ' + str(maxValue) + '\n'
         else:
-            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + type + ' or is missing\n'
+            return 'ConfigValueError: ' + ' > '.join(str(element) for element in cfgLocationTuple) + ' must be a(n) ' + itemType + ' or is missing\n'
 
 
     def setCustomErrorText(self,customErrText):

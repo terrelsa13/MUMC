@@ -12,6 +12,11 @@ def get_min_config_version():
     return '5.0.1'
 
 
+#Get the max config version
+def get_max_config_version():
+    return None
+
+
 #Get the min Python version
 def get_min_python_version():
     return '3.10.0'
@@ -53,7 +58,7 @@ def get_semantic_version_parts(version):
         semVersionDict['release']=str(get_prerelease_semantic_version(version))
         return semVersionDict
     except:
-        raise ValueError(f"{version} is not formatted correctly")
+        raise ValueError(f"version: {version} is not formatted correctly in the configuration file")
 
 
 #Get major semanic version number
@@ -87,7 +92,7 @@ def get_prerelease_semantic_version(version):
         return "stable"
 
 
-def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
+def compareSemanticVersions(currentVersion,minVersion,maxVersion=None):
     current_version=get_semantic_version_parts(currentVersion)
     currentMajorStr=str(current_version['major'])
     currentMinorStr=str(current_version['minor'])
@@ -173,15 +178,18 @@ def checkSemanticVersion(currentVersion,minVersion,maxVersion=None):
 def checkYAMLVersion(cfg,init_dict):
 
     if (cfg['version'] == ''):
-        return 'ConfigVersionError: Config version is blank: \'\''\
-                '\n Please use a config with a version greater than or equal to: '\
-                + init_dict['min_config_version'] + ' or create a new config \n'
+        return False
+        #return 'ConfigVersionError: Config version is blank: \'\''\
+                #'\n Please use a config with a version greater than or equal to: '\
+                #+ init_dict['min_config_version'] + ' or create a new config \n'
     else:
-        config_version_ok=checkSemanticVersion(cfg['version'],init_dict['min_config_version'])
+        config_version_ok=compareSemanticVersions(cfg['version'],init_dict['min_config_version'],init_dict['max_config_version'])
 
     if (not (config_version_ok)):
-        return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
-                + init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
-                + init_dict['min_config_version'] + ' or create a new config \n'
+        return False
+        #return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
+                #+ init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
+                #+ init_dict['min_config_version'] + ' or create a new config \n'
     else:
-        return ''
+        return True
+        #return ''

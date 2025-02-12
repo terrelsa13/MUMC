@@ -9,7 +9,6 @@ from mumc_modules.mumc_data_checks import data_checker
 
 #Check select config variables are as expected
 def cfgCheckYAML(cfg,init_dict):
-
 #######################################################################################################
 
     cfgChecker=data_checker(cfg,init_dict)
@@ -25,7 +24,14 @@ def cfgCheckYAML(cfg,init_dict):
                     if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
                         errorFlag=False
     if (errorFlag):
-        cfgChecker.setCustomErrorText('ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + get_script_version() +')')
+        cfgChecker.setCustomErrorText('ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
+
+    errorFlag=True
+    if (checkYAMLVersion(cfg,init_dict)):
+        errorFlag=False
+
+    if (errorFlag):
+        cfgChecker.setCustomErrorText('ConfigValueError: ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']))
 
 #######################################################################################################
 
@@ -72,7 +78,7 @@ def cfgCheckYAML(cfg,init_dict):
 
             auth_key=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=32,maxLength=32,errOut=True,comparisonValues=None)
 
-            admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None) == None
+            admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -2116,33 +2122,33 @@ def pre_cfgCheckYAML(cfg):
     error_found_in_mumc_config_yaml=''
     try:
         cfg['admin_settings']=cfg['admin_settings']
+        try:
+            cfg['admin_settings']['server']=cfg['admin_settings']['server']
+            try:
+                cfg['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand']
+            except:
+                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > brand is missing from the configuration file\n'
+            try:
+                cfg['admin_settings']['server']['url']=cfg['admin_settings']['server']['url']
+            except:
+                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > url is missing from the configuration file\n'
+            try:
+                cfg['admin_settings']['server']['auth_key']=cfg['admin_settings']['server']['auth_key']
+            except:
+                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > auth_key is missing from the configuration file\n'
+            try:
+                cfg['admin_settings']['server']['admin_id']=cfg['admin_settings']['server']['admin_id']
+            except:
+                pass
+                #error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > admin_id is missing from the configuration file\n'
+        except:
+            error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server is missing from the configuration file\n'
+        try:
+            cfg['admin_settings']['users']=cfg['admin_settings']['users']
+        except:
+            error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > users is missing from the configuration file\n'
     except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['server']=cfg['admin_settings']['server']
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand']
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > brand is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['server']['url']=cfg['admin_settings']['server']['url']
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > url is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['server']['auth_key']=cfg['admin_settings']['server']['auth_key']
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > auth_key is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['server']['admin_id']=cfg['admin_settings']['server']['admin_id']
-    except:
-        pass
-        #error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > admin_id is missing from the mumc_config.yaml\n'
-    try:
-        cfg['admin_settings']['users']=cfg['admin_settings']['users']
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > users is missing from the mumc_config.yaml\n'
+        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings is missing from the configuration file\n'
 
     #Bring all errors found to users attention
     if (not (error_found_in_mumc_config_yaml == '')):

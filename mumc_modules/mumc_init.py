@@ -6,7 +6,7 @@ from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
-from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,checkSemanticVersion,get_script_version,get_min_config_version
+from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,compareSemanticVersions,get_script_version,get_min_config_version,get_max_config_version
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
 from sys import exit
 
@@ -21,13 +21,14 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['python_version']=get_python_version()
     the_cfg['minium_python_version']=get_min_python_version()
     #verify Python version meets the minimum/maximum rquired versions before going any further
-    if (not (checkSemanticVersion(the_cfg['python_version'],the_cfg['minium_python_version']))):
+    if (not (compareSemanticVersions(the_cfg['python_version'],the_cfg['minium_python_version']))):
         print('\nPythonVersionError: Python version "' + the_cfg['python_version'] + '" is not compatible with this version of MUMC.\n\tSee https://github.com/terrelsa13/MUMC/wiki/Install for information on compatible Python versions\n')
         exit(0)
     the_cfg['os_info']=get_operating_system_info()
     the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
+    the_cfg['max_config_version']=get_max_config_version()
     the_cfg['client_name']='mumc.py'
     the_cfg['config_file_path']=None
     the_cfg['config_file_name']=None
