@@ -1610,7 +1610,7 @@ def merge_configuration(cfg_default,cfg_file):
                     else:
                         pass
                 except:
-                    pass
+                    cfg_default['admin_settings']['users'][1]['whitelist']=cfg_default['admin_settings']['users'][0]['whitelist']
                 try:
                     userInfo['blacklist']=userInfo['blacklist']
                     if (len(userInfo['blacklist']) >= 1):
@@ -1651,7 +1651,7 @@ def merge_configuration(cfg_default,cfg_file):
                     else:
                         pass
                 except:
-                    pass
+                    cfg_default['admin_settings']['users'][1]['blacklist']=cfg_default['admin_settings']['users'][0]['blacklist']
         else:
             error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users list is empty\n'
     except:
@@ -1668,14 +1668,6 @@ def merge_configuration(cfg_default,cfg_file):
     except:
         pass
     try:
-        cfg_default['admin_settings']['media_managers']['radarr']['port']=cfg_file['admin_settings']['media_managers']['radarr']['port']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['radarr']['base_url']=cfg_file['admin_settings']['media_managers']['radarr']['base_url']
-    except:
-        pass
-    try:
         cfg_default['admin_settings']['media_managers']['radarr']['api_key']=cfg_file['admin_settings']['media_managers']['radarr']['api_key']
     except:
         pass
@@ -1686,14 +1678,6 @@ def merge_configuration(cfg_default,cfg_file):
         pass
     try:
         cfg_default['admin_settings']['media_managers']['sonarr']['url']=cfg_file['admin_settings']['media_managers']['sonarr']['url']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['sonarr']['port']=cfg_file['admin_settings']['media_managers']['sonarr']['port']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['sonarr']['base_url']=cfg_file['admin_settings']['media_managers']['sonarr']['base_url']
     except:
         pass
     try:
@@ -1710,14 +1694,6 @@ def merge_configuration(cfg_default,cfg_file):
     except:
         pass
     try:
-        cfg_default['admin_settings']['media_managers']['lidarr']['port']=cfg_file['admin_settings']['media_managers']['lidarr']['port']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['lidarr']['base_url']=cfg_file['admin_settings']['media_managers']['lidarr']['base_url']
-    except:
-        pass
-    try:
         cfg_default['admin_settings']['media_managers']['lidarr']['api_key']=cfg_file['admin_settings']['media_managers']['lidarr']['api_key']
     except:
         pass
@@ -1728,14 +1704,6 @@ def merge_configuration(cfg_default,cfg_file):
         pass
     try:
         cfg_default['admin_settings']['media_managers']['readarr']['url']=cfg_file['admin_settings']['media_managers']['readarr']['url']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['readarr']['port']=cfg_file['admin_settings']['media_managers']['readarr']['port']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['readarr']['base_url']=cfg_file['admin_settings']['media_managers']['readarr']['base_url']
     except:
         pass
     try:
