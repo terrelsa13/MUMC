@@ -52,27 +52,6 @@ def cfgCheckYAML(cfg,init_dict):
                 cfgChecker.setCustomErrorText('ConfigValueError: admin_settings > server > brand must be a string or is missing\n\tValid values are emby, jellyfin\n')
             else:
                 cfgChecker.brand=brand
-                #sets of tags for user later
-                filter_movie_whitetag_set=set()
-                filter_movie_blacktag_set=set()
-                filter_episode_whitetag_set=set()
-                filter_episode_blacktag_set=set()
-                filter_audio_whitetag_set=set()
-                filter_audio_blacktag_set=set()
-                #Sif (isJellyfinServer(brand)):
-                filter_audiobook_whitetag_set=set()
-                filter_audiobook_blacktag_set=set()
-                movie_whitetag_set=set()
-                movie_blacktag_set=set()
-                episode_whitetag_set=set()
-                episode_blacktag_set=set()
-                audio_whitetag_set=set()
-                audio_blacktag_set=set()
-                #if (isJellyfinServer(brand)):
-                audiobook_whitetag_set=set()
-                audiobook_blacktag_set=set()
-                global_whitetag_set=set()
-                global_blacktag_set=set()
 
             url=cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
@@ -100,14 +79,18 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    #define userId and username lists to be used later
     user_ids_check_list=[]
     user_names_check_list=[]
-    if (not ((usersList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,required=True,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
+    if (not ((usersList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,required=True,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+  
         for userInfo in usersList:
-            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=4,maxLength=4,errOut=True,comparisonValues=None)) == None)):
+            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
@@ -124,7 +107,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
 
                             collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
 
@@ -145,11 +128,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
 
-                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
 
-                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
                             network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
@@ -375,20 +358,15 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-        #storedFilterTags={}
-        #storedFilterTags['movie']={}
-        #storedFilterTags['episode']={}
-        #storedFilterTags['audio']={}
-        #storedFilterTags['movie']['whitetags']=[]
-        #storedFilterTags['movie']['blacktags']=[]
-        #storedFilterTags['episode']['whitetags']=[]
-        #storedFilterTags['episode']['blacktags']=[]
-        #storedFilterTags['audio']['whitetags']=[]
-        #storedFilterTags['audio']['blacktags']=[]
-        #if (isJellyfinServer(brand)):
-            #storedFilterTags['audiobook']={}
-            #storedFilterTags['audibook']['whitetags']=[]
-            #storedFilterTags['audibook']['blacktags']=[]
+        #sets of filter tags for user later
+        filter_movie_whitetag_set=set()
+        filter_movie_blacktag_set=set()
+        filter_episode_whitetag_set=set()
+        filter_episode_blacktag_set=set()
+        filter_audio_whitetag_set=set()
+        filter_audio_blacktag_set=set()
+        filter_audiobook_whitetag_set=set()
+        filter_audiobook_blacktag_set=set()
 
 #######################################################################################################
 
@@ -1161,6 +1139,22 @@ def cfgCheckYAML(cfg,init_dict):
 
                         else:
                             cfgChecker.setCustomErrorText('ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
+
+#######################################################################################################
+
+        #sets of global tags for user later
+        global_whitetag_set=set()
+        global_blacktag_set=set()
+
+        #sets of tags for user later
+        movie_whitetag_set=set()
+        movie_blacktag_set=set()
+        episode_whitetag_set=set()
+        episode_blacktag_set=set()
+        audio_whitetag_set=set()
+        audio_blacktag_set=set()
+        audiobook_whitetag_set=set()
+        audiobook_blacktag_set=set()
 
 #######################################################################################################
 

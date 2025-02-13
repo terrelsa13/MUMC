@@ -513,6 +513,25 @@ def setYAMLConfigSkeleton(the_dict):
     the_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
 
     the_dict['admin_settings']['users']=[]
+    the_dict['admin_settings']['users'].append({})
+    the_dict['admin_settings']['users'][0]['user_id']=None
+    the_dict['admin_settings']['users'][0]['user_name']=None
+    the_dict['admin_settings']['users'][0]['whitelist']=[]
+    the_dict['admin_settings']['users'][0]['whitelist'].append({})
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['lib_id']=None
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['collection_type']=None
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['path']=None
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['network_path']=None
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['subfolder_id']=None
+    the_dict['admin_settings']['users'][0]['whitelist'][0]['lib_enabled']=True
+    the_dict['admin_settings']['users'][0]['blacklist']=[]
+    the_dict['admin_settings']['users'][0]['blacklist'].append({})
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['lib_id']=None
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['collection_type']=None
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['path']=None
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['network_path']=None
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['subfolder_id']=None
+    the_dict['admin_settings']['users'][0]['blacklist'][0]['lib_enabled']=True
 
     the_dict['admin_settings']['media_managers']={}
     the_dict['admin_settings']['media_managers']['radarr']={}
