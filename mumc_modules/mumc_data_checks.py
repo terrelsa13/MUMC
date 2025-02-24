@@ -195,6 +195,7 @@ class data_checker:
         isError=False
         setError=False
         value=self.whichValue(*cfgLocationTuple,value=value)
+        instanceOk=True
 
         try:
             if ((not (caseSensitive)) and (not (value == None))):
@@ -206,12 +207,14 @@ class data_checker:
         if (not (value == None)):
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
-            if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
-                isError=True
-            if ((not (value == None)) and (not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength)))):
-                isError=True
-            if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value.casefold(),comparisonValues)))):
-                isError=True
+                instanceOk=False
+            if (instanceOk):
+                if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
+                    isError=True
+                if ((not (value == None)) and (not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength)))):
+                    isError=True
+                if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value.casefold(),comparisonValues)))):
+                    isError=True
         elif ((required) or (setError)):
             isError=True
 
@@ -226,16 +229,19 @@ class data_checker:
     def checkInteger(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minValue=None,maxValue=None,errOut=True,comparisonValues=None):
         isError=False
         value=self.whichValue(*cfgLocationTuple,value=value)
+        instanceOk=True
 
         if (not (value == None)):
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
-            if ((not (value == None)) and (not (minValue == None)) and (not (self.compareMinValue(value,minValue)))):
-                isError=True
-            if ((not (value == None)) and (not (maxValue == None)) and (not (self.compareMaxValue(value,maxValue)))):
-                isError=True
-            if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues)))):
-                isError=True
+                instanceOk=False
+            if (instanceOk):
+                if ((not (value == None)) and (not (minValue == None)) and (not (self.compareMinValue(value,minValue)))):
+                    isError=True
+                if ((not (value == None)) and (not (maxValue == None)) and (not (self.compareMaxValue(value,maxValue)))):
+                    isError=True
+                if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues)))):
+                    isError=True
         elif (required):
             isError=True
 
@@ -278,20 +284,23 @@ class data_checker:
     def checkList(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None):
         isError=False
         value=self.whichValue(*cfgLocationTuple,value=value)
+        instanceOk=True
 
         if (not (value == None)):
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
-            if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
-                isError=True
-            if ((not (value == None)) and (not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength)))):
-                isError=True
-            if ((not (value == None)) and (not (minValue == None)) and (not (self.compareMinValue(value,minValue)))):
-                isError=True
-            if ((not (value == None)) and (not (maxValue == None)) and (not (self.compareMaxValue(value,maxValue)))):
-                isError=True
-            if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues)))):
-                isError=True
+                instanceOk=False
+            if (instanceOk):
+                if ((not (value == None)) and (not (minLength == None)) and (not (self.compareMinLength(value,minLength)))):
+                    isError=True
+                if ((not (value == None)) and (not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength)))):
+                    isError=True
+                if ((not (value == None)) and (not (minValue == None)) and (not (self.compareMinValue(value,minValue)))):
+                    isError=True
+                if ((not (value == None)) and (not (maxValue == None)) and (not (self.compareMaxValue(value,maxValue)))):
+                    isError=True
+                if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues)))):
+                    isError=True
         elif (required):
             isError=True
 
@@ -306,16 +315,19 @@ class data_checker:
     def checkDict(self,*cfgLocationTuple,value=None,instanceType=None,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None):
         isError=False
         value=self.whichValue(*cfgLocationTuple,value=value)
+        instanceOk=True
 
         if (not (value == None)):
             if ((not (instanceType == None)) and (not (isinstance(value,instanceType)))):
                 isError=True
-            if ((not (minLength == None)) and (not (self.compareMinLength(value,minLength))) and (not (value == None))):
-                isError=True
-            if ((not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength))) and (not (value == None))):
-                isError=True
-            if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues))) and (not (value == None))):
-                isError=True
+                instanceOk=False
+            if (instanceOk):
+                if ((not (minLength == None)) and (not (self.compareMinLength(value,minLength))) and (not (value == None))):
+                    isError=True
+                if ((not (maxLength == None)) and (not (self.compareMaxLength(value,maxLength))) and (not (value == None))):
+                    isError=True
+                if ((not (comparisonValues == None)) and (not (self.compareValueToValues(value,comparisonValues))) and (not (value == None))):
+                    isError=True
         elif (required):
             isError=True
 

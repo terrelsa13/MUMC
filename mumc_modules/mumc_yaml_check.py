@@ -189,7 +189,7 @@ def cfgCheckYAML(cfg,init_dict):
 
                 radarr_url=cfgChecker.checkString('admin_settings','media_managers','radarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -201,7 +201,7 @@ def cfgCheckYAML(cfg,init_dict):
 
                 sonarr_url=cfgChecker.checkString('admin_settings','media_managers','sonarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                sonarr_api_key=cfgChecker.checkString('admin_settings','media_managers','sonarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                sonarr_api_key=cfgChecker.checkString('admin_settings','media_managers','sonarr','api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -213,7 +213,7 @@ def cfgCheckYAML(cfg,init_dict):
 
                 lidarr_url=cfgChecker.checkString('admin_settings','media_managers','lidarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                lidarr_api_key=cfgChecker.checkString('admin_settings','media_managers','lidarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                lidarr_api_key=cfgChecker.checkString('admin_settings','media_managers','lidarr','api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -225,7 +225,7 @@ def cfgCheckYAML(cfg,init_dict):
 
                 readarr_url=cfgChecker.checkString('admin_settings','media_managers','readarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                readarr_api_key=cfgChecker.checkString('admin_settings','media_managers','readarr','api_key',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                readarr_api_key=cfgChecker.checkString('admin_settings','media_managers','readarr','api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -233,9 +233,9 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-            attempts=cfgChecker.checkInteger('admin_settings','api_controls','attempts',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=16,errOut=False,comparisonValues=None)
+            attempts=cfgChecker.checkInteger('admin_settings','api_controls','attempts',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=16,errOut=True,comparisonValues=None)
 
-            item_limit=cfgChecker.checkInteger('admin_settings','api_controls','item_limit',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=10000,errOut=False,comparisonValues=None)
+            item_limit=cfgChecker.checkInteger('admin_settings','api_controls','item_limit',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=10000,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -243,11 +243,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-            size=cfgChecker.checkInteger('admin_settings','cache','size',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=10000,errOut=False,comparisonValues=None)
+            size=cfgChecker.checkInteger('admin_settings','cache','size',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=10000,errOut=True,comparisonValues=None)
 
             fallback_behavior=cfgChecker.checkString('admin_settings','cache','fallback_behavior',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['fifo','lfu','lru'])
 
-            minimum_age=cfgChecker.checkInteger('admin_settings','cache','minimum_age',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=600000,errOut=False,comparisonValues=None)
+            minimum_age=cfgChecker.checkInteger('admin_settings','cache','minimum_age',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=600000,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -259,7 +259,7 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                print=cfgChecker.checkInteger('admin_settings','output_controls','character_limit','print',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                print=cfgChecker.checkInteger('admin_settings','output_controls','character_limit','print',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
