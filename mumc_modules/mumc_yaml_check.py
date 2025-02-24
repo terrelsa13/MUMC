@@ -24,14 +24,14 @@ def cfgCheckYAML(cfg,init_dict):
                     if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
                         errorFlag=False
     if (errorFlag):
-        cfgChecker.setCustomErrorText('ConfigValueError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
+        cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
 
     errorFlag=True
     if (checkYAMLVersion(cfg,init_dict)):
         errorFlag=False
 
     if (errorFlag):
-        cfgChecker.setCustomErrorText('ConfigValueError: ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']))
+        cfgChecker.setCustomErrorText('ConfigError: ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']))
 
 #######################################################################################################
 
@@ -43,21 +43,36 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-        if (not ((server:=cfgChecker.checkDict('admin_settings','server',value=None,instanceType=cfgChecker.dict,required=True,minLength=3,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        if (not ((server:=cfgChecker.checkDict('admin_settings','server',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
             brand=None
-            if ((brand:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=False,comparisonValues=['emby','jellyfin'])) == None):
-                cfgChecker.setCustomErrorText('ConfigValueError: admin_settings > server > brand must be a string or is missing\n\tValid values are emby, jellyfin\n')
-            else:
+            if (not ((brand:=cfgChecker.checkString('admin_settings','server','brand',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=['emby','jellyfin'])) == None)):
                 cfgChecker.brand=brand
+            else:
+                #something is not right with the admin_settings > server > brand
+                #cfgChecker.wasErrorFlag=True
+                cfgChecker.printError()
 
-            url=cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+            if ((url:=cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None):
+                #something is not right with the admin_settings > server > url
+                #cfgChecker.wasErrorFlag=True
+                cfgChecker.printError()
 
-            auth_key=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=32,maxLength=32,errOut=True,comparisonValues=None)
+            if ((auth_key:=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
+                #something is not right with the admin_settings > server > auth_key
+                #cfgChecker.wasErrorFlag=True
+                cfgChecker.printError()
 
-            admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+            admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+
+#######################################################################################################
+
+        else:
+            #something is not right with the admin_settings > server
+            #cfgChecker.wasErrorFlag=True
+            cfgChecker.printError()
 
 #######################################################################################################
 
@@ -79,66 +94,86 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    #define userId and username lists to be used later
-    user_ids_check_list=[]
-    user_names_check_list=[]
+        #define userId and username lists to be used later
+        user_ids_check_list=[]
+        user_names_check_list=[]
 
 #######################################################################################################
 
-    if (not ((usersList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,required=True,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+        if (not ((usersList:=cfgChecker.checkList('admin_settings','users',value=None,instanceType=cfgChecker.list,required=True,minLength=1,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
-  
-        for userInfo in usersList:
-            if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                if (not ((user_id:=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'user_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=1,maxLength=32,errOut=True,comparisonValues=None)) == None)):
-                    user_ids_check_list.append(user_id)
-
-                if (not ((user_name:=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'user_name',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                    user_names_check_list.append(user_name)
-
-                if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-                    for userWhitelistListInfo in whitelistList:
-                        if (not ((userWhitelistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+    
+            for userInfo in usersList:
+                if (not ((userInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                    if (not ((user_id:=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'user_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None)):
+                        user_ids_check_list.append(user_id)
 
-                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+                    if (not ((user_name:=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'user_name',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        user_names_check_list.append(user_name)
 
-                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                    if (isJellyfinServer(brand)):
+                        collection_type_vales=['movies','tvshows','music','audiobooks']
+                    else:
+                        collection_type_vales=['movies','tvshows','music','audiobooks']
 
-                            network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                    if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                            subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
-
-                            lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
-                if (not ((blacklistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-                    for userBlacklistListInfo in blacklistList:
-                        if (not ((userBlacklistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        for userWhitelistListInfo in whitelistList:
+                            if (not ((userWhitelistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-                            lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
+                                lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
-                            collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=['movies','tvshows','music','audiobooks'])
+                                collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=collection_type_vales)
 
-                            path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                            network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                            subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                            lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+#######################################################################################################
+
+                    if (not ((blacklistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                        for userBlacklistListInfo in blacklistList:
+                            if (not ((userBlacklistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                                lib_id=cfgChecker.checkAlphaNumeric('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_id',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
+
+                                collection_type=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'collection_type',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=collection_type_vales)
+
+                                path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+
+                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+#######################################################################################################
+
+            # after we have all admin_settings > users > # related errors display them all at once
+            if (cfgChecker.wasErrorFlag):
+                #something is not right with the admin_settings > users > #
+                #cfgChecker.wasErrorFlag=True
+                cfgChecker.printError()
+
+#######################################################################################################
+
+        else:
+            #something is not right with the admin_settings > users
+            #cfgChecker.wasErrorFlag=True
+            cfgChecker.printError()
 
 #######################################################################################################
 
@@ -225,6 +260,13 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
                 print=cfgChecker.checkInteger('admin_settings','output_controls','character_limit','print',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+
+#######################################################################################################
+
+    else:
+        #something is not right with the admin_settings
+        #cfgChecker.wasErrorFlag=True
+        cfgChecker.printError()
 
 #######################################################################################################
 
@@ -386,7 +428,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagMovie in filtertagsMovieWhitetagsList:
                         if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','whitetags',filtertagsMovieWhitetagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagMovie)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > movie > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -398,7 +440,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagMovie in filtertagsMovieBlacktagsList:
                         if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','blacktags',filtertagsMovieBlacktagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagMovie)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > movie > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -414,7 +456,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagEpisode in filtertagsEpisodeWhitetagsList:
                         if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','whitetags',filtertagsEpisodeWhitetagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagEpisode)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > episode > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -426,7 +468,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagEpisode in filtertagsEpisodeBlacktagsList:
                         if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','blacktags',filtertagsEpisodeBlacktagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagEpisode)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > episode > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -442,7 +484,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagAudio in filtertagsAudioWhitetagsList:
                         if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','whitetags',filtertagsAudioWhitetagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagAudio)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > audio > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -454,7 +496,7 @@ def cfgCheckYAML(cfg,init_dict):
                     for filtertagAudio in filtertagsAudioBlacktagsList:
                         if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','blacktags',filtertagsAudioBlacktagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (not get_isFilterStatementTag(filtertagAudio)):
-                                cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > audio > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -471,7 +513,7 @@ def cfgCheckYAML(cfg,init_dict):
                         for filtertagAudiobook in filtertagsAudiobookWhitetagsList:
                             if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','whitetags',filtertagsAudiobookWhitetagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                                 if (not get_isFilterStatementTag(filtertagAudiobook)):
-                                    cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -483,7 +525,7 @@ def cfgCheckYAML(cfg,init_dict):
                         for filtertagAudiobook in filtertagsAudiobookBlacktagsList:
                             if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','blacktags',filtertagsAudiobookBlacktagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                                 if (not get_isFilterStatementTag(filtertagAudiobook)):
-                                    cfgChecker.setCustomErrorText('ConfigValueError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
 
 #######################################################################################################
 
@@ -1053,7 +1095,7 @@ def cfgCheckYAML(cfg,init_dict):
                         high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigValueError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1081,7 +1123,7 @@ def cfgCheckYAML(cfg,init_dict):
                         high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigValueError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1109,7 +1151,7 @@ def cfgCheckYAML(cfg,init_dict):
                         high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigValueError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1138,7 +1180,7 @@ def cfgCheckYAML(cfg,init_dict):
                             high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                         else:
-                            cfgChecker.setCustomErrorText('ConfigValueError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
+                            cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
 
 #######################################################################################################
 

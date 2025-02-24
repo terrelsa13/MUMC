@@ -568,7 +568,7 @@ def parse_command_line_options(the_dict):
 
     #if -config not input as a command line option or environmental variable
     #and we are running as a docker container
-    #then set the default config location: '/usr/src/app/config/mumc_config.yaml/.yml/.py'
+    #then set the default config location: '/usr/src/app/config/mumc_config.yaml or .yml or .py'
     if ((not ('-config' in cmdopt_dict['argv'])) and
     ('-container' in cmdopt_dict['argv']) and
     (cmdopt_dict['argv']['-container'])):

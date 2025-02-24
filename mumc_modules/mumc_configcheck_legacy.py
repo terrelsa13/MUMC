@@ -156,7 +156,7 @@ def cfgCheckLegacy(cfg,the_dict):
             ((check == 'emby') or
             (check == 'jellyfin')))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'server_brand\' variable must be a string with a value of \'emby\' or \'jellyfin\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'server_brand\' variable must be a string with a value of \'emby\' or \'jellyfin\'\n'
             server_brand='invalid'
         else:
             config_dict['server_brand']=check
@@ -187,13 +187,13 @@ def cfgCheckLegacy(cfg,the_dict):
                                 (len(check_irt) == 32) and
                                 (str(check_irt).isalnum()))
                         ):
-                            error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_keys\' must be a single list with a key:value pair for each monitored \'UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
+                            error_found_in_mumc_config_py+='LegacyConfigError: \'user_keys\' must be a single list with a key:value pair for each monitored \'UserName:UserId\' each user key must be a 32-character alphanumeric string\n'
                 else:
                     config_dict['user_keys']=check_list
             else:
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_keys cannot be empty\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'user_keys cannot be empty\n'
         except:
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_keys\' has an unknown formatting error\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'user_keys\' has an unknown formatting error\n'
     else:
         error_found_in_mumc_config_py+='LegacyConfigNameError: The \'user_keys\' variable is missing from ' + str(the_dict['mumc_path'] / the_dict['config_file_name_py']) + '\n'
 
@@ -217,7 +217,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((check[0] >= -1) and (check[0] <= 730500)) and
                 ((check[2] >= 1) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'played_filter_movie\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'played_filter_movie\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
             config_dict['played_filter_movie']=check
     else:
@@ -241,7 +241,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check[1] == 'not >=') or (check[1] == 'not <=')) and
                 ((check[2] >= 1) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'played_filter_episode\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'played_filter_episode\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
             config_dict['played_filter_episode']=check
     else:
@@ -265,7 +265,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check[1] == 'not >=') or (check[1] == 'not <=')) and
                 ((check[2] >= 1) and (check[2] <= 730500)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'played_filter_audio\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'played_filter_audio\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
         else:
             config_dict['played_filter_audio']=check
     else:
@@ -290,7 +290,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check[1] == 'not >=') or (check[1] == 'not <=')) and
                     ((check[2] >= 1) and (check[2] <= 730500)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'played_filter_audiobook\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'played_filter_audiobook\' must be a list with three entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 and 1 thru 730500 (0 is invalid)\n'
             else:
                 config_dict['played_filter_audiobook']=check
         else:
@@ -318,7 +318,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((check[2] >= 0) and (check[2] <= 730500)) and
                 ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'created_filter_movie\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'created_filter_movie\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
             config_dict['created_filter_movie']=check
     else:
@@ -344,7 +344,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((check[2] >= 0) and (check[2] <= 730500)) and
                 ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'created_filter_episode\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'created_filter_episode\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
             config_dict['created_filter_episode']=check
     else:
@@ -370,7 +370,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((check[2] >= 0) and (check[2] <= 730500)) and
                 ((check[3] == True) or (check[3] == False)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'created_filter_audio\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'created_filter_audio\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
         else:
             config_dict['created_filter_audio']=check
     else:
@@ -397,7 +397,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     ((check[2] >= 0) and (check[2] <= 730500)) and
                     ((check[3] == True) or (check[3] == False)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'created_filter_audiobook\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'created_filter_audiobook\' must be a list with four entries\n\tValid range for first entry -1 thru 730500\n\tValid values for second entry are inequalities \'>\', \'<\', \'>=\', etc...\n\tValid range for third entry -1 thru 730500\n\tValid values for fourth entry boolean \'True\' or \'False\'\n'
             else:
                 config_dict['created_filter_audiobook']=check
         else:
@@ -424,7 +424,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['favorited_behavior_movie']=check
     else:
@@ -450,7 +450,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['favorited_behavior_episode']=check
     else:
@@ -476,7 +476,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['favorited_behavior_audio']=check
     else:
@@ -503,7 +503,7 @@ def cfgCheckLegacy(cfg,the_dict):
                      (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
                 config_dict['favorited_behavior_audiobook']=check
         else:
@@ -520,7 +520,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_movie_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_movie_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_movie_genre']=check
     else:
@@ -535,7 +535,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_movie_library_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_movie_library_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_movie_library_genre']=check
     else:
@@ -552,7 +552,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_episode_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_episode_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_episode_genre']=check
     else:
@@ -567,7 +567,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_season_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_season_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_season_genre']=check
     else:
@@ -582,7 +582,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_series_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_series_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_series_genre']=check
     else:
@@ -597,7 +597,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_tv_library_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_tv_library_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_tv_library_genre']=check
     else:
@@ -612,7 +612,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_tv_studio_network\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_tv_studio_network\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_tv_studio_network']=check
     else:
@@ -627,7 +627,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_tv_studio_network_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_tv_studio_network_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_tv_studio_network_genre']=check
     else:
@@ -644,7 +644,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_track_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_track_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_track_genre']=check
     else:
@@ -659,7 +659,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_album_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_album_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_album_genre']=check
     else:
@@ -674,7 +674,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_music_library_genre\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_music_library_genre\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_music_library_genre']=check
     else:
@@ -689,7 +689,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_track_artist\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_track_artist\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_track_artist']=check
     else:
@@ -704,7 +704,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 2))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_album_artist\' must be an integer; valid range 0 thru 2\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_album_artist\' must be an integer; valid range 0 thru 2\n'
         else:
             config_dict['favorited_advanced_album_artist']=check
     else:
@@ -722,7 +722,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_track_genre\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_track_genre\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_track_genre']=check
             else:
@@ -737,7 +737,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_genre\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_genre\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_genre']=check
             else:
@@ -752,7 +752,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_library_genre\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_library_genre\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_library_genre']=check
             else:
@@ -767,7 +767,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_track_author\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_track_author\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_track_author']=check
             else:
@@ -782,7 +782,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_author\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_author\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_author']=check
             else:
@@ -797,7 +797,7 @@ def cfgCheckLegacy(cfg,the_dict):
                         (check >= 0) and
                         (check <= 2))
                 ):
-                    error_found_in_mumc_config_py+='LegacyConfigValueError: \'favorited_advanced_audiobook_library_author\' must be an integer; valid range 0 thru 2\n'
+                    error_found_in_mumc_config_py+='LegacyConfigError: \'favorited_advanced_audiobook_library_author\' must be an integer; valid range 0 thru 2\n'
                 else:
                     config_dict['favorited_advanced_audiobook_library_author']=check
             else:
@@ -813,7 +813,7 @@ def cfgCheckLegacy(cfg,the_dict):
             not ((isinstance(check,str)) and
                 (check.find('\\') < 0))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'Whitetag(s)\' must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'Whitetag(s)\' must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
         else:
             config_dict['whitetag']=check
     else:
@@ -841,7 +841,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitetagged_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitetagged_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitetagged_behavior_movie']=check
     else:
@@ -867,7 +867,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitetagged_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitetagged_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitetagged_behavior_episode']=check
     else:
@@ -893,7 +893,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitetagged_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitetagged_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitetagged_behavior_audio']=check
     else:
@@ -920,7 +920,7 @@ def cfgCheckLegacy(cfg,the_dict):
                      (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitetagged_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'whitetagged_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
                 config_dict['whitetagged_behavior_audiobook']=check
         else:
@@ -936,7 +936,7 @@ def cfgCheckLegacy(cfg,the_dict):
             not ((isinstance(check,str)) and
                 (check.find('\\') < 0))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'Blacktag(s)\' must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'Blacktag(s)\' must be a single string with a comma separating multiple tag names; backlash \'\\\' not allowed\n'
         else:
             config_dict['blacktag']=check
     else:
@@ -964,7 +964,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacktagged_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacktagged_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacktagged_behavior_movie']=check
     else:
@@ -990,7 +990,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacktagged_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacktagged_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacktagged_behavior_episode']=check
     else:
@@ -1016,7 +1016,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacktagged_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacktagged_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacktagged_behavior_audio']=check
     else:
@@ -1043,7 +1043,7 @@ def cfgCheckLegacy(cfg,the_dict):
                      (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacktagged_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'blacktagged_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid value for second entry: \'all\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
                 config_dict['blacktagged_behavior_audiobook']=check
         else:
@@ -1071,7 +1071,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitelisted_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitelisted_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitelisted_behavior_movie']=check
     else:
@@ -1097,7 +1097,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitelisted_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitelisted_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitelisted_behavior_episode']=check
     else:
@@ -1123,7 +1123,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitelisted_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'whitelisted_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['whitelisted_behavior_audio']=check
     else:
@@ -1150,7 +1150,7 @@ def cfgCheckLegacy(cfg,the_dict):
                      (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'whitelisted_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'whitelisted_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
                 config_dict['whitelisted_behavior_audiobook']=check
         else:
@@ -1178,7 +1178,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacklisted_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacklisted_behavior_movie\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacklisted_behavior_movie']=check
     else:
@@ -1204,7 +1204,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacklisted_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacklisted_behavior_episode\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacklisted_behavior_episode']=check
     else:
@@ -1230,7 +1230,7 @@ def cfgCheckLegacy(cfg,the_dict):
                  (check[2].casefold() == 'ignore')) and
                 ((check[3] >= 0) and (check[3] <= 8)))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacklisted_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'blacklisted_behavior_audio\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
         else:
             config_dict['blacklisted_behavior_audio']=check
     else:
@@ -1257,7 +1257,7 @@ def cfgCheckLegacy(cfg,the_dict):
                      (check[2].casefold() == 'ignore')) and
                     ((check[3] >= 0) and (check[3] <= 8)))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'blacklisted_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'blacklisted_behavior_audiobook\' must be a list with four entries\n\tValid values for first entry: \'delete\' and \'keep\'\n\tValid values for second entry: \'all\' and/or \'any\'\n\tValid values for third entry: \'all\', \'any\', and/or \'ignore\'\n\tValid range for fourth entry: 0 thru 8\n'
             else:
                 config_dict['blacklisted_behavior_audiobook']=check
         else:
@@ -1274,7 +1274,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'minimum_number_episodes\' must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'minimum_number_episodes\' must be an integer; valid range 0 thru 730500\n'
         else:
             config_dict['minimum_number_episodes']=check
     else:
@@ -1289,7 +1289,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 730500))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'minimum_number_played_episodes\' must be an integer; valid range 0 thru 730500\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'minimum_number_played_episodes\' must be an integer; valid range 0 thru 730500\n'
         else:
             config_dict['minimum_number_played_episodes']=check
     else:
@@ -1333,7 +1333,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == 'maxunplayedmaxplayed') or
                 (check == 'maxplayedminplayed')))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'minimum_number_episodes_behavior\' must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'minimum_number_episodes_behavior\' must be a string; valid values \'User Name\', \'User Id\', and \'Min/Max Played/Unplayed\'\n'
         else:
             config_dict['minimum_number_episodes_behavior']=check
     else:
@@ -1350,7 +1350,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'movie_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'movie_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
         else:
             config_dict['movie_set_missing_last_played_date']=check
     else:
@@ -1365,7 +1365,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'episode_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'episode_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
         else:
             config_dict['episode_set_missing_last_played_date']=check
     else:
@@ -1380,7 +1380,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'audio_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'audio_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
         else:
             config_dict['audio_set_missing_last_played_date']=check
     else:
@@ -1396,7 +1396,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check == True) or
                     (check == False))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'audiobook_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'audiobook_set_missing_last_played_date\' must be a boolean; valid values True and False\n'
             else:
                 config_dict['audiobook_set_missing_last_played_date']=check
         else:
@@ -1413,7 +1413,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_script_header\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_script_header\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_script_header']=check
     else:
@@ -1428,7 +1428,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_warnings\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_warnings\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_warnings']=check
     else:
@@ -1443,7 +1443,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_user_header\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_user_header\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_user_header']=check
     else:
@@ -1458,7 +1458,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_movie_delete_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_movie_delete_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_movie_delete_info']=check
     else:
@@ -1473,7 +1473,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_movie_keep_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_movie_keep_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_movie_keep_info']=check
     else:
@@ -1488,7 +1488,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_episode_delete_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_episode_delete_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_episode_delete_info']=check
     else:
@@ -1503,7 +1503,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_episode_keep_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_episode_keep_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_episode_keep_info']=check
     else:
@@ -1518,7 +1518,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audio_delete_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_audio_delete_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_audio_delete_info']=check
     else:
@@ -1533,7 +1533,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audio_keep_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_audio_keep_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_audio_keep_info']=check
     else:
@@ -1549,7 +1549,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check == True) or
                     (check == False))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audiobook_delete_info\' must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'print_audiobook_delete_info\' must be a boolean; valid values True and False\n'
             else:
                 config_dict['print_audiobook_delete_info']=check
         else:
@@ -1564,7 +1564,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check == True) or
                     (check == False))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audiobook_keep_info\' must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'print_audiobook_keep_info\' must be a boolean; valid values True and False\n'
             else:
                 config_dict['print_audiobook_keep_info']=check
         else:
@@ -1579,7 +1579,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_movie_post_processing_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_movie_post_processing_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_movie_post_processing_info']=check
     else:
@@ -1594,7 +1594,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_episode_post_processing_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_episode_post_processing_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_episode_post_processing_info']=check
     else:
@@ -1609,7 +1609,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audio_post_processing_info\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_audio_post_processing_info\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_audio_post_processing_info']=check
     else:
@@ -1625,7 +1625,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check == True) or
                     (check == False))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audiobook_post_processing_info\' must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'print_audiobook_post_processing_info\' must be a boolean; valid values True and False\n'
             else:
                 config_dict['print_audiobook_post_processing_info']=check
         else:
@@ -1640,7 +1640,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_summary_header\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_summary_header\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_summary_header']=check
     else:
@@ -1655,7 +1655,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_movie_summary\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_movie_summary\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_movie_summary']=check
     else:
@@ -1670,7 +1670,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_episode_summary\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_episode_summary\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_episode_summary']=check
     else:
@@ -1685,7 +1685,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audio_summary\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_audio_summary\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_audio_summary']=check
     else:
@@ -1701,7 +1701,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     (check == True) or
                     (check == False))
             ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_audiobook_summary\' must be a boolean; valid values True and False\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'print_audiobook_summary\' must be a boolean; valid values True and False\n'
             else:
                 config_dict['print_audiobook_summary']=check
         else:
@@ -1716,7 +1716,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'print_script_footer\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'print_script_footer\' must be a boolean; valid values True and False\n'
         else:
             config_dict['print_script_footer']=check
     else:
@@ -1738,7 +1738,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'script_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'script_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
             
         else:
             config_dict['script_header_format']=check
@@ -1759,7 +1759,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'nscript_warnings_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'nscript_warnings_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['script_warnings_format']=check
     else:
@@ -1779,7 +1779,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'user_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['user_header_format']=check
     else:
@@ -1799,7 +1799,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'movie_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'movie_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['movie_delete_info_format']=check
     else:
@@ -1819,7 +1819,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'movie_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'movie_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['movie_keep_info_format']=check
     else:
@@ -1839,7 +1839,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'episode_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'episode_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['episode_delete_info_format']=check
     else:
@@ -1859,7 +1859,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'episode_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'episode_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['episode_keep_info_format']=check
     else:
@@ -1879,7 +1879,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'audio_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'audio_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['audio_delete_info_format']=check
     else:
@@ -1899,7 +1899,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'audio_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'audio_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['audio_keep_info_format']=check
     else:
@@ -1920,7 +1920,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'audiobook_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'audiobook_delete_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
             else:
                 config_dict['audiobook_delete_info_format']=check
         else:
@@ -1940,7 +1940,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'audiobook_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'audiobook_keep_info_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
             else:
                 config_dict['audiobook_keep_info_format']=check
         else:
@@ -1960,7 +1960,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'movie_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'movie_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['movie_post_processing_format']=check
     else:
@@ -1980,7 +1980,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'episode_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'episode_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['episode_post_processing_format']=check
     else:
@@ -2000,7 +2000,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'audio_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'audio_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['audio_post_processing_format']=check
     else:
@@ -2021,7 +2021,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'audiobook_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'audiobook_post_processing_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
             else:
                 config_dict['audiobook_post_processing_format']=check
         else:
@@ -2041,7 +2041,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'summary_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'summary_header_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['summary_header_format']=check
     else:
@@ -2061,7 +2061,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'movie_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'movie_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['movie_summary_format']=check
     else:
@@ -2081,7 +2081,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'episode_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'episode_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['episode_summary_format']=check
     else:
@@ -2101,7 +2101,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'audio_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'audio_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['audio_summary_format']=check
     else:
@@ -2122,7 +2122,7 @@ def cfgCheckLegacy(cfg,the_dict):
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                     ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
                 ):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'audiobook_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'audiobook_summary_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
             else:
                 config_dict['audiobook_summary_format']=check
         else:
@@ -2142,7 +2142,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('background_color',check[1]),int)) or (check[1] == None) or (check[1] == '')) and
                 ((isinstance(the_dict['text_attrs'].get_text_attribute_ansi_code('font_style',check[2]),int)) or (check[2] == None) or (check[2] == '')))
             ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'script_footer_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'script_footer_format\' must be a list with three entries\n\tValid values for each entry are \'\', \'None\' or the attributes values defined here: https://github.com/terrelsa13/MUMC/tree/MUMC-Latest#control-console-text-formatting\n'
         else:
             config_dict['script_footer_format']=check
     else:
@@ -2159,7 +2159,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'UPDATE_CONFIG\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'UPDATE_CONFIG\' must be a boolean; valid values True and False\n'
         else:
             config_dict['UPDATE_CONFIG']=check
     else:
@@ -2176,7 +2176,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check == True) or
                 (check == False))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'REMOVE_FILES\' must be a boolean; valid values True and False\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'REMOVE_FILES\' must be a boolean; valid values True and False\n'
         else:
             config_dict['REMOVE_FILES']=check
     else:
@@ -2191,7 +2191,7 @@ def cfgCheckLegacy(cfg,the_dict):
         if (
             not (isinstance(check,str))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'server_url\' must be a string\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'server_url\' must be a string\n'
         else:
             config_dict['server_url']=check
     else:
@@ -2208,7 +2208,7 @@ def cfgCheckLegacy(cfg,the_dict):
             (len(check) == 32) and
             (str(check).isalnum()))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'auth_key\' must be a 32-character alphanumeric string\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'auth_key\' must be a 32-character alphanumeric string\n'
         else:
             config_dict['auth_key']=check
     else:
@@ -2224,7 +2224,7 @@ def cfgCheckLegacy(cfg,the_dict):
             not ((isinstance(check,str)) and
             ((check == 'blacklist') or (check == 'whitelist')))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'library_setup_behavior\' must be a string; valid values \'blacklist\' or \'whitelist\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'library_setup_behavior\' must be a string; valid values \'blacklist\' or \'whitelist\'\n'
         else:
             config_dict['library_setup_behavior']=check
     else:
@@ -2240,7 +2240,7 @@ def cfgCheckLegacy(cfg,the_dict):
             not ((isinstance(check,str)) and
             ((check == 'byid') or (check == 'bypath') or (check == 'bynetworkpath')))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'library_matching_behavior\' must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'library_matching_behavior\' must be a string; valid values \'byId\' or \'byPath\' or \'byNetworkPath\'\n'
         else:
             config_dict['library_matching_behavior']=check
     else:
@@ -2257,11 +2257,11 @@ def cfgCheckLegacy(cfg,the_dict):
         if (check_user_bllibs_length > 0):
             #Check number of users matches the number of blacklist entries
             if (not (check_user_bllibs_length == check_user_keys_length)):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_bl_libs\' Number of configured users does not match the number of configured blacklists\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'user_bl_libs\' Number of configured users does not match the number of configured blacklists\n'
             else:
                 error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_bl_libs')
         else:
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_bl_libs\' cannot be empty\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'user_bl_libs\' cannot be empty\n'
 
         config_dict['user_bl_libs']=check_list
     else:
@@ -2278,11 +2278,11 @@ def cfgCheckLegacy(cfg,the_dict):
         if (check_user_wllibs_length > 0):
             #Check number of users matches the number of whitelist entries
             if (not (check_user_wllibs_length == check_user_keys_length)):
-                error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_wl_libs\' Number of configured users does not match the number of configured whitelists\n'
+                error_found_in_mumc_config_py+='LegacyConfigError: \'user_wl_libs\' Number of configured users does not match the number of configured whitelists\n'
             else:
                 error_found_in_mumc_config_py+=cfgCheck_forLibraries(check_list, userid_check_list, username_check_list, 'user_wl_libs')
         else:
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'user_wl_libs\' cannot be empty\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'user_wl_libs\' cannot be empty\n'
 
         config_dict['user_wl_libs']=check_list
     else:
@@ -2299,7 +2299,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 16))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_attempts\' must be an integer; valid range 0 thru 16\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'api_query_attempts\' must be an integer; valid range 0 thru 16\n'
         else:
             config_dict['api_query_attempts']=check
     else:
@@ -2314,7 +2314,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 1) and
                 (check <= 10000))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_item_limit\' must be an integer; valid range 0 thru 10000\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'api_query_item_limit\' must be an integer; valid range 0 thru 10000\n'
         else:
             config_dict['api_query_item_limit']=check
     else:
@@ -2331,7 +2331,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 10000))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_cache_size\' must be a number; valid range 0 thru 10000\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'api_query_cache_size\' must be a number; valid range 0 thru 10000\n'
         else:
             config_dict['api_query_cache_size']=check
     else:
@@ -2345,7 +2345,7 @@ def cfgCheckLegacy(cfg,the_dict):
             not (isinstance(check,str)) and
                 ((check.casefold() == 'fifo') or (check.casefold() == 'lfu') or (check.casefold() == 'lru'))
        ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_cache_fallback_behavior\' must be a string; valid values \'FIFO\', \'LFU\', or \'LRU\'\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'api_query_cache_fallback_behavior\' must be a string; valid values \'FIFO\', \'LFU\', or \'LRU\'\n'
         else:
             config_dict['api_query_cache_fallback_behavior']=check
     else:
@@ -2360,7 +2360,7 @@ def cfgCheckLegacy(cfg,the_dict):
                 (check >= 0) and
                 (check <= 60000))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'api_query_cache_last_accessed_time\' must be a number; valid range 0 thru 60000\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'api_query_cache_last_accessed_time\' must be a number; valid range 0 thru 60000\n'
         else:
             config_dict['api_query_cache_last_accessed_time']=check
     else:
@@ -2377,7 +2377,7 @@ def cfgCheckLegacy(cfg,the_dict):
             (((check >= 0) and (check <= 4)) or
              check == 255))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigValueError: \'DEBUG\' must be a integer or bool; valid range 0 thru 4\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'DEBUG\' must be a integer or bool; valid range 0 thru 4\n'
         else:
             config_dict['DEBUG']=check
     else:

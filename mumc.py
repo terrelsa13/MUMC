@@ -31,6 +31,10 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
+    #####WIP######
+    #get and check config values are what we expect them to be
+    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
+
     #after importing the config; remove old DEBUG if it exists
     delete_debug_log(init_dict)
 

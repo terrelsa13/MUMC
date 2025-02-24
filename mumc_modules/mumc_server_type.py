@@ -7,7 +7,7 @@ def isJellyfinServer(server_brand):
     elif (server_brand.casefold() == 'emby'):
         return False
     else:
-        raise ValueError('ConfigValueError: admin_settings > server > brand must be a string or is missing\n\tValid values are emby, jellyfin\n')
+        raise ValueError('ConfigError: admin_settings > server > brand must be a string or is missing\n\tValid values are emby, jellyfin\n')
 
 
 #Determine if server is Emby
