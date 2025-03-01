@@ -286,11 +286,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_staements','movie','played','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','movie','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','movie','played','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','movie','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','movie','played','count',value=None,instanceType=cfgChecker.int,required=True,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','movie','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -298,13 +298,13 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','movie','created','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','movie','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','count',value=None,instanceType=cfgChecker.int,required=True,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','movie','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','movie','created','behavioral_control',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
+                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','movie','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
@@ -316,11 +316,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_staements','episode','played','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','episode','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','episode','played','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','episode','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','episode','played','count',value=None,instanceType=cfgChecker.int,required=True,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','episode','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -328,13 +328,13 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','episode','created','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','episode','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','count',value=None,instanceType=cfgChecker.int,required=True,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','episode','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','episode','created','behavioral_control',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
+                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','episode','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
@@ -346,11 +346,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_staements','audio','played','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audio','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','audio','played','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','audio','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','audio','played','count',value=None,instanceType=cfgChecker.int,required=True,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','audio','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -358,13 +358,13 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                    condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','audio','created','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                    count_equality=cfgChecker.checkString('basic_settings','filter_statements','audio','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                    count=cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','count',value=None,instanceType=cfgChecker.int,required=True,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                    count=cfgChecker.checkInteger('basic_settings','filter_statements','audio','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=True,comparisonValues=None)
 
-                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','audio','created','behavioral_control',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
+                    behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','audio','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
@@ -378,11 +378,11 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                        condition_days=cfgChecker.checkInteger('basic_settings','filter_staements','audiobook','played','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                        condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                        count_equality=cfgChecker.checkString('basic_settings','filter_statements','audiobook','played','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                        count_equality=cfgChecker.checkString('basic_settings','filter_statements','audiobook','played','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                        count=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','count',value=None,instanceType=cfgChecker.int,required=True,minValue=1,maxValue=730500,errOut=False,comparisonValues=None)
+                        count=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','played','count',value=None,instanceType=cfgChecker.int,minValue=1,maxValue=730500,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -390,13 +390,13 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                        condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','condition_days',value=None,instanceType=cfgChecker.int,required=True,minValue=-1,maxValue=730500,errOut=False,comparisonValues=None)
+                        condition_days=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','condition_days',value=None,instanceType=cfgChecker.int,minValue=-1,maxValue=730500,errOut=True,comparisonValues=None)
 
-                        count_equality=cfgChecker.checkString('basic_settings','filter_statements','audiobook','created','count_equality',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=6,errOut=True,comparisonValues=['>','<','>=','<=','=','not ==','not >','not <','not >=','not <='])
+                        count_equality=cfgChecker.checkString('basic_settings','filter_statements','audiobook','created','count_equality',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['>','<','>=','<=','==','not ==','not >','not <','not >=','not <='])
 
-                        count=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','count',value=None,instanceType=cfgChecker.int,required=True,minValue=0,maxValue=730500,errOut=False,comparisonValues=None)
+                        count=cfgChecker.checkInteger('basic_settings','filter_statements','audiobook','created','count',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=730500,errOut=True,comparisonValues=None)
 
-                        behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','audiobook','created','behavioral_control',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
+                        behavioral_control=cfgChecker.checkBoolean('basic_settings','filter_statements','audiobook','created','behavioral_control',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
@@ -529,7 +529,36 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-    if (not ((advanced_settings:=cfgChecker.checkDict('advanced_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        if ((filter_statements == None) and (filter_tags == None)):
+            cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media item entry')
+            cfgChecker.printError()
+
+#######################################################################################################
+
+    else:
+        #something is not right with the basic_settings
+        #cfgChecker.wasErrorFlag=True
+        cfgChecker.printError()
+
+#######################################################################################################
+
+    #sets of global tags for user later
+    global_whitetag_set=set()
+    global_blacktag_set=set()
+
+    #sets of tags for user later
+    movie_whitetag_set=set()
+    movie_blacktag_set=set()
+    episode_whitetag_set=set()
+    episode_blacktag_set=set()
+    audio_whitetag_set=set()
+    audio_blacktag_set=set()
+    audiobook_whitetag_set=set()
+    audiobook_blacktag_set=set()
+
+#######################################################################################################
+
+    if (not ((advanced_settings:=cfgChecker.checkDict('advanced_settings',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
@@ -704,7 +733,11 @@ def cfgCheckYAML(cfg,init_dict):
 
                     dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_statements','movie','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
 
+#######################################################################################################
+
                     if (not ((extra:=cfgChecker.checkDict('advanced_settings','behavioral_statements','movie','favorited','extra',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
 
                         genre=cfgChecker.checkInteger('advanced_settings','behavioral_statements','movie','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
 
@@ -794,7 +827,11 @@ def cfgCheckYAML(cfg,init_dict):
 
                     dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_statements','episode','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
 
+#######################################################################################################
+
                     if (not ((extra:=cfgChecker.checkDict('advanced_settings','behavioral_statements','episode','favorited','extra',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
 
                         genre=cfgChecker.checkInteger('advanced_settings','behavioral_statements','episode','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
 
@@ -989,7 +1026,11 @@ def cfgCheckYAML(cfg,init_dict):
 
                         dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','favorited','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
 
+#######################################################################################################
+
                         if (not ((extra:=cfgChecker.checkDict('advanced_settings','behavioral_statements','audiobook','favorited','extra',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
 
                             genre=cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','favorited','extra','genre',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=2,errOut=False,comparisonValues=None)
 
@@ -1076,26 +1117,28 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
                 for behavioral_tag_movie in behavioral_tags_movie:
-                    if (not ((behavioral_tag_movie:=cfgChecker.checkString(*(),value=behavioral_tag_movie,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) == None)):
+                    if (not ((behavioral_tag_movie_ok:=cfgChecker.checkString(*(),value=behavioral_tag_movie,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) == None)):
 
 #######################################################################################################
 
-                        behavioral_tag_contents=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
-                        action=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+#######################################################################################################
 
-                        user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
 
-                        played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
 
-                        action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
 
-                        dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
 
-                        high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or basic_settings > filter_tags > movie > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1104,26 +1147,28 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
                 for behavioral_tag_episode in behavioral_tags_episode:
-                    if (not ((behavioral_tag_episode:=cfgChecker.checkString(*(),value=behavioral_tag_episode,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) == None)):
+                    if (not ((behavioral_tag_episode_ok:=cfgChecker.checkString(*(),value=behavioral_tag_episode,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) == None)):
 
 #######################################################################################################
 
-                        behavioral_tag_contents=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
-                        action=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+#######################################################################################################
 
-                        user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
 
-                        played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
 
-                        action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
 
-                        dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
 
-                        high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or basic_settings > filter_tags > episode > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1136,22 +1181,24 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                        behavioral_tag_contents=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
-                        action=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+#######################################################################################################
 
-                        user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
 
-                        played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
 
-                        action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
 
-                        dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
 
-                        high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
 
                     else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or basic_settings > filter_tags > audio > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
 
 #######################################################################################################
 
@@ -1165,38 +1212,24 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-                            behavioral_tag_contents=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
-
-                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
-
-                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
-
-                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
-
-                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                        else:
-                            cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
+                            if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-        #sets of global tags for user later
-        global_whitetag_set=set()
-        global_blacktag_set=set()
+                                action=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
 
-        #sets of tags for user later
-        movie_whitetag_set=set()
-        movie_blacktag_set=set()
-        episode_whitetag_set=set()
-        episode_blacktag_set=set()
-        audio_whitetag_set=set()
-        audio_blacktag_set=set()
-        audiobook_whitetag_set=set()
-        audiobook_blacktag_set=set()
+                                user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+
+                                played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+
+                                action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+
+                                dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                                high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                        else:
+                            cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or basic_settings > filter_tags > audiobook > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
 
 #######################################################################################################
 
