@@ -569,11 +569,14 @@ class data_checker:
 
 
     #Check for overlapping tags between blacklists and whitelists
-    def checkOverlappingTags(self,global_whitetag_set,global_blacktag_set,movie_whitetag_set,movie_blacktag_set,filter_movie_whitetag_set,filter_movie_blacktag_set,episode_whitetag_set,episode_blacktag_set,filter_episode_whitetag_set,filter_episode_blacktag_set,audio_whitetag_set,audio_blacktag_set,filter_audio_whitetag_set,filter_audio_blacktag_set,audiobook_whitetag_set=(),audiobook_blacktag_set=(),filter_audiobook_whitetag_set=(),filter_audiobook_blacktag_set=()):
+    def checkOverlappingTags(self,global_whitetag_set,global_blacktag_set,filter_global_whitetag_set,filter_global_blacktag_set,movie_whitetag_set,movie_blacktag_set,filter_movie_whitetag_set,filter_movie_blacktag_set,episode_whitetag_set,episode_blacktag_set,filter_episode_whitetag_set,filter_episode_blacktag_set,audio_whitetag_set,audio_blacktag_set,filter_audio_whitetag_set,filter_audio_blacktag_set,audiobook_whitetag_set=(),audiobook_blacktag_set=(),filter_audiobook_whitetag_set=(),filter_audiobook_blacktag_set=()):
 
             #check global blacktags and global whitetags do not have a common string
             if (overlapping_tags_set:=global_blacktag_set.intersection(global_whitetag_set)):
                 self.setCustomErrorText('ConfigError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > global\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+            #check global filter blacktags and global filter whitetags do not have a common string
+            if (overlapping_tags_set:=filter_global_blacktag_set.intersection(filter_global_whitetag_set)):
+                self.setCustomErrorText('ConfigError: The same tag cannot be used for both advanced_settings > blacktags > global and advanced_settings > whitetags > global\n\tTo proceed the following overlapping filter tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
 
         #######################################################################################################
 

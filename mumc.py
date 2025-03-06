@@ -32,7 +32,7 @@ def MUMC():
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
     #####WIP######
-    #get and check config values are what we expect them to be
+    #get and check user defined config values are what we expect them to be
     cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #after importing the config; remove old DEBUG if it exists
@@ -61,7 +61,7 @@ def MUMC():
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
-    #get and check config values are what we expect them to be
+    #get and check user defined + default config values are what we expect them to be
     cfg,init_dict=cfgCheckYAML(cfg,init_dict)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure

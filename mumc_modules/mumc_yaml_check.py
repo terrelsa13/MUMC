@@ -400,161 +400,10 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-        #sets of filter tags for user later
-        filter_movie_whitetag_set=set()
-        filter_movie_blacktag_set=set()
-        filter_episode_whitetag_set=set()
-        filter_episode_blacktag_set=set()
-        filter_audio_whitetag_set=set()
-        filter_audio_blacktag_set=set()
-        filter_audiobook_whitetag_set=set()
-        filter_audiobook_blacktag_set=set()
-
-#######################################################################################################
-
-        if (not ((filter_tags:=cfgChecker.checkDict('basic_settings','filter_tags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-            if (not ((movie:=cfgChecker.checkDict('basic_settings','filter_tags','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                if (not ((filtertagsMovieWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','movie','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_movie_whitetag_set.update(filtertagsMovieWhitetagsList)
-
-#######################################################################################################
-
-                    for filtertagMovie in filtertagsMovieWhitetagsList:
-                        if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','whitetags',filtertagsMovieWhitetagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagMovie)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-                if (not ((filtertagsMovieBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','movie','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_movie_blacktag_set.update(filtertagsMovieBlacktagsList)
-
-#######################################################################################################
-
-                    for filtertagMovie in filtertagsMovieBlacktagsList:
-                        if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','blacktags',filtertagsMovieBlacktagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagMovie)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-            if (not ((episode:=cfgChecker.checkDict('basic_settings','filter_tags','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                if (not ((filtertagsEpisodeWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','episode','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_episode_whitetag_set.update(filtertagsEpisodeWhitetagsList)
-
-#######################################################################################################
-
-                    for filtertagEpisode in filtertagsEpisodeWhitetagsList:
-                        if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','whitetags',filtertagsEpisodeWhitetagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagEpisode)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-                if (not ((filtertagsEpisodeBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','episode','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_episode_blacktag_set.update(filtertagsEpisodeBlacktagsList)
-
-#######################################################################################################
-
-                    for filtertagEpisode in filtertagsEpisodeBlacktagsList:
-                        if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','blacktags',filtertagsEpisodeBlacktagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagEpisode)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-            if (not ((audio:=cfgChecker.checkDict('basic_settings','filter_tags','audio',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                if (not ((filtertagsAudioWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','audio','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_audio_whitetag_set.update(filtertagsAudioWhitetagsList)
-
-#######################################################################################################
-
-                    for filtertagAudio in filtertagsAudioWhitetagsList:
-                        if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','whitetags',filtertagsAudioWhitetagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagAudio)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-                if (not ((filtertagsAudioBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','audio','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                    filter_audio_blacktag_set.update(filtertagsAudioBlacktagsList)
-
-#######################################################################################################
-
-                    for filtertagAudio in filtertagsAudioBlacktagsList:
-                        if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','blacktags',filtertagsAudioBlacktagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            if (not get_isFilterStatementTag(filtertagAudio)):
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-            if (isJellyfinServer(brand)):
-                if (not ((audiobook:=cfgChecker.checkDict('basic_settings','filter_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                    if (not ((filtertagsAudiobookWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                        filter_audiobook_whitetag_set.update(filtertagsAudiobookWhitetagsList)
-
-#######################################################################################################
-
-                        for filtertagAudiobook in filtertagsAudiobookWhitetagsList:
-                            if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','whitetags',filtertagsAudiobookWhitetagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                                if (not get_isFilterStatementTag(filtertagAudiobook)):
-                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-                    if (not ((filtertagsAudiobookBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-                        filter_audiobook_blacktag_set.update(filtertagsAudiobookBlacktagsList)
-
-#######################################################################################################
-
-                        for filtertagAudiobook in filtertagsAudiobookBlacktagsList:
-                            if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','blacktags',filtertagsAudiobookBlacktagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                                if (not get_isFilterStatementTag(filtertagAudiobook)):
-                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
-
-#######################################################################################################
-
-        if ((filter_statements == None) and (filter_tags == None)):
-            cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media item entry')
-            cfgChecker.printError()
-
-#######################################################################################################
-
     else:
         #something is not right with the basic_settings
         #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
-
-#######################################################################################################
-
-    #sets of global tags for user later
-    global_whitetag_set=set()
-    global_blacktag_set=set()
-
-    #sets of tags for user later
-    movie_whitetag_set=set()
-    movie_blacktag_set=set()
-    episode_whitetag_set=set()
-    episode_blacktag_set=set()
-    audio_whitetag_set=set()
-    audio_blacktag_set=set()
-    audiobook_whitetag_set=set()
-    audiobook_blacktag_set=set()
 
 #######################################################################################################
 
@@ -1105,261 +954,6 @@ def cfgCheckYAML(cfg,init_dict):
                         action_control=cfgChecker.checkInteger('advanced_settings','behavioral_statements','audiobook','blacklisted','action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
 
                         dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_statements','audiobook','blacklisted','dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
-        if (not ((behavioral_tags:=cfgChecker.checkDict('advanced_settings','behavioral_tags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-            if (not ((behavioral_tags_movie:=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for behavioral_tag_movie in behavioral_tags_movie:
-                    if (not ((behavioral_tag_movie_ok:=cfgChecker.checkString(*(),value=behavioral_tag_movie,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) == None)):
-
-#######################################################################################################
-
-                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
-
-                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
-
-                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
-
-                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
-
-                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                    else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or basic_settings > filter_tags > movie > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
-
-#######################################################################################################
-
-            if (not ((behavioral_tags_episode:=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for behavioral_tag_episode in behavioral_tags_episode:
-                    if (not ((behavioral_tag_episode_ok:=cfgChecker.checkString(*(),value=behavioral_tag_episode,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) == None)):
-
-#######################################################################################################
-
-                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
-
-                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
-
-                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
-
-                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
-
-                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                    else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or basic_settings > filter_tags > episode > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
-
-#######################################################################################################
-
-            if (not ((behavioral_tags_audio:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for behavioral_tag_audio in behavioral_tags_audio:
-                    if (not ((behavioral_tag_audio_ok:=cfgChecker.checkString(*(),value=behavioral_tag_audio,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) == None)):
-
-#######################################################################################################
-
-                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
-
-                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
-
-                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
-
-                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
-
-                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                    else:
-                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or basic_settings > filter_tags > audio > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
-
-#######################################################################################################
-
-            if (isJellyfinServer(brand)):
-                if (not ((behavioral_tags_audiobook:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                    for behavioral_tag_audiobook in behavioral_tags_audiobook:
-                        if (not ((behavioral_tag_audiobook_ok:=cfgChecker.checkString(*(),value=behavioral_tag_audiobook,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) == None)):
-
-#######################################################################################################
-
-                            if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                                action=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
-
-                                user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
-
-                                played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
-
-                                action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
-
-                                dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                                high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                        else:
-                            cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or basic_settings > filter_tags > audiobook > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
-
-#######################################################################################################
-
-        if (not ((whitetags:=cfgChecker.checkDict('advanced_settings','whitetags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-            if (not ((whitetags_global:=cfgChecker.checkList('advanced_settings','whitetags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for whitetag_global in whitetags_global:
-                    if (not ((whitetag_global:=cfgChecker.checkString('advanced_settings','whitetags','global',whitetags_global.index(whitetag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_global.find('\\') < 0) or (whitetag_global == None)):
-                        if (whitetag_global.find('\\') < 0):
-                            global_whitetag_set.add(whitetag_global)
-
-#######################################################################################################
-
-            if (not ((whitetags_movie:=cfgChecker.checkList('advanced_settings','whitetags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for whitetag_movie in whitetags_movie:
-                    if (not ((whitetag_movie:=cfgChecker.checkString('advanced_settings','whitetags','movie',whitetags_movie.index(whitetag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_movie.find('\\') < 0) or (whitetag_movie == None)):
-                        if (whitetag_movie.find('\\') < 0):
-                            movie_whitetag_set.add(whitetag_movie)
-
-#######################################################################################################
-
-            if (not ((whitetags_episode:=cfgChecker.checkList('advanced_settings','whitetags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for whitetag_episode in whitetags_episode:
-                    if (not ((whitetag_episode:=cfgChecker.checkString('advanced_settings','whitetags','episode',whitetags_episode.index(whitetag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_episode.find('\\') < 0) or (whitetag_episode == None)):
-                        if (whitetag_episode.find('\\') < 0):
-                            episode_whitetag_set.add(whitetag_episode)
-
-#######################################################################################################
-
-            if (not ((whitetags_audio:=cfgChecker.checkList('advanced_settings','whitetags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for whitetag_audio in whitetags_audio:
-                    if (not ((whitetag_audio:=cfgChecker.checkString('advanced_settings','whitetags','audio',whitetags_audio.index(whitetag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_audio.find('\\') < 0) or (whitetag_audio == None)):
-                        if (whitetag_audio.find('\\') < 0):
-                            audio_whitetag_set.add(whitetag_audio)
-
-#######################################################################################################
-
-            if (isJellyfinServer(brand)):
-                if (not ((whitetags_audiobook:=cfgChecker.checkList('advanced_settings','whitetags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                    for whitetag_audiobook in whitetags_audiobook:
-                        if (not ((whitetag_audiobook:=cfgChecker.checkString('advanced_settings','whitetags','audiobook',whitetags_audiobook.index(whitetag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            #if ((whitetag_audiobook.find('\\') < 0) or (whitetag_audiobook == None)):
-                            if (whitetag_audiobook.find('\\') < 0):
-                                audiobook_whitetag_set.add(whitetag_audiobook)
-
-#######################################################################################################
-
-        if (not ((blacktags:=cfgChecker.checkDict('advanced_settings','blacktags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-            if (not ((blacktags_global:=cfgChecker.checkList('advanced_settings','blacktags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for blacktag_global in blacktags_global:
-                    if (not ((blacktag_global:=cfgChecker.checkString('advanced_settings','blacktags','global',blacktags_global.index(blacktag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_global.find('\\') < 0) or (blacktag_global == None)):
-                        if (blacktag_global.find('\\') < 0):
-                            global_blacktag_set.add(blacktag_global)
-
-#######################################################################################################
-
-            if (not ((blacktags_movie:=cfgChecker.checkList('advanced_settings','blacktags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for blacktag_movie in blacktags_movie:
-                    if (not ((blacktag_movie:=cfgChecker.checkString('advanced_settings','blacktags','movie',blacktags_movie.index(blacktag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_movie.find('\\') < 0) or (blacktag_movie == None)):
-                        if (blacktag_movie.find('\\') < 0):
-                            movie_blacktag_set.add(blacktag_movie)
-
-#######################################################################################################
-
-            if (not ((blacktags_episode:=cfgChecker.checkList('advanced_settings','blacktags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for blacktag_episode in blacktags_episode:
-                    if (not ((blacktag_episode:=cfgChecker.checkString('advanced_settings','blacktags','episode',blacktags_episode.index(blacktag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_episode.find('\\') < 0) or (blacktag_episode == None)):
-                        if (blacktag_episode.find('\\') < 0):
-                            episode_blacktag_set.add(blacktag_episode)
-
-#######################################################################################################
-
-            if (not ((blacktags_audio:=cfgChecker.checkList('advanced_settings','blacktags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                for blacktag_audio in blacktags_audio:
-                    if (not ((blacktag_audio:=cfgChecker.checkString('advanced_settings','blacktags','audio',blacktags_audio.index(blacktag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_audio.find('\\') < 0) or (blacktag_audio == None)):
-                        if (blacktag_audio.find('\\') < 0):
-                            audio_blacktag_set.add(blacktag_audio)
-
-#######################################################################################################
-
-            if (isJellyfinServer(brand)):
-                if (not ((blacktags_audiobook:=cfgChecker.checkList('advanced_settings','blacktags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-#######################################################################################################
-
-                    for blacktag_audiobook in blacktags_audiobook:
-                        if (not ((blacktag_audiobook:=cfgChecker.checkString('advanced_settings','blacktags','audiobook',blacktags_audiobook.index(blacktag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            #if ((blacktag_audiobook.find('\\') < 0) or (blacktag_audiobook == None)):
-                            if (blacktag_audiobook.find('\\') < 0):
-                                audiobook_blacktag_set.add(blacktag_audiobook)
 
 #######################################################################################################
 
@@ -2164,8 +1758,483 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
+    else:
+        #something is not right with the advanced_settings
+        #cfgChecker.wasErrorFlag=True
+        cfgChecker.printError()
+
+#######################################################################################################
+#######################################################################################################
+#Do it for the TAGS!!!
+#######################################################################################################
+#######################################################################################################
+
+    #sets of global filter tags for use later
+    filter_global_whitetag_set=set()
+    filter_global_blacktag_set=set()
+
+    #sets of filter tags for use later
+    filter_movie_whitetag_set=set()
+    filter_movie_blacktag_set=set()
+    filter_episode_whitetag_set=set()
+    filter_episode_blacktag_set=set()
+    filter_audio_whitetag_set=set()
+    filter_audio_blacktag_set=set()
+    filter_audiobook_whitetag_set=set()
+    filter_audiobook_blacktag_set=set()
+
+    #sets of global tags for user later
+    global_whitetag_set=set()
+    global_blacktag_set=set()
+
+    #sets of tags for user later
+    movie_whitetag_set=set()
+    movie_blacktag_set=set()
+    episode_whitetag_set=set()
+    episode_blacktag_set=set()
+    audio_whitetag_set=set()
+    audio_blacktag_set=set()
+    audiobook_whitetag_set=set()
+    audiobook_blacktag_set=set()
+
+#######################################################################################################
+#filter tags
+#######################################################################################################
+
+    if (not ((basic_settings:=cfgChecker.checkDict('basic_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+        if (not ((filter_tags:=cfgChecker.checkDict('basic_settings','filter_tags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            if (not ((movie:=cfgChecker.checkDict('basic_settings','filter_tags','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                if (not ((filtertagsMovieWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','movie','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagMovie in filtertagsMovieWhitetagsList:
+                        if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','whitetags',filtertagsMovieWhitetagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagMovie)):
+                                filter_movie_whitetag_set.add(filtertagMovie)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+                if (not ((filtertagsMovieBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','movie','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagMovie in filtertagsMovieBlacktagsList:
+                        if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','blacktags',filtertagsMovieBlacktagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagMovie)):
+                                filter_movie_blacktag_set.add(filtertagMovie)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+            if (not ((episode:=cfgChecker.checkDict('basic_settings','filter_tags','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                if (not ((filtertagsEpisodeWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','episode','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagEpisode in filtertagsEpisodeWhitetagsList:
+                        if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','whitetags',filtertagsEpisodeWhitetagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagEpisode)):
+                                filter_episode_whitetag_set.add(filtertagEpisode)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+                if (not ((filtertagsEpisodeBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','episode','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagEpisode in filtertagsEpisodeBlacktagsList:
+                        if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','blacktags',filtertagsEpisodeBlacktagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagEpisode)):
+                                filter_episode_blacktag_set.add(filtertagEpisode)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+            if (not ((audio:=cfgChecker.checkDict('basic_settings','filter_tags','audio',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                if (not ((filtertagsAudioWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','audio','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagAudio in filtertagsAudioWhitetagsList:
+                        if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','whitetags',filtertagsAudioWhitetagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagAudio)):
+                                filter_audio_whitetag_set.add(filtertagAudio)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+                if (not ((filtertagsAudioBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','audio','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for filtertagAudio in filtertagsAudioBlacktagsList:
+                        if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','blacktags',filtertagsAudioBlacktagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            if (get_isFilterStatementTag(filtertagAudio)):
+                                filter_audio_blacktag_set.add(filtertagAudio)
+                            else:
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+            if (isJellyfinServer(brand)):
+                if (not ((audiobook:=cfgChecker.checkDict('basic_settings','filter_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    if (not ((filtertagsAudiobookWhitetagsList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','whitetags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                        for filtertagAudiobook in filtertagsAudiobookWhitetagsList:
+                            if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','whitetags',filtertagsAudiobookWhitetagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                                if (not get_isFilterStatementTag(filtertagAudiobook)):
+                                    filter_audiobook_whitetag_set.add(filtertagAudiobook)
+                                else:
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+                    if (not ((filtertagsAudiobookBlacktagsList:=cfgChecker.checkList('basic_settings','filter_tags','audiobook','blacktags',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                        for filtertagAudiobook in filtertagsAudiobookBlacktagsList:
+                            if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','blacktags',filtertagsAudiobookBlacktagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=12,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                                if (get_isFilterStatementTag(filtertagAudiobook)):
+                                    filter_audiobook_blacktag_set.add(filtertagAudiobook)
+                                else:
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained in the MUMC Wiki\n')
+
+#######################################################################################################
+
+        if ((filter_statements == None) and (filter_tags == None)):
+            cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media item entry')
+            cfgChecker.printError()
+
+#######################################################################################################
+
+    else:
+        #something is not right with the basic_settings
+        #cfgChecker.wasErrorFlag=True
+        cfgChecker.printError()
+
+#######################################################################################################
+#regular tags
+#######################################################################################################
+
+    if (not ((advanced_settings:=cfgChecker.checkDict('advanced_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+        if (not ((whitetags:=cfgChecker.checkDict('advanced_settings','whitetags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            if (not ((whitetags_global:=cfgChecker.checkList('advanced_settings','whitetags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for whitetag_global in whitetags_global:
+                    if (not ((whitetag_global:=cfgChecker.checkString('advanced_settings','whitetags','global',whitetags_global.index(whitetag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((whitetag_global.find('\\') < 0) or (whitetag_global == None)):
+                        if (whitetag_global.find('\\') < 0):
+                            global_whitetag_set.add(whitetag_global)
+                            if (get_isFilterStatementTag(whitetag_global)):
+                                filter_global_whitetag_set.add(whitetag_global)
+
+#######################################################################################################
+
+            if (not ((whitetags_movie:=cfgChecker.checkList('advanced_settings','whitetags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for whitetag_movie in whitetags_movie:
+                    if (not ((whitetag_movie:=cfgChecker.checkString('advanced_settings','whitetags','movie',whitetags_movie.index(whitetag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((whitetag_movie.find('\\') < 0) or (whitetag_movie == None)):
+                        if (whitetag_movie.find('\\') < 0):
+                            movie_whitetag_set.add(whitetag_movie)
+                            if (get_isFilterStatementTag(whitetag_movie)):
+                                filter_movie_whitetag_set.add(whitetag_movie)
+
+#######################################################################################################
+
+            if (not ((whitetags_episode:=cfgChecker.checkList('advanced_settings','whitetags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for whitetag_episode in whitetags_episode:
+                    if (not ((whitetag_episode:=cfgChecker.checkString('advanced_settings','whitetags','episode',whitetags_episode.index(whitetag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((whitetag_episode.find('\\') < 0) or (whitetag_episode == None)):
+                        if (whitetag_episode.find('\\') < 0):
+                            episode_whitetag_set.add(whitetag_episode)
+                            if (get_isFilterStatementTag(whitetag_episode)):
+                                filter_episode_whitetag_set.add(whitetag_episode)
+
+#######################################################################################################
+
+            if (not ((whitetags_audio:=cfgChecker.checkList('advanced_settings','whitetags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for whitetag_audio in whitetags_audio:
+                    if (not ((whitetag_audio:=cfgChecker.checkString('advanced_settings','whitetags','audio',whitetags_audio.index(whitetag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((whitetag_audio.find('\\') < 0) or (whitetag_audio == None)):
+                        if (whitetag_audio.find('\\') < 0):
+                            audio_whitetag_set.add(whitetag_audio)
+                            if (get_isFilterStatementTag(whitetag_audio)):
+                                filter_audio_whitetag_set.add(whitetag_audio)
+
+#######################################################################################################
+
+            if (isJellyfinServer(brand)):
+                if (not ((whitetags_audiobook:=cfgChecker.checkList('advanced_settings','whitetags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for whitetag_audiobook in whitetags_audiobook:
+                        if (not ((whitetag_audiobook:=cfgChecker.checkString('advanced_settings','whitetags','audiobook',whitetags_audiobook.index(whitetag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            #if ((whitetag_audiobook.find('\\') < 0) or (whitetag_audiobook == None)):
+                            if (whitetag_audiobook.find('\\') < 0):
+                                audiobook_whitetag_set.add(whitetag_audiobook)
+                                if (get_isFilterStatementTag(whitetag_audiobook)):
+                                    filter_audiobook_whitetag_set.add(whitetag_audiobook)
+
+#######################################################################################################
+
+        if (not ((blacktags:=cfgChecker.checkDict('advanced_settings','blacktags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            if (not ((blacktags_global:=cfgChecker.checkList('advanced_settings','blacktags','global',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for blacktag_global in blacktags_global:
+                    if (not ((blacktag_global:=cfgChecker.checkString('advanced_settings','blacktags','global',blacktags_global.index(blacktag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((blacktag_global.find('\\') < 0) or (blacktag_global == None)):
+                        if (blacktag_global.find('\\') < 0):
+                            global_blacktag_set.add(blacktag_global)
+                            if (get_isFilterStatementTag(blacktag_global)):
+                                filter_global_blacktag_set.add(blacktag_global)
+
+#######################################################################################################
+
+            if (not ((blacktags_movie:=cfgChecker.checkList('advanced_settings','blacktags','movie',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for blacktag_movie in blacktags_movie:
+                    if (not ((blacktag_movie:=cfgChecker.checkString('advanced_settings','blacktags','movie',blacktags_movie.index(blacktag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((blacktag_movie.find('\\') < 0) or (blacktag_movie == None)):
+                        if (blacktag_movie.find('\\') < 0):
+                            movie_blacktag_set.add(blacktag_movie)
+                            if (get_isFilterStatementTag(blacktag_movie)):
+                                filter_movie_blacktag_set.add(blacktag_movie)
+
+#######################################################################################################
+
+            if (not ((blacktags_episode:=cfgChecker.checkList('advanced_settings','blacktags','episode',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for blacktag_episode in blacktags_episode:
+                    if (not ((blacktag_episode:=cfgChecker.checkString('advanced_settings','blacktags','episode',blacktags_episode.index(blacktag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((blacktag_episode.find('\\') < 0) or (blacktag_episode == None)):
+                        if (blacktag_episode.find('\\') < 0):
+                            episode_blacktag_set.add(blacktag_episode)
+                            if (get_isFilterStatementTag(blacktag_episode)):
+                                filter_episode_blacktag_set.add(blacktag_episode)
+
+#######################################################################################################
+
+            if (not ((blacktags_audio:=cfgChecker.checkList('advanced_settings','blacktags','audio',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for blacktag_audio in blacktags_audio:
+                    if (not ((blacktag_audio:=cfgChecker.checkString('advanced_settings','blacktags','audio',blacktags_audio.index(blacktag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        #if ((blacktag_audio.find('\\') < 0) or (blacktag_audio == None)):
+                        if (blacktag_audio.find('\\') < 0):
+                            audio_blacktag_set.add(blacktag_audio)
+                            if (get_isFilterStatementTag(blacktag_audio)):
+                                filter_audio_blacktag_set.add(blacktag_audio)
+
+#######################################################################################################
+
+            if (isJellyfinServer(brand)):
+                if (not ((blacktags_audiobook:=cfgChecker.checkList('advanced_settings','blacktags','audiobook',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for blacktag_audiobook in blacktags_audiobook:
+                        if (not ((blacktag_audiobook:=cfgChecker.checkString('advanced_settings','blacktags','audiobook',blacktags_audiobook.index(blacktag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                            #if ((blacktag_audiobook.find('\\') < 0) or (blacktag_audiobook == None)):
+                            if (blacktag_audiobook.find('\\') < 0):
+                                audiobook_blacktag_set.add(blacktag_audiobook)
+                                if (get_isFilterStatementTag(blacktag_audiobook)):
+                                    filter_audiobook_blacktag_set.add(blacktag_audiobook)
+
+#######################################################################################################
+#behavioral tags
+#######################################################################################################
+
+        if (not ((behavioral_tags:=cfgChecker.checkDict('advanced_settings','behavioral_tags',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+            if (not ((behavioral_tags_movie:=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for behavioral_tag_movie in behavioral_tags_movie:
+                    if (not ((behavioral_tag_movie_ok:=cfgChecker.checkString(*(),value=behavioral_tag_movie,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) == None)):
+
+#######################################################################################################
+
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','movie',behavioral_tag_movie_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    else:
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > movie > ' + str(behavioral_tag_movie) + ' must be a(n) string or does not match any basic_settings > filter_tags > movie > whitetags or basic_settings > filter_tags > movie > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_movie_whitetag_set) + list(filter_movie_blacktag_set))) + '\n')
+
+#######################################################################################################
+
+            if (not ((behavioral_tags_episode:=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for behavioral_tag_episode in behavioral_tags_episode:
+                    if (not ((behavioral_tag_episode_ok:=cfgChecker.checkString(*(),value=behavioral_tag_episode,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) == None)):
+
+#######################################################################################################
+
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','episode',behavioral_tag_episode_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    else:
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > episode > ' + str(behavioral_tag_episode) + ' must be a(n) string or does not match any basic_settings > filter_tags > episode > whitetags or basic_settings > filter_tags > episode > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_episode_whitetag_set) + list(filter_episode_blacktag_set))) + '\n')
+
+#######################################################################################################
+
+            if (not ((behavioral_tags_audio:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                for behavioral_tag_audio in behavioral_tags_audio:
+                    if (not ((behavioral_tag_audio_ok:=cfgChecker.checkString(*(),value=behavioral_tag_audio,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) == None)):
+
+#######################################################################################################
+
+                        if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                            action=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+
+                            user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+
+                            played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+
+                            action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+
+                            dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                            high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audio',behavioral_tag_audio_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    else:
+                        cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audio > ' + str(behavioral_tag_audio) + ' must be a(n) string or does not match any basic_settings > filter_tags > audio > whitetags or basic_settings > filter_tags > audio > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audio_whitetag_set) + list(filter_audio_blacktag_set))) + '\n')
+
+#######################################################################################################
+
+            if (isJellyfinServer(brand)):
+                if (not ((behavioral_tags_audiobook:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                    for behavioral_tag_audiobook in behavioral_tags_audiobook:
+                        if (not ((behavioral_tag_audiobook_ok:=cfgChecker.checkString(*(),value=behavioral_tag_audiobook,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=False,comparisonValues=list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) == None)):
+
+#######################################################################################################
+
+                            if  (not ((behavioral_tag_contents:=cfgChecker.checkDict('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+
+#######################################################################################################
+
+                                action=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['keep','delete'])
+
+                                user_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'user_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all'])
+
+                                played_conditional=cfgChecker.checkString('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'played_conditional',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=['all_all','any_any','any_all','all_any','any_played','all_played','any_created','all_created','ignore'])
+
+                                action_control=cfgChecker.checkInteger('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'action_control',value=None,instanceType=cfgChecker.int,minValue=0,maxValue=8,errOut=True,comparisonValues=None)
+
+                                dynamic_behavior=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'dynamic_behavior',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                                high_priority=cfgChecker.checkBoolean('advanced_settings','behavioral_tags','audiobook',behavioral_tag_audiobook_ok,'high_priority',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                        else:
+                            cfgChecker.setCustomErrorText('ConfigError: advanced_settings > behavioral_tags > audiobook > ' + str(behavioral_tag_audiobook) + ' must be a(n) string or does not match any basic_settings > filter_tags > audiobook > whitetags or basic_settings > filter_tags > audiobook > blacktags\n\tValid value(s) are: ' + ', '.join(str(element) for element in (list(filter_audiobook_whitetag_set) + list(filter_audiobook_blacktag_set))) + '\n')
+
+#######################################################################################################
+
+    else:
+        #something is not right with the advanced_settings
+        #cfgChecker.wasErrorFlag=True
+        cfgChecker.printError()
+
+#######################################################################################################
+
     #Check for overlapping tags between blacklists and whitelists
-    cfgChecker.checkOverlappingTags(global_whitetag_set,global_blacktag_set,
+    cfgChecker.checkOverlappingTags(global_whitetag_set,global_blacktag_set,filter_global_whitetag_set,filter_global_blacktag_set,
                                       movie_whitetag_set,movie_blacktag_set,filter_movie_whitetag_set,filter_movie_blacktag_set,
                                       episode_whitetag_set,episode_blacktag_set,filter_episode_whitetag_set,filter_episode_blacktag_set,
                                       audio_whitetag_set,audio_blacktag_set,filter_audio_whitetag_set,filter_audio_blacktag_set,
@@ -2183,6 +2252,7 @@ def cfgCheckYAML(cfg,init_dict):
         #sys.exit(0)
 
 #######################################################################################################
+
     return cfg,init_dict
 
 
