@@ -1031,40 +1031,39 @@ def cfgCheckYAML(cfg,init_dict):
 
 #######################################################################################################
 
-        if (not ((lidarr:=cfgChecker.checkDict('advanced_settings','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        #if (not ((lidarr:=cfgChecker.checkDict('advanced_settings','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-            if (not ((album:=cfgChecker.checkDict('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            #if (not ((album:=cfgChecker.checkDict('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-                unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','album','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+                #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','album','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-                remove=cfgChecker.checkBoolean('advanced_settings','lidarr','album','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
-            if (not ((track:=cfgChecker.checkDict('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                #remove=cfgChecker.checkBoolean('advanced_settings','lidarr','album','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-                unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','track','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+            #if (not ((track:=cfgChecker.checkDict('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-        if (isJellyfinServer(brand)):
-            if (not ((readarr:=cfgChecker.checkDict('advanced_settings','readarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','track','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-                if (not ((book:=cfgChecker.checkDict('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        #if (not ((readarr:=cfgChecker.checkDict('advanced_settings','readarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-                    unmonitor=cfgChecker.checkBoolean('advanced_settings','readarr','book','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+            #if (not ((book:=cfgChecker.checkDict('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
-                    remove=cfgChecker.checkBoolean('advanced_settings','readarr','book','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+#######################################################################################################
+
+                #unmonitor=cfgChecker.checkBoolean('advanced_settings','readarr','book','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                #remove=cfgChecker.checkBoolean('advanced_settings','readarr','book','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 

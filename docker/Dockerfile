@@ -17,6 +17,7 @@ RUN mkdir -p logs/
 RUN touch config/mumc_config.yaml
 RUN touch logs/mumc_DEBUG.log
 RUN touch logs/mumc_CRON_OUTPUT.log
+
 COPY mumc_modules/*.py mumc_modules/
 COPY mumc.py .
 
