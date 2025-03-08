@@ -8,10 +8,11 @@ from mumc_modules.mumc_data_checks import data_checker
 
 
 #Check select config variables are as expected
-def cfgCheckYAML(cfg,init_dict):
+#def cfgCheckYAML(cfg,init_dict):
+def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
-    cfgChecker=data_checker(cfg,init_dict)
+    #cfgChecker=data_checker(cfg,init_dict)
 
 #######################################################################################################
 
@@ -26,12 +27,14 @@ def cfgCheckYAML(cfg,init_dict):
     if (errorFlag):
         cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
 
+    '''
     errorFlag=True
     if (checkYAMLVersion(cfg,init_dict)):
         errorFlag=False
 
     if (errorFlag):
         cfgChecker.setCustomErrorText('ConfigError: ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']))
+    '''
 
 #######################################################################################################
 
@@ -1930,7 +1933,7 @@ def cfgCheckYAML(cfg,init_dict):
 #######################################################################################################
 
         if ((filter_statements == None) and (filter_tags == None)):
-            cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media item entry')
+            cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media type entry')
             cfgChecker.printError()
 
 #######################################################################################################
@@ -1944,7 +1947,7 @@ def cfgCheckYAML(cfg,init_dict):
 #regular tags
 #######################################################################################################
 
-    if (not ((advanced_settings:=cfgChecker.checkDict('advanced_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+    if (not ((advanced_settings:=cfgChecker.checkDict('advanced_settings',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
@@ -2243,18 +2246,12 @@ def cfgCheckYAML(cfg,init_dict):
 
     cfgChecker.printError()
 
-    ##Bring all errors found to users attention
-    #if (not (error_found_in_mumc_config_yaml == '')):
-        #if (init_dict['DEBUG']):
-            #appendTo_DEBUG_log("\n" + error_found_in_mumc_config_yaml,2,init_dict)
-        #print('\n' + error_found_in_mumc_config_yaml)
-        #sys.exit(0)
-
 #######################################################################################################
 
-    return cfg,init_dict
+    return cfg
 
 
+'''
 #admin_settings and server have to be checked early
 def pre_cfgCheckYAML(cfg):
     error_found_in_mumc_config_yaml=''
@@ -2291,4 +2288,41 @@ def pre_cfgCheckYAML(cfg):
     #Bring all errors found to users attention
     if (not (error_found_in_mumc_config_yaml == '')):
         print('\n' + error_found_in_mumc_config_yaml)
+        sys.exit(0)
+'''
+
+
+def pre_cfgCheckYAML(cfg,init_dict):
+    errorFlag=False
+
+    try:
+        cfg['version']=cfg['version']
+    except:
+        errorFlag=True
+
+    if (errorFlag):
+        #Bring error to attention
+        print('\nConfigError: version does not exist\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
+        sys.exit(0)
+
+    try:
+        if (not (isinstance(cfg['version'],str))):
+            errorFlag=True
+    except:
+        errorFlag=True
+
+    if (errorFlag):
+        #Bring error to attention
+        print('\nConfigError: version must be a(n) string\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
+        sys.exit(0)
+
+    try:
+        if (not (checkYAMLVersion(cfg,init_dict))):
+            errorFlag=True
+    except:
+        errorFlag=True
+
+    if (errorFlag):
+        #Bring error to attention
+        print('\nConfigError: configuration - ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']) + '\n')
         sys.exit(0)

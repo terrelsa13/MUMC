@@ -22,12 +22,13 @@ def merge_configuration(cfg_default,cfg_file):
     try:
         cfg_default['version']=cfg_file['version']
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: version is missing from the MUMC config file\n'
+        error_found_in_mumc_config_yaml+='ConfigError: version is missing from the MUMC config file\n'
 
     try:
         cfg_file['advanced_settings']=cfg_file['advanced_settings']
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings is missing from the MUMC config file\n'
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigError: advanced_settings is missing from the MUMC config file\n'
     try:
         cfg_default['DEBUG']=cfg_file['DEBUG']
     except:
@@ -1523,7 +1524,8 @@ def merge_configuration(cfg_default,cfg_file):
     try:
         cfg_default['advanced_settings']['REMOVE_FILES']=cfg_file['advanced_settings']['REMOVE_FILES']
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: advanced_settings > REMOVE_FILES is missing from the MUMC config file\n'
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigError: advanced_settings > REMOVE_FILES is missing from the MUMC config file\n'
 
     try:
         cfg_default['admin_settings']['behavior']['list']=cfg_file['admin_settings']['behavior']['list']
@@ -1542,16 +1544,18 @@ def merge_configuration(cfg_default,cfg_file):
     try:
         cfg_default['admin_settings']['server']['url']=cfg_file['admin_settings']['server']['url']
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > url is missing from the MUMC config file\n'
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > server > url is missing from the MUMC config file\n'
     try:
         cfg_default['admin_settings']['server']['auth_key']=cfg_file['admin_settings']['server']['auth_key']
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > auth_key is missing from the MUMC config file\n'
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > server > auth_key is missing from the MUMC config file\n'
     try:
         cfg_default['admin_settings']['server']['admin_id']=cfg_file['admin_settings']['server']['admin_id']
     except:
         pass
-        #error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > server > admin_id is missing from the MUMC config file\n'
+        #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > server > admin_id is missing from the MUMC config file\n'
 
     try:
         #cfg_default['admin_settings']['users']=cfg_file['admin_settings']['users']
@@ -1564,12 +1568,12 @@ def merge_configuration(cfg_default,cfg_file):
                     userInfo['user_id']=userInfo['user_id']
                     cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['user_id']=userInfo['user_id']
                 except:
-                    error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > user_id is missing from the MUMC config file\n'
+                    error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > user_id is missing from the MUMC config file\n'
                 try:
                     userInfo['user_name']=userInfo['user_name']
                     cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['user_name']=userInfo['user_name']
                 except:
-                    error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > user_name is missing from the MUMC config file\n'
+                    error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > user_name is missing from the MUMC config file\n'
                 try:
                     userInfo['whitelist']=userInfo['whitelist']
                     if (len(userInfo['whitelist']) >= 1):
@@ -1581,17 +1585,17 @@ def merge_configuration(cfg_default,cfg_file):
                                 whitelistInfo['lib_id']=whitelistInfo['lib_id']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['lib_id']=whitelistInfo['lib_id']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > lib_id is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > lib_id is missing from the MUMC config file\n'
                             try:
                                 whitelistInfo['collection_type']=whitelistInfo['collection_type']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['collection_type']=whitelistInfo['collection_type']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > collection_type is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > collection_type is missing from the MUMC config file\n'
                             try:
                                 whitelistInfo['path']=whitelistInfo['path']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['path']=whitelistInfo['path']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > path is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > path is missing from the MUMC config file\n'
                             try:
                                 whitelistInfo['network_path']=whitelistInfo['network_path']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['network_path']=whitelistInfo['network_path']
@@ -1622,17 +1626,17 @@ def merge_configuration(cfg_default,cfg_file):
                                 blacklistInfo['lib_id']=blacklistInfo['lib_id']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['lib_id']=blacklistInfo['lib_id']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > lib_id is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > lib_id is missing from the MUMC config file\n'
                             try:
                                 blacklistInfo['collection_type']=blacklistInfo['collection_type']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['collection_type']=blacklistInfo['collection_type']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > collection_type is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > collection_type is missing from the MUMC config file\n'
                             try:
                                 blacklistInfo['path']=blacklistInfo['path']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['path']=blacklistInfo['path']
                             except:
-                                error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > path is missing from the MUMC config file\n'
+                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_file['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > path is missing from the MUMC config file\n'
                             try:
                                 blacklistInfo['network_path']=blacklistInfo['network_path']
                                 cfg_default['admin_settings']['users'][cfg_file['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['network_path']=blacklistInfo['network_path']
@@ -1653,9 +1657,11 @@ def merge_configuration(cfg_default,cfg_file):
                 except:
                     cfg_default['admin_settings']['users'][1]['blacklist']=cfg_default['admin_settings']['users'][0]['blacklist']
         else:
-            error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users list is empty\n'
+            pass
+            #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users list is empty\n'
     except:
-        error_found_in_mumc_config_yaml+='ConfigNameError: admin_settings > users is missing from the MUMC config file\n'
+        pass
+        #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users is missing from the MUMC config file\n'
 
     cfg_default['admin_settings']['users'].pop(0)
 

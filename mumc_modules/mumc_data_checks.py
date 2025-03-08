@@ -3,14 +3,15 @@ from collections.abc import Mapping
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
+from mumc_modules.mumc_versions import checkYAMLVersion,get_script_version
 
 
 #Data checker class
 class data_checker:
     #Initialize and define data checker variables
-    def __init__(self,cfg=(),init_dict=()):
+    def __init__(self,cfg=(),DEBUG=0):
         self.cfg=cfg
-        self.init_dict=init_dict
+        self.DEBUG=DEBUG
         self.brand=None
         self.wasErrorFlag=False
         self.errorString=''
@@ -35,8 +36,8 @@ class data_checker:
     def printError(self):
         if (self.wasError()):
             #Bring all errors found to users attention
-            if (self.init_dict['DEBUG']):
-                appendTo_DEBUG_log("\n" + self.errorString,2,self.init_dict)
+            #if (self.DEBUG):
+                #appendTo_DEBUG_log("\n" + self.errorString,2,self.)
             print('\n' + self.errorString)
             self.wasErrorExit()
 
@@ -369,8 +370,7 @@ class data_checker:
                     )):
                         error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' + at least one user_id is not a 32-character alphanumeric string\n'
             else:
-                error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_id key is missing for at least one user\n'
-
+                error_found_in_mumc_config_yaml+='ConfigError: The ' + config_var_name + ' > user_id key is missing for at least one user\n'
 
             #Check if user_name exists
             if ('user_name' in check_irt):
@@ -389,7 +389,7 @@ class data_checker:
                 if (not (isinstance(check_irt['user_name'], str))):
                     error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' the user_name is not a string or is not a list for at least one user\n'
             else:
-                error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > user_name is missing for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigError: The ' + config_var_name + ' > user_name is missing for at least one user\n'
 
             #Check if whitelist exists
             if ('whitelist' in check_irt):
@@ -397,7 +397,7 @@ class data_checker:
                 if (not (isinstance(check_irt['whitelist'], list))):
                     error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' the whitelist is not a string or is not a list for at least one user\n'
             else:
-                error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > whitelist is missing for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigError: The ' + config_var_name + ' > whitelist is missing for at least one user\n'
 
             #Check if blacklist exists
             if ('blacklist' in check_irt):
@@ -405,7 +405,7 @@ class data_checker:
                 if (not (isinstance(check_irt['blacklist'], list))):
                     error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' the blacklist is not a string or is not a list for at least one user\n'
             else:
-                error_found_in_mumc_config_yaml+='ConfigNameError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
+                error_found_in_mumc_config_yaml+='ConfigError: The ' + config_var_name + ' > blacklist is missing for at least one user\n'
 
             #Get number of elements
             for user_elements in check_irt:

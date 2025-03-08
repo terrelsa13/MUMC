@@ -12,10 +12,12 @@ from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
+#from mumc_modules.mumc_yaml_check import cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_default import create_default_config,merge_configuration
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
+from mumc_modules.mumc_data_checks import data_checker
 #from memory_profiler import profile
 
 
@@ -31,9 +33,15 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
+    #precheck the config for the minimum needed variables to run
+    #pre_cfgCheckYAML(cfg)
+
     #####WIP######
+    pre_cfgCheckYAML(cfg,init_dict)
+    cfgChecker=data_checker(cfg,init_dict['DEBUG'])
+
     #get and check user defined config values are what we expect them to be
-    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
+    cfg=cfgCheckYAML(cfg,cfgChecker)
 
     #after importing the config; remove old DEBUG if it exists
     delete_debug_log(init_dict)
@@ -44,8 +52,8 @@ def MUMC():
     #remember original config for when user wants to update existing config file
     cfg_orig=copy.deepcopy(cfg)
 
-    #precheck the config for the minimum needed variables to run
-    pre_cfgCheckYAML(cfg)
+    ##precheck the config for the minimum needed variables to run
+    #pre_cfgCheckYAML(cfg)
 
     #create default config file
     default_config=create_default_config(cfg['admin_settings']['server']['brand'])
