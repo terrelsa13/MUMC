@@ -1,12 +1,21 @@
 import json
 import yaml
 from pathlib import Path
-from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file,get_default_config_path
 
 
 class NoAliasDumper(yaml.SafeDumper):
     def ignore_aliases(self, data):
         return True
+
+
+def open_and_return_file(full_file_path):
+    with open(full_file_path, 'r') as opened_file:
+        return yaml.safe_load(opened_file)
+
+
+def open_and_return_default_config():
+    return open_and_return_file(get_default_config_path())
 
 
 def save_yaml_config(dataInput,filePathName):

@@ -1,5 +1,5 @@
 ---
-version: '5.11.0-alpha'
+version:
 basic_settings:
   filter_statements:
     movie:
@@ -215,49 +215,89 @@ advanced_settings:
         played_conditional: any_played
         action_control: 3
         dynamic_behavior: false
+    audiobook:
+      favorited:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+        extra:
+          genre: 0
+          audiobook_genre: 0
+          library_genre: 0
+          track_author: 0
+          author: 0
+          library_author: 0
+      whitetagged:
+        action: keep
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+      blacktagged:
+        action: delete
+        user_conditional: all
+        played_conditional: any_played
+        action_control: 0
+        dynamic_behavior: false
+      whitelisted:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+      blacklisted:
+        action: delete
+        user_conditional: any
+        played_conditional: any_played
+        action_control: 3
+        dynamic_behavior: false
   behavioral_tags:
     movie:
-      null:
-        action: delete
-        user_conditional: all
-        played_conditional: ignore
-        action_control: 0
-        dynamic_behavior: false
-        high_priority: false
+      #null:-1:>=:1
+        #action: delete
+        #user_conditional: all
+        #played_conditional: ignore
+        #action_control: 0
+        #dynamic_behavior: false
+        #high_priority: false
     episode:
-      null:
-        action: delete
-        user_conditional: all
-        played_conditional: ignore
-        action_control: 0
-        dynamic_behavior: false
-        high_priority: false
+      #null:-1:>=:1
+        #action: delete
+        #user_conditional: all
+        #played_conditional: ignore
+        #action_control: 0
+        #dynamic_behavior: false
+        #high_priority: false
     audio:
-      null:
-        action: delete
-        user_conditional: all
-        played_conditional: ignore
-        action_control: 0
-        dynamic_behavior: false
-        high_priority: false
+      #null:-1:>=:1
+        #action: delete
+        #user_conditional: all
+        #played_conditional: ignore
+        #action_control: 0
+        #dynamic_behavior: false
+        #high_priority: false
     audiobook:
-      null:
-        action: delete
-        user_conditional: all
-        played_conditional: ignore
-        action_control: 0
-        dynamic_behavior: false
-        high_priority: false
+      #null:-1:>=:1
+        #action: delete
+        #user_conditional: all
+        #played_conditional: ignore
+        #action_control: 0
+        #dynamic_behavior: false
+        #high_priority: false
   whitetags:
     global: []
     movie: []
     episode: []
     audio: []
+    audiobook: []
   blacktags:
     global: []
     movie: []
     episode: []
     audio: []
+    audiobook: []
   delete_empty_folders:
     episode:
       season: false
@@ -474,22 +514,22 @@ admin_settings:
     users:
       monitor_disabled: true
   users:
-  - user_id: null
-    user_name: null
-    whitelist:
-    - lib_id: null
-      collection_type: null
-      path: null
-      network_path: null
-      subfolder_id: null
-      lib_enabled: true
-    blacklist:
-    - lib_id: null
-      collection_type: null
-      path: null
-      network_path: null
-      subfolder_id: null
-      lib_enabled: true
+  #- user_id: null
+    #user_name: null
+    #whitelist:
+    #- lib_id: null
+      #collection_type: null
+      #path: null
+      #network_path: null
+      #subfolder_id: null
+      #lib_enabled: true
+    #blacklist:
+    #- lib_id: null
+      #collection_type: null
+      #path: null
+      #network_path: null
+      #subfolder_id: null
+      #lib_enabled: true
   media_managers:
     radarr:
       enabled: true

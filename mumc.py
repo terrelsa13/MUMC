@@ -11,10 +11,12 @@ from mumc_modules.mumc_console_info import print_informational_header,print_star
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
+from mumc_modules.mumc_output import open_and_return_default_config
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 #from mumc_modules.mumc_yaml_check import cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
-from mumc_modules.mumc_config_default import create_default_config,merge_configuration
+#from mumc_modules.mumc_config_merge import create_default_config,merge_configurations
+from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_data_checks import data_checker
@@ -33,15 +35,13 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
-    #precheck the config for the minimum needed variables to run
-    #pre_cfgCheckYAML(cfg)
-
     #####WIP######
+    #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
-    cfgChecker=data_checker(cfg,init_dict['DEBUG'])
 
     #get and check user defined config values are what we expect them to be
-    cfg=cfgCheckYAML(cfg,cfgChecker)
+    userCfgChecker=data_checker(cfg,init_dict['DEBUG'])
+    cfg=cfgCheckYAML(cfg,userCfgChecker)
 
     #after importing the config; remove old DEBUG if it exists
     delete_debug_log(init_dict)
@@ -52,25 +52,23 @@ def MUMC():
     #remember original config for when user wants to update existing config file
     cfg_orig=copy.deepcopy(cfg)
 
-    ##precheck the config for the minimum needed variables to run
-    #pre_cfgCheckYAML(cfg)
-
     #create default config file
-    default_config=create_default_config(cfg['admin_settings']['server']['brand'])
+    default_config=open_and_return_default_config()
 
     #copy over path info for use later
     default_config['mumc_path']=init_dict['mumc_path']
     default_config['debug_file_name']=init_dict['debug_file_name']
 
     #merge user config into default config
-    cfg=merge_configuration(default_config,cfg)
+    cfg=merge_configurations(default_config,cfg)
 
     if (cfg['DEBUG']):
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
     #get and check user defined + default config values are what we expect them to be
-    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
+    cfgChecker=data_checker(cfg,cfg['DEBUG'])
+    cfg=cfgCheckYAML(cfg,cfgChecker)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))

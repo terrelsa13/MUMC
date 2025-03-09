@@ -3,12 +3,114 @@ from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_bas
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_config_not_setup_to_delete_media
-from mumc_modules.mumc_configuration_yaml import yaml_configurationBuilder
+#from mumc_modules.mumc_config_defaults import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
+import copy
+import yaml
+from mumc_modules.mumc_output import save_yaml_config,print2json,open_and_return_default_config
+
+
+def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
+
+    return {cleanKey:dirty_dict[cleanKey] for cleanKey in clean_keys}
+
+
+def yaml_configurationBuilder(the_dict):
+
+    #strip out uneccessary data
+    config_data=filterYAMLConfigKeys_ToKeep(copy.deepcopy(the_dict),'version','basic_settings','advanced_settings','admin_settings','DEBUG')
+
+    #start building config yaml
+    #config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
+    config_data=open_and_return_default_config()
+
+    config_data['basic_settings']['filter_statements'].pop('audio')
+
+    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+        config_data['basic_settings']['filter_statements'].pop('audiobook')
+
+    config_data['basic_settings'].pop('filter_tags')
+    config_data['advanced_settings'].pop('filter_statements')
+    config_data['advanced_settings'].pop('behavioral_statements')
+    config_data['advanced_settings'].pop('behavioral_tags')
+
+    if (the_dict['advanced_settings']['whitetags']['global'] == []):
+        config_data['advanced_settings'].pop('whitetags')
+    else:
+        config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
+        config_data['advanced_settings']['whitetags'].pop('movie')
+        config_data['advanced_settings']['whitetags'].pop('episode')
+        config_data['advanced_settings']['whitetags'].pop('audio')
+        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+            config_data['advanced_settings']['whitetags'].pop('audiobook')
+    if (the_dict['advanced_settings']['blacktags']['global'] == []):
+        config_data['advanced_settings'].pop('blacktags')
+    else:
+        config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
+        config_data['advanced_settings']['blacktags'].pop('movie')
+        config_data['advanced_settings']['blacktags'].pop('episode')
+        config_data['advanced_settings']['blacktags'].pop('audio')
+        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
+            config_data['advanced_settings']['blacktags'].pop('audiobook')
+
+    config_data['advanced_settings'].pop('delete_empty_folders')
+    config_data['advanced_settings'].pop('radarr')
+    config_data['advanced_settings'].pop('sonarr')
+    #config_data['advanced_settings'].pop('lidarr')
+    #config_data['advanced_settings'].pop('readarr')
+    config_data['advanced_settings'].pop('trakt_fix')
+    config_data['advanced_settings'].pop('console_controls')
+    config_data['advanced_settings'].pop('UPDATE_CONFIG')
+
+    if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
+        config_data['admin_settings'].pop('behavior')
+    else:
+        if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+            config_data['admin_settings']['behavior'].pop('list')
+        else:
+            config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+        if (the_dict['admin_settings']['behavior']['matching'] == 'byId'):
+            config_data['admin_settings']['behavior'].pop('matching')
+        else:
+            config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+        if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+            config_data['admin_settings']['behavior'].pop('users')
+        else:
+            config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+
+    if (the_dict['admin_settings']['media_managers']['radarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('radarr')
+    else:
+        config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
+
+    if (the_dict['admin_settings']['media_managers']['sonarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('sonarr')
+    else:
+        config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
+
+    if (the_dict['admin_settings']['media_managers']['lidarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('lidarr')
+    else:
+        config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
+
+    if (the_dict['admin_settings']['media_managers']['readarr'] == {}):
+        config_data['admin_settings']['media_managers'].pop('readarr')
+    else:
+        config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
+
+    if (len(config_data['admin_settings']['media_managers']) == 0):
+        config_data['admin_settings'].pop('media_managers')
+
+    config_data['admin_settings'].pop('api_controls')
+    config_data['admin_settings'].pop('cache')
+    config_data['admin_settings'].pop('output_controls')
+
+    #save yaml config file
+    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
 
 
 #get user input needed to build or edit the mumc_config.yaml file
