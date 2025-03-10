@@ -39,7 +39,7 @@ def MUMC():
     #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
 
-    #get and check user defined config values are what we expect them to be
+    #get and full check user defined config values are what we expect them to be
     userCfgChecker=data_checker(cfg,init_dict['DEBUG'])
     cfg=cfgCheckYAML(cfg,userCfgChecker)
 

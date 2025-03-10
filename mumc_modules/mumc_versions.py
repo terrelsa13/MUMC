@@ -53,19 +53,6 @@ def get_operating_system_info():
     return(platform.platform())
 
 
-#Get major, minor and patch version numbers along with release version information
-def get_semantic_version_parts(version):
-    semVersionDict={}
-    try:
-        semVersionDict['major']=abs(int(get_major_semantic_version(version)))
-        semVersionDict['minor']=abs(int(get_minor_semantic_version(version)))
-        semVersionDict['patch']=abs(int(get_patch_semantic_version(version)))
-        semVersionDict['release']=str(get_prerelease_semantic_version(version))
-        return semVersionDict
-    except:
-        raise ValueError(f"version: {version} is not formatted correctly in the configuration file")
-
-
 #Get major semanic version number
 def get_major_semantic_version(version):
     verParts = version.split(".")
@@ -95,6 +82,19 @@ def get_prerelease_semantic_version(version):
         return verPreRel[1]
     else:
         return "stable"
+
+
+#Get major, minor and patch version numbers along with release version information
+def get_semantic_version_parts(version):
+    semVersionDict={}
+    try:
+        semVersionDict['major']=abs(int(get_major_semantic_version(version)))
+        semVersionDict['minor']=abs(int(get_minor_semantic_version(version)))
+        semVersionDict['patch']=abs(int(get_patch_semantic_version(version)))
+        semVersionDict['release']=str(get_prerelease_semantic_version(version))
+        return semVersionDict
+    except:
+        raise ValueError(f"version: {version} is not formatted correctly in the configuration file")
 
 
 def compareSemanticVersions(currentVersion,minVersion,maxVersion=None):
