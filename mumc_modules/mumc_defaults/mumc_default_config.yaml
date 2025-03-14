@@ -513,7 +513,7 @@ admin_settings:
     list: blacklist
     users:
       monitor_disabled: true
-  users:
+  users: []
   #- user_id: null
     #user_name: null
     #whitelist:

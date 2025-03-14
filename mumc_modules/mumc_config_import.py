@@ -38,7 +38,7 @@ def assignVarTest(init_dict,cmdopt_dict,cfg):
     try:
         #check if mumc_config.yaml exists but is blank
         if (not (cfg == None)):
-            #removing any of the test variables from mumc_config.yaml will cause script to rebuild a new config.yaml
+            #removing either 'version:' or 'DEBUG:' from mumc_config.yaml will cause script to attempt rebuilding a new config.yaml
             #try assigning the below variables from the mumc_config.yaml file
             #if any do not exist go to except and rebuild the mumc_config.yaml file
             init_dict['version']=cfg['version']

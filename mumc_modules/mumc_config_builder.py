@@ -1,4 +1,4 @@
-from mumc_modules.mumc_output import print_byType
+from mumc_modules.mumc_output import print_byType,open_and_return_default_config,save_yaml_config
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type,proceed_arr_setup,get_arr_url,get_arr_port,get_arr_base_url,get_arr_api
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
@@ -11,7 +11,6 @@ from mumc_modules.mumc_init import getIsAnyMediaEnabled
 from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
 import copy
 import yaml
-from mumc_modules.mumc_output import save_yaml_config,print2json,open_and_return_default_config
 
 
 def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
@@ -26,36 +25,36 @@ def yaml_configurationBuilder(the_dict):
 
     #start building config yaml
     #config_data=yaml_configurationLayout(config_data,config_data['admin_settings']['server']['brand'])
-    config_data=open_and_return_default_config()
+    #config_data=open_and_return_default_config()
 
     config_data['basic_settings']['filter_statements'].pop('audio')
 
-    if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
-        config_data['basic_settings']['filter_statements'].pop('audiobook')
+    #if (the_dict['admin_settings']['server']['brand'] == 'emby'):
+    config_data['basic_settings']['filter_statements'].pop('audiobook')
 
     config_data['basic_settings'].pop('filter_tags')
     config_data['advanced_settings'].pop('filter_statements')
     config_data['advanced_settings'].pop('behavioral_statements')
     config_data['advanced_settings'].pop('behavioral_tags')
 
-    if (the_dict['advanced_settings']['whitetags']['global'] == []):
+    if (config_data['advanced_settings']['whitetags']['global'] == []):
         config_data['advanced_settings'].pop('whitetags')
     else:
-        config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
+        #config_data['advanced_settings']['whitetags']['global']=the_dict['advanced_settings']['whitetags']['global']
         config_data['advanced_settings']['whitetags'].pop('movie')
         config_data['advanced_settings']['whitetags'].pop('episode')
         config_data['advanced_settings']['whitetags'].pop('audio')
-        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
-            config_data['advanced_settings']['whitetags'].pop('audiobook')
-    if (the_dict['advanced_settings']['blacktags']['global'] == []):
+        #if (the_dict['admin_settings']['server']['brand'] == 'emby'):
+        config_data['advanced_settings']['whitetags'].pop('audiobook')
+    if (config_data['advanced_settings']['blacktags']['global'] == []):
         config_data['advanced_settings'].pop('blacktags')
     else:
-        config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
+        #config_data['advanced_settings']['blacktags']['global']=the_dict['advanced_settings']['blacktags']['global']
         config_data['advanced_settings']['blacktags'].pop('movie')
         config_data['advanced_settings']['blacktags'].pop('episode')
         config_data['advanced_settings']['blacktags'].pop('audio')
-        if (the_dict['admin_settings']['server']['brand'] == 'jellyfin'):
-            config_data['advanced_settings']['blacktags'].pop('audiobook')
+        #if (the_dict['admin_settings']['server']['brand'] == 'emby'):
+        config_data['advanced_settings']['blacktags'].pop('audiobook')
 
     config_data['advanced_settings'].pop('delete_empty_folders')
     config_data['advanced_settings'].pop('radarr')
@@ -66,43 +65,70 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings'].pop('console_controls')
     config_data['advanced_settings'].pop('UPDATE_CONFIG')
 
-    if ((the_dict['admin_settings']['behavior']['list'] == 'blacklist') and (the_dict['admin_settings']['behavior']['matching'] == 'byId') and (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
+    if ((config_data['admin_settings']['behavior']['list'] == 'blacklist') and (config_data['admin_settings']['behavior']['matching'] == 'byId') and (config_data['admin_settings']['behavior']['users']['monitor_disabled'])):
         config_data['admin_settings'].pop('behavior')
     else:
-        if (the_dict['admin_settings']['behavior']['list'] == 'blacklist'):
+        if (config_data['admin_settings']['behavior']['list'] == 'blacklist'):
             config_data['admin_settings']['behavior'].pop('list')
-        else:
-            config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
-        if (the_dict['admin_settings']['behavior']['matching'] == 'byId'):
+        #else:
+            #config_data['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+        if (config_data['admin_settings']['behavior']['matching'] == 'byId'):
             config_data['admin_settings']['behavior'].pop('matching')
-        else:
-            config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
-        if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+        #else:
+            #config_data['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+        if (config_data['admin_settings']['behavior']['users']['monitor_disabled']):
             config_data['admin_settings']['behavior'].pop('users')
-        else:
-            config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+        #else:
+            #config_data['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
 
-    if (the_dict['admin_settings']['media_managers']['radarr'] == {}):
+    config_data['advanced_settings'].pop('episode_control')
+
+    if ((config_data['admin_settings']['media_managers']['radarr']['url'] == None) and (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None)):
         config_data['admin_settings']['media_managers'].pop('radarr')
     else:
-        config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
+        #config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
+        if (config_data['admin_settings']['media_managers']['radarr']['enabled']):
+            config_data['admin_settings']['media_maangers']['radarr'].pop('enabled')
+        if (config_data['admin_settings']['media_managers']['radarr']['url'] == None):
+            config_data['admin_settings']['media_maangers']['radarr'].pop('url')
+        if (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None):
+            config_data['admin_settings']['media_maangers']['radarr'].pop('api_key')
 
-    if (the_dict['admin_settings']['media_managers']['sonarr'] == {}):
+    if ((config_data['admin_settings']['media_managers']['sonarr']['url'] == None) and (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
         config_data['admin_settings']['media_managers'].pop('sonarr')
     else:
-        config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
+        #config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
+        if (config_data['admin_settings']['media_managers']['sonarr']['enabled']):
+            config_data['admin_settings']['media_maangers']['sonarr'].pop('enabled')
+        if (config_data['admin_settings']['media_managers']['sonarr']['url'] == None):
+            config_data['admin_settings']['media_maangers']['sonarr'].pop('url')
+        if (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None):
+            config_data['admin_settings']['media_maangers']['sonarr'].pop('api_key')
 
-    if (the_dict['admin_settings']['media_managers']['lidarr'] == {}):
-        config_data['admin_settings']['media_managers'].pop('lidarr')
-    else:
-        config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
+    #if ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
+        #config_data['admin_settings']['media_managers'].pop('lidarr')
+    #else:
+        ##config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
+        #if (config_data['admin_settings']['media_managers']['lidarr']['enabled']):
+            #config_data['admin_settings']['media_maangers']['lidarr'].pop('enabled')
+        #if (config_data['admin_settings']['media_managers']['lidarr']['url'] == None):
+            #config_data['admin_settings']['media_maangers']['lidarr'].pop('url')
+        #if (config_data['admin_settings']['media_managers']['lidarr']['api_key'] == None):
+            #config_data['admin_settings']['media_maangers']['lidarr'].pop('api_key')
 
-    if (the_dict['admin_settings']['media_managers']['readarr'] == {}):
-        config_data['admin_settings']['media_managers'].pop('readarr')
-    else:
-        config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
+    #if ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
+        #config_data['admin_settings']['media_managers'].pop('readarr')
+    #else:
+        ##config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
+        #if (config_data['admin_settings']['media_managers']['readarr']['enabled']):
+            #config_data['admin_settings']['media_maangers']['readarr'].pop('enabled')
+        #if (config_data['admin_settings']['media_managers']['readarr']['url'] == None):
+            #config_data['admin_settings']['media_maangers']['readarr'].pop('url')
+        #if (config_data['admin_settings']['media_managers']['readarr']['api_key'] == None):
+            #config_data['admin_settings']['media_maangers']['readarr'].pop('api_key')
 
-    if (len(config_data['admin_settings']['media_managers']) == 0):
+    if (config_data['admin_settings']['media_managers'] == {}):
+    #if (config_data['admin_settings']['media_managers'] == None):
         config_data['admin_settings'].pop('media_managers')
 
     config_data['admin_settings'].pop('api_controls')
@@ -118,14 +144,17 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
     print('Version: ' + get_script_version())
-    the_dict['version']=get_script_version()
 
     #Building the config
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
+
+        the_dict.update(open_and_return_default_config())
+        the_dict['version']=get_script_version()
+
         print('----------------------------------------------------------------------------------------')
         #ask user for server brand (i.e. emby or jellyfin)
-        the_dict['admin_settings']={}
-        the_dict['admin_settings']['server']={}
+        #the_dict['admin_settings']={}
+        #the_dict['admin_settings']['server']={}
         if ('-server_brand' in the_dict['argv']):
             the_dict['admin_settings']['server']['brand']=the_dict['argv']['-server_brand']
         else:
@@ -135,7 +164,7 @@ def build_configuration_file(the_dict,orig_dict={}):
         if ('-config_updater' in the_dict['argv']):
             the_dict['advanced_settings']['UPDATE_CONFIG']=the_dict['argv']['-config_updater']
         the_dict['UPDATE_CONFIG']=the_dict['advanced_settings']['UPDATE_CONFIG']
-        the_dict=setYAMLConfigSkeleton(the_dict)
+        #the_dict=setYAMLConfigSkeleton(the_dict)
         the_dict['admin_settings']['server']['brand']=the_dict['server_brand']
         the_dict['advanced_settings']['UPDATE_CONFIG']=the_dict['UPDATE_CONFIG']
         the_dict.pop('server_brand')
@@ -261,6 +290,9 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
+
+        the_dict['version']=get_script_version()
+
         print('----------------------------------------------------------------------------------------')
 
         #ask user how they want to choose libraries/folders
@@ -283,7 +315,7 @@ def build_configuration_file(the_dict,orig_dict={}):
     the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
 
     #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
-    the_dict['admin_settings']['behavior']['users']={}
+    #the_dict['admin_settings']['behavior']['users']={}
     if ('-monitor_disabled_users' in the_dict['argv']):
         the_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['argv']['-monitor_disabled_users']
     else:
@@ -308,7 +340,7 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     for arr in arrDict:
         #define *arr dict
-        the_dict['admin_settings']['media_managers'][arr.casefold()]={}
+        #the_dict['admin_settings']['media_managers'][arr.casefold()]={}
         the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
         the_dict[arr.casefold() + '_url']=None
         the_dict[arr.casefold() + '_port']=None
