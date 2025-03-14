@@ -119,9 +119,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         user_names_check_list.append(user_name)
 
                     if (isJellyfinServer(brand)):
-                        collection_type_vales=['movies','tvshows','music','audiobooks']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','playlists']
                     else:
-                        collection_type_vales=['movies','tvshows','music','audiobooks']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','playlists']
 
                     if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
@@ -271,6 +271,9 @@ def cfgCheckYAML(cfg,cfgChecker):
         #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
+    #do any filter_statements exist
+    filter_statement_exists=False
+
 #######################################################################################################
 
     if (not ((basic_settings:=cfgChecker.checkDict('basic_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
@@ -286,6 +289,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((played:=cfgChecker.checkDict('basic_settings','filter_statements','movie','played',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -298,6 +302,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((created:=cfgChecker.checkDict('basic_settings','filter_statements','movie','created',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -316,6 +321,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((played:=cfgChecker.checkDict('basic_settings','filter_statements','episode','played',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -328,6 +334,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((created:=cfgChecker.checkDict('basic_settings','filter_statements','episode','created',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -346,6 +353,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((played:=cfgChecker.checkDict('basic_settings','filter_statements','audio','played',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -358,6 +366,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                 if (not ((created:=cfgChecker.checkDict('basic_settings','filter_statements','audio','created',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    filter_statement_exists=True
 
 #######################################################################################################
 
@@ -378,6 +387,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                     if (not ((played:=cfgChecker.checkDict('basic_settings','filter_statements','audiobook','played',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        filter_statement_exists=True
 
 #######################################################################################################
 
@@ -390,6 +400,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 #######################################################################################################
 
                     if (not ((created:=cfgChecker.checkDict('basic_settings','filter_statements','audiobook','created',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                        filter_statement_exists=True
 
 #######################################################################################################
 
@@ -1799,6 +1810,9 @@ def cfgCheckYAML(cfg,cfgChecker):
     audiobook_whitetag_set=set()
     audiobook_blacktag_set=set()
 
+    #do any filter_tags exist
+    filter_tag_exists=False
+
 #######################################################################################################
 #filter tags
 #######################################################################################################
@@ -1823,6 +1837,7 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','whitetags',filtertagsMovieWhitetagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagMovie)):
                                 filter_movie_whitetag_set.add(filtertagMovie)
+                                filter_tag_exists=True
                             else:
                                 cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
@@ -1836,6 +1851,7 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagMovie:=cfgChecker.checkString('basic_settings','filter_tags','movie','blacktags',filtertagsMovieBlacktagsList.index(filtertagMovie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagMovie)):
                                 filter_movie_blacktag_set.add(filtertagMovie)
+                                filter_tag_exists=True
                             else:
                                 cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > movie > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
@@ -1853,8 +1869,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','whitetags',filtertagsEpisodeWhitetagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagEpisode)):
                                 filter_episode_whitetag_set.add(filtertagEpisode)
+                                filter_tag_exists=True
                             else:
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > whitetags: ' + filtertagEpisode + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
@@ -1866,8 +1883,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagEpisode:=cfgChecker.checkString('basic_settings','filter_tags','episode','blacktags',filtertagsEpisodeBlacktagsList.index(filtertagEpisode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagEpisode)):
                                 filter_episode_blacktag_set.add(filtertagEpisode)
+                                filter_tag_exists=True
                             else:
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > episode > blacktags: ' + filtertagEpisode + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
@@ -1883,8 +1901,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','whitetags',filtertagsAudioWhitetagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagAudio)):
                                 filter_audio_whitetag_set.add(filtertagAudio)
+                                filter_tag_exists=True
                             else:
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > whitetags: ' + filtertagAudio + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
@@ -1896,8 +1915,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         if (not ((filtertagAudio:=cfgChecker.checkString('basic_settings','filter_tags','audio','blacktags',filtertagsAudioBlacktagsList.index(filtertagAudio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                             if (get_isFilterStatementTag(filtertagAudio)):
                                 filter_audio_blacktag_set.add(filtertagAudio)
+                                filter_tag_exists=True
                             else:
-                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audio > blacktags: ' + filtertagAudio + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
@@ -1914,8 +1934,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                             if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','whitetags',filtertagsAudiobookWhitetagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                                 if (not get_isFilterStatementTag(filtertagAudiobook)):
                                     filter_audiobook_whitetag_set.add(filtertagAudiobook)
+                                    filter_tag_exists=True
                                 else:
-                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > whitetags: ' + filtertagAudiobook + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
@@ -1927,12 +1948,13 @@ def cfgCheckYAML(cfg,cfgChecker):
                             if (not ((filtertagAudiobook:=cfgChecker.checkString('basic_settings','filter_tags','audiobook','blacktags',filtertagsAudiobookBlacktagsList.index(filtertagAudiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
                                 if (get_isFilterStatementTag(filtertagAudiobook)):
                                     filter_audiobook_blacktag_set.add(filtertagAudiobook)
+                                    filter_tag_exists=True
                                 else:
-                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagMovie + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
+                                    cfgChecker.setCustomErrorText('ConfigError: basic_settings > filter_tags > audiobook > blacktags: ' + filtertagAudiobook + ' must be a string\n\tfilter_tags must follow the pre-defined format and values as explained here: https://github.com/terrelsa13/MUMC/wiki/Filter-Tags-And-Behavioral-Tags#filter-tags\n')
 
 #######################################################################################################
 
-        if ((filter_statements == None) and (filter_tags == None)):
+        if (not (filter_statement_exists or filter_tag_exists)):
             cfgChecker.setCustomErrorText('ConfigError: Either basic_settings > filter_statements or basic_settings > filter_tags must exist and have at least one media type entry')
             cfgChecker.printError()
 
