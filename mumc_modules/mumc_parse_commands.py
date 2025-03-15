@@ -426,7 +426,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if ('RDAPI' in envar):
         argv['-radarr_api_key']=envar['RDAPI']
     if ('radarr_api_key' in envar):
-        argv['-radarr_api_key']=envar['radarr_api_key']
+        argv['-radarr_api_key']=envar['RADARR_API_KEY']
 
     #save environmental variable - SNURL,SONARR_URL
     if ('SNURL' in envar):
@@ -450,7 +450,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if ('SNAPI' in envar):
         argv['-sonarr_api_key']=envar['SNAPI']
     if ('sonarr_api_key' in envar):
-        argv['-sonarr_api_key']=envar['sonarr_api_key']
+        argv['-sonarr_api_key']=envar['SONARR_API_KEY']
 
     #save environmental variable - LDURL,LIDARR_URL
     #save environmental variable - LDPRT,LIDARR_PORT
