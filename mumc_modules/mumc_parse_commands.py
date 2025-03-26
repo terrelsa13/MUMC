@@ -174,7 +174,7 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
     elif (doesFileExist(cfg['mumc_path'] / cfg['config_file_name_yaml'])):
         config_file_full_path=cfg['mumc_path'] / cfg['config_file_name_yaml']
     else:
-        print('Unable to find valid configuration file.')
+        print('ConfigError: Unable to find valid configuration file.')
         sys.exit(0)
         
     #for cmdOption in argv:

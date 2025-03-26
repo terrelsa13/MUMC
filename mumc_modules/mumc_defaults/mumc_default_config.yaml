@@ -499,7 +499,7 @@ advanced_settings:
             color: ''
             style: ''
           background:
-            colo/r: ''
+            color: ''
   UPDATE_CONFIG: false
   REMOVE_FILES: false
 admin_settings:

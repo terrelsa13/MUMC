@@ -27,7 +27,8 @@ def create_library_dicts(the_dict):
             pathpos=lib['LibraryOptions']['PathInfos'].index(pathinfo)
 
             if (not (((lib['Name'] == 'Recordings') and (lib['LibraryOptions']['PathInfos'][pathpos]['Path'].endswith('recordings'))) or
-                     ((lib['Name'] == 'Collections') and (lib['CollectionType'] == 'boxsets')))):
+                     ((lib['Name'] == 'Collections') and (lib['CollectionType'] == 'boxsets')) or
+                     ((lib['Name'] == 'Playlists') and (lib['CollectionType'] == 'playlists')))):
 
                 temp_lib_dict['lib_id']=the_dict['all_libraries'][libpos][libraryGuid]
                 if (('CollectionType' in lib) and
