@@ -246,7 +246,26 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 appendTo_DEBUG_log("\n" + str(err),2,the_dict)
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
                             print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
-                            print('\n  URL: ' + str(url))
+                            try:
+                                print('  Object: ' + str(url.header_items))
+                            except:
+                                print('  Object:')
+                            try:
+                                print('     URL: ' + str(url.full_url))
+                            except:
+                                print('     URL: ' + str(url))
+                            try:
+                                print('  Method: ' + str(url.method))
+                            except:
+                                print('  Method:')
+                            try:
+                                print('  Header: ' + str(url.headers))
+                            except:
+                                print('  Header:')
+                            try:
+                                print('    Data: ' + str(url.data))
+                            except:
+                                print('    Data:')
                             sys.exit(0)
                         else:
                             time.sleep(doubling_delay)
@@ -256,7 +275,26 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 if (debugState):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.")
-                                print('\n  URL: ' + str(url))
+                                try:
+                                    print('  Object: ' + str(url.header_items))
+                                except:
+                                    print('  Object:')
+                                try:
+                                    print('     URL: ' + str(url.full_url))
+                                except:
+                                    print('     URL: ' + str(url))
+                                try:
+                                    print('  Method: ' + str(url.method))
+                                except:
+                                    print('  Method:')
+                                try:
+                                    print('  Header: ' + str(url.headers))
+                                except:
+                                    print('  Header:')
+                                try:
+                                    print('    Data: ' + str(url.data))
+                                except:
+                                    print('    Data:')
                                 sys.exit(0)
                 elif (response.getcode() == 204):
                     source = response.read()
@@ -275,7 +313,26 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     if (debugState):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()))
-                    print('\n  URL: ' + str(url))
+                    try:
+                        print('  Object: ' + str(url.header_items))
+                    except:
+                        print('  Object:')
+                    try:
+                        print('     URL: ' + str(url.full_url))
+                    except:
+                        print('     URL: ' + str(url))
+                    try:
+                        print('  Method: ' + str(url.method))
+                    except:
+                        print('  Method:')
+                    try:
+                        print('  Header: ' + str(url.headers))
+                    except:
+                        print('  Header:')
+                    try:
+                        print('    Data: ' + str(url.data))
+                    except:
+                        print('    Data:')
                     sys.exit(0)
         except HTTPError as err:
             time.sleep(doubling_delay)
