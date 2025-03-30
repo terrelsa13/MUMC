@@ -1,11 +1,10 @@
 import platform
 from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
-from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 
 #Get the current script version
 def get_script_version():
-    return '5.10.5'
+    return '5.10.6'
 
 
 #Get the min config version
@@ -25,7 +24,7 @@ def get_server_version(the_dict):
     req=build_emby_jellyfin_request_message(url=url,the_dict=the_dict)
 
     #api call
-    ServerInfo=requestURL(req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'],the_dict)
+    ServerInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'])
 
     return(ServerInfo['Version'])
 

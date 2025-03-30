@@ -59,7 +59,7 @@ def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorizatio
 
 
 def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
-    
+
     if (not (token == None)):
         token=token
     elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api_key')) == None)):
@@ -153,7 +153,7 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     QueryLimit=var_dict['QueryLimit_' + suffix_str]
     APIDebugMsg=var_dict['APIDebugMsg_' + suffix_str]
 
-    data=requestURL(url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    data=requestURL(the_dict, url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'])
 
     TotalItems = data['TotalRecordCount']
     StartIndex = StartIndex + QueryLimit
@@ -200,7 +200,7 @@ def get_http_error_code_link(error_code):
 
 
 #send url request
-def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
+def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message undefined', retries=4, exitOnError=True):
 
     if (debugState):
         #Double newline for better debug file readablilty
@@ -266,7 +266,14 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 print('    Data: ' + str(url.data))
                             except:
                                 print('    Data:')
-                            sys.exit(0)
+                            try:
+                                print(' DataSrc: ' + str(data))
+                            except:
+                                print(' DataSrc:')
+                            if (exitOnError):
+                                sys.exit(0)
+                            else:
+                                return None
                         else:
                             time.sleep(doubling_delay)
                             #doubling_delay value doubles each time the same API request is resent
@@ -295,7 +302,14 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                     print('    Data: ' + str(url.data))
                                 except:
                                     print('    Data:')
-                                sys.exit(0)
+                                try:
+                                    print(' DataSrc: ' + str(data))
+                                except:
+                                    print(' DataSrc:')
+                                if (exitOnError):
+                                    sys.exit(0)
+                                else:
+                                    return None
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
@@ -333,7 +347,14 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         print('    Data: ' + str(url.data))
                     except:
                         print('    Data:')
-                    sys.exit(0)
+                    try:
+                        print(' DataSrc: ' + str(data))
+                    except:
+                        print(' DataSrc:')
+                    if (exitOnError):
+                        sys.exit(0)
+                    else:
+                        return None
         except HTTPError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -360,6 +381,10 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
+                try:
+                    print(' DataSrc: ' + str(data))
+                except:
+                    print(' DataSrc:')
                 print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
                 print('\nHTTP Error Codes: ' + get_http_error_code_link(err.status))
                 if(debugState):
@@ -384,9 +409,16 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
                     except:
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
                     appendTo_DEBUG_log('\nHTTP Error Codes: ' + get_http_error_code_link(err.status),1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
         except URLError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -413,6 +445,10 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
+                try:
+                    print(' DataSrc: ' + str(data))
+                except:
+                    print(' DataSrc:')
                 print('\n' + str(err.reason))
                 print('\nCheck ip, url and/or port to server are correct')
                 if(debugState):
@@ -437,9 +473,16 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
                         appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
                     appendTo_DEBUG_log('\n' + str(err.reason),1,the_dict)
                     appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
         except TimeoutError:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -466,6 +509,10 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     print('    Data: ' + str(url.data))
                 except:
                     print('    Data:')
+                try:
+                    print(' DataSrc: ' + str(data))
+                except:
+                    print(' DataSrc:')
                 print('\nTimeout - Response taking too long')
                 if(debugState):
                     appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,1,the_dict)
@@ -489,7 +536,14 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
                     except:
                         appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                    try:
+                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                    except:
+                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
                     appendTo_DEBUG_log('\nTimeout - Response taking too long',1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
 
     return(data)

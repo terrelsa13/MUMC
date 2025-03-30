@@ -14,7 +14,7 @@ def authenticate_user_by_name(admin_username,admin_password,the_dict):
     preConfigDebug = 0
 
     #api call
-    authenticated_user_data=requestURL(req, preConfigDebug, 'authenticate_by_name', 4, the_dict)
+    authenticated_user_data=requestURL(the_dict, req, preConfigDebug, 'authenticate_by_name', 4)
 
     return(authenticated_user_data)
 
@@ -32,7 +32,7 @@ def get_labelled_authentication_keys(authenticated_user_data,the_dict):
     preConfigDebug = 0
 
     #api call
-    labelled_authentication_keys=requestURL(req, preConfigDebug, 'get_labelled_authentication_key', 4, the_dict)
+    labelled_authentication_keys=requestURL(the_dict, req, preConfigDebug, 'get_labelled_authentication_key', 4)
 
     labelled_authentication_keys['request_url']=req
 
@@ -52,7 +52,7 @@ def create_labelled_authentication_key(authenticated_user_data,the_dict):
     preConfigDebug = 0
 
     #api call
-    requestURL(req, preConfigDebug, 'create_labelled_authentication_key', 4, the_dict)
+    requestURL(the_dict, req, preConfigDebug, 'create_labelled_authentication_key', 4)
 
 
 #delete GUI auth key for MUMC
@@ -68,7 +68,7 @@ def delete_labelled_authentication_key(key_to_delete,authenticated_user_data,the
     preConfigDebug = 0
 
     #api call
-    requestURL(req, preConfigDebug, 'delete_labelled_authentication_key_' + str(key_to_delete), 4, the_dict)
+    requestURL(the_dict, req, preConfigDebug, 'delete_labelled_authentication_key_' + str(key_to_delete), 4)
 
 
 #Find existing MUMC auth key

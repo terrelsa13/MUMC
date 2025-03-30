@@ -12,7 +12,7 @@ def get_all_libraries(the_dict):
     preConfigDebug = 0
 
     #api calls
-    data_all_folders = requestURL(req, preConfigDebug, 'get_all_library_folders', 3, the_dict)
+    data_all_folders = requestURL(the_dict, req, preConfigDebug, 'get_all_library_folders', 3)
 
     return data_all_folders
 
@@ -28,6 +28,6 @@ def get_all_library_subfolders(the_dict):
     preConfigDebug = 0
 
     #api calls
-    data_all_folders = requestURL(req, preConfigDebug, 'get_all_library_subfolders', 3, the_dict)
+    data_all_folders = requestURL(the_dict. req, preConfigDebug, 'get_all_library_subfolders', 3)
 
     return data_all_folders
