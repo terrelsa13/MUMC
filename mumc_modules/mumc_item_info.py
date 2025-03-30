@@ -72,7 +72,7 @@ def get_MOVIE_radarrInfo(radarrTMdbId,the_dict):
 
     req=build_radarr_request_message(url,the_dict)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'])
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'], False)
 
     return itemInfo
 
@@ -96,7 +96,7 @@ def remove_MOVIE_radarr(radarrId,the_dict):
 
     req=build_radarr_request_message(url,the_dict,accept='*/*',contentType='*/*',method='DELETE')
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_movie_with_radarrId: ' + str(radarrId) + ' from_Radarr', the_dict['admin_settings']['api_controls']['attempts'])
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_movie_with_radarrId: ' + str(radarrId) + ' from_Radarr', the_dict['admin_settings']['api_controls']['attempts'], False)
 
     return itemInfo
 
@@ -108,7 +108,7 @@ def get_SERIES_sonarrInfo(seriesTVdBId,postproc_dict,the_dict):
 
     req=build_sonarr_request_message(url,the_dict)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_sonarr_series_info_for_' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'])
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_sonarr_series_info_for_' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo
 
@@ -132,7 +132,7 @@ def remove_SERIES_sonarr(sonarrId,the_dict):
 
     req=build_sonarr_request_message(url,the_dict,accept='*/*',contentType='*/*',method='DELETE')
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_series_with_sonarrId: ' + str(sonarrId) + ' from_Sonarr', the_dict['admin_settings']['api_controls']['attempts'])
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_series_with_sonarrId: ' + str(sonarrId) + ' from_Sonarr', the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo
 
