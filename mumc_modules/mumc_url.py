@@ -62,7 +62,7 @@ def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType
 
     if (not (token == None)):
         token=token
-    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api')) == None)):
+    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api_key')) == None)):
         #assume stored token if not defined
         token=token
     else:
@@ -105,7 +105,7 @@ def build_sonarr_request_message(url,the_dict,accept=None,token=None,contentType
     
     if (not (token == None)):
         token=token
-    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','sonarr','api')) == None)):
+    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','sonarr','api_key')) == None)):
         #assume stored token if not defined
         token=token
     else:
@@ -153,7 +153,7 @@ def api_query_handler(suffix_str,var_dict,the_dict):
     QueryLimit=var_dict['QueryLimit_' + suffix_str]
     APIDebugMsg=var_dict['APIDebugMsg_' + suffix_str]
 
-    data=requestURL(url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    data=requestURL(the_dict, url, the_dict['DEBUG'], APIDebugMsg, the_dict['admin_settings']['api_controls']['attempts'])
 
     TotalItems = data['TotalRecordCount']
     StartIndex = StartIndex + QueryLimit
@@ -200,7 +200,7 @@ def get_http_error_code_link(error_code):
 
 
 #send url request
-def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
+def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message undefined', retries=4, exitOnError=True):
 
     if (debugState):
         #Double newline for better debug file readablilty
@@ -246,8 +246,30 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 appendTo_DEBUG_log("\n" + str(err),2,the_dict)
                                 appendTo_DEBUG_log("\nAUTH_ERROR: User Not Authorized To Access Library",2,the_dict)
                             print("\nAUTH_ERROR: User Not Authorized To Access Library\n" + str(err))
-                            print('\n  URL: ' + str(url))
-                            sys.exit(0)
+                            try:
+                                print('  Object: ' + str(url.header_items))
+                            except:
+                                print('  Object:')
+                            try:
+                                print('     URL: ' + str(url.full_url))
+                            except:
+                                print('     URL: ' + str(url))
+                            try:
+                                print('  Method: ' + str(url.method))
+                            except:
+                                print('  Method:')
+                            try:
+                                print('  Header: ' + str(url.headers))
+                            except:
+                                print('  Header:')
+                            try:
+                                print('    Data: ' + str(url.data))
+                            except:
+                                print('    Data:')
+                            if (exitOnError):
+                                sys.exit(0)
+                            else:
+                                return None
                         else:
                             time.sleep(doubling_delay)
                             #doubling_delay value doubles each time the same API request is resent
@@ -256,8 +278,30 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                                 if (debugState):
                                     appendTo_DEBUG_log("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.",2,the_dict)
                                 print("\nAn error occured, a maximum of " + str(retryAttempts) + " attempts met, and no data retrieved from the \"" + requestDebugMessage + "\" lookup.")
-                                print('\n  URL: ' + str(url))
-                                sys.exit(0)
+                                try:
+                                    print('  Object: ' + str(url.header_items))
+                                except:
+                                    print('  Object:')
+                                try:
+                                    print('     URL: ' + str(url.full_url))
+                                except:
+                                    print('     URL: ' + str(url))
+                                try:
+                                    print('  Method: ' + str(url.method))
+                                except:
+                                    print('  Method:')
+                                try:
+                                    print('  Header: ' + str(url.headers))
+                                except:
+                                    print('  Header:')
+                                try:
+                                    print('    Data: ' + str(url.data))
+                                except:
+                                    print('    Data:')
+                                if (exitOnError):
+                                    sys.exit(0)
+                                else:
+                                    return None
                 elif (response.getcode() == 204):
                     source = response.read()
                     data = source
@@ -275,8 +319,30 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     if (debugState):
                         appendTo_DEBUG_log("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()),2,the_dict)
                     print("\nAn error occurred while attempting to retrieve data from the API.\nAttempt to get data at: " + requestDebugMessage + ". Server responded with code: " + str(response.getcode()))
-                    print('\n  URL: ' + str(url))
-                    sys.exit(0)
+                    try:
+                        print('  Object: ' + str(url.header_items))
+                    except:
+                        print('  Object:')
+                    try:
+                        print('     URL: ' + str(url.full_url))
+                    except:
+                        print('     URL: ' + str(url))
+                    try:
+                        print('  Method: ' + str(url.method))
+                    except:
+                        print('  Method:')
+                    try:
+                        print('  Header: ' + str(url.headers))
+                    except:
+                        print('  Header:')
+                    try:
+                        print('    Data: ' + str(url.data))
+                    except:
+                        print('    Data:')
+                    if (exitOnError):
+                        sys.exit(0)
+                    else:
+                        return None
         except HTTPError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -329,7 +395,10 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
                     appendTo_DEBUG_log('\nHTTP Error Codes: ' + get_http_error_code_link(err.status),1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
         except URLError as err:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -382,7 +451,10 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                         appendTo_DEBUG_log('\n    Data:',1,the_dict)
                     appendTo_DEBUG_log('\n' + str(err.reason),1,the_dict)
                     appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
         except TimeoutError:
             time.sleep(doubling_delay)
             #doubling_delay value doubles each time the same API request is resent
@@ -433,6 +505,9 @@ def requestURL(url, debugState, requestDebugMessage, retries, the_dict):
                     except:
                         appendTo_DEBUG_log('\n    Data:',1,the_dict)
                     appendTo_DEBUG_log('\nTimeout - Response taking too long',1,the_dict)
-                sys.exit(0)
+                if (exitOnError):
+                    sys.exit(0)
+                else:
+                    return None
 
     return(data)

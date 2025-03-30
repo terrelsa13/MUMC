@@ -30,4 +30,4 @@ def modify_lastPlayedDate(item,userKey,the_dict):
     req=build_emby_jellyfin_request_message(url,the_dict,method='POST')
 
     #API POST for UserData modification
-    requestURL(req, the_dict['DEBUG'], 'add_missing_LastPlayedDate', 3, the_dict)
+    requestURL(the_dict, req, the_dict['DEBUG'], 'add_missing_LastPlayedDate', 3)

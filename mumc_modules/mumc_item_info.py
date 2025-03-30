@@ -10,7 +10,7 @@ def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict):
 
     req=build_emby_jellyfin_request_message(url,the_dict)
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -25,7 +25,7 @@ def get_STUDIO_itemInfo(studioNetworkName,the_dict):
     
     req=build_emby_jellyfin_request_message(url,the_dict)
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'studio_network_info_for_' + str(studioNetworkName), the_dict['api_query_attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'studio_network_info_for_' + str(studioNetworkName), the_dict['api_query_attempts'])
 
     return itemInfo
 
@@ -72,7 +72,7 @@ def get_MOVIE_radarrInfo(radarrTMdbId,the_dict):
 
     req=build_radarr_request_message(url,the_dict)
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'get_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -84,7 +84,7 @@ def put_MOVIE_radarrInfo(radarrTMdbId,movieData,the_dict):
 
     req=build_radarr_request_message(url,the_dict,data=movieData,method='PUT')
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'set_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'set_info_for_movie_with_tmdbid: ' + str(radarrTMdbId), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -96,7 +96,7 @@ def remove_MOVIE_radarr(radarrId,the_dict):
 
     req=build_radarr_request_message(url,the_dict,accept='*/*',contentType='*/*',method='DELETE')
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'remove_movie_with_radarrId: ' + str(radarrId) + ' from_Radarr', the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_movie_with_radarrId: ' + str(radarrId) + ' from_Radarr', the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -108,7 +108,7 @@ def get_SERIES_sonarrInfo(seriesTVdBId,postproc_dict,the_dict):
 
     req=build_sonarr_request_message(url,the_dict)
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'get_sonarr_series_info_for_' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_sonarr_series_info_for_' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -120,7 +120,7 @@ def put_SERIES_sonarrInfo(sonarrTVdbId,seriesData,the_dict):
 
     req=build_sonarr_request_message(url,the_dict,data=seriesData,method='PUT')
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'set_info_for_series_with_tvdbId: ' + str(sonarrTVdbId), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'set_info_for_series_with_tvdbId: ' + str(sonarrTVdbId), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -132,7 +132,7 @@ def remove_SERIES_sonarr(sonarrId,the_dict):
 
     req=build_sonarr_request_message(url,the_dict,accept='*/*',contentType='*/*',method='DELETE')
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'remove_series_with_sonarrId: ' + str(sonarrId) + ' from_Sonarr', the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'remove_series_with_sonarrId: ' + str(sonarrId) + ' from_Sonarr', the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo
 
@@ -148,6 +148,6 @@ def update_EPISODE_sonarrMonitorStatus(sonarrItemId,the_dict,monitored_status=Fa
 
     req=build_sonarr_request_message(url,the_dict,accept='*/*',data=monitorData_dict,method='PUT')
 
-    itemInfo=requestURL(req, the_dict['DEBUG'], 'set_episodeId_' + str(monitorData_dict['episodeIds']) + '_monitor_status_to_' + str(monitorData_dict['monitored']), the_dict['admin_settings']['api_controls']['attempts'], the_dict)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'set_episodeId_' + str(monitorData_dict['episodeIds']) + '_monitor_status_to_' + str(monitorData_dict['monitored']), the_dict['admin_settings']['api_controls']['attempts'])
 
     return itemInfo

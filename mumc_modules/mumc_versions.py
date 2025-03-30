@@ -38,7 +38,7 @@ def get_server_version(the_dict):
     req=build_emby_jellyfin_request_message(url=url,the_dict=the_dict)
 
     #api call
-    ServerInfo=requestURL(req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'],the_dict)
+    ServerInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'])
 
     return(ServerInfo['Version'])
 
