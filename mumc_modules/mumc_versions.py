@@ -14,7 +14,7 @@ def get_min_config_version():
 
 #Get the max config version
 def get_max_config_version():
-    max_version='5.11.15-beta'
+    max_version=''
 
     if (max_version == ''):
         max_version=get_script_version()
