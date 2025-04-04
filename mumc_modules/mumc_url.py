@@ -263,13 +263,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                             except:
                                 print('  Header:')
                             try:
-                                print('    Data: ' + str(url.data))
+                                print('  DataTx: ' + str(url.data))
                             except:
-                                print('    Data:')
+                                print('  DataTx:')
                             try:
-                                print(' DataSrc: ' + str(data))
+                                print('  DataRx: ' + str(data))
                             except:
-                                print(' DataSrc:')
+                                print('  DataRx:')
                             if (exitOnError):
                                 sys.exit(0)
                             else:
@@ -299,13 +299,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                                 except:
                                     print('  Header:')
                                 try:
-                                    print('    Data: ' + str(url.data))
+                                    print('  DataTx: ' + str(url.data))
                                 except:
-                                    print('    Data:')
+                                    print('  DataTx:')
                                 try:
-                                    print(' DataSrc: ' + str(data))
+                                    print('  DataRx: ' + str(data))
                                 except:
-                                    print(' DataSrc:')
+                                    print('  DataRx:')
                                 if (exitOnError):
                                     sys.exit(0)
                                 else:
@@ -344,13 +344,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     except:
                         print('  Header:')
                     try:
-                        print('    Data: ' + str(url.data))
+                        print('  DataTx: ' + str(url.data))
                     except:
-                        print('    Data:')
+                        print('  DataTx:')
                     try:
-                        print(' DataSrc: ' + str(data))
+                        print('  DataRx: ' + str(data))
                     except:
-                        print(' DataSrc:')
+                        print('  DataRx:')
                     if (exitOnError):
                         sys.exit(0)
                     else:
@@ -378,13 +378,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                 except:
                     print('  Header:')
                 try:
-                    print('    Data: ' + str(url.data))
+                    print('  DataTx: ' + str(url.data))
                 except:
-                    print('    Data:')
+                    print('  DataTx:')
                 try:
-                    print(' DataSrc: ' + str(data))
+                    print('  DataRx: ' + str(data))
                 except:
-                    print(' DataSrc:')
+                    print('  DataRx:')
                 print('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason))
                 print('\nHTTP Error Codes: ' + get_http_error_code_link(err.status))
                 if(debugState):
@@ -406,13 +406,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     except:
                         appendTo_DEBUG_log('\n  Header:',2,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),2,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx: ' + str(url.data),2,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',2,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx:',2,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx: ' + str(data),2,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx:',2,the_dict)
                     appendTo_DEBUG_log('\nHTTPError: ' + str(err.status) + ' - ' + str(err.reason),2,the_dict)
                     appendTo_DEBUG_log('\nHTTP Error Codes: ' + get_http_error_code_link(err.status),1,the_dict)
                 if (exitOnError):
@@ -442,13 +442,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                 except:
                     print('  Header:')
                 try:
-                    print('    Data: ' + str(url.data))
+                    print('  DataTx: ' + str(url.data))
                 except:
-                    print('    Data:')
+                    print('  DataTx:')
                 try:
-                    print(' DataSrc: ' + str(data))
+                    print('  DataRx: ' + str(data))
                 except:
-                    print(' DataSrc:')
+                    print('  DataRx:')
                 print('\n' + str(err.reason))
                 print('\nCheck ip, url and/or port to server are correct')
                 if(debugState):
@@ -470,13 +470,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     except:
                         appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx: ' + str(data),2,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx:',2,the_dict)
                     appendTo_DEBUG_log('\n' + str(err.reason),1,the_dict)
                     appendTo_DEBUG_log('\nCheck ip, url and/or port to server are correct',1,the_dict)
                 if (exitOnError):
@@ -506,13 +506,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                 except:
                     print('  Header:')
                 try:
-                    print('    Data: ' + str(url.data))
+                    print('  DataTx: ' + str(url.data))
                 except:
-                    print('    Data:')
+                    print('  DataTx:')
                 try:
-                    print(' DataSrc: ' + str(data))
+                    print('  DataRx: ' + str(data))
                 except:
-                    print(' DataSrc:')
+                    print('  DataRx:')
                 print('\nTimeout - Response taking too long')
                 if(debugState):
                     appendTo_DEBUG_log('\nTimeoutError: Unable to get response from server during processing of: ' + requestDebugMessage,1,the_dict)
@@ -533,13 +533,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     except:
                         appendTo_DEBUG_log('\n  Header:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n    Data: ' + str(url.data),1,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx: ' + str(url.data),1,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n    Data:',1,the_dict)
+                        appendTo_DEBUG_log('\n  DataTx:',1,the_dict)
                     try:
-                        appendTo_DEBUG_log('\n DataSrc: ' + str(data),2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx: ' + str(data),2,the_dict)
                     except:
-                        appendTo_DEBUG_log('\n DataSrc:',2,the_dict)
+                        appendTo_DEBUG_log('\n  DataRx:',2,the_dict)
                     appendTo_DEBUG_log('\nTimeout - Response taking too long',1,the_dict)
                 if (exitOnError):
                     sys.exit(0)

@@ -76,19 +76,31 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
         print_audiobook_summary=False
         audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
 
-    unmonitorRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] & the_dict['advanced_settings']['radarr']['movie']['unmonitor'])
-    removeRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] & the_dict['advanced_settings']['radarr']['movie']['remove'])
+    radarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
+                          (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
 
-    unmonitorSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] & the_dict['advanced_settings']['sonarr']['series']['unmonitor'])
-    removeSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] & the_dict['advanced_settings']['sonarr']['series']['remove'])
-    unmonitorSonarrEpisode=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] & the_dict['advanced_settings']['sonarr']['episode']['unmonitor'])
+    sonarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
+                          (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
 
-    #unmonitorLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] & the_dict['advanced_settings']['lidarr']['album']['unmonitor'])
-    #removeLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] & the_dict['advanced_settings']['lidarr']['album']['remove'])
-    #unmonitorLidarrTrack=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] & the_dict['advanced_settings']['lidarr']['track']['unmonitor'])
+    #lidarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['url'] == '') or
+                          #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == '')))
 
-    #unmonitorReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] & the_dict['advanced_settings']['readarr']['book']['unmonitor'])
-    #removeReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] & the_dict['advanced_settings']['readarr']['book']['remove'])
+    #readarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['url'] == '') or
+                          #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == '')))
+
+    unmonitorRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] and the_dict['advanced_settings']['radarr']['movie']['unmonitor'] and radarrURLAndAPI)
+    removeRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] and the_dict['advanced_settings']['radarr']['movie']['remove'] and radarrURLAndAPI)
+
+    unmonitorSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['series']['unmonitor'] and sonarrURLAndAPI)
+    removeSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['series']['remove'] and sonarrURLAndAPI)
+    unmonitorSonarrEpisode=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['episode']['unmonitor'] and sonarrURLAndAPI)
+
+    #unmonitorLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['album']['unmonitor'] and lidarrURLAndAPI)
+    #removeLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['album']['remove'] and lidarrURLAndAPI)
+    #unmonitorLidarrTrack=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['track']['unmonitor'] and lidarrURLAndAPI)
+
+    #unmonitorReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] and the_dict['advanced_settings']['readarr']['book']['unmonitor'] and readarrURLAndAPI)
+    #removeReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] and the_dict['advanced_settings']['readarr']['book']['remove'] and readarrURLAndAPI)
 
     #get number of items to be deleted
      #have to loop thru and look for item_ids because some media has almost
