@@ -7,7 +7,7 @@ from mumc_modules.mumc_parse_commands import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
-from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
+from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml,override_media_manager_enabled_states
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
@@ -94,6 +94,9 @@ def MUMC():
         cfg['cached_data'].wipeCache()
 
         return
+
+    #check for media_manager info; override if None or ''
+    override_media_manager_enabled_states(cfg)
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)

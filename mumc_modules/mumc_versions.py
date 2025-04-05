@@ -1,5 +1,5 @@
 import platform
-from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
+from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message,build_radarr_request_message,build_sonarr_request_message
 
 
 #Get the current script version
@@ -47,6 +47,36 @@ def get_server_version(the_dict):
 #Get the current Python verison
 def get_python_version():
     return(platform.python_version())
+
+
+#Get the Radarr version
+def get_radarr_version(the_dict):
+    lookupTopic="get_radarr_version"
+
+    #Get additonal item information
+    url=the_dict['admin_settings']['media_managers']['radarr']['url'] + '/api/v3/system/status'
+
+    req=build_radarr_request_message(url=url,the_dict=the_dict)
+
+    #api call
+    ServerInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'])
+
+    return(ServerInfo['version'])
+
+
+#Get the Sonarr version
+def get_sonarr_version(the_dict):
+    lookupTopic="get_sonarr_version"
+
+    #Get additonal item information
+    url=the_dict['admin_settings']['media_managers']['sonarr']['url'] + '/api/v3/system/status'
+
+    req=build_sonarr_request_message(url=url,the_dict=the_dict)
+
+    #api call
+    ServerInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic, the_dict['admin_settings']['api_controls']['attempts'])
+
+    return(ServerInfo['version'])
 
 
 #Get the operating system information

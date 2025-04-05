@@ -76,32 +76,6 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
         print_audiobook_summary=False
         audiobook_summary_format={'font':{'color':'','style':''},'background':{'color':''}}
 
-    radarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
-                          (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
-
-    sonarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
-                          (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
-
-    #lidarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['url'] == '') or
-                          #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == '')))
-
-    #readarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['url'] == '') or
-                          #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == '')))
-
-    unmonitorRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] and the_dict['advanced_settings']['radarr']['movie']['unmonitor'] and radarrURLAndAPI)
-    removeRadarrMovie=(the_dict['admin_settings']['media_managers']['radarr']['enabled'] and the_dict['advanced_settings']['radarr']['movie']['remove'] and radarrURLAndAPI)
-
-    unmonitorSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['series']['unmonitor'] and sonarrURLAndAPI)
-    removeSonarrSeries=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['series']['remove'] and sonarrURLAndAPI)
-    unmonitorSonarrEpisode=(the_dict['admin_settings']['media_managers']['sonarr']['enabled'] and the_dict['advanced_settings']['sonarr']['episode']['unmonitor'] and sonarrURLAndAPI)
-
-    #unmonitorLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['album']['unmonitor'] and lidarrURLAndAPI)
-    #removeLidarrAlbum=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['album']['remove'] and lidarrURLAndAPI)
-    #unmonitorLidarrTrack=(the_dict['admin_settings']['media_managers']['lidarr']['enabled'] and the_dict['advanced_settings']['lidarr']['track']['unmonitor'] and lidarrURLAndAPI)
-
-    #unmonitorReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] and the_dict['advanced_settings']['readarr']['book']['unmonitor'] and readarrURLAndAPI)
-    #removeReadarrBook=(the_dict['admin_settings']['media_managers']['readarr']['enabled'] and the_dict['advanced_settings']['readarr']['book']['remove'] and readarrURLAndAPI)
-
     #get number of items to be deleted
      #have to loop thru and look for item_ids because some media has almost
       #the same data and would not be filtered out by turning this into a set
@@ -137,7 +111,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #unmonitor media item
-                        if (unmonitorRadarrMovie):
+                        if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['unmonitor'])):
                             #get movie info from radarr using TMdBId
                             media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                             try:
@@ -148,10 +122,10 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     media_item_data=put_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],media_item_data[0],the_dict)
                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored\n',2,the_dict)
                             except:
-                                print('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be unmonitored.')
+                                print('\nRadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be unmonitored.')
                                 appendTo_DEBUG_log('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be unmonitored.\n',2,the_dict)
                         #remove media item
-                        if (removeRadarrMovie):
+                        if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['remove'])):
                             #get movie info from radarr using TMdBId
                             media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                             try:
@@ -162,7 +136,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     media_item_data=remove_MOVIE_radarr(item['mumc']['providerIds']['radarr'],the_dict)
                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Radarr\n',2,the_dict)
                             except:
-                                print('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be deleted.')
+                                print('\nRadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be deleted.')
                                 appendTo_DEBUG_log('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be deleted.\n',2,the_dict)
 
                     #Print output for deleted media item
@@ -179,7 +153,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #unmonitor media item
-                        if (unmonitorSonarrEpisode):
+                        if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['episode']['unmonitor'])):
                             if (the_dict['advanced_settings']['REMOVE_FILES']):
                                 #unmonitor episode item in Sonarr
                                 media_item_data=update_EPISODE_sonarrMonitorStatus(item['mumc']['providerIds']['sonarr'],the_dict)
@@ -234,7 +208,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #unmonitor media item
-                        if (unmonitorSonarrSeries):
+                        if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['unmonitor'])):
                             user_info={}
                             user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                             #get series info
@@ -251,10 +225,10 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     media_item_data=put_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],media_item_data[0],the_dict)
                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored\n',2,the_dict)
                             except:
-                                print('SonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be unmonitored.')
+                                print('\nSonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be unmonitored.')
                                 appendTo_DEBUG_log('SonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be unmonitored.\n',2,the_dict)
                         #remove media item
-                        if (removeSonarrSeries):
+                        if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['remove'])):
                             user_info={}
                             user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                             #get series info
