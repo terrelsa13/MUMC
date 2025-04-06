@@ -65,7 +65,19 @@ def get_SERIES_itemInfo(episode,user_info,the_dict):
     return series_item_info
 
 
-#get movie item info from radarr
+#lookup movie item info from radarr using IMDBId
+def lookup_MOVIE_radarrInfo(radarrIMdbId,the_dict):
+
+    url=the_dict['admin_settings']['media_managers']['radarr']['url'] + '/api/v3/movie/lookup/imdb?imdbId=' + str(radarrIMdbId)
+
+    req=build_radarr_request_message(url,the_dict)
+
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_tmdbid: ' + str(radarrIMdbId), the_dict['admin_settings']['api_controls']['attempts'], False)
+
+    return itemInfo
+
+
+#get movie item info from radarr using TMDBId
 def get_MOVIE_radarrInfo(radarrTMdbId,the_dict):
 
     url=the_dict['admin_settings']['media_managers']['radarr']['url'] + '/api/v3/movie?tmdbId=' + str(radarrTMdbId)

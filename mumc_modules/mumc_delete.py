@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 from mumc_modules.mumc_console_info import build_config_setup_to_delete_media
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_MOVIE_radarrInfo,put_MOVIE_radarrInfo,remove_MOVIE_radarr,update_EPISODE_sonarrMonitorStatus,get_SERIES_sonarrInfo,put_SERIES_sonarrInfo,remove_SERIES_sonarr
+from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,lookup_MOVIE_radarrInfo,get_MOVIE_radarrInfo,put_MOVIE_radarrInfo,remove_MOVIE_radarr,update_EPISODE_sonarrMonitorStatus,get_SERIES_sonarrInfo,put_SERIES_sonarrInfo,remove_SERIES_sonarr
 #from memory_profiler import profile
 
 
@@ -139,8 +139,15 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                         #unmonitor media item
                         if (unmonitorRadarrMovie):
                             try:
+                                #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                #  1. Lookup movie using the IMDB Id (the IMDB Id should NEVER change)
+                                #  2. Grab the TMDB Id from the lookup in step #1
+                                #  3. Get the movie info using the TMDB Id
+                                #lookup movie info from Radarr using IMdBId
+                                lookup_media_item_data=lookup_MOVIE_radarrInfo(item['mumc']['providerIds']['Imdb'],the_dict)
                                 #get movie info from radarr using TMdBId
-                                media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
+                                #media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
+                                media_item_data=get_MOVIE_radarrInfo(lookup_media_item_data['tmdbId'],the_dict)
                                 #set monitored state to False
                                 media_item_data[0]['monitored']=False
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
@@ -153,8 +160,15 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                         #remove media item
                         if (removeRadarrMovie):
                             try:
+                                #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                #  1. Lookup movie using the IMDB Id (the IMDB Id should NEVER change)
+                                #  2. Grab the TMDB Id from the lookup in step #1
+                                #  3. Get the movie info using the TMDB Id
+                                #lookup movie info from Radarr using IMdBId
+                                lookup_media_item_data=lookup_MOVIE_radarrInfo(item['mumc']['providerIds']['Imdb'],the_dict)
                                 #get movie info from radarr using TMdBId
-                                media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
+                                #media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
+                                media_item_data=get_MOVIE_radarrInfo(lookup_media_item_data['tmdbId'],the_dict)
                                 #save movie's radarr id
                                 item['mumc']['providerIds']['radarr']=media_item_data[0]['id']
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
