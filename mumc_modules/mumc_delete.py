@@ -112,23 +112,23 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     if (delete_media_item(item['Id'],the_dict)):
                         #unmonitor media item
                         if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['unmonitor'])):
-                            #get movie info from radarr using TMdBId
-                            media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                             try:
+                                #get movie info from radarr using TMdBId
+                                media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                                 #set monitored state to False
                                 media_item_data[0]['monitored']=False
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
                                     #unmonitor movie in Radarr
                                     media_item_data=put_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],media_item_data[0],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored\n',2,the_dict)
+                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Radarr\n',2,the_dict)
                             except:
-                                print('\nRadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be unmonitored.')
-                                appendTo_DEBUG_log('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be unmonitored.\n',2,the_dict)
+                                print('\nRadarrTMDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr.')
+                                appendTo_DEBUG_log('RadarrTMDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr.\n',2,the_dict)
                         #remove media item
                         if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['remove'])):
-                            #get movie info from radarr using TMdBId
-                            media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                             try:
+                                #get movie info from radarr using TMdBId
+                                media_item_data=get_MOVIE_radarrInfo(item['mumc']['providerIds']['Tmdb'],the_dict)
                                 #save movie's radarr id
                                 item['mumc']['providerIds']['radarr']=media_item_data[0]['id']
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
@@ -136,8 +136,8 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     media_item_data=remove_MOVIE_radarr(item['mumc']['providerIds']['radarr'],the_dict)
                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Radarr\n',2,the_dict)
                             except:
-                                print('\nRadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be deleted.')
-                                appendTo_DEBUG_log('RadarrTMDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Radarr. Cannot be deleted.\n',2,the_dict)
+                                print('\nRadarrTMDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.')
+                                appendTo_DEBUG_log('RadarrTMDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.\n',2,the_dict)
 
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
@@ -157,7 +157,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                             if (the_dict['advanced_settings']['REMOVE_FILES']):
                                 #unmonitor episode item in Sonarr
                                 media_item_data=update_EPISODE_sonarrMonitorStatus(item['mumc']['providerIds']['sonarr'],the_dict)
-                            appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored\n',2,the_dict)
+                            appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr\n',2,the_dict)
 
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
@@ -215,18 +215,18 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                             series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
                             item['mumc']={}
                             item['mumc']['providerIds']=series_info['ProviderIds']
-                            #get series info from sonarr using TVdBId
-                            media_item_data=get_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],the_dict,the_dict)
                             try:
+                                #get series info from sonarr using TVdBId
+                                media_item_data=get_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],the_dict,the_dict)
                                 #set monitored state to False
                                 media_item_data[0]['monitored']=False
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
                                     #unmonitor series in Sonarr
                                     media_item_data=put_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],media_item_data[0],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored\n',2,the_dict)
+                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr\n',2,the_dict)
                             except:
-                                print('\nSonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be unmonitored.')
-                                appendTo_DEBUG_log('SonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be unmonitored.\n',2,the_dict)
+                                print('\nSonarrTVDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr.')
+                                appendTo_DEBUG_log('SonarrTVDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr.\n',2,the_dict)
                         #remove media item
                         if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['remove'])):
                             user_info={}
@@ -235,9 +235,9 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                             series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
                             item['mumc']={}
                             item['mumc']['providerIds']=series_info['ProviderIds']
-                            #get series info from sonarr using TVdBId
-                            media_item_data=get_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],the_dict,the_dict)
                             try:
+                                #get series info from sonarr using TVdBId
+                                media_item_data=get_SERIES_sonarrInfo(item['mumc']['providerIds']['Tvdb'],the_dict,the_dict)
                                 #save series' sonarr id
                                 item['mumc']['providerIds']['sonarr']=media_item_data[0]['id']
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
@@ -245,8 +245,8 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     media_item_data=remove_SERIES_sonarr(item['mumc']['providerIds']['sonarr'],the_dict)
                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Radarr\n',2,the_dict)
                             except:
-                                print('SonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be deleted.')
-                                appendTo_DEBUG_log('SonarrTVDBIdError: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" does not exist in Sonarr. Cannot be deleted.\n',2,the_dict)
+                                print('SonarrTVDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be delete from Sonarr.')
+                                appendTo_DEBUG_log('SonarrTVDBIdWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr.\n',2,the_dict)
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
                     print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)
