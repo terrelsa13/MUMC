@@ -757,7 +757,7 @@ def init_postProcessing(the_dict):
 
         #prepare for post processing; return dictionary of lists of media items to be deleted
         #setup for multiprocessing of the post processing of each media type
-        mpp_movie_post_process=multiprocessing.Process(target=start_postProcessing,args=(the_dict,movie_dict,deleteItems_dict))
+        mpp_moviePostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,movie_dict,deleteItems_dict))
         mpp_episodePostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,episode_dict,deleteItems_dict))
         mpp_audioPostProcess=multiprocessing.Process(target=start_postProcessing,args=(the_dict,audio_dict,deleteItems_dict))
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
@@ -766,13 +766,13 @@ def init_postProcessing(the_dict):
         #start all multi processes
         #order intentially: Audio, Episodes, Movies, Audiobooks
         if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
-            mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start(),mpp_audiobookPostProcess.start()
-            mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join(), mpp_audiobookPostProcess.join()
-            mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close(),mpp_audiobookPostProcess.close()
+            mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_moviePostProcess.start(),mpp_audiobookPostProcess.start()
+            mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_moviePostProcess.join(), mpp_audiobookPostProcess.join()
+            mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_moviePostProcess.close(),mpp_audiobookPostProcess.close()
         else:
-            mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_movie_post_process.start()
-            mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_movie_post_process.join()
-            mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_movie_post_process.close()
+            mpp_audioPostProcess.start(),mpp_episodePostProcess.start(),mpp_moviePostProcess.start()
+            mpp_audioPostProcess.join(), mpp_episodePostProcess.join(), mpp_moviePostProcess.join()
+            mpp_audioPostProcess.close(),mpp_episodePostProcess.close(),mpp_moviePostProcess.close()
             deleteItems_dict['audiobook']=[]
 
     else: #when debug enabled do not allow multiprocessing; this will allow stepping thru debug

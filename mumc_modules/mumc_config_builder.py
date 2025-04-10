@@ -88,44 +88,44 @@ def yaml_configurationBuilder(the_dict):
     else:
         #config_data['admin_settings']['media_managers']['radarr']=the_dict['admin_settings']['media_managers']['radarr']
         if (config_data['admin_settings']['media_managers']['radarr']['enabled']):
-            config_data['admin_settings']['media_maangers']['radarr'].pop('enabled')
+            config_data['admin_settings']['media_managers']['radarr'].pop('enabled')
         if (config_data['admin_settings']['media_managers']['radarr']['url'] == None):
-            config_data['admin_settings']['media_maangers']['radarr'].pop('url')
+            config_data['admin_settings']['media_managers']['radarr'].pop('url')
         if (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None):
-            config_data['admin_settings']['media_maangers']['radarr'].pop('api_key')
+            config_data['admin_settings']['media_managers']['radarr'].pop('api_key')
 
     if ((config_data['admin_settings']['media_managers']['sonarr']['url'] == None) and (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
         config_data['admin_settings']['media_managers'].pop('sonarr')
     else:
         #config_data['admin_settings']['media_managers']['sonarr']=the_dict['admin_settings']['media_managers']['sonarr']
         if (config_data['admin_settings']['media_managers']['sonarr']['enabled']):
-            config_data['admin_settings']['media_maangers']['sonarr'].pop('enabled')
+            config_data['admin_settings']['media_managers']['sonarr'].pop('enabled')
         if (config_data['admin_settings']['media_managers']['sonarr']['url'] == None):
-            config_data['admin_settings']['media_maangers']['sonarr'].pop('url')
+            config_data['admin_settings']['media_managers']['sonarr'].pop('url')
         if (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None):
-            config_data['admin_settings']['media_maangers']['sonarr'].pop('api_key')
+            config_data['admin_settings']['media_managers']['sonarr'].pop('api_key')
 
     #if ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
         #config_data['admin_settings']['media_managers'].pop('lidarr')
     #else:
         ##config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
         #if (config_data['admin_settings']['media_managers']['lidarr']['enabled']):
-            #config_data['admin_settings']['media_maangers']['lidarr'].pop('enabled')
+            #config_data['admin_settings']['media_managers']['lidarr'].pop('enabled')
         #if (config_data['admin_settings']['media_managers']['lidarr']['url'] == None):
-            #config_data['admin_settings']['media_maangers']['lidarr'].pop('url')
+            #config_data['admin_settings']['media_managers']['lidarr'].pop('url')
         #if (config_data['admin_settings']['media_managers']['lidarr']['api_key'] == None):
-            #config_data['admin_settings']['media_maangers']['lidarr'].pop('api_key')
+            #config_data['admin_settings']['media_managers']['lidarr'].pop('api_key')
 
     #if ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
         #config_data['admin_settings']['media_managers'].pop('readarr')
     #else:
         ##config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
         #if (config_data['admin_settings']['media_managers']['readarr']['enabled']):
-            #config_data['admin_settings']['media_maangers']['readarr'].pop('enabled')
+            #config_data['admin_settings']['media_managers']['readarr'].pop('enabled')
         #if (config_data['admin_settings']['media_managers']['readarr']['url'] == None):
-            #config_data['admin_settings']['media_maangers']['readarr'].pop('url')
+            #config_data['admin_settings']['media_managers']['readarr'].pop('url')
         #if (config_data['admin_settings']['media_managers']['readarr']['api_key'] == None):
-            #config_data['admin_settings']['media_maangers']['readarr'].pop('api_key')
+            #config_data['admin_settings']['media_managers']['readarr'].pop('api_key')
 
     if (config_data['admin_settings']['media_managers'] == {}):
     #if (config_data['admin_settings']['media_managers'] == None):

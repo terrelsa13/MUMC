@@ -721,10 +721,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
                                         PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
                                         SeriesName=item['SeriesName']
+                                        imdbId=series_info['ProviderIds']['Imdb']
                                         tvdbId=series_info['ProviderIds']['Tvdb']
 
                                     if (not ('SeriesName' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['SeriesName']=SeriesName
+                                    if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                        var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=imdbId
                                     if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=tvdbId
                                     if (not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
