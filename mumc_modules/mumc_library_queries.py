@@ -2,7 +2,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 
 #Request for libraries (i.e. movies, tvshows, audio, etc...)
-def get_all_libraries(the_dict):
+def get_all_libraries_from_media_server(the_dict):
     #Request for libraries (i.e. movies, tvshows, audio, etc...)
     url=the_dict['admin_settings']['server']['url'] + '/Library/VirtualFolders'
 

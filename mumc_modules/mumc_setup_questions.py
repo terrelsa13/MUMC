@@ -301,11 +301,13 @@ def get_user_and_library_selection_type(library_setup_behavior):
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
         print('0 - Select users and libraries.')
-        print('    Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
+        print('    Select libraries to be ' + str(library_setup_behavior) + 'ed for selected users.')
         print('1 - Select users only.')
         print('    Selected users will have all libraries ' + str(library_setup_behavior) + 'ed according to their access policy.')
         print('2 - Select libraries only.')
         print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
+        print('3 - Select nothing.')
+        print('    All libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
         selection=input('Enter number (default 0 - Select users and libraries): ')
         if (selection == ''):
             valid_value = True
@@ -317,6 +319,9 @@ def get_user_and_library_selection_type(library_setup_behavior):
         elif (selection == '2'):
             valid_value = True
             defaultvalue=2
+        elif (selection == '3'):
+            valid_value = True
+            defaultvalue=3
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)

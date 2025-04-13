@@ -1,4 +1,4 @@
-from mumc_modules.mumc_user_queries import get_all_users
+from mumc_modules.mumc_user_queries import get_all_users_from_media_server
 from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_query
 
@@ -9,7 +9,7 @@ def get_admin_user_id(the_dict):
     userIds_list=[]
     libNums_list=[]
     if (the_dict['admin_settings']['server']['admin_id'] == None):
-        data_all_users=get_all_users(the_dict)
+        data_all_users=get_all_users_from_media_server(the_dict)
         for user_info in data_all_users:
             if (user_info['Policy']['EnableAllFolders']):
                 the_dict['admin_settings']['server']['admin_id']=user_info['Id']

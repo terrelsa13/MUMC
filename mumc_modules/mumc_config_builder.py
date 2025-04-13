@@ -6,9 +6,10 @@ from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_co
 #from mumc_modules.mumc_config_defaults import yaml_configurationBuilder
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
+#from mumc_modules.mumc_builder_userlibrary import get_users_and_libraries
+from mumc_modules.mumc_builder_userlibrary import build_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
-from mumc_modules.mumc_blacklist_whitelist import get_opposing_listing_type
+from mumc_modules.mumc_blacklist_whitelist import get_unfavored_listing_type
 import copy
 import yaml
 
@@ -208,11 +209,11 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict['password']=None
 
         #check if server_auth_key CMD option exists
-        if ('-server_auth_key' in the_dict['argv']):
-            the_dict['admin_settings']['server']['auth_key']=the_dict['argv']['-server_auth_key']
+        if (('-server_auth_key' in the_dict['argv']) and (not (the_dict['argv']["-server_auth_key"].strip() == ""))):
+            the_dict['admin_settings']['server']['auth_key']=the_dict['argv']['-server_auth_key'].strip()
 
-            if ('-server_admin_id' in the_dict['argv']):
-                the_dict['admin_settings']['server']['admin_id']=the_dict['argv']['-server_admin_id']
+            if (('-server_admin_id' in the_dict['argv']) and (not (the_dict['argv']["-server_admin_id"].strip() == ""))):
+                the_dict['admin_settings']['server']['admin_id']=the_dict['argv']['-server_admin_id'].strip()
         else:
             #ask user for administrator username
             if ('-admin_username' in the_dict['argv']):
@@ -311,8 +312,8 @@ def build_configuration_file(the_dict,orig_dict={}):
 
 
     #store the opposing and matching listing types to be used in get_users_and_libraries()
-    the_dict['opposing_listing_type']=get_opposing_listing_type(the_dict['admin_settings']['behavior']['list'])
-    the_dict['matching_listing_type']=the_dict['admin_settings']['behavior']['list']
+    the_dict['unfavored_listing_type']=get_unfavored_listing_type(the_dict['admin_settings']['behavior']['list'])
+    the_dict['favored_listing_type']=the_dict['admin_settings']['behavior']['list']
 
     #ask if users disabled in the GUI should be monitored; this also controls if they are shown during selection of monitored_users
     #the_dict['admin_settings']['behavior']['users']={}
@@ -330,7 +331,8 @@ def build_configuration_file(the_dict,orig_dict={}):
     print('----------------------------------------------------------------------------------------')
 
     #run the user and library selector
-    the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
+    #the_dict['admin_settings']['users']=get_users_and_libraries(the_dict)
+    the_dict['admin_settings']['users']=build_users_and_libraries(the_dict)
 
     print('----------------------------------------------------------------------------------------')
 
