@@ -26,6 +26,7 @@ class user_data(user_library_data):
         self.selected=selected
 
     def __str__(self):
+        #check if user is selected
         if (self.selected):
             return f"Name: {self.user_name} -"
         else: #(not (self.selected)):
@@ -203,20 +204,20 @@ def update_all_user_libraries(the_dict,all_libraries,all_users):
     return all_users
 
 
-#clean and covert selected users to list
-def clean_selection_convert_selection_to_list(selected_user):
+#clean and covert selection string to list
+def clean_selection_convert_selection_to_list(selection_str):
     #check if at least one selection, check if selection is all commas
-    if ((len(selected_user) > 0) and (len(selected_user) == selected_user.count(','))):
+    if ((len(selection_str) > 0) and (len(selection_str) == selection_str.count(','))):
         #all commas will become []; append an invalid value to force a retry
-        selected_user='retry'
+        selection_str='retry'
 
     #check if at least one selection, check if selection is all commas
-    if ((len(selected_user) > 0) and (len(selected_user) == selected_user.count(' '))):
+    if ((len(selection_str) > 0) and (len(selection_str) == selection_str.count(' '))):
         #all spaces will become []; append an invalid value to force a retry
-        selected_user='retry'
+        selection_str='retry'
 
     #replace spaces with commas (assuming people will use spaces because the space bar is bigger and easier to push)
-    selection_no_spaces=selected_user.replace(' ',',')
+    selection_no_spaces=selection_str.replace(' ',',')
     #convert string to list
     selection_list=selection_no_spaces.split(',')
     #remove blanks
@@ -230,23 +231,23 @@ def clean_selection_convert_selection_to_list(selected_user):
     return selection_list
 
 
-#check if all selection are valid
-def are_valid_users_selected(selection_list,selection_limit):
+#check if all selections are valid
+def are_valid_inputs_selected(selection_list,selection_limit):
     #loop thru all selections
     for thisSelection in selection_list:
         try:
-            #check if selection converts to a complex number
-            if (isinstance(thisSelection,complex)):
-                #selection is NOT valid
-                valid_selection=False
-                break
-            #check if selection converts to a float
-            elif (isinstance(thisSelection,float)):
-                #selection is NOT valid
-                valid_selection=False
-                break
+            ##check if selection converts to a complex number
+            #if (isinstance(thisSelection,complex)):
+                ##selection is NOT valid
+                #valid_selection=False
+                #break
+            ##check if selection converts to a float
+            #elif (isinstance(thisSelection,float)):
+                ##selection is NOT valid
+                #valid_selection=False
+                #break
             #check if selection converts to an integer
-            elif (isinstance(int(thisSelection),int)):
+            if (isinstance(int(thisSelection),int)):
                 #check if integer is less than zero; check if integer is greater than limit; check if string is '-0'
                 if ((int(thisSelection) < 0) or (int(thisSelection) > selection_limit) or (thisSelection == '-0')):
                     #selection is NOT valid
@@ -285,27 +286,24 @@ def show_users(all_users):
 def get_single_user_selection(all_users):
     print()
 
-    #declare variable to run while loop
+    #loop until finished selecting users
     loop_active=True
 
     #loop until user is finished
     while (loop_active):
         #show message on console; wait for input
-        selected_user = input('Select one user at a time.\nEnter number of user to monitor; leave blank when finished: ')
+        user_selection_str = input('Select one user at a time.\nEnter number of user to monitor; leave blank when finished: ')
 
         #check if any commas; this implies multiple users selected
-        if (selected_user.find(',') >= 0):
+        if (user_selection_str.find(',') >= 0):
             #something resembling a multiple selection; append an invalid value to force a retry
-            selected_user='retry'
+            user_selection_str='retry'
 
         #scrub and normalize selection
-        selected_user_list=clean_selection_convert_selection_to_list(selected_user)
+        selected_user_list=clean_selection_convert_selection_to_list(user_selection_str)
 
-        #check if single user was selected; verify selection is valid
-        if ((len(selected_user_list) == 1) and (are_valid_users_selected(selected_user_list,len(all_users) - 1))):
-            #at least one user selected; ok to exit selection loop
-            loop_active=False
-        elif ((len(selected_user_list) == 0)):
+        #check if no selection was made
+        if (selected_user_list == []):
             #loop thru all users
             for thisAllUser in all_users:
                 if (thisAllUser.selected):
@@ -318,6 +316,10 @@ def get_single_user_selection(all_users):
                 #print user info to console
                 show_users(all_users)
                 print()
+        #check if single user was selected; verify selection is valid
+        elif ((len(selected_user_list) == 1) and (are_valid_inputs_selected(selected_user_list,len(all_users) - 1))):
+            #at least one user selected; ok to exit selection loop
+            loop_active=False
         else:
             #invalid selection; NOT ok to exit selection loop
             print('\nInvalid selection. Try again.')
@@ -335,19 +337,16 @@ def get_multiple_user_selection(all_users):
     #declare variable to run while loop
     loop_active=True
 
-    #loop until user is finished
+    #loop until finished selecting users
     while (loop_active):
         #show message on console; wait for input
-        selected_user = input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+        user_selection_str = input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
         #scrub and normalize selection
-        selected_user_list=clean_selection_convert_selection_to_list(selected_user)
+        selected_user_list=clean_selection_convert_selection_to_list(user_selection_str)
 
-        #check if single user was selected; verify selection is valid
-        if (are_valid_users_selected(selected_user_list,len(all_users) - 1)):
-            #at least one user selected; ok to exit selection loop
-            loop_active=False
-        elif ((len(selected_user_list) == 0)):
+        #check if no selection was made
+        if (selected_user_list == []):
             #loop thru all users
             for thisAllUser in all_users:
                 if (thisAllUser.selected):
@@ -360,6 +359,10 @@ def get_multiple_user_selection(all_users):
                 #print user info to console
                 show_users(all_users)
                 print()
+        #check if single user was selected; verify selection is valid
+        elif (are_valid_inputs_selected(selected_user_list,len(all_users) - 1)):
+            #at least one user selected; ok to exit selection loop
+            loop_active=False
         else:
             #invalid selection; NOT ok to exit selection loop
             print('\nInvalid selection. Try again.')

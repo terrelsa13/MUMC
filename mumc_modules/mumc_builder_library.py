@@ -1,4 +1,5 @@
 from mumc_modules.mumc_library_queries import get_all_libraries_from_media_server,get_all_library_subfolders
+from mumc_modules.mumc_builder_user import clean_selection_convert_selection_to_list,are_valid_inputs_selected
 
 
 #user library class for builder
@@ -28,10 +29,11 @@ class user_library:
 #media library class for builder
 class media_library(user_library):
 
-    def __init__(self,lib_id='',collection_type='',path='',network_path='',subfolder_id='',lib_enabled=False,name='',selected=False):
+    def __init__(self,lib_id='',collection_type='',path='',network_path='',subfolder_id='',lib_enabled=False,name='',selected=False,selection=None):
         user_library.__init__(self,lib_id,collection_type,path,network_path,subfolder_id,lib_enabled)
         self.name=name
         self.selected=selected
+        self.selection=selection
 
     def __str__(self):
         if (self.collection_type == 'movies'):
@@ -42,8 +44,15 @@ class media_library(user_library):
             strAlignment="------"
         else: #(self.collection_type == 'audiobooks')
             strAlignment="-"
-            
-        return f"{self.collection_type} {strAlignment} Name: {self.name} - Path: {self.path} - NetPath: {self.network_path} - LibId: {self.lib_id} - SubFolderId: {self.subfolder_id}"
+
+        #check if user is selected
+        if (self.selected):
+            return f"{self.selection} - {self.collection_type} {strAlignment} Name: {self.name} - Path: {self.path} -"
+        else: #(not (self.selected)):
+            return f"{self.selection} - {self.collection_type} {strAlignment} Name: {self.name} - Path: {self.path} - NetPath: {self.network_path} - LibId: {self.lib_id} - SubFolderId: {self.subfolder_id}"
+
+    def display(self):
+        return f"LibId: {self.lib_id} - CollectionType: {self.collection_type} - Path: {self.path} - NetPath: {self.network_path} - SubFolderId: {self.subfolder_id} - LibEnabled: {self.lib_enabled} - Name: {self.name} - Selected: {self.selected} - Selection: {self.selection}"
 
 
 def get_all_libraries(the_dict):
@@ -95,3 +104,113 @@ def get_all_libraries(the_dict):
                     allLibrariesList.append(media_library(id=virtFolder[libraryId],collectionType=virtFolder['CollectionType'],path=pathInfo['Path'],name=virtFolder['Name']))
 
     return allLibrariesList
+
+
+
+def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
+    #declare list of libraries to show
+    libraries_to_show=[]
+    #declare list of libraries ids/subfolder ids
+    library_tracker=[]
+
+    #loop thru each user selection in the list
+    for usrPos in user_selection:
+
+        #check which listing type was selected
+        if (the_dict['favored_listing_type'] == 'whitelist'):
+            #whitelisting selected
+            thisUserFavoredListType=all_users[usrPos].whitelist
+            #blacklisting not selected
+            thisUserUnfavoredListType=all_users[usrPos].blacklist
+        else:
+            #blacklisting selected
+            thisUserFavoredListType=all_users[usrPos].blacklist
+            #whitelisting not selected
+            thisUserUnfavoredListType=all_users[usrPos].whitelist
+
+        #loop thru each favored listing type library
+        for thisLib in thisUserFavoredListType:
+            if (not (str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) in library_tracker)):
+                #append library to list of libraries to be shown
+                libraries_to_show.append(thisLib)
+                #add library to library_tracker
+                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id))
+
+        #loop thru each unfavored listing type library
+        for thisLib in thisUserUnfavoredListType:
+            if (not (str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) in library_tracker)):
+                #append library to list of libraries to be shown
+                libraries_to_show.append(thisLib)
+                #add library to library_tracker
+                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id))
+
+    return libraries_to_show
+
+
+#populate the selection number into each library
+def enumerate_libraries_to_be_shown(libraries_to_show):
+    #loop thru libraries to be shown
+    for thisLib in libraries_to_show:
+        #add selection number that alings with list index
+        thisLib.selection=libraries_to_show.index(thisLib)
+
+    return libraries_to_show
+
+
+#print library info to console
+def show_libraries(libraries_to_show):
+    #print blank line
+    print()
+    #loop thru all libraries to be shown in the console
+    for thisLib in libraries_to_show:
+        #print library info to the console
+        print(str(thisLib))
+
+
+#select one library
+def get_single_library_selection(libraries_to_show):
+    #n/a - this is not a needed function
+    pass
+
+
+#select one or more libraries
+def get_multiple_library_selection(libraries_to_show):
+    print()
+
+    #declare variable to run while loop
+    loop_active=True
+
+    #loop until finished selecting libraries
+    while (loop_active):
+        #show message on console; wait for input
+        library_selection_str = input('Select one or more libraries.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+
+        #scrub and normalize selection
+        selected_library_list=clean_selection_convert_selection_to_list(library_selection_str)
+
+        #check if no selection was made
+        if (selected_library_list == []):
+            #loop thru all libraries
+            for thisLib in libraries_to_show:
+                if (thisLib.selected):
+                    #at least one library selected; ok to exit selection loop
+                    loop_active=False
+                    break
+            else:
+                #no libraries selected; NOT ok to exit selection loop
+                print('\nMust select at least one library. Try again.')
+                #print library info to console
+                show_libraries(libraries_to_show)
+                print()
+        #check if single library was selected; verify selection is valid
+        elif (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
+            #at least one library selected; ok to exit selection loop
+            loop_active=False
+        else:
+            #invalid selection; NOT ok to exit selection loop
+            print('\nInvalid selection. Try again.')
+            #print library info to console
+            show_libraries(libraries_to_show)
+            print()
+
+    return selected_library_list

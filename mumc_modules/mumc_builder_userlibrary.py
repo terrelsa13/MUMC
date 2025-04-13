@@ -1,6 +1,6 @@
 import copy
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
-from mumc_modules.mumc_builder_library import get_all_libraries
+from mumc_modules.mumc_builder_library import get_all_libraries,get_list_of_libraries_to_show,enumerate_libraries_to_be_shown,show_libraries,get_multiple_library_selection
 from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users
 
 
@@ -75,8 +75,24 @@ def build_users_and_libraries(the_dict):
 
         #check if loop is active
         if (loop_active):
-            #select one or more libraries
-            if ((the_dict['user_library_selection'] == 0) or (the_dict['user_library_selection'] == 2)):
+            #show and select one or more libraries for one user
+            if (the_dict['user_library_selection'] == 0):
+                #build list of libraries to be shown on the console
+                libraries_to_show=get_list_of_libraries_to_show(the_dict,all_users,user_selection)
+
+                #enumerate each library selection to align with it's position in the list
+                enumerate_libraries_to_be_shown(libraries_to_show)
+
+                #print library info to console
+                show_libraries(libraries_to_show)
+
+                #select one or more libraries; clean the selection; check selection is valid; return list with selection
+                library_selection=get_multiple_library_selection(libraries_to_show)
+                
+                pass
+
+            #show and select one or more libraries for multiple users
+            if (the_dict['user_library_selection'] == 2):
                 pass
 
             #auto select all libraries
