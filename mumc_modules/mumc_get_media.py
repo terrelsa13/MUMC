@@ -920,7 +920,7 @@ def init_getMedia(the_dict):
             data_single_user=get_single_user(user_id,the_dict)
             for lib_id in the_dict['byUserId_accessibleLibraries'][user_id]:
                 parent_id=the_dict['byUserId_accessibleLibraryParents'][user_id][the_dict['byUserId_accessibleLibraries'][user_id].index(lib_id)]
-                if ((parent_id + '_' + lib_id) in data_single_user['Policy']['ExcludedSubFolders']):
+                if ((str(parent_id) + '_' + str(lib_id)) in data_single_user['Policy']['ExcludedSubFolders']):
                     for user_data in the_dict['admin_settings']['users']:
                         if (user_data['user_id'] == user_id):
                             user_index=the_dict['admin_settings']['users'].index(user_data)

@@ -29,7 +29,7 @@ class user_library:
 #media library class for builder
 class media_library(user_library):
 
-    def __init__(self,lib_id='',collection_type='',path='',network_path='',subfolder_id='',lib_enabled=False,name='',selected=False,selection=None):
+    def __init__(self,lib_id='',collection_type='',path='',network_path='',subfolder_id=None,lib_enabled=False,name='',selected=False,selection=None):
         user_library.__init__(self,lib_id,collection_type,path,network_path,subfolder_id,lib_enabled)
         self.name=name
         self.selected=selected
@@ -55,6 +55,7 @@ class media_library(user_library):
         return f"LibId: {self.lib_id} - CollectionType: {self.collection_type} - Path: {self.path} - NetPath: {self.network_path} - SubFolderId: {self.subfolder_id} - LibEnabled: {self.lib_enabled} - Name: {self.name} - Selected: {self.selected} - Selection: {self.selection}"
 
 
+#get and build all libraries
 def get_all_libraries(the_dict):
     allLibrariesList=[]
     isEmby=the_dict['isEmby']
@@ -101,12 +102,12 @@ def get_all_libraries(the_dict):
                     except:
                         networkPath=None
                     #create list of library folder information objects
-                    allLibrariesList.append(media_library(id=virtFolder[libraryId],collectionType=virtFolder['CollectionType'],path=pathInfo['Path'],name=virtFolder['Name']))
+                    allLibrariesList.append(media_library(lib_id=virtFolder[libraryId],collection_type=virtFolder['CollectionType'],path=pathInfo['Path'],network_path=networkPath,name=virtFolder['Name']))
 
     return allLibrariesList
 
 
-
+#get and return list of libraries to be shown
 def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
     #declare list of libraries to show
     libraries_to_show=[]
@@ -130,19 +131,21 @@ def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
 
         #loop thru each favored listing type library
         for thisLib in thisUserFavoredListType:
-            if (not (str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) in library_tracker)):
+            #check if library has already been added to libraries_to_show (because jellyfin does not have subfolder_ids, path has to be used for comparison)
+            if (not ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path)) in library_tracker)):
                 #append library to list of libraries to be shown
                 libraries_to_show.append(thisLib)
                 #add library to library_tracker
-                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id))
+                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path))
 
         #loop thru each unfavored listing type library
         for thisLib in thisUserUnfavoredListType:
-            if (not (str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) in library_tracker)):
+            #check if library has already been added to libraries_to_show (because jellyfin does not have subfolder_ids, path has to be used for comparison)
+            if (not ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path)) in library_tracker)):
                 #append library to list of libraries to be shown
                 libraries_to_show.append(thisLib)
                 #add library to library_tracker
-                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id))
+                library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path))
 
     return libraries_to_show
 
@@ -168,13 +171,13 @@ def show_libraries(libraries_to_show):
 
 
 #select one library
-def get_single_library_selection(libraries_to_show):
+def get_single_library_selection():
     #n/a - this is not a needed function
     pass
 
 
 #select one or more libraries
-def get_multiple_library_selection(libraries_to_show):
+def get_multiple_library_selection(libraries_to_show,favored_listing_type,user_library_selection):
     print()
 
     #declare variable to run while loop
@@ -183,13 +186,13 @@ def get_multiple_library_selection(libraries_to_show):
     #loop until finished selecting libraries
     while (loop_active):
         #show message on console; wait for input
-        library_selection_str = input('Select one or more libraries.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+        library_selection_str = input('Select one or more libraries to be ' + str(favored_listing_type) + 'ed.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
         #scrub and normalize selection
         selected_library_list=clean_selection_convert_selection_to_list(library_selection_str)
 
-        #check if no selection was made
-        if (selected_library_list == []):
+        #check if no selection was made and user_library_select only requires selecting one or more libraries
+        if ((selected_library_list == []) and (user_library_selection == 2)):
             #loop thru all libraries
             for thisLib in libraries_to_show:
                 if (thisLib.selected):
@@ -204,6 +207,7 @@ def get_multiple_library_selection(libraries_to_show):
                 print()
         #check if single library was selected; verify selection is valid
         elif (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
+        #if (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
             #at least one library selected; ok to exit selection loop
             loop_active=False
         else:
@@ -214,3 +218,31 @@ def get_multiple_library_selection(libraries_to_show):
             print()
 
     return selected_library_list
+
+
+#set selected for all user libraries to True
+def select_all_user_libraries(all_users,selected_value=True):
+    #loop thru all users
+    for thisUser in all_users:
+        #loop thru whitelist libraries for this user
+        for thisLib in thisUser.whitelist:
+            #unselect this library
+            thisLib.selected=selected_value
+        #loop thru blacklist libraries for this user
+        for thisLib in thisUser.blacklist:
+            #unselecte this library
+            thisLib.selected=selected_value
+
+
+#set selected for all user libraries to False
+def unselect_all_user_libraries(all_users,selected_value=False):
+    select_all_user_libraries(all_users,selected_value)
+
+
+#auto select all libraries
+def auto_select_libraries_to_show(libraries_to_show):
+    
+    #covert range() into selected_user_list
+    library_selection=list(range(0,len(libraries_to_show)))
+    
+    return library_selection
