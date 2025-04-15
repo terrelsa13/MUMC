@@ -106,9 +106,9 @@ def cfgCheckARGV(argvCfgChecker):
         if ((config:=argvCfgChecker.checkString('-config',value=None,instanceType=argvCfgChecker.str,required=False,minLength=None,maxLength=None,errOut=False)) == None):
             argvCfgChecker.setCustomErrorText(f'config option/environmental-variable must be a string')
 
-    if (argvCfgChecker.getValue('-config_updater')):
-        if ((config_updater:=argvCfgChecker.checkBoolean('config_updater',value=None,instanceType=argvCfgChecker.bool,errOut=False)) == None):
-            argvCfgChecker.setCustomErrorText(f'config_updater option/environmental-variable must be a boolean\n\tValid values True,False')
+    #if (argvCfgChecker.getValue('-config_updater')):
+        #if ((config_updater:=argvCfgChecker.checkBoolean('config_updater',value=None,instanceType=argvCfgChecker.bool,errOut=False)) == None):
+            #argvCfgChecker.setCustomErrorText(f'config_updater option/environmental-variable must be a boolean\n\tValid values True,False')
 
     #print any logged errors
     argvCfgChecker.printError()
