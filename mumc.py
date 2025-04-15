@@ -12,7 +12,6 @@ from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
 from mumc_modules.mumc_output import open_and_return_default_config
-from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 #from mumc_modules.mumc_yaml_check import cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 #from mumc_modules.mumc_config_merge import create_default_config,merge_configurations
@@ -20,6 +19,8 @@ from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_data_checks import data_checker
+from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
+from mumc_modules.mumc_argv_check import cfgCheckARGV
 #from memory_profiler import profile
 
 
@@ -30,6 +31,12 @@ def MUMC():
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
+
+    #fully check argv commandline options (and environmental variables) are what we expect them to be
+    argvCfgChecker=data_checker(cmdopt_dict['argv'])
+    cmdopt_dict['argv']=cfgCheckARGV(argvCfgChecker)
+
+    #update theh argv created during initialization
     init_dict['argv']=cmdopt_dict['argv']
 
     #import config file
@@ -38,9 +45,9 @@ def MUMC():
     #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
 
-    #get and full check user defined config values are what we expect them to be
-    userCfgChecker=data_checker(cfg,init_dict['DEBUG'])
-    cfg=cfgCheckYAML(cfg,userCfgChecker)
+    #get and fully check user defined config values are what we expect them to be
+    userCfgChecker=data_checker(cfg)
+    cfg=cfgCheckYAML(userCfgChecker)
 
     #after importing the config; remove old DEBUG if it exists
     delete_debug_log(init_dict)
@@ -65,9 +72,9 @@ def MUMC():
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
-    #get and check user defined + default config values are what we expect them to be
-    cfgChecker=data_checker(cfg,cfg['DEBUG'])
-    cfg=cfgCheckYAML(cfg,cfgChecker)
+    #get and fully check user defined + default config values are what we expect them to be
+    cfgChecker=data_checker(cfg)
+    cfg=cfgCheckYAML(cfgChecker)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))

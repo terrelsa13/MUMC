@@ -5,6 +5,11 @@ from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_a
 
 
 def build_users_and_libraries(the_dict):
+
+    ##########################################################################################################
+    ######Data Collection#####################################################################################
+    ##########################################################################################################
+
     #check if emby or jellyfin
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
         the_dict['isEmby']=True
@@ -32,10 +37,7 @@ def build_users_and_libraries(the_dict):
     #update users with "new" libraries they have permission to access
     all_users=update_all_user_libraries(the_dict,all_libraries,all_users)
 
-    #declare variables to run while loops
-    user_loop_active=True
-    library_loop_active=True
-
+    ##########################################################################################################
     ##########################################################################################################
     # 0 - Select users and libraries.
     #     Select libraries to be whitelisted/blacklisted for selected users.
@@ -46,11 +48,18 @@ def build_users_and_libraries(the_dict):
     # 3 - Select nothing.
     #     All libraries will be whitelisted/blacklisted for all users according to their access policy.
     ##########################################################################################################
+    ##########################################################################################################
+
+    #declare variables to run while loops
+    user_loop_active=True
+    library_loop_active=True
+
+    ##########################################################################################################
+    ######User Selection######################################################################################
+    ##########################################################################################################
 
     #loop until finished
     while (user_loop_active):
-
-        ######User Selection######################################################################################
 
         #select one user
         if (the_dict['user_library_selection'] == 0):
@@ -96,7 +105,9 @@ def build_users_and_libraries(the_dict):
                 #select all user libraries
                 select_all_user_libraries(all_users)
 
+        ##########################################################################################################
         ######Library Selection###################################################################################
+        ##########################################################################################################
 
         #check if loop is active
         if (user_loop_active):
@@ -149,6 +160,10 @@ def build_users_and_libraries(the_dict):
                     if (the_dict['user_library_selection'] == 3):
                         #stop loop
                         user_loop_active=False
+
+    ##########################################################################################################
+    ######Data To YAML########################################################################################
+    ##########################################################################################################
 
     #declare list to return
     user_and_library_list=[]

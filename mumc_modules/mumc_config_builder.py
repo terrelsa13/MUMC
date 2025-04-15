@@ -12,6 +12,7 @@ from mumc_modules.mumc_init import getIsAnyMediaEnabled
 from mumc_modules.mumc_blacklist_whitelist import get_unfavored_listing_type
 import copy
 import yaml
+import sys
 
 
 def filterYAMLConfigKeys_ToKeep(dirty_dict,*clean_keys):
@@ -172,19 +173,19 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict.pop('UPDATE_CONFIG')
 
         print('----------------------------------------------------------------------------------------')
-        #ask user for server's url
+        #ask user for server url
         if ('-server_url' in the_dict['argv']):
             the_dict['url']=the_dict['argv']['-server_url']
         else:
             the_dict['url']=get_url()
         print('----------------------------------------------------------------------------------------')
-        #ask user for the emby or jellyfin port number
+        #ask user for the server port number
         if ('-server_port' in the_dict['argv']):
             the_dict['port']=the_dict['argv']['-server_port']
         else:
             the_dict['port']=get_port()
         print('----------------------------------------------------------------------------------------')
-        #ask user for base-url
+        #ask user for server base-url
         if ('-server_base_url' in the_dict['argv']):
             the_dict['base']=the_dict['argv']['-server_base_url']
         else:
@@ -198,6 +199,7 @@ def build_configuration_file(the_dict,orig_dict={}):
             the_dict['admin_settings']['server']['url']=the_dict['url'] + '/' + str(the_dict['base'])
         else:
             the_dict['admin_settings']['server']['url']=the_dict['url']
+
         #Remove server, port, and base so they cannot be used later
         the_dict.pop('url')
         the_dict.pop('port')
@@ -422,9 +424,9 @@ def build_configuration_file(the_dict,orig_dict={}):
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict[arr.casefold() + '_url']
 
             #get *arr API key
-            if ('-' + arr.casefold() + '_api' in the_dict['argv']):
+            if ('-' + arr.casefold() + '_api_key' in the_dict['argv']):
                 #save *arr api command option
-                the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=the_dict['argv']['-' + arr.casefold() + '_api']
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=the_dict['argv']['-' + arr.casefold() + '_api_key']
             elif (not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))):
                 #save *arr manual apiinput
                 the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=get_arr_api(arr)

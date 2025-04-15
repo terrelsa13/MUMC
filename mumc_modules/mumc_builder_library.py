@@ -27,7 +27,7 @@ class user_library:
 
 
 #media library class for builder
-class media_library(user_library):
+class library_data(user_library):
 
     def __init__(self,lib_id='',collection_type='',path='',network_path='',subfolder_id=None,lib_enabled=False,name='',selected=False,selection=None):
         user_library.__init__(self,lib_id,collection_type,path,network_path,subfolder_id,lib_enabled)
@@ -92,7 +92,7 @@ def get_all_libraries(the_dict):
                                     except:
                                         networkPath=None
                                     #create list of library (sub)folder information objects
-                                    allLibrariesList.append(media_library(lib_id=virtFolder[libraryId],collection_type=virtFolder['CollectionType'],path=pathInfo['Path'],network_path=networkPath,subfolder_id=subfolderInfo['Id'],name=virtFolder['Name']))
+                                    allLibrariesList.append(library_data(lib_id=virtFolder[libraryId],collection_type=virtFolder['CollectionType'],path=pathInfo['Path'],network_path=networkPath,subfolder_id=subfolderInfo['Id'],name=virtFolder['Name']))
                             break
                 #when jellyfin; subfolders do not exist and cannot be specifically handled
                 else:
@@ -102,7 +102,7 @@ def get_all_libraries(the_dict):
                     except:
                         networkPath=None
                     #create list of library folder information objects
-                    allLibrariesList.append(media_library(lib_id=virtFolder[libraryId],collection_type=virtFolder['CollectionType'],path=pathInfo['Path'],network_path=networkPath,name=virtFolder['Name']))
+                    allLibrariesList.append(library_data(lib_id=virtFolder[libraryId],collection_type=virtFolder['CollectionType'],path=pathInfo['Path'],network_path=networkPath,name=virtFolder['Name']))
 
     return allLibrariesList
 

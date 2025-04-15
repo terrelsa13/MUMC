@@ -9,7 +9,7 @@ from mumc_modules.mumc_data_checks import data_checker
 
 #Check select config variables are as expected
 #def cfgCheckYAML(cfg,init_dict):
-def cfgCheckYAML(cfg,cfgChecker):
+def cfgCheckYAML(cfgChecker):
 #######################################################################################################
 
     #cfgChecker=data_checker(cfg,init_dict)
@@ -119,9 +119,9 @@ def cfgCheckYAML(cfg,cfgChecker):
                         user_names_check_list.append(user_name)
 
                     if (isJellyfinServer(brand)):
-                        collection_type_vales=['movies','tvshows','music','audiobooks','playlists']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','books']
                     else:
-                        collection_type_vales=['movies','tvshows','music','audiobooks','playlists']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','books']
 
                     if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
@@ -192,7 +192,7 @@ def cfgCheckYAML(cfg,cfgChecker):
 
                 radarr_url=cfgChecker.checkString('admin_settings','media_managers','radarr','url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.alnum,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
+                radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr','api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -2252,7 +2252,6 @@ def cfgCheckYAML(cfg,cfgChecker):
 
     else:
         #something is not right with the advanced_settings
-        #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
 #######################################################################################################
@@ -2266,11 +2265,12 @@ def cfgCheckYAML(cfg,cfgChecker):
 
 #######################################################################################################
 
+    #print any logged errors
     cfgChecker.printError()
 
 #######################################################################################################
 
-    return cfg
+    return cfgChecker.cfg
 
 
 '''

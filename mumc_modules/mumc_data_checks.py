@@ -9,9 +9,9 @@ from mumc_modules.mumc_versions import checkYAMLVersion,get_script_version
 #Data checker class
 class data_checker:
     #Initialize and define data checker variables
-    def __init__(self,cfg=(),DEBUG=0):
+    def __init__(self,cfg=()):
         self.cfg=cfg
-        self.DEBUG=DEBUG
+        #self.DEBUG=DEBUG
         self.brand=None
         self.wasErrorFlag=False
         self.errorString=''

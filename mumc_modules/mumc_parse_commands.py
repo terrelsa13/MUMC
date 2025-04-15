@@ -538,13 +538,31 @@ def parse_command_line_options(the_dict):
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
     cmdopt_dict['argv']|=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
 
+    #everything is string up to this point
     #normalize all 'true'/'false' strings as booleans
     #normalize all '#' as intergers
+    #normalize blacktag/whitetag blank string '' to empty list []; remove leading/trailing spaces
     for cmd in cmdopt_dict['argv']:
         if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
             cmdopt_dict['argv'][cmd]=True
         elif (cmdopt_dict['argv'][cmd].casefold() == 'false'):
             cmdopt_dict['argv'][cmd]=False
+        elif (((cmd == '-global_blacktags') or (cmd == '-global_whitetags')) and (cmdopt_dict['argv'][cmd].strip() == '')):
+            cmdopt_dict['argv'][cmd]=[]
+
+        elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags')):
+            if (cmdopt_dict['argv'][cmd].strip() == ''):
+                  cmdopt_dict['argv'][cmd]=[]
+            elif ((cmdopt_dict['argv'][cmd].count(' ') + cmdopt_dict['argv'][cmd].count('[') + cmdopt_dict['argv'][cmd].count(']')) == len(cmdopt_dict['argv'][cmd])):
+                cmdopt_dict['argv'][cmd]=[]
+            else:
+                cmdopt_dict['argv'][cmd]=cmdopt_dict['argv'][cmd].split(',')
+                for item in cmdopt_dict['argv'][cmd]:
+                    cmdopt_dict['argv'][cmd][cmdopt_dict['argv'][cmd].index(item)]=item.strip()
+                for item in cmdopt_dict['argv'][cmd][:]:
+                    if (not(item.strip())):
+                        cmdopt_dict['argv'][cmd].remove(item)
+
         else:
             try:
                 cmdopt_dict['argv'][cmd]=int(cmdopt_dict['argv'][cmd])
