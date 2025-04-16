@@ -485,6 +485,20 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     return argv
 
 
+#remove the leading double dash from commands
+def normalizeCommandLineOptions(argvs,options_list):
+    #loop thru command line options
+    for argv in argvs:
+        #count the number of '-' (dashes) in the string
+        dash_count=argv.count('-')
+        #force lowercaes; replace "dash_count - 1" number of '-'es (dashes); then check if this new string is in the list of possible command line options
+        if ((argv.strip().casefold().replace('-','',dash_count - 1)) in options_list):
+            #remove all extra '-'es (dashes); save lowercase command line option with a single '-' (dash)
+            argvs[argvs.index(argv)]=argv.strip().casefold().replace('-','',dash_count - 1)
+
+    return argvs
+
+
 #parse the command line options
 def parse_command_line_options(the_dict):
 
@@ -529,8 +543,11 @@ def parse_command_line_options(the_dict):
                                 '-d','-container',
                                 '-u','-config_updater',
                                 #'-rak','-remake-api-key',
-                                '-h','-help','-?','--h','--help','--?'
+                                '-h','-help','-?'
                                 ]
+
+    #normalize by removing too many leading '-'es (dashes) and forcing lowercase
+    the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
     #first covert environmental variables to command line arguements; environamental variables have a lower priority
     cmdopt_dict['argv']|=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])

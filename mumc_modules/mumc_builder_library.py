@@ -108,7 +108,7 @@ def get_all_libraries(the_dict):
 
 
 #get and return list of libraries to be shown
-def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
+def get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection):
     #declare list of libraries to show
     libraries_to_show=[]
     #declare list of libraries ids/subfolder ids
@@ -118,19 +118,19 @@ def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
     for usrPos in user_selection:
 
         #check which listing type was selected
-        if (the_dict['favored_listing_type'] == 'whitelist'):
+        if (preferred_listing_type == 'whitelist'):
             #whitelisting selected
-            thisUserFavoredListType=all_users[usrPos].whitelist
+            thisUserPreferredListType=all_users[usrPos].whitelist
             #blacklisting not selected
-            thisUserUnfavoredListType=all_users[usrPos].blacklist
+            thisUserUnpreferredListType=all_users[usrPos].blacklist
         else:
             #blacklisting selected
-            thisUserFavoredListType=all_users[usrPos].blacklist
+            thisUserPreferredListType=all_users[usrPos].blacklist
             #whitelisting not selected
-            thisUserUnfavoredListType=all_users[usrPos].whitelist
+            thisUserUnpreferredListType=all_users[usrPos].whitelist
 
-        #loop thru each favored listing type library
-        for thisLib in thisUserFavoredListType:
+        #loop thru each preferred listing type library
+        for thisLib in thisUserPreferredListType:
             #check if library has already been added to libraries_to_show (because jellyfin does not have subfolder_ids, path has to be used for comparison)
             if (not ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path)) in library_tracker)):
                 #append library to list of libraries to be shown
@@ -138,8 +138,8 @@ def get_list_of_libraries_to_show(the_dict,all_users,user_selection):
                 #add library to library_tracker
                 library_tracker.append(str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path))
 
-        #loop thru each unfavored listing type library
-        for thisLib in thisUserUnfavoredListType:
+        #loop thru each unpreferred listing type library
+        for thisLib in thisUserUnpreferredListType:
             #check if library has already been added to libraries_to_show (because jellyfin does not have subfolder_ids, path has to be used for comparison)
             if (not ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id) + '_' + str(thisLib.path)) in library_tracker)):
                 #append library to list of libraries to be shown
@@ -172,12 +172,12 @@ def show_libraries(libraries_to_show):
 
 #select one library
 def get_single_library_selection():
-    #n/a - this is not a needed function
+    #n/a - this function is not needed
     pass
 
 
 #select one or more libraries
-def get_multiple_library_selection(libraries_to_show,favored_listing_type,user_library_selection):
+def get_multiple_library_selection(preferred_listing_type,libraries_to_show,user_library_selection):
     print()
 
     #declare variable to run while loop
@@ -186,7 +186,7 @@ def get_multiple_library_selection(libraries_to_show,favored_listing_type,user_l
     #loop until finished selecting libraries
     while (loop_active):
         #show message on console; wait for input
-        library_selection_str = input('Select one or more libraries to be ' + str(favored_listing_type) + 'ed.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+        library_selection_str = input('Select one or more libraries to be ' + str(preferred_listing_type) + 'ed.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
         #scrub and normalize selection
         selected_library_list=clean_selection_convert_selection_to_list(library_selection_str)

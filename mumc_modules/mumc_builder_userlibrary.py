@@ -4,11 +4,15 @@ from mumc_modules.mumc_builder_library import get_all_libraries,get_list_of_libr
 from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries
 
 
+#build users and libraries
 def build_users_and_libraries(the_dict):
 
     ##########################################################################################################
     ######Data Collection#####################################################################################
     ##########################################################################################################
+
+    #set preferred_listing_type
+    preferred_listing_type=the_dict['preferred_listing_type']
 
     #check if emby or jellyfin
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
@@ -32,10 +36,10 @@ def build_users_and_libraries(the_dict):
     all_users=clean_all_users(the_dict['admin_settings']['users'],all_users)
 
     #remove any existing user libraries that no longer exist; remove libraries the user does NOT have permission to access
-    all_users=clean_all_user_libraries(the_dict,all_libraries,all_users)
+    all_users=clean_all_user_libraries(preferred_listing_type,all_libraries,all_users)
 
     #update users with "new" libraries they have permission to access
-    all_users=update_all_user_libraries(the_dict,all_libraries,all_users)
+    all_users=update_all_user_libraries(preferred_listing_type,all_libraries,all_users)
 
     ##########################################################################################################
     ##########################################################################################################
@@ -121,7 +125,7 @@ def build_users_and_libraries(the_dict):
                 #show and select one or more libraries for one user or multiple users
                 if ((user_library_selection == 0) or (user_library_selection == 2)):
                     #build list of libraries to be shown on the console
-                    libraries_to_show=get_list_of_libraries_to_show(the_dict,all_users,user_selection)
+                    libraries_to_show=get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection)
 
                     #enumerate each library selection to align with it's position in the list
                     enumerate_libraries_to_be_shown(libraries_to_show)
@@ -130,10 +134,10 @@ def build_users_and_libraries(the_dict):
                     show_libraries(libraries_to_show)
 
                     #select one or more libraries; clean the selection; check selection is valid; return list with selection
-                    library_selection=get_multiple_library_selection(libraries_to_show,the_dict['favored_listing_type'],user_library_selection)
+                    library_selection=get_multiple_library_selection(preferred_listing_type,libraries_to_show,user_library_selection)
 
                     #toggle if library is considered selected or unselected
-                    toggle_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection)
+                    toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
                     #if no library selected set loop to inactive
                     if (library_selection == []):
@@ -147,14 +151,14 @@ def build_users_and_libraries(the_dict):
                 #auto select all libraries
                 elif ((user_library_selection == 1) or (user_library_selection == 3)):
                     #build list of libraries to be shown on the console
-                    libraries_to_show=get_list_of_libraries_to_show(the_dict,all_users,user_selection)
+                    libraries_to_show=get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection)
 
                     #auto select all libraries; return list with selection
                     library_selection=auto_select_libraries_to_show(libraries_to_show)
 
                     if (user_library_selection == 1):
                         #toggle if library is considered selected or unselected
-                        on_off_all_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection)
+                        on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
                     #stop loop
                     library_loop_active=False
@@ -175,6 +179,6 @@ def build_users_and_libraries(the_dict):
         #check if user is selected
         if (thisUser.selected):
             #add new user and library entry to list
-            user_and_library_list.append(thisUser.userObjectToYAML(the_dict['favored_listing_type']))
+            user_and_library_list.append(thisUser.userObjectToYAML(preferred_listing_type))
 
     return user_and_library_list

@@ -1,5 +1,6 @@
 import copy
 from mumc_modules.mumc_user_queries import get_all_users_from_media_server
+from mumc_modules.mumc_blacklist_whitelist import get_unpreferred_listing_type
 
 
 #user data class for builder
@@ -53,7 +54,7 @@ class user_data(user_library_data):
     def display(self):
         return f"UserId: {self.user_id} - Name: {self.user_name} - Whitelist: {self.whitelist} - Blacklist: {self.blacklist} - AccessToAllFolders: {self.enableAllFolders} - EnabledFolders: {self.enabledFolders} - ExcludedSubfolders: {self.excludedSubFolders} - Selected: {self.selected}"
  
-    def userObjectToYAML(self,favored_listing_type):
+    def userObjectToYAML(self,preferred_listing_type):
         #delcare dictionary and top level keys
         userDataLibDataDict={}
         userDataLibDataDict['user_id']=self.user_id
@@ -61,21 +62,13 @@ class user_data(user_library_data):
         userDataLibDataDict['whitelist']=[]
         userDataLibDataDict['blacklist']=[]
 
-        #check which listing type was selected
-        if (favored_listing_type == 'whitelist'):
-            #whitelist favored
-            #blacklist unfavored
-            unfavored_listing_type='blacklist'
-        else:
-            #blacklist favored
-            #whitelist unfavored
-            unfavored_listing_type='whitelist'
+        #get unpreferred listing type
+        unpreferred_listing_type=get_unpreferred_listing_type(preferred_listing_type)
 
         #loop thru user's whitelist libraries
         for thisLib in self.whitelist:
-            #declare sub-dictonary for lib items
+            #delcare sub-dictionary and its top level keys
             libDict={}
-            #save keys
             libDict['lib_id']=thisLib.lib_id
             libDict['lib_name']=thisLib.name
             libDict['collection_type']=thisLib.collection_type
@@ -85,17 +78,16 @@ class user_data(user_library_data):
             libDict['lib_enabled']=thisLib.lib_enabled
             #check if lib is selected
             if (thisLib.selected):
-                #when lib selected append to the favored_listing_type
-                userDataLibDataDict[favored_listing_type].append(libDict)
+                #when lib selected append to the preferred_listing_type
+                userDataLibDataDict[preferred_listing_type].append(libDict)
             else:
-                #when lib NOT selected append to the unfavored_listing_type
-                userDataLibDataDict[unfavored_listing_type].append(libDict)
+                #when lib NOT selected append to the unpreferred_listing_type
+                userDataLibDataDict[unpreferred_listing_type].append(libDict)
 
         #loop thru user's blacklist libraries
         for thisLib in self.blacklist:
-            #declare sub-dictonary for lib items
+            #delcare sub-dictionary and its top level keys
             libDict={}
-            #save keys
             libDict['lib_id']=thisLib.lib_id
             libDict['lib_name']=thisLib.name
             libDict['collection_type']=thisLib.collection_type
@@ -105,11 +97,11 @@ class user_data(user_library_data):
             libDict['lib_enabled']=thisLib.lib_enabled
             #check if lib is selected
             if (thisLib.selected):
-                #when lib selected append to the favored_listing_type
-                userDataLibDataDict[favored_listing_type].append(libDict)
+                #when lib selected append to the preferred_listing_type
+                userDataLibDataDict[preferred_listing_type].append(libDict)
             else:
-                #when lib NOT selected append to the unfavored_listing_type
-                userDataLibDataDict[unfavored_listing_type].append(libDict)
+                #when lib NOT selected append to the unpreferred_listing_type
+                userDataLibDataDict[unpreferred_listing_type].append(libDict)
 
         return userDataLibDataDict
 
@@ -181,23 +173,24 @@ def does_user_have_access_to_this_lib_folder(thisUser,thisAllLib):
 
 
 #remove any existing user libraries not in all_libraries; or any libraries the user does not have permission to access
-def clean_all_user_libraries(the_dict,all_libraries,all_users):
+def clean_all_user_libraries(preferred_listing_type,all_libraries,all_users):
     #loop thru all_users
     for thisUser in all_users:
+
         #check which listing type was selected
-        if (the_dict['favored_listing_type'] == 'whitelist'):
+        if (preferred_listing_type == 'whitelist'):
             #whitelisting selected
-            thisUserFavoredListType=thisUser.whitelist
+            thisUserPreferredListType=thisUser.whitelist
             #blacklisting not selected
-            thisUserUnfavoredListType=thisUser.blacklist
+            thisUserUnpreferredListType=thisUser.blacklist
         else:
             #blacklisting selected
-            thisUserFavoredListType=thisUser.blacklist
+            thisUserPreferredListType=thisUser.blacklist
             #whitelisting not selected
-            thisUserUnfavoredListType=thisUser.whitelist
+            thisUserUnpreferredListType=thisUser.whitelist
 
         #loop thru the specific user's selected library listing type
-        for thisUserLib in reversed(thisUserFavoredListType):
+        for thisUserLib in reversed(thisUserPreferredListType):
             #loop thru all_libraries
             for thisAllLib in all_libraries:
                 #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
@@ -206,20 +199,20 @@ def clean_all_user_libraries(the_dict,all_libraries,all_users):
                     if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
                         #create temp copy
                         temp_thisAllLib=copy.copy(thisAllLib)
-                        #libraries/subfolders in the favored listing type are selected
+                        #libraries/subfolders in the preferred listing type are selected
                         temp_thisAllLib.selected=True
                         #store lib_enabled state for existing library
                         temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
                         #copy the matching entry from all_libraries to overwrite the existing library
-                        thisUserFavoredListType[thisUserFavoredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        thisUserPreferredListType[thisUserPreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
                         break
             else:
                 #library folder no longer exists or user does not have permissoin to access the library folder
                 #either way; remove this library from the user
-                thisUserFavoredListType.remove(thisUserLib)
+                thisUserPreferredListType.remove(thisUserLib)
 
         #loop thru the specific user's selected library listing type
-        for thisUserLib in reversed(thisUserUnfavoredListType):
+        for thisUserLib in reversed(thisUserUnpreferredListType):
             #loop thru all_libraries
             for thisAllLib in all_libraries:
                 #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
@@ -231,40 +224,40 @@ def clean_all_user_libraries(the_dict,all_libraries,all_users):
                         #store lib_enabled state for existing library
                         temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
                         #copy the matching entry from all_libraries to overwrite the existing library
-                        thisUserUnfavoredListType[thisUserUnfavoredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        thisUserUnpreferredListType[thisUserUnpreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
                         break
             else:
                 #library folder no longer exists or user does not have permissoin to access the library folder
                 #either way; remove this library from the user
-                thisUserUnfavoredListType.remove(thisUserLib)
+                thisUserUnpreferredListType.remove(thisUserLib)
 
     return all_users
 
 
 #update users with "new" libraries they have permission to access
-def update_all_user_libraries(the_dict,all_libraries,all_users):
+def update_all_user_libraries(preferred_listing_type,all_libraries,all_users):
     #loop thru all_users
     for thisUser in all_users:
         #check which listing type was selected
-        if (the_dict['favored_listing_type'] == 'whitelist'):
+        if (preferred_listing_type == 'whitelist'):
             #whitelisting selected
-            thisUserFavoredListType=thisUser.whitelist
+            thisUserPreferredListType=thisUser.whitelist
             #blacklisting not selected
-            thisUserUnfavoredListType=thisUser.blacklist
+            thisUserUnpreferredListType=thisUser.blacklist
         else:
             #blacklisting selected
-            thisUserFavoredListType=thisUser.blacklist
+            thisUserPreferredListType=thisUser.blacklist
             #whitelisting not selected
-            thisUserUnfavoredListType=thisUser.whitelist
+            thisUserUnpreferredListType=thisUser.whitelist
 
         #declare a list for this user's already populated blacklist and whitelist libraries
         user_lib_id_subfolder_id_list=[]
 
-        #loop thru all favored listing type libraries
-        for thisUserLib in thisUserFavoredListType:
+        #loop thru all preferred listing type libraries
+        for thisUserLib in thisUserPreferredListType:
             user_lib_id_subfolder_id_list.append(str(thisUserLib.lib_id) + '_' + str(thisUserLib.subfolder_id))
-        #loop thru all unfavored listing type libraries
-        for thisUserLib in thisUserUnfavoredListType:
+        #loop thru all unpreferred listing type libraries
+        for thisUserLib in thisUserUnpreferredListType:
             user_lib_id_subfolder_id_list.append(str(thisUserLib.lib_id) + '_' + str(thisUserLib.subfolder_id))
 
         #loop thru all libraries
@@ -278,7 +271,7 @@ def update_all_user_libraries(the_dict,all_libraries,all_users):
                     #set lib_enabled state for new libraries
                     temp_thisAllLib.lib_enabled=True
                     #copy the matching entry from all_libraries to overwrite the existing library
-                    thisUserUnfavoredListType.append(copy.copy(temp_thisAllLib))
+                    thisUserUnpreferredListType.append(copy.copy(temp_thisAllLib))
 
     return all_users
 
@@ -467,15 +460,15 @@ def auto_select_all_users(all_users):
 
 
 #update user libraries select flag
-def toggle_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection):
+def toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection):
     #loop thru user selection list
     for usrPos in user_selection:
         #check which listing type was selected
-        if (the_dict['favored_listing_type'] == 'whitelist'):
-            #whitelist favored listing type; combine whitelist and blacklist
+        if (preferred_listing_type == 'whitelist'):
+            #whitelist preferred listing type; combine whitelist and blacklist
             userLibs=all_users[usrPos].whitelist + all_users[usrPos].blacklist
         else:
-            #blacklist favored listing type; combine blacklist and whitelist
+            #blacklist preferred listing type; combine blacklist and whitelist
             userLibs=all_users[usrPos].blacklist + all_users[usrPos].whitelist
 
         #loop thru this users libraries
@@ -490,15 +483,15 @@ def toggle_selected_user_libraries(the_dict,all_users,user_selection,libraries_t
 
 
 #update user libraries select flag all to the same value
-def on_off_all_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection):
+def on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection):
     #loop thru user selection list
     for usrPos in user_selection:
         #check which listing type was selected
-        if (the_dict['favored_listing_type'] == 'whitelist'):
-            #whitelist favored listing type; combine whitelist and blacklist
+        if (preferred_listing_type == 'whitelist'):
+            #whitelist preferred listing type; combine whitelist and blacklist
             userLibs=all_users[usrPos].whitelist + all_users[usrPos].blacklist
         else:
-            #blacklist favored listing type; combine blacklist and whitelist
+            #blacklist preferred listing type; combine blacklist and whitelist
             userLibs=all_users[usrPos].blacklist + all_users[usrPos].whitelist
 
         #loop thru this users libraries

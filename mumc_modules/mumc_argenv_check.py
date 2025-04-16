@@ -1,14 +1,7 @@
-import sys
-from mumc_modules.mumc_versions import get_semantic_version_parts,checkYAMLVersion,get_script_version
-from mumc_modules.mumc_output import appendTo_DEBUG_log
-from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_compare_items import keys_exist_return_value
-from mumc_modules.mumc_tagged import get_isFilterStatementTag
-from mumc_modules.mumc_data_checks import data_checker
 
 
 #Check select argv/environmental variables are as expected
-def cfgCheckARGV(argvCfgChecker):
+def cfgCheckARGENV(argvCfgChecker):
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-server_brand')):
@@ -184,13 +177,6 @@ def cfgCheckARGV(argvCfgChecker):
         if ((config:=argvCfgChecker.checkString('-config',value=None,instanceType=argvCfgChecker.str,required=False,minLength=None,maxLength=None,errOut=False)) == None):
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: config option/environmental-variable must be a string\n')
-
-    ##check if command line option exists
-    #if (argvCfgChecker.getValue('-config_updater')):
-        ##verify command line option has and expected data type and/or value
-        #if ((config_updater:=argvCfgChecker.checkBoolean('config_updater',value=None,instanceType=argvCfgChecker.bool,errOut=False)) == None):
-            ##set error if not expected data type and/or value
-            #argvCfgChecker.setCustomErrorText(f'CmdEnvError: config_updater option/environmental-variable must be a boolean\n\tValid values True,False\n')
 
     #print any logged errors
     argvCfgChecker.printError()

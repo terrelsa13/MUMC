@@ -20,7 +20,7 @@ from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_data_checks import data_checker
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
-from mumc_modules.mumc_argv_check import cfgCheckARGV
+from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 #from memory_profiler import profile
 
 
@@ -34,7 +34,7 @@ def MUMC():
 
     #fully check argv commandline options (and environmental variables) are what we expect them to be
     argvCfgChecker=data_checker(cmdopt_dict['argv'])
-    cmdopt_dict['argv']=cfgCheckARGV(argvCfgChecker)
+    cmdopt_dict['argv']=cfgCheckARGENV(argvCfgChecker)
 
     #update theh argv created during initialization
     init_dict['argv']=cmdopt_dict['argv']
