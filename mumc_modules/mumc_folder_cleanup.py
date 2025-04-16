@@ -5,26 +5,23 @@ from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_q
 
 def get_admin_user_id(the_dict):
     user_info={}
-    user_all_libs_enabled_found=False
-    userIds_list=[]
-    libNums_list=[]
+
+    #check if admin_id exists
     if (the_dict['admin_settings']['server']['admin_id'] == None):
+        #get all user data
         data_all_users=get_all_users_from_media_server(the_dict)
+        #loop thru all users
         for user_info in data_all_users:
-            if (user_info['Policy']['EnableAllFolders']):
+            #check if this user is an administrator
+            if (user_info['Policy'][['IsAdministrator']]):
+                #save this user id as the admin_id
                 the_dict['admin_settings']['server']['admin_id']=user_info['Id']
-                user_all_libs_enabled_found=True
+                #save this user id as the admin_id
+                user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                 break
-            else:
-                userIds_list.append(user_info['Id'])
-                libNums_list.append(len(user_info['Policy']['EnabledFolders']) - len(user_info['Policy']['ExcludedSubFolders']))
-
-        if (user_all_libs_enabled_found == False):
-            sorted_libNums_list=libNums_list.copy()
-            sorted_libNums_list.sort(reverse=True)
-            the_dict['admin_settings']['server']['admin_id']=userIds_list[libNums_list.index(sorted_libNums_list[0])]
-
-    user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
+        else:
+            print(f'\nAdminError: At least one user must be allowed to manage the server; folder cleanup is not possible.\n')
+            user_info=None
 
     return user_info
 
@@ -49,52 +46,55 @@ def get_empty_folders(folder_type,the_dict):
 
     user_info=get_admin_user_id(the_dict)
 
-    var_dict=init_empty_folder_query(var_dict)
+    #when user_info == None folder cleanup cannot happen; skip it
+    if (not (user_info == None)):
 
-    var_dict['QueryItemsRemaining_All']=True
+        var_dict=init_empty_folder_query(var_dict)
 
-    while (var_dict['QueryItemsRemaining_All']):
-        var_dict=empty_folder_query(user_info,var_dict,the_dict)
+        var_dict['QueryItemsRemaining_All']=True
 
-        var_dict['QueryItemsRemaining_All']=var_dict['QueriesRemaining_Empty_Folder']
+        while (var_dict['QueryItemsRemaining_All']):
+            var_dict=empty_folder_query(user_info,var_dict,the_dict)
 
-        for parentItem in var_dict['data_Empty_Folder']['Items']:
-            try:
-                seriesId=parentItem['SeriesId']
-            except:
-                seriesId=parentItem['ParentId']
-            #When season look for parents with no children; add them to the delete list
-            #When season/series and REMOVE_FILES is True look for parents with no children; add them to the delete list
-            if (the_dict['advanced_settings']['REMOVE_FILES']):
-                if (not (parentItem == None)):
-                    if ('ChildCount' in parentItem):
-                        if (int(parentItem['ChildCount']) == 0):
-                            if (parentItem['Id'] in parentItems_Tracker):
-                                parent_item_index=parentItems_Tracker.index(parentItem['Id'])
-                                the_dict['parentDeleteItems'][parent_item_index]=parentItem
-                            else:
-                                parentItems_Tracker.append(parentItem['Id'])
-                                the_dict['parentDeleteItems'].append(parentItem)
-                            if (seriesId in the_dict['child_remaining']):
-                                the_dict['child_remaining'][seriesId]+=1
-                            else:
-                                the_dict['child_remaining'][seriesId]=1
-            #When season/series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
-            else:
-                if (not (parentItem == None)):
-                    if ('ChildCount' in parentItem):
-                        if (not (parentItem['Id'] in parentItems_Tracker)):
-                            parentItems_Tracker.append(parentItem['Id'])
-                        if (parentItem['Id'] in the_dict['child_remaining']):
-                            the_dict['child_remaining'][parentItem['Id']]=parentItem['ChildCount'] - the_dict['child_remaining'][parentItem['Id']]
-                            if (the_dict['child_remaining'][parentItem['Id']] == 0):
-                                the_dict['parentDeleteItems'].append(parentItem)
-                                if (seriesId in the_dict['pre_child_remaing']):
-                                    the_dict['pre_child_remaing'][seriesId]+=1
+            var_dict['QueryItemsRemaining_All']=var_dict['QueriesRemaining_Empty_Folder']
+
+            for parentItem in var_dict['data_Empty_Folder']['Items']:
+                try:
+                    seriesId=parentItem['SeriesId']
+                except:
+                    seriesId=parentItem['ParentId']
+                #When season look for parents with no children; add them to the delete list
+                #When season/series and REMOVE_FILES is True look for parents with no children; add them to the delete list
+                if (the_dict['advanced_settings']['REMOVE_FILES']):
+                    if (not (parentItem == None)):
+                        if ('ChildCount' in parentItem):
+                            if (int(parentItem['ChildCount']) == 0):
+                                if (parentItem['Id'] in parentItems_Tracker):
+                                    parent_item_index=parentItems_Tracker.index(parentItem['Id'])
+                                    the_dict['parentDeleteItems'][parent_item_index]=parentItem
                                 else:
-                                    the_dict['pre_child_remaing'][seriesId]=1
+                                    parentItems_Tracker.append(parentItem['Id'])
+                                    the_dict['parentDeleteItems'].append(parentItem)
+                                if (seriesId in the_dict['child_remaining']):
+                                    the_dict['child_remaining'][seriesId]+=1
+                                else:
+                                    the_dict['child_remaining'][seriesId]=1
+                #When season/series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
+                else:
+                    if (not (parentItem == None)):
+                        if ('ChildCount' in parentItem):
+                            if (not (parentItem['Id'] in parentItems_Tracker)):
+                                parentItems_Tracker.append(parentItem['Id'])
+                            if (parentItem['Id'] in the_dict['child_remaining']):
+                                the_dict['child_remaining'][parentItem['Id']]=parentItem['ChildCount'] - the_dict['child_remaining'][parentItem['Id']]
+                                if (the_dict['child_remaining'][parentItem['Id']] == 0):
+                                    the_dict['parentDeleteItems'].append(parentItem)
+                                    if (seriesId in the_dict['pre_child_remaing']):
+                                        the_dict['pre_child_remaing'][seriesId]+=1
+                                    else:
+                                        the_dict['pre_child_remaing'][seriesId]=1
 
-    the_dict['child_remaining']=the_dict['pre_child_remaing']
+        the_dict['child_remaining']=the_dict['pre_child_remaing']
 
     return the_dict
 
