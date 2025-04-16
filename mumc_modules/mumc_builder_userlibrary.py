@@ -50,6 +50,9 @@ def build_users_and_libraries(the_dict):
     ##########################################################################################################
     ##########################################################################################################
 
+    #set user_library_selection
+    user_library_selection=the_dict['user_library_selection']
+
     #declare variables to run while loops
     user_loop_active=True
     library_loop_active=True
@@ -62,7 +65,7 @@ def build_users_and_libraries(the_dict):
     while (user_loop_active):
 
         #select one user
-        if (the_dict['user_library_selection'] == 0):
+        if (user_library_selection == 0):
             #print user info to console
             show_users(all_users)
 
@@ -78,7 +81,7 @@ def build_users_and_libraries(the_dict):
                 library_loop_active=True
 
         #select one or more users
-        elif (the_dict['user_library_selection'] == 1):
+        elif (user_library_selection == 1):
             #print user info to console
             show_users(all_users)
 
@@ -94,11 +97,11 @@ def build_users_and_libraries(the_dict):
                 library_loop_active=True
 
         #auto select all users
-        elif ((the_dict['user_library_selection'] == 2) or (the_dict['user_library_selection'] == 3)):
+        elif ((user_library_selection == 2) or (user_library_selection == 3)):
             #auto select all users; return list with selection
             user_selection=auto_select_all_users(all_users)
 
-            if (the_dict['user_library_selection'] == 2):
+            if (user_library_selection == 2):
                 #unselect all user libraries before show_libraries(); this will show all as unselected
                 unselect_all_user_libraries(all_users)
             else:
@@ -116,7 +119,7 @@ def build_users_and_libraries(the_dict):
             while(library_loop_active):
 
                 #show and select one or more libraries for one user or multiple users
-                if ((the_dict['user_library_selection'] == 0) or (the_dict['user_library_selection'] == 2)):
+                if ((user_library_selection == 0) or (user_library_selection == 2)):
                     #build list of libraries to be shown on the console
                     libraries_to_show=get_list_of_libraries_to_show(the_dict,all_users,user_selection)
 
@@ -127,7 +130,7 @@ def build_users_and_libraries(the_dict):
                     show_libraries(libraries_to_show)
 
                     #select one or more libraries; clean the selection; check selection is valid; return list with selection
-                    library_selection=get_multiple_library_selection(libraries_to_show,the_dict['favored_listing_type'],the_dict['user_library_selection'])
+                    library_selection=get_multiple_library_selection(libraries_to_show,the_dict['favored_listing_type'],user_library_selection)
 
                     #toggle if library is considered selected or unselected
                     toggle_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection)
@@ -137,19 +140,19 @@ def build_users_and_libraries(the_dict):
                         #stop loop
                         library_loop_active=False
                         #check if selecting one or more libraries for multiple users
-                        if (the_dict['user_library_selection'] == 2):
+                        if (user_library_selection == 2):
                             #stop loop
                             user_loop_active=False
                             
                 #auto select all libraries
-                elif ((the_dict['user_library_selection'] == 1) or (the_dict['user_library_selection'] == 3)):
+                elif ((user_library_selection == 1) or (user_library_selection == 3)):
                     #build list of libraries to be shown on the console
                     libraries_to_show=get_list_of_libraries_to_show(the_dict,all_users,user_selection)
 
                     #auto select all libraries; return list with selection
                     library_selection=auto_select_libraries_to_show(libraries_to_show)
 
-                    if (the_dict['user_library_selection'] == 1):
+                    if (user_library_selection == 1):
                         #toggle if library is considered selected or unselected
                         on_off_all_selected_user_libraries(the_dict,all_users,user_selection,libraries_to_show,library_selection)
 
@@ -157,7 +160,7 @@ def build_users_and_libraries(the_dict):
                     library_loop_active=False
 
                     #check if auto selecting both users and libraries
-                    if (the_dict['user_library_selection'] == 3):
+                    if (user_library_selection == 3):
                         #stop loop
                         user_loop_active=False
 

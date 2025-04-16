@@ -296,7 +296,7 @@ def get_show_disabled_users():
 
 
 def get_user_and_library_selection_type(library_setup_behavior):
-    defaultvalue=0
+    defaultvalue=3
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
@@ -308,7 +308,7 @@ def get_user_and_library_selection_type(library_setup_behavior):
         print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
         print('3 - Select nothing.')
         print('    All libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
-        selection=input('Enter number (default 0 - Select users and libraries): ')
+        selection=input('Enter number (default 3 - Select users and libraries): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
