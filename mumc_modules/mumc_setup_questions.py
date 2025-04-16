@@ -308,7 +308,7 @@ def get_user_and_library_selection_type(library_setup_behavior):
         print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
         print('3 - Select nothing.')
         print('    All libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
-        selection=input('Enter number (default ' + str(defaultvalue) + ' - Select users and libraries): ')
+        selection=input('Enter number (default ' + str(defaultvalue) + ' - All users and all libraries automatically selected.): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
