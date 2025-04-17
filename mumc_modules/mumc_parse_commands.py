@@ -485,7 +485,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     return argv
 
 
-#remove the leading double dash from commands
+#remove extra leading dashes, remove leading and trailing spaces, and remove capitalizatoin from command line options
 def normalizeCommandLineOptions(argvs,options_list):
     #loop thru command line options
     for argv in argvs:
@@ -546,7 +546,7 @@ def parse_command_line_options(the_dict):
                                 '-h','-help','-?'
                                 ]
 
-    #normalize by removing too many leading '-'es (dashes) and forcing lowercase
+    #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
     #first covert environmental variables to command line arguements; environamental variables have a lower priority

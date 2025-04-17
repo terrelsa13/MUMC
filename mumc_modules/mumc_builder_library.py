@@ -22,7 +22,7 @@ class user_library:
             strAlignment="------"
         else: #(self.collection_type == 'audiobooks')
             strAlignment="-"
-            
+
         return f"{self.collection_type} {strAlignment} Path: {self.path} - NetPath: {self.network_path} - LibId: {self.lib_id} - SubFolderId: {self.subfolder_id}"
 
 
