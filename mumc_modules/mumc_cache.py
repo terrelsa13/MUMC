@@ -173,15 +173,15 @@ class cached_data_handler:
 
                         if (len(temp_cached_entry_hits) == 0):
                             #First In First Out
-                            if (self.api_query_cache_fallback_behavior == 'FIFO'):
+                            if (self.api_query_cache_fallback_behavior.casefold() == 'fifo'):
                                 #FIFO Remove oldest cached entry
                                 self.removeCachedEntry(self.cached_entry_urls[0])
                             #Least Frequently Used
-                            elif (self.api_query_cache_fallback_behavior == 'LFU'):
+                            elif (self.api_query_cache_fallback_behavior.casefold() == 'lfu'):
                                 #LFU Remove oldest and least accessed cache entry
                                 self.removeCachedEntry(self.cached_entry_urls[self.getLowestAttributeValueCacheEntryIndex(self.cached_entry_hits)])
                             #Last Recently Used
-                            else: #(self.api_query_cache_fallback_behavior == 'LRU'):
+                            else: #(self.api_query_cache_fallback_behavior.casefold() == 'lru'):
                                 #LRU Remove cache entry with oldest access time
                                 self.removeCachedEntry(self.cached_entry_urls[self.getLowestAttributeValueCacheEntryIndex(self.cached_entry_times)])
                             temp_cached_entry_hits=self.cached_entry_hits.copy()

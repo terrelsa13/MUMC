@@ -12,15 +12,15 @@ def get_single_user(userId,the_dict):
     preConfigDebug = 0
 
     #api call
-    data_single_user=requestURL(req, preConfigDebug, 'get_single_user_info_for_' + str(userId), 3, the_dict)
+    data_single_user=requestURL(the_dict, req, preConfigDebug, 'get_single_user_info_for_' + str(userId), 3)
 
     return data_single_user
 
 
 #API call to get all user accounts
-def get_all_users(the_dict):
+def get_all_users_from_media_server(the_dict,isDisabled=''):
 
-    url=the_dict['admin_settings']['server']['url'] + '/Users'
+    url=the_dict['admin_settings']['server']['url'] + '/Users?IsDisabled=' + str(isDisabled)
     
     req=build_emby_jellyfin_request_message(url,the_dict)
 
@@ -28,6 +28,6 @@ def get_all_users(the_dict):
     preConfigDebug = 0
 
     #api call
-    data_all_users=requestURL(req, preConfigDebug, 'get_all_user_info', 3, the_dict)
+    data_all_users=requestURL(the_dict, req, preConfigDebug, 'get_all_user_info', 3)
 
     return data_all_users

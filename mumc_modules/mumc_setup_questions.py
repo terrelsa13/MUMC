@@ -106,6 +106,20 @@ def get_arr_port(arr,port):
 
 
 #base url?
+def get_arr_base_url(arr):
+    print('If you have not explicity changed this option in ' + arr + ', press enter for default.')
+    print('For example: http://example.com/<baseurl>')
+    base=input('Enter base url (default n/a): ')
+    if (base == ''):
+        return(base)
+    else:
+        if (base.find('/',0,1) == 0):
+            return(base[1:len(base)])
+        else:
+            return(base)
+
+
+#base url?
 def get_base(brand):
     defaultbase='emby'
     if (brand == defaultbase):
@@ -282,17 +296,19 @@ def get_show_disabled_users():
 
 
 def get_user_and_library_selection_type(library_setup_behavior):
-    defaultvalue=0
+    defaultvalue=3
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
         print('0 - Select users and libraries.')
-        print('    Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
+        print('    Select libraries to be ' + str(library_setup_behavior) + 'ed for selected users.')
         print('1 - Select users only.')
         print('    Selected users will have all libraries ' + str(library_setup_behavior) + 'ed according to their access policy.')
         print('2 - Select libraries only.')
         print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
-        selection=input('Enter number (default 0 - Select users and libraries): ')
+        print('3 - Select nothing.')
+        print('    All libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
+        selection=input('Enter number (default ' + str(defaultvalue) + ' - All users and all libraries automatically selected.): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
@@ -303,6 +319,9 @@ def get_user_and_library_selection_type(library_setup_behavior):
         elif (selection == '2'):
             valid_value = True
             defaultvalue=2
+        elif (selection == '3'):
+            valid_value = True
+            defaultvalue=3
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)

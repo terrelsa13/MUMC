@@ -15,7 +15,7 @@ from mumc_modules.mumc_get_blacktagged import init_blacklist_blacktagged_query,i
 from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,init_whitelist_whitetagged_query,blacklist_whitetagged_query,whitelist_whitetagged_query
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
 from mumc_modules.mumc_user_queries import get_single_user
-from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys_ToKeep
+from mumc_modules.mumc_config_builder import filterYAMLConfigKeys_ToKeep
 #from memory_profiler import profile
 
 
@@ -721,10 +721,13 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
                                         PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
                                         SeriesName=item['SeriesName']
+                                        imdbId=series_info['ProviderIds']['Imdb']
                                         tvdbId=series_info['ProviderIds']['Tvdb']
 
                                     if (not ('SeriesName' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['SeriesName']=SeriesName
+                                    if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                        var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=imdbId
                                     if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=tvdbId
                                     if (not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
@@ -855,10 +858,10 @@ def init_getMedia(the_dict):
         if (this_users_info['Policy']['IsDisabled']):
             #check the monitor_disabled_users config value
             if (monitor_disabled_users):
-                #mark the user as enabled
+                #treat the user as enabled when monitor disabled is True
                 the_dict['enabled_users'].append(user_info)
                 the_dict['enabled_user_ids'].append(user_info['user_id'])
-        #if user is enabled; mark the user as enabled
+        #if user is enabled; treat all users as enabled
         else:
             the_dict['enabled_users'].append(user_info)
             the_dict['enabled_user_ids'].append(user_info['user_id'])
@@ -917,7 +920,7 @@ def init_getMedia(the_dict):
             data_single_user=get_single_user(user_id,the_dict)
             for lib_id in the_dict['byUserId_accessibleLibraries'][user_id]:
                 parent_id=the_dict['byUserId_accessibleLibraryParents'][user_id][the_dict['byUserId_accessibleLibraries'][user_id].index(lib_id)]
-                if ((parent_id + '_' + lib_id) in data_single_user['Policy']['ExcludedSubFolders']):
+                if ((str(parent_id) + '_' + str(lib_id)) in data_single_user['Policy']['ExcludedSubFolders']):
                     for user_data in the_dict['admin_settings']['users']:
                         if (user_data['user_id'] == user_id):
                             user_index=the_dict['admin_settings']['users'].index(user_data)
@@ -976,17 +979,17 @@ def init_getMedia(the_dict):
 
     for mediaType in ('movie','episode','audio','audiobook'):
         if (not ((isEmbyServer(the_dict['admin_settings']['server']['brand'])) and (mediaType == 'audiobook'))):
-            #remove whitespace(s) from the beginning and end of each tag
-            filter_whitetags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['whitetags'] if tagstr.strip()]
-            filter_blacktags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['blacktags'] if tagstr.strip()]
-            #whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if tagstr.strip()]
-            #blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if tagstr.strip()]
-            #whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if tagstr.strip()]
-            #blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if tagstr.strip()]
-            whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'][mediaType] if tagstr.strip()]
-            blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'][mediaType] if tagstr.strip()]
-            whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags']['global'] if tagstr.strip()]
-            blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags']['global'] if tagstr.strip()]
+            #ignore any tags with a value of None and remove whitespace(s) from the beginning and end of each tag
+            filter_whitetags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['whitetags'] if ((not (tagstr == None)) and tagstr.strip())]
+            filter_blacktags_media_specific = [tagstr for tagstr in the_dict['basic_settings']['filter_tags'][mediaType]['blacktags'] if ((not (tagstr == None)) and tagstr.strip())]
+            #whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['whitetagged']['tags'] if ((not (tagstr == None)) and tagstr.strip())]
+            #blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['behavioral_statements'][mediaType]['blacktagged']['tags'] if ((not (tagstr == None)) and tagstr.strip())]
+            #whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'] if ((not (tagstr == None)) and tagstr.strip())]
+            #blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'] if ((not (tagstr == None)) and tagstr.strip())]
+            whitetags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['whitetags'][mediaType] if ((not (tagstr == None)) and tagstr.strip())]
+            blacktags_media_specific = [tagstr for tagstr in the_dict['advanced_settings']['blacktags'][mediaType] if ((not (tagstr == None)) and tagstr.strip())]
+            whitetags_global = [tagstr for tagstr in the_dict['advanced_settings']['whitetags']['global'] if ((not (tagstr == None)) and tagstr.strip())]
+            blacktags_global = [tagstr for tagstr in the_dict['advanced_settings']['blacktags']['global'] if ((not (tagstr == None)) and tagstr.strip())]
 
             #combine tags and remove any duplicates
             #the_dict['whitetags'][mediaType]=list(set(filter_whitetags_media_specific + whitetags_media_specific + whitetags_global))

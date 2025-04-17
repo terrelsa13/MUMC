@@ -1,364 +1,505 @@
 import copy
-from mumc_modules.mumc_compare_items import keys_exist,keys_exist_return_value
+from mumc_modules.mumc_user_queries import get_all_users_from_media_server
+from mumc_modules.mumc_blacklist_whitelist import get_unpreferred_listing_type
 
 
-def create_user_dicts(the_dict):
+#user data class for builder
+class user_library_data:
 
-    for user in the_dict['all_users']:
-        if (not (user['Id'] in the_dict['prev_user_ids_list'])):
-            user_dict={}
-            user_dict['user_id']=user['Id']
-            user_dict['user_name']=user['Name']
-            user_dict['whitelist']=[]
-            user_dict['blacklist']=[]
+    def __init__(self,user_id='',user_name='',whitelist=[],blacklist=[]):
+        self.user_id=user_id
+        self.user_name=user_name
+        self.whitelist=whitelist
+        self.blacklist=blacklist
 
-            the_dict['all_users_dict'].append(user_dict)
-   
-    return the_dict
+    def __str__(self):
+        return f"UserId: {self.user_id} - Name: {self.user_name} - Whitelist: {self.whitelist} - Blacklist: {self.blacklist}"
 
 
-def reorder_all_users(the_dict):
-    temp_the_dict={}
-    temp_the_dict['all_users']=[]
-    for aud in the_dict['all_users_dict']:
-        for au in the_dict['all_users']:
-            if (aud['user_id'] == au['Id']):
-                 temp_the_dict['all_users'].append(au)
-                 break
+#user data class for builder
+class user_data(user_library_data):
 
-    the_dict['all_users']=temp_the_dict['all_users']
+    def __init__(self,user_id='',user_name='',whitelist=[],blacklist=[],enableAllFolders=False,enabledFolders=[],excludedSubFolders=[],selected=False):
+        user_library_data.__init__(self,user_id,user_name,whitelist,blacklist)
+        self.enableAllFolders=enableAllFolders
+        self.enabledFolders=enabledFolders
+        self.excludedSubFolders=excludedSubFolders
+        self.selected=selected
 
-    return the_dict
+    def __str__(self):
+        #initialize user selected to false
+        self.selected=False
 
+        #loop thru whitelist libraries
+        for thisLib in self.whitelist:
+            #check if any libraries selected
+            if (thisLib.selected):
+                #set user selectoin to true if any libraries are selected
+                self.selected=True
+                break
+        #loop thru blacklist libraries
+        for thisLib in self.blacklist:
+            #check if any libraries selected
+            if (thisLib.selected):
+                #set user selectoin to true if any libraries are selected
+                self.selected=True
+                break
 
-def show_hide_gui_disabled_users(the_dict):
-    temp_dict={}
-    temp_dict['all_users']=copy.deepcopy(the_dict['all_users'])
-    #Should disabled users be shown or hidden?
-    if (not (the_dict['admin_settings']['behavior']['users']['monitor_disabled'])):
-        #Remove/Hide users disabled in the GUI
-        for user_data in reversed(temp_dict['all_users']):
-            user_data_index=temp_dict['all_users'].index(user_data)
-            if (user_data['Policy']['IsDisabled']):
-                the_dict['all_users'].pop(user_data_index)
-                the_dict['all_users_dict'].pop(user_data_index)
-                the_dict['all_user_ids_list'].pop(user_data_index)
-                the_dict['library_ids_per_user'].pop(temp_dict['all_users'][user_data_index]['Id'])
-                try:
-                    the_dict['prev_users_dict'].pop(user_data_index)
-                except IndexError:
-                    pass
-                try:
-                    the_dict['prev_user_ids_list'].pop(user_data_index)
-                except IndexError:
-                    pass
+        #check if user is selected
+        if (self.selected):
+            return f"Name: {self.user_name} -"
+        else: #(not (self.selected)):
+            return f"Name: {self.user_name} - UserId: {self.user_id}"
 
-    return the_dict
+    def display(self):
+        return f"UserId: {self.user_id} - Name: {self.user_name} - Whitelist: {self.whitelist} - Blacklist: {self.blacklist} - AccessToAllFolders: {self.enableAllFolders} - EnabledFolders: {self.enabledFolders} - ExcludedSubfolders: {self.excludedSubFolders} - Selected: {self.selected}"
+ 
+    def userObjectToYAML(self,preferred_listing_type):
+        #delcare dictionary and top level keys
+        userDataLibDataDict={}
+        userDataLibDataDict['user_id']=self.user_id
+        userDataLibDataDict['user_name']=self.user_name
+        userDataLibDataDict['whitelist']=[]
+        userDataLibDataDict['blacklist']=[]
 
+        #get unpreferred listing type
+        unpreferred_listing_type=get_unpreferred_listing_type(preferred_listing_type)
 
-def print_users_to_console(the_dict):
+        #loop thru user's whitelist libraries
+        for thisLib in self.whitelist:
+            #delcare sub-dictionary and its top level keys
+            libDict={}
+            libDict['lib_id']=thisLib.lib_id
+            libDict['lib_name']=thisLib.name
+            libDict['collection_type']=thisLib.collection_type
+            libDict['path']=thisLib.path
+            libDict['network_path']=thisLib.network_path
+            libDict['subfolder_id']=thisLib.subfolder_id
+            libDict['lib_enabled']=thisLib.lib_enabled
+            #check if lib is selected
+            if (thisLib.selected):
+                #when lib selected append to the preferred_listing_type
+                userDataLibDataDict[preferred_listing_type].append(libDict)
+            else:
+                #when lib NOT selected append to the unpreferred_listing_type
+                userDataLibDataDict[unpreferred_listing_type].append(libDict)
 
-    if (len(the_dict['all_users_dict']) >= 1):
-        for user in the_dict['all_users_dict']:
-            the_dict['user_index_total']=the_dict['all_users_dict'].index(user)
-            the_dict['all_users_dict'][the_dict['user_index_total']]['userPosition']=the_dict['user_index_total']
+        #loop thru user's blacklist libraries
+        for thisLib in self.blacklist:
+            #delcare sub-dictionary and its top level keys
+            libDict={}
+            libDict['lib_id']=thisLib.lib_id
+            libDict['lib_name']=thisLib.name
+            libDict['collection_type']=thisLib.collection_type
+            libDict['path']=thisLib.path
+            libDict['network_path']=thisLib.network_path
+            libDict['subfolder_id']=thisLib.subfolder_id
+            libDict['lib_enabled']=thisLib.lib_enabled
+            #check if lib is selected
+            if (thisLib.selected):
+                #when lib selected append to the preferred_listing_type
+                userDataLibDataDict[preferred_listing_type].append(libDict)
+            else:
+                #when lib NOT selected append to the unpreferred_listing_type
+                userDataLibDataDict[unpreferred_listing_type].append(libDict)
 
-            if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 1)):
-                try:
-                    print(str(the_dict['user_index_total']) +' - '+ the_dict['prev_users_dict'][the_dict['user_index_total']]['user_name'] + ' - ')
-                except (IndexError,TypeError):
-                    print(str(the_dict['user_index_total']) +' - '+ the_dict['all_users_dict'][the_dict['user_index_total']]['user_name'] + ' - ' + user['user_id'])
+        return userDataLibDataDict
 
-        print('')
+ 
+def get_all_users(the_dict):
+    allUsersList=[]
 
-    return the_dict
+    #check if disabled users should be monitored
+    if (the_dict['admin_settings']['behavior']['users']['monitor_disabled']):
+        #send query to server for both enabled and disabled users
+        usersList=get_all_users_from_media_server(the_dict)
+    else:
+        #send query to server for only enabled
+        usersList=get_all_users_from_media_server(the_dict,False)
 
-
-def get_user_selection(the_dict):
-    if (the_dict['atleast_one_user_selected'] == False):
-        if (the_dict['user_library_selection_type'] == 0):
-            the_dict['user_selection_str']=input('Select one user at a time.\nEnter number of the user to monitor: ')
-        elif (the_dict['user_library_selection_type'] == 1):
-            the_dict['user_selection_str']=input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
-        else: #(the_dict['user_library_selection_type'] == 2):
-            pass
-    #When multiple explain how to select each user; when coming back to the user selection show this
-    else: #((i >= 1) and (the_dict['atleast_one_user_selected'] == True)):
-        if (the_dict['user_index_total'] >= 1):
-            print('Monitoring multiple users is possible.')
-        if (the_dict['user_library_selection_type'] == 0):
-            the_dict['user_selection_str']=input('Select one user at a time.\nEnter number of the next user to monitor; leave blank when finished: ')
-        elif (the_dict['user_library_selection_type'] == 1):
-            the_dict['user_selection_str']=input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
-        else: #(the_dict['user_library_selection_type'] == 2):
-            pass
-    
-    print('')
-        
-    return the_dict
-
-
-def select_all_users(the_dict):
-    the_dict['user_selection_str']=''
-
-    for user_id in the_dict['all_user_ids_list']:
-        the_dict['user_selection_str']+=str(the_dict['all_user_ids_list'].index(user_id)) + ','
-
-    return the_dict
-
-
-def build_library_data_for_selected_user(the_dict):
-    temp_the_dict={}
-    temp_the_dict['library_info_print_all_list']=[]
-    temp_the_dict['library_info_print_opposing_list']=[]
-    temp_the_dict['library_info_print_matching_list']=[]
-    temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
-
-    user_index=the_dict['user_selection_int']
-
-    for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]:
-        lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
-        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
-        opposing_list_pos=temp_the_dict['library_info_print_opposing_list'].index(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index])
-        temp_the_dict['library_info_print_opposing_list'][opposing_list_pos]['NoneMe']=True
-        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']][lib_index].copy())
-
-    for lib_data in temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']]:
-        lib_index=temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].index(lib_data)
-        temp_the_dict['library_info_print_all_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
-        temp_the_dict['library_info_print_opposing_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
-        temp_the_dict['library_info_print_matching_list'].append(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index].copy())
-        matching_list_pos=temp_the_dict['library_info_print_matching_list'].index(the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']][lib_index])
-        temp_the_dict['library_info_print_matching_list'][matching_list_pos]['NoneMe']=True
-
-    temp_the_dict['library_info_print_all_list']=sorted(temp_the_dict['library_info_print_all_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
-    temp_the_dict['library_info_print_opposing_list']=sorted(temp_the_dict['library_info_print_opposing_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
-    temp_the_dict['library_info_print_matching_list']=sorted(temp_the_dict['library_info_print_matching_list'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
-
-    for lib_data in temp_the_dict['library_info_print_all_list']:
-        lib_data_index=temp_the_dict['library_info_print_all_list'].index(lib_data)
-        if ((not ((check:=keys_exist_return_value(temp_the_dict['library_info_print_opposing_list'][lib_data_index],'NoneMe')) == None)) and (check)):
-            temp_the_dict['library_info_print_opposing_list'][lib_data_index]=None
-        if ((not ((check:=keys_exist_return_value(temp_the_dict['library_info_print_matching_list'][lib_data_index],'NoneMe')) == None)) and (check)):
-            temp_the_dict['library_info_print_matching_list'][lib_data_index]=None
-
-    the_dict['library_info_print_all_list']=temp_the_dict['library_info_print_all_list']
-    the_dict['library_info_print_opposing_list']=temp_the_dict['library_info_print_opposing_list']
-    the_dict['library_info_print_matching_list']=temp_the_dict['library_info_print_matching_list']
-
-    return the_dict
-
-
-def filter_library_folder_data_for_selected_user(the_dict):
-
-    temp_the_dict={}
-    temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])
-
-    for path_id in the_dict['all_library_ids_list']:
-        path_index=temp_the_dict['all_library_ids_list'].index(path_id)
-        if (the_dict['all_library_ids_list'][path_index] and the_dict['all_library_path_ids_list'][path_index]):
-            lib_id_folder_id=str(the_dict['all_library_ids_list'][path_index] + '_' + the_dict['all_library_path_ids_list'][path_index])
-            if (lib_id_folder_id in the_dict['all_users'][the_dict['user_selection_int']]['Policy']['ExcludedSubFolders']):
-                the_dict['library_info_print_all_list'][path_index]=False
-                the_dict['library_info_print_opposing_list'][path_index]=False
-                the_dict['library_info_print_matching_list'][path_index]=False
-        temp_the_dict['all_library_ids_list'][path_index]=None
-
-    while False in the_dict['library_info_print_all_list']:
-        the_dict['library_info_print_all_list'].remove(False)
-        the_dict['library_info_print_opposing_list'].remove(False)
-        the_dict['library_info_print_matching_list'].remove(False)
-
-    return the_dict
-
-
-def jellyfin_filter_library_data_for_selected_user(the_dict):
-    #check library policy for each user
-    #if library is not enabled for user; remove said library
-    temp_the_dict={}
-    temp_the_dict['all_library_ids_list']=copy.deepcopy(the_dict['all_library_ids_list'])
-
-    for path_id in the_dict['all_library_ids_list']:
-        path_index=temp_the_dict['all_library_ids_list'].index(path_id)
-        if (the_dict['all_users'][the_dict['user_selection_int']]['Policy']['EnableAllFolders']):
-            break
+    #loop thru list of all users
+    for userInfo in usersList:
+        #check if server is emby or jellyfin
+        if (the_dict['isEmby']):
+            #save user data; emby allows subfolder specific user permissions
+            allUsersList.append(user_data(user_id=userInfo['Id'],user_name=userInfo['Name'],whitelist=[],blacklist=[],enableAllFolders=userInfo['Policy']['EnableAllFolders'],enabledFolders=userInfo['Policy']['EnabledFolders'],excludedSubFolders=userInfo['Policy']['ExcludedSubFolders']))
         else:
-            if (not (path_id in the_dict['all_users'][the_dict['user_selection_int']]['Policy']['EnabledFolders'])):
-                the_dict['library_info_print_all_list'][path_index]=False
-                the_dict['library_info_print_opposing_list'][path_index]=False
-                the_dict['library_info_print_matching_list'][path_index]=False
-            temp_the_dict['all_library_ids_list'][path_index]=None        
+            #save user data; jellyfin does NOT allow subfolder specific user permissions
+            allUsersList.append(user_data(user_id=userInfo['Id'],user_name=userInfo['Name'],whitelist=[],blacklist=[],enableAllFolders=userInfo['Policy']['EnableAllFolders'],enabledFolders=userInfo['Policy']['EnabledFolders'],excludedSubFolders=[]))
 
-    while False in the_dict['library_info_print_all_list']:
-        the_dict['library_info_print_all_list'].remove(False)
-        the_dict['library_info_print_opposing_list'].remove(False)
-        the_dict['library_info_print_matching_list'].remove(False)
-
-    return the_dict
+    return allUsersList
 
 
-def print_library_data_for_selected_user(the_dict):
+#remove any already existing users that no longer exist on the server
+def clean_all_users(existingUsers,allUsersList):
+    #loop thru list of existing users
+    for existingUser in existingUsers:
+        #loop thru list of all users
+        for thisUser in allUsersList:
+            #check if userIds match
+            #existing userIds that are never matched; are pruned here
+            if (existingUser['user_id'] == thisUser.user_id):
+                #existing user found transfer whitelist
+                thisUser.whitelist=existingUser['whitelist']
+                #existing user found transfer blacklist
+                thisUser.blacklist=existingUser['blacklist']
+                #existing users are selected
+                thisUser.selected=True
 
-    if (the_dict['user_valid_selection']):
-        #Depending on library setup behavior the chosen libraries will either be treated as blacklisted libraries or whitelisted libraries
-        listing_type=the_dict['admin_settings']['behavior']['list']
-        if (listing_type == 'blacklist'):
-            monitor_type='monitored for'
-        else: #(listing_type == 'whitelist'):
-            monitor_type='excluded from'
-        message='Enter number of the library folder(s) to ' + str(listing_type) + ' for the selected user.'
-        message+='\nMedia in ' + str(listing_type) + 'ed library folder(s) will be ' + str(monitor_type) + ' deletion.'
-
-    for lib_info in the_dict['library_info_print_all_list']:
-        print_string=str(lib_info['selection'])
-        print_string+=' - ' + str(lib_info['collection_type'])
-        if (not (lib_info['selected'])):
-            print_string+=' - Path: ' + str(lib_info['path'])
-            print_string+=' - NetPath: ' + str(lib_info['network_path'])
-            print_string+=' - LibId: ' + str(lib_info['lib_id'])
-
-        if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
-            print(print_string)
-
-    if ((the_dict['user_library_selection_type'] == 0) or (the_dict['user_library_selection_type'] == 2)):
-        print('')
-
-    return the_dict
+    return allUsersList
 
 
-def is_valid_user_selected(the_dict):
-    print_error=''
-    the_dict['user_selection_list']=[]
+#check if user has access to this library and/or subfolder
+def does_user_have_access_to_this_lib_folder(thisUser,thisAllLib):
+
+    #check if user has access to all libraries/subfolders
+    if (thisUser.enableAllFolders):
+        does_user_have_access=True
+    #determine which specific libraries/subfolders a user has access to
+    else:
+        #check if this lib_id is enabled for this user
+        if (str(thisAllLib.lib_id) in thisUser.enabledFolders):
+            #check if this subfolder_id is excluded for this user
+            if ((str(thisAllLib.lib_id) + '_' + str(thisAllLib.subfolder_id)) in thisUser.excludedSubFolders):
+                does_user_have_access=False
+            #subfolder_id is included for this user
+            else:
+                does_user_have_access=True
+        #lib_id is disabled for this user
+        else:
+            does_user_have_access=False
+
+    return does_user_have_access
+
+
+#remove any existing user libraries not in all_libraries; or any libraries the user does not have permission to access
+def clean_all_user_libraries(preferred_listing_type,all_libraries,all_users):
+    #loop thru all_users
+    for thisUser in all_users:
+
+        #check which listing type was selected
+        if (preferred_listing_type == 'whitelist'):
+            #whitelisting selected
+            thisUserPreferredListType=thisUser.whitelist
+            #blacklisting not selected
+            thisUserUnpreferredListType=thisUser.blacklist
+        else:
+            #blacklisting selected
+            thisUserPreferredListType=thisUser.blacklist
+            #whitelisting not selected
+            thisUserUnpreferredListType=thisUser.whitelist
+
+        #loop thru the specific user's selected library listing type
+        for thisUserLib in reversed(thisUserPreferredListType):
+            #loop thru all_libraries
+            for thisAllLib in all_libraries:
+                #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
+                if ((thisUserLib['lib_id'] == thisAllLib.lib_id) and (thisUserLib['subfolder_id'] == thisAllLib.subfolder_id) and (thisUserLib['path'] == thisAllLib.path)):
+                    #check if user has access to this library folder
+                    if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                        #create temp copy
+                        temp_thisAllLib=copy.copy(thisAllLib)
+                        #libraries/subfolders in the preferred listing type are selected
+                        temp_thisAllLib.selected=True
+                        #store lib_enabled state for existing library
+                        temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
+                        #copy the matching entry from all_libraries to overwrite the existing library
+                        thisUserPreferredListType[thisUserPreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        break
+            else:
+                #library folder no longer exists or user does not have permissoin to access the library folder
+                #either way; remove this library from the user
+                thisUserPreferredListType.remove(thisUserLib)
+
+        #loop thru the specific user's selected library listing type
+        for thisUserLib in reversed(thisUserUnpreferredListType):
+            #loop thru all_libraries
+            for thisAllLib in all_libraries:
+                #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
+                if ((thisUserLib['lib_id'] == thisAllLib.lib_id) and (thisUserLib['subfolder_id'] == thisAllLib.subfolder_id) and (thisUserLib['path'] == thisAllLib.path)):
+                    #check if user has access to this library folder
+                    if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                        #create temp copy
+                        temp_thisAllLib=copy.copy(thisAllLib)
+                        #store lib_enabled state for existing library
+                        temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
+                        #copy the matching entry from all_libraries to overwrite the existing library
+                        thisUserUnpreferredListType[thisUserUnpreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        break
+            else:
+                #library folder no longer exists or user does not have permissoin to access the library folder
+                #either way; remove this library from the user
+                thisUserUnpreferredListType.remove(thisUserLib)
+
+    return all_users
+
+
+#update users with "new" libraries they have permission to access
+def update_all_user_libraries(preferred_listing_type,all_libraries,all_users):
+    #loop thru all_users
+    for thisUser in all_users:
+        #check which listing type was selected
+        if (preferred_listing_type == 'whitelist'):
+            #whitelisting selected
+            thisUserPreferredListType=thisUser.whitelist
+            #blacklisting not selected
+            thisUserUnpreferredListType=thisUser.blacklist
+        else:
+            #blacklisting selected
+            thisUserPreferredListType=thisUser.blacklist
+            #whitelisting not selected
+            thisUserUnpreferredListType=thisUser.whitelist
+
+        #declare a list for this user's already populated blacklist and whitelist libraries
+        user_lib_id_subfolder_id_list=[]
+
+        #loop thru all preferred listing type libraries
+        for thisUserLib in thisUserPreferredListType:
+            user_lib_id_subfolder_id_list.append(str(thisUserLib.lib_id) + '_' + str(thisUserLib.subfolder_id))
+        #loop thru all unpreferred listing type libraries
+        for thisUserLib in thisUserUnpreferredListType:
+            user_lib_id_subfolder_id_list.append(str(thisUserLib.lib_id) + '_' + str(thisUserLib.subfolder_id))
+
+        #loop thru all libraries
+        for thisAllLib in all_libraries:
+            #verify this lib_id and subfolder_id are NOT already in this user's blacklist or whitelist
+            if (not ((str(thisAllLib.lib_id) + '_' + str(thisAllLib.subfolder_id)) in user_lib_id_subfolder_id_list)):
+                #check if user has access to this library folder
+                if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                    #create temp copy
+                    temp_thisAllLib=copy.copy(thisAllLib)
+                    #set lib_enabled state for new libraries
+                    temp_thisAllLib.lib_enabled=True
+                    #copy the matching entry from all_libraries to overwrite the existing library
+                    thisUserUnpreferredListType.append(copy.copy(temp_thisAllLib))
+
+    return all_users
+
+
+#clean and covert selection string to list
+def clean_selection_convert_selection_to_list(selection_str):
+    #check if at least one selection, check if selection is all commas
+    if ((len(selection_str) > 0) and (len(selection_str) == selection_str.count(','))):
+        #all commas will become []; append an invalid value to force a retry
+        selection_str='retry'
+
+    #check if at least one selection, check if selection is all commas
+    if ((len(selection_str) > 0) and (len(selection_str) == selection_str.count(' '))):
+        #all spaces will become []; append an invalid value to force a retry
+        selection_str='retry'
 
     #replace spaces with commas (assuming people will use spaces because the space bar is bigger and easier to push)
-    the_dict['comma_selected_user_str']=the_dict['user_selection_str'].replace(' ',',')
+    selection_no_spaces=selection_str.replace(' ',',')
     #convert string to list
-    the_dict['selected_user_list_of_strs']=the_dict['comma_selected_user_str'].split(',')
+    selection_list=selection_no_spaces.split(',')
     #remove blanks
-    while ('' in the_dict['selected_user_list_of_strs']):
-        the_dict['selected_user_list_of_strs'].remove('')
+    while ('' in selection_list):
+        selection_list.remove('')
     #remove duplicate strings
-    the_dict['selected_user_list_of_strs']=list(set(the_dict['selected_user_list_of_strs']))
-    the_dict['selected_user_list_of_strs'].sort()
+    selection_list=list(set(selection_list))
+    #sort alphabetically
+    selection_list.sort()
 
-    try:
-        selected_user_str=None
+    return selection_list
 
-        #We get here when we are done selecting users to monitor
-        if ((the_dict['selected_user_list_of_strs'] == []) and (the_dict['atleast_one_user_selected'])):
-            the_dict['user_stop_loop']=True
-            print('')
-        #We get here if we tried not to select any users; at least one must be selected
-        elif ((the_dict['selected_user_list_of_strs'][0] == '') and (not (the_dict['atleast_one_user_selected']))):
-            print_error('\nMust select at least one user. Try again.\n')
-        #We get here to allow selecting users
-        elif (not (the_dict['selected_user_list_of_strs'][0] == '')):
-            for selected_user_str in the_dict['selected_user_list_of_strs']:
-                #We get here to allow selecting libraries for the specified library
-                the_dict['user_selection_float']=float(selected_user_str)
-                if ((the_dict['user_selection_float'] % 1) == 0):
-                    the_dict['user_selection_int']=int(the_dict['user_selection_float'])
+
+#check if all selections are valid
+def are_valid_inputs_selected(selection_list,selection_limit):
+    #loop thru all selections
+    for thisSelection in selection_list:
+        try:
+            ##check if selection converts to a complex number
+            #if (isinstance(thisSelection,complex)):
+                ##selection is NOT valid
+                #valid_selection=False
+                #break
+            ##check if selection converts to a float
+            #elif (isinstance(thisSelection,float)):
+                ##selection is NOT valid
+                #valid_selection=False
+                #break
+            #check if selection converts to an integer
+            if (isinstance(int(thisSelection),int)):
+                #check if integer is less than zero; check if integer is greater than limit; check if string is '-0'
+                if ((int(thisSelection) < 0) or (int(thisSelection) > selection_limit) or (thisSelection == '-0')):
+                    #selection is NOT valid
+                    valid_selection=False
+                    break
                 else:
-                    the_dict['user_selection_int']=None
-                    print_error+='Invalid value. Try again.\n'
-
-                if (not (the_dict['user_selection_int'] == None)):
-                    if ((the_dict['user_selection_int'] >= 0) and (the_dict['user_selection_int'] < len(the_dict['all_user_ids_list']))):
-                        the_dict['user_selection_list'].append(the_dict['user_selection_int'])
-                        the_dict['atleast_one_user_selected']=True
-                        the_dict['user_valid_selection']=True
-                    else:
-                        print_error+='Value Out Of Range. Try again.\n'
-    except:
-        print_error+='Error When Selecting library. Try again.\n'
-
-    if (the_dict['user_library_selection_type'] == 0):
-        if (len(the_dict['user_selection_list']) > 1):
-            print_error='Must not select more than a single user at a time. Try again.\n'
-            selected_user_str=the_dict['user_selection_list']
-
-    if (not (print_error == '')):
-        print(str(selected_user_str) + ' - ' + str(print_error) + '\n')
-        the_dict['user_valid_selection']=False
+                    #convert string of int into actual int
+                    selection_list[selection_list.index(thisSelection)]=int(thisSelection)
+            #selection is NOT numeric value
+            else:
+                #selection is NOT valid
+                valid_selection=False
+                break
+        except:
+            #selection is NOT valid
+            valid_selection=False
+            break
     else:
-        #remove duplicate integers and sort
-        the_dict['user_selection_list']=list(set(the_dict['user_selection_list']))
-        the_dict['user_selection_list'].sort()
+        #all selections are valid
+        valid_selection=True
 
-    return the_dict
+    return valid_selection
 
 
-def save_library_data_for_selected_user(the_dict):
-    temp_the_dict={}
-    temp_the_dict['all_users_dict']=copy.deepcopy(the_dict['all_users_dict'])
+#print user info to console
+def show_users(all_users):
+    #print blank line
+    print()
+    #loop thru all users
+    for thisAllUser in all_users:
+        #print user info for each user to console
+        print(str(all_users.index(thisAllUser)) + ' - ' + str(thisAllUser))
 
-    user_index=the_dict['user_selection_int']
 
-    temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']]=[]
-    temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']]=[]
+#select one user
+def get_single_user_selection(all_users):
+    print()
 
-    for lib_data in the_dict['library_info_print_all_list']:
-        if (lib_data['selected']):
-            temp_the_dict['all_users_dict'][user_index][the_dict['matching_listing_type']].append(lib_data)
+    #loop until finished selecting users
+    loop_active=True
+
+    #loop until user is finished
+    while (loop_active):
+        #show message on console; wait for input
+        user_selection_str = input('Select one user at a time.\nEnter number of user to monitor; leave blank when finished: ')
+
+        #check if any commas; this implies multiple users selected
+        if (user_selection_str.find(',') >= 0):
+            #something resembling a multiple selection; append an invalid value to force a retry
+            user_selection_str='retry'
+
+        #scrub and normalize selection
+        selected_user_list=clean_selection_convert_selection_to_list(user_selection_str)
+
+        #check if no selection was made
+        if (selected_user_list == []):
+            #loop thru all users
+            for thisAllUser in all_users:
+                if (thisAllUser.selected):
+                    #at least one user selected; ok to exit selection loop
+                    loop_active=False
+                    break
+            else:
+                #no users selected; NOT ok to exit selection loop
+                print('\nMust select at least one user. Try again.')
+                #print user info to console
+                show_users(all_users)
+                print()
+        #check if single user was selected; verify selection is valid
+        elif ((len(selected_user_list) == 1) and (are_valid_inputs_selected(selected_user_list,len(all_users) - 1))):
+            #at least one user selected; ok to exit selection loop
+            loop_active=False
         else:
-            temp_the_dict['all_users_dict'][user_index][the_dict['opposing_listing_type']].append(lib_data)
+            #invalid selection; NOT ok to exit selection loop
+            print('\nInvalid selection. Try again.')
+            #print user info to console
+            show_users(all_users)
+            print()
 
-    the_dict['all_users_dict']=temp_the_dict['all_users_dict']
-
-    for user_pos in range(len(the_dict['prev_users_dict'])):
-        if (not (the_dict['prev_users_dict'][user_pos] == None)):
-            the_dict['prev_users_dict'][user_pos]=copy.deepcopy(the_dict['all_users_dict'][user_pos])
-    
-    if (the_dict['prev_users_dict'][user_index] == None):
-        the_dict['prev_users_dict'][user_index]=the_dict['all_users_dict'][user_index]
-        the_dict['prev_user_ids_list'][user_index]=the_dict['all_user_ids_list'][user_index]
-    
-    return the_dict
+    return selected_user_list
 
 
-def update_fake_user_dict(the_dict):
-    fake_user_index=0
-    the_dict['fake_user_dict'][fake_user_index][the_dict['opposing_listing_type']].clear()
-    the_dict['fake_user_dict'][fake_user_index][the_dict['matching_listing_type']].clear()
+#select one or more users
+def get_multiple_user_selection(all_users):
+    print()
 
-    for lib_info in the_dict['library_info_print_opposing_list']:
-        if (not (lib_info == None)):
-            the_dict['fake_user_dict'][fake_user_index][the_dict['opposing_listing_type']].append(lib_info)
+    #declare variable to run while loop
+    loop_active=True
 
-    for lib_info in the_dict['library_info_print_matching_list']:
-        if (not (lib_info == None)):
-            the_dict['fake_user_dict'][fake_user_index][the_dict['matching_listing_type']].append(lib_info)
+    #loop until finished selecting users
+    while (loop_active):
+        #show message on console; wait for input
+        user_selection_str = input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
-    return the_dict
+        #scrub and normalize selection
+        selected_user_list=clean_selection_convert_selection_to_list(user_selection_str)
 
-
-def build_user_selection_list(the_dict):
-    for user_info in the_dict['prev_users_dict']:
-        user_index=the_dict['prev_users_dict'].index(user_info)
-        if (not (user_info == None)):
-            the_dict['user_selection_list'].append(user_index)
-
-    return the_dict
-
-
-def swap_users(the_dict):
-    for selected_user in the_dict['user_selection_list']:
-        if (the_dict['prev_users_dict'][selected_user] == None):
-            the_dict['prev_users_dict'][selected_user]=the_dict['all_users_dict'][selected_user]
+        #check if no selection was made
+        if (selected_user_list == []):
+            #loop thru all users
+            for thisAllUser in all_users:
+                if (thisAllUser.selected):
+                    #at least one user selected; ok to exit selection loop
+                    loop_active=False
+                    break
+            else:
+                #no users selected; NOT ok to exit selection loop
+                print('\nMust select at least one user. Try again.')
+                #print user info to console
+                show_users(all_users)
+                print()
+        #check if single user was selected; verify selection is valid
+        elif (are_valid_inputs_selected(selected_user_list,len(all_users) - 1)):
+            #at least one user selected; ok to exit selection loop
+            loop_active=False
         else:
-            the_dict['prev_users_dict'][selected_user]=None
+            #invalid selection; NOT ok to exit selection loop
+            print('\nInvalid selection. Try again.')
+            #print user info to console
+            show_users(all_users)
+            print()
 
-    return the_dict
+    return selected_user_list
 
 
-def remove_key_from_user(the_key,the_dict):
-    temp_the_dict={}
-    temp_the_dict['admin_settings']={}
-    temp_the_dict['admin_settings']['users']=the_dict['admin_settings']['users'].copy()
+#auto select all users
+def auto_select_all_users(all_users):
+    
+    #covert range() into selected_user_list
+    selected_user_list=list(range(0,len(all_users)))
 
-    for user_data in temp_the_dict['admin_settings']['users']:
-        if (keys_exist(user_data,the_key)):
-            the_dict['admin_settings']['users'][the_dict['admin_settings']['users'].index(user_data)].pop(the_key)
+    #loop thru all users
+    for thisUser in all_users:
+        #set this user to selected
+        thisUser.selected=True
+    
+    return selected_user_list
 
-    return the_dict
+
+#update user libraries select flag
+def toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection):
+    #loop thru user selection list
+    for usrPos in user_selection:
+        #check which listing type was selected
+        if (preferred_listing_type == 'whitelist'):
+            #whitelist preferred listing type; combine whitelist and blacklist
+            userLibs=all_users[usrPos].whitelist + all_users[usrPos].blacklist
+        else:
+            #blacklist preferred listing type; combine blacklist and whitelist
+            userLibs=all_users[usrPos].blacklist + all_users[usrPos].whitelist
+
+        #loop thru this users libraries
+        for thisUserLib in userLibs:
+            #loop thru library selection list
+            for thisLibSelection in library_selection:
+                #check if the lib_id and subfolder_id from the user library entry and the selected library entry
+                if ((thisUserLib.lib_id == libraries_to_show[thisLibSelection].lib_id) and (thisUserLib.subfolder_id == libraries_to_show[thisLibSelection].subfolder_id)):
+                    #toggle selection
+                    thisUserLib.selected=(not thisUserLib.selected)
+                    break
+
+
+#update user libraries select flag all to the same value
+def on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection):
+    #loop thru user selection list
+    for usrPos in user_selection:
+        #check which listing type was selected
+        if (preferred_listing_type == 'whitelist'):
+            #whitelist preferred listing type; combine whitelist and blacklist
+            userLibs=all_users[usrPos].whitelist + all_users[usrPos].blacklist
+        else:
+            #blacklist preferred listing type; combine blacklist and whitelist
+            userLibs=all_users[usrPos].blacklist + all_users[usrPos].whitelist
+
+        #loop thru this users libraries
+        for thisUserLib in userLibs:
+            #loop thru library selection list
+            for thisLibSelection in library_selection:
+                #check if the lib_id and subfolder_id from the user library entry and the selected library entry
+                if ((thisUserLib.lib_id == libraries_to_show[thisLibSelection].lib_id) and (thisUserLib.subfolder_id == libraries_to_show[thisLibSelection].subfolder_id)):
+                    #toggle selection
+                    thisUserLib.selected=(not all_users[usrPos].selected)
+                    break

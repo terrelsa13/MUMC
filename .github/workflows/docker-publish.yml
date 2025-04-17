@@ -1,19 +1,27 @@
-name: Docker
+name: Build And Deploy MUMC Docker Container
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
 
+# Controls when the action will run.
 on:
   schedule:
     - cron: '0 5 * * *'
   push:
-    branches: [ "MUMC-Latest", "MUMC_beta", "MUMC_alpha" ]
+    branches:
+      - 'MUMC-Latest'
+      - 'MUMC_beta'
+      - 'MUMC_alpha'
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags:
+      - 'v*.*.*'
   pull_request:
-    branches: [ "MUMC-Latest", "MUMC_beta", "MUMC_alpha" ]
+    branches:
+      - 'MUMC-Latest'
+      - 'MUMC_beta'
+      - 'MUMC_alpha'
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -22,10 +30,15 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+
+  # This workflow contains a single job called "build"
   build:
 
+    # Base image job will run on
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write

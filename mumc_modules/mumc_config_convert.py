@@ -2,7 +2,8 @@ import yaml
 from mumc_modules.mumc_versions import get_script_version
 from mumc_modules.mumc_paths_files import get_current_directory
 from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-from mumc_modules.mumc_configuration_yaml import filterYAMLConfigKeys_ToKeep
+from mumc_modules.mumc_config_builder import filterYAMLConfigKeys_ToKeep
+from mumc_modules.mumc_output import save_yaml_config
 
 
 def libConvertLegacyToYAML(user_wl_libs,user_bl_libs):
@@ -1225,8 +1226,12 @@ def convert_legacyConfigToYAML(cfg,configPath,configFileNameNoExt):
         configPath=get_current_directory()
 
     #Save the config file
-    with open(configPath / (configFileNameNoExt + '.yaml'),'w') as file:
-        file.write('---\n')
-        #strip out uneccessary data; write remaining data to config yaml
-        yaml.safe_dump(filterYAMLConfigKeys_ToKeep(config_data,'version','basic_settings','advanced_settings','admin_settings','DEBUG'),file,sort_keys=False)
-        file.write('...')
+    #with open(configPath / (configFileNameNoExt + '.yaml'),'w') as file:
+        #file.write('---\n')
+        ##strip out uneccessary data; write remaining data to config yaml
+        #yaml.safe_dump(filterYAMLConfigKeys_ToKeep(config_data,'version','basic_settings','advanced_settings','admin_settings','DEBUG'),file,sort_keys=False)
+        #file.write('...')
+
+    #Save the config file
+    #strip out uneccessary data; write remaining data to config yaml
+    save_yaml_config(filterYAMLConfigKeys_ToKeep(config_data,'version','basic_settings','advanced_settings','admin_settings','DEBUG'),configPath / (configFileNameNoExt + '.yaml'))

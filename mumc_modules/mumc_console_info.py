@@ -2,11 +2,51 @@
 import yaml
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
-from mumc_modules.mumc_versions import get_script_version,get_python_version,get_server_version,get_operating_system_info
+from mumc_modules.mumc_versions import get_script_version,get_server_version,get_radarr_version,get_sonarr_version
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
 from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
 from mumc_modules.mumc_output import appendTo_DEBUG_log
+
+
+def override_media_manager_enabled_states(the_dict):
+    if (the_dict['admin_settings']['media_managers']['radarr']['enabled']):
+        radarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
+                            (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
+
+        unmonitorRadarrMovie=(the_dict['advanced_settings']['radarr']['movie']['unmonitor'] and radarrURLAndAPI)
+        removeRadarrMovie=(the_dict['advanced_settings']['radarr']['movie']['remove'] and radarrURLAndAPI)
+
+        the_dict['admin_settings']['media_managers']['radarr']['enabled']=(unmonitorRadarrMovie or removeRadarrMovie)
+
+    if (the_dict['admin_settings']['media_managers']['sonarr']['enabled']):
+        sonarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
+                            (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
+
+        unmonitorSonarrSeries=(the_dict['advanced_settings']['sonarr']['series']['unmonitor'] and sonarrURLAndAPI)
+        removeSonarrSeries=(the_dict['advanced_settings']['sonarr']['series']['remove'] and sonarrURLAndAPI)
+        unmonitorSonarrEpisode=(the_dict['advanced_settings']['sonarr']['episode']['unmonitor'] and sonarrURLAndAPI)
+
+        the_dict['admin_settings']['media_managers']['sonarr']['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode)
+
+    #if (the_dict['admin_settings']['media_managers']['lidarr']['enabled']):
+        #lidarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['url'] == '') or
+                            #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == '')))
+
+        #unmonitorLidarrAlbum=(the_dict['advanced_settings']['lidarr']['album']['unmonitor'] and lidarrURLAndAPI)
+        #removeLidarrAlbum=(the_dict['advanced_settings']['lidarr']['album']['remove'] and lidarrURLAndAPI)
+        #unmonitorLidarrTrack=(the_dict['advanced_settings']['lidarr']['track']['unmonitor'] and lidarrURLAndAPI)
+
+        #the_dict['admin_settings']['media_managers']['lidarr']['enabled']=(unmonitorLidarrAlbum or removeLidarrAlbum or unmonitorLidarrTrack)
+
+    #if (the_dict['admin_settings']['media_managers']['readarr']['enabled']):
+        #readarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['url'] == '') or
+                            #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == '')))
+
+        #unmonitorReadarrBook=(the_dict['advanced_settings']['readarr']['book']['unmonitor'] and readarrURLAndAPI)
+        #removeReadarrBook=(the_dict['advanced_settings']['readarr']['book']['remove'] and readarrURLAndAPI)
+
+        #the_dict['admin_settings']['media_managers']['readarr']['enabled']=(unmonitorReadarrBook or removeReadarrBook)
 
 
 #print informational header to console
@@ -21,8 +61,12 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
-    strings_list_to_print+='Python Version: ' + get_python_version() + '\n'
-    strings_list_to_print+='OS Info: ' + get_operating_system_info() + '\n'
+    strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
+    if (the_dict['admin_settings']['media_managers']['radarr']['enabled']):
+        strings_list_to_print+='Radarr Version: ' + get_radarr_version(the_dict) + '\n'
+    if (the_dict['admin_settings']['media_managers']['sonarr']['enabled']):
+        strings_list_to_print+='Sonarr Version: ' + get_sonarr_version(the_dict) + '\n'
+    strings_list_to_print+='OS Info: ' + the_dict['os_info'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['headers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['headers']['script']['formatting'])
@@ -219,22 +263,52 @@ def default_helper_menu(the_dict):
 def print_full_help_menu(the_dict):
     strings_list_to_print=''
     strings_list_to_print+='\n' + the_dict['app_name_short'] + ' Version: ' + get_script_version() + '\n'
-    strings_list_to_print+=the_dict['app_name_long'] + ' aka ' + the_dict['app_name_short'] + ' (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.' + '\n'
+    strings_list_to_print+=the_dict['app_name_long'] + ' aka ' + the_dict['app_name_short'] + ' (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='Usage:' + '\n'
-    strings_list_to_print+='/path/to/python3.x /path/to/mumc.py [-option] [arg]' + '\n'
+    strings_list_to_print+='Usage:\n'
+    strings_list_to_print+='/path/to/python3.x /path/to/mumc.py [-option] [arg]\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+'Options:' + '\n'
-    strings_list_to_print+='-a, -attrs, -attributes       Show console attribute test output; will override all other options' + '\n'
-    strings_list_to_print+='-c [path], -config [path]     Specify alternate *.py configuration file' + '\n'
-    strings_list_to_print+='-d, -container                Script is running in a docker container' + '\n'
-    strings_list_to_print+='-u, -config-updater           Modify configuration by adding users to the mumc_config.yaml' + '\n'
-    #strings_list_to_print+='-rak, -remake-api-key         Delete the existing MUMC API key and make a new one.' + '\n'
+    strings_list_to_print+'Options:\n'
+    strings_list_to_print+='-c [path], -config [path]           Specify alternate *.py configuration file\n'
+    strings_list_to_print+='-brand, -server_brand                  tbd\n'
+    strings_list_to_print+='-url, -server_url                    tbd\n'
+    strings_list_to_print+='-port, -server_port                   tbd\n'
+    strings_list_to_print+='-base, -server_base_url                    tbd\n'
+    strings_list_to_print+='-username, -admin_username                Admin username\n'
+    strings_list_to_print+='-password, -admin_password                Admin password\n'
+    strings_list_to_print+='-authkey, -server_auth_key              tbd\n'
+    strings_list_to_print+='-adminid, -server_admin_id              tbd\n'
+    strings_list_to_print+='-lstbeh, -list_behavior                 tbd\n'
+    strings_list_to_print+='-matbeh, -matching_behavior             tbd\n'
+    strings_list_to_print+='-blacktags, -global_blacktags       tbd\n'
+    strings_list_to_print+='-whitetags, -global_whitetags       tbd\n'
+    strings_list_to_print+='-disusrs, -monitor_disabled_users       tbd\n'
+    strings_list_to_print+='-libsel, -user_library_selection       tbd\n'
+    strings_list_to_print+='-rdurl, -radarr_url                    tbd\n'
+    strings_list_to_print+='-rdprt, -radarr_port                    tbd\n'
+    strings_list_to_print+='-rdburl, -radarr_base_url                    tbd\n'
+    strings_list_to_print+='-rdapi, -radarr_api_key                    tbd\n'
+    strings_list_to_print+='-snurl, -sonarr_url                    tbd\n'
+    strings_list_to_print+='-snprt, -sonarr_port                    tbd\n'
+    strings_list_to_print+='-snburl, -sonarr_base_url                    tbd\n'
+    strings_list_to_print+='-snapi, -sonarr_api_key                    tbd\n'
+    #strings_list_to_print+='-ldurl, -lidarr_url                    tbd\n'
+    #strings_list_to_print+='-ldprt, -lidarr_port                    tbd\n'
+    #strings_list_to_print+='-ldburl, -lidarr_base_url                    tbd\n'
+    #strings_list_to_print+='-ldapi, -lidarr_api                    tbd\n'
+    #strings_list_to_print+='-reurl, -readarr_url                   tbd\n'
+    #strings_list_to_print+='-reprt, -readarr_port                   tbd\n'
+    #strings_list_to_print+='-reburl, -readarr_base_url                   tbd\n'
+    #strings_list_to_print+='-reapi, -readarr_api                   tbd\n'
+    strings_list_to_print+='-a, -attrs, -attributes             Show console attribute test output; will override all other options\n'
+    strings_list_to_print+='-d, -container                      Script is running in a docker container\n'
+    strings_list_to_print+='-u, -config_updater                 Modify configuration by adding users to the mumc_config.yaml\n'
+    #strings_list_to_print+='-rak, -remake-api-key               Delete the existing MUMC API key and make a new one.\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='-h, -help                     Show this help menu; will override all other options' + '\n'
+    strings_list_to_print+='-h, -help                           tbd\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='Latest Release:' + '\n'
-    strings_list_to_print+='https://github.com/terrelsa13/MUMC/releases' + '\n'
+    strings_list_to_print+='Latest Release:\n'
+    strings_list_to_print+='https://github.com/terrelsa13/MUMC/releases\n'
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -260,7 +334,8 @@ def missing_config_argument_helper(argv,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='Verify the -c option looks like this: -c c:\\path\\to\\alternate_config.yaml' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    for key, value in argv.items():
+        strings_list_to_print+=str(key) + ': ' + str(value)
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -278,19 +353,20 @@ def missing_config_argument_format_helper(argv,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='Verify the -c option looks like this: -c c:\\path\\to\\alternate_config.yaml' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    for key, value in argv.items():
+        strings_list_to_print+=str(key) + ': ' + str(value)
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
 #print alt config does not exist helper
-def alt_config_file_does_not_exists_helper(argv,the_dict):
+def alt_config_file_does_not_exist_helper(argv,the_dict):
     strings_list_to_print=''
     strings_list_to_print+='\n'
     strings_list_to_print+='AlternateConfigNotFoundError: Alternate config path or file does not exist; check for typo, create config file, or move existing config to this location' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+=' '.join(argv) + '\n'
+    strings_list_to_print+='\t' + argv['-config'] + '\n'
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
@@ -304,7 +380,7 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print+='\n'
     strings_list_to_print+='These are NOT valid config file names:' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='\t' + argv[argv.index(cmdOption)+1] + '\n'
+    strings_list_to_print+='\t-config: ' + argv['-config'] + '\n'
     strings_list_to_print+='\t/path/to/alternate.config.yml' + '\n'
     strings_list_to_print+='\t/path/to/alternate config.yml' + '\n'
     strings_list_to_print+='\tc:\\path\\to\\alternate.config.yml' + '\n'
@@ -338,25 +414,25 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
 
 
 #print unable to sucessfully load the Configuration file
-def print_failed_to_load_config(the_dict):
-    strings_list_to_print=''
-    strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    strings_list_to_print+='Config file missing or cannot find alternate Config file.' + '\n'
-    strings_list_to_print+='Or Config file missing \'DEBUG\' and/or \'version\' variables.' + '\n'
-    strings_list_to_print+='Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py' + '\n'
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
+#def print_failed_to_load_config(the_dict):
+    #strings_list_to_print=''
+    #strings_list_to_print+=the_dict['_console_separator'] + '\n'
+    #strings_list_to_print+='Config file missing or cannot find alternate Config file.' + '\n'
+    #strings_list_to_print+='Or Config file missing \'DEBUG\' and/or \'version\' variables.' + '\n'
+    #strings_list_to_print+='Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py' + '\n'
+    #strings_list_to_print+=the_dict['console_separator'] + '\n'
 
-    print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
+    #print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
 #print unable to sucessfully load the Configuration file
 def print_containerized_config_missing(the_dict):
     strings_list_to_print=''
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    strings_list_to_print+='Config file missing.' + '\n'
-    strings_list_to_print+='Config file should be located at /usr/src/app/config/mumc_config.yaml of the guest OS.' + '\n'
+    strings_list_to_print+='Config file missing or not setup.' + '\n'
+    strings_list_to_print+='Config file should be located at ' + str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + ' of the guest OS.' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='To build config run: docker exec -it mumc bash' + '\n'
+    strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c '+ str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 #import re
-#import yaml
 import emoji
 from sys import path
 from pathlib import Path
@@ -64,6 +63,10 @@ def get_current_directory():
     return Path('.').parent.resolve()
 
 
+def get_default_config_path():
+    return Path(get_current_directory() / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
+
+
 # Delete existing mumc_DEBUG.log file
 def delete_debug_log(the_dict):
     Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
@@ -97,7 +100,7 @@ def append_to_file(dataInput,filePathName):
     #remove emojis
     dataInput=remove_emojis(dataInput)
 
-    #Save the config file
+    #Append data to the config file
     with open(fullPathName,'a') as file:
         file.write(dataInput)
 

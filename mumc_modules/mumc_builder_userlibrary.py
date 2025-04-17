@@ -1,181 +1,184 @@
 import copy
-from mumc_modules.mumc_server_type import isEmbyServer
-from mumc_modules.mumc_user_queries import get_all_users
-from mumc_modules.mumc_get_folders import add_subfolder_id_placeholders
-from mumc_modules.mumc_library_queries import get_all_libraries,get_all_library_subfolders
-from mumc_modules.mumc_builder_user import create_user_dicts,reorder_all_users,show_hide_gui_disabled_users,print_users_to_console,get_user_selection,is_valid_user_selected,build_library_data_for_selected_user,print_library_data_for_selected_user,save_library_data_for_selected_user,select_all_users,filter_library_folder_data_for_selected_user,update_fake_user_dict,swap_users,build_user_selection_list,jellyfin_filter_library_data_for_selected_user,remove_key_from_user
-from mumc_modules.mumc_builder_library import create_library_dicts,create_library_path_id_dicts,update_existing_user_libraries,remove_libraries_from_existing_users,remove_subfolders_from_existing_users,remove_nonexisting_subfolders_from_existing_users,add_libraries_to_existing_users,add_libraries_to_new_users,add_selection_and_selected_keys,get_library_selections,is_valid_library_selected,swap_libraries,remove_key_from_blacklist_whitelist,select_all_unselected_libraries,pre_build_all_library_data,build_all_library_data,reorder_libraries_before_printing,autoselect_subfolders_with_same_library_id,reorder_user_policy_libararies,update_users_with_path_ids
+from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
+from mumc_modules.mumc_builder_library import get_all_libraries,get_list_of_libraries_to_show,enumerate_libraries_to_be_shown,show_libraries,get_multiple_library_selection,select_all_user_libraries,unselect_all_user_libraries,auto_select_libraries_to_show
+from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries
 
 
-#run the user and library builder
-def get_users_and_libraries(the_dict):
+#build users and libraries
+def build_users_and_libraries(the_dict):
 
-    the_dict['all_users']=get_all_users(the_dict)
-    the_dict['all_libraries']=get_all_libraries(the_dict)
+    ##########################################################################################################
+    ######Data Collection#####################################################################################
+    ##########################################################################################################
 
-    #Emby and Jellyfin use different key-names for their libraryId
+    #set preferred_listing_type
+    preferred_listing_type=the_dict['preferred_listing_type']
+
+    #check if emby or jellyfin
     if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-        libraryGuid='Guid'
+        the_dict['isEmby']=True
+        the_dict['isJellyfin']=False
+        #set libraryId key for emby
+        the_dict['libraryId']='Guid'
     else:
-        libraryGuid='ItemId'
+        the_dict['isEmby']=False
+        the_dict['isJellyfin=']=True
+        #set libraryId key for jellyfin
+        the_dict['libraryId']='ItemId'
 
-    the_dict['all_libraries']=sorted(the_dict['all_libraries'],key=lambda all_lib_ids: all_lib_ids[libraryGuid])
+    #get all libraries from server
+    all_libraries=get_all_libraries(the_dict)
 
-    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-        the_dict['all_library_subfolders']=get_all_library_subfolders(the_dict)
+    #get all users from server
+    all_users=get_all_users(the_dict)
 
-    the_dict=add_subfolder_id_placeholders('blacklist',the_dict)
-    the_dict=add_subfolder_id_placeholders('whitelist',the_dict)
+    #remove any already existing users that no longer exist on the server; populate libraries of existing users
+    all_users=clean_all_users(the_dict['admin_settings']['users'],all_users)
 
-    for user_info in the_dict['admin_settings']['users']:
-        user_info_index=the_dict['admin_settings']['users'].index(user_info)
-        the_dict['admin_settings']['users'][user_info_index]['whitelist']=sorted(the_dict['admin_settings']['users'][user_info_index]['whitelist'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
-        the_dict['admin_settings']['users'][user_info_index]['blacklist']=sorted(the_dict['admin_settings']['users'][user_info_index]['blacklist'],key=lambda all_lib_ids: all_lib_ids['lib_id'])
+    #remove any existing user libraries that no longer exist; remove libraries the user does NOT have permission to access
+    all_users=clean_all_user_libraries(preferred_listing_type,all_libraries,all_users)
 
-    the_dict['all_users_dict']=copy.deepcopy(the_dict['admin_settings']['users'])
-    the_dict['prev_users_dict']=copy.deepcopy(the_dict['admin_settings']['users'])
+    #update users with "new" libraries they have permission to access
+    all_users=update_all_user_libraries(preferred_listing_type,all_libraries,all_users)
 
-    the_dict['prev_user_ids_list']=[]
-    for user in the_dict['prev_users_dict']:
-        the_dict['prev_user_ids_list'].append(user['user_id'])
+    ##########################################################################################################
+    ##########################################################################################################
+    # 0 - Select users and libraries.
+    #     Select libraries to be whitelisted/blacklisted for selected users.
+    # 1 - Select users only.
+    #     Selected users will have all libraries whitelisted/blacklisted according to their access policy.
+    # 2 - Select libraries only.
+    #     Selected libraries will be whitelisted/blacklisted for all users according to their access policy.
+    # 3 - Select nothing.
+    #     All libraries will be whitelisted/blacklisted for all users according to their access policy.
+    ##########################################################################################################
+    ##########################################################################################################
 
-    the_dict['library_ids_per_user']={}
-    the_dict['library_paths_per_user']={}
-    the_dict['library_networkpaths_per_user']={}
-    the_dict['all_user_ids_list']=the_dict['prev_user_ids_list'].copy()
-    for user in the_dict['all_users']:
-        the_dict['library_ids_per_user'][user['Id']]=[]
-        if (not (user['Id'] in the_dict['all_user_ids_list'])):
-            the_dict['all_user_ids_list'].append(user['Id'])
-            the_dict['prev_user_ids_list'].append(None)
-            the_dict['prev_users_dict'].append(None)
+    #set user_library_selection
+    user_library_selection=the_dict['user_library_selection']
 
-    the_dict=create_user_dicts(the_dict)
-    the_dict=reorder_all_users(the_dict)
-    the_dict=show_hide_gui_disabled_users(the_dict)
-    the_dict=create_library_dicts(the_dict)
-    the_dict=reorder_user_policy_libararies(the_dict)
-    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-        the_dict=create_library_path_id_dicts(the_dict)
-        the_dict=update_users_with_path_ids(the_dict)
-    the_dict=update_existing_user_libraries(the_dict)
-    the_dict=remove_libraries_from_existing_users(the_dict)
-    the_dict=add_libraries_to_existing_users(the_dict)
-    if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-        the_dict=remove_subfolders_from_existing_users(the_dict)
-        the_dict=remove_nonexisting_subfolders_from_existing_users(the_dict)
-    the_dict=add_libraries_to_new_users(the_dict)
-    the_dict=add_selection_and_selected_keys(the_dict)
+    #declare variables to run while loops
+    user_loop_active=True
+    library_loop_active=True
 
-    the_dict['user_stop_loop']=False
-    the_dict['atleast_one_user_selected']=False
+    ##########################################################################################################
+    ######User Selection######################################################################################
+    ##########################################################################################################
 
-    #choose user and/or library selector types
-    if (the_dict['user_library_selection_type'] == 0):
-        #select user and associate desired libraries to be monitored for each user
-        the_dict=select_users_select_libraries(the_dict)
-    elif (the_dict['user_library_selection_type'] == 1):
-        #select user and automatically associate all libraries each user has access to
-        the_dict=select_users_all_libraries(the_dict)
-    else: #(the_dict['user_library_selection_type'] == 2):
-        #select libraries and automatically associate them to users that have access
-        the_dict=all_users_select_libraries(the_dict)
+    #loop until finished
+    while (user_loop_active):
 
-    the_dict['admin_settings']['users']=the_dict['prev_users_dict']
-    while None in the_dict['admin_settings']['users']:
-        the_dict['admin_settings']['users'].remove(None)
+        #select one user
+        if (user_library_selection == 0):
+            #print user info to console
+            show_users(all_users)
 
-    the_dict=remove_key_from_blacklist_whitelist('selection',the_dict)
-    the_dict=remove_key_from_blacklist_whitelist('selected',the_dict)
-    the_dict=remove_key_from_user('userPosition',the_dict)
+            #select one user; clean the selection; check selection is valid; return list with selection
+            user_selection=get_single_user_selection(all_users)
 
-    return the_dict['admin_settings']['users']
+            #if no user selected set loop to inactive
+            if (user_selection == []):
+                #stop user loop
+                user_loop_active=False
+            else:
+                #start library loop
+                library_loop_active=True
 
+        #select one or more users
+        elif (user_library_selection == 1):
+            #print user info to console
+            show_users(all_users)
 
-def select_users_select_libraries(the_dict):
+            #select one user; clean the selection; check selection is valid; return list with selection
+            user_selection=get_multiple_user_selection(all_users)
 
-    while (the_dict['user_stop_loop'] == False):
-        the_dict=print_users_to_console(the_dict)
-        the_dict=get_user_selection(the_dict)
-        the_dict=is_valid_user_selected(the_dict)
+            #if no user selected set loop to inactive
+            if (user_selection == []):
+                #stop loop
+                user_loop_active=False
+            else:
+                #start library loop
+                library_loop_active=True
 
-        if ((not the_dict['user_stop_loop']) and the_dict['user_valid_selection']):
-            the_dict=build_library_data_for_selected_user(the_dict)
-            the_dict['library_stop_loop']=False
-            while (the_dict['library_stop_loop'] == False):
-                the_dict=reorder_libraries_before_printing(the_dict)
-                the_dict=print_library_data_for_selected_user(the_dict)
-                the_dict=get_library_selections(the_dict)
-                the_dict['library_valid_selection']=False
-                the_dict=is_valid_library_selected(the_dict)
-                if (the_dict['library_valid_selection']):
-                    if (not (isEmbyServer(the_dict['admin_settings']['server']['brand']))):
-                        the_dict=autoselect_subfolders_with_same_library_id(the_dict)
-                    the_dict=swap_libraries(the_dict)
-            the_dict=save_library_data_for_selected_user(the_dict)
+        #auto select all users
+        elif ((user_library_selection == 2) or (user_library_selection == 3)):
+            #auto select all users; return list with selection
+            user_selection=auto_select_all_users(all_users)
 
-    return the_dict
+            if (user_library_selection == 2):
+                #unselect all user libraries before show_libraries(); this will show all as unselected
+                unselect_all_user_libraries(all_users)
+            else:
+                #select all user libraries
+                select_all_user_libraries(all_users)
 
+        ##########################################################################################################
+        ######Library Selection###################################################################################
+        ##########################################################################################################
 
-def select_users_all_libraries(the_dict):
+        #check if loop is active
+        if (user_loop_active):
 
-    while (the_dict['user_stop_loop'] == False):
-        the_dict=print_users_to_console(the_dict)
-        the_dict=get_user_selection(the_dict)
-        the_dict=is_valid_user_selected(the_dict)
+            #loop until finished
+            while(library_loop_active):
 
-        if (the_dict['user_stop_loop'] and the_dict['user_valid_selection']):
-            the_dict=build_user_selection_list(the_dict)
-            for selected_user in the_dict['user_selection_list']:
-                the_dict['user_selection_int']=selected_user
-                the_dict=build_library_data_for_selected_user(the_dict)
-                the_dict['library_stop_loop']=False
-                while (the_dict['library_stop_loop'] == False):
-                    the_dict=reorder_libraries_before_printing(the_dict)
-                    the_dict=print_library_data_for_selected_user(the_dict)
-                    the_dict=select_all_unselected_libraries(the_dict)
-                    the_dict['library_stop_loop'] = True
-                    the_dict['library_valid_selection']=False
-                    the_dict=is_valid_library_selected(the_dict)
-                    if (the_dict['library_valid_selection']):
-                        the_dict=swap_libraries(the_dict)
-                the_dict=save_library_data_for_selected_user(the_dict)
-        else:
-            the_dict=swap_users(the_dict)
+                #show and select one or more libraries for one user or multiple users
+                if ((user_library_selection == 0) or (user_library_selection == 2)):
+                    #build list of libraries to be shown on the console
+                    libraries_to_show=get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection)
 
-    return the_dict
+                    #enumerate each library selection to align with it's position in the list
+                    enumerate_libraries_to_be_shown(libraries_to_show)
 
+                    #print library info to console
+                    show_libraries(libraries_to_show)
 
-def all_users_select_libraries(the_dict):
+                    #select one or more libraries; clean the selection; check selection is valid; return list with selection
+                    library_selection=get_multiple_library_selection(preferred_listing_type,libraries_to_show,user_library_selection)
 
-    the_dict=pre_build_all_library_data(the_dict)
+                    #toggle if library is considered selected or unselected
+                    toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
-    while (the_dict['user_stop_loop'] == False):
-        the_dict=print_users_to_console(the_dict)
-        the_dict=select_all_users(the_dict)
-        the_dict=is_valid_user_selected(the_dict)
+                    #if no library selected set loop to inactive
+                    if (library_selection == []):
+                        #stop loop
+                        library_loop_active=False
+                        #check if selecting one or more libraries for multiple users
+                        if (user_library_selection == 2):
+                            #stop loop
+                            user_loop_active=False
+                            
+                #auto select all libraries
+                elif ((user_library_selection == 1) or (user_library_selection == 3)):
+                    #build list of libraries to be shown on the console
+                    libraries_to_show=get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection)
 
-        if ((not the_dict['user_stop_loop']) and the_dict['user_valid_selection']):
-            the_dict=build_all_library_data(the_dict)
-            the_dict=reorder_libraries_before_printing(the_dict)
-            the_dict=print_library_data_for_selected_user(the_dict)
-            the_dict=get_library_selections(the_dict)
-            the_dict['library_valid_selection']=False
-            the_dict=is_valid_library_selected(the_dict)
+                    #auto select all libraries; return list with selection
+                    library_selection=auto_select_libraries_to_show(libraries_to_show)
 
-        if (the_dict['library_valid_selection']):
-            if (not (isEmbyServer(the_dict['admin_settings']['server']['brand']))):
-                the_dict=autoselect_subfolders_with_same_library_id(the_dict)
-            the_dict=swap_libraries(the_dict)
-            the_dict=update_fake_user_dict(the_dict)
+                    if (user_library_selection == 1):
+                        #toggle if library is considered selected or unselected
+                        on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
-    for selected_user in the_dict['user_selection_list']:
-        the_dict['user_selection_int']=selected_user
-        if (isEmbyServer(the_dict['admin_settings']['server']['brand'])):
-            the_dict=filter_library_folder_data_for_selected_user(the_dict)
-        else:
-            the_dict=jellyfin_filter_library_data_for_selected_user(the_dict)
-        the_dict=save_library_data_for_selected_user(the_dict)
-        the_dict=build_all_library_data(the_dict)
+                    #stop loop
+                    library_loop_active=False
 
-    return the_dict
+                    #check if auto selecting both users and libraries
+                    if (user_library_selection == 3):
+                        #stop loop
+                        user_loop_active=False
+
+    ##########################################################################################################
+    ######Data To YAML########################################################################################
+    ##########################################################################################################
+
+    #declare list to return
+    user_and_library_list=[]
+    #save user and library selections
+    for thisUser in all_users:
+        #check if user is selected
+        if (thisUser.selected):
+            #add new user and library entry to list
+            user_and_library_list.append(thisUser.userObjectToYAML(preferred_listing_type))
+
+    return user_and_library_list

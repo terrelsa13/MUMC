@@ -1,14 +1,15 @@
 from datetime import datetime,timezone
-from sys import argv,path
+#from sys import argv,path,exit
+import sys
 from os import environ as envar
 from mumc_modules.mumc_paths_files import add_to_PATH
 from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
-from mumc_modules.mumc_versions import get_min_config_version,get_script_version
+from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,compareSemanticVersions,get_script_version,get_min_config_version,get_max_config_version
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
-
+#from sys import exit
 
 def initialize_mumc(cwd,mumc_path):
 
@@ -18,9 +19,17 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['app_name_short']='MUMC'
     the_cfg['app_name_long']='Multi-User Media Cleaner'
     the_cfg['DEBUG']=0
+    the_cfg['python_version']=get_python_version()
+    the_cfg['minium_python_version']=get_min_python_version()
+    #verify Python version meets the minimum/maximum rquired versions before going any further
+    if (not (compareSemanticVersions(the_cfg['python_version'],the_cfg['minium_python_version']))):
+        print('\nPythonVersionError: Python ' + the_cfg['python_version'] + ' is not compatible with this version of MUMC.\n\tPython version must be >= Python ' + get_min_python_version() + '\n')
+        sys.exit(0)
+    the_cfg['os_info']=get_operating_system_info()
     the_cfg['version']=get_script_version()
     the_cfg['script_version']=get_script_version()
     the_cfg['min_config_version']=get_min_config_version()
+    the_cfg['max_config_version']=get_max_config_version()
     the_cfg['client_name']='mumc.py'
     the_cfg['config_file_path']=None
     the_cfg['config_file_name']=None
@@ -35,38 +44,24 @@ def initialize_mumc(cwd,mumc_path):
 
     #save current working directory
     the_cfg['cwd']=cwd
-    if (not(str(cwd) in path)):
+    if (not(str(cwd) in sys.path)):
         add_to_PATH(cwd,0)
 
     #save ../config/mumc_config.yaml directory
     the_cfg['mumc_path_config_dir']=mumc_path / 'config'
-    if (not(str(mumc_path / 'config') in path)):
+    if (not(str(mumc_path / 'config') in sys.path)):
         add_to_PATH(mumc_path / 'config',1)
 
     #save ../mumc_config.yaml directory
     the_cfg['mumc_path']=mumc_path
-    if (not(str(mumc_path) in path)):
+    if (not(str(mumc_path) in sys.path)):
         add_to_PATH(mumc_path,1)
 
     #save command line arguments
-    the_cfg['argv']=argv
-    #save container environmental variable
-    try:
-        the_cfg['argv'].extend(envar.get('CMDLINE_ARGS').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('CMD_LINE_ARGS').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('COMMANDLINE_ARGUMENTS').replace(' ','').split(','))
-    except:
-        pass
-    try:
-        the_cfg['argv'].extend(envar.get('COMMAND_LINE_ARGUMENTS').replace(' ','').split(','))
-    except:
-        pass
+    the_cfg['argv']=sys.argv
+
+    #save environmental variables
+    the_cfg['envar']=envar
 
     the_cfg['console_separator']='----------------------------------------------------------------------------------------'
     the_cfg['console_separator_']='----------------------------------------------------------------------------------------\n'
