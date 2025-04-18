@@ -2317,6 +2317,8 @@ def pre_cfgCheckYAML(cfg):
 def pre_cfgCheckYAML(cfg,init_dict):
     errorFlag=False
 
+    print(cfg)
+
     try:
         cfg['version']=cfg['version']
     except:
