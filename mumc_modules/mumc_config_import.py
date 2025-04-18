@@ -72,7 +72,7 @@ def importConfig(init_dict,cmdopt_dict):
                 #with open(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'], 'r') as mumc_config_yaml:
                     #cfg = yaml.safe_load(mumc_config_yaml)
 
-                init_dict['mumc_path']=cmdopt_dict['altConfigPath']
+                #init_dict['mumc_path']=cmdopt_dict['altConfigPath']
                 init_dict['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
 
             #check if legacy config
