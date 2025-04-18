@@ -137,6 +137,9 @@ def yaml_configurationBuilder(the_dict):
     config_data['admin_settings'].pop('cache')
     config_data['admin_settings'].pop('output_controls')
 
+    print('\nconfigsavelocation')
+    print(str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']))
+    print('configsavelocation\n')
     #save yaml config file
     save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
 
