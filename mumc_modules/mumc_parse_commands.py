@@ -513,8 +513,8 @@ def parse_command_line_options(the_dict):
                                 '-url','-server_url',
                                 '-port','-server_port',
                                 '-base','-server_base_url',
-                                '-username','-admin_username',
-                                '-password','-admin_password',
+                                '-admin_username', #do not use '-username' as this could be a common username
+                                '-admin_password', #do not use '-password' as this could be a common password
                                 '-authkey','-server_auth_key',
                                 '-adminid','-server_admin_id',
                                 '-lstbeh','-list_behavior',
@@ -546,7 +546,6 @@ def parse_command_line_options(the_dict):
                                 '-h','-help','-?'
                                 ]
 
-
     for argv in reversed(the_dict['argv']):
         argvEq=argv.strip().split('=',1)
         argvSp=argv.strip().split(' ',1)
@@ -567,7 +566,6 @@ def parse_command_line_options(the_dict):
                 #the_dict['argv'].append('-' + str(argvSp[0].casefold().strip()))
                 #the_dict['argv'].append(argvSp[1])
 
-
     for argv in the_dict['argv']:
         if ('-' + str(argv.casefold().strip()) in cmdopt_dict['optionsList']):
             argvIndex=the_dict['argv'].index(argv)
@@ -577,7 +575,6 @@ def parse_command_line_options(the_dict):
             print(argvIndex)
             print(str(argv.casefold().strip()))
             print(the_dict['argv'])
-
 
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
