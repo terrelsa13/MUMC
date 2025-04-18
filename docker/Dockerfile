@@ -11,7 +11,7 @@ RUN mkdir -p mumc_modules/mumc_defaults/
 #RUN mkdir config/
 #RUN mkdir logs/
 
-RUN touch config/mumc_config.yaml
+#RUN touch config/mumc_config.yaml
 #RUN touch logs/mumc_DEBUG.log
 #RUN touch logs/mumc_CRON_OUTPUT.log
 
