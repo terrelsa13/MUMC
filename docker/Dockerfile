@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 VOLUME /config
 
 RUN mkdir mumc_modules/
-RUN mkdir mumc_modules/mumc_defaults/
+#RUN mkdir mumc_modules/mumc_defaults/
 RUN mkdir config/
 RUN mkdir logs/
 
