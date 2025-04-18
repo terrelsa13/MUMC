@@ -570,10 +570,12 @@ def parse_command_line_options(the_dict):
 
     for argv in the_dict['argv']:
         if ('-' + str(argv.casefold().strip()) in cmdopt_dict['optionsList']):
-            argv='-' + str(argv.casefold().strip())
+            argvIndex=the_dict['argv'].index(argv)
+            the_dict['argv'][argvIndex]='-' + str(argv.casefold().strip())
             print('\nwithout =')
             print(str(argv.casefold().strip()))
             print(the_dict['argv'])
+            print(the_dict['argv'].index(argv))
 
 
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
