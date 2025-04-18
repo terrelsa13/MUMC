@@ -167,7 +167,7 @@ def build_configuration_file(the_dict,orig_dict={}):
             the_dict['advanced_settings']['UPDATE_CONFIG']=the_dict['argv']['-config_updater']
         the_dict['UPDATE_CONFIG']=the_dict['advanced_settings']['UPDATE_CONFIG']
         #the_dict=setYAMLConfigSkeleton(the_dict)
-        the_dict['admin_settings']['server']['brand']=the_dict['server_brand']
+        #the_dict['admin_settings']['server']['brand']=the_dict['server_brand']
         the_dict['advanced_settings']['UPDATE_CONFIG']=the_dict['UPDATE_CONFIG']
         the_dict.pop('server_brand')
         the_dict.pop('UPDATE_CONFIG')

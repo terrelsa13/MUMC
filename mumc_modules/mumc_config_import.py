@@ -10,6 +10,7 @@ from mumc_modules.mumc_config_convert import convert_legacyConfigToYAML
 from mumc_modules.mumc_output import open_and_return_file
 
 
+'''
 def cannotFindConfig(init_dict,cmdopt_dict):
     if (('-container' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-container'])):
         print_containerized_config_missing(init_dict)
@@ -29,10 +30,29 @@ def cannotFindConfig(init_dict,cmdopt_dict):
             init_dict['mumc_path']=cmdopt_dict['altConfigPath']
             init_dict['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
         build_configuration_file(init_dict)
-        while (True):
-            time.sleep(60)
+
         #exit gracefully
         sys.exit(0)
+'''
+
+
+def cannotFindConfig(init_dict,cmdopt_dict):
+    #config not found
+    #or
+    #config found; but missing DEBUG or server_brand options; automatically start to rebuild new config
+    init_dict['DEBUG']=0
+    init_dict['advanced_settings']={}
+    init_dict['advanced_settings']['UPDATE_CONFIG']=False
+    if ((cmdopt_dict['altConfigPath'] == None) and (cmdopt_dict['altConfigFileExt'] == None)):
+        init_dict['mumc_path']=init_dict['mumc_path']
+        init_dict['config_file_name_yaml']=init_dict['config_file_name_yaml']
+    else:
+        init_dict['mumc_path']=cmdopt_dict['altConfigPath']
+        init_dict['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
+    build_configuration_file(init_dict)
+
+    #exit gracefully
+    sys.exit(0)
 
 
 #verify specified variables are avaialbe in the config
