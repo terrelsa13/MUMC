@@ -29,6 +29,12 @@ def MUMC():
     #inital dictionary setup
     init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
 
+    print('\npostinit\n')
+    print(init_dict['argv'])
+    print('\npostinit\n')
+    print(init_dict['envar'])
+    print('\npostinit\n')
+
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
 
