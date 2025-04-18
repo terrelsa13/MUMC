@@ -166,4 +166,8 @@ def importConfig(init_dict,cmdopt_dict):
     except (AttributeError, ModuleNotFoundError, KeyError):
         cannotFindConfig(init_dict,cmdopt_dict)
 
+    print (cfg)
+    print ('\n\n\n')
+    print (init_dict)
+
     return cfg,init_dict
