@@ -17,7 +17,7 @@ RUN touch logs/mumc_DEBUG.log
 RUN touch logs/mumc_CRON_OUTPUT.log
 
 COPY mumc_modules/*.py mumc_modules/
-COPY mumc_modules/mumc_defaults mumc_modules/
+#COPY mumc_modules/mumc_defaults mumc_modules/
 COPY mumc.py .
 
 RUN ls --recursive .
