@@ -32,9 +32,17 @@ def MUMC():
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
 
+    print('\nprecheck\n')
+    print(cmdopt_dict['argv'])
+    print('\nprecheck\n')
+
     #fully check argv commandline options (and environmental variables) are what we expect them to be
     argvCfgChecker=data_checker(cmdopt_dict['argv'])
     cmdopt_dict['argv']=cfgCheckARGENV(argvCfgChecker)
+
+    print('\npostcheck\n')
+    print(cmdopt_dict['argv'])
+    print('\npostcheck\n')
 
     #update theh argv created during initialization
     init_dict['argv']=cmdopt_dict['argv']
