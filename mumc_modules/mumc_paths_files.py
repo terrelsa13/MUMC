@@ -70,6 +70,7 @@ def get_default_config_path():
 # Delete existing mumc_DEBUG.log file
 def delete_debug_log(the_dict):
     Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
+    Path(the_dict['debug_file_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
     Path(the_dict['mumc_path_config_dir'] / the_dict['debug_file_name']).unlink(missing_ok=True)
 
 

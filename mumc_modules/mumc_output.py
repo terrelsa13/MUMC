@@ -100,17 +100,17 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
             character_limit=128
 
         #if debug file does not exist; create blank file
-        if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
-            with open(Path(the_dict['mumc_path']) / the_dict['debug_file_name'],'a') as file:
+        if (not(doesFileExist(Path(the_dict['debug_file_path']) / the_dict['debug_file_name']))):
+            with open(Path(the_dict['debug_file_path']) / the_dict['debug_file_name'],'a') as file:
                 #create blank file
                 pass
 
         #limit number of characters in a single write to 250
         #loop thru inputs > 250 characters and write in multiple passes
         if (len(string_to_save) > character_limit):
-            append_long_string_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'],character_limit)
+            append_long_string_to_file(str(string_to_save),Path(the_dict['debug_file_path']) / the_dict['debug_file_name'],character_limit)
         else:
-            append_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
+            append_to_file(str(string_to_save),Path(the_dict['debug_file_path']) / the_dict['debug_file_name'])
 
 
 #determine if the requested console output line should be shown or hidden

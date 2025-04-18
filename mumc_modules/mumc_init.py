@@ -37,7 +37,9 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['config_file_name_yaml']='mumc_config.yaml'
     the_cfg['config_file_name_yml']='mumc_config.yml'
     the_cfg['config_file_name_no_ext']='mumc_config'
+    the_cfg['debug_file_path']=None
     the_cfg['debug_file_name']='mumc_DEBUG.log'
+    the_cfg['debug_file_name_no_ext']='mumc_DEBUG'
     the_cfg['date_time_now']=datetime.now()
     the_cfg['date_time_now_tz_utc']=datetime.now(timezone.utc)
     the_cfg['date_time_utc_now']=the_cfg['date_time_now_tz_utc'].replace(tzinfo=None)

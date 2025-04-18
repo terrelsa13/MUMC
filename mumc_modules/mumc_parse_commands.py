@@ -670,4 +670,14 @@ def parse_command_line_options(the_dict):
         cmdopt_dict['altConfigFileNoExt']=None
         cmdopt_dict['altConfigFileExt']=None
 
+    #look for -contaier command line option and argument
+    if ('-container' in cmdopt_dict['argv']):
+        cmdopt_dict['debugLogPath']=the_dict['mumc_path'] / 'logs'
+        cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
+        cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
+    else:
+        cmdopt_dict['debugLogPath']=the_dict['mumc_path']
+        cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
+        cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
+
     return cmdopt_dict
