@@ -7,7 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 VOLUME /config
 
-#RUN mkdir mumc_modules/
 RUN mkdir -p mumc_modules/mumc_defaults/
 RUN mkdir config/
 RUN mkdir logs/
@@ -19,7 +18,5 @@ RUN touch logs/mumc_CRON_OUTPUT.log
 COPY mumc_modules/*.py mumc_modules/
 COPY mumc_modules/mumc_defaults/*.yaml mumc_modules/mumc_defaults/
 COPY mumc.py .
-
-RUN ls --recursive .
 
 ENTRYPOINT ["python", "./mumc.py", "-d"]
