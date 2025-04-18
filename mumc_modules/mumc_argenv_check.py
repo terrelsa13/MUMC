@@ -22,7 +22,7 @@ def cfgCheckARGENV(argvCfgChecker):
         #verify command line option has and expected data type and/or value
         if ((server_port:=argvCfgChecker.checkInteger('-server_port',value=None,instanceType=argvCfgChecker.int,required=False,minValue=1,maxValue=65535,errOut=False)) == None):
             #set error if not expected data type and/or value
-            argvCfgChecker.setCustomErrorText(f'CmdEnvError: server_port option/environmental-variable must be a integer\n\tValid values 1 thru 65535\n')
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: server_port option/environmental-variable must be an integer\n\tValid values 1 thru 65535\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-server_base_url')):
@@ -113,7 +113,7 @@ def cfgCheckARGENV(argvCfgChecker):
         #verify command line option has and expected data type and/or value
         if ((user_library_selection:=argvCfgChecker.checkInteger('-user_library_selection',value=None,instanceType=argvCfgChecker.int,required=False,minValue=0,maxValue=3,errOut=False)) == None):
             #set error if not expected data type and/or value
-            argvCfgChecker.setCustomErrorText(f'CmdEnvError: user_library_selection option/environmental-variable must be a integer\n\tValid values 0 thru 3\n')
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: user_library_selection option/environmental-variable must be an integer\n\tValid values 0 thru 3\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-radarr_url')):
@@ -127,7 +127,7 @@ def cfgCheckARGENV(argvCfgChecker):
         #verify command line option has and expected data type and/or value
         if ((radarr_port:=argvCfgChecker.checkInteger('-radarr_port',value=None,instanceType=argvCfgChecker.int,required=False,minValue=1,maxValue=65535,errOut=False)) == None):
             #set error if not expected data type and/or value
-            argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_port option/environmental-variable must be a integer\n\tValid values 1 thru 65535\n')
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_port option/environmental-variable must be an integer\n\tValid values 1 thru 65535\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-radarr_base_url')):
@@ -155,7 +155,7 @@ def cfgCheckARGENV(argvCfgChecker):
         #verify command line option has and expected data type and/or value
         if ((sonarr_port:=argvCfgChecker.checkInteger('-sonarr_port',value=None,instanceType=argvCfgChecker.int,required=False,minValue=1,maxValue=65535,errOut=False)) == None):
             #set error if not expected data type and/or value
-            argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_port option/environmental-variable must be a integer\n\tValid values 1 thru 65535\n')
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_port option/environmental-variable must be an integer\n\tValid values 1 thru 65535\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-sonarr_base_url')):

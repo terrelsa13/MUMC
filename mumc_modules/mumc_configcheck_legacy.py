@@ -2377,7 +2377,7 @@ def cfgCheckLegacy(cfg,the_dict):
             (((check >= 0) and (check <= 4)) or
              check == 255))
         ):
-            error_found_in_mumc_config_py+='LegacyConfigError: \'DEBUG\' must be a integer or bool; valid range 0 thru 4\n'
+            error_found_in_mumc_config_py+='LegacyConfigError: \'DEBUG\' must be an integer or bool; valid range 0 thru 4\n'
         else:
             config_dict['DEBUG']=check
     else:

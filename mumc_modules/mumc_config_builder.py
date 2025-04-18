@@ -351,62 +351,64 @@ def build_configuration_file(the_dict,orig_dict={}):
         the_dict[arr.casefold() + '_base_url']=None
         the_dict[arr.casefold() + '_api']=None
 
-        if ('-' + arr.casefold() + '_url' in the_dict['argv']):
-            #save *arr url command option
-            the_dict[arr.casefold() + '_url']=the_dict['argv']['-' + arr.casefold() + '_url']
-
-            if ('-' + arr.casefold() + '_port' in the_dict['argv']):
-                #save *arr port command option
-                the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+        #check if not running as a container 
+        if (not ('-container' in the_dict['argv'])):
+            #url option populated
+            if ('-' + arr.casefold() + '_url' in the_dict['argv']):
+                #url not == ''
+                if (not (the_dict['argv']['-' + arr.casefold() + '_url'] == '')):
+                    #save *arr url command option
+                    the_dict[arr.casefold() + '_url']=the_dict['argv']['-' + arr.casefold() + '_url']
             else:
-                #save *arr manual port input
-                the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
+                if (proceedOK:=proceed_arr_setup(arr)):
+                    #save *arr manual url input
+                    the_dict[arr.casefold() + '_url']=get_arr_url(arr)
 
-            if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
-                #save *arr base_url command option
-                the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
+                    #port option populated
+                    if ('-' + arr.casefold() + '_port' in the_dict['argv']):
+                        #save *arr port command option
+                        the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+                    else:
+                        if (proceedOK(arr)):
+                            #save *arr manual port input
+                            the_dict[arr.casefold() + '_port']=get_arr_port(arr)
+
+                    #base_url option populated
+                    if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
+                        #save *arr base_url command option
+                        the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
+                    else:
+                        if (proceedOK(arr)):
+                            #save *arr manual base_url input
+                            the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
+                else:
+                    #disable arr
+                    the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
+        else: #it is running as a container
+            #url option populated
+            if ('-' + arr.casefold() + '_url' in the_dict['argv']):
+                #url not == ''
+                if (not (the_dict['argv']['-' + arr.casefold() + '_url'] == '')):
+                    #save *arr url command option
+                    the_dict[arr.casefold() + '_url']=the_dict['argv']['-' + arr.casefold() + '_url']
+
+                    #port option populated
+                    if ('-' + arr.casefold() + '_port' in the_dict['argv']):
+                        #save *arr port command option
+                        the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
+
+                    #base_url option populated
+                    if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
+                        #save *arr base_url command option
+                        the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
+                else:
+                    #disable arr
+                    the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
             else:
-                #save *arr manual base_url input
-                the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
+                #disable arr
+                the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
 
-        elif ('-' + arr.casefold() + '_port' in the_dict['argv']):
-            #save *arr manual url input
-            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
-
-            #save *arr port command option
-            the_dict[arr.casefold() + '_port']=the_dict['argv']['-' + arr.casefold() + '_port']
-
-            if ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
-                #save *arr base_url command option
-                the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
-            else:
-                #save *arr manual base_url input
-                the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
-
-        elif ('-' + arr.casefold() + '_base_url' in the_dict['argv']):
-            #save *arr manual url input
-            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
-
-            #save *arr manual port input
-            the_dict[arr.casefold() + '_port']=get_arr_port(arr)
-
-            #save *arr base_url command option
-            the_dict[arr.casefold() + '_base_url']=the_dict['argv']['-' + arr.casefold() + '_base_url']
-
-        elif ((not (('-d' in the_dict['argv']) or ('-container' in the_dict['argv']))) and (proceed_arr_setup(arr))):
-            #save *arr manual url input
-            the_dict[arr.casefold() + '_url']=get_arr_url(arr)
-
-            #save *arr manual port input
-            the_dict[arr.casefold() + '_port']=get_arr_port(arr,arrDict[arr])
-
-            #save *arr manual base_url input
-            the_dict[arr.casefold() + '_base_url']=get_arr_base_url(arr)
-
-        else:
-            #disable *arr
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
-
+        #if arr enabled build the FQDN
         if (the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']):
 
             #contruct *arr FQDN

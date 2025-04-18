@@ -546,6 +546,7 @@ def parse_command_line_options(the_dict):
                                 '-h','-help','-?'
                                 ]
 
+    #
     for argv in reversed(the_dict['argv']):
         argvEq=argv.strip().split('=',1)
         argvSp=argv.strip().split(' ',1)
@@ -565,7 +566,11 @@ def parse_command_line_options(the_dict):
                 the_dict['argv'].insert(argvSpIndex + 1,argvSp[1])
                 #the_dict['argv'].append('-' + str(argvSp[0].casefold().strip()))
                 #the_dict['argv'].append(argvSp[1])
+        if (argv == '-e'):
+            argv_EIndex=the_dict['argv'].index(argv)
+            the_dict['argv'].pop(argv_EIndex)
 
+    #
     for argv in the_dict['argv']:
         if ('-' + str(argv.casefold().strip()) in cmdopt_dict['optionsList']):
             argvIndex=the_dict['argv'].index(argv)
