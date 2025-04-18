@@ -536,7 +536,7 @@ def parse_command_line_options(the_dict):
                                 #'-ldburl','-lidarr_base_url',
                                 #'-ldapi','-lidarr_api',
                                 #'-reurl','-readarr_url',
-                                #'-reprt','-readarr_port',
+                                #'-reprt','-RR_API_KEY', '9786543210fedcbaabcdef0123456789']readarr_port',
                                 #'-reburl','-readarr_base_url',
                                 #'-reapi','-readarr_api',
                                 '-a','-attrs','-attributes',
@@ -545,6 +545,28 @@ def parse_command_line_options(the_dict):
                                 #'-rak','-remake-api-key',
                                 '-h','-help','-?'
                                 ]
+
+
+    for argv in the_dict['argv']:
+        argvEq=argv.strip().split('=',1)
+        argvSp=argv.strip().split(' ',1)
+        if (len(argvEq) == 2):
+            if ('-' + str(argvEq[0].casefold().strip()) in cmdopt_dict['optionsList']):
+                #argvEqIndex=the_dict['argv'].index(argv)
+                #the_dict['argv'].pop(argvEqIndex)
+                #the_dict['argv'].insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
+                #the_dict['argv'].insert(argvEqIndex + 1,argvEq[1])
+                the_dict['argv'].append('-' + str(argvEq[0].casefold().strip()))
+                the_dict['argv'].append(argvEq[1])
+        if (len(argvSp) == 2):
+            if ('-' + str(argvSp[0].casefold().strip()) in cmdopt_dict['optionsList']):
+                #argvSpIndex=the_dict['argv'].index(argv)
+                #the_dict['argv'].pop(argvSpIndex)
+                #the_dict['argv'].insert(argvSpIndex,'-' + str(argvSp[0].casefold()))
+                #the_dict['argv'].insert(argvSpIndex + 1,argvSp[1])
+                the_dict['argv'].append('-' + str(argvSp[0].casefold().strip()))
+                the_dict['argv'].append(argvSp[1])
+
 
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
