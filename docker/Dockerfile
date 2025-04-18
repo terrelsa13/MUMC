@@ -7,8 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 VOLUME /config
 
-RUN mkdir mumc_modules/
-#RUN mkdir mumc_modules/mumc_defaults/
+#RUN mkdir mumc_modules/
+RUN mkdir -p mumc_modules/mumc_defaults/
 RUN mkdir config/
 RUN mkdir logs/
 
@@ -21,9 +21,5 @@ COPY mumc_modules/*.py mumc_modules/
 COPY mumc.py .
 
 RUN ls --recursive .
-RUN ls --recursive mumc_modules/
-RUN ls --recursive mumc_modules/mumc_defaults/
-RUN ls --recursive config
-RUN ls --recursive logs
 
 ENTRYPOINT ["python", "./mumc.py", "-d"]
