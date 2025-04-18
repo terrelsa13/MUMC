@@ -168,6 +168,8 @@ def importConfig(init_dict,cmdopt_dict):
 
     print (cfg)
     print ('\n\n\n')
+    print(cmdopt_dict)
+    print ('\n\n\n')
     print (init_dict)
 
     return cfg,init_dict
