@@ -51,6 +51,9 @@ def cannotFindConfig(init_dict,cmdopt_dict):
         init_dict['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
     build_configuration_file(init_dict)
 
+    while (True):
+        time.sleep(60)
+
     #exit gracefully
     sys.exit(0)
 
