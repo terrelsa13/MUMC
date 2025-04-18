@@ -73,6 +73,7 @@ def importConfig(init_dict,cmdopt_dict):
                     #cfg = yaml.safe_load(mumc_config_yaml)
 
                 #init_dict['mumc_path']=cmdopt_dict['altConfigPath']
+                init_dict['config_file_path']=cmdopt_dict['altConfigPath']
                 init_dict['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
 
             #check if legacy config
@@ -166,10 +167,12 @@ def importConfig(init_dict,cmdopt_dict):
     except (AttributeError, ModuleNotFoundError, KeyError):
         cannotFindConfig(init_dict,cmdopt_dict)
 
+    print('\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n')
     print (cfg)
-    print ('\n\n\n')
+    print('\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n')
     print(cmdopt_dict)
-    print ('\n\n\n')
+    print('\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n')
     print (init_dict)
+    print('\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n')
 
     return cfg,init_dict

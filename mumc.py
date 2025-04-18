@@ -42,6 +42,12 @@ def MUMC():
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
+    print('\n*************************************************************************************************************\n')
+    print(cfg)
+    print('\n*************************************************************************************************************\n')
+    print(init_dict)
+    print('\n*************************************************************************************************************\n')
+
     #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
 
