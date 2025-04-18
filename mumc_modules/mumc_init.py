@@ -59,9 +59,31 @@ def initialize_mumc(cwd,mumc_path):
 
     #save command line arguments
     the_cfg['argv']=sys.argv
+    
+    print('\nrawargv')
+    print(sys.argv)
+    print('\nrawargv')
+
+    print('\norigargv')
+    print(the_cfg['argv'])
+    print('\norigargv')
+
+    if (the_cfg['argv'] == sys.argv):
+        print('\nargv copied\n')
 
     #save environmental variables
     the_cfg['envar']=envar
+
+    print('\rrawenv')
+    print(envar)
+    print('\rrawenv')
+
+    print('\norigaenv')
+    print(the_cfg['envar'])
+    print('\norigenv')
+
+    if (the_cfg['envar'] == envar):
+        print('\nenv copied\n')
 
     the_cfg['console_separator']='----------------------------------------------------------------------------------------'
     the_cfg['console_separator_']='----------------------------------------------------------------------------------------\n'

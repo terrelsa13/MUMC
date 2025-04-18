@@ -547,45 +547,58 @@ def parse_command_line_options(the_dict):
                                 ]
 
 
-    for argv in the_dict['argv']:
+    for argv in reversed(the_dict['argv']):
         argvEq=argv.strip().split('=',1)
         argvSp=argv.strip().split(' ',1)
         if (len(argvEq) == 2):
             if ('-' + str(argvEq[0].casefold().strip()) in cmdopt_dict['optionsList']):
-                #argvEqIndex=the_dict['argv'].index(argv)
-                #the_dict['argv'].pop(argvEqIndex)
-                #the_dict['argv'].insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
-                #the_dict['argv'].insert(argvEqIndex + 1,argvEq[1])
-                the_dict['argv'].append('-' + str(argvEq[0].casefold().strip()))
-                the_dict['argv'].append(argvEq[1])
+                argvEqIndex=the_dict['argv'].index(argv)
+                the_dict['argv'].pop(argvEqIndex)
+                the_dict['argv'].insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
+                the_dict['argv'].insert(argvEqIndex + 1,argvEq[1])
+                #the_dict['argv'].append('-' + str(argvEq[0].casefold().strip()))
+                #the_dict['argv'].append(argvEq[1])
         if (len(argvSp) == 2):
             if ('-' + str(argvSp[0].casefold().strip()) in cmdopt_dict['optionsList']):
-                #argvSpIndex=the_dict['argv'].index(argv)
-                #the_dict['argv'].pop(argvSpIndex)
-                #the_dict['argv'].insert(argvSpIndex,'-' + str(argvSp[0].casefold()))
-                #the_dict['argv'].insert(argvSpIndex + 1,argvSp[1])
-                the_dict['argv'].append('-' + str(argvSp[0].casefold().strip()))
-                the_dict['argv'].append(argvSp[1])
+                argvSpIndex=the_dict['argv'].index(argv)
+                the_dict['argv'].pop(argvSpIndex)
+                the_dict['argv'].insert(argvSpIndex,'-' + str(argvSp[0].casefold()))
+                the_dict['argv'].insert(argvSpIndex + 1,argvSp[1])
+                #the_dict['argv'].append('-' + str(argvSp[0].casefold().strip()))
+                #the_dict['argv'].append(argvSp[1])
 
 
     for argv in the_dict['argv']:
         if ('-' + str(argv.casefold().strip()) in cmdopt_dict['optionsList']):
             argvIndex=the_dict['argv'].index(argv)
+            print(the_dict['argv'].index(argv))
             the_dict['argv'][argvIndex]='-' + str(argv.casefold().strip())
             print('\nwithout =')
+            print(argvIndex)
             print(str(argv.casefold().strip()))
             print(the_dict['argv'])
-            print(the_dict['argv'].index(argv))
 
 
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
+    print('\npostnormalize')
+    print(the_dict['argv'])
+    print('\npostnormalize')
+
     #first covert environmental variables to command line arguements; environamental variables have a lower priority
     cmdopt_dict['argv']|=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
 
+    print('\npostenvconvert')
+    print(the_dict['argv'])
+    print('\npostenvconvert')
+
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
     cmdopt_dict['argv']|=convertCMDOptionsToDict(the_dict['argv'],cmdopt_dict['optionsList'])
+
+    print('\npostmerge')
+    print(the_dict['argv'])
+    print('\npostmerge')
 
     #everything is string up to this point
     #normalize all 'true'/'false' strings as booleans
