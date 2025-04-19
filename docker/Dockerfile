@@ -9,9 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 #VOLUME config/ logs/
 #VOLUME /logs
 
-RUN mkdir -p mumc_modules/mumc_defaults/
-#RUN mkdir config/
-#RUN mkdir logs/
+RUN mkdir -p /usr/src/app/mumc_modules/mumc_defaults/
+RUN mkdir /usr/src/app/config/
+RUN mkdir /usr/src/app/logs/
 
 RUN touch /usr/src/app/config/mumc_config.yaml
 RUN touch /usr/src/app/logs/mumc_DEBUG.log
