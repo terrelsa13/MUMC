@@ -111,10 +111,20 @@ def importConfig(init_dict,cmdopt_dict):
     try:
         #check if default yaml (i.e. config/mumc_config.yaml) or a custom yaml (i.e. /path/to/some_config.yaml) exists
         if (doesFileExist(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])):
+
+            print('\nwhichone?')
+            print('location#1')
+            print('whichone?\n')
+
             #open and return config file
             cfg=open_and_return_file(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])
             #make sure a few of the necessary config variables are there
             if (assignVarTest(cfg)):
+
+                print('\nwhichone?')
+                print('location#2')
+                print('whichone?\n')
+
                 init_dict['config_file_path']=cmdopt_dict['config_file_path']
                 init_dict['config_file_name_yaml']=cmdopt_dict['config_file_name_yaml']
                 init_dict['config_file_name_yml']=cmdopt_dict['config_file_name_yaml']
@@ -123,13 +133,28 @@ def importConfig(init_dict,cmdopt_dict):
                 cmdopt_dict['config_file_name_yml']=cmdopt_dict['config_file_name_yaml']
             #assing variable test failed
             else:
+
+                print('\nwhichone?')
+                print('location#3')
+                print('whichone?\n')
+
                 cannotFindConfig(init_dict,cmdopt_dict)
         #check if default yaml (i.e. config/mumc_config.yml) exists
         elif (doesFileExist(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])):
+
+            print('\nwhichone?')
+            print('location#4')
+            print('whichone?\n')
+
             #open and return config file
             cfg=open_and_return_file(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])
             #make sure a few of the necessary config variables are there
             if (assignVarTest(cfg)):
+
+                print('\nwhichone?')
+                print('location#5')
+                print('whichone?\n')
+
                 init_dict['config_file_path']=cmdopt_dict['config_file_path']
                 init_dict['config_file_name_yaml']=cmdopt_dict['config_file_name_yml']
                 init_dict['config_file_name_yml']=cmdopt_dict['config_file_name_yml']
@@ -138,10 +163,25 @@ def importConfig(init_dict,cmdopt_dict):
                 cmdopt_dict['config_file_name_yaml']=cmdopt_dict['config_file_name_yml']
             #assing variable test failed
             else:
+
+                print('\nwhichone?')
+                print('location#6')
+                print('whichone?\n')
+
                 cannotFindConfig(init_dict,cmdopt_dict)
         else:
+
+            print('\nwhichone?')
+            print('location#7')
+            print('whichone?\n')
+
             cannotFindConfig(init_dict,cmdopt_dict)
     except (AttributeError, ModuleNotFoundError, KeyError):
+
+        print('\nwhichone?')
+        print('location#8')
+        print('whichone?\n')
+
         cannotFindConfig(init_dict,cmdopt_dict)
 
     return cfg,init_dict
