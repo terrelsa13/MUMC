@@ -140,6 +140,7 @@ def yaml_configurationBuilder(the_dict):
 
     print('\nconfigsavelocation')
     print(str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']))
+    print(str(the_dict['config_file_path'] / the_dict['config_file_name_yml']))
     print('configsavelocation\n')
     #save yaml config file
     save_yaml_config(config_data,the_dict['config_file_path'] / the_dict['config_file_name_yaml'])

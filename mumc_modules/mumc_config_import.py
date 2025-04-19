@@ -125,9 +125,9 @@ def importConfig(init_dict,cmdopt_dict):
             else:
                 cannotFindConfig(init_dict,cmdopt_dict)
         #check if default yaml (i.e. config/mumc_config.yml) exists
-        elif (doesFileExist(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_yml'])):
+        elif (doesFileExist(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])):
             #open and return config file
-            cfg=open_and_return_file(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_yml'])
+            cfg=open_and_return_file(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])
             #make sure a few of the necessary config variables are there
             if (assignVarTest(cfg)):
                 init_dict['config_file_path']=cmdopt_dict['config_file_path']
