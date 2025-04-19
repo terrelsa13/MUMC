@@ -13,8 +13,8 @@ RUN mkdir -p /usr/src/app/mumc_modules/mumc_defaults/
 RUN mkdir /usr/src/app/config/
 RUN mkdir /usr/src/app/logs/
 
-RUN touch /usr/src/app/config/mumc_config.yaml
-RUN touch /usr/src/app/logs/mumc_DEBUG.log
+#RUN touch /usr/src/app/config/mumc_config.yaml
+#RUN touch /usr/src/app/logs/mumc_DEBUG.log
 #RUN touch logs/mumc_CRON_OUTPUT.log
 
 COPY mumc_modules/*.py mumc_modules/
