@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY docker/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-VOLUME /config /logs
+VOLUME /usr/src/app/config /usr/src/app/logs
 #VOLUME config/ logs/
 #VOLUME /logs
 
