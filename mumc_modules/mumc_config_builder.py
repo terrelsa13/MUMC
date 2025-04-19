@@ -355,13 +355,13 @@ def build_configuration_file(the_dict,orig_dict={}):
         arr_url_has_value=False
         arr_api_key_has_value=False
 
-        if (('-' + arr.casefold() + '_url' in the_dict['argv']) and (not (the_dict['argv'][arr.casefold() + '_url'] == ''))):
+        if (('-' + arr.casefold() + '_url' in the_dict['argv']) and (not (the_dict['argv']['-' + arr.casefold() + '_url'] == ''))):
             #*arr url
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict['argv'][arr.casefold() + '_url']
+            the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict['argv']['-' + arr.casefold() + '_url']
             arr_url_has_value=True
 
         #get *arr API key
-        if (('-' + arr.casefold() + '_api_key' in the_dict['argv']) and (not (the_dict['argv'][arr.casefold() + '_api_key'] == ''))):
+        if (('-' + arr.casefold() + '_api_key' in the_dict['argv']) and (not (the_dict['argv']['-' + arr.casefold() + '_api_key'] == ''))):
             #save *arr api command option
             the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=the_dict['argv']['-' + arr.casefold() + '_api_key']
             arr_api_key_has_value=True
