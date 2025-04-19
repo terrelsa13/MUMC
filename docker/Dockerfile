@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY docker/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-VOLUME /usr/src/app/config /usr/src/app/logs
+#VOLUME /usr/src/app/config /usr/src/app/logs
 #VOLUME config/ logs/
 #VOLUME /logs
 
@@ -13,8 +13,8 @@ RUN mkdir -p mumc_modules/mumc_defaults/
 #RUN mkdir config/
 #RUN mkdir logs/
 
-#RUN touch config/mumc_config.yaml
-#RUN touch logs/mumc_DEBUG.log
+RUN touch /usr/src/app/config/mumc_config.yaml
+RUN touch /usr/src/app/logs/mumc_DEBUG.log
 #RUN touch logs/mumc_CRON_OUTPUT.log
 
 COPY mumc_modules/*.py mumc_modules/
