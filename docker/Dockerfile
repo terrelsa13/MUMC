@@ -6,7 +6,7 @@ COPY docker/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 #VOLUME /usr/src/app/config /usr/src/app/logs
-VOLUME /user/src/app/config
+VOLUME /usr/src/app/config
 #VOLUME /logs
 
 RUN mkdir -p /usr/src/app/mumc_modules/mumc_defaults/
