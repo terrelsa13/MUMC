@@ -29,8 +29,8 @@ def save_yaml_config(dataInput,filePathName):
     print(dataInput)
     print('peepthedata\n')
 
-    #while (True):
-        #time.sleep(60)
+    while (True):
+        time.sleep(60)
 
     #Save the config file
     with open(filePathName,'w') as file:
