@@ -2,6 +2,7 @@ import json
 import yaml
 from pathlib import Path
 from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+import time
 
 
 class NoAliasDumper(yaml.SafeDumper):
@@ -19,6 +20,18 @@ def open_and_return_file(full_file_path):
 
 
 def save_yaml_config(dataInput,filePathName):
+
+    print('\npeepthepath')
+    print(filePathName)
+    print('peepthepath\n')
+
+    print('\npeepthedata')
+    print(dataInput)
+    print('peepthedata\n')
+
+    while (True):
+        time.sleep(60)
+
     #Save the config file
     with open(filePathName,'w') as file:
         file.write('---\n')
