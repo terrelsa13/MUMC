@@ -1,4 +1,4 @@
-from mumc_modules.mumc_output import print_byType,open_and_return_default_config,save_yaml_config
+from mumc_modules.mumc_output import print_byType,open_and_return_file,save_yaml_config
 from mumc_modules.mumc_setup_questions import get_brand,get_url,get_port,get_base,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type,proceed_arr_setup,get_arr_url,get_arr_port,get_arr_base_url,get_arr_api
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
 from mumc_modules.mumc_versions import get_script_version
@@ -10,6 +10,7 @@ from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
 from mumc_modules.mumc_builder_userlibrary import build_users_and_libraries
 from mumc_modules.mumc_init import getIsAnyMediaEnabled
 from mumc_modules.mumc_blacklist_whitelist import get_unpreferred_listing_type
+from mumc_modules.mumc_paths_files import get_default_config_path
 import copy
 import yaml
 import sys
@@ -138,10 +139,10 @@ def yaml_configurationBuilder(the_dict):
     config_data['admin_settings'].pop('output_controls')
 
     print('\nconfigsavelocation')
-    print(str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']))
+    print(str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']))
     print('configsavelocation\n')
     #save yaml config file
-    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+    save_yaml_config(config_data,the_dict['config_file_path'] / the_dict['config_file_name_yaml'])
 
 
 #get user input needed to build or edit the mumc_config.yaml file
@@ -153,7 +154,8 @@ def build_configuration_file(the_dict,orig_dict={}):
     #Building the config
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
 
-        the_dict.update(open_and_return_default_config())
+        #the_dict.update(open_and_return_default_config())
+        the_dict.update(open_and_return_file(get_default_config_path(the_dict['script_file_path'])))
         the_dict['version']=get_script_version()
 
         print('----------------------------------------------------------------------------------------')
@@ -452,7 +454,7 @@ def build_configuration_file(the_dict,orig_dict={}):
     print('----------------------------------------------------------------------------------------')
 
     #Build and save new yaml config file
-    if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
+    if (not (the_dict['advanced_settings']['UPDATE_CONFIG'])):
         yaml_configurationBuilder(the_dict)
 
         try:

@@ -20,8 +20,8 @@ def override_media_manager_enabled_states(the_dict):
         the_dict['admin_settings']['media_managers']['radarr']['enabled']=(unmonitorRadarrMovie or removeRadarrMovie)
 
     if (the_dict['admin_settings']['media_managers']['sonarr']['enabled']):
-        sonarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
-                            (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == '')))
+        sonarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['sonarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['sonarr']['url'] == '') or
+                            (the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None) or (the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == '')))
 
         unmonitorSonarrSeries=(the_dict['advanced_settings']['sonarr']['series']['unmonitor'] and sonarrURLAndAPI)
         removeSonarrSeries=(the_dict['advanced_settings']['sonarr']['series']['remove'] and sonarrURLAndAPI)
@@ -48,6 +48,8 @@ def override_media_manager_enabled_states(the_dict):
 
         #the_dict['admin_settings']['media_managers']['readarr']['enabled']=(unmonitorReadarrBook or removeReadarrBook)
 
+    return the_dict
+
 
 #print informational header to console
 def print_informational_header(the_dict):
@@ -59,7 +61,7 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Version: ' + the_dict['script_version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
-    strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + '\n'
+    strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
     strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
     if (the_dict['admin_settings']['media_managers']['radarr']['enabled']):
@@ -135,7 +137,7 @@ def cache_data_to_debug(the_dict):
     strings_list_to_print+=convert2json(the_dict['cached_data'].cached_entry_sizes) + '\n'
     strings_list_to_print+='\nAll Cached URL Data Last Accessed Times:' + '\n'
     strings_list_to_print+=convert2json(the_dict['cached_data'].cached_entry_times) + '\n'
-    strings_list_to_print+='\nAll Cached URLs And Data:' + '\n'
+    strings_list_to_print+='\nAll Cached URL And Data:' + '\n'
     strings_list_to_print+=convert2json(the_dict['cached_data'].cached_data) + '\n'
 
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
@@ -154,42 +156,42 @@ def print_footer_information(the_dict):
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
 
 
-#there are times when new config option can be gracefully removed from the config yaml
- #when this is possible, print a warning notification to the console for the user to view
-def print_config_options_removed_warning(the_dict,*yaml_sections):
-    missing_accordion=''
-    for yaml_section in yaml_sections:
-        if (missing_accordion == ''):
-            missing_accordion=yaml_section
-        else:
-            missing_accordion+=(' > ' + yaml_section)
+##there are times when new config option can be gracefully removed from the config yaml
+ ##when this is possible, print a warning notification to the console for the user to view
+#def print_config_options_removed_warning(the_dict,*yaml_sections):
+    #missing_accordion=''
+    #for yaml_section in yaml_sections:
+        #if (missing_accordion == ''):
+            #missing_accordion=yaml_section
+        #else:
+            #missing_accordion+=(' > ' + yaml_section)
 
-    strings_list_to_print=''
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='During the configuration check, the following option(s) were removed from the yaml configuration file...' + '\n'
-    strings_list_to_print+='   ' + missing_accordion + '\n'
-    strings_list_to_print+=the_dict['console_separator_'] + '\n'
+    #strings_list_to_print=''
+    #strings_list_to_print+=the_dict['console_separator'] + '\n'
+    #strings_list_to_print+='During the configuration check, the following option(s) were removed from the yaml configuration file...' + '\n'
+    #strings_list_to_print+='   ' + missing_accordion + '\n'
+    #strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
-    print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+    #print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
 
-#there are times when new config option can be gracefully added to the config yaml
- #when this is possible, print a warning notification to the console for the user to view
-def print_config_options_added_warning(the_dict,*yaml_sections):
-    missing_accordion=''
-    for yaml_section in yaml_sections:
-        if (missing_accordion == ''):
-            missing_accordion=yaml_section
-        else:
-            missing_accordion+=(' > ' + yaml_section)
+##there are times when new config option can be gracefully added to the config yaml
+ ##when this is possible, print a warning notification to the console for the user to view
+#def print_config_options_added_warning(the_dict,*yaml_sections):
+    #missing_accordion=''
+    #for yaml_section in yaml_sections:
+        #if (missing_accordion == ''):
+            #missing_accordion=yaml_section
+        #else:
+            #missing_accordion+=(' > ' + yaml_section)
 
-    strings_list_to_print=''
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='During the configuration check, the following option(s) were added to mumc_config.yaml file...' + '\n'
-    strings_list_to_print+='   ' + missing_accordion + '\n'
-    strings_list_to_print+=the_dict['console_separator_'] + '\n'
+    #strings_list_to_print=''
+    #strings_list_to_print+=the_dict['console_separator'] + '\n'
+    #strings_list_to_print+='During the configuration check, the following option(s) were added to mumc_config.yaml file...' + '\n'
+    #strings_list_to_print+='   ' + missing_accordion + '\n'
+    #strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
-    print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
+    #print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
 
 #build and then print the individual media item data
@@ -446,7 +448,7 @@ def print_all_media_disabled(the_dict):
     strings_list_to_print+="* ATTENTION!!!                                                                         *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* No media types are being monitored.                                                  *" + '\n'
-    strings_list_to_print+="* Open " + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + " in a text editor." + '\n'
+    strings_list_to_print+="* Open " + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + " in a text editor." + '\n'
     strings_list_to_print+="* Enable at least one media type's Filter Statement by setting condition_days >= 0.    *" + '\n'
     strings_list_to_print+="*                                                                                      *" + '\n'
     strings_list_to_print+="* basic_settings > filter_statements > movie > played > condition_days: -1             *" + '\n'
@@ -477,7 +479,7 @@ def print_all_media_disabled(the_dict):
 #print how to delete files info
 def remove_files_helper(strings_list_to_print,the_dict):
     strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='To delete media, open ' + str(the_dict['mumc_path'] / the_dict['config_file_name_yaml']) + ' in a text editor:' + '\n'
+    strings_list_to_print+='To delete media, open ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + ' in a text editor:' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+='* Set advanced_settings > REMOVE_FILES: true' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'

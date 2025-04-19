@@ -58,20 +58,37 @@ def getFileExtension(path_or_filename):
     else:
         return None
 
+def getFileNameNoExtension(path_or_filename):
+    if (doesFileExist(path_or_filename)):
+        return Path(path_or_filename).stem
+    else:
+        return None
 
-def get_current_directory():
-    return Path('.').parent.resolve()
+def getFileName(path_or_filename):
+    if (doesFileExist(path_or_filename)):
+        return Path(path_or_filename).name
+    else:
+        return None
 
 
-def get_default_config_path():
-    return Path(get_current_directory() / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
+#def get_default_config_path(script_file_path):
+    #return Path(script_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
+
+
+def get_default_config_path(script_file_path):
+    return Path(script_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
 
 
 # Delete existing mumc_DEBUG.log file
 def delete_debug_log(the_dict):
-    Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
-    Path(the_dict['debug_file_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
-    Path(the_dict['mumc_path_config_dir'] / the_dict['debug_file_name']).unlink(missing_ok=True)
+
+    #for the sake of Docker; do not delete the mumc_DEBUG.log file; instead clear the contents
+    if (doesFileExist(the_dict['debug_file_path'] / the_dict['debug_file_name_log'])):
+        with open(the_dict['debug_file_path'] / the_dict['debug_file_name_log'], 'w'):
+            pass
+
+    #if a mumc_DEBUG.log file exists in the old location (aka the root structure); go ahead and delete it
+    Path(the_dict['script_file_path'] / the_dict['debug_file_name_log']).unlink(missing_ok=True)
 
 
 #Remove emojis before printing to mumc_debug.log

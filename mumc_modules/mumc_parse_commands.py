@@ -3,7 +3,7 @@ import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
-from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist
+from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist,add_to_PATH
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
@@ -148,9 +148,10 @@ def findUnknownCMDRequest(argv,optionsList,the_dict):
 def findAlternateConfigCMDAndArgument(argv,optionsList,moduleExtension,the_dict,expectedCMD):
     if (cmdOption:=findCMDRequest(argv,expectedCMD)):
         if (cmdOption:=findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict)):
-            if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
-                [argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
-                return argumentPath,argumentFileNoExt,argumentFileExt
+            #if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
+                #[argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
+                #return argumentPath,argumentFileNoExt,argumentFileExt
+            return Path(argv[cmdOption])
     else:
         return cmdOption
 
@@ -167,12 +168,13 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
     the_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(the_dict)
 
-    if (cmdopt_dict['altConfigInfo'] and doesFileExist(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'])):
-        config_file_full_path=cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']
-        cfg['mumc_path']=cmdopt_dict['altConfigPath']
-        cfg['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
-    elif (doesFileExist(cfg['mumc_path'] / cfg['config_file_name_yaml'])):
-        config_file_full_path=cfg['mumc_path'] / cfg['config_file_name_yaml']
+    #if (cmdopt_dict['altConfigInfo'] and doesFileExist(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'])):
+        #config_file_full_path=cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']
+        #cfg['config_file_path']=cmdopt_dict['config_file_path']
+        #cfg['config_file_name_yaml']=cmdopt_dict['config_file_name_yaml']
+    #elif (doesFileExist(cfg['config_file_path'] / cfg['config_file_name_yaml'])):
+    if (doesFileExist(cfg['config_file_path'] / cfg['config_file_name_yaml'])):
+        config_file_full_path=cfg['config_file_path'] / cfg['config_file_name_yaml']
     else:
         print('ConfigError: Unable to find valid configuration file.')
         sys.exit(0)
@@ -660,24 +662,47 @@ def parse_command_line_options(the_dict):
                 cmdopt_dict['argv']['-config']=configStr
                 break
 
+
+    ##look for -contaier command line option and argument
+    #if ('-container' in cmdopt_dict['argv']):
+        #cmdopt_dict['debugLogPath']=the_dict['mumc_path'] / 'logs'
+        #cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
+        #cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
+    #else:
+        #cmdopt_dict['debugLogPath']=the_dict['mumc_path']
+        #cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
+        #cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
+
+    return cmdopt_dict
+
+
+def get_config_location(cmdopt_dict,the_dict):
     #look for -c or -attributesconfig command line option and argument
     if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
-        cmdopt_dict['altConfigPath']=alternatePathInfo[0]
-        cmdopt_dict['altConfigFileNoExt']=alternatePathInfo[1]
-        cmdopt_dict['altConfigFileExt']=alternatePathInfo[2]
+        cmdopt_dict['config_file_path']=alternatePathInfo.parent
+        cmdopt_dict['config_file_name_yaml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
+        #the_dict['config_file_path']=alternatePathInfo[0]
+        #the_dict['config_file_name']=alternatePathInfo[1]
+        #the_dict['config_file_name_no_ext']=alternatePathInfo[2]
     else:
-        cmdopt_dict['altConfigPath']=None
-        cmdopt_dict['altConfigFileNoExt']=None
-        cmdopt_dict['altConfigFileExt']=None
+        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
+        cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
+        cmdopt_dict['config_file_name_yml']='mumc_config.yml'
+        cmdopt_dict['config_file_name_no_ext']='mumc_config'
+        #the_dict['config_file_path']=the_dict['script_file_path'] / 'config'
+        #the_dict['config_file_name_yaml']='mumc_config.yaml'
+        #the_dict['config_file_name_yml']='mumc_config.yml'
+        #the_dict['config_file_name_no_ext']='mumc_config'
 
-    #look for -contaier command line option and argument
-    if ('-container' in cmdopt_dict['argv']):
-        cmdopt_dict['debugLogPath']=the_dict['mumc_path'] / 'logs'
-        cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
-        cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
-    else:
-        cmdopt_dict['debugLogPath']=the_dict['mumc_path']
-        cmdopt_dict['debugLogFileNoExt']='mumc_DEBUG'
-        cmdopt_dict['debugLogFileExt']=the_dict['debug_file_name']
+    add_to_PATH(cmdopt_dict['config_file_path'],2)
+
+    print('\nderivedconfigpath')
+    print(cmdopt_dict['config_file_path'])
+    print(cmdopt_dict['config_file_name_yaml'])
+    print(cmdopt_dict['config_file_name_yml'])
+    print(cmdopt_dict['config_file_name_no_ext'])
+    print(sys.path)
 
     return cmdopt_dict

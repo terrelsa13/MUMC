@@ -9,9 +9,10 @@ from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,compareSemanticVersions,get_script_version,get_min_config_version,get_max_config_version
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
+from mumc_modules.mumc_paths_files import getFileName,getFileNameNoExtension
 #from sys import exit
 
-def initialize_mumc(cwd,mumc_path):
+def initialize_mumc(cwd,script_full_path):
 
     the_cfg={}
 
@@ -31,33 +32,63 @@ def initialize_mumc(cwd,mumc_path):
     the_cfg['min_config_version']=get_min_config_version()
     the_cfg['max_config_version']=get_max_config_version()
     the_cfg['client_name']='mumc.py'
+
+    #save current working directory
+    the_cfg['cwd']=cwd
+    #update sys.path with debug path info
+    add_to_PATH(str(the_cfg['cwd']),0)
+
+    print('\ncwd')
+    print(the_cfg['cwd'])
+    print(sys.path)
+
+    #save script's (e.g. ./mumc.py) file and path info
+    the_cfg['script_file_path']=script_full_path.parent
+    the_cfg['script_file_name_py']=getFileName(script_full_path)
+    the_cfg['script_file_name_no_ext']=getFileNameNoExtension(script_full_path)
+
+    print('\nscript')
+    print(the_cfg['script_file_path'])
+    print(the_cfg['script_file_name_py'])
+    print(the_cfg['script_file_name_no_ext'])
+
+    #initialize config's (e.g. mumc_config.yaml) file and path info; we will not know it until after command line arguments are processed
     the_cfg['config_file_path']=None
-    the_cfg['config_file_name']=None
-    the_cfg['config_file_name_py']='mumc_config.py'
-    the_cfg['config_file_name_yaml']='mumc_config.yaml'
-    the_cfg['config_file_name_yml']='mumc_config.yml'
-    the_cfg['config_file_name_no_ext']='mumc_config'
-    the_cfg['debug_file_path']=None
-    the_cfg['debug_file_name']='mumc_DEBUG.log'
+    the_cfg['config_file_name_yaml']=None
+    the_cfg['config_file_name_yml']=None
+    the_cfg['config_file_name_no_ext']=None
+
+    print('\nconfig')
+    print(the_cfg['config_file_path'])
+    print(the_cfg['config_file_name_yaml'])
+    print(the_cfg['config_file_name_yml'])
+    print(the_cfg['config_file_name_no_ext'])
+
+    #save debug's (e.g. log/mumc_DEBUG.log) file and path info
+    the_cfg['debug_file_path']=the_cfg['script_file_path'] / 'logs'
+    the_cfg['debug_file_name_log']='mumc_DEBUG.log'
     the_cfg['debug_file_name_no_ext']='mumc_DEBUG'
+    #update sys.path with debug path info
+    add_to_PATH(str(the_cfg['debug_file_path']),1)
+
+    print('\ndebug')
+    print(the_cfg['debug_file_path'])
+    print(the_cfg['debug_file_name_log'])
+    print(the_cfg['debug_file_name_no_ext'])
+
     the_cfg['date_time_now']=datetime.now()
     the_cfg['date_time_now_tz_utc']=datetime.now(timezone.utc)
     the_cfg['date_time_utc_now']=the_cfg['date_time_now_tz_utc'].replace(tzinfo=None)
 
-    #save current working directory
-    the_cfg['cwd']=cwd
-    if (not(str(cwd) in sys.path)):
-        add_to_PATH(cwd,0)
+    ##save ../config/mumc_config.yaml directory
+    #the_cfg['mumc_path_config_dir']=mumc_path / 'config'
+    #if (not(str(mumc_path / 'config') in sys.path)):
+        #add_to_PATH(mumc_path / 'config',1)
 
-    #save ../config/mumc_config.yaml directory
-    the_cfg['mumc_path_config_dir']=mumc_path / 'config'
-    if (not(str(mumc_path / 'config') in sys.path)):
-        add_to_PATH(mumc_path / 'config',1)
-
-    #save ../mumc_config.yaml directory
-    the_cfg['mumc_path']=mumc_path
-    if (not(str(mumc_path) in sys.path)):
-        add_to_PATH(mumc_path,1)
+    ##save ../mumc_config.yaml directory
+    #the_cfg['mumc_mumc_pathpath']=mumc_path
+    #if (not(str(mumc_path) in sys.path)):
+        #add_to_PATH(mumc_path,1)
 
     #save command line arguments
     the_cfg['argv']=sys.argv
