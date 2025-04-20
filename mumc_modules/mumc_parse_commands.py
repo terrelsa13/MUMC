@@ -213,7 +213,6 @@ def findCMD_getArgument(argv,optionsList,expectedCMD,the_dict):
 
 def convertCMDOptionsToDict(argv,optionsList):
     cmd_dict={}
-    argv.pop(0)
     for cmd in argv:
         if ((cmd == '-a') or (cmd == '-attrs') or (cmd == '-attributes') or
             (cmd == '-u') or (cmd == '-config_updater') or
