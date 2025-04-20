@@ -1,7 +1,7 @@
 import json
 import yaml
 from pathlib import Path
-from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file,doesDirectoryExistCreateIfNot
 
 
 class NoAliasDumper(yaml.SafeDumper):
@@ -15,7 +15,11 @@ def open_and_return_file(full_file_path):
 
 
 def save_yaml_config(dataInput,filePathName):
-    #Save the config file
+    #Check if directory exists; if not create it and it's parent directory structure
+    doesDirectoryExistCreateIfNot(filePathName.parent)
+
+    #if config does NOT exist create it; then write data to it
+    #if config does exist; then write data to it
     with open(filePathName,'w') as file:
         file.write('---\n')
         yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)

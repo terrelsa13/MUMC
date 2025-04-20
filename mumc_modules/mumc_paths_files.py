@@ -31,6 +31,13 @@ def doesFileExist(filePathName):
     return fileExists
 
 
+def doesFileExistCreateIfNot(filePathName):
+    if (not (filePathName.exists())):
+        #Create empty file if it does not already exist
+        with open(filePathName,'w') as file:
+            pass
+
+
 def getFullPathName(filePathName):
     #full path preferred
     #if not full path then search cwd, mumc_dir, and $PATH dirs
@@ -50,6 +57,11 @@ def doesDirectoryExist(PathName):
     if (Path(PathName).is_dir()):
         pathExists=True
     return pathExists
+
+
+def doesDirectoryExistCreateIfNot(PathName):
+    #create directory and it's parent directory structure
+    Path(PathName).mkdir(parents=True, exist_ok=True)
 
 
 def getFileExtension(path_or_filename):
