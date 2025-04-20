@@ -1,9 +1,7 @@
 import sys
 from collections.abc import Mapping
-from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
-from mumc_modules.mumc_versions import checkYAMLVersion,get_script_version
 
 
 #Data checker class
@@ -36,8 +34,6 @@ class data_checker:
     def printError(self):
         if (self.wasError()):
             #Bring all errors found to users attention
-            #if (self.DEBUG):
-                #appendTo_DEBUG_log("\n" + self.errorString,2,self.)
             print('\n' + self.errorString)
             self.wasErrorExit()
 
@@ -95,16 +91,12 @@ class data_checker:
                 return True
         elif (isinstance(value,self.dict)):
             for vItem in value:
-                #if ((not (vItem in comparisonValues)) or
-                    #(not (value[vItem] == comparisonValues[vItem]))):
-                    #return False
                 if (not (vItem in comparisonValues)):
                     return False
             else:
                 return True
         else:
             if value in comparisonValues:
-            #if (value == cmpStr):
                 return True
             else:
                 return False
@@ -440,7 +432,6 @@ class data_checker:
                                 path_found += 1
                                 check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['path']
                                 #Check path is string; checking for backslashes does not work for windows
-                                #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
                                 if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                     error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > path: ' + str(check_item) + ' is not an expected string value\n'
 
@@ -448,7 +439,6 @@ class data_checker:
                                 network_path_found += 1
                                 check_item=check_irt[user_elements][int(check_irt[user_elements].index(libinfo))]['network_path']
                                 #Check network_path is string; checking for backslashes does not work for windows
-                                #if (not ((isinstance(check_item,str) and (check_item.find('\\') < 0)) or (check_item == '') or (check_item == None))):
                                 if (not (isinstance(check_item,str) or (check_item == '') or (check_item == None))):
                                     error_found_in_mumc_config_yaml+='ConfigError: ' + config_var_name + ' > user_id: ' + str(check_irt['user_id']) + ' > ' + user_elements + ' > library_id: ' + str(libinfo['lib_id']) + ' > network_path: ' + str(check_item) + ' is not an expected string value\n'
 

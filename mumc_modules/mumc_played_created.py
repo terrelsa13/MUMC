@@ -126,23 +126,15 @@ def getTag_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(tag_type,the_dict,
         #todo get item tags
         this_tag_dict=var_dict[tag_type + '_filter_statements'][this_tag]
         if (this_tag.startswith('played')):
-            #played_days=this_tag['media_played_days']
             this_tag_dict['media_created_days']=-1
-            #cut_off_date_played=this_tag_dict['cut_off_date_played_media']
             this_tag_dict['cut_off_date_created_media']=None
-            #played_count_comparison=this_tag_dict['media_played_count_comparison']
-            #played_count=this_tag_dict['media_played_count']
             this_tag_dict['media_created_played_count_comparison']=None
             this_tag_dict['media_created_played_count']=None
         elif (this_tag.startswith('created')):
             this_tag_dict['media_played_days']=-1
-            #created_days=this_tag_dict['media_created_days']
             this_tag_dict['cut_off_date_played_media']=None
-            #cut_off_date_created=this_tag_dict['cut_off_date_created_media']
             this_tag_dict['media_played_count_comparison']=None
             this_tag_dict['media_played_count']=None
-            #created_played_count_comparison=this_tag_dict['media_created_played_count_comparison']
-            #created_played_count=this_tag_dict['media_created_played_count']
 
         isPlayed_isUnplayed=get_isPlayed_isUnplayed_isPlayedAndUnplayed_QueryValue(the_dict,this_tag_dict)
 

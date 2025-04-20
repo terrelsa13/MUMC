@@ -1,19 +1,11 @@
 import sys
 from mumc_modules.mumc_versions import get_semantic_version_parts,checkYAMLVersion,get_script_version
-from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isJellyfinServer
-from mumc_modules.mumc_compare_items import keys_exist_return_value
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
-from mumc_modules.mumc_data_checks import data_checker
 
 
 #Check select config variables are as expected
-#def cfgCheckYAML(cfg,init_dict):
 def cfgCheckYAML(cfgChecker):
-#######################################################################################################
-
-    #cfgChecker=data_checker(cfg,init_dict)
-
 #######################################################################################################
 
     errorFlag=True
@@ -26,15 +18,6 @@ def cfgCheckYAML(cfgChecker):
                         errorFlag=False
     if (errorFlag):
         cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
-
-    '''
-    errorFlag=True
-    if (checkYAMLVersion(cfg,init_dict)):
-        errorFlag=False
-
-    if (errorFlag):
-        cfgChecker.setCustomErrorText('ConfigError: ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']))
-    '''
 
 #######################################################################################################
 
@@ -55,17 +38,14 @@ def cfgCheckYAML(cfgChecker):
                 cfgChecker.brand=brand
             else:
                 #something is not right with the admin_settings > server > brand
-                #cfgChecker.wasErrorFlag=True
                 cfgChecker.printError()
 
             if ((url:=cfgChecker.checkString('admin_settings','server','url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None):
                 #something is not right with the admin_settings > server > url
-                #cfgChecker.wasErrorFlag=True
                 cfgChecker.printError()
 
             if ((auth_key:=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
                 #something is not right with the admin_settings > server > auth_key
-                #cfgChecker.wasErrorFlag=True
                 cfgChecker.printError()
 
             admin_id=cfgChecker.checkAlphaNumeric('admin_settings','server','admin_id',value=None,instanceType=cfgChecker.alnum,minLength=1,maxLength=32,errOut=True,comparisonValues=None)
@@ -74,7 +54,6 @@ def cfgCheckYAML(cfgChecker):
 
         else:
             #something is not right with the admin_settings > server
-            #cfgChecker.wasErrorFlag=True
             cfgChecker.printError()
 
 #######################################################################################################
@@ -168,14 +147,12 @@ def cfgCheckYAML(cfgChecker):
             # after we have all admin_settings > users > # related errors display them all at once
             if (cfgChecker.wasErrorFlag):
                 #something is not right with the admin_settings > users > #
-                #cfgChecker.wasErrorFlag=True
                 cfgChecker.printError()
 
 #######################################################################################################
 
         else:
             #something is not right with the admin_settings > users
-            #cfgChecker.wasErrorFlag=True
             cfgChecker.printError()
 
 #######################################################################################################
@@ -268,7 +245,6 @@ def cfgCheckYAML(cfgChecker):
 
     else:
         #something is not right with the admin_settings
-        #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
     #do any filter_statements exist
@@ -416,7 +392,6 @@ def cfgCheckYAML(cfgChecker):
 
     else:
         #something is not right with the basic_settings
-        #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
 #######################################################################################################
@@ -1773,7 +1748,6 @@ def cfgCheckYAML(cfgChecker):
 
     else:
         #something is not right with the advanced_settings
-        #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
 #######################################################################################################
@@ -1962,7 +1936,6 @@ def cfgCheckYAML(cfgChecker):
 
     else:
         #something is not right with the basic_settings
-        #cfgChecker.wasErrorFlag=True
         cfgChecker.printError()
 
 #######################################################################################################
@@ -1983,7 +1956,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for whitetag_global in whitetags_global:
                     if (not ((whitetag_global:=cfgChecker.checkString('advanced_settings','whitetags','global',whitetags_global.index(whitetag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_global.find('\\') < 0) or (whitetag_global == None)):
                         if (whitetag_global.find('\\') < 0):
                             global_whitetag_set.add(whitetag_global)
                             if (get_isFilterStatementTag(whitetag_global)):
@@ -1997,7 +1969,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for whitetag_movie in whitetags_movie:
                     if (not ((whitetag_movie:=cfgChecker.checkString('advanced_settings','whitetags','movie',whitetags_movie.index(whitetag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_movie.find('\\') < 0) or (whitetag_movie == None)):
                         if (whitetag_movie.find('\\') < 0):
                             movie_whitetag_set.add(whitetag_movie)
                             if (get_isFilterStatementTag(whitetag_movie)):
@@ -2011,7 +1982,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for whitetag_episode in whitetags_episode:
                     if (not ((whitetag_episode:=cfgChecker.checkString('advanced_settings','whitetags','episode',whitetags_episode.index(whitetag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_episode.find('\\') < 0) or (whitetag_episode == None)):
                         if (whitetag_episode.find('\\') < 0):
                             episode_whitetag_set.add(whitetag_episode)
                             if (get_isFilterStatementTag(whitetag_episode)):
@@ -2025,7 +1995,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for whitetag_audio in whitetags_audio:
                     if (not ((whitetag_audio:=cfgChecker.checkString('advanced_settings','whitetags','audio',whitetags_audio.index(whitetag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((whitetag_audio.find('\\') < 0) or (whitetag_audio == None)):
                         if (whitetag_audio.find('\\') < 0):
                             audio_whitetag_set.add(whitetag_audio)
                             if (get_isFilterStatementTag(whitetag_audio)):
@@ -2040,7 +2009,6 @@ def cfgCheckYAML(cfgChecker):
 
                     for whitetag_audiobook in whitetags_audiobook:
                         if (not ((whitetag_audiobook:=cfgChecker.checkString('advanced_settings','whitetags','audiobook',whitetags_audiobook.index(whitetag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            #if ((whitetag_audiobook.find('\\') < 0) or (whitetag_audiobook == None)):
                             if (whitetag_audiobook.find('\\') < 0):
                                 audiobook_whitetag_set.add(whitetag_audiobook)
                                 if (get_isFilterStatementTag(whitetag_audiobook)):
@@ -2058,7 +2026,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for blacktag_global in blacktags_global:
                     if (not ((blacktag_global:=cfgChecker.checkString('advanced_settings','blacktags','global',blacktags_global.index(blacktag_global),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_global.find('\\') < 0) or (blacktag_global == None)):
                         if (blacktag_global.find('\\') < 0):
                             global_blacktag_set.add(blacktag_global)
                             if (get_isFilterStatementTag(blacktag_global)):
@@ -2072,7 +2039,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for blacktag_movie in blacktags_movie:
                     if (not ((blacktag_movie:=cfgChecker.checkString('advanced_settings','blacktags','movie',blacktags_movie.index(blacktag_movie),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_movie.find('\\') < 0) or (blacktag_movie == None)):
                         if (blacktag_movie.find('\\') < 0):
                             movie_blacktag_set.add(blacktag_movie)
                             if (get_isFilterStatementTag(blacktag_movie)):
@@ -2086,7 +2052,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for blacktag_episode in blacktags_episode:
                     if (not ((blacktag_episode:=cfgChecker.checkString('advanced_settings','blacktags','episode',blacktags_episode.index(blacktag_episode),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_episode.find('\\') < 0) or (blacktag_episode == None)):
                         if (blacktag_episode.find('\\') < 0):
                             episode_blacktag_set.add(blacktag_episode)
                             if (get_isFilterStatementTag(blacktag_episode)):
@@ -2100,7 +2065,6 @@ def cfgCheckYAML(cfgChecker):
 
                 for blacktag_audio in blacktags_audio:
                     if (not ((blacktag_audio:=cfgChecker.checkString('advanced_settings','blacktags','audio',blacktags_audio.index(blacktag_audio),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                        #if ((blacktag_audio.find('\\') < 0) or (blacktag_audio == None)):
                         if (blacktag_audio.find('\\') < 0):
                             audio_blacktag_set.add(blacktag_audio)
                             if (get_isFilterStatementTag(blacktag_audio)):
@@ -2115,7 +2079,6 @@ def cfgCheckYAML(cfgChecker):
 
                     for blacktag_audiobook in blacktags_audiobook:
                         if (not ((blacktag_audiobook:=cfgChecker.checkString('advanced_settings','blacktags','audiobook',blacktags_audiobook.index(blacktag_audiobook),value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
-                            #if ((blacktag_audiobook.find('\\') < 0) or (blacktag_audiobook == None)):
                             if (blacktag_audiobook.find('\\') < 0):
                                 audiobook_blacktag_set.add(blacktag_audiobook)
                                 if (get_isFilterStatementTag(blacktag_audiobook)):
@@ -2273,50 +2236,10 @@ def cfgCheckYAML(cfgChecker):
     return cfgChecker.cfg
 
 
-'''
-#admin_settings and server have to be checked early
-def pre_cfgCheckYAML(cfg):
-    error_found_in_mumc_config_yaml=''
-    try:
-        cfg['admin_settings']=cfg['admin_settings']
-        try:
-            cfg['admin_settings']['server']=cfg['admin_settings']['server']
-            try:
-                cfg['admin_settings']['server']['brand']=cfg['admin_settings']['server']['brand']
-            except:
-                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > brand is missing from the configuration file\n'
-            try:
-                cfg['admin_settings']['server']['url']=cfg['admin_settings']['server']['url']
-            except:
-                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > url is missing from the configuration file\n'
-            try:
-                cfg['admin_settings']['server']['auth_key']=cfg['admin_settings']['server']['auth_key']
-            except:
-                error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > auth_key is missing from the configuration file\n'
-            try:
-                cfg['admin_settings']['server']['admin_id']=cfg['admin_settings']['server']['admin_id']
-            except:
-                pass
-                #error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server > admin_id is missing from the configuration file\n'
-        except:
-            error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > server is missing from the configuration file\n'
-        try:
-            cfg['admin_settings']['users']=cfg['admin_settings']['users']
-        except:
-            error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings > users is missing from the configuration file\n'
-    except:
-        error_found_in_mumc_config_yaml+='ConfigVariableError: admin_settings is missing from the configuration file\n'
-
-    #Bring all errors found to users attention
-    if (not (error_found_in_mumc_config_yaml == '')):
-        print('\n' + error_found_in_mumc_config_yaml)
-        sys.exit(0)
-'''
-
-
 def pre_cfgCheckYAML(cfg,init_dict):
     errorFlag=False
 
+    #trying assigning version
     try:
         cfg['version']=cfg['version']
     except:
@@ -2327,6 +2250,7 @@ def pre_cfgCheckYAML(cfg,init_dict):
         print('\nConfigError: version does not exist\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
         sys.exit(0)
 
+    #try checking if version is a string
     try:
         if (not (isinstance(cfg['version'],str))):
             errorFlag=True
@@ -2338,6 +2262,7 @@ def pre_cfgCheckYAML(cfg,init_dict):
         print('\nConfigError: version must be a(n) string\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
         sys.exit(0)
 
+    #try checking the version is formatted and valued as expected
     try:
         if (not (checkYAMLVersion(cfg,init_dict))):
             errorFlag=True

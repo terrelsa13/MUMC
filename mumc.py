@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-import copy
 import sys
+import copy
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
-from mumc_modules.mumc_parse_commands import parse_command_line_options
+from mumc_modules.mumc_parse_commands import parse_command_line_options,get_config_location
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
 from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml,override_media_manager_enabled_states
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
-from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
-from mumc_modules.mumc_output import open_and_return_default_config
-#from mumc_modules.mumc_yaml_check import cfgCheckYAML
+from mumc_modules.mumc_paths_files import delete_debug_log,get_default_config_path
+from mumc_modules.mumc_output import open_and_return_file
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
-#from mumc_modules.mumc_config_merge import create_default_config,merge_configurations
 from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
@@ -26,17 +24,24 @@ from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 
 #@profile
 def MUMC():
-    #inital dictionary setup
-    init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
+
+    #inital dictionary setup; get cwd; get mumc.py full path and filename if changed
+    init_dict=initialize_mumc(Path('.').parent.resolve(),Path(__file__))
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
+
+    #check for alternate -config command; or use default config
+    cmdopt_dict=get_config_location(cmdopt_dict,init_dict)
+
+    #remove old DEBUG if it exists
+    delete_debug_log(init_dict)
 
     #fully check argv commandline options (and environmental variables) are what we expect them to be
     argvCfgChecker=data_checker(cmdopt_dict['argv'])
     cmdopt_dict['argv']=cfgCheckARGENV(argvCfgChecker)
 
-    #update theh argv created during initialization
+    #update the argv created during initialization
     init_dict['argv']=cmdopt_dict['argv']
 
     #import config file
@@ -49,9 +54,6 @@ def MUMC():
     userCfgChecker=data_checker(cfg)
     cfg=cfgCheckYAML(userCfgChecker)
 
-    #after importing the config; remove old DEBUG if it exists
-    delete_debug_log(init_dict)
-
     #look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
 
@@ -59,11 +61,11 @@ def MUMC():
     cfg_orig=copy.deepcopy(cfg)
 
     #create default config file
-    default_config=open_and_return_default_config()
+    default_config=open_and_return_file(get_default_config_path(init_dict['script_file_path']))
 
     #copy over path info for use later
-    default_config['mumc_path']=init_dict['mumc_path']
-    default_config['debug_file_name']=init_dict['debug_file_name']
+    default_config['debug_file_path']=init_dict['debug_file_path']
+    default_config['debug_file_name_log']=init_dict['debug_file_name_log']
 
     #merge user config into default config
     cfg=merge_configurations(default_config,cfg)
@@ -84,7 +86,6 @@ def MUMC():
     cfg['cached_data'].updateCacheVariables(cfg)
 
     #check if user wants to update the existing config file
-    #if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
     if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (('-config_updater' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-config_updater']))):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg,cfg_orig)
@@ -103,7 +104,7 @@ def MUMC():
         return
 
     #check for media_manager info; override if None or ''
-    override_media_manager_enabled_states(cfg)
+    cfg=override_media_manager_enabled_states(cfg)
 
     #output details about script, Emby/Jellyfin, and server
     print_informational_header(cfg)
@@ -161,7 +162,21 @@ def MUMC():
 
 if (__name__ == "__main__"):
 
+    # ::::     :::: :::    ::: ::::    :::::  ::::::::
+    # +:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:
+    # +:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       
+    # +#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       
+    # +#+       +#+ +#+    +#+ +#+       +#+ +#+       
+    # #+#       #+# #+#    #+# #+#       #+# #+#    #+#
+    # ###       ###  ########  ###       ###  ########
     MUMC()
+    # ####     #### ###    ### ####    #####  ########
+    # #+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#
+    # +#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       
+    # +#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       
+    # +:+       +:+ +:+    +:+ +:+       +:+ +:+       
+    # :+:       :+: :+:    :+: :+:       :+: :+:    :+:
+    # :::       :::  ::::::::  :::       :::  ::::::::
 
 #Exit Gracefully
 sys.exit(0)

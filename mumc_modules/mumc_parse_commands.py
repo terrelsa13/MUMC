@@ -2,29 +2,14 @@ import os
 import sys
 import copy
 from pathlib import Path
-from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_helper,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
-from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist
+from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
+from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist,add_to_PATH
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
-
-
-#define custom exception
-class UnknownCMDOptionError(Exception):
-    pass
-
-
-#define custom exception
-class CMDOptionIndexError(Exception):
-    pass
-
-
-#define custom exception
-class CMDOptionMissingIndexError(Exception):
-    pass
 
 
 #define custom exception
@@ -148,9 +133,10 @@ def findUnknownCMDRequest(argv,optionsList,the_dict):
 def findAlternateConfigCMDAndArgument(argv,optionsList,moduleExtension,the_dict,expectedCMD):
     if (cmdOption:=findCMDRequest(argv,expectedCMD)):
         if (cmdOption:=findNoCMDAfterCMD(cmdOption,argv,optionsList,the_dict)):
-            if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
-                [argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
-                return argumentPath,argumentFileNoExt,argumentFileExt
+            #if(verifyPathFileExist(argv[cmdOption],argv,the_dict)):
+                #[argumentPath,argumentFileNoExt,argumentFileExt]=parsePathFileSyntax(argv,argv[cmdOption],cmdOption,moduleExtension,the_dict)
+                #return argumentPath,argumentFileNoExt,argumentFileExt
+            return Path(argv[cmdOption])
     else:
         return cmdOption
 
@@ -167,12 +153,8 @@ def findRemakeAuthKeyRequest(cmdopt_dict,the_dict):
     the_dict.update(copy.deepcopy(cfg))
     cfg=copy.deepcopy(the_dict)
 
-    if (cmdopt_dict['altConfigInfo'] and doesFileExist(cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt'])):
-        config_file_full_path=cmdopt_dict['altConfigPath'] / cmdopt_dict['altConfigFileExt']
-        cfg['mumc_path']=cmdopt_dict['altConfigPath']
-        cfg['config_file_name_yaml']=cmdopt_dict['altConfigFileExt']
-    elif (doesFileExist(cfg['mumc_path'] / cfg['config_file_name_yaml'])):
-        config_file_full_path=cfg['mumc_path'] / cfg['config_file_name_yaml']
+    if (doesFileExist(cfg['config_file_path'] / cfg['config_file_name_yaml'])):
+        config_file_full_path=cfg['config_file_path'] / cfg['config_file_name_yaml']
     else:
         print('ConfigError: Unable to find valid configuration file.')
         sys.exit(0)
@@ -231,13 +213,10 @@ def findCMD_getArgument(argv,optionsList,expectedCMD,the_dict):
 
 def convertCMDOptionsToDict(argv,optionsList):
     cmd_dict={}
-    argv.pop(0)
     for cmd in argv:
         if ((cmd == '-a') or (cmd == '-attrs') or (cmd == '-attributes') or
-            (cmd == '-d') or (cmd == '-container') or
             (cmd == '-u') or (cmd == '-config_updater') or
-            (cmd == '-h') or (cmd == '-help') or (cmd == '-?') or
-            (cmd == '--h') or (cmd == '--help') or (cmd == '--?')):
+            (cmd == '-h') or (cmd == '-help') or (cmd == '-?')):
 
             if (((argv.index(cmd) + 1) < len(argv)) and
                (argv[argv.index(cmd) + 1].strip().casefold() == 'false')):
@@ -259,10 +238,6 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
         return '-server_brand'
     elif (cmd.casefold() == '-url'):
         return '-server_url'
-    elif (cmd.casefold() == '-port'):
-        return '-server_port'
-    elif (cmd.casefold() == '-base'):
-        return '-server_base_url'
     elif (cmd.casefold() == '-username'):
         return '-admin_username'
     elif (cmd.casefold() == '-password'):
@@ -285,27 +260,17 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
         return '-user_library_selection'
     elif (cmd.casefold() == '-rdurl'):
         return '-radarr_url'
-    elif (cmd.casefold() == '-rdprt'):
-        return '-radarr_port'
-    elif (cmd.casefold() == '-rdburl'):
-        return '-radarr_base_url'
     elif (cmd.casefold() == '-rdapi'):
         return '-radarr_api_key'
     elif (cmd.casefold() == '-snurl'):
         return '-sonarr_url'
-    elif (cmd.casefold() == '-snprt'):
-        return '-sonarr_port'
-    elif (cmd.casefold() == '-snburl'):
-        return '-sonarr_base_url'
     elif (cmd.casefold() == '-snapi'):
         return '-sonarr_api_key'
     elif ((cmd.casefold() == '-a') or (cmd.casefold() == '-attrs')):
         return '-attributes'
-    elif (cmd.casefold() == '-d'):
-        return '-container'
     elif (cmd.casefold() == '-u'):
         return '-config_updater'
-    elif ((cmd.casefold() == '-h') or (cmd.casefold() == '-?') or (cmd.casefold() == '--h') or (cmd.casefold() == '--help') or (cmd.casefold() == '--?')):
+    elif ((cmd.casefold() == '-h') or (cmd.casefold() == '-?')):
         return '-help'
     else:
         return cmd.casefold()
@@ -331,18 +296,6 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
         argv['-server_url']=envar.get('URL')
     if (envar.get('SERVER_URL')):
         argv['-server_url']=envar.get('SERVER_URL')
-
-    #save environmental variable - PORT,SERVER_PORT
-    if (envar.get('PORT')):
-        argv['-server_port']=envar.get('PORT')
-    if (envar.get('SERVER_PORT')):
-        argv['-server_port']=envar.get('SERVER_PORT')
-
-    #save environmental variable - BASE,SERVER_BASE_URL
-    if (envar.get('BASE')):
-        argv['-server_base_url']=envar.ge('BASE')
-    if (envar.get('SERVER_BASE_URL')):
-        argv['-server_base_url']=envar.get('SERVER_BASE_URL')
 
     #save environmental variable - USERNAME,ADMIN_USERNAME
     if (envar.get('USERNAME')):
@@ -410,41 +363,17 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if ('RADARR_URL' in envar):
         argv['-radarr_url']=envar['RADARR_URL']
 
-    #save environmental variable - RDPRT,RADARR_PORT
-    if ('RDPRT' in envar):
-        argv['-radarr_port']=envar['RDPRT']
-    if ('RADARR_PORT' in envar):
-        argv['-radarr_port']=envar['RADARR_PORT']
-
-    #save environmental variable - RDBURL,RADARR_BASE_URL
-    if ('RDBURL' in envar):
-        argv['-radarr_base_url']=envar['RDBURL']
-    if ('RADARR_BASE_URL' in envar):
-        argv['-radarr_base_url']=envar['RADARR_BASE_URL']
-
     #save environmental variable - RDAPI,radarr_api_key
     if ('RDAPI' in envar):
         argv['-radarr_api_key']=envar['RDAPI']
     if ('radarr_api_key' in envar):
         argv['-radarr_api_key']=envar['RADARR_API_KEY']
 
-    #save environmental variable - SNURL,SONARR_URL
+    #save environmental variable - RDURL,SONARR_URL
     if ('SNURL' in envar):
         argv['-sonarr_url']=envar['SNURL']
     if ('SONARR_URL' in envar):
         argv['-sonarr_url']=envar['SONARR_URL']
-
-    #save environmental variable - SNPRT,SONARR_PORT
-    if ('SNPRT' in envar):
-        argv['-sonarr_port']=envar['SNPRT']
-    if ('SONARR_PORT' in envar):
-        argv['-sonarr_port']=envar['SONARR_PORT']
-
-    #save environmental variable - SNBURL,SONARR_BASE_URL
-    if ('SNBURL' in envar):
-        argv['-sonarr_base_url']=envar['SNBURL']
-    if ('SONARR_BASE_URL' in envar):
-        argv['-sonarr_base_url']=envar['SONARR_BASE_URL']
 
     #save environmental variable - SNAPI,sonarr_api_key
     if ('SNAPI' in envar):
@@ -453,13 +382,9 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
         argv['-sonarr_api_key']=envar['SONARR_API_KEY']
 
     #save environmental variable - LDURL,LIDARR_URL
-    #save environmental variable - LDPRT,LIDARR_PORT
-    #save environmental variable - LDBURL,LIDARR_BASE_URL
     #save environmental variable - LDAPI,LIDARR_API
 
     #save environmental variable - REURL,READARR_URL
-    #save environmental variable - REPRT,READARR_PORT
-    #save environmental variable - REBURL,READARR_BASE_URL
     #save environmental variable - REAPI,READARR_API
 
     #save environmental variable - A,ATTRS,ATTRIBUTES
@@ -469,12 +394,6 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
         argv['-attributes']=envar.get('ATTRS')
     if (envar.get('ATTRIBUTES')):
         argv['-attributes']=envar.get('ATTRIBUTES')
-
-    #save environmental variable - D,CONTAINER
-    if (envar.get('D')):
-        argv['-container']=envar.get('D')
-    if (envar.get('CONTAINER')):
-        argv['-container']=envar.get('CONTAINER')
 
     #save environmental variable - U,CONFIG_UPDATER
     if (envar.get('U')):
@@ -499,22 +418,68 @@ def normalizeCommandLineOptions(argvs,options_list):
     return argvs
 
 
+def findAbnormalCommandLineOptions(argvs,options_list):
+    #loop thru all arguments
+    for argv in reversed(argvs):
+        #strip leading/trailer whitespaces and split at '='
+        argvEq=argv.strip().split('=',1)
+        #strip leading/trailer whitespaces and split at first ' ' (space)
+        argvSp=argv.strip().split(' ',1)
+        #check if lenght of split list is == 2
+        if (len(argvEq) == 2):
+            #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
+            if ('-' + str(argvEq[0].casefold().strip()) in options_list):
+                #get the index
+                argvEqIndex=argvs.index(argv)
+                #remove the orginal
+                argvs.pop(argvEqIndex)
+                #insert argument at position of original
+                argvs.insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
+                #insert value at position of original + 1
+                argvs.insert(argvEqIndex + 1,argvEq[1])
+        #check if lenght of split list is == 2
+        if (len(argvSp) == 2):
+            #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
+            if ('-' + str(argvSp[0].casefold().strip()) in options_list):
+                #get the index
+                argvSpIndex=argvs.index(argv)
+                #remove the orginal
+                argvs.pop(argvSpIndex)
+                #insert argument at position of original
+                argvs.insert(argvSpIndex,'-' + str(argvSp[0].casefold()))
+                #insert value at position of original + 1
+                argvs.insert(argvSpIndex + 1,argvSp[1])
+        #check it argv is docker's -e
+        if (argv == '-e'):
+            #get the index
+            argv_EIndex=argvs.index(argv)
+            #remove -e from dictionary
+            argvs.pop(argv_EIndex)
+
+    #loop thru all arguments; intent is to find arguements formatted like this (arg value) instead of like this (arg=value)
+    for argv in argvs:
+        #check if this argument is recognized after removing leading and trailing whitespace and appending '-' to the beginning
+        if ('-' + str(argv.casefold().strip()) in options_list):
+            #get the index
+            argvIndex=argvs.index(argv)
+            #append '-' to the beginning of the original arguement and save
+            argvs[argvIndex]='-' + str(argv.casefold().strip())
+
+    return argvs
+
 #parse the command line options
 def parse_command_line_options(the_dict):
 
     cmdopt_dict={}
     cmdopt_dict['argv']={}
     cmdopt_dict['envar']=the_dict['envar']
-    #cmdopt_dict['containerized']=False
     cmdopt_dict['moduleExtension']=['.yaml','.yml','.py']
 
     cmdopt_dict['optionsList']=['-c','-config',
                                 '-brand','-server_brand',
                                 '-url','-server_url',
-                                '-port','-server_port',
-                                '-base','-server_base_url',
-                                '-username','-admin_username',
-                                '-password','-admin_password',
+                                '-admin_username', #do not use '-username' as this could be a common username
+                                '-admin_password', #do not use '-password' as this could be a common password
                                 '-authkey','-server_auth_key',
                                 '-adminid','-server_admin_id',
                                 '-lstbeh','-list_behavior',
@@ -524,27 +489,20 @@ def parse_command_line_options(the_dict):
                                 '-disusrs','-monitor_disabled_users',
                                 '-libsel','-user_library_selection',
                                 '-rdurl','-radarr_url',
-                                '-rdprt','-radarr_port',
-                                '-rdburl','-radarr_base_url',
                                 '-rdapi','-radarr_api_key',
                                 '-snurl','-sonarr_url',
-                                '-snprt','-sonarr_port',
-                                '-snburl','-sonarr_base_url',
                                 '-snapi','-sonarr_api_key',
                                 #'-ldurl','-lidarr_url',
-                                #'-ldprt','-lidarr_port',
-                                #'-ldburl','-lidarr_base_url',
                                 #'-ldapi','-lidarr_api',
                                 #'-reurl','-readarr_url',
-                                #'-reprt','-readarr_port',
-                                #'-reburl','-readarr_base_url',
                                 #'-reapi','-readarr_api',
                                 '-a','-attrs','-attributes',
-                                '-d','-container',
                                 '-u','-config_updater',
                                 #'-rak','-remake-api-key',
                                 '-h','-help','-?'
                                 ]
+
+    the_dict['argv']=findAbnormalCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
@@ -560,28 +518,39 @@ def parse_command_line_options(the_dict):
     #normalize all '#' as intergers
     #normalize blacktag/whitetag blank string '' to empty list []; remove leading/trailing spaces
     for cmd in cmdopt_dict['argv']:
+        #if string version of True; convert to boolean
         if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
             cmdopt_dict['argv'][cmd]=True
+        #if string version of False; convert to boolean
         elif (cmdopt_dict['argv'][cmd].casefold() == 'false'):
             cmdopt_dict['argv'][cmd]=False
-        elif (((cmd == '-global_blacktags') or (cmd == '-global_whitetags')) and (cmdopt_dict['argv'][cmd].strip() == '')):
-            cmdopt_dict['argv'][cmd]=[]
-
+        #if -global_blacktags or -global_whitetags
         elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags')):
+            #check if ''
             if (cmdopt_dict['argv'][cmd].strip() == ''):
-                  cmdopt_dict['argv'][cmd]=[]
+                #save as empty list
+                cmdopt_dict['argv'][cmd]=[]
+            #check if after removing leading and trailing whitespaces if equal to ''
+            elif (cmdopt_dict['argv'][cmd].strip() == ''):
+                #save as empty list
+                cmdopt_dict['argv'][cmd]=[]
+            #check if an empty list with leading, trailing, and/or middle whitespaces
             elif ((cmdopt_dict['argv'][cmd].count(' ') + cmdopt_dict['argv'][cmd].count('[') + cmdopt_dict['argv'][cmd].count(']')) == len(cmdopt_dict['argv'][cmd])):
+                #save as empty list
                 cmdopt_dict['argv'][cmd]=[]
             else:
+                #split into list at the commas
                 cmdopt_dict['argv'][cmd]=cmdopt_dict['argv'][cmd].split(',')
+                #loop thru list
                 for item in cmdopt_dict['argv'][cmd]:
+                    #strip leading and trailing whitespaces
                     cmdopt_dict['argv'][cmd][cmdopt_dict['argv'][cmd].index(item)]=item.strip()
                 for item in cmdopt_dict['argv'][cmd][:]:
                     if (not(item.strip())):
                         cmdopt_dict['argv'][cmd].remove(item)
-
         else:
             try:
+                #try converting to integer
                 cmdopt_dict['argv'][cmd]=int(cmdopt_dict['argv'][cmd])
             except:
                 pass
@@ -601,26 +570,22 @@ def parse_command_line_options(the_dict):
             console_text_attributes().console_attribute_test()
             sys.exit(0)
 
-    #if -config not input as a command line option or environmental variable
-    #and we are running as a docker container
-    #then set the default config location: '/usr/src/app/config/mumc_config.yaml or .yml or .py'
-    if ((not ('-config' in cmdopt_dict['argv'])) and
-    ('-container' in cmdopt_dict['argv']) and
-    (cmdopt_dict['argv']['-container'])):
-        for ext in cmdopt_dict['moduleExtension']:
-            configStr='/usr/src/app/config/mumc_config' + ext
-            if(getFullPathName(configStr)):
-                cmdopt_dict['argv']['-config']=configStr
-                break
+    return cmdopt_dict
 
+
+def get_config_location(cmdopt_dict,the_dict):
     #look for -c or -attributesconfig command line option and argument
     if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
-        cmdopt_dict['altConfigPath']=alternatePathInfo[0]
-        cmdopt_dict['altConfigFileNoExt']=alternatePathInfo[1]
-        cmdopt_dict['altConfigFileExt']=alternatePathInfo[2]
+        cmdopt_dict['config_file_path']=alternatePathInfo.parent
+        cmdopt_dict['config_file_name_yaml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
     else:
-        cmdopt_dict['altConfigPath']=None
-        cmdopt_dict['altConfigFileNoExt']=None
-        cmdopt_dict['altConfigFileExt']=None
+        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
+        cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
+        cmdopt_dict['config_file_name_yml']='mumc_config.yml'
+        cmdopt_dict['config_file_name_no_ext']='mumc_config'
+
+    add_to_PATH(cmdopt_dict['config_file_path'],2)
 
     return cmdopt_dict

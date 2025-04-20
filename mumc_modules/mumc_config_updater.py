@@ -156,9 +156,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
                     config_data['admin_settings']['media_managers']['radarr']={}
                 config_data['admin_settings']['media_managers']['radarr']['url']=the_dict['admin_settings']['media_managers']['radarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['url'] == None):
-                #pass
         except:
             pass
         try:
@@ -169,9 +166,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
                     config_data['admin_settings']['media_managers']['radarr']={}
                 config_data['admin_settings']['media_managers']['radarr']['api_key']=the_dict['admin_settings']['media_managers']['radarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None):
-                #pass
         except:
             pass
 
@@ -193,9 +187,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
                     config_data['admin_settings']['media_managers']['sonarr']={}
                 config_data['admin_settings']['media_managers']['sonarr']['url']=the_dict['admin_settings']['media_managers']['sonarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['url'] == None):
-                #pass
         except:
             pass
         try:
@@ -206,9 +197,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
                     config_data['admin_settings']['media_managers']['sonarr']={}
                 config_data['admin_settings']['media_managers']['sonarr']['api_key']=the_dict['admin_settings']['media_managers']['sonarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None):
-                #pass
         except:
             pass
 
@@ -230,9 +218,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
                     config_data['admin_settings']['media_managers']['lidarr']={}
                 config_data['admin_settings']['media_managers']['lidarr']['url']=the_dict['admin_settings']['media_managers']['lidarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['url'] == None):
-                #pass
         except:
             pass
         try:
@@ -243,9 +228,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
                     config_data['admin_settings']['media_managers']['lidarr']={}
                 config_data['admin_settings']['media_managers']['lidarr']['api_key']=the_dict['admin_settings']['media_managers']['lidarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None):
-                #pass
         except:
             pass
 
@@ -267,9 +249,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
                     config_data['admin_settings']['media_managers']['readarr']={}
                 config_data['admin_settings']['media_managers']['readarr']['url']=the_dict['admin_settings']['media_managers']['readarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['readarr']['url'] == None):
-                #pass
         except:
             pass
         try:
@@ -280,9 +259,6 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
                 if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
                     config_data['admin_settings']['media_managers']['readarr']={}
                 config_data['admin_settings']['media_managers']['readarr']['api_key']=the_dict['admin_settings']['media_managers']['readarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None):
-                #pass
         except:
             pass
 
@@ -300,4 +276,4 @@ def yaml_configurationUpdater(the_dict,orig_dict={}):
             config_data['DEBUG']=0
 
     #save yaml config file
-    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+    save_yaml_config(config_data,the_dict['config_file_path'] / the_dict['config_file_name_yaml'])

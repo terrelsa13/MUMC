@@ -21,7 +21,7 @@ def get_brand():
 
 
 #ip address, hostname, or FQDN?
-def get_url(defaulturl='http://localhost'):
+def get_server_url(defaulturl='http://localhost'):
     #defaulturl='http://localhost'
     url=input('Enter server ip, hostname, or FQDN (default ' + defaulturl + '): ')
     if (url == ''):
@@ -50,7 +50,7 @@ def proceed_arr_setup(arr):
 #ip address, hostname, or FQDN for *arr?
 def get_arr_url(arr):
     print('\nFor ' + arr + '...')
-    return get_url()
+    return get_server_url()
 
 
 #api key for *arr?
@@ -67,75 +67,6 @@ def get_arr_api(arr):
         else:
             print('\nInvalid API Key. Try again.\n')
     return api_key
-
-
-#http or https port?
-def get_port(defaultport='8096'):
-    #defaultport='8096'
-    valid_port=False
-    while (valid_port == False):
-        print('If you have not explicity changed this option, press enter for default.')
-        print('Space for no port.')
-        port=input('Enter port (default ' + defaultport + '): ')
-        if (port == ''):
-            valid_port=True
-            return(defaultport)
-        elif (port == ' '):
-            valid_port=True
-            return('')
-        else:
-            try:
-                port_float=float(port)
-                if ((port_float % 1) == 0):
-                    port_int=int(port_float)
-                    if ((int(port_int) >= 1) and (int(port_int) <= 65535)):
-                        valid_port=True
-                        return(str(port_int))
-                    else:
-                        print('\nInvalid port. Try again.\n')
-                else:
-                    print('\nInvalid port. Try again.\n')
-            except:
-                print('\nInvalid port. Try again.\n')
-
-
-#arr http or https port?
-def get_arr_port(arr,port):
-    print('\nFor ' + arr + '...')
-    return get_port(port)
-
-
-#base url?
-def get_arr_base_url(arr):
-    print('If you have not explicity changed this option in ' + arr + ', press enter for default.')
-    print('For example: http://example.com/<baseurl>')
-    base=input('Enter base url (default n/a): ')
-    if (base == ''):
-        return(base)
-    else:
-        if (base.find('/',0,1) == 0):
-            return(base[1:len(base)])
-        else:
-            return(base)
-
-
-#base url?
-def get_base(brand):
-    defaultbase='emby'
-    if (brand == defaultbase):
-        print('Using "/' + defaultbase + '" as base url')
-        return(defaultbase)
-    else:
-        print('If you have not explicity changed this option in jellyfin, press enter for default.')
-        print('For example: http://example.com/<baseurl>')
-        base=input('Enter base url (default n/a): ')
-        if (base == ''):
-            return(base)
-        else:
-            if (base.find('/',0,1) == 0):
-                return(base[1:len(base)])
-            else:
-                return(base)
 
 
 #admin username?

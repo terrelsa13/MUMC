@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 #Get the current script version
 def get_script_version():
-    return '5.11.1-beta'
+    return '5.11.2-beta'
 
 
 #Get the min config version
@@ -216,17 +216,10 @@ def checkYAMLVersion(cfg,init_dict):
 
     if (cfg['version'] == ''):
         return False
-        #return 'ConfigVersionError: Config version is blank: \'\''\
-                #'\n Please use a config with a version greater than or equal to: '\
-                #+ init_dict['min_config_version'] + ' or create a new config \n'
     else:
         config_version_ok=compareSemanticVersions(cfg['version'],init_dict['min_config_version'],init_dict['max_config_version'])
 
     if (not (config_version_ok)):
         return False
-        #return 'ConfigVersionError: Config version: ' + cfg['version'] + ' is not supported by script version: '\
-                #+ init_dict['script_version'] + '\n Please use a config with a version greater than or equal to: '\
-                #+ init_dict['min_config_version'] + ' or create a new config \n'
     else:
         return True
-        #return ''

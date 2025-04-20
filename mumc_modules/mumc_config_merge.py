@@ -1,26 +1,5 @@
 import sys
-import yaml
-from pathlib import Path
 from mumc_modules.mumc_output import appendTo_DEBUG_log
-from mumc_modules.mumc_config_skeleton import setYAMLConfigSkeleton
-#from mumc_modules.mumc_config_defaults import yaml_configurationLayout
-#from mumc_modules.mumc_output import open_and_return_default_config
-
-
-'''
-def create_default_config(server_brand='emby'):
-
-    #default_config={}
-    #default_config['server_brand']=server_brand
-    #create empty config yaml
-    #default_config=setYAMLConfigSkeleton(default_config)
-    #default_config['admin_settings']['server']['brand']='emby'
-    #populate empty config yaml with default values
-    #default_config=yaml_configurationLayout(default_config,default_config['server_brand'])
-    default_config=open_and_return_default_config()
-
-    return default_config
-'''
 
 
 #merge user config into default config; then move forward with the default config
@@ -32,23 +11,20 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['version']=cfg_user['version']
     except:
         pass
-        #error_found_in_mumc_config_yaml+='ConfigError: version is missing from the MUMC config file\n'
 
     try:
         cfg_user['advanced_settings']=cfg_user['advanced_settings']
     except:
         pass
-        #error_found_in_mumc_config_yaml+='ConfigError: advanced_settings is missing from the MUMC config file\n'
+
     try:
         cfg_default['DEBUG']=cfg_user['DEBUG']
     except:
-        #cfg_default['DEBUG']=0
         pass
 
     try:
         server_brand=cfg_user['admin_settings']['server']['brand']
     except:
-        #server_brand='emby'
         pass
 
     try:
@@ -1574,117 +1550,6 @@ def merge_configurations(cfg_default,cfg_user):
     except:
         pass
 
-    '''
-    try:
-        #cfg_default['admin_settings']['users']=cfg_user['admin_settings']['users']
-        cfg_user['admin_settings']['users']=cfg_user['admin_settings']['users']
-        if (len(cfg_user['admin_settings']['users']) >= 1):
-            #cfg_default['admin_settings']['users'].append({})
-            for userInfo in cfg_user['admin_settings']['users']:
-                cfg_default['admin_settings']['users'].append({})
-                try:
-                    userInfo['user_id']=userInfo['user_id']
-                    cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['user_id']=userInfo['user_id']
-                except:
-                    error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > user_id is missing from the MUMC config file\n'
-                try:
-                    userInfo['user_name']=userInfo['user_name']
-                    cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['user_name']=userInfo['user_name']
-                except:
-                    error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > user_name is missing from the MUMC config file\n'
-                try:
-                    userInfo['whitelist']=userInfo['whitelist']
-                    if (len(userInfo['whitelist']) >= 1):
-                        cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist']=[]
-                        #cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'].append({})
-                        for whitelistInfo in userInfo['whitelist']:
-                            cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'].append({})
-                            try:
-                                whitelistInfo['lib_id']=whitelistInfo['lib_id']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['lib_id']=whitelistInfo['lib_id']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > lib_id is missing from the MUMC config file\n'
-                            try:
-                                whitelistInfo['collection_type']=whitelistInfo['collection_type']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['collection_type']=whitelistInfo['collection_type']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > collection_type is missing from the MUMC config file\n'
-                            try:
-                                whitelistInfo['path']=whitelistInfo['path']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['path']=whitelistInfo['path']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > whitelist > ' + userInfo['whitelist'].index(whitelistInfo) + ' > path is missing from the MUMC config file\n'
-                            try:
-                                whitelistInfo['network_path']=whitelistInfo['network_path']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['network_path']=whitelistInfo['network_path']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['network_path']=cfg_default['admin_settings']['users'][0]['whitelist'][0]['network_path']
-                            try:
-                                whitelistInfo['subfolder_id']=whitelistInfo['subfolder_id']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['subfolder_id']=whitelistInfo['subfolder_id']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['subfolder_id']=cfg_default['admin_settings']['users'][0]['whitelist'][0]['subfolder_id']
-                            try:
-                                whitelistInfo['lib_enabled']=whitelistInfo['lib_enabled']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['lib_enabled']=whitelistInfo['lib_enabled']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['whitelist'][userInfo['whitelist'].index(whitelistInfo)]['lib_enabled']=cfg_default['admin_settings']['users'][0]['whitelist'][0]['lib_enabled']
-                    else:
-                        pass
-                except:
-                    #cfg_default['admin_settings']['users'][1]['whitelist']=cfg_default['admin_settings']['users'][0]['whitelist']
-                    pass
-                try:
-                    userInfo['blacklist']=userInfo['blacklist']
-                    if (len(userInfo['blacklist']) >= 1):
-                        cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist']=[]
-                        #cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'].append({})
-                        for blacklistInfo in userInfo['blacklist']:
-                            cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'].append({})
-                            try:
-                                blacklistInfo['lib_id']=blacklistInfo['lib_id']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['lib_id']=blacklistInfo['lib_id']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > lib_id is missing from the MUMC config file\n'
-                            try:
-                                blacklistInfo['collection_type']=blacklistInfo['collection_type']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['collection_type']=blacklistInfo['collection_type']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > collection_type is missing from the MUMC config file\n'
-                            try:
-                                blacklistInfo['path']=blacklistInfo['path']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['path']=blacklistInfo['path']
-                            except:
-                                error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users > ' + str(cfg_user['admin_settings']['users'].index(userInfo)) + ' > blacklist > ' + userInfo['blacklist'].index(blacklistInfo) + ' > path is missing from the MUMC config file\n'
-                            try:
-                                blacklistInfo['network_path']=blacklistInfo['network_path']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['network_path']=blacklistInfo['network_path']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['network_path']=cfg_default['admin_settings']['users'][0]['blacklist'][0]['network_path']
-                            try:
-                                blacklistInfo['subfolder_id']=blacklistInfo['subfolder_id']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['subfolder_id']=blacklistInfo['subfolder_id']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['subfolder_id']=cfg_default['admin_settings']['users'][0]['blacklist'][0]['subfolder_id']
-                            try:
-                                blacklistInfo['lib_enabled']=blacklistInfo['lib_enabled']
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['lib_enabled']=blacklistInfo['lib_enabled']
-                            except:
-                                cfg_default['admin_settings']['users'][cfg_user['admin_settings']['users'].index(userInfo) + 1]['blacklist'][userInfo['blacklist'].index(blacklistInfo)]['lib_enabled']=cfg_default['admin_settings']['users'][0]['blacklist'][0]['lib_enabled']
-                    else:
-                        pass
-                except:
-                    #cfg_default['admin_settings']['users'][1]['blacklist']=cfg_default['admin_settings']['users'][0]['blacklist']
-                    pass
-        else:
-            pass
-            #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users list is empty\n'
-    except:
-        pass
-        #error_found_in_mumc_config_yaml+='ConfigError: admin_settings > users is missing from the MUMC config file\n'
-
-    cfg_default['admin_settings']['users'].pop(0)
-    '''
 
     try:
         cfg_default['admin_settings']['media_managers']['radarr']['enabled']=cfg_user['admin_settings']['media_managers']['radarr']['enabled']
