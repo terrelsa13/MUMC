@@ -586,6 +586,6 @@ def get_config_location(cmdopt_dict,the_dict):
         cmdopt_dict['config_file_name_yml']='mumc_config.yml'
         cmdopt_dict['config_file_name_no_ext']='mumc_config'
 
-    add_to_PATH(cmdopt_dict['config_file_path'],2)
+    add_to_PATH(str(cmdopt_dict['config_file_path']),2)
 
     return cmdopt_dict
