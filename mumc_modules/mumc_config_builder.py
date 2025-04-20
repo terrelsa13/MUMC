@@ -23,7 +23,6 @@ def yaml_configurationBuilder(the_dict):
 
     config_data['basic_settings']['filter_statements'].pop('audio')
 
-    #if (the_dict['admin_settings']['server']['brand'] == 'emby'):
     config_data['basic_settings']['filter_statements'].pop('audiobook')
 
     config_data['basic_settings'].pop('filter_tags')

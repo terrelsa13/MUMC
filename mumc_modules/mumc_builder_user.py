@@ -308,16 +308,6 @@ def are_valid_inputs_selected(selection_list,selection_limit):
     #loop thru all selections
     for thisSelection in selection_list:
         try:
-            ##check if selection converts to a complex number
-            #if (isinstance(thisSelection,complex)):
-                ##selection is NOT valid
-                #valid_selection=False
-                #break
-            ##check if selection converts to a float
-            #elif (isinstance(thisSelection,float)):
-                ##selection is NOT valid
-                #valid_selection=False
-                #break
             #check if selection converts to an integer
             if (isinstance(int(thisSelection),int)):
                 #check if integer is less than zero; check if integer is greater than limit; check if string is '-0'

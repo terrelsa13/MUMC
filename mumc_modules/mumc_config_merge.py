@@ -11,23 +11,20 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['version']=cfg_user['version']
     except:
         pass
-        #error_found_in_mumc_config_yaml+='ConfigError: version is missing from the MUMC config file\n'
 
     try:
         cfg_user['advanced_settings']=cfg_user['advanced_settings']
     except:
         pass
-        #error_found_in_mumc_config_yaml+='ConfigError: advanced_settings is missing from the MUMC config file\n'
+
     try:
         cfg_default['DEBUG']=cfg_user['DEBUG']
     except:
-        #cfg_default['DEBUG']=0
         pass
 
     try:
         server_brand=cfg_user['admin_settings']['server']['brand']
     except:
-        #server_brand='emby'
         pass
 
     try:

@@ -207,7 +207,6 @@ def get_multiple_library_selection(preferred_listing_type,libraries_to_show,user
                 print()
         #check if single library was selected; verify selection is valid
         elif (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
-        #if (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
             #at least one library selected; ok to exit selection loop
             loop_active=False
         else:

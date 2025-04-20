@@ -13,4 +13,4 @@ COPY mumc_modules/mumc_defaults/*.yaml mumc_modules/mumc_defaults/
 COPY mumc_modules/*.py mumc_modules/
 COPY mumc.py .
 
-ENTRYPOINT ["python", "./mumc.py", "-d"]
+ENTRYPOINT ["python", "./mumc.py"]

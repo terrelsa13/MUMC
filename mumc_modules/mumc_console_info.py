@@ -9,6 +9,29 @@ from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_cr
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 
 
+def get_MUMC_ASCII_art(start=True):
+    mumc_ascii_art=''
+
+    if (start):
+        mumc_ascii_art+='::::     :::: :::    ::: ::::    :::::  :::::::: \n'
+        mumc_ascii_art+='+:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:\n'
+        mumc_ascii_art+='+:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       \n'
+        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
+        mumc_ascii_art+='+#+       +#+ +#+    +#+ +#+       +#+ +#+       \n'
+        mumc_ascii_art+='#+#       #+# #+#    #+# #+#       #+# #+#    #+#\n'
+        mumc_ascii_art+='###       ###  ########  ###       ###  ######## \n'
+    else:
+        mumc_ascii_art+='####     #### ###    ### ####    #####  ######## \n'
+        mumc_ascii_art+='#+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#\n'
+        mumc_ascii_art+='+#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       \n'
+        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
+        mumc_ascii_art+='+:+       +:+ +:+    +:+ +:+       +:+ +:+       \n'
+        mumc_ascii_art+=':+:       :+: :+:    :+: :+:       :+: :+:    :+:\n'
+        mumc_ascii_art+=':::       :::  ::::::::  :::       :::  :::::::: \n'
+
+    return mumc_ascii_art
+
+
 def override_media_manager_enabled_states(the_dict):
     if (the_dict['admin_settings']['media_managers']['radarr']['enabled']):
         radarrURLAndAPI=(not ((the_dict['admin_settings']['media_managers']['radarr']['url'] == None) or (the_dict['admin_settings']['media_managers']['radarr']['url'] == '') or
@@ -49,30 +72,6 @@ def override_media_manager_enabled_states(the_dict):
         #the_dict['admin_settings']['media_managers']['readarr']['enabled']=(unmonitorReadarrBook or removeReadarrBook)
 
     return the_dict
-
-
-def get_MUMC_ASCII_art(start=True):
-    mumc_ascii_art=''
-
-    if (start):
-        mumc_ascii_art+='::::     :::: :::    ::: ::::    :::::  :::::::: \n'
-        mumc_ascii_art+='+:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:\n'
-        mumc_ascii_art+='+:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       \n'
-        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
-        mumc_ascii_art+='+#+       +#+ +#+    +#+ +#+       +#+ +#+       \n'
-        mumc_ascii_art+='#+#       #+# #+#    #+# #+#       #+# #+#    #+#\n'
-        mumc_ascii_art+='###       ###  ########  ###       ###  ######## \n'
-    else:
-        mumc_ascii_art+='####     #### ###    ### ####    #####  ######## \n'
-        mumc_ascii_art+='#+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#\n'
-        mumc_ascii_art+='+#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       \n'
-        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
-        mumc_ascii_art+='+:+       +:+ +:+    +:+ +:+       +:+ +:+       \n'
-        mumc_ascii_art+=':+:       :+: :+:    :+: :+:       :+: :+:    :+:\n'
-        mumc_ascii_art+=':::       :::  ::::::::  :::       :::  :::::::: \n'
-
-    return mumc_ascii_art
-
 
 
 #print informational header to console

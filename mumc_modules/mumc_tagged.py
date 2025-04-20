@@ -42,14 +42,12 @@ def get_isItemTagged(usertags,matched_tags,item,the_dict):
         else:
             for tagpos in range(len(item[tagData])):
                 tag_list.append(item[tagData][tagpos])
-        #Check if any of the media items tags match the tags in the config file
 
         #Check if any of the media items tags match the tags in the config file
         itemIsTagged=get_isItemMatching(usertags,tag_list,the_dict)
 
         #Save media item's tags state
         if (itemIsTagged['any_match']):
-            #matched_tags.append(item['Id'])
             matched_tags.extend(match for match in itemIsTagged['match_value'] if (not (match == None)))
             matched_tags=list(set(matched_tags))
 
@@ -99,9 +97,6 @@ def addTags_To_mediaItem(matched_tags,child_item,the_dict):
     else:
         for thisTag in matched_tags:
             child_item[tagData].append(thisTag)
-
-    #child_item[tagData]+=parent_item[tagData]
-    #child_item[tagData].extend(parent_item[tagData])
 
     return child_item
 
