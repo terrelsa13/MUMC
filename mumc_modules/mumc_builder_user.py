@@ -399,6 +399,8 @@ def get_single_user_selection(all_users):
             show_users(all_users)
             print()
 
+    print('\n----------------------------------------------------------------------------------------')
+
     return selected_user_list
 
 
@@ -441,6 +443,8 @@ def get_multiple_user_selection(all_users):
             #print user info to console
             show_users(all_users)
             print()
+
+    print('\n----------------------------------------------------------------------------------------')
 
     return selected_user_list
 

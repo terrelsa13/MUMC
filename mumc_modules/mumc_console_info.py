@@ -51,10 +51,37 @@ def override_media_manager_enabled_states(the_dict):
     return the_dict
 
 
+def get_MUMC_ASCII_art(start=True):
+    mumc_ascii_art=''
+
+    if (start):
+        mumc_ascii_art+='::::     :::: :::    ::: ::::    :::::  :::::::: \n'
+        mumc_ascii_art+='+:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:\n'
+        mumc_ascii_art+='+:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       \n'
+        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
+        mumc_ascii_art+='+#+       +#+ +#+    +#+ +#+       +#+ +#+       \n'
+        mumc_ascii_art+='#+#       #+# #+#    #+# #+#       #+# #+#    #+#\n'
+        mumc_ascii_art+='###       ###  ########  ###       ###  ######## \n'
+    else:
+        mumc_ascii_art+='####     #### ###    ### ####    #####  ######## \n'
+        mumc_ascii_art+='#+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#\n'
+        mumc_ascii_art+='+#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       \n'
+        mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
+        mumc_ascii_art+='+:+       +:+ +:+    +:+ +:+       +:+ +:+       \n'
+        mumc_ascii_art+=':+:       :+: :+:    :+: :+:       :+: :+:    :+:\n'
+        mumc_ascii_art+=':::       :::  ::::::::  :::       :::  :::::::: \n'
+
+    return mumc_ascii_art
+
+
+
 #print informational header to console
 def print_informational_header(the_dict):
     strings_list_to_print=''
-    strings_list_to_print+=the_dict['_console_separator'] + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
+    strings_list_to_print+=the_dict['console_separator_'] + '\n'
+    strings_list_to_print+=get_MUMC_ASCII_art() + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+='Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S') + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
@@ -152,46 +179,11 @@ def print_footer_information(the_dict):
     strings_list_to_print+='Time Stamp End: ' + datetime.now().strftime('%Y%m%d%H%M%S') + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
+    strings_list_to_print+=get_MUMC_ASCII_art(False) + '\n'
+    strings_list_to_print+=the_dict['console_separator'] + '\n'
+    strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
     print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['footers']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['footers']['script']['formatting'])
-
-
-##there are times when new config option can be gracefully removed from the config yaml
- ##when this is possible, print a warning notification to the console for the user to view
-#def print_config_options_removed_warning(the_dict,*yaml_sections):
-    #missing_accordion=''
-    #for yaml_section in yaml_sections:
-        #if (missing_accordion == ''):
-            #missing_accordion=yaml_section
-        #else:
-            #missing_accordion+=(' > ' + yaml_section)
-
-    #strings_list_to_print=''
-    #strings_list_to_print+=the_dict['console_separator'] + '\n'
-    #strings_list_to_print+='During the configuration check, the following option(s) were removed from the yaml configuration file...' + '\n'
-    #strings_list_to_print+='   ' + missing_accordion + '\n'
-    #strings_list_to_print+=the_dict['console_separator_'] + '\n'
-
-    #print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
-
-
-##there are times when new config option can be gracefully added to the config yaml
- ##when this is possible, print a warning notification to the console for the user to view
-#def print_config_options_added_warning(the_dict,*yaml_sections):
-    #missing_accordion=''
-    #for yaml_section in yaml_sections:
-        #if (missing_accordion == ''):
-            #missing_accordion=yaml_section
-        #else:
-            #missing_accordion+=(' > ' + yaml_section)
-
-    #strings_list_to_print=''
-    #strings_list_to_print+=the_dict['console_separator'] + '\n'
-    #strings_list_to_print+='During the configuration check, the following option(s) were added to mumc_config.yaml file...' + '\n'
-    #strings_list_to_print+='   ' + missing_accordion + '\n'
-    #strings_list_to_print+=the_dict['console_separator_'] + '\n'
-
-    #print_byType(strings_list_to_print,the_dict['advanced_settings']['console_controls']['warnings']['script']['show'],the_dict,the_dict['advanced_settings']['console_controls']['warnings']['script']['formatting'])
 
 
 #build and then print the individual media item data
@@ -274,8 +266,6 @@ def print_full_help_menu(the_dict):
     strings_list_to_print+='-c [path], -config [path]           Specify alternate *.py configuration file\n'
     strings_list_to_print+='-brand, -server_brand                  tbd\n'
     strings_list_to_print+='-url, -server_url                    tbd\n'
-    strings_list_to_print+='-port, -server_port                   tbd\n'
-    strings_list_to_print+='-base, -server_base_url                    tbd\n'
     strings_list_to_print+='-username, -admin_username                Admin username\n'
     strings_list_to_print+='-password, -admin_password                Admin password\n'
     strings_list_to_print+='-authkey, -server_auth_key              tbd\n'
@@ -287,27 +277,18 @@ def print_full_help_menu(the_dict):
     strings_list_to_print+='-disusrs, -monitor_disabled_users       tbd\n'
     strings_list_to_print+='-libsel, -user_library_selection       tbd\n'
     strings_list_to_print+='-rdurl, -radarr_url                    tbd\n'
-    strings_list_to_print+='-rdprt, -radarr_port                    tbd\n'
-    strings_list_to_print+='-rdburl, -radarr_base_url                    tbd\n'
     strings_list_to_print+='-rdapi, -radarr_api_key                    tbd\n'
     strings_list_to_print+='-snurl, -sonarr_url                    tbd\n'
-    strings_list_to_print+='-snprt, -sonarr_port                    tbd\n'
-    strings_list_to_print+='-snburl, -sonarr_base_url                    tbd\n'
     strings_list_to_print+='-snapi, -sonarr_api_key                    tbd\n'
     #strings_list_to_print+='-ldurl, -lidarr_url                    tbd\n'
-    #strings_list_to_print+='-ldprt, -lidarr_port                    tbd\n'
-    #strings_list_to_print+='-ldburl, -lidarr_base_url                    tbd\n'
     #strings_list_to_print+='-ldapi, -lidarr_api                    tbd\n'
     #strings_list_to_print+='-reurl, -readarr_url                   tbd\n'
-    #strings_list_to_print+='-reprt, -readarr_port                   tbd\n'
-    #strings_list_to_print+='-reburl, -readarr_base_url                   tbd\n'
     #strings_list_to_print+='-reapi, -readarr_api                   tbd\n'
     strings_list_to_print+='-a, -attrs, -attributes             Show console attribute test output; will override all other options\n'
-    strings_list_to_print+='-d, -container                      Script is running in a docker container\n'
     strings_list_to_print+='-u, -config_updater                 Modify configuration by adding users to the mumc_config.yaml\n'
     #strings_list_to_print+='-rak, -remake-api-key               Delete the existing MUMC API key and make a new one.\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='-h, -help                           tbd\n'
+    strings_list_to_print+='-h, -help, -?                       tbd\n'
     strings_list_to_print+='\n'
     strings_list_to_print+='Latest Release:\n'
     strings_list_to_print+='https://github.com/terrelsa13/MUMC/releases\n'
@@ -413,18 +394,6 @@ def alt_config_syntax_helper(argv,cmdOption,the_dict):
     strings_list_to_print+='\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
-
-
-#print unable to sucessfully load the Configuration file
-#def print_failed_to_load_config(the_dict):
-    #strings_list_to_print=''
-    #strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    #strings_list_to_print+='Config file missing or cannot find alternate Config file.' + '\n'
-    #strings_list_to_print+='Or Config file missing \'DEBUG\' and/or \'version\' variables.' + '\n'
-    #strings_list_to_print+='Either point to the correct alternate Config file, add missing Config variables, or rebuild the Config by running: /path/to/python /path/to/mumc.py' + '\n'
-    #strings_list_to_print+=the_dict['console_separator'] + '\n'
-
-    #print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
 
 
 #print unable to sucessfully load the Configuration file
@@ -555,7 +524,8 @@ def print_post_processing_completed(the_dict,postproc_dict):
 
     print_byType(strings_list_to_print,postproc_dict['print_media_post_processing'],the_dict,postproc_dict['media_post_processing_format'])
     
-    
+
+#print dictionary/list config structure to config yaml file
 def print_configuration_yaml(the_dict,init_dict):
     cfg_out={}
     cfg_out['version']=the_dict['version']

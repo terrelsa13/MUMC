@@ -217,6 +217,8 @@ def get_multiple_library_selection(preferred_listing_type,libraries_to_show,user
             show_libraries(libraries_to_show)
             print()
 
+    print('\n----------------------------------------------------------------------------------------')
+
     return selected_library_list
 
 

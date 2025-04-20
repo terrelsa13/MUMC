@@ -2,7 +2,6 @@ import json
 import yaml
 from pathlib import Path
 from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
-import time
 
 
 class NoAliasDumper(yaml.SafeDumper):
@@ -15,23 +14,7 @@ def open_and_return_file(full_file_path):
         return yaml.safe_load(opened_file)
 
 
-#def open_and_return_default_config():
-    #return open_and_return_file(get_default_config_path())
-
-
 def save_yaml_config(dataInput,filePathName):
-
-    print('\npeepthepath')
-    print(filePathName)
-    print('peepthepath\n')
-
-    print('\npeepthedata')
-    print(dataInput)
-    print('peepthedata\n')
-
-    #while (True):
-        #time.sleep(60)
-
     #Save the config file
     with open(filePathName,'w') as file:
         file.write('---\n')
@@ -77,7 +60,6 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
                 str_to_print_list.append(str_to_print)
 
             #string_to_print=''.join(string_to_print_list)
-            #print(string_to_print,end="",flush=True)
             print(''.join(str_to_print_list),end="",flush=True)
     else:
         print(the_dict['text_attrs'].build_ansi_escaped_string(string_to_print,

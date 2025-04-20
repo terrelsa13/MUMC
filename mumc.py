@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import copy
 import sys
+import copy
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
 from mumc_modules.mumc_parse_commands import parse_command_line_options,get_config_location
@@ -12,9 +12,7 @@ from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
 from mumc_modules.mumc_paths_files import delete_debug_log,get_default_config_path
 from mumc_modules.mumc_output import open_and_return_file
-#from mumc_modules.mumc_yaml_check import cfgCheckYAML
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
-#from mumc_modules.mumc_config_merge import create_default_config,merge_configurations
 from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
@@ -24,39 +22,11 @@ from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 #from memory_profiler import profile
 
 
-#default paths
-#/script/dir/mumc.py
-#/script/dir/config/mumc_config.yaml
-#/script/dir/logs/mumc_DEBUG.log
-
-#user defined paths
-#-config /path/to/mumc_config.yaml
-
-#if -config option exists and is not blank
-    #use custom config path
-#else -config option does not exist or is blank
-    #use default config path
-
-#if config exists
-    #if config has "version" and "debug"
-        #use the config
-    #else it does not have "version" and "debug"
-        #create a new config
-#else config does not exits
-    #create a new config
-
-
 #@profile
 def MUMC():
 
     #inital dictionary setup; get cwd; get mumc.py full path and filename if changed
     init_dict=initialize_mumc(Path('.').parent.resolve(),Path(__file__))
-
-    print('\npostinit\n')
-    print(init_dict['argv'])
-    print('\npostinit\n')
-    print(init_dict['envar'])
-    print('\npostinit\n')
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
@@ -67,29 +37,15 @@ def MUMC():
     #remove old DEBUG if it exists
     delete_debug_log(init_dict)
 
-    print('\nprecheck\n')
-    print(cmdopt_dict['argv'])
-    print('\nprecheck\n')
-
     #fully check argv commandline options (and environmental variables) are what we expect them to be
     argvCfgChecker=data_checker(cmdopt_dict['argv'])
     cmdopt_dict['argv']=cfgCheckARGENV(argvCfgChecker)
-
-    print('\npostcheck\n')
-    print(cmdopt_dict['argv'])
-    print('\npostcheck\n')
 
     #update the argv created during initialization
     init_dict['argv']=cmdopt_dict['argv']
 
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
-
-    print('\n*************************************************************************************************************\n')
-    print(cfg)
-    print('\n*************************************************************************************************************\n')
-    print(init_dict)
-    print('\n*************************************************************************************************************\n')
 
     #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
@@ -98,9 +54,6 @@ def MUMC():
     userCfgChecker=data_checker(cfg)
     cfg=cfgCheckYAML(userCfgChecker)
 
-    #after importing the config; remove old DEBUG if it exists
-    #delete_debug_log(init_dict)
-
     #look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
 
@@ -108,7 +61,6 @@ def MUMC():
     cfg_orig=copy.deepcopy(cfg)
 
     #create default config file
-    #default_config=open_and_return_default_config()
     default_config=open_and_return_file(get_default_config_path(init_dict['script_file_path']))
 
     #copy over path info for use later
@@ -134,7 +86,6 @@ def MUMC():
     cfg['cached_data'].updateCacheVariables(cfg)
 
     #check if user wants to update the existing config file
-    #if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
     if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (('-config_updater' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-config_updater']))):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg,cfg_orig)

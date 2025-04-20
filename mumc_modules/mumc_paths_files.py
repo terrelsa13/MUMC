@@ -71,10 +71,7 @@ def getFileName(path_or_filename):
         return None
 
 
-#def get_default_config_path(script_file_path):
-    #return Path(script_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
-
-
+#return the default config path
 def get_default_config_path(script_file_path):
     return Path(script_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
 
