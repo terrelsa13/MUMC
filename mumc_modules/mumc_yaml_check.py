@@ -14,7 +14,7 @@ def cfgCheckYAML(cfgChecker):
         if (not (cfgChecker.checkInteger(*(),value=version_parts['major'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
             if (not (cfgChecker.checkInteger(*(),value=version_parts['minor'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
                 if (not (cfgChecker.checkInteger(*(),value=version_parts['patch'],instanceType=cfgChecker.int,minValue=0,maxValue=None,errOut=False,comparisonValues=None) == None)):
-                    if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=5,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
+                    if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=0,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
                         errorFlag=False
     if (errorFlag):
         cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
