@@ -13,6 +13,7 @@ def get_MUMC_ASCII_art(start=True):
     mumc_ascii_art=''
 
     if (start):
+        #original
         mumc_ascii_art+='::::     :::: :::    ::: ::::    :::::  :::::::: \n'
         mumc_ascii_art+='+:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:\n'
         mumc_ascii_art+='+:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       \n'
@@ -21,6 +22,7 @@ def get_MUMC_ASCII_art(start=True):
         mumc_ascii_art+='#+#       #+# #+#    #+# #+#       #+# #+#    #+#\n'
         mumc_ascii_art+='###       ###  ########  ###       ###  ######## \n'
     else:
+        #swapped dark and light
         mumc_ascii_art+='####     #### ###    ### ####    #####  ######## \n'
         mumc_ascii_art+='#+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#\n'
         mumc_ascii_art+='+#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       \n'
@@ -28,6 +30,15 @@ def get_MUMC_ASCII_art(start=True):
         mumc_ascii_art+='+:+       +:+ +:+    +:+ +:+       +:+ +:+       \n'
         mumc_ascii_art+=':+:       :+: :+:    :+: :+:       :+: :+:    :+:\n'
         mumc_ascii_art+=':::       :::  ::::::::  :::       :::  :::::::: \n'
+
+        #vertical mirror
+        #mumc_ascii_art+='###       ###  ########  ###       ###  ######## \n'
+        #mumc_ascii_art+='#+#       #+# #+#    #+# #+#       #+# #+#    #+#\n'
+        #mumc_ascii_art+='+#+       +#+ +#+    +#+ +#+       +#+ +#+       \n'
+        #mumc_ascii_art+='+#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       \n'
+        #mumc_ascii_art+='+:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       \n'
+        #mumc_ascii_art+='+:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:\n'
+        #mumc_ascii_art+='::::     :::: :::    ::: ::::    :::::  :::::::: \n'
 
     return mumc_ascii_art
 
