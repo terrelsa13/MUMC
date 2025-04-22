@@ -11,7 +11,6 @@ RUN mkdir logs
 
 COPY mumc_modules/mumc_defaults/*.yaml mumc_modules/mumc_defaults/
 COPY mumc_modules/*.py mumc_modules/
-COPY mumc_modules/mumc_defaults/*.yaml mumc_modules/mumc_defaults/
 COPY mumc.py .
 
 ENTRYPOINT ["python", "./mumc.py"]
