@@ -98,6 +98,9 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
         except:
             character_limit=128
 
+        #create ../logs/ path if it does not exists
+        doesDirectoryExistCreateIfNot(the_dict['debug_file_path'])
+
         #if debug file does not exist; create blank file
         if (not(doesFileExist(Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log']))):
             with open(Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log'],'a') as file:
