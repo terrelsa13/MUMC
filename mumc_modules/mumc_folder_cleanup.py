@@ -1,4 +1,4 @@
-from mumc_modules.mumc_user_queries import get_all_users_from_media_server
+from mumc_modules.mumc_user_queries import get_all_users_from_media_server,get_single_user
 from mumc_modules.mumc_delete import print_and_delete_items
 from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_query
 
@@ -6,8 +6,9 @@ from mumc_modules.mumc_get_folders import init_empty_folder_query,empty_folder_q
 def get_admin_user_id(the_dict):
     user_info={}
 
-    #check if admin_id exists
-    if (the_dict['admin_settings']['server']['admin_id'] == None):
+    #check if admin_id exists or not
+    if ((the_dict['admin_settings']['server']['admin_id'] == None) or
+        (the_dict['admin_settings']['server']['admin_id'] == '')):
         #get all user data
         data_all_users=get_all_users_from_media_server(the_dict)
         #loop thru all users
@@ -22,6 +23,10 @@ def get_admin_user_id(the_dict):
         else:
             print(f'\nAdminError: At least one user must be allowed to manage the server; folder cleanup is not possible.\n')
             user_info=None
+    else:
+        #admin_id exists; get info for this user
+        user_info=get_single_user(the_dict['admin_settings']['server']['admin_id'],the_dict)
+        user_info['user_id']=user_info['Id']
 
     return user_info
 
@@ -46,8 +51,8 @@ def get_empty_folders(folder_type,the_dict):
 
     user_info=get_admin_user_id(the_dict)
 
-    #when user_info == None folder cleanup cannot happen; skip it
-    if (not (user_info == None)):
+    #when user_info == None or user_info == {} folder cleanup cannot happen; skip it
+    if (not (user_info == None) or (user_info == {})):
 
         var_dict=init_empty_folder_query(var_dict)
 
