@@ -16,6 +16,7 @@ from mumc_modules.mumc_get_whitetagged import init_blacklist_whitetagged_query,i
 from mumc_modules.mumc_get_favorited import init_blacklist_favorited_query,init_whitelist_favorited_query,blacklist_favorited_query,whitelist_favorited_query
 from mumc_modules.mumc_user_queries import get_single_user
 from mumc_modules.mumc_config_builder import filterYAMLConfigKeys_ToKeep
+from mumc_modules.mumc_string_case import all_uppercase_lowercase_permutations
 #from memory_profiler import profile
 
 
@@ -688,13 +689,21 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                         UnplayedItemCount=int(series_info['UserData']['UnplayedItemCount'])
                                         PlayedEpisodeCount=RecursiveItemCount - UnplayedItemCount
                                         SeriesName=item['SeriesName']
-                                        imdbId=series_info['ProviderIds']['Imdb']
-                                        tvdbId=series_info['ProviderIds']['Tvdb']
+                                        #Imdb not consistent from Emby/Jellyfin with uppercase and lowercase
+                                        for imdbStr in all_uppercase_lowercase_permutations('imdb'):
+                                            if (imdbStr in series_info['ProviderIds']):
+                                                if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                                    var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=series_info['ProviderIds'][imdbStr]
+
+                                        #Tvdb not consistent from Emby/Jellyfin with uppercase and lowercase
+                                        for tvdbStr in all_uppercase_lowercase_permutations('tvdb'):
+                                            if (tvdbStr in series_info['ProviderIds']):
+                                                if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                                    var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=series_info['ProviderIds'][tvdbStr]
 
                                     if (not ('SeriesName' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['SeriesName']=SeriesName
-                                    if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
-                                        var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=imdbId
+
                                     if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=tvdbId
                                     if (not ('TotalEpisodeCount' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):

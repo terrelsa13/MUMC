@@ -1,6 +1,7 @@
 from collections import defaultdict
 from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,get_SERIES_itemInfo,lookup_SERIES_sonarrInfo_IMdbId,get_SERIES_sonarrInfo_TVdbId
+from mumc_modules.mumc_string_case import all_uppercase_lowercase_permutations
 
 
 #Minimum episodes and minimum played episodes control
@@ -575,11 +576,18 @@ class minEpisodesToKeep_data_handler:
         for episodeId in self.episodesToKeep_bySeriesIMdBId:
             seriesIMdBId=self.episodesToKeep_bySeriesIMdBId[episodeId]
             lookupseriesInfo = lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,the_dict)
-            seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo['tvdbid'],self.postproc_dict,the_dict)
-            #check the "status" value and "ended" value
-            if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
-                while (episodeId in self.episodesToKeepIds):
-                    self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
+
+            #tvdbid not consistent from Emby/Jellyfin with uppercase and lowercase; need to search every case permutatoin before using it
+            for tvdbIdStr in all_uppercase_lowercase_permutations('tvdbid'):
+                if (tvdbIdStr in lookupseriesInfo[0]):
+                    seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo[0][tvdbIdStr],self.postproc_dict,the_dict)
+                    #make sure an empty list was not returned (i.e. the series still exists on Sonarr)
+                    if (not (seriesInfo == [])):
+                        #check the "status" value and "ended" value
+                        if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
+                            while (episodeId in self.episodesToKeepIds):
+                                self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
+                    break
 
 
     def remove_episodesToKeep_fromDeleteList(self,postproc_dict):
