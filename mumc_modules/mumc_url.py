@@ -235,6 +235,8 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                         data = json.loads(source)
                         if ((url.method == 'GET')):
                             the_dict['cached_data'].addEntryToCache(url.full_url,data)
+                        elif (url.method == 'DELETE'):
+                            data = response.getcode()
                         getdata = False
                         if (debugState):
                             appendTo_DEBUG_log("\nResponse Code: " + str(response.getcode()) + " From The " + str(requestDebugMessage) + " Request:\n",2,the_dict)
@@ -315,11 +317,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     data = source
                     if (url.method == 'GET'):
                         the_dict['cached_data'].addEntryToCache(url.full_url,data)
+                    elif (url.method == 'DELETE'):
+                        data = response.getcode()
                     getdata = False
                     if (debugState):
                         appendTo_DEBUG_log("\nOptional for server to return data for the " + str(requestDebugMessage) + " request:",2,the_dict)
                         if (data):
-                            appendTo_DEBUG_log("\n" + data,4,the_dict)
+                            appendTo_DEBUG_log("\n" + str(data),4,the_dict)
                         else:
                             appendTo_DEBUG_log("\nNo data returned",4,the_dict)
                 else:
