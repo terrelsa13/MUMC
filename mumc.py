@@ -3,7 +3,7 @@ import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
-from mumc_modules.mumc_parse_commands import parse_command_line_options,get_config_location
+from mumc_modules.mumc_parse_commands import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
@@ -32,7 +32,7 @@ def MUMC():
     cmdopt_dict=parse_command_line_options(init_dict)
 
     #check for alternate -config command; or use default config
-    cmdopt_dict=get_config_location(cmdopt_dict,init_dict)
+    #cmdopt_dict=get_custom_config_location(cmdopt_dict,init_dict)
 
     #remove old DEBUG if it exists
     delete_debug_log(init_dict)

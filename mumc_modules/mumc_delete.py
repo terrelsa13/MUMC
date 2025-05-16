@@ -16,17 +16,18 @@ def delete_media_item(itemID,the_dict):
 #########################################################################################################
     #Option #1
     #build API delete request for specified media item (only single itemIds)
-    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID) #DELETE
+    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID) #DELETE emby and jellyfin
     req=build_emby_jellyfin_request_message(url,the_dict,method='DELETE')
 #########################################################################################################
     #Option #2
     #build API delete request for specified media item (multiple comma separated itemIds)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items?Ids=' + str(itemID) #DELETE
+    #url=the_dict['admin_settings']['server']['url'] + '/Items?Id=' + str(itemID) #DELETE emby
+    #url=the_dict['admin_settings']['server']['url'] + '/Items?itemId=' + str(itemID) #DELETE jellyfin
     #req=build_emby_jellyfin_request_message(url,the_dict,method='DELETE')
 #########################################################################################################
     #Option #3
     #build API delete request for specified media item (multiple comma separated itemIds)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID) #POST
+    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID) #POST emby only
     #req=build_emby_jellyfin_request_message(url,the_dict,method='POST')
 #########################################################################################################
 

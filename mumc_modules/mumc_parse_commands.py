@@ -3,12 +3,12 @@ import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
-from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist,add_to_PATH
+from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
-from mumc_modules.mumc_config_import import importConfig
+#from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
 
 
@@ -569,23 +569,5 @@ def parse_command_line_options(the_dict):
         if (cmdopt_dict['argv'][cmdOption]):
             console_text_attributes().console_attribute_test()
             sys.exit(0)
-
-    return cmdopt_dict
-
-
-def get_config_location(cmdopt_dict,the_dict):
-    #look for -c or -attributesconfig command line option and argument
-    if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
-        cmdopt_dict['config_file_path']=alternatePathInfo.parent
-        cmdopt_dict['config_file_name_yaml']=alternatePathInfo.name
-        cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
-        cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
-    else:
-        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
-        cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
-        cmdopt_dict['config_file_name_yml']='mumc_config.yml'
-        cmdopt_dict['config_file_name_no_ext']='mumc_config'
-
-    add_to_PATH(str(cmdopt_dict['config_file_path']),2)
 
     return cmdopt_dict

@@ -76,7 +76,7 @@ def get_admin_username():
 
 #admin password?
 def get_admin_password():
-    print('Plain text password used to grab authentication key; password is not stored.')
+    print('Plain text password used to grab authentication key. Password is NOT stored.')
     password=input('Enter admin password: ')
     return(password)
 

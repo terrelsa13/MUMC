@@ -42,6 +42,10 @@ def build_users_and_libraries(the_dict):
 
     ##########################################################################################################
     ##########################################################################################################
+    #set user_library_selection
+    user_library_selection=the_dict['user_library_selection']
+    ##########################################################################################################
+    ##########################################################################################################
     # 0 - Select users and libraries.
     #     Select libraries to be whitelisted/blacklisted for selected users.
     # 1 - Select users only.
@@ -52,9 +56,6 @@ def build_users_and_libraries(the_dict):
     #     All libraries will be whitelisted/blacklisted for all users according to their access policy.
     ##########################################################################################################
     ##########################################################################################################
-
-    #set user_library_selection
-    user_library_selection=the_dict['user_library_selection']
 
     #declare variables to run while loops
     user_loop_active=True

@@ -66,12 +66,26 @@ def get_all_libraries(the_dict):
 
     #loop thru libraries
     for virtFolder in virtualFolders:
-        #filter library results by collection type
-        if ((virtFolder['CollectionType'] == 'movies') or
+        #Allowed Collection Types:
+         #movies - Emby/Jellfyin
+         #tvshows - Emby/Jellfyin
+         #music - Emby/Jellfyin
+         #audiobooks - Emby
+         #books - Emby/Jellfyin
+        #Not Allowed Collection Types:
+         #homevideos - Emby/Jellfyin
+         #musicvidoes - Emby/Jellfyin
+         #games - Emby
+         #playlists - Emby
+         #null - Emby/Jellyfin (used for Mixed Movies & Shows content type)
+
+        #check for CollectionType then filter library results by CollectionType
+        if (('CollectionType' in virtFolder) and
+           ((virtFolder['CollectionType'] == 'movies') or
             (virtFolder['CollectionType'] == 'tvshows') or
             (virtFolder['CollectionType'] == 'music') or
             (virtFolder['CollectionType'] == 'audiobooks') or
-            (virtFolder['CollectionType'] == 'books')):
+            (virtFolder['CollectionType'] == 'books'))):
             #loop thru subfolder paths within this library
             for pathInfo in virtFolder['LibraryOptions']['PathInfos']:
                 #when emby; the subfolders need to be specifically handled

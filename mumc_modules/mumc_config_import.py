@@ -1,7 +1,8 @@
 import sys
 from mumc_modules.mumc_config_builder import build_configuration_file
-from mumc_modules.mumc_paths_files import doesFileExist
+from mumc_modules.mumc_paths_files import doesFileExist,add_to_PATH
 from mumc_modules.mumc_output import open_and_return_file
+from mumc_modules.mumc_parse_commands import findAlternateConfigCMDAndArgument
 
 
 def cannotFindConfig(init_dict,cmdopt_dict):
@@ -42,9 +43,30 @@ def assignVarTest(cfg):
     return assignVarTestSuccessful
 
 
+def get_custom_config_location(cmdopt_dict,the_dict):
+    #look for -c or -attributesconfig command line option and argument
+    if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
+        cmdopt_dict['config_file_path']=alternatePathInfo.parent
+        cmdopt_dict['config_file_name_yaml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
+        cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
+    else:
+        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
+        cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
+        cmdopt_dict['config_file_name_yml']='mumc_config.yml'
+        cmdopt_dict['config_file_name_no_ext']='mumc_config'
+
+    add_to_PATH(str(cmdopt_dict['config_file_path']),2)
+
+    return cmdopt_dict
+
+
 #import config file if it exists; else create the config file
 def importConfig(init_dict,cmdopt_dict):
     try:
+        #get custom yaml (i.e. /path/to/some/config.yaml); if none, return defauts
+        cmdopt_dict=get_custom_config_location(cmdopt_dict,init_dict)
+
         #check if default yaml (i.e. config/mumc_config.yaml) or a custom yaml (i.e. /path/to/some_config.yaml) exists
         if (doesFileExist(cmdopt_dict['config_file_path'] / cmdopt_dict['config_file_name_yaml'])):
             #open and return config file
