@@ -77,6 +77,7 @@ def get_all_libraries(the_dict):
          #musicvidoes - Emby/Jellfyin
          #games - Emby
          #playlists - Emby
+         #boxsets - Emby
          #null - Emby/Jellyfin (used for Mixed Movies & Shows content type)
 
         #check for CollectionType then filter library results by CollectionType
