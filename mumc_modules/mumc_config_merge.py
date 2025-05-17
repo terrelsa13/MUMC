@@ -1099,11 +1099,11 @@ def merge_configurations(cfg_default,cfg_user):
     except:
         pass
     try:
-        cfg_default['advanced_settings']['sonarr']['series']['remove']=cfg_user['advanced_settings']['sonarr']['series']['unmonitor']
+        cfg_default['advanced_settings']['sonarr']['series']['remove']=cfg_user['advanced_settings']['sonarr']['series']['remove']
     except:
         pass
     try:
-        cfg_default['advanced_settings']['sonarr']['episode']['unmonitor']=cfg_user['advanced_settings']['sonarr']['episode']['remove']
+        cfg_default['advanced_settings']['sonarr']['episode']['unmonitor']=cfg_user['advanced_settings']['sonarr']['episode']['unmonitor']
     except:
         pass
 
@@ -1552,56 +1552,49 @@ def merge_configurations(cfg_default,cfg_user):
 
 
     try:
-        cfg_default['admin_settings']['media_managers']['radarr']['enabled']=cfg_user['admin_settings']['media_managers']['radarr']['enabled']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['radarr']['url']=cfg_user['admin_settings']['media_managers']['radarr']['url']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['radarr']['api_key']=cfg_user['admin_settings']['media_managers']['radarr']['api_key']
-    except:
-        pass
-
-    try:
-        cfg_default['admin_settings']['media_managers']['sonarr']['enabled']=cfg_user['admin_settings']['media_managers']['sonarr']['enabled']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['sonarr']['url']=cfg_user['admin_settings']['media_managers']['sonarr']['url']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['sonarr']['api_key']=cfg_user['admin_settings']['media_managers']['sonarr']['api_key']
+        cfg_default['admin_settings']['media_managers']['radarr']=cfg_user['admin_settings']['media_managers']['radarr']
+        for arrEntry in cfg_default['admin_settings']['media_managers']['radarr']:
+            try:
+                if (not ('enabled' in arrEntry)):
+                    arrEntry['enabled']=True
+            except:
+                pass
     except:
         pass
 
     try:
-        cfg_default['admin_settings']['media_managers']['lidarr']['enabled']=cfg_user['admin_settings']['media_managers']['lidarr']['enabled']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['lidarr']['url']=cfg_user['admin_settings']['media_managers']['lidarr']['url']
-    except:
-        pass
-    try:
-        cfg_default['admin_settings']['media_managers']['lidarr']['api_key']=cfg_user['admin_settings']['media_managers']['lidarr']['api_key']
+        cfg_default['admin_settings']['media_managers']['sonarr']=cfg_user['admin_settings']['media_managers']['sonarr']
+        for arrEntry in cfg_default['admin_settings']['media_managers']['sonarr']:
+            try:
+                if (not ('enabled' in arrEntry)):
+                    arrEntry['enabled']=True
+            except:
+                pass
     except:
         pass
 
     try:
-        cfg_default['admin_settings']['media_managers']['readarr']['enabled']=cfg_user['admin_settings']['media_managers']['readarr']['enabled']
+        cfg_default['admin_settings']['media_managers']['lidarr']=cfg_user['admin_settings']['media_managers']['lidarr']
+        for arrEntry in cfg_default['admin_settings']['media_managers']['lidarr']:
+            try:
+                if (not ('enabled' in arrEntry)):
+                    arrEntry['enabled']=True
+            except:
+                pass
     except:
         pass
+
     try:
-        cfg_default['admin_settings']['media_managers']['readarr']['url']=cfg_user['admin_settings']['media_managers']['readarr']['url']
+        cfg_default['admin_settings']['media_managers']['readarr']=cfg_user['admin_settings']['media_managers']['readarr']
+        for arrEntry in cfg_default['admin_settings']['media_managers']['readarr']:
+            try:
+                if (not ('enabled' in arrEntry)):
+                    arrEntry['enabled']=True
+            except:
+                pass
     except:
         pass
-    try:
-        cfg_default['admin_settings']['media_managers']['readarr']['api_key']=cfg_user['admin_settings']['media_managers']['readarr']['api_key']
-    except:
-        pass
+
 
     try:
         cfg_default['admin_settings']['api_controls']['attempts']=cfg_user['admin_settings']['api_controls']['attempts']

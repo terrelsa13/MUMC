@@ -531,14 +531,14 @@ admin_settings:
       #subfolder_id: null
       #lib_enabled: true
   media_managers:
-    radarr:
-      enabled: true
-      url: null
-      api_key: null
-    sonarr:
-      enabled: true
-      url: null
-      api_key: null
+    radarr: []
+    #- enabled: true
+      #url: null
+      #api_key: null
+    sonarr: []
+    #- enabled: true
+      #url: null
+      #api_key: null
   api_controls:
     attempts: 4
     item_limit: 25

@@ -68,47 +68,65 @@ def yaml_configurationBuilder(the_dict):
 
     config_data['advanced_settings'].pop('episode_control')
 
-    if ((config_data['admin_settings']['media_managers']['radarr']['url'] == None) and (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None)):
+    #if ((config_data['admin_settings']['media_managers']['radarr']['url'] == None) and (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None)):
+    if (config_data['admin_settings']['media_managers']['radarr'] == []):
         config_data['admin_settings']['media_managers'].pop('radarr')
     else:
-        if (config_data['admin_settings']['media_managers']['radarr']['enabled']):
-            config_data['admin_settings']['media_managers']['radarr'].pop('enabled')
-        if (config_data['admin_settings']['media_managers']['radarr']['url'] == None):
-            config_data['admin_settings']['media_managers']['radarr'].pop('url')
-        if (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None):
-            config_data['admin_settings']['media_managers']['radarr'].pop('api_key')
+        for arr in config_data['admin_settings']['media_managers']['radarr']:
+            if (arr['enabled']):
+                #config_data['admin_settings']['media_managers']['radarr'].pop('enabled')
+                arr.pop('enabled')
+            if ((arr['url'] == None) or (arr['url'] == '')):
+                #config_data['admin_settings']['media_managers']['radarr'].pop('url')
+                arr.pop('url')
+            if ((arr['api_key'] == None) or (arr['api_key'] == '')):
+                #config_data['admin_settings']['media_managers']['radarr'].pop('api_key')
+                arr.pop('api_key')
 
-    if ((config_data['admin_settings']['media_managers']['sonarr']['url'] == None) and (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
+    #if ((config_data['admin_settings']['media_managers']['sonarr']['url'] == None) and (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
+    if (config_data['admin_settings']['media_managers']['sonarr'] == []):
         config_data['admin_settings']['media_managers'].pop('sonarr')
     else:
-        if (config_data['admin_settings']['media_managers']['sonarr']['enabled']):
-            config_data['admin_settings']['media_managers']['sonarr'].pop('enabled')
-        if (config_data['admin_settings']['media_managers']['sonarr']['url'] == None):
-            config_data['admin_settings']['media_managers']['sonarr'].pop('url')
-        if (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None):
-            config_data['admin_settings']['media_managers']['sonarr'].pop('api_key')
+        for arr in config_data['admin_settings']['media_managers']['sonarr']:
+            if (arr['enabled']):
+                #config_data['admin_settings']['media_managers']['sonarr'].pop('enabled')
+                arr.pop('enabled')
+            if ((arr['url'] == None) or (arr['url'] == '')):
+                #config_data['admin_settings']['media_managers']['sonarr'].pop('url')
+                arr.pop('url')
+            if ((arr['api_key'] == None) or (arr['api_key'] == '')):
+                #config_data['admin_settings']['media_managers']['sonarr'].pop('api_key')
+                arr.pop('api_key')
 
-    #if ((the_dict['admin_settings']['media_managers']['lidarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
+    ##if ((config_data['admin_settings']['media_managers']['lidarr']['url'] == None) and (config_data['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
+    #if (config_data['admin_settings']['media_managers']['lidarr'] == []):
         #config_data['admin_settings']['media_managers'].pop('lidarr')
     #else:
-        ##config_data['admin_settings']['media_managers']['lidarr']=the_dict['admin_settings']['media_managers']['lidarr']
-        #if (config_data['admin_settings']['media_managers']['lidarr']['enabled']):
-            #config_data['admin_settings']['media_managers']['lidarr'].pop('enabled')
-        #if (config_data['admin_settings']['media_managers']['lidarr']['url'] == None):
-            #config_data['admin_settings']['media_managers']['lidarr'].pop('url')
-        #if (config_data['admin_settings']['media_managers']['lidarr']['api_key'] == None):
-            #config_data['admin_settings']['media_managers']['lidarr'].pop('api_key')
+        #for arr in config_data['admin_settings']['media_managers']['lidarr']:
+            #if (arr['enabled']):
+                ##config_data['admin_settings']['media_managers']['lidarr'].pop('enabled')
+                #arr.pop('enabled')
+            #if ((arr['url'] == None) or (arr['url'] == '')):
+                ##config_data['admin_settings']['media_managers']['lidarr'].pop('url')
+                #arr.pop('url')
+            #if ((arr['api_key'] == None) or (arr['api_key'] == '')):
+                ##config_data['admin_settings']['media_managers']['lidarr'].pop('api_key')
+                #arr.pop('api_key')
 
-    #if ((the_dict['admin_settings']['media_managers']['readarr']['url'] == None) and (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
+    ##if ((config_data['admin_settings']['media_managers']['readarr']['url'] == None) and (config_data['admin_settings']['media_managers']['readarr']['api_key'] == None)):
+    #if (config_data['admin_settings']['media_managers']['readarr'] == []):
         #config_data['admin_settings']['media_managers'].pop('readarr')
     #else:
-        ##config_data['admin_settings']['media_managers']['readarr']=the_dict['admin_settings']['media_managers']['readarr']
-        #if (config_data['admin_settings']['media_managers']['readarr']['enabled']):
-            #config_data['admin_settings']['media_managers']['readarr'].pop('enabled')
-        #if (config_data['admin_settings']['media_managers']['readarr']['url'] == None):
-            #config_data['admin_settings']['media_managers']['readarr'].pop('url')
-        #if (config_data['admin_settings']['media_managers']['readarr']['api_key'] == None):
-            #config_data['admin_settings']['media_managers']['readarr'].pop('api_key')
+        #for arr in config_data['admin_settings']['media_managers']['readarr']:
+            #if (arr['enabled']):
+                ##config_data['admin_settings']['media_managers']['readarr'].pop('enabled')
+                #arr.pop('enabled')
+            #if ((arr['url'] == None) or (arr['url'] == '')):
+                ##config_data['admin_settings']['media_managers']['readarr'].pop('url')
+                #arr.pop('url')
+            #if ((arr['api_key'] == None) or (arr['api_key'] == '')):
+                ##config_data['admin_settings']['media_managers']['readarr'].pop('api_key')
+                #arr.pop('api_key')
 
     if (config_data['admin_settings']['media_managers'] == {}):
         config_data['admin_settings'].pop('media_managers')
@@ -307,25 +325,28 @@ def build_configuration_file(the_dict,orig_dict={}):
     #arrDict={'Radarr':'7878','Sonarr':'8989','Lidarr':'8686','Readarr':'8787'}
     arrDict={'Radarr':'7878','Sonarr':'8989'}
 
+    #loop thru each *arr
     for arr in arrDict:
-        arr_url_has_value=False
-        arr_api_key_has_value=False
+        #create empty list
+        arr_list=[]
+        #loop thru each argv *arr instance
+        for arr_url,arr_api_key in zip(the_dict['argv']['-' + arr.casefold() + '_url'],the_dict['argv']['-' + arr.casefold() + '_api_key']):
+            #set url found to false
+            arr_url_has_value=False
+            #set api_key found to false
+            arr_api_key_has_value=False
+            #check if url is empty string or None
+            if (not ((arr_url == '') or (arr_url == None))):
+                #set url found to true
+                arr_url_has_value=True
+            #check if api_key is empty string or None
+            if (not ((arr_api_key == '') or (arr_api_key == None))):
+                #set api_key found to true
+                arr_api_key_has_value=True
+            #append url and api_key pair to arr_list
+            arr_list.append({'enabled':(arr_url_has_value and arr_api_key_has_value),'url':arr_url,'api_key':arr_api_key})
 
-        if (('-' + arr.casefold() + '_url' in the_dict['argv']) and (not (the_dict['argv']['-' + arr.casefold() + '_url'] == ''))):
-            #*arr url
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['url']=the_dict['argv']['-' + arr.casefold() + '_url']
-            arr_url_has_value=True
-
-        #get *arr API key
-        if (('-' + arr.casefold() + '_api_key' in the_dict['argv']) and (not (the_dict['argv']['-' + arr.casefold() + '_api_key'] == ''))):
-            #save *arr api command option
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['api_key']=the_dict['argv']['-' + arr.casefold() + '_api_key']
-            arr_api_key_has_value=True
-
-        if (arr_url_has_value and arr_api_key_has_value):
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=True
-        else:
-            the_dict['admin_settings']['media_managers'][arr.casefold()]['enabled']=False
+        the_dict['admin_settings']['media_managers'][arr.casefold()]=arr_list
 
     #set REMOVE_FILES
     the_dict['advanced_settings']['REMOVE_FILES']=False

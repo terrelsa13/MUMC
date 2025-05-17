@@ -518,14 +518,26 @@ def parse_command_line_options(the_dict):
     #normalize all '#' as intergers
     #normalize blacktag/whitetag blank string '' to empty list []; remove leading/trailing spaces
     for cmd in cmdopt_dict['argv']:
-        #if string version of True; convert to boolean
+        #check if string version of True; convert to boolean
         if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
             cmdopt_dict['argv'][cmd]=True
-        #if string version of False; convert to boolean
+        #check if string version of False; convert to boolean
         elif (cmdopt_dict['argv'][cmd].casefold() == 'false'):
             cmdopt_dict['argv'][cmd]=False
-        #if -global_blacktags or -global_whitetags
-        elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags')):
+        ########################################################################################################
+        #check if -radarr_url,  -radarr_api_key, -sonarr-url, -sonarr_api-key, -global_blacktags or -global_whitetags
+        ########################################################################################################
+        ########################################################################################################
+        #Acceptable COMMAND LINE format for arguements with multiple values
+        # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
+        ########################################################################################################
+        #Acceptable ENVIRONMENTAL VARIABLE format for arguements with multiple values
+        # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
+        ########################################################################################################
+        ########################################################################################################
+        elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags') or
+              (cmd == '-radarr_url') or (cmd == '-radarr_api_key') or
+              (cmd == '-sonarr_url') or (cmd == '-sonarr_api_key')):
             #check if ''
             if (cmdopt_dict['argv'][cmd].strip() == ''):
                 #save as empty list
@@ -546,6 +558,7 @@ def parse_command_line_options(the_dict):
                     #strip leading and trailing whitespaces
                     cmdopt_dict['argv'][cmd][cmdopt_dict['argv'][cmd].index(item)]=item.strip()
                 for item in cmdopt_dict['argv'][cmd][:]:
+                    #check if not blank after removing leading and trailing whitespaces
                     if (not(item.strip())):
                         cmdopt_dict['argv'][cmd].remove(item)
         else:

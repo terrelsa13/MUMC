@@ -665,3 +665,95 @@ class data_checker:
             if (isJellyfinServer(self.brand)):
                 if (overlapping_tags_set:=filter_audiobook_blacktag_set.intersection(audiobook_whitetag_set)):
                     self.setCustomErrorText('ConfigError: The same tag cannot be used for both advanced_settings > blacktags > audiobook and advanced_settings > whitetags > audiobook\n\tTo proceed the following overlapping tag(s) need to be fixed: ' +  str(list(overlapping_tags_set))  + '\n')
+
+
+#convert legacy admin_settings > media_managers > {} into #convert legacy admin_settings > media_managers > []
+def convertLegacyMediaMangers(cfg):
+    #check if admin_settings and media_managers is in the config
+    if (('admin_settings' in cfg) and ('media_managers' in cfg['admin_settings'])):
+
+        #check if radarr listed under media_managers
+        if ('radarr' in cfg['admin_settings']['media_managers']):
+            #check if radarr is a dictionary
+            if (isinstance(cfg['admin_settings']['media_managers']['radarr'],dict)):
+                #create empty dictionary inside of empty list
+                arr_list=[{}]
+                #check if enabled is in config
+                if ('enabled' in cfg['admin_settings']['media_managers']['radarr']):
+                    #convert enabled into media_managers > radarr > [0] > enabled
+                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['radarr']['enabled']
+                #check if url is in config
+                if ('url' in cfg['admin_settings']['media_managers']['radarr']):
+                    #convert enabled into media_managers > radarr > [0] > url
+                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['radarr']['url']
+                #check if url is in api_key
+                if ('api_key' in cfg['admin_settings']['media_managers']['radarr']):
+                    #convert enabled into media_managers > radarr > [0] > api_key
+                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['radarr']['api_key']
+                #save radarr data converted from legacy dictionary format into list format
+                cfg['admin_settings']['media_managers']['radarr']=arr_list
+
+        #check if sonarr listed under media_managers
+        if ('sonarr' in cfg['admin_settings']['media_managers']):
+            #check if sonarr is a dictionary
+            if (isinstance(cfg['admin_settings']['media_managers']['sonarr'],dict)):
+                #create empty dictionary inside of empty list
+                arr_list=[{}]
+                #check if enabled is in config
+                if ('enabled' in cfg['admin_settings']['media_managers']['sonarr']):
+                    #convert enabled into media_managers > sonarr > [0] > enabled
+                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['sonarr']['enabled']
+                #check if url is in config
+                if ('url' in cfg['admin_settings']['media_managers']['sonarr']):
+                    #convert enabled into media_managers > sonarr > [0] > url
+                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['sonarr']['url']
+                #check if url is in api_key
+                if ('api_key' in cfg['admin_settings']['media_managers']['sonarr']):
+                    #convert enabled into media_managers > sonarr > [0] > api_key
+                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['sonarr']['api_key']
+                #save sonarr data converted from legacy dictionary format into list format
+                cfg['admin_settings']['media_managers']['sonarr']=arr_list
+
+        #check if lidarr listed under media_managers
+        if ('lidarr' in cfg['admin_settings']['media_managers']):
+            #check if lidarr is a dictionary
+            if (isinstance(cfg['admin_settings']['media_managers']['lidarr'],dict)):
+                #create empty dictionary inside of empty list
+                arr_list=[{}]
+                #check if enabled is in config
+                if ('enabled' in cfg['admin_settings']['media_managers']['lidarr']):
+                    #convert enabled into media_managers > lidarr > [0] > enabled
+                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['lidarr']['enabled']
+                #check if url is in config
+                if ('url' in cfg['admin_settings']['media_managers']['lidarr']):
+                    #convert enabled into media_managers > lidarr > [0] > url
+                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['lidarr']['url']
+                #check if url is in api_key
+                if ('api_key' in cfg['admin_settings']['media_managers']['lidarr']):
+                    #convert enabled into media_managers > lidarr > [0] > api_key
+                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['lidarr']['api_key']
+                #save lidarr data converted from legacy dictionary format into list format
+                cfg['admin_settings']['media_managers']['lidarr']=arr_list
+
+        #check if readarr listed under media_managers
+        if ('readarr' in cfg['admin_settings']['media_managers']):
+            #check if readarr is a dictionary
+            if (isinstance(cfg['admin_settings']['media_managers']['readarr'],dict)):
+                #create empty dictionary inside of empty list
+                arr_list=[{}]
+                #check if enabled is in config
+                if ('enabled' in cfg['admin_settings']['media_managers']['readarr']):
+                    #convert enabled into media_managers > readarr > [0] > enabled
+                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['readarr']['enabled']
+                #check if url is in config
+                if ('url' in cfg['admin_settings']['media_managers']['readarr']):
+                    #convert enabled into media_managers > readarr > [0] > url
+                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['readarr']['url']
+                #check if url is in api_key
+                if ('api_key' in cfg['admin_settings']['media_managers']['readarr']):
+                    #convert enabled into media_managers > readarr > [0] > api_key
+                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['readarr']['api_key']
+                #save readarr data converted from legacy dictionary format into list format
+                cfg['admin_settings']['media_managers']['readarr']=arr_list
+
+    return cfg
