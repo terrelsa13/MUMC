@@ -116,7 +116,7 @@ def cfgCheckARGENV(argvCfgChecker):
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: user_library_selection option/environmental-variable must be an integer\n\tValid values 0 thru 3\n')
 
     #check if command line option exists
-    if (argvCfgChecker.getValue('-radarr_url')):
+    if ((argvCfgChecker.getValue('-radarr_url')) and (argvCfgChecker.getValue('-radarr_api_key'))):
         #verify command line option has an expected data type and/or value
         if (not ((radarr_url:=argvCfgChecker.checkList('-radarr_url',value=None,instanceType=argvCfgChecker.list,required=False,minLength=len(argvCfgChecker.cfg['-radarr_api_key']),maxLength=len(argvCfgChecker.cfg['-radarr_api_key']),errOut=False)) == None)):
             #loop thru all urls
@@ -128,6 +128,9 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_url option/environmental-variable must be a comma separated string of URLs\n\tradarr_url and radarr_api_key must have the same number of entries\n')
+    else:
+            #set error if not used with sibling
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_url and radarr_api_key options/environmental-variables must be used together\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-radarr_port')):
@@ -144,7 +147,7 @@ def cfgCheckARGENV(argvCfgChecker):
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_base_url option/environmental-variable must be a string\n')
 
     #check if command line option exists
-    if (argvCfgChecker.getValue('-radarr_api_key')):
+    if ((argvCfgChecker.getValue('-radarr_api_key')) and (argvCfgChecker.getValue('-radarr_url'))):
         #verify command line option has an expected data type and/or value
         if (not ((radarr_api_key:=argvCfgChecker.checkList('-radarr_api_key',value=None,instanceType=argvCfgChecker.list,required=False,minLength=len(argvCfgChecker.cfg['-radarr_url']),maxLength=len(argvCfgChecker.cfg['-radarr_url']),errOut=False)) == None)):
             #loop thru all urls
@@ -156,9 +159,12 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tradarr_url and radarr_api_key must have the same number of entries\n')
+    else:
+            #set error if not used with sibling
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key and radarr_url options/environmental-variables must be used together\n')
 
     #check if command line option exists
-    if (argvCfgChecker.getValue('-sonarr_url')):
+    if ((argvCfgChecker.getValue('-sonarr_url')) and (argvCfgChecker.getValue('-sonarr_api_key'))):
         #verify command line option has an expected data type and/or value
         if (not ((sonarr_url:=argvCfgChecker.checkList('-sonarr_url',value=None,instanceType=argvCfgChecker.list,required=False,minLength=len(argvCfgChecker.cfg['-sonarr_api_key']),maxLength=len(argvCfgChecker.cfg['-sonarr_api_key']),errOut=False)) == None)):
             #loop thru all urls
@@ -170,6 +176,9 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_url option/environmental-variable must be a comma separated string of URLs\n\tsonarr_url and sonarr_api_key must have the same number of entries\n')
+    else:
+            #set error if not used with sibling
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_url and sonarr_api_key options/environmental-variables must be used together\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-sonarr_port')):
@@ -186,7 +195,7 @@ def cfgCheckARGENV(argvCfgChecker):
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_base_url option/environmental-variable must be a string\n')
 
     #check if command line option exists
-    if (argvCfgChecker.getValue('-sonarr_api_key')):
+    if ((argvCfgChecker.getValue('-sonarr_api_key')) and (argvCfgChecker.getValue('-sonarr_url'))):
         #verify command line option has an expected data type and/or value
         if (not ((sonarr_api_key:=argvCfgChecker.checkList('-sonarr_api_key',value=None,instanceType=argvCfgChecker.list,required=False,minLength=len(argvCfgChecker.cfg['-sonarr_url']),maxLength=len(argvCfgChecker.cfg['-sonarr_url']),errOut=False)) == None)):
             #loop thru all urls
@@ -198,6 +207,9 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tsonarr_url and sonarr_api_key must have the same number of entries\n')
+    else:
+            #set error if not used with sibling
+            argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key and sonarr_url options/environmental-variables must be used together\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-config')):
