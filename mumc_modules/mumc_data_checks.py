@@ -259,7 +259,7 @@ class data_checker:
             setError = True
 
         if (not (value == None)):
-            if ((self.checkString(*cfgLocationTuple,value=None,instanceType=instanceType,required=required,caseSensitive=caseSensitive,minLength=minLength,maxLength=maxLength,errOut=False,comparisonValues=comparisonValues)) == None):
+            if ((self.checkString(*cfgLocationTuple,value=value,instanceType=instanceType,required=required,caseSensitive=caseSensitive,minLength=minLength,maxLength=maxLength,errOut=False,comparisonValues=comparisonValues)) == None):
                 isError=True
             if (not (value.isalnum())):
                 isError=True

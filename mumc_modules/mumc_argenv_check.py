@@ -48,14 +48,14 @@ def cfgCheckARGENV(argvCfgChecker):
     #check if command line option exists
     if (argvCfgChecker.getValue('-server_auth_key')):
         #verify command line option has an expected data type and/or value
-        if ((server_auth_key:=argvCfgChecker.checkString('-server_auth_key',value=None,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
+        if ((server_auth_key:=argvCfgChecker.checkAlphaNumeric('-server_auth_key',value=None,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: server_auth_key option/environmental-variable must be a string\n\tValid minimium length is: 8\n\tValid maximium length is: 32\n')
 
     #check if command line option exists
     if (argvCfgChecker.getValue('-server_admin_id')):
         #verify command line option has an expected data type and/or value
-        if ((server_admin_id:=argvCfgChecker.checkString('-server_admin_id',value=None,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
+        if ((server_admin_id:=argvCfgChecker.checkAlphaNumeric('-server_admin_id',value=None,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: server_admin_id option/environmental-variable must be a string\n\tValid minimium length is: 8\n\tValid maximium length is: 32\n')
 
@@ -153,9 +153,9 @@ def cfgCheckARGENV(argvCfgChecker):
             #loop thru all urls
             for thisAPIKey in radarr_api_key:
                 #verify is expected data type and/or value
-                if ((url:=argvCfgChecker.checkString(*(),value=thisAPIKey,instanceType=argvCfgChecker.str,required=False,minLength=None,maxLength=None,errOut=False)) == None):
+                if ((url:=argvCfgChecker.checkAlphaNumeric(*(),value=thisAPIKey,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
                     #set error if not expected data type and/or value
-                    argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key > {thisAPIKey} option/environmental-variable must be a string\n')
+                    argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key > {thisAPIKey} option/environmental-variable must be an alphanumberic string\n\tValid minimium length is: 8\n\tValid maximium length is: 32\n')
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tradarr_url and radarr_api_key must have the same number of entries\n')
@@ -201,9 +201,9 @@ def cfgCheckARGENV(argvCfgChecker):
             #loop thru all urls
             for thisAPIKey in sonarr_api_key:
                 #verify is expected data type and/or value
-                if ((url:=argvCfgChecker.checkString(*(),value=thisAPIKey,instanceType=argvCfgChecker.str,required=False,minLength=None,maxLength=None,errOut=False)) == None):
+                if ((url:=argvCfgChecker.checkAlphaNumeric(*(),value=thisAPIKey,instanceType=argvCfgChecker.str,required=False,minLength=8,maxLength=32,errOut=False)) == None):
                     #set error if not expected data type and/or value
-                    argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key > {thisAPIKey} option/environmental-variable must be a string\n')
+                    argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key > {thisAPIKey} option/environmental-variable must be an alphanumeric string\n\tValid minimium length is: 8\n\tValid maximium length is: 32\n')
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tsonarr_url and sonarr_api_key must have the same number of entries\n')

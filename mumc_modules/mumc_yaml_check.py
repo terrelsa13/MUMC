@@ -44,7 +44,7 @@ def cfgCheckYAML(cfgChecker):
                 #something is not right with the admin_settings > server > url
                 cfgChecker.printError()
 
-            if ((auth_key:=cfgChecker.checkString('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
+            if ((auth_key:=cfgChecker.checkAlphaNumeric('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
                 #something is not right with the admin_settings > server > auth_key
                 cfgChecker.printError()
 
