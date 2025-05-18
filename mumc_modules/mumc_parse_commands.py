@@ -425,7 +425,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
         argvEq=argv.strip().split('=',1)
         #strip leading/trailer whitespaces and split at first ' ' (space)
         argvSp=argv.strip().split(' ',1)
-        #check if lenght of split list is == 2
+        #check if length of split list is == 2
         if (len(argvEq) == 2):
             #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
             if ('-' + str(argvEq[0].casefold().strip()) in options_list):
@@ -437,7 +437,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
                 argvs.insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
                 #insert value at position of original + 1
                 argvs.insert(argvEqIndex + 1,argvEq[1])
-        #check if lenght of split list is == 2
+        #check if length of split list is == 2
         if (len(argvSp) == 2):
             #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
             if ('-' + str(argvSp[0].casefold().strip()) in options_list):

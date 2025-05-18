@@ -128,7 +128,7 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_url option/environmental-variable must be a comma separated string of URLs\n\tradarr_url and radarr_api_key must have the same number of entries\n')
-    else:
+    elif (argvCfgChecker.getValue('-radarr_url')):
             #set error if not used with sibling
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_url and radarr_api_key options/environmental-variables must be used together\n')
 
@@ -159,7 +159,7 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tradarr_url and radarr_api_key must have the same number of entries\n')
-    else:
+    elif (argvCfgChecker.getValue('-radarr_api_key')):
             #set error if not used with sibling
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: radarr_api_key and radarr_url options/environmental-variables must be used together\n')
 
@@ -176,7 +176,7 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_url option/environmental-variable must be a comma separated string of URLs\n\tsonarr_url and sonarr_api_key must have the same number of entries\n')
-    else:
+    elif (argvCfgChecker.getValue('-sonarr_url')):
             #set error if not used with sibling
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_url and sonarr_api_key options/environmental-variables must be used together\n')
 
@@ -207,7 +207,7 @@ def cfgCheckARGENV(argvCfgChecker):
         else:
             #set error if not expected data type and/or value
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key option/environmental-variable must be a comma separated string of API keys\n\tsonarr_url and sonarr_api_key must have the same number of entries\n')
-    else:
+    elif (argvCfgChecker.getValue('-sonarr_api_key')):
             #set error if not used with sibling
             argvCfgChecker.setCustomErrorText(f'CmdEnvError: sonarr_api_key and sonarr_url options/environmental-variables must be used together\n')
 
