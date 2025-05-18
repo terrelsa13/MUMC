@@ -366,7 +366,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - RDAPI,radarr_api_key
     if ('RDAPI' in envar):
         argv['-radarr_api_key']=envar['RDAPI']
-    if ('radarr_api_key' in envar):
+    if ('RADARR_API_KEY' in envar):
         argv['-radarr_api_key']=envar['RADARR_API_KEY']
 
     #save environmental variable - RDURL,SONARR_URL
@@ -378,7 +378,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - SNAPI,sonarr_api_key
     if ('SNAPI' in envar):
         argv['-sonarr_api_key']=envar['SNAPI']
-    if ('sonarr_api_key' in envar):
+    if ('SONARR_API_KEY' in envar):
         argv['-sonarr_api_key']=envar['SONARR_API_KEY']
 
     #save environmental variable - LDURL,LIDARR_URL
@@ -456,7 +456,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
             #remove -e from dictionary
             argvs.pop(argv_EIndex)
 
-    #loop thru all arguments; intent is to find arguements formatted like this (arg value) instead of like this (arg=value)
+    #loop thru all arguments; intent is to find arguments formatted like this (arg value) instead of like this (arg=value)
     for argv in argvs:
         #check if this argument is recognized after removing leading and trailing whitespace and appending '-' to the beginning
         if ('-' + str(argv.casefold().strip()) in options_list):
@@ -507,7 +507,7 @@ def parse_command_line_options(the_dict):
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
-    #first covert environmental variables to command line arguements; environamental variables have a lower priority
+    #first covert environmental variables to command line arguments; environamental variables have a lower priority
     cmdopt_dict['argv']|=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
 
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
@@ -528,10 +528,10 @@ def parse_command_line_options(the_dict):
         #check if -radarr_url,  -radarr_api_key, -sonarr-url, -sonarr_api-key, -global_blacktags or -global_whitetags
         ########################################################################################################
         ########################################################################################################
-        #Acceptable COMMAND LINE format for arguements with multiple values
+        #Acceptable COMMAND LINE format for arguments with multiple values
         # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
         ########################################################################################################
-        #Acceptable ENVIRONMENTAL VARIABLE format for arguements with multiple values
+        #Acceptable ENVIRONMENTAL VARIABLE format for arguments with multiple values
         # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
         ########################################################################################################
         ########################################################################################################
