@@ -327,26 +327,28 @@ def build_configuration_file(the_dict,orig_dict={}):
 
     #loop thru each *arr
     for arr in arrDict:
-        #create empty list
-        arr_list=[]
-        #loop thru each argv *arr instance
-        for arr_url,arr_api_key in zip(the_dict['argv']['-' + arr.casefold() + '_url'],the_dict['argv']['-' + arr.casefold() + '_api_key']):
-            #set url found to false
-            arr_url_has_value=False
-            #set api_key found to false
-            arr_api_key_has_value=False
-            #check if url is empty string or None
-            if (not ((arr_url == '') or (arr_url == None))):
-                #set url found to true
-                arr_url_has_value=True
-            #check if api_key is empty string or None
-            if (not ((arr_api_key == '') or (arr_api_key == None))):
-                #set api_key found to true
-                arr_api_key_has_value=True
-            #append url and api_key pair to arr_list
-            arr_list.append({'enabled':(arr_url_has_value and arr_api_key_has_value),'url':arr_url,'api_key':arr_api_key})
+        #check if *arr_url and *arr_api_key exist
+        if (('-' + arr.casefold() + '_url' in the_dict['argv']) and ('-' + arr.casefold() + '_api_key' in the_dict['argv'])):
+            #create empty list
+            arr_list=[]
+            #loop thru each argv *arr instance
+            for arr_url,arr_api_key in zip(the_dict['argv']['-' + arr.casefold() + '_url'],the_dict['argv']['-' + arr.casefold() + '_api_key']):
+                #set url found to false
+                arr_url_has_value=False
+                #set api_key found to false
+                arr_api_key_has_value=False
+                #check if url is empty string or None
+                if (not ((arr_url == '') or (arr_url == None))):
+                    #set url found to true
+                    arr_url_has_value=True
+                #check if api_key is empty string or None
+                if (not ((arr_api_key == '') or (arr_api_key == None))):
+                    #set api_key found to true
+                    arr_api_key_has_value=True
+                #append url and api_key pair to arr_list
+                arr_list.append({'enabled':(arr_url_has_value and arr_api_key_has_value),'url':arr_url,'api_key':arr_api_key})
 
-        the_dict['admin_settings']['media_managers'][arr.casefold()]=arr_list
+            the_dict['admin_settings']['media_managers'][arr.casefold()]=arr_list
 
     #set REMOVE_FILES
     the_dict['advanced_settings']['REMOVE_FILES']=False
