@@ -98,9 +98,9 @@ def cfgCheckYAML(cfgChecker):
                         user_names_check_list.append(user_name)
 
                     if (isJellyfinServer(brand)):
-                        collection_type_vales=['movies','tvshows','music','audiobooks','books']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','books','mixed']
                     else:
-                        collection_type_vales=['movies','tvshows','music','audiobooks','books']
+                        collection_type_vales=['movies','tvshows','music','audiobooks','books','mixed']
 
                     if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 

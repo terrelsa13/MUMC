@@ -87,7 +87,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     #clear tracker so it can be used again below
     deleteItems_Tracker.clear()
 
-    #List items to be deleted
+    #List number of items to be deleted
     strings_list_to_print=''
     strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type)
 

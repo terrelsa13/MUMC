@@ -276,6 +276,18 @@ def update_all_user_libraries(preferred_listing_type,all_libraries,all_users):
     return all_users
 
 
+#remove users that do not have access to any valid libraries
+def remove_users_without_valid_libraries(all_users):
+    #loop thru all users
+    for thisUser in reversed(all_users):
+        #check if both blacklist and whitelist for this user are empty
+        if ((thisUser.blacklist == []) and (thisUser.whitelist == [])):
+            #if both are empty remove this user; there is no libraries that can be assigned
+            all_users.pop(all_users.index(thisUser))
+
+    return all_users
+
+
 #clean and covert selection string to list
 def clean_selection_convert_selection_to_list(selection_str):
     #check if at least one selection, check if selection is all commas
