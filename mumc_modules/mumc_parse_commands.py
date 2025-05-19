@@ -3,12 +3,12 @@ import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_console_info import default_helper_menu,print_full_help_menu,missing_config_argument_format_helper,alt_config_file_does_not_exist_helper,alt_config_syntax_helper,unknown_command_line_option_helper
-from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist,add_to_PATH
+from mumc_modules.mumc_paths_files import getFullPathName,getFileExtension,doesFileExist
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_setup_questions import get_admin_username,get_admin_password
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name,get_labelled_authentication_keys,get_MUMC_labelled_authentication_key,create_labelled_authentication_key,delete_labelled_authentication_key
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
-from mumc_modules.mumc_config_import import importConfig
+#from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_yaml_check import cfgCheckYAML
 
 
@@ -366,7 +366,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - RDAPI,radarr_api_key
     if ('RDAPI' in envar):
         argv['-radarr_api_key']=envar['RDAPI']
-    if ('radarr_api_key' in envar):
+    if ('RADARR_API_KEY' in envar):
         argv['-radarr_api_key']=envar['RADARR_API_KEY']
 
     #save environmental variable - RDURL,SONARR_URL
@@ -378,7 +378,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     #save environmental variable - SNAPI,sonarr_api_key
     if ('SNAPI' in envar):
         argv['-sonarr_api_key']=envar['SNAPI']
-    if ('sonarr_api_key' in envar):
+    if ('SONARR_API_KEY' in envar):
         argv['-sonarr_api_key']=envar['SONARR_API_KEY']
 
     #save environmental variable - LDURL,LIDARR_URL
@@ -425,7 +425,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
         argvEq=argv.strip().split('=',1)
         #strip leading/trailer whitespaces and split at first ' ' (space)
         argvSp=argv.strip().split(' ',1)
-        #check if lenght of split list is == 2
+        #check if length of split list is == 2
         if (len(argvEq) == 2):
             #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
             if ('-' + str(argvEq[0].casefold().strip()) in options_list):
@@ -437,7 +437,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
                 argvs.insert(argvEqIndex,'-' + str(argvEq[0].casefold()))
                 #insert value at position of original + 1
                 argvs.insert(argvEqIndex + 1,argvEq[1])
-        #check if lenght of split list is == 2
+        #check if length of split list is == 2
         if (len(argvSp) == 2):
             #check if casefolded argv with '-' appended to the beginning is a recognized command line arguement
             if ('-' + str(argvSp[0].casefold().strip()) in options_list):
@@ -456,7 +456,7 @@ def findAbnormalCommandLineOptions(argvs,options_list):
             #remove -e from dictionary
             argvs.pop(argv_EIndex)
 
-    #loop thru all arguments; intent is to find arguements formatted like this (arg value) instead of like this (arg=value)
+    #loop thru all arguments; intent is to find arguments formatted like this (arg value) instead of like this (arg=value)
     for argv in argvs:
         #check if this argument is recognized after removing leading and trailing whitespace and appending '-' to the beginning
         if ('-' + str(argv.casefold().strip()) in options_list):
@@ -507,7 +507,7 @@ def parse_command_line_options(the_dict):
     #normalize by removing too many leading '-'es (dashes), leading and trailing spaces, and forcing lowercase
     the_dict['argv']=normalizeCommandLineOptions(the_dict['argv'],cmdopt_dict['optionsList'])
 
-    #first covert environmental variables to command line arguements; environamental variables have a lower priority
+    #first covert environmental variables to command line arguments; environamental variables have a lower priority
     cmdopt_dict['argv']|=convertEnvironmentalVariablesToCMDOptions(cmdopt_dict['argv'],cmdopt_dict['envar'])
 
     #second convert command line argument list into dictionary; overwriting environmental variables; command line arguments have a higher priority
@@ -518,14 +518,26 @@ def parse_command_line_options(the_dict):
     #normalize all '#' as intergers
     #normalize blacktag/whitetag blank string '' to empty list []; remove leading/trailing spaces
     for cmd in cmdopt_dict['argv']:
-        #if string version of True; convert to boolean
+        #check if string version of True; convert to boolean
         if (cmdopt_dict['argv'][cmd].casefold() == 'true'):
             cmdopt_dict['argv'][cmd]=True
-        #if string version of False; convert to boolean
+        #check if string version of False; convert to boolean
         elif (cmdopt_dict['argv'][cmd].casefold() == 'false'):
             cmdopt_dict['argv'][cmd]=False
-        #if -global_blacktags or -global_whitetags
-        elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags')):
+        ########################################################################################################
+        #check if -radarr_url,  -radarr_api_key, -sonarr-url, -sonarr_api-key, -global_blacktags or -global_whitetags
+        ########################################################################################################
+        ########################################################################################################
+        #Acceptable COMMAND LINE format for arguments with multiple values
+        # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
+        ########################################################################################################
+        #Acceptable ENVIRONMENTAL VARIABLE format for arguments with multiple values
+        # /path/to/python3.x /path/to/mumc.py -option 'arg0,arg1,arg2' -option 'arg3,arg4,arg5' -etc [etc]...
+        ########################################################################################################
+        ########################################################################################################
+        elif ((cmd == '-global_blacktags') or (cmd == '-global_whitetags') or
+              (cmd == '-radarr_url') or (cmd == '-radarr_api_key') or
+              (cmd == '-sonarr_url') or (cmd == '-sonarr_api_key')):
             #check if ''
             if (cmdopt_dict['argv'][cmd].strip() == ''):
                 #save as empty list
@@ -546,6 +558,7 @@ def parse_command_line_options(the_dict):
                     #strip leading and trailing whitespaces
                     cmdopt_dict['argv'][cmd][cmdopt_dict['argv'][cmd].index(item)]=item.strip()
                 for item in cmdopt_dict['argv'][cmd][:]:
+                    #check if not blank after removing leading and trailing whitespaces
                     if (not(item.strip())):
                         cmdopt_dict['argv'][cmd].remove(item)
         else:
@@ -569,23 +582,5 @@ def parse_command_line_options(the_dict):
         if (cmdopt_dict['argv'][cmdOption]):
             console_text_attributes().console_attribute_test()
             sys.exit(0)
-
-    return cmdopt_dict
-
-
-def get_config_location(cmdopt_dict,the_dict):
-    #look for -c or -attributesconfig command line option and argument
-    if (alternatePathInfo:=findAlternateConfigCMDAndArgument(cmdopt_dict['argv'],cmdopt_dict['optionsList'],cmdopt_dict['moduleExtension'],the_dict,'-config')):
-        cmdopt_dict['config_file_path']=alternatePathInfo.parent
-        cmdopt_dict['config_file_name_yaml']=alternatePathInfo.name
-        cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
-        cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
-    else:
-        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
-        cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
-        cmdopt_dict['config_file_name_yml']='mumc_config.yml'
-        cmdopt_dict['config_file_name_no_ext']='mumc_config'
-
-    add_to_PATH(str(cmdopt_dict['config_file_path']),2)
 
     return cmdopt_dict

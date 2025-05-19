@@ -58,11 +58,11 @@ def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorizatio
     return req
 
 
-def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
+def build_radarr_request_message(url,arrInfo,accept=None,token=None,contentType=None,data=None,method='GET'):
 
     if (not (token == None)):
         token=token
-    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','radarr','api_key')) == None)):
+    elif (not ((token:=keys_exist_return_value(arrInfo,'api_key')) == None)):
         #assume stored token if not defined
         token=token
     else:
@@ -101,11 +101,11 @@ def build_radarr_request_message(url,the_dict,accept=None,token=None,contentType
     return req
 
 
-def build_sonarr_request_message(url,the_dict,accept=None,token=None,contentType=None,data=None,method='GET'):
+def build_sonarr_request_message(url,arrInfo,accept=None,token=None,contentType=None,data=None,method='GET'):
     
     if (not (token == None)):
         token=token
-    elif (not ((token:=keys_exist_return_value(the_dict,'admin_settings','media_managers','sonarr','api_key')) == None)):
+    elif (not ((token:=keys_exist_return_value(arrInfo,'api_key')) == None)):
         #assume stored token if not defined
         token=token
     else:

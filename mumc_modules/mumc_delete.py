@@ -16,17 +16,18 @@ def delete_media_item(itemID,the_dict):
 #########################################################################################################
     #Option #1
     #build API delete request for specified media item (only single itemIds)
-    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID) #DELETE
+    url=the_dict['admin_settings']['server']['url'] + '/Items/' + str(itemID) #DELETE emby and jellyfin
     req=build_emby_jellyfin_request_message(url,the_dict,method='DELETE')
 #########################################################################################################
     #Option #2
     #build API delete request for specified media item (multiple comma separated itemIds)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items?Ids=' + str(itemID) #DELETE
+    #url=the_dict['admin_settings']['server']['url'] + '/Items?Id=' + str(itemID) #DELETE emby
+    #url=the_dict['admin_settings']['server']['url'] + '/Items?itemId=' + str(itemID) #DELETE jellyfin
     #req=build_emby_jellyfin_request_message(url,the_dict,method='DELETE')
 #########################################################################################################
     #Option #3
     #build API delete request for specified media item (multiple comma separated itemIds)
-    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID) #POST
+    #url=the_dict['admin_settings']['server']['url'] + '/Items/Delete?Ids=' + str(itemID) #POST emby only
     #req=build_emby_jellyfin_request_message(url,the_dict,method='POST')
 #########################################################################################################
 
@@ -86,7 +87,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     #clear tracker so it can be used again below
     deleteItems_Tracker.clear()
 
-    #List items to be deleted
+    #List number of items to be deleted
     strings_list_to_print=''
     strings_list_to_print=build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_item_type)
 
@@ -110,50 +111,56 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
-                        #unmonitor media item in radarr
-                        if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['unmonitor'])):
-                            try:
-                                #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
-                                #  1. Lookup movie using the IMDB Id (the IMDB Id should NEVER change)
-                                #  2. Grab the TMDB Id from the lookup in step #1
-                                #  3. Get the movie info using the TMDB Id in step #2
-                                #  4. Unmonitor movie in Radarr using Radarr Id in step #3
-                                ######################################################################
-                                #lookup movie info from Radarr using IMdBId
-                                lookup_media_item_data=lookup_MOVIE_radarrInfo_IMdBId(item['mumc']['providerIds']['Imdb'],the_dict)
-                                #get movie info from radarr using TMdBId
-                                media_item_data=get_MOVIE_radarrInfo_TMdBId(lookup_media_item_data['tmdbId'],the_dict)
-                                #set monitored state to False
-                                media_item_data[0]['monitored']=False
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #unmonitor movie in Radarr using Radarr Id
-                                    media_item_data=put_MOVIE_radarrInfo_radarrId(media_item_data[0]['id'],media_item_data[0],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Radarr.\n',2,the_dict)
-                            except:
-                                print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr.\n')
-                                appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr.\n',2,the_dict)
-                        #remove media item from radarr
-                        if ((the_dict['admin_settings']['media_managers']['radarr']['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['remove'])):
-                            try:
-                                #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
-                                #  1. Lookup movie using the IMDB Id (the IMDB Id should NEVER change)
-                                #  2. Grab the TMDB Id from the lookup in step #1
-                                #  3. Get the movie info using the TMDB Id in step #2
-                                #  4. Remove movie from Radarr using Radarr Id in step #3
-                                ######################################################################
-                                #lookup movie info from Radarr using IMdBId
-                                lookup_media_item_data=lookup_MOVIE_radarrInfo_IMdBId(item['mumc']['providerIds']['Imdb'],the_dict)
-                                #get movie info from radarr using TMdBId
-                                media_item_data=get_MOVIE_radarrInfo_TMdBId(lookup_media_item_data['tmdbId'],the_dict)
-                                #save movie's radarr id
-                                item['mumc']['providerIds']['radarr']=media_item_data[0]['id']
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #remove movie from Radarr using Radarr Id
-                                    media_item_data=remove_MOVIE_radarr_radarrId(media_item_data[0]['id'],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Radarr.\n',2,the_dict)
-                            except:
-                                print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.\n')
-                                appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.\n',2,the_dict)
+                        #loop thru each radarr instance
+                        for arrInfo in the_dict['admin_settings']['media_managers']['radarr']:
+                            #unmonitor media item in radarr
+                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['unmonitor'])):
+                                try:
+                                    ######################################################################
+                                    #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                    #  1. Lookup movie in Radarr using the IMDB Id (the IMDB Id should NEVER change)
+                                    #  2. Grab the TMDB Id from the lookup in step #1
+                                    #  3. Get the movie info using the TMDB Id in step #2
+                                    #  4. Grab the Radarr Id returned in step #3
+                                    #  5. Unmonitor movie in Radarr using Radarr Id in step #4
+                                    ######################################################################
+                                    #lookup movie info from Radarr using IMdBId
+                                    lookup_media_item_data=lookup_MOVIE_radarrInfo_IMdBId(item['mumc']['providerIds']['Imdb'],arrInfo,the_dict)
+                                    #get movie info from radarr using TMdBId
+                                    media_item_data=get_MOVIE_radarrInfo_TMdBId(lookup_media_item_data['tmdbId'],arrInfo,the_dict)
+                                    #set monitored state to False
+                                    media_item_data[0]['monitored']=False
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #unmonitor movie in Radarr using Radarr Id
+                                        media_item_data=put_MOVIE_radarrInfo_radarrId(media_item_data[0]['id'],media_item_data[0],arrInfo,the_dict)
+                                    appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                except:
+                                    print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n')
+                                    appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            #remove media item from radarr
+                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['remove'])):
+                                try:
+                                    ######################################################################
+                                    #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                    #  1. Lookup movie in Radarr using the IMDB Id (the IMDB Id should NEVER change)
+                                    #  2. Grab the TMDB Id from the lookup in step #1
+                                    #  3. Get the movie info using the TMDB Id in step #2
+                                    #  4. Grab the Radarr Id returned in step #3
+                                    #  5. Unmonitor movie in Radarr using Radarr Id in step #4
+                                    ######################################################################
+                                    #lookup movie info from Radarr using IMdBId
+                                    lookup_media_item_data=lookup_MOVIE_radarrInfo_IMdBId(item['mumc']['providerIds']['Imdb'],arrInfo,the_dict)
+                                    #get movie info from radarr using TMdBId
+                                    media_item_data=get_MOVIE_radarrInfo_TMdBId(lookup_media_item_data['tmdbId'],arrInfo,the_dict)
+                                    #save movie's radarr id
+                                    item['mumc']['providerIds']['radarr']=media_item_data[0]['id']
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #remove movie from Radarr using Radarr Id
+                                        media_item_data=remove_MOVIE_radarr_radarrId(media_item_data[0]['id'],the_dict)
+                                    appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                except:
+                                    print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n')
+                                    appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
 
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
@@ -168,16 +175,18 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
 
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
-                        #unmonitor media item
-                        if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['episode']['unmonitor'])):
-                            try:
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #unmonitor episode item in Sonarr
-                                    media_item_data=put_EPISODE_sonarrInfo_sonarrId(item['mumc']['providerIds']['sonarr'],the_dict)
-                                appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr\n',2,the_dict)
-                            except:
-                                print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.\n')
-                                appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Radarr.\n',2,the_dict)
+                        #loop thru each sonarr instance
+                        for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+                            #unmonitor media item
+                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['episode']['unmonitor'])):
+                                try:
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #unmonitor episode item in Sonarr
+                                        media_item_data=put_EPISODE_sonarrInfo_sonarrId(item['mumc']['providerIds']['sonarr'],arrInfo,the_dict)
+                                    appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                except:
+                                    print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                                    appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
 
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
@@ -227,62 +236,69 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
 
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
-                        #unmonitor media item
-                        if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['unmonitor'])):
-                            user_info={}
-                            user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
-                            #get series info
-                            series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
-                            item['mumc']={}
-                            item['mumc']['providerIds']=series_info['ProviderIds']
-                            try:
-                                #For series; because TVDB sometimes changes the series Ids and then re-adds them with completely new Ids this has to be done in a certain order
-                                #  1. Lookup series using the IMDB Id (the IMDB Id should NEVER change)
-                                #  2. Grab the TMDB Id from the lookup in step #1
-                                #  3. Get the movie info using the TMDB Id in step #2
-                                #  4. Unmonitor movie in Radarr using Radarr Id in step #3
-                                ######################################################################
-                                #lookup series info from sonarrr using IMdBId
-                                lookup_media_item_data=lookup_SERIES_sonarrInfo_IMdbId(item['mumc']['providerIds']['Imdb'],the_dict)
-                                #get series info from sonarr using TVdBId
-                                media_item_data=get_SERIES_sonarrInfo_TVdbId(lookup_media_item_data[0]['tvdbId'],the_dict,the_dict)
-                                #set monitored state to False
-                                media_item_data[0]['monitored']=False
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #unmonitor series in Sonarr
-                                    media_item_data=put_SERIES_sonarrInfo_sonarrId(media_item_data[0]['id'],media_item_data[0],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr.\n',2,the_dict)
-                            except:
-                                print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr.\n')
-                                appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr.\n',2,the_dict)
-                        #remove media item
-                        if ((the_dict['admin_settings']['media_managers']['sonarr']['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['remove'])):
-                            user_info={}
-                            user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
-                            #get series info
-                            series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
-                            item['mumc']={}
-                            item['mumc']['providerIds']=series_info['ProviderIds']
-                            try:
-                                #For series; because TVDB sometimes changes the series Ids and then re-adds them with completely new Ids this has to be done in a certain order
-                                #  1. Lookup series using the IMDB Id (the IMDB Id should NEVER change)
-                                #  2. Grab the TMDB Id from the lookup in step #1
-                                #  3. Get the movie info using the TMDB Id in step #2
-                                #  4. Unmonitor movie in Radarr using Radarr Id in step #3
-                                ######################################################################
-                                #lookup series info from sonarrr using IMdBId
-                                lookup_media_item_data=lookup_SERIES_sonarrInfo_IMdbId(item['mumc']['providerIds']['Imdb'],the_dict)
-                                #get series info from sonarr using TVdBId
-                                media_item_data=get_SERIES_sonarrInfo_TVdbId(lookup_media_item_data[0]['tvdbId'],the_dict,the_dict)
-                                #force an exception if series is not in Sonarr
-                                media_item_data[0]['id']=media_item_data[0]['id']
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #remove series from Sonarr
-                                    media_item_data=remove_SERIES_sonarr(media_item_data['id'],the_dict)
-                                appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Sonarr.\n',2,the_dict)
-                            except:
-                                print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr.\n')
-                                appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr.\n',2,the_dict)
+                        #loop thru each sonarr instance
+                        for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+                            #unmonitor media item
+                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['unmonitor'])):
+                                user_info={}
+                                user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
+                                #get series info
+                                series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
+                                item['mumc']={}
+                                item['mumc']['providerIds']=series_info['ProviderIds']
+                                try:
+                                    ######################################################################
+                                    #For series; because TVDB sometimes changes the series Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                    #  1. Lookup series in Sonarr using the IMDB Id (the IMDB Id should NEVER change)
+                                    #  2. Grab the TMDB Id from the lookup in step #1
+                                    #  3. Get the series info using the TMDB Id in step #2
+                                    #  4. Grab the Sonarr Id returned in step #3
+                                    #  5. Unmonitor series in Sonarr using Sonarr Id in step #4
+                                    ######################################################################
+                                    #lookup series info from sonarrr using IMdBId
+                                    lookup_media_item_data=lookup_SERIES_sonarrInfo_IMdbId(item['mumc']['providerIds']['Imdb'],arrInfo,the_dict)
+                                    #get series info from sonarr using TVdBId
+                                    media_item_data=get_SERIES_sonarrInfo_TVdbId(lookup_media_item_data[0]['tvdbId'],arrInfo,the_dict)
+                                    #set monitored state to False
+                                    media_item_data[0]['monitored']=False
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #unmonitor series in Sonarr
+                                        media_item_data=put_SERIES_sonarrInfo_sonarrId(media_item_data[0]['id'],arrInfo,media_item_data[0],the_dict)
+                                    appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                except:
+                                    print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                                    appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            #remove media item
+                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['remove'])):
+                                user_info={}
+                                user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
+                                #get series info
+                                series_info=get_ADDITIONAL_itemInfo(user_info,item['Id'],'get_series_info_to_unmonitor',the_dict)
+                                item['mumc']={}
+                                item['mumc']['providerIds']=series_info['ProviderIds']
+                                try:
+                                    ######################################################################
+                                    #For series; because TVDB sometimes changes the series Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                                    #  1. Lookup series in Sonarr using the IMDB Id (the IMDB Id should NEVER change)
+                                    #  2. Grab the TMDB Id from the lookup in step #1
+                                    #  3. Get the series info using the TMDB Id in step #2
+                                    #  4. Grab the Sonarr Id returned in step #3
+                                    #  5. Unmonitor series in Sonarr using Sonarr Id in step #4
+                                    ######################################################################
+                                    #lookup series info from sonarrr using IMdBId
+                                    lookup_media_item_data=lookup_SERIES_sonarrInfo_IMdbId(item['mumc']['providerIds']['Imdb'],arrInfo,the_dict)
+                                    #get series info from sonarr using TVdBId
+                                    media_item_data=get_SERIES_sonarrInfo_TVdbId(lookup_media_item_data[0]['tvdbId'],arrInfo,the_dict)
+                                    #force an exception if series is not in Sonarr
+                                    media_item_data[0]['id']=media_item_data[0]['id']
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #remove series from Sonarr
+                                        media_item_data=remove_SERIES_sonarr(media_item_data['id'],the_dict)
+                                    appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now deleted from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                except:
+                                    print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                                    appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be deleted from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+
                     #Print output for deleted media item
                     strings_list_to_print+=item_output_details + '\n'
                     print_byType(strings_list_to_print,print_episode_summary,the_dict,episode_summary_format)

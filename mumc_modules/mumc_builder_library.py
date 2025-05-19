@@ -18,7 +18,7 @@ class user_library:
             strAlignment="-----"
         elif (self.collection_type == 'tvshows'):
             strAlignment="----"
-        elif ((self.collection_type == 'music') or (self.collection_type == 'books')):
+        elif ((self.collection_type == 'music') or (self.collection_type == 'books') or (self.collection_type == 'mixed')):
             strAlignment="------"
         else: #(self.collection_type == 'audiobooks')
             strAlignment="-"
@@ -40,7 +40,7 @@ class library_data(user_library):
             strAlignment="-----"
         elif (self.collection_type == 'tvshows'):
             strAlignment="----"
-        elif ((self.collection_type == 'music') or (self.collection_type == 'books')):
+        elif ((self.collection_type == 'music') or (self.collection_type == 'books') or (self.collection_type == 'mixed')):
             strAlignment="------"
         else: #(self.collection_type == 'audiobooks')
             strAlignment="-"
@@ -66,12 +66,33 @@ def get_all_libraries(the_dict):
 
     #loop thru libraries
     for virtFolder in virtualFolders:
-        #filter library results by collection type
-        if ((virtFolder['CollectionType'] == 'movies') or
+        #Allowed Collection Types:
+         #movies - Emby/Jellfyin
+         #tvshows - Emby/Jellfyin
+         #music - Emby/Jellfyin
+         #audiobooks - Emby
+         #books - Emby/Jellfyin
+         #mixed - Emby/Jellyfin - Custom CollectionType (orginally n/a; does not have a Collection Type) used for Mixed Movies & Shows library content type
+        #Not Allowed Collection Types:
+         #homevideos - Emby/Jellfyin
+         #musicvidoes - Emby/Jellfyin
+         #games - Emby
+         #playlists - Emby
+         #boxsets - Emby
+
+        #check if CollectionType dos not exist
+        if (not ('CollectionType' in virtFolder)):
+            #for libraries with a "Mixed Movies And Shows" content type the CollectionType does not exist; add a custom "mixed" CollectionType
+            virtFolder['CollectionType']='mixed'
+
+        #check for CollectionType then filter library results by CollectionType
+        if (('CollectionType' in virtFolder) and
+           ((virtFolder['CollectionType'] == 'movies') or
             (virtFolder['CollectionType'] == 'tvshows') or
             (virtFolder['CollectionType'] == 'music') or
             (virtFolder['CollectionType'] == 'audiobooks') or
-            (virtFolder['CollectionType'] == 'books')):
+            (virtFolder['CollectionType'] == 'books') or
+            (virtFolder['CollectionType'] == 'mixed'))):
             #loop thru subfolder paths within this library
             for pathInfo in virtFolder['LibraryOptions']['PathInfos']:
                 #when emby; the subfolders need to be specifically handled

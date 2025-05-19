@@ -150,7 +150,7 @@ def clean_all_users(existingUsers,allUsersList):
 
 
 #check if user has access to this library and/or subfolder
-def does_user_have_access_to_this_lib_folder(thisUser,thisAllLib):
+def does_user_have_access_to_this_lib_folder(thisUser,thisLib):
 
     #check if user has access to all libraries/subfolders
     if (thisUser.enableAllFolders):
@@ -158,9 +158,9 @@ def does_user_have_access_to_this_lib_folder(thisUser,thisAllLib):
     #determine which specific libraries/subfolders a user has access to
     else:
         #check if this lib_id is enabled for this user
-        if (str(thisAllLib.lib_id) in thisUser.enabledFolders):
+        if (str(thisLib.lib_id) in thisUser.enabledFolders):
             #check if this subfolder_id is excluded for this user
-            if ((str(thisAllLib.lib_id) + '_' + str(thisAllLib.subfolder_id)) in thisUser.excludedSubFolders):
+            if ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id)) in thisUser.excludedSubFolders):
                 does_user_have_access=False
             #subfolder_id is included for this user
             else:
@@ -192,19 +192,19 @@ def clean_all_user_libraries(preferred_listing_type,all_libraries,all_users):
         #loop thru the specific user's selected library listing type
         for thisUserLib in reversed(thisUserPreferredListType):
             #loop thru all_libraries
-            for thisAllLib in all_libraries:
+            for thisLib in all_libraries:
                 #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
-                if ((thisUserLib['lib_id'] == thisAllLib.lib_id) and (thisUserLib['subfolder_id'] == thisAllLib.subfolder_id) and (thisUserLib['path'] == thisAllLib.path)):
+                if ((thisUserLib['lib_id'] == thisLib.lib_id) and (thisUserLib['subfolder_id'] == thisLib.subfolder_id) and (thisUserLib['path'] == thisLib.path)):
                     #check if user has access to this library folder
-                    if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                    if (does_user_have_access_to_this_lib_folder(thisUser,thisLib)):
                         #create temp copy
-                        temp_thisAllLib=copy.copy(thisAllLib)
+                        temp_thisLib=copy.copy(thisLib)
                         #libraries/subfolders in the preferred listing type are selected
-                        temp_thisAllLib.selected=True
+                        temp_thisLib.selected=True
                         #store lib_enabled state for existing library
-                        temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
+                        temp_thisLib.lib_enabled=thisUserLib['lib_enabled']
                         #copy the matching entry from all_libraries to overwrite the existing library
-                        thisUserPreferredListType[thisUserPreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        thisUserPreferredListType[thisUserPreferredListType.index(thisUserLib)]=copy.copy(temp_thisLib)
                         break
             else:
                 #library folder no longer exists or user does not have permissoin to access the library folder
@@ -214,17 +214,17 @@ def clean_all_user_libraries(preferred_listing_type,all_libraries,all_users):
         #loop thru the specific user's selected library listing type
         for thisUserLib in reversed(thisUserUnpreferredListType):
             #loop thru all_libraries
-            for thisAllLib in all_libraries:
+            for thisLib in all_libraries:
                 #check if lib_id and subfolder_id match for the specific user's library entry and the library entry from all_libraries (because jellyfin does not have subfolder_ids, path has to be used for comparison)
-                if ((thisUserLib['lib_id'] == thisAllLib.lib_id) and (thisUserLib['subfolder_id'] == thisAllLib.subfolder_id) and (thisUserLib['path'] == thisAllLib.path)):
+                if ((thisUserLib['lib_id'] == thisLib.lib_id) and (thisUserLib['subfolder_id'] == thisLib.subfolder_id) and (thisUserLib['path'] == thisLib.path)):
                     #check if user has access to this library folder
-                    if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                    if (does_user_have_access_to_this_lib_folder(thisUser,thisLib)):
                         #create temp copy
-                        temp_thisAllLib=copy.copy(thisAllLib)
+                        temp_thisLib=copy.copy(thisLib)
                         #store lib_enabled state for existing library
-                        temp_thisAllLib.lib_enabled=thisUserLib['lib_enabled']
+                        temp_thisLib.lib_enabled=thisUserLib['lib_enabled']
                         #copy the matching entry from all_libraries to overwrite the existing library
-                        thisUserUnpreferredListType[thisUserUnpreferredListType.index(thisUserLib)]=copy.copy(temp_thisAllLib)
+                        thisUserUnpreferredListType[thisUserUnpreferredListType.index(thisUserLib)]=copy.copy(temp_thisLib)
                         break
             else:
                 #library folder no longer exists or user does not have permissoin to access the library folder
@@ -261,17 +261,29 @@ def update_all_user_libraries(preferred_listing_type,all_libraries,all_users):
             user_lib_id_subfolder_id_list.append(str(thisUserLib.lib_id) + '_' + str(thisUserLib.subfolder_id))
 
         #loop thru all libraries
-        for thisAllLib in all_libraries:
+        for thisLib in all_libraries:
             #verify this lib_id and subfolder_id are NOT already in this user's blacklist or whitelist
-            if (not ((str(thisAllLib.lib_id) + '_' + str(thisAllLib.subfolder_id)) in user_lib_id_subfolder_id_list)):
+            if (not ((str(thisLib.lib_id) + '_' + str(thisLib.subfolder_id)) in user_lib_id_subfolder_id_list)):
                 #check if user has access to this library folder
-                if (does_user_have_access_to_this_lib_folder(thisUser,thisAllLib)):
+                if (does_user_have_access_to_this_lib_folder(thisUser,thisLib)):
                     #create temp copy
-                    temp_thisAllLib=copy.copy(thisAllLib)
+                    temp_thisLib=copy.copy(thisLib)
                     #set lib_enabled state for new libraries
-                    temp_thisAllLib.lib_enabled=True
+                    temp_thisLib.lib_enabled=True
                     #copy the matching entry from all_libraries to overwrite the existing library
-                    thisUserUnpreferredListType.append(copy.copy(temp_thisAllLib))
+                    thisUserUnpreferredListType.append(copy.copy(temp_thisLib))
+
+    return all_users
+
+
+#remove users that do not have access to any valid libraries
+def remove_users_without_valid_libraries(all_users):
+    #loop thru all users
+    for thisUser in reversed(all_users):
+        #check if both blacklist and whitelist for this user are empty
+        if ((thisUser.blacklist == []) and (thisUser.whitelist == [])):
+            #if both are empty remove this user; there is no libraries that can be assigned
+            all_users.pop(all_users.index(thisUser))
 
     return all_users
 

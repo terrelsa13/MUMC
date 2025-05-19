@@ -3,7 +3,7 @@ import sys
 import copy
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
-from mumc_modules.mumc_parse_commands import parse_command_line_options,get_config_location
+from mumc_modules.mumc_parse_commands import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
@@ -16,7 +16,7 @@ from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
-from mumc_modules.mumc_data_checks import data_checker
+from mumc_modules.mumc_data_checks import data_checker,convertLegacyMediaMangers
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 #from memory_profiler import profile
@@ -30,9 +30,6 @@ def MUMC():
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
-
-    #check for alternate -config command; or use default config
-    cmdopt_dict=get_config_location(cmdopt_dict,init_dict)
 
     #remove old DEBUG if it exists
     delete_debug_log(init_dict)
@@ -49,6 +46,9 @@ def MUMC():
 
     #get and pre-check user defined values are what we expect them to be
     pre_cfgCheckYAML(cfg,init_dict)
+
+    #convert legacy media_managers > *arr > {} into media_managers > *arr > []
+    cfg=convertLegacyMediaMangers(cfg)
 
     #get and fully check user defined config values are what we expect them to be
     userCfgChecker=data_checker(cfg)

@@ -1,6 +1,6 @@
 from mumc_modules.mumc_server_type import isEmbyServer
 from mumc_modules.mumc_builder_library import get_all_libraries,get_list_of_libraries_to_show,enumerate_libraries_to_be_shown,show_libraries,get_multiple_library_selection,select_all_user_libraries,unselect_all_user_libraries,auto_select_libraries_to_show
-from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries
+from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries,remove_users_without_valid_libraries
 
 
 #build users and libraries
@@ -40,6 +40,13 @@ def build_users_and_libraries(the_dict):
     #update users with "new" libraries they have permission to access
     all_users=update_all_user_libraries(preferred_listing_type,all_libraries,all_users)
 
+    #remove users that do not have any libraries (or any valid libraries)
+    all_users=remove_users_without_valid_libraries(all_users)
+
+    ##########################################################################################################
+    ##########################################################################################################
+    #set user_library_selection
+    user_library_selection=the_dict['user_library_selection']
     ##########################################################################################################
     ##########################################################################################################
     # 0 - Select users and libraries.
@@ -52,9 +59,6 @@ def build_users_and_libraries(the_dict):
     #     All libraries will be whitelisted/blacklisted for all users according to their access policy.
     ##########################################################################################################
     ##########################################################################################################
-
-    #set user_library_selection
-    user_library_selection=the_dict['user_library_selection']
 
     #declare variables to run while loops
     user_loop_active=True

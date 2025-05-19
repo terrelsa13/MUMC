@@ -76,7 +76,7 @@ def get_admin_username():
 
 #admin password?
 def get_admin_password():
-    print('Plain text password used to grab authentication key; password is not stored.')
+    print('Plain text password used to grab authentication key. Password is NOT stored.')
     password=input('Enter admin password: ')
     return(password)
 
@@ -244,6 +244,7 @@ def get_user_and_library_selection_type(library_setup_behavior):
             valid_value = True
         elif (selection == '0'):
             valid_value = True
+            defaultvalue=0
         elif (selection == '1'):
             valid_value = True
             defaultvalue=1
@@ -252,7 +253,7 @@ def get_user_and_library_selection_type(library_setup_behavior):
             defaultvalue=2
         elif (selection == '3'):
             valid_value = True
-            defaultvalue=3
+            #defaultvalue=3
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)
