@@ -112,9 +112,9 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #loop thru each radarr instance
-                        for arrInfo in the_dict['admin_settings']['media_managers']['radarr']:
+                        for arrInfo,arrMovie in zip(the_dict['admin_settings']['media_managers']['radarr'],the_dict['advanced_settings']['radarr']['movie']):
                             #unmonitor media item in radarr
-                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['unmonitor'])):
+                            if ((arrInfo['enabled']) and (arrMovie['unmonitor'])):
                                 try:
                                     ######################################################################
                                     #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
@@ -138,7 +138,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n')
                                     appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
                             #remove media item from radarr
-                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['radarr']['movie']['remove'])):
+                            if ((arrInfo['enabled']) and (arrMovie['remove'])):
                                 try:
                                     ######################################################################
                                     #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
@@ -176,9 +176,9 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #loop thru each sonarr instance
-                        for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+                        for arrInfo,arrEpisode in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['episode']):
                             #unmonitor media item
-                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['episode']['unmonitor'])):
+                            if ((arrInfo['enabled']) and (arrEpisode['unmonitor'])):
                                 try:
                                     if (the_dict['advanced_settings']['REMOVE_FILES']):
                                         #unmonitor episode item in Sonarr
@@ -237,9 +237,9 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
                         #loop thru each sonarr instance
-                        for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+                        for arrInfo,arrSeries in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['series']):
                             #unmonitor media item
-                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['unmonitor'])):
+                            if ((arrInfo['enabled']) and (arrSeries['unmonitor'])):
                                 user_info={}
                                 user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                                 #get series info
@@ -269,7 +269,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
                                     appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
                             #remove media item
-                            if ((arrInfo['enabled']) and (the_dict['advanced_settings']['sonarr']['series']['remove'])):
+                            if ((arrInfo['enabled']) and (arrSeries['remove'])):
                                 user_info={}
                                 user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                                 #get series info

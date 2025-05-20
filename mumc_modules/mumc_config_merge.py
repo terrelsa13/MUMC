@@ -1085,49 +1085,93 @@ def merge_configurations(cfg_default,cfg_user):
     except:
         pass
 
+
     try:
-        cfg_default['advanced_settings']['radarr']['movie']['unmonitor']=cfg_user['advanced_settings']['radarr']['movie']['unmonitor']
-    except:
-        pass
-    try:
-        cfg_default['advanced_settings']['radarr']['movie']['remove']=cfg_user['advanced_settings']['radarr']['movie']['remove']
+        cfg_default['advanced_settings']['radarr']['movie']=cfg_user['advanced_settings']['radarr']['movie']
+        for arrConfig in cfg_default['advanced_settings']['radarr']['movie']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
+            try:
+                if (not (isinstance(arrConfig['remove'],bool))):
+                    arrConfig['remove']=False
+            except:
+                pass
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['sonarr']['series']['unmonitor']=cfg_user['advanced_settings']['sonarr']['series']['unmonitor']
-    except:
-        pass
-    try:
-        cfg_default['advanced_settings']['sonarr']['series']['remove']=cfg_user['advanced_settings']['sonarr']['series']['remove']
-    except:
-        pass
-    try:
-        cfg_default['advanced_settings']['sonarr']['episode']['unmonitor']=cfg_user['advanced_settings']['sonarr']['episode']['unmonitor']
-    except:
-        pass
-
-    try:
-        cfg_default['advanced_settings']['lidarr']['album']['unmonitor']=cfg_user['advanced_settings']['lidarr']['album']['unmonitor']
-    except:
-        pass
-    try:
-        cfg_default['advanced_settings']['lidarr']['album']['remove']=cfg_user['advanced_settings']['album']['album']['remove']
-    except:
-        pass
-    try:
-        cfg_default['advanced_settings']['lidarr']['track']['unmonitor']=cfg_user['advanced_settings']['lidarr']['track']['unmonitor']
+        cfg_default['advanced_settings']['sonarr']['series']=cfg_user['advanced_settings']['sonarr']['series']
+        for arrConfig in cfg_default['advanced_settings']['sonarr']['series']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
+            try:
+                if (not (isinstance(arrConfig['remove'],bool))):
+                    arrConfig['remove']=False
+            except:
+                pass
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['readarr']['book']['unmonitor']=cfg_user['advanced_settings']['readarr']['readarr']['unmonitor']
+        cfg_default['advanced_settings']['sonarr']['episode']=cfg_user['advanced_settings']['sonarr']['episode']
+        for arrConfig in cfg_default['advanced_settings']['sonarr']['episode']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
     except:
         pass
+
     try:
-        cfg_default['advanced_settings']['readarr']['book']['delete']=cfg_user['advanced_settings']['readarr']['readarr']['delete']
+        cfg_default['advanced_settings']['lidarr']['album']=cfg_user['advanced_settings']['lidarr']['album']
+        for arrConfig in cfg_default['advanced_settings']['lidarr']['album']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
+            try:
+                if (not (isinstance(arrConfig['remove'],bool))):
+                    arrConfig['remove']=False
+            except:
+                pass
     except:
         pass
+
+    try:
+        cfg_default['advanced_settings']['lidarr']['track']=cfg_user['advanced_settings']['lidarr']['track']
+        for arrConfig in cfg_default['advanced_settings']['lidarr']['track']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
+    except:
+        pass
+
+    try:
+        cfg_default['advanced_settings']['readarr']['book']=cfg_user['advanced_settings']['readarr']['book']
+        for arrConfig in cfg_default['advanced_settings']['readarr']['book']:
+            try:
+                if (not (isinstance(arrConfig['unmonitor'],bool))):
+                    arrConfig['unmonitor']=True
+            except:
+                pass
+            try:
+                if (not (isinstance(arrConfig['remove'],bool))):
+                    arrConfig['remove']=False
+            except:
+                pass
+    except:
+        pass
+
 
     try:
         cfg_default['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']=cfg_user['advanced_settings']['trakt_fix']['set_missing_last_played_date']['movie']
