@@ -44,7 +44,7 @@ def cfgCheckYAML(cfgChecker):
                 #something is not right with the admin_settings > server > url
                 cfgChecker.printError()
 
-            if ((auth_key:=cfgChecker.checkAlphaNumeric('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.str,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
+            if ((auth_key:=cfgChecker.checkAlphaNumeric('admin_settings','server','auth_key',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)) == None):
                 #something is not right with the admin_settings > server > auth_key
                 cfgChecker.printError()
 
@@ -161,59 +161,59 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            if (not ((radarr:=cfgChecker.checkList('admin_settings','media_managers','radarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((media_managers_radarr:=cfgChecker.checkList('admin_settings','media_managers','radarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                for radarrInfo in radarr:
+                for radarrInfo in media_managers_radarr:
 
 #######################################################################################################
 
                     radarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','radarr',cfgChecker.cfg['admin_settings']['media_managers']['radarr'].index(radarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-                    radarr_url=cfgChecker.checkString('admin_settings','media_managers','radarr',cfgChecker.cfg['admin_settings']['media_managers']['radarr'].index(radarrInfo),'url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                    radarr_url=cfgChecker.checkString('admin_settings','media_managers','radarr',cfgChecker.cfg['admin_settings']['media_managers']['radarr'].index(radarrInfo),'url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                    radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr',cfgChecker.cfg['admin_settings']['media_managers']['radarr'].index(radarrInfo),'api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
+                    radarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','radarr',cfgChecker.cfg['admin_settings']['media_managers']['radarr'].index(radarrInfo),'api_key',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
-            if (not ((sonarr:=cfgChecker.checkList('admin_settings','media_managers','sonarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((media_managers_sonarr:=cfgChecker.checkList('admin_settings','media_managers','sonarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                for sonarrInfo in sonarr:
+                for sonarrInfo in media_managers_sonarr:
 
 #######################################################################################################
 
                     sonarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','sonarr',cfgChecker.cfg['admin_settings']['media_managers']['sonarr'].index(sonarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-                    sonarr_url=cfgChecker.checkString('admin_settings','media_managers','sonarr',cfgChecker.cfg['admin_settings']['media_managers']['sonarr'].index(sonarrInfo),'url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                    sonarr_url=cfgChecker.checkString('admin_settings','media_managers','sonarr',cfgChecker.cfg['admin_settings']['media_managers']['sonarr'].index(sonarrInfo),'url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                    sonarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','sonarr',cfgChecker.cfg['admin_settings']['media_managers']['sonarr'].index(sonarrInfo),'api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
-
-#######################################################################################################
-
-            if (not ((lidarr:=cfgChecker.checkList('admin_settings','media_managers','lidarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
-
-                for lidarrInfo in lidarr:
+                    sonarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','sonarr',cfgChecker.cfg['admin_settings']['media_managers']['sonarr'].index(sonarrInfo),'api_key',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
-                    lidarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+            #if (not ((media_managers_lidarr:=cfgChecker.checkList('admin_settings','media_managers','lidarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                    lidarr_url=cfgChecker.checkString('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
-
-                    lidarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
+                #for lidarrInfo in media_managers_lidarr:
 
 #######################################################################################################
 
-            if (not ((readarr:=cfgChecker.checkList('admin_settings','media_managers','readarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+                    #lidarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-                for readarrInfo in readarr:
+                    #lidarr_url=cfgChecker.checkString('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                    #lidarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','lidarr',cfgChecker.cfg['admin_settings']['media_managers']['lidarr'].index(lidarrInfo),'api_key',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
-                    readarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+            #if (not ((media_managers_readarr:=cfgChecker.checkList('admin_settings','media_managers','readarr',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                    readarr_url=cfgChecker.checkString('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'url',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                #for readarrInfo in media_managers_readarr:
 
-                    readarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'api_key',value=None,instanceType=cfgChecker.str,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
+#######################################################################################################
+
+                    #readarr_enabled=cfgChecker.checkBoolean('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    #readarr_url=cfgChecker.checkString('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'url',value=None,instanceType=cfgChecker.str,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+
+                    #readarr_api_key=cfgChecker.checkAlphaNumeric('admin_settings','media_managers','readarr',cfgChecker.cfg['admin_settings']['media_managers']['readarr'].index(readarrInfo),'api_key',value=None,instanceType=cfgChecker.alnum,required=True,minLength=8,maxLength=32,errOut=True,comparisonValues=None)
 
 #######################################################################################################
 
@@ -992,75 +992,87 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-        if (not ((radarr:=cfgChecker.checkDict('advanced_settings','radarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        if (not ((radarr_config:=cfgChecker.checkDict('advanced_settings','radarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-            if (not ((movie:=cfgChecker.checkDict('advanced_settings','radarr','movie',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((radarr_config_movie:=cfgChecker.checkList('advanced_settings','radarr','movie',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_radarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                for radarrConfig in radarr_config_movie:
 
 #######################################################################################################
 
-                unmonitor=cfgChecker.checkBoolean('advanced_settings','radarr','movie','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+                    unmonitor=cfgChecker.checkBoolean('advanced_settings','radarr','movie',cfgChecker.cfg['advanced_settings']['radarr']['movie'].index(radarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-                remove=cfgChecker.checkBoolean('advanced_settings','radarr','movie','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
-        if (not ((sonarr:=cfgChecker.checkDict('advanced_settings','sonarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    remove=cfgChecker.checkBoolean('advanced_settings','radarr','movie',cfgChecker.cfg['advanced_settings']['radarr']['movie'].index(radarrConfig),'remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-            if (not ((series:=cfgChecker.checkDict('advanced_settings','sonarr','series',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+        if (not ((sonarr_config:=cfgChecker.checkDict('advanced_settings','sonarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-                unmonitor=cfgChecker.checkBoolean('advanced_settings','sonarr','series','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+            if (not ((sonarr_config_series:=cfgChecker.checkList('advanced_settings','sonarr','series',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_sonarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
-                remove=cfgChecker.checkBoolean('advanced_settings','sonarr','series','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-#######################################################################################################
-
-            if (not ((episode:=cfgChecker.checkDict('advanced_settings','sonarr','episode',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                for sonarrConfig in sonarr_config_series:
 
 #######################################################################################################
 
-                unmonitor=cfgChecker.checkBoolean('advanced_settings','sonarr','episode','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+                    unmonitor=cfgChecker.checkBoolean('advanced_settings','sonarr','series',cfgChecker.cfg['advanced_settings']['sonarr']['series'].index(sonarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    remove=cfgChecker.checkBoolean('advanced_settings','sonarr','series',cfgChecker.cfg['advanced_settings']['sonarr']['series'].index(sonarrConfig),'remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-        #if (not ((lidarr:=cfgChecker.checkDict('advanced_settings','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((sonarr_config_episode:=cfgChecker.checkList('advanced_settings','sonarr','episode',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_sonarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                for sonarrConfig in sonarr_config_episode:
 
 #######################################################################################################
 
-            #if (not ((album:=cfgChecker.checkDict('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    unmonitor=cfgChecker.checkBoolean('advanced_settings','sonarr','episode',cfgChecker.cfg['advanced_settings']['sonarr']['episode'].index(sonarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-                #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','album','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
-
-                #remove=cfgChecker.checkBoolean('advanced_settings','lidarr','album','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+        #if (not ((lidarr_config:=cfgChecker.checkDict('advanced_settings','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
-            #if (not ((track:=cfgChecker.checkDict('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            #if (not ((lidarr_config_album:=cfgChecker.checkList('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_lidarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                #for lidarrConfig in lidarr_config_album:
 
 #######################################################################################################
 
-                #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','track','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+                    #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','album',cfgChecker.cfg['advanced_settings']['lidarr']['album'].index(lidarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    #remove=cfgChecker.checkBoolean('advanced_settings','lidarr','album',cfgChecker.cfg['advanced_settings']['lidarr']['album'].index(lidarrConfig),'remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-        #if (not ((readarr:=cfgChecker.checkDict('advanced_settings','readarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            #if (not ((lidarr_config_track:=cfgChecker.checkList('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_lidarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                #for lidarrConfig in lidarr_config_track:
 
 #######################################################################################################
 
-            #if (not ((book:=cfgChecker.checkDict('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+                    #unmonitor=cfgChecker.checkBoolean('advanced_settings','lidarr','track',cfgChecker.cfg['advanced_settings']['lidarr']['track'].index(lidarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 
-                #unmonitor=cfgChecker.checkBoolean('advanced_settings','readarr','book','unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+        #if (not ((readarr_config:=cfgChecker.checkDict('advanced_settings','readarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
-                #remove=cfgChecker.checkBoolean('advanced_settings','readarr','book','remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+#######################################################################################################
+
+            #if (not ((readarr_config_book:=cfgChecker.checkList('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_readarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+
+                #for readarrConfig in readarr_config_book:
+
+#######################################################################################################
+
+                    #unmonitor=cfgChecker.checkBoolean('advanced_settings','readarr','book',cfgChecker.cfg['advanced_settings']['readarr']['book'].index(readarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
+
+                    #remove=cfgChecker.checkBoolean('advanced_settings','readarr','book',cfgChecker.cfg['advanced_settings']['readarr']['book'].index(readarrConfig),'remove',value=None,instanceType=cfgChecker.bool,errOut=True)
 
 #######################################################################################################
 

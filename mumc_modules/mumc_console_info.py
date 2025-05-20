@@ -44,37 +44,37 @@ def get_MUMC_ASCII_art(start=True):
 
 
 def override_media_manager_enabled_states(the_dict):
-    for arrInfo in the_dict['admin_settings']['media_managers']['radarr']:
+    for arrInfo,arrMovie in zip(the_dict['admin_settings']['media_managers']['radarr'],the_dict['advanced_settings']['radarr']['movie']):
         if (arrInfo['enabled']):
 
-            unmonitorRadarrMovie=the_dict['advanced_settings']['radarr']['movie']['unmonitor']
-            removeRadarrMovie=the_dict['advanced_settings']['radarr']['movie']['remove']
+            unmonitorRadarrMovie=arrMovie['unmonitor']
+            removeRadarrMovie=arrMovie['remove']
             
             arrInfo['enabled']=(unmonitorRadarrMovie or removeRadarrMovie)
 
-    for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+    for arrInfo,arrSeries,arrEpisode in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['series'],the_dict['advanced_settings']['sonarr']['episode']):
         if (arrInfo['enabled']):
 
-            unmonitorSonarrSeries=the_dict['advanced_settings']['sonarr']['series']['unmonitor']
-            removeSonarrSeries=the_dict['advanced_settings']['sonarr']['series']['remove']
-            unmonitorSonarrEpisode=the_dict['advanced_settings']['sonarr']['episode']['unmonitor']
+            unmonitorSonarrSeries=arrSeries['unmonitor']
+            removeSonarrSeries=arrSeries['remove']
+            unmonitorSonarrEpisode=arrEpisode['unmonitor']
 
             arrInfo['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode)
 
-    #for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+    #for arrInfo,arrAlbum,arrTrack in zip(the_dict['admin_settings']['media_managers']['lidarr'],the_dict['advanced_settings']['lidarr']['album'],the_dict['advanced_settings']['lidarr']['track']):
         #if (arrInfo['enabled']):
 
-            #unmonitorLidarrAlbum=the_dict['advanced_settings']['lidarr']['album']['unmonitor']
-            #removeLidarrAlbum=the_dict['advanced_settings']['lidarr']['album']['remove']
-            #unmonitorLidarrTrack=the_dict['advanced_settings']['lidarr']['track']['unmonitor']
+            #unmonitorLidarrAlbum=arrAlbum['unmonitor']
+            #removeLidarrAlbum=arrAlbum['remove']
+            #unmonitorLidarrTrack=arrTrack['unmonitor']
 
             #arrInfo['enabled']=(unmonitorLidarrAlbum or removeLidarrAlbum or unmonitorLidarrTrack)
 
-    #for arrInfo in the_dict['admin_settings']['media_managers']['readarr']:
+    #for arrInfo,arrBook in zip(the_dict['admin_settings']['media_managers']['readarr'],the_dict['advanced_settings']['readarr']['book']):
         #if (arrInfo['enabled']):
 
-            #unmonitorReadarrBook=the_dict['advanced_settings']['readarr']['book']['unmonitor']
-            #removeReadarrBook=the_dict['advanced_settings']['readarr']['book']['remove']
+            #unmonitorReadarrBook=arrBook['unmonitor']
+            #removeReadarrBook=arrBook['remove']
 
             #arrInfo['enabled']=(unmonitorReadarrBook or removeReadarrBook)
 

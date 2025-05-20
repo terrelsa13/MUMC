@@ -309,15 +309,15 @@ advanced_settings:
     series_ended:
       delete_episodes: false
   radarr:
-    movie:
-      unmonitor: true
-      remove: false
+    movie: []
+    #- unmonitor: true
+      #remove: false
   sonarr:
-    series:
-      unmonitor: true
-      remove: false
-    episode:
-      unmonitor: true
+    series: []
+    #- unmonitor: true
+      #remove: false
+    episode: []
+    #- unmonitor: true
   trakt_fix:
     set_missing_last_played_date:
       movie: true
