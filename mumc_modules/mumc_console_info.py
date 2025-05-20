@@ -456,9 +456,9 @@ def print_all_media_disabled(the_dict):
 #print how to delete files info
 def remove_files_helper(strings_list_to_print,the_dict):
     strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='To delete media, open ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + ' in a text editor:' + '\n'
-    strings_list_to_print+=the_dict['console_separator'] + '\n'
-    strings_list_to_print+='* Set advanced_settings > REMOVE_FILES: true' + '\n'
+    strings_list_to_print+='To delete media, open ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + ' in a text editor.' + '\n'
+    #strings_list_to_print+=the_dict['console_separator'] + '\n'
+    strings_list_to_print+='Set advanced_settings > REMOVE_FILES: true' + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     return strings_list_to_print
@@ -486,6 +486,10 @@ def build_config_setup_to_delete_media(strings_list_to_print,the_dict,delete_ite
         strings_list_to_print+='* Dry Run Mode' + '\n'
         strings_list_to_print+='* advanced_settings > REMOVE_FILES: false' + '\n'
         strings_list_to_print+='* No Media Deleted' + '\n'
+        strings_list_to_print+='* No Media Unmonitored In Radarr' + '\n'
+        strings_list_to_print+='* No Media Removed From Radarr' + '\n'
+        strings_list_to_print+='* No Media Unmonitored In Sonarr' + '\n'
+        strings_list_to_print+='* No Media Removed From Sonarr' + '\n'
         strings_list_to_print+='* Items = ' + str(the_dict['deleteItemsLength']) + '\n'
 
         strings_list_to_print=remove_files_helper(strings_list_to_print,the_dict)
