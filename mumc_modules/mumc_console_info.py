@@ -96,13 +96,11 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
-    strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
     for arrInfo in the_dict['admin_settings']['media_managers']['radarr']:
-        if (arrInfo['enabled']):
-            strings_list_to_print+='Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + ' Version: ' + get_radarr_version(arrInfo,the_dict) + '\n'
+        strings_list_to_print+='Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + ' Version: ' + get_radarr_version(arrInfo,the_dict) + '\n'
     for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
-        if (arrInfo['enabled']):
-            strings_list_to_print+='Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + ' Version: ' + get_sonarr_version(arrInfo,the_dict) + '\n'
+        strings_list_to_print+='Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + ' Version: ' + get_sonarr_version(arrInfo,the_dict) + '\n'
+    strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
     strings_list_to_print+='OS Info: ' + the_dict['os_info'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
 
