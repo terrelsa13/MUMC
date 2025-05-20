@@ -1599,7 +1599,7 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['admin_settings']['media_managers']['radarr']=cfg_user['admin_settings']['media_managers']['radarr']
         for arrEntry in cfg_default['admin_settings']['media_managers']['radarr']:
             try:
-                if (not ('enabled' in arrEntry)):
+                if ((not ('enabled' in arrEntry)) or (not (isinstance(arrEntry['enabled'],bool)))):
                     arrEntry['enabled']=True
             except:
                 pass
@@ -1610,7 +1610,7 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['admin_settings']['media_managers']['sonarr']=cfg_user['admin_settings']['media_managers']['sonarr']
         for arrEntry in cfg_default['admin_settings']['media_managers']['sonarr']:
             try:
-                if (not ('enabled' in arrEntry)):
+                if ((not ('enabled' in arrEntry)) or (not (isinstance(arrEntry['enabled'],bool)))):
                     arrEntry['enabled']=True
             except:
                 pass
@@ -1621,7 +1621,7 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['admin_settings']['media_managers']['lidarr']=cfg_user['admin_settings']['media_managers']['lidarr']
         for arrEntry in cfg_default['admin_settings']['media_managers']['lidarr']:
             try:
-                if (not ('enabled' in arrEntry)):
+                if ((not ('enabled' in arrEntry)) or (not (isinstance(arrEntry['enabled'],bool)))):
                     arrEntry['enabled']=True
             except:
                 pass
@@ -1632,7 +1632,7 @@ def merge_configurations(cfg_default,cfg_user):
         cfg_default['admin_settings']['media_managers']['readarr']=cfg_user['admin_settings']['media_managers']['readarr']
         for arrEntry in cfg_default['admin_settings']['media_managers']['readarr']:
             try:
-                if (not ('enabled' in arrEntry)):
+                if ((not ('enabled' in arrEntry)) or (not (isinstance(arrEntry['enabled'],bool)))):
                     arrEntry['enabled']=True
             except:
                 pass
