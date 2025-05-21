@@ -996,7 +996,12 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            if (not ((radarr_config_movie:=cfgChecker.checkList('advanced_settings','radarr','movie',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_radarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            if (media_managers_radarr == None):
+                media_managers_radarr_length=0
+            else:
+                media_managers_radarr_length=len(media_managers_radarr)
+
+            if (not ((radarr_config_movie:=cfgChecker.checkList('advanced_settings','radarr','movie',value=None,instanceType=cfgChecker.list,minLength=media_managers_radarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 for radarrConfig in radarr_config_movie:
 
@@ -1012,7 +1017,12 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            if (not ((sonarr_config_series:=cfgChecker.checkList('advanced_settings','sonarr','series',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_sonarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            if (media_managers_sonarr == None):
+                media_managers_sonarr_length=0
+            else:
+                media_managers_sonarr_length=len(media_managers_sonarr)
+
+            if (not ((sonarr_config_series:=cfgChecker.checkList('advanced_settings','sonarr','series',value=None,instanceType=cfgChecker.list,minLength=media_managers_sonarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 for sonarrConfig in sonarr_config_series:
 
@@ -1024,7 +1034,7 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            if (not ((sonarr_config_episode:=cfgChecker.checkList('advanced_settings','sonarr','episode',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_sonarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((sonarr_config_episode:=cfgChecker.checkList('advanced_settings','sonarr','episode',value=None,instanceType=cfgChecker.list,minLength=media_managers_sonarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 for sonarrConfig in sonarr_config_episode:
 
@@ -1038,7 +1048,12 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            #if (not ((lidarr_config_album:=cfgChecker.checkList('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_lidarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            #if (media_managers_lidarr == None):
+                #media_managers_lidarr_length=0
+            #else:
+                #media_managers_lidarr_length=len(media_managers_lidarr)
+
+            #if (not ((lidarr_config_album:=cfgChecker.checkList('advanced_settings','lidarr','album',value=None,instanceType=cfgChecker.list,minLength=media_managers_lidarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 #for lidarrConfig in lidarr_config_album:
 
@@ -1050,7 +1065,7 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            #if (not ((lidarr_config_track:=cfgChecker.checkList('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_lidarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            #if (not ((lidarr_config_track:=cfgChecker.checkList('advanced_settings','lidarr','track',value=None,instanceType=cfgChecker.list,minLength=media_managers_lidarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 #for lidarrConfig in lidarr_config_track:
 
@@ -1064,7 +1079,12 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            #if (not ((readarr_config_book:=cfgChecker.checkList('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.list,minLength=len(media_managers_readarr),maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+            #if (media_managers_readarr == None):
+                #media_managers_readarr_length=0
+            #else:
+                #media_managers_readarr_length=len(media_managers_readarr)
+
+            #if (not ((readarr_config_book:=cfgChecker.checkList('advanced_settings','readarr','book',value=None,instanceType=cfgChecker.list,minLength=media_managers_readarr_length,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                 #for readarrConfig in readarr_config_book:
 
