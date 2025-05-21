@@ -669,92 +669,102 @@ class data_checker:
 
 #convert legacy admin_settings > media_managers > *arr > {} into admin_settings > media_managers > *arr > []
 def convertLegacyMediaMangers(cfg):
-    #check if admin_settings and media_managers is in the config
-    if (('admin_settings' in cfg) and ('media_managers' in cfg['admin_settings'])):
 
-        #check if radarr listed under media_managers
-        if ('radarr' in cfg['admin_settings']['media_managers']):
-            #check if radarr is a dictionary
-            if (isinstance(cfg['admin_settings']['media_managers']['radarr'],dict)):
-                #create empty dictionary inside of empty list
-                arr_list=[{}]
-                #check if enabled is in config
-                if ('enabled' in cfg['admin_settings']['media_managers']['radarr']):
-                    #convert enabled into media_managers > radarr > [0] > enabled
-                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['radarr']['enabled']
-                #check if url is in config
-                if ('url' in cfg['admin_settings']['media_managers']['radarr']):
-                    #convert enabled into media_managers > radarr > [0] > url
-                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['radarr']['url']
-                #check if url is in api_key
-                if ('api_key' in cfg['admin_settings']['media_managers']['radarr']):
-                    #convert enabled into media_managers > radarr > [0] > api_key
-                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['radarr']['api_key']
-                #save radarr data converted from legacy dictionary format into list format
-                cfg['admin_settings']['media_managers']['radarr']=arr_list
+    #check if advanced_settings in the config
+    if (not ('admin_settings' in cfg)):
+        cfg['admin_settings']={}
 
-        #check if sonarr listed under media_managers
-        if ('sonarr' in cfg['admin_settings']['media_managers']):
-            #check if sonarr is a dictionary
-            if (isinstance(cfg['admin_settings']['media_managers']['sonarr'],dict)):
-                #create empty dictionary inside of empty list
-                arr_list=[{}]
-                #check if enabled is in config
-                if ('enabled' in cfg['admin_settings']['media_managers']['sonarr']):
-                    #convert enabled into media_managers > sonarr > [0] > enabled
-                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['sonarr']['enabled']
-                #check if url is in config
-                if ('url' in cfg['admin_settings']['media_managers']['sonarr']):
-                    #convert enabled into media_managers > sonarr > [0] > url
-                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['sonarr']['url']
-                #check if url is in api_key
-                if ('api_key' in cfg['admin_settings']['media_managers']['sonarr']):
-                    #convert enabled into media_managers > sonarr > [0] > api_key
-                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['sonarr']['api_key']
-                #save sonarr data converted from legacy dictionary format into list format
-                cfg['admin_settings']['media_managers']['sonarr']=arr_list
+    #check if media_managers in the admin_settings
+    if (not ('media_managers' in cfg['admin_settings'])):
+        cfg['admin_settings']['media_managers']={}
 
-        #check if lidarr listed under media_managers
-        if ('lidarr' in cfg['admin_settings']['media_managers']):
-            #check if lidarr is a dictionary
-            if (isinstance(cfg['admin_settings']['media_managers']['lidarr'],dict)):
-                #create empty dictionary inside of empty list
-                arr_list=[{}]
-                #check if enabled is in config
-                if ('enabled' in cfg['admin_settings']['media_managers']['lidarr']):
-                    #convert enabled into media_managers > lidarr > [0] > enabled
-                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['lidarr']['enabled']
-                #check if url is in config
-                if ('url' in cfg['admin_settings']['media_managers']['lidarr']):
-                    #convert enabled into media_managers > lidarr > [0] > url
-                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['lidarr']['url']
-                #check if url is in api_key
-                if ('api_key' in cfg['admin_settings']['media_managers']['lidarr']):
-                    #convert enabled into media_managers > lidarr > [0] > api_key
-                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['lidarr']['api_key']
-                #save lidarr data converted from legacy dictionary format into list format
-                cfg['admin_settings']['media_managers']['lidarr']=arr_list
+    #check if media_managers is None
+    if (cfg['admin_settings']['media_managers'] == None):
+        cfg['admin_settings']['media_managers']={}
 
-        #check if readarr listed under media_managers
-        if ('readarr' in cfg['admin_settings']['media_managers']):
-            #check if readarr is a dictionary
-            if (isinstance(cfg['admin_settings']['media_managers']['readarr'],dict)):
-                #create empty dictionary inside of empty list
-                arr_list=[{}]
-                #check if enabled is in config
-                if ('enabled' in cfg['admin_settings']['media_managers']['readarr']):
-                    #convert enabled into media_managers > readarr > [0] > enabled
-                    arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['readarr']['enabled']
-                #check if url is in config
-                if ('url' in cfg['admin_settings']['media_managers']['readarr']):
-                    #convert enabled into media_managers > readarr > [0] > url
-                    arr_list[0]['url']=cfg['admin_settings']['media_managers']['readarr']['url']
-                #check if url is in api_key
-                if ('api_key' in cfg['admin_settings']['media_managers']['readarr']):
-                    #convert enabled into media_managers > readarr > [0] > api_key
-                    arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['readarr']['api_key']
-                #save readarr data converted from legacy dictionary format into list format
-                cfg['admin_settings']['media_managers']['readarr']=arr_list
+    #check if radarr in cfg['admin_settings']['media_managers']
+    if ('radarr' in cfg['admin_settings']['media_managers']):
+        #check if radarr is a dictionary
+        if (isinstance(cfg['admin_settings']['media_managers']['radarr'],dict)):
+            #create empty dictionary inside of empty list
+            arr_list=[{'enabled':False,'url':'','api_key':'0a1b2c3d'}]
+            #check if enabled is in config
+            if ('enabled' in cfg['admin_settings']['media_managers']['radarr']):
+                #convert enabled into media_managers > radarr > [0] > enabled
+                arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['radarr']['enabled']
+            #check if url is in config
+            if ('url' in cfg['admin_settings']['media_managers']['radarr']):
+                #convert enabled into media_managers > radarr > [0] > url
+                arr_list[0]['url']=cfg['admin_settings']['media_managers']['radarr']['url']
+            #check if url is in api_key
+            if ('api_key' in cfg['admin_settings']['media_managers']['radarr']):
+                #convert enabled into media_managers > radarr > [0] > api_key
+                arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['radarr']['api_key']
+            #save radarr data converted from legacy dictionary format into list format
+            cfg['admin_settings']['media_managers']['radarr']=arr_list
+
+    #check if sonarr in cfg['admin_settings']['media_managers']
+    if ('sonarr' in cfg['admin_settings']['media_managers']):
+        #check if sonarr is a dictionary
+        if (isinstance(cfg['admin_settings']['media_managers']['sonarr'],dict)):
+            #create empty dictionary inside of empty list
+            arr_list=[{'enabled':False,'url':'','api_key':'0a1b2c3d'}]
+            #check if enabled is in config
+            if ('enabled' in cfg['admin_settings']['media_managers']['sonarr']):
+                #convert enabled into media_managers > sonarr > [0] > enabled
+                arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['sonarr']['enabled']
+            #check if url is in config
+            if ('url' in cfg['admin_settings']['media_managers']['sonarr']):
+                #convert enabled into media_managers > sonarr > [0] > url
+                arr_list[0]['url']=cfg['admin_settings']['media_managers']['sonarr']['url']
+            #check if url is in api_key
+            if ('api_key' in cfg['admin_settings']['media_managers']['sonarr']):
+                #convert enabled into media_managers > sonarr > [0] > api_key
+                arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['sonarr']['api_key']
+            #save sonarr data converted from legacy dictionary format into list format
+            cfg['admin_settings']['media_managers']['sonarr']=arr_list
+
+    #check if lidarr in cfg['admin_settings']['media_managers']
+    if ('lidarr' in cfg['admin_settings']['media_managers']):
+        #check if lidarr is a dictionary
+        if (isinstance(cfg['admin_settings']['media_managers']['lidarr'],dict)):
+            #create empty dictionary inside of empty list
+            arr_list=[{'enabled':False,'url':'','api_key':'0a1b2c3d'}]
+            #check if enabled is in config
+            if ('enabled' in cfg['admin_settings']['media_managers']['lidarr']):
+                #convert enabled into media_managers > lidarr > [0] > enabled
+                arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['lidarr']['enabled']
+            #check if url is in config
+            if ('url' in cfg['admin_settings']['media_managers']['lidarr']):
+                #convert enabled into media_managers > lidarr > [0] > url
+                arr_list[0]['url']=cfg['admin_settings']['media_managers']['lidarr']['url']
+            #check if url is in api_key
+            if ('api_key' in cfg['admin_settings']['media_managers']['lidarr']):
+                #convert enabled into media_managers > lidarr > [0] > api_key
+                arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['lidarr']['api_key']
+            #save lidarr data converted from legacy dictionary format into list format
+            cfg['admin_settings']['media_managers']['lidarr']=arr_list
+
+    #check if readarr in cfg['admin_settings']['media_managers']
+    if ('readarr' in cfg['admin_settings']['media_managers']):
+        #check if readarr is a dictionary
+        if (isinstance(cfg['admin_settings']['media_managers']['readarr'],dict)):
+            #create empty dictionary inside of empty list
+            arr_list=[{'enabled':False,'url':'','api_key':'0a1b2c3d'}]
+            #check if enabled is in config
+            if ('enabled' in cfg['admin_settings']['media_managers']['readarr']):
+                #convert enabled into media_managers > readarr > [0] > enabled
+                arr_list[0]['enabled']=cfg['admin_settings']['media_managers']['readarr']['enabled']
+            #check if url is in config
+            if ('url' in cfg['admin_settings']['media_managers']['readarr']):
+                #convert enabled into media_managers > readarr > [0] > url
+                arr_list[0]['url']=cfg['admin_settings']['media_managers']['readarr']['url']
+            #check if url is in api_key
+            if ('api_key' in cfg['admin_settings']['media_managers']['readarr']):
+                #convert enabled into media_managers > readarr > [0] > api_key
+                arr_list[0]['api_key']=cfg['admin_settings']['media_managers']['readarr']['api_key']
+            #save readarr data converted from legacy dictionary format into list format
+            cfg['admin_settings']['media_managers']['readarr']=arr_list
 
     return cfg
 
@@ -762,7 +772,7 @@ def convertLegacyMediaMangers(cfg):
 #convert legacy advanced_settings > *arr > media_type > {} into advanced_settings > *arr > media_type > []
 def convertLegacyMediaMangerSettings(cfg):
 
-    #check if advanced_settings and radarr is in the config
+    #check if advanced_settings in the config
     if (not ('advanced_settings' in cfg)):
         cfg['advanced_settings']={}
 
@@ -784,16 +794,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('remove' in cfg['advanced_settings']['radarr']['movie']):
             #convert remove into radarr > movie > [0] > remove
             arr_list[0]['remove']=cfg['advanced_settings']['radarr']['movie']['remove']
-        #check if length of arr_list is less than length of admin_settings > media_managers > radarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['radarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['radarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('radarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > radarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['radarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['radarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save radarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['radarr']['movie']=arr_list
 
@@ -815,16 +826,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('remove' in cfg['advanced_settings']['sonarr']['series']):
             #convert remove into sonarr > series > [0] > remove
             arr_list[0]['remove']=cfg['advanced_settings']['sonarr']['series']['remove']
-        #check if length of arr_list is less than length of admin_settings > media_managers > sonarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['sonarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['sonarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('sonarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > sonarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['sonarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['sonarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save sonarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['sonarr']['series']=arr_list
 
@@ -842,16 +854,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('unmonitor' in cfg['advanced_settings']['sonarr']['episode']):
             #convert unmonitor into sonarr > episode > [0] > unmonitor
             arr_list[0]['unmonitor']=cfg['advanced_settings']['sonarr']['episode']['unmonitor']
-        #check if length of arr_list is less than length of admin_settings > media_managers > sonarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['sonarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['sonarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('sonarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > sonarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['sonarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['sonarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save sonarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['sonarr']['episode']=arr_list
 
@@ -874,16 +887,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('remove' in cfg['advanced_settings']['lidarr']['album']):
             #convert remove into lidarr > album > [0] > remove
             arr_list[0]['remove']=cfg['advanced_settings']['lidarr']['album']['remove']
-        #check if length of arr_list is less than length of admin_settings > media_managers > lidarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['lidarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['lidarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('lidarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > lidarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['lidarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['lidarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save lidarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['lidarr']['album']=arr_list
     '''
@@ -903,16 +917,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('unmonitor' in cfg['advanced_settings']['lidarr']['track']):
             #convert unmonitor into lidarr > track > [0] > unmonitor
             arr_list[0]['unmonitor']=cfg['advanced_settings']['lidarr']['track']['unmonitor']
-        #check if length of arr_list is less than length of admin_settings > media_managers > lidarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['lidarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['lidarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('lidarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > lidarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['lidarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['lidarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save lidarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['lidarr']['track']=arr_list
     '''
@@ -936,16 +951,17 @@ def convertLegacyMediaMangerSettings(cfg):
         if ('remove' in cfg['advanced_settings']['readarr']['book']):
             #convert remove into readarr > book > [0] > remove
             arr_list[0]['remove']=cfg['advanced_settings']['readarr']['book']['remove']
-        #check if length of arr_list is less than length of admin_settings > media_managers > readarr
-        if (len(arr_list) < len(cfg['admin_settings']['media_managers']['readarr'])):
-            #find length difference
-            arr_list_diff=(len(cfg['admin_settings']['media_managers']['readarr']) - len(arr_list))
-            #loop (arr_list_diff - 1) times
-            while arr_list_diff > 0:
-                #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
-                arr_list.append(arr_list[0].copy())
-                #decrement loop control
-                arr_list_diff-=1
+        if ('readarr' in cfg['admin_settings']['media_managers']):
+            #check if length of arr_list is less than length of admin_settings > media_managers > readarr
+            if (len(arr_list) < len(cfg['admin_settings']['media_managers']['readarr'])):
+                #find length difference
+                arr_list_diff=(len(cfg['admin_settings']['media_managers']['readarr']) - len(arr_list))
+                #loop (arr_list_diff - 1) times
+                while arr_list_diff > 0:
+                    #legacy behavior assumed all *arr instances used the same configuration settings; expand list with values from position arr_list[0]
+                    arr_list.append(arr_list[0].copy())
+                    #decrement loop control
+                    arr_list_diff-=1
         #save readarr data converted from legacy dictionary format into list format
         cfg['advanced_settings']['readarr']['book']=arr_list
     '''
