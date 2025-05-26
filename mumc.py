@@ -16,7 +16,7 @@ from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
 from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
-from mumc_modules.mumc_data_checks import data_checker,convertLegacyMediaMangers,convertLegacyMediaMangerSettings
+from mumc_modules.mumc_data_checks import data_checker,convertLegacyMediaManagers,convertLegacyMediaManagerSettings,convertLegacyMediaManagerLengths
 from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
 from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 #from memory_profiler import profile
@@ -49,9 +49,7 @@ def MUMC():
 
     #must be done in this order
     #convert legacy admin_settings > media_managers > *arr > {} into admin_settings > media_managers > *arr > []
-    cfg=convertLegacyMediaMangers(cfg)
-    #convert legacy advanced_settings > *arr > media_type > {} into advanced_settings > *arr > media_type > []
-    cfg=convertLegacyMediaMangerSettings(cfg)
+    cfg=convertLegacyMediaManagers(cfg)
 
     #get and fully check user defined config values are what we expect them to be
     userCfgChecker=data_checker(cfg)
@@ -62,6 +60,11 @@ def MUMC():
 
     #remember original config for when user wants to update existing config file
     cfg_orig=copy.deepcopy(cfg)
+
+    #convert legacy advanced_settings > *arr > media_type > {} into advanced_settings > *arr > media_type > []
+    cfg=convertLegacyMediaManagerSettings(cfg)
+    #match length of advanced_settings > *arr > media_type > [] to length of admin_settings > media_managers > *arr > []
+    cfg=convertLegacyMediaManagerLengths(cfg)
 
     #create default config file
     default_config=open_and_return_file(get_default_config_path(init_dict['script_file_path']))
@@ -78,8 +81,8 @@ def MUMC():
         print_configuration_yaml(cfg,init_dict)
 
     #get and fully check user defined + default config values are what we expect them to be
-    cfgChecker=data_checker(cfg)
-    cfg=cfgCheckYAML(cfgChecker)
+    #cfgChecker=data_checker(cfg)
+    #cfg=cfgCheckYAML(cfgChecker)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))

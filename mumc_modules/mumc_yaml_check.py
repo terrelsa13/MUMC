@@ -25,7 +25,7 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-    if (not ((admin_settings:=cfgChecker.checkDict('admin_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=2,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+    if (not ((admin_settings:=cfgChecker.checkDict('admin_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
@@ -102,7 +102,7 @@ def cfgCheckYAML(cfgChecker):
                     else:
                         collection_type_vales=['movies','tvshows','music','audiobooks','books','mixed']
 
-                    if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+                    if (not ((whitelistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'whitelist',value=None,instanceType=cfgChecker.list,required=True,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                         for userWhitelistListInfo in whitelistList:
                             if (not ((userWhitelistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
@@ -115,15 +115,15 @@ def cfgCheckYAML(cfgChecker):
 
                                 path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'network_path',value=None,instanceType=cfgChecker.str,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,required=False,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'whitelist',whitelistList.index(userWhitelistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
 
 #######################################################################################################
 
-                    if (not ((blacklistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
+                    if (not ((blacklistList:=cfgChecker.checkList('admin_settings','users',usersList.index(userInfo),'blacklist',value=None,instanceType=cfgChecker.list,required=True,minLength=None,maxLength=None,minValue=None,maxValue=None,errOut=True,comparisonValues=None)) == None)):
 
                         for userBlacklistListInfo in blacklistList:
                             if (not ((userBlacklistListInfo:=cfgChecker.checkDict('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
@@ -136,11 +136,11 @@ def cfgCheckYAML(cfgChecker):
 
                                 path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'path',value=None,instanceType=cfgChecker.str,required=True,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
+                                network_path=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'network_path',value=None,instanceType=cfgChecker.str,required=False,minLength=None,maxLength=None,errOut=True,comparisonValues=None)
 
-                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
+                                subfolder_id=cfgChecker.checkString('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'subfolder_id',value=None,instanceType=cfgChecker.str,required=False,minLength=1,maxLength=None,errOut=True,comparisonValues=None)
 
-                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,errOut=True)
+                                lib_enabled=cfgChecker.checkBoolean('admin_settings','users',usersList.index(userInfo),'blacklist',blacklistList.index(userBlacklistListInfo),'lib_enabled',value=None,instanceType=cfgChecker.bool,required=True,errOut=True)
 
 #######################################################################################################
 
@@ -255,10 +255,10 @@ def cfgCheckYAML(cfgChecker):
         #something is not right with the admin_settings
         cfgChecker.printError()
 
+#######################################################################################################
+
     #do any filter_statements exist
     filter_statement_exists=False
-
-#######################################################################################################
 
     if (not ((basic_settings:=cfgChecker.checkDict('basic_settings',value=None,instanceType=cfgChecker.dict,required=True,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
@@ -996,6 +996,11 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
+            try:
+                media_managers_radarr=media_managers_radarr
+            except:
+                media_managers_radarr=None
+
             if (media_managers_radarr == None):
                 media_managers_radarr_length=0
             else:
@@ -1016,6 +1021,11 @@ def cfgCheckYAML(cfgChecker):
         if (not ((sonarr_config:=cfgChecker.checkDict('advanced_settings','sonarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
+
+            try:
+                media_managers_sonarr=media_managers_sonarr
+            except:
+                media_managers_sonarr=None
 
             if (media_managers_sonarr == None):
                 media_managers_sonarr_length=0
@@ -1048,6 +1058,11 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
+            #try:
+                #media_managers_lidarr=media_managers_lidarr
+            #except:
+                #media_managers_lidarr=None
+
             #if (media_managers_lidarr == None):
                 #media_managers_lidarr_length=0
             #else:
@@ -1079,6 +1094,11 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
+            #try:
+                #media_managers_readarr=media_managers_readarr
+            #except:
+                #media_managers_readarr=None
+
             #if (media_managers_readarr == None):
                 #media_managers_readarr_length=0
             #else:
@@ -1100,7 +1120,7 @@ def cfgCheckYAML(cfgChecker):
 
 #######################################################################################################
 
-            if (not ((episode_control:=cfgChecker.checkDict('advanced_settings','trakt_fix','set_missing_last_played_date',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
+            if (not ((set_missing_last_played_date:=cfgChecker.checkDict('advanced_settings','trakt_fix','set_missing_last_played_date',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):
 
 #######################################################################################################
 
@@ -1784,11 +1804,6 @@ def cfgCheckYAML(cfgChecker):
 
         remove_files=cfgChecker.checkBoolean('advanced_settings','REMOVE_FILES',value=None,instanceType=cfgChecker.bool,errOut=True)
 
-#######################################################################################################
-
-    else:
-        #something is not right with the advanced_settings
-        cfgChecker.printError()
 
 #######################################################################################################
 #######################################################################################################

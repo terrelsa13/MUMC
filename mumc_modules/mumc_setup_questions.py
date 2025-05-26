@@ -130,11 +130,11 @@ def get_library_matching_behavior(library_matching_behavior=None):
                 (library_matching_behavior.casefold() == 'bynetworkpath')):
                 print('')
                 if (library_matching_behavior.casefold() == 'byid'):
-                    print('Script previously setup to match media items to libraries 0 - ' + library_matching_behavior + '.')
+                    print('Script previously setup to match media items to libraries using 0 - ' + library_matching_behavior + '.')
                 elif (library_matching_behavior.casefold() == 'bypath'):
-                    print('Script previously setup to match media items to libraries 1 - ' + library_matching_behavior + '.')
+                    print('Script previously setup to match media items to libraries using 1 - ' + library_matching_behavior + '.')
                 else: #(library_matching_behavior.casefold() == 'bynetworkpath'):
-                    print('Script previously setup to match media items to libraries 2 - ' + library_matching_behavior + '.')
+                    print('Script previously setup to match media items to libraries using 2 - ' + library_matching_behavior + '.')
         behavior=input('Choose how the script will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True

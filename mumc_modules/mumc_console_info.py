@@ -46,37 +46,48 @@ def get_MUMC_ASCII_art(start=True):
 def override_media_manager_enabled_states(the_dict):
     for arrInfo,arrMovie in zip(the_dict['admin_settings']['media_managers']['radarr'],the_dict['advanced_settings']['radarr']['movie']):
         if (arrInfo['enabled']):
+            if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
 
-            unmonitorRadarrMovie=arrMovie['unmonitor']
-            removeRadarrMovie=arrMovie['remove']
-            
-            arrInfo['enabled']=(unmonitorRadarrMovie or removeRadarrMovie)
+                unmonitorRadarrMovie=arrMovie['unmonitor']
+                removeRadarrMovie=arrMovie['remove']
+                
+                arrInfo['enabled']=(unmonitorRadarrMovie or removeRadarrMovie)
+            else:
+                arrInfo['enabled']=False
 
     for arrInfo,arrSeries,arrEpisode in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['series'],the_dict['advanced_settings']['sonarr']['episode']):
         if (arrInfo['enabled']):
+            if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
+                unmonitorSonarrSeries=arrSeries['unmonitor']
+                removeSonarrSeries=arrSeries['remove']
+                unmonitorSonarrEpisode=arrEpisode['unmonitor']
 
-            unmonitorSonarrSeries=arrSeries['unmonitor']
-            removeSonarrSeries=arrSeries['remove']
-            unmonitorSonarrEpisode=arrEpisode['unmonitor']
-
-            arrInfo['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode)
+                arrInfo['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode)
+            else:
+                arrInfo['enabled']=False
 
     #for arrInfo,arrAlbum,arrTrack in zip(the_dict['admin_settings']['media_managers']['lidarr'],the_dict['advanced_settings']['lidarr']['album'],the_dict['advanced_settings']['lidarr']['track']):
-        #if (arrInfo['enabled']):
+        #if ((arrInfo['enabled']) and (not ((arrInfo['url'] == '') or (arrInfo[''] == '')))):
+            #if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
 
-            #unmonitorLidarrAlbum=arrAlbum['unmonitor']
-            #removeLidarrAlbum=arrAlbum['remove']
-            #unmonitorLidarrTrack=arrTrack['unmonitor']
+                #unmonitorLidarrAlbum=arrAlbum['unmonitor']
+                #removeLidarrAlbum=arrAlbum['remove']
+                #unmonitorLidarrTrack=arrTrack['unmonitor']
 
-            #arrInfo['enabled']=(unmonitorLidarrAlbum or removeLidarrAlbum or unmonitorLidarrTrack)
+                #arrInfo['enabled']=(unmonitorLidarrAlbum or removeLidarrAlbum or unmonitorLidarrTrack)
+            #else:
+                #arrInfo['enabled']=False
 
     #for arrInfo,arrBook in zip(the_dict['admin_settings']['media_managers']['readarr'],the_dict['advanced_settings']['readarr']['book']):
-        #if (arrInfo['enabled']):
+        #if ((arrInfo['enabled']) and (not ((arrInfo['url'] == '') or (arrInfo[''] == '')))):
+            #if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
 
-            #unmonitorReadarrBook=arrBook['unmonitor']
-            #removeReadarrBook=arrBook['remove']
+                #unmonitorReadarrBook=arrBook['unmonitor']
+                #removeReadarrBook=arrBook['remove']
 
-            #arrInfo['enabled']=(unmonitorReadarrBook or removeReadarrBook)
+                #arrInfo['enabled']=(unmonitorReadarrBook or removeReadarrBook)
+            #else:
+                #arrInfo['enabled']=False
 
     return the_dict
 
@@ -97,9 +108,13 @@ def print_informational_header(the_dict):
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
     for arrInfo in the_dict['admin_settings']['media_managers']['radarr']:
-        strings_list_to_print+='Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + ' Version: ' + get_radarr_version(arrInfo,the_dict) + '\n'
+        if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
+            arr_index=the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)
+            strings_list_to_print+='Radarr-' + str(arr_index) + ' Version: ' + get_radarr_version(the_dict,arrInfo,str(arr_index)) + '\n'
     for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
-        strings_list_to_print+='Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + ' Version: ' + get_sonarr_version(arrInfo,the_dict) + '\n'
+        if (not ((arrInfo['url'] == '') or (arrInfo[''] == ''))):
+            arr_index=the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)
+            strings_list_to_print+='Sonarr-' + str(arr_index) + ' Version: ' + get_sonarr_version(the_dict,arrInfo,str(arr_index)) + '\n'
     strings_list_to_print+='Python Version: ' + the_dict['python_version'] + '\n'
     strings_list_to_print+='OS Info: ' + the_dict['os_info'] + '\n'
     strings_list_to_print+=the_dict['console_separator_'] + '\n'
