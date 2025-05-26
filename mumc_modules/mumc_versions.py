@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 #Get the current script version
 def get_script_version():
-    return '5.11.23-beta'
+    return '5.11.24-beta'
 
 
 #Get the min config version
@@ -50,8 +50,8 @@ def get_python_version():
 
 
 #Get the Radarr version
-def get_radarr_version(arrInfo,the_dict):
-    lookupTopic="get_radarr_version"
+def get_radarr_version(the_dict,arrInfo,arr_index=''):
+    lookupTopic="get_radarr" + arr_index + "_version"
 
     #Get additonal item information
     url=arrInfo['url'] + '/api/v3/system/status'
@@ -65,7 +65,7 @@ def get_radarr_version(arrInfo,the_dict):
 
 
 #Get the Sonarr version
-def get_sonarr_version(arrInfo,the_dict):
+def get_sonarr_version(the_dict,arrInfo,arr_index=''):
     lookupTopic="get_sonarr_version"
 
     #Get additonal item information

@@ -1,3 +1,4 @@
+import sys
 import json
 import yaml
 from pathlib import Path
@@ -11,7 +12,11 @@ class NoAliasDumper(yaml.SafeDumper):
 
 def open_and_return_file(full_file_path):
     with open(full_file_path, 'r') as opened_file:
-        return yaml.safe_load(opened_file)
+        try:
+            return yaml.safe_load(opened_file)
+        except:
+            print('\nConfigError: Format or Syntax of configuration file is incorrect.\n\tUnable to load ' + str(full_file_path) + '\n')
+            sys.exit(0)
 
 
 def save_yaml_config(dataInput,filePathName):

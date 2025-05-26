@@ -69,11 +69,11 @@ def yaml_configurationBuilder(the_dict):
     config_data['advanced_settings'].pop('episode_control')
 
     #if ((config_data['admin_settings']['media_managers']['radarr']['url'] == None) and (config_data['admin_settings']['media_managers']['radarr']['api_key'] == None)):
-    if (config_data['admin_settings']['media_managers']['radarr'] == []):
+    if (config_data['admin_settings']['media_managers']['radarr'] == [{'enabled':True,'url':'','api_key':''}]):
         config_data['admin_settings']['media_managers'].pop('radarr')
     else:
         for arr in config_data['admin_settings']['media_managers']['radarr']:
-            if (arr['enabled']):
+            if (arr['enabled'] or (arr['enabled'] == None)):
                 #config_data['admin_settings']['media_managers']['radarr'].pop('enabled')
                 arr.pop('enabled')
             if ((arr['url'] == None) or (arr['url'] == '')):
@@ -84,11 +84,11 @@ def yaml_configurationBuilder(the_dict):
                 arr.pop('api_key')
 
     #if ((config_data['admin_settings']['media_managers']['sonarr']['url'] == None) and (config_data['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
-    if (config_data['admin_settings']['media_managers']['sonarr'] == []):
+    if (config_data['admin_settings']['media_managers']['sonarr'] == [{'enabled':True,'url':'','api_key':''}]):
         config_data['admin_settings']['media_managers'].pop('sonarr')
     else:
         for arr in config_data['admin_settings']['media_managers']['sonarr']:
-            if (arr['enabled']):
+            if (arr['enabled'] or (arr['enabled'] == None)):
                 #config_data['admin_settings']['media_managers']['sonarr'].pop('enabled')
                 arr.pop('enabled')
             if ((arr['url'] == None) or (arr['url'] == '')):
@@ -99,11 +99,11 @@ def yaml_configurationBuilder(the_dict):
                 arr.pop('api_key')
 
     ##if ((config_data['admin_settings']['media_managers']['lidarr']['url'] == None) and (config_data['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
-    #if (config_data['admin_settings']['media_managers']['lidarr'] == []):
+    #if (config_data['admin_settings']['media_managers']['lidarr'] == [{'enabled':True,'url':'','api_key':''}]):
         #config_data['admin_settings']['media_managers'].pop('lidarr')
     #else:
         #for arr in config_data['admin_settings']['media_managers']['lidarr']:
-            #if (arr['enabled']):
+            #if (arr['enabled'] or (arr['enabled'] == None)):
                 ##config_data['admin_settings']['media_managers']['lidarr'].pop('enabled')
                 #arr.pop('enabled')
             #if ((arr['url'] == None) or (arr['url'] == '')):
@@ -114,11 +114,11 @@ def yaml_configurationBuilder(the_dict):
                 #arr.pop('api_key')
 
     ##if ((config_data['admin_settings']['media_managers']['readarr']['url'] == None) and (config_data['admin_settings']['media_managers']['readarr']['api_key'] == None)):
-    #if (config_data['admin_settings']['media_managers']['readarr'] == []):
+    #if (config_data['admin_settings']['media_managers']['readarr'] == [{'enabled':True,'url':'','api_key':''}]):
         #config_data['admin_settings']['media_managers'].pop('readarr')
     #else:
         #for arr in config_data['admin_settings']['media_managers']['readarr']:
-            #if (arr['enabled']):
+            #if (arr['enabled'] or (arr['enabled'] == None)):
                 ##config_data['admin_settings']['media_managers']['readarr'].pop('enabled')
                 #arr.pop('enabled')
             #if ((arr['url'] == None) or (arr['url'] == '')):

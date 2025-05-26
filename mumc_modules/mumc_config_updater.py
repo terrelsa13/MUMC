@@ -91,47 +91,80 @@ def yaml_configurationUpdater(mem_dict,orig_dict={}):
             try:
                 #check if default value was NOT selected during updating
                 if (mem_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                    orig_dict['admin_settings']['behavior']['list']='whitelist'
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','list'))):
+                        new_dict['admin_settings']['behavior']['list']=None
+                    new_dict['admin_settings']['behavior']['list']='whitelist'
                 else:
                     #check if keys already exist in 
                     if (keys_exist(orig_dict,'admin_settings','behavior','list')):
-                        orig_dict['admin_settings']['behavior']['list']=mem_dict['admin_settings']['behavior']['list']
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','list'))):
+                            new_dict['admin_settings']['behavior']['list']=None
+                        new_dict['admin_settings']['behavior']['list']=mem_dict['admin_settings']['behavior']['list']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['list']=orig_dict['admin_settings']['behavior'].pop('list')
+                new_dict['admin_settings']['behavior']['list']=new_dict['admin_settings']['behavior'].pop('list')
             except:
                 pass
 
             try:
                 #check if default value was NOT selected during updating
                 if (mem_dict['admin_settings']['behavior']['matching'] == 'byPath'):
-                    orig_dict['admin_settings']['behavior']['matching']='byPath'
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                        new_dict['admin_settings']['behavior']['matching']=None
+                    new_dict['admin_settings']['behavior']['matching']='byPath'
                 elif (mem_dict['admin_settings']['behavior']['matching'] == 'byNetworkPath'):
-                    orig_dict['admin_settings']['behavior']['matching']='byNetworkPath'
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                        new_dict['admin_settings']['behavior']['matching']=None
+                    new_dict['admin_settings']['behavior']['matching']='byNetworkPath'
                 else:
+                    #check if keys already exist in 
                     if (keys_exist(orig_dict,'admin_settings','behavior','matching')):
-                        orig_dict['admin_settings']['behavior']['matching']=mem_dict['admin_settings']['behavior']['matching']
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                            new_dict['admin_settings']['behavior']['matching']=None
+                        new_dict['admin_settings']['behavior']['matching']=mem_dict['admin_settings']['behavior']['matching']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['matching']=orig_dict['admin_settings']['behavior'].pop('matching')
+                new_dict['admin_settings']['behavior']['matching']=new_dict['admin_settings']['behavior'].pop('matching')
             except:
                 pass
 
             try:
                 #check if default value was NOT selected during updating
                 if (mem_dict['admin_settings']['behavior']['users']['monitor_disabled'] == False):
-                    orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=False
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','users'))):
+                        new_dict['admin_settings']['behavior']['users']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','users','monitor_disabled'))):
+                        new_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
+                    new_dict['admin_settings']['behavior']['users']['monitor_disabled']=False
                 else:
-                    if (keys_exist(orig_dict,'admin_settings','behavior','users')):
-                        orig_dict['admin_settings']['behavior']['users']={}
-                        orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=mem_dict['admin_settings']['behavior']['users']['monitor_disabled']
+                    #check if keys already exist in 
+                    if (keys_exist(orig_dict,'admin_settings','behavior','users','monitor_disabled')):
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','users'))):
+                            new_dict['admin_settings']['behavior']['users']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','users','monitor_disabled'))):
+                            new_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
+                        new_dict['admin_settings']['behavior']['users']['monitor_disabled']=mem_dict['admin_settings']['behavior']['users']['monitor_disabled']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['users']=orig_dict['admin_settings']['behavior'].pop('users')
+                new_dict['admin_settings']['behavior']['users']=new_dict['admin_settings']['behavior'].pop('users')
             except:
                 pass
 
-            new_dict['admin_settings']['behavior']=orig_dict['admin_settings']['behavior']
+            #new_dict['admin_settings']['behavior']=orig_dict['admin_settings']['behavior']
         except:
             pass
         new_dict['admin_settings']['server']=orig_dict['admin_settings']['server']
@@ -153,8 +186,8 @@ def yaml_configurationUpdater(mem_dict,orig_dict={}):
             if ('media_managers' in mem_dict['admin_settings']):
                 #check if radarr in mem_dict['admin_settings']['media_managers']
                 if ('radarr' in mem_dict['admin_settings']['media_managers']):
-                    #check if mem_dict['admin_settings']['media_managers']['radarr'] is an empty list
-                    if (not (mem_dict['admin_settings']['media_managers']['radarr'] == [])):
+                    #check if mem_dict['admin_settings']['media_managers']['radarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['radarr'] == [{'enabled':True,'url':'','api_key':''}])):
                         #set mem_dict has values
                         arr_in_mem_dict=True
 
@@ -188,8 +221,8 @@ def yaml_configurationUpdater(mem_dict,orig_dict={}):
             if ('media_managers' in mem_dict['admin_settings']):
                 #check if sonarr in mem_dict['admin_settings']['media_managers']
                 if ('sonarr' in mem_dict['admin_settings']['media_managers']):
-                    #check if mem_dict['admin_settings']['media_managers']['sonarr'] is an empty list
-                    if (not (mem_dict['admin_settings']['media_managers']['sonarr'] == [])):
+                    #check if mem_dict['admin_settings']['media_managers']['sonarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['sonarr'] == [{'enabled':True,'url':'','api_key':''}])):
                         #set mem_dict has values
                         arr_in_mem_dict=True
 
@@ -223,8 +256,8 @@ def yaml_configurationUpdater(mem_dict,orig_dict={}):
             if ('media_managers' in mem_dict['admin_settings']):
                 #check if lidarr in mem_dict['admin_settings']['media_managers']
                 if ('lidarr' in mem_dict['admin_settings']['media_managers']):
-                    #check if mem_dict['admin_settings']['media_managers']['lidarr'] is an empty list
-                    if (not (mem_dict['admin_settings']['media_managers']['lidarr'] == [])):
+                    #check if mem_dict['admin_settings']['media_managers']['lidarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['lidarr'] == [{'enabled':True,'url':'','api_key':''}])):
                         #set mem_dict has values
                         arr_in_mem_dict=True
 
@@ -258,8 +291,8 @@ def yaml_configurationUpdater(mem_dict,orig_dict={}):
             if ('media_managers' in mem_dict['admin_settings']):
                 #check if readarr in mem_dict['admin_settings']['media_managers']
                 if ('readarr' in mem_dict['admin_settings']['media_managers']):
-                    #check if mem_dict['admin_settings']['media_managers']['readarr'] is an empty list
-                    if (not (mem_dict['admin_settings']['media_managers']['readarr'] == [])):
+                    #check if mem_dict['admin_settings']['media_managers']['readarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['readarr'] == [{'enabled':True,'url':'','api_key':''}])):
                         #set mem_dict has values
                         arr_in_mem_dict=True
 

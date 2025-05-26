@@ -44,17 +44,25 @@ basic_settings:
         behavioral_control: True
   filter_tags:
     movie:
-      whitetags: []
-      blacktags: []
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
     episode:
-      whitetags: []
-      blacktags: []
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
     audio:
-      whitetags: []
-      blacktags: []
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
     audiobook:
-      whitetags: []
-      blacktags: []
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
 advanced_settings:
   filter_statements:
     movie:
@@ -255,49 +263,59 @@ advanced_settings:
         dynamic_behavior: false
   behavioral_tags:
     movie:
-      #null:-1:>=:1
-        #action: delete
-        #user_conditional: all
-        #played_conditional: ignore
-        #action_control: 0
-        #dynamic_behavior: false
-        #high_priority: false
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
     episode:
-      #null:-1:>=:1
-        #action: delete
-        #user_conditional: all
-        #played_conditional: ignore
-        #action_control: 0
-        #dynamic_behavior: false
-        #high_priority: false
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
     audio:
-      #null:-1:>=:1
-        #action: delete
-        #user_conditional: all
-        #played_conditional: ignore
-        #action_control: 0
-        #dynamic_behavior: false
-        #high_priority: false
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
     audiobook:
-      #null:-1:>=:1
-        #action: delete
-        #user_conditional: all
-        #played_conditional: ignore
-        #action_control: 0
-        #dynamic_behavior: false
-        #high_priority: false
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
   whitetags:
-    global: []
-    movie: []
-    episode: []
-    audio: []
-    audiobook: []
+    global:
+    - ''
+    movie:
+    - ''
+    episode:
+    - ''
+    audio:
+    - ''
+    audiobook:
+    - ''
   blacktags:
-    global: []
-    movie: []
-    episode: []
-    audio: []
-    audiobook: []
+    global:
+    - ''
+    movie:
+    - ''
+    episode:
+    - ''
+    audio:
+    - ''
+    audiobook:
+    - ''
   delete_empty_folders:
     episode:
       season: false
@@ -309,15 +327,15 @@ advanced_settings:
     series_ended:
       delete_episodes: false
   radarr:
-    movie: []
-    #- unmonitor: true
-      #remove: false
+    movie:
+    - unmonitor: true
+      remove: false
   sonarr:
-    series: []
-    #- unmonitor: true
-      #remove: false
-    episode: []
-    #- unmonitor: true
+    series:
+    - unmonitor: true
+      remove: false
+    episode:
+    - unmonitor: true
   trakt_fix:
     set_missing_last_played_date:
       movie: true
@@ -504,41 +522,41 @@ advanced_settings:
   REMOVE_FILES: false
 admin_settings:
   server:
-    brand: null
-    url: null
-    auth_key: null
-    admin_id: null
+    brand: ''
+    url: ''
+    auth_key: ''
+    admin_id: ''
   behavior:
     matching: byId
     list: blacklist
     users:
       monitor_disabled: true
-  users: []
-  #- user_id: null
-    #user_name: null
-    #whitelist:
-    #- lib_id: null
-      #collection_type: null
-      #path: null
-      #network_path: null
-      #subfolder_id: null
-      #lib_enabled: true
-    #blacklist:
-    #- lib_id: null
-      #collection_type: null
-      #path: null
-      #network_path: null
-      #subfolder_id: null
-      #lib_enabled: true
+  users:
+  - user_id: ''
+    user_name: ''
+    whitelist:
+    - lib_id: ''
+      collection_type: ''
+      path: ''
+      network_path: ''
+      subfolder_id: ''
+      lib_enabled: false
+    blacklist:
+    - lib_id: ''
+      collection_type: ''
+      path: ''
+      network_path: ''
+      subfolder_id: ''
+      lib_enabled: false
   media_managers:
-    radarr: []
-    #- enabled: true
-      #url: null
-      #api_key: null
-    sonarr: []
-    #- enabled: true
-      #url: null
-      #api_key: null
+    radarr:
+    - enabled: true
+      url: ''
+      api_key: ''
+    sonarr:
+    - enabled: true
+      url: ''
+      api_key: ''
   api_controls:
     attempts: 4
     item_limit: 25
