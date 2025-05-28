@@ -5,9 +5,9 @@ Multi-User Media Cleaner aka MUMC (pronounced Mew-Mick) will query your Emby/Jel
 Check out the **MUMC [WIKI](https://github.com/terrelsa13/MUMC/wiki)**.
 
 # Install MUMC
-* [Linux](https://github.com/terrelsa13/MUMC/wiki/Install#Linux)
-* [Windows](https://github.com/terrelsa13/MUMC/wiki/Install#Windows)
-* [Docker](https://github.com/terrelsa13/MUMC/wiki/Install#Docker)
+* [Linux](https://github.com/terrelsa13/MUMC/wiki/Install_Linux)
+* [Windows](https://github.com/terrelsa13/MUMC/wiki/Install_Windows)
+* [Docker Compose](https://github.com/terrelsa13/MUMC/wiki/Install_Docker_Compose)
 
 # MUMC Branches
 * [MUMC-Latest](https://github.com/terrelsa13/MUMC/tree/MUMC-Latest) - MUMC_v5 is the current and latest branch
