@@ -559,28 +559,22 @@ class minEpisodesToKeep_data_handler:
                                                 self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
                 seasonNumIndex += 1
 
-    '''
-    def has_seriesEnded_okToDeleteEpisode(self,the_dict):
-        #loop thru self.episodesToKeep_bySeriesTVdBId
-        for episodeId in self.episodesToKeep_bySeriesTVdBId:
-            seriesTVdBId=self.episodesToKeep_bySeriesTVdBId[episodeId]
-            seriesInfo = get_SERIES_sonarrInfo_TVdbId(seriesTVdBId,self.postproc_dict,the_dict)
-            #check the "status" value and "ended" value
-            if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
-                while (episodeId in self.episodesToKeepIds):
-                    self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
-    '''
 
     def has_seriesEnded_okToDeleteEpisode(self,the_dict):
+        #check for the first properly configured instances of sonarr
+        for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+            if (not ((arrInfo['url'] == '') or (arrInfo['api_key'] == '') or (arrInfo['url'] == None) or (arrInfo['api_key'] == None))):
+                break        
+
         #loop thru self.episodesToKeep_bySeriesIMdBId
         for episodeId in self.episodesToKeep_bySeriesIMdBId:
             seriesIMdBId=self.episodesToKeep_bySeriesIMdBId[episodeId]
-            lookupseriesInfo = lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,the_dict)
+            lookupseriesInfo = lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,arrInfo,the_dict)
 
             #tvdbid not consistent from Emby/Jellyfin with uppercase and lowercase; need to search every case permutatoin before using it
             for tvdbIdStr in all_uppercase_lowercase_permutations('tvdbid'):
                 if (tvdbIdStr in lookupseriesInfo[0]):
-                    seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo[0][tvdbIdStr],self.postproc_dict,the_dict)
+                    seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo[0][tvdbIdStr],arrInfo,the_dict)
                     #make sure an empty list was not returned (i.e. the series still exists on Sonarr)
                     if (not (seriesInfo == [])):
                         #check the "status" value and "ended" value
