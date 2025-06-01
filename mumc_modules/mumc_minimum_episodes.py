@@ -29,7 +29,7 @@ class minEpisodesToKeep_data_handler:
 
         self.episodesToKeepIds = []
         self.episodesToKeep_bySeriesIMdBId = {}
-        self.episodesToKeep_bySeriesTVdBId = {}
+        #self.episodesToKeep_bySeriesTVdBId = {}
         self.episodes_seriesEnded = {}
 
         #Define dictionary of different behavior types
@@ -518,7 +518,7 @@ class minEpisodesToKeep_data_handler:
                                                 #add this episodeId to the list of episodeIds to be removed from the delete list later
                                                 self.episodesToKeepIds.append(episodeId)
                                                 self.episodesToKeep_bySeriesIMdBId[episodeId]=self.episodeTracker[seriesId]['IMdBId']
-                                                self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
+                                                #self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
                 seasonNumIndex += 1    
 
 
@@ -556,7 +556,7 @@ class minEpisodesToKeep_data_handler:
                                                 #add this episodeId to the list of episodeIds to be removed from the delete list later
                                                 self.episodesToKeepIds.append(episodeId)
                                                 self.episodesToKeep_bySeriesIMdBId[episodeId]=self.episodeTracker[seriesId]['IMdBId']
-                                                self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
+                                                #self.episodesToKeep_bySeriesTVdBId[episodeId]=self.episodeTracker[seriesId]['TVdBId']
                 seasonNumIndex += 1
 
 
@@ -569,19 +569,20 @@ class minEpisodesToKeep_data_handler:
         #loop thru self.episodesToKeep_bySeriesIMdBId
         for episodeId in self.episodesToKeep_bySeriesIMdBId:
             seriesIMdBId=self.episodesToKeep_bySeriesIMdBId[episodeId]
-            lookupseriesInfo = lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,arrInfo,the_dict)
+            if (not (seriesIMdBId == None)):
+                lookupseriesInfo = lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,arrInfo,the_dict)
 
-            #tvdbid not consistent from Emby/Jellyfin with uppercase and lowercase; need to search every case permutatoin before using it
-            for tvdbIdStr in all_uppercase_lowercase_permutations('tvdbid'):
-                if (tvdbIdStr in lookupseriesInfo[0]):
-                    seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo[0][tvdbIdStr],arrInfo,the_dict)
-                    #make sure an empty list was not returned (i.e. the series still exists on Sonarr)
-                    if (not (seriesInfo == [])):
-                        #check the "status" value and "ended" value
-                        if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
-                            while (episodeId in self.episodesToKeepIds):
-                                self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
-                    break
+                #tvdbid not consistent from Emby/Jellyfin with uppercase and lowercase; need to search every case permutatoin before using it
+                for tvdbIdStr in all_uppercase_lowercase_permutations('tvdbid'):
+                    if (tvdbIdStr in lookupseriesInfo[0]):
+                        seriesInfo = get_SERIES_sonarrInfo_TVdbId(lookupseriesInfo[0][tvdbIdStr],arrInfo,the_dict)
+                        #make sure an empty list was not returned (i.e. the series still exists on Sonarr)
+                        if (not (seriesInfo == [])):
+                            #check the "status" value and "ended" value
+                            if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
+                                while (episodeId in self.episodesToKeepIds):
+                                    self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
+                        break
 
 
     def remove_episodesToKeep_fromDeleteList(self,postproc_dict):
