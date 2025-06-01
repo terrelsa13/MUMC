@@ -694,12 +694,20 @@ def get_mediaItems(the_dict,media_type,user_info,media_returns):
                                             if (imdbStr in series_info['ProviderIds']):
                                                 if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                                     var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=series_info['ProviderIds'][imdbStr]
+                                                break
+                                        else:
+                                            if (not ('IMdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                                    var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['IMdBId']=None
 
                                         #Tvdb not consistent from Emby/Jellyfin with uppercase and lowercase
                                         for tvdbStr in all_uppercase_lowercase_permutations('tvdb'):
                                             if (tvdbStr in series_info['ProviderIds']):
                                                 if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                                     var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=series_info['ProviderIds'][tvdbStr]
+                                                break
+                                        else:
+                                            if (not ('TVdBId' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
+                                                    var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['TVdBId']=None
 
                                     if (not ('SeriesName' in var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']])):
                                         var_dict['mediaCounts_byUserId'][user_info['user_id']][item['SeriesId']]['SeriesName']=SeriesName

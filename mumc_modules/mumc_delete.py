@@ -114,7 +114,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                         #loop thru each radarr instance
                         for arrInfo,arrMovie in zip(the_dict['admin_settings']['media_managers']['radarr'],the_dict['advanced_settings']['radarr']['movie']):
                             #unmonitor media item in radarr
-                            if ((arrInfo['enabled']) and (arrMovie['unmonitor'])):
+                            if ((arrInfo['enabled']) and (arrMovie['unmonitor']) and (not(item['mumc']['providerIds']['Imdb'] == None))):
                                 try:
                                     ######################################################################
                                     #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
@@ -138,7 +138,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n')
                                     appendTo_DEBUG_log('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
                             #remove media item from radarr
-                            if ((arrInfo['enabled']) and (arrMovie['remove'])):
+                            if ((arrInfo['enabled']) and (arrMovie['remove']) and (not(item['mumc']['providerIds']['Imdb'] == None))):
                                 try:
                                     ######################################################################
                                     #For movies; because TMDB sometimes changes the movie Ids and then re-adds them with completely new Ids this has to be done in a certain order
@@ -239,7 +239,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                         #loop thru each sonarr instance
                         for arrInfo,arrSeries in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['series']):
                             #unmonitor media item
-                            if ((arrInfo['enabled']) and (arrSeries['unmonitor'])):
+                            if ((arrInfo['enabled']) and (arrSeries['unmonitor']) and (not(item['mumc']['providerIds']['Imdb'] == None))):
                                 user_info={}
                                 user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                                 #get series info
@@ -269,7 +269,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     print('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
                                     appendTo_DEBUG_log('SonarrSeriesWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
                             #remove media item
-                            if ((arrInfo['enabled']) and (arrSeries['remove'])):
+                            if ((arrInfo['enabled']) and (arrSeries['remove']) and (not(item['mumc']['providerIds']['Imdb'] == None))):
                                 user_info={}
                                 user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
                                 #get series info
