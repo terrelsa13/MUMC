@@ -110,7 +110,8 @@ class console_text_attributes:
             for r2 in range (0,10):
                 z=(10 * r1) + r2
                 if (z <= 107):
-                    attrs_show += f'\033[{z}m{z:4}\033[0m'
+                    #attrs_show += f'\033[{z}m{z:4}\033[0m'
+                    attrs_show += f'\033[{z}m{z:4}' + self.text_attribute_dict['end_attr']
                 if (r2 >= 9):
                     attrs_show += '\n'
         print(attrs_show)
