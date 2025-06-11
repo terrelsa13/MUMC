@@ -23,7 +23,7 @@ def build_emby_jellyfin_request_message(url,the_dict,authorization='Authorizatio
 
     if (version == None):
         #assume stored version if not defined
-        version=the_dict['script_version']
+        version=the_dict['MUMC_version']
 
     if (not (token == None)):
         token=token

@@ -1,5 +1,5 @@
 import sys
-from mumc_modules.mumc_versions import get_semantic_version_parts,checkYAMLVersion,get_script_version
+from mumc_modules.mumc_versions import get_semantic_version_parts,checkYAMLVersion,get_MUMC_version
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
 
@@ -17,7 +17,7 @@ def cfgCheckYAML(cfgChecker):
                     if (not (cfgChecker.checkString(*(),value=version_parts['release'],instanceType=cfgChecker.str,minLength=0,maxLength=None,errOut=False,comparisonValues=['alpha','beta','stable']) == None)):
                         errorFlag=False
     if (errorFlag):
-        cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')')
+        cfgChecker.setCustomErrorText('ConfigError: version must be in the semantic versioning syntax\n\tFormatted as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_MUMC_version()) +')')
 
 #######################################################################################################
 
@@ -2302,7 +2302,7 @@ def pre_cfgCheckYAML(cfg,init_dict):
 
     if (errorFlag):
         #Bring error to attention
-        print('\nConfigError: version does not exist\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
+        print('\nConfigError: version does not exist\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_MUMC_version()) +')\n')
         sys.exit(0)
 
     #try checking if version is a string
@@ -2314,7 +2314,7 @@ def pre_cfgCheckYAML(cfg,init_dict):
 
     if (errorFlag):
         #Bring error to attention
-        print('\nConfigError: version must be a(n) string\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_script_version()) +')\n')
+        print('\nConfigError: version must be a(n) string\n\tFormatting as shown: MAJOR#.MINOR#.PATCH# (e.g. ' + str(get_MUMC_version()) +')\n')
         sys.exit(0)
 
     #try checking the version is formatted and valued as expected
@@ -2326,5 +2326,5 @@ def pre_cfgCheckYAML(cfg,init_dict):
 
     if (errorFlag):
         #Bring error to attention
-        print('\nConfigError: configuration - ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_script_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']) + '\n')
+        print('\nConfigError: configuration - ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_MUMC_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']) + '\n')
         sys.exit(0)

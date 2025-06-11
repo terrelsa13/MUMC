@@ -86,7 +86,7 @@ def get_library_setup_behavior(library_setup_behavior=None):
     defaultbehavior='blacklist'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Decide how the script will use the libraries chosen for each user.')
+        print('Decide how MUMC will use the libraries chosen for each user.')
         print('0 - blacklist - Chosen libraries will blacklisted.')
         print('                All other libraries will be whitelisted.')
         print('1 - whitelist - Chosen libraries will whitelisted.')
@@ -94,11 +94,11 @@ def get_library_setup_behavior(library_setup_behavior=None):
         if (not (library_setup_behavior == None)):
             if (library_setup_behavior.casefold() == 'blacklist'):
                 print('')
-                print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
+                print('MUMC previously setup using \'0 - ' + library_setup_behavior + '\'.')
             elif (library_setup_behavior.casefold() == 'whitelist'):
                 print('')
-                print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
-        behavior=input('Choose how the script will use the chosen libraries. (default 0 - ' + defaultbehavior + '): ')
+                print('MUMC previously setup using \'1 - ' + library_setup_behavior + '\'.')
+        behavior=input('Choose how MUMC will use the chosen libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -117,7 +117,7 @@ def get_library_matching_behavior(library_matching_behavior=None):
     defaultbehavior='byId'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Decide how the script will match media items to libraries.')
+        print('Decide how MUMC will match media items to libraries.')
         print('0 - byId - Media items will be matched to libraries using \'LibraryIds\'.')
         print('1 - byPath - Media items will be matched to libraries using \'Paths\'.')
         print('2 - byNetworkPath - Media items will be matched to libraries using \'NetworkPaths\'.')
@@ -130,12 +130,12 @@ def get_library_matching_behavior(library_matching_behavior=None):
                 (library_matching_behavior.casefold() == 'bynetworkpath')):
                 print('')
                 if (library_matching_behavior.casefold() == 'byid'):
-                    print('Script previously setup to match media items to libraries using 0 - ' + library_matching_behavior + '.')
+                    print('MUMC previously setup to match media items to libraries using 0 - ' + library_matching_behavior + '.')
                 elif (library_matching_behavior.casefold() == 'bypath'):
-                    print('Script previously setup to match media items to libraries using 1 - ' + library_matching_behavior + '.')
+                    print('MUMC previously setup to match media items to libraries using 1 - ' + library_matching_behavior + '.')
                 else: #(library_matching_behavior.casefold() == 'bynetworkpath'):
-                    print('Script previously setup to match media items to libraries using 2 - ' + library_matching_behavior + '.')
-        behavior=input('Choose how the script will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
+                    print('MUMC previously setup to match media items to libraries using 2 - ' + library_matching_behavior + '.')
+        behavior=input('Choose how MUMC will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)

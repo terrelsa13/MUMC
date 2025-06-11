@@ -25,7 +25,7 @@ def change_to_directory(directory):
 
 def doesFileExist(filePathName):
     fileExists=False
-    #check if file exists; script can be run from anywhere; recommend using full paths
+    #check if file exists; MUMC can be run from anywhere; recommend using full paths
     if (Path(filePathName).is_file()):
         fileExists=True
     return fileExists
@@ -84,8 +84,8 @@ def getFileName(path_or_filename):
 
 
 #return the default config path
-def get_default_config_path(script_file_path):
-    return Path(script_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
+def get_default_config_path(MUMC_file_path):
+    return Path(MUMC_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
 
 
 # Delete existing mumc_DEBUG.log file
@@ -97,7 +97,7 @@ def delete_debug_log(the_dict):
             pass
 
     #if a mumc_DEBUG.log file exists in the old location (aka the root structure); go ahead and delete it
-    Path(the_dict['script_file_path'] / the_dict['debug_file_name_log']).unlink(missing_ok=True)
+    Path(the_dict['MUMC_file_path'] / the_dict['debug_file_name_log']).unlink(missing_ok=True)
 
 
 #Remove emojis before printing to mumc_debug.log
@@ -120,7 +120,7 @@ def remove_emojis(dataInput: str) -> str:
     #return removeEmojis.sub(r'',dataInput)
 
 
-#Save file to the directory this script is running from; even when the cwd is not the same
+#Save file to the directory this MUMC is running from; even when the cwd is not the same
 def append_to_file(dataInput,filePathName):
     fullPathName=getFullPathName(filePathName)
 
