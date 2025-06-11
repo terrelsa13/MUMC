@@ -2,9 +2,9 @@ import platform
 from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message,build_radarr_request_message,build_sonarr_request_message
 
 
-#Get the current script version
-def get_script_version():
-    return '5.11.28-alpha'
+#Get the current MUMC version
+def get_MUMC_version():
+    return '5.11.29-alpha'
 
 
 #Get the min config version
@@ -18,7 +18,7 @@ def get_max_config_version():
     #max_version='#.#.#-release'
 
     if (max_version == ''):
-        max_version=get_script_version()
+        max_version=get_MUMC_version()
 
     return max_version
 

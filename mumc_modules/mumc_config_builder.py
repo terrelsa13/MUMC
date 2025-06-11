@@ -1,7 +1,7 @@
 from mumc_modules.mumc_output import print_byType,open_and_return_file,save_yaml_config
 from mumc_modules.mumc_setup_questions import get_brand,get_server_url,get_admin_username,get_admin_password,get_library_setup_behavior,get_library_matching_behavior,get_tag_name,get_show_disabled_users,get_user_and_library_selection_type
 from mumc_modules.mumc_key_authentication import authenticate_user_by_name
-from mumc_modules.mumc_versions import get_script_version
+from mumc_modules.mumc_versions import get_MUMC_version
 from mumc_modules.mumc_console_info import print_all_media_disabled,built_new_config_not_setup_to_delete_media
 from mumc_modules.mumc_config_updater import yaml_configurationUpdater
 from mumc_modules.mumc_builder_userlibrary import build_users_and_libraries
@@ -143,13 +143,13 @@ def yaml_configurationBuilder(the_dict):
 def build_configuration_file(the_dict,orig_dict={}):
 
     print('----------------------------------------------------------------------------------------')
-    print('Version: ' + get_script_version())
+    print('Version: ' + get_MUMC_version())
 
     #Building the config
     if (not the_dict['advanced_settings']['UPDATE_CONFIG']):
 
-        the_dict.update(open_and_return_file(get_default_config_path(the_dict['script_file_path'])))
-        the_dict['version']=get_script_version()
+        the_dict.update(open_and_return_file(get_default_config_path(the_dict['MUMC_file_path'])))
+        the_dict['version']=get_MUMC_version()
 
         print('----------------------------------------------------------------------------------------')
 
@@ -274,7 +274,7 @@ def build_configuration_file(the_dict,orig_dict={}):
     #Updating the config; Prepare to run the config editor
     else: #(the_dict['advanced_settings']['UPDATE_CONFIG']):
 
-        the_dict['version']=get_script_version()
+        the_dict['version']=get_MUMC_version()
 
         print('----------------------------------------------------------------------------------------')
 
@@ -371,7 +371,7 @@ def build_configuration_file(the_dict,orig_dict={}):
             #something went wrong
             #mumc_config.yaml should have been created by now
             #we are here because the mumc_config.yaml file does not exist
-            #this is either the first time the script is running or mumc_config.yaml file was deleted
+            #this is either the first time MUMC is running or mumc_config.yaml file was deleted
 
             #raise error
             raise RuntimeError('\nConfigError: Cannot find or open mumc_config.yaml')

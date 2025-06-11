@@ -117,10 +117,10 @@ class console_text_attributes:
         print(attrs_show)
 
 
-############# START OF SCRIPT #############
+############# START OF ATTRIBUTES TESTER #############
 
 if (__name__ == "__main__"):
     console_text_attributes().console_attribute_test()
     sys.exit(0)
 
-############# END OF SCRIPT #############
+############# END OF ATTRIBUTES TESTER #############

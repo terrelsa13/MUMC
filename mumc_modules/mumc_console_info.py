@@ -2,7 +2,7 @@
 import yaml
 from datetime import datetime
 from mumc_modules.mumc_output import appendTo_DEBUG_log,print_byType,convert2json
-from mumc_modules.mumc_versions import get_script_version,get_server_version,get_radarr_version,get_sonarr_version
+from mumc_modules.mumc_versions import get_MUMC_version,get_server_version,get_radarr_version,get_sonarr_version
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
 from mumc_modules.mumc_days_since import get_days_since_played,get_days_since_created
@@ -103,7 +103,7 @@ def print_informational_header(the_dict):
     strings_list_to_print+='Time Stamp Start: ' + the_dict['date_time_now'].strftime('%Y%m%d%H%M%S') + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
-    strings_list_to_print+=the_dict['app_name_short'] + ' Version: ' + the_dict['script_version'] + '\n'
+    strings_list_to_print+=the_dict['app_name_short'] + ' Version: ' + the_dict['MUMC_version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Version: ' + the_dict['version'] + '\n'
     strings_list_to_print+=the_dict['app_name_short'] + ' Config Path: ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['admin_settings']['server']['brand'].capitalize() + ' Version: ' + get_server_version(the_dict) + '\n'
@@ -277,7 +277,7 @@ def default_helper_menu(the_dict):
 #show the full help menu
 def print_full_help_menu(the_dict):
     strings_list_to_print=''
-    strings_list_to_print+='\n' + the_dict['app_name_short'] + ' Version: ' + get_script_version() + '\n'
+    strings_list_to_print+='\n' + the_dict['app_name_short'] + ' Version: ' + get_MUMC_version() + '\n'
     strings_list_to_print+=the_dict['app_name_long'] + ' aka ' + the_dict['app_name_short'] + ' (pronounced Mew-Mick) will query movies, tv episodes, audio tracks, and audiobooks in your Emby/Jellyfin libraries and delete media_items you no longer want to keep.\n'
     strings_list_to_print+='\n'
     strings_list_to_print+='Usage:\n'

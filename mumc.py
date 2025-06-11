@@ -67,7 +67,7 @@ def MUMC():
     cfg=convertLegacyMediaManagerLengths(cfg)
 
     #create default config file
-    default_config=open_and_return_file(get_default_config_path(init_dict['script_file_path']))
+    default_config=open_and_return_file(get_default_config_path(init_dict['MUMC_file_path']))
 
     #copy over path info for use later
     default_config['debug_file_path']=init_dict['debug_file_path']
@@ -112,7 +112,7 @@ def MUMC():
     #check for media_manager info; override if None or ''
     cfg=override_media_manager_enabled_states(cfg)
 
-    #output details about script, Emby/Jellyfin, and server
+    #output details about MUMC, Emby/Jellyfin, and server
     print_informational_header(cfg)
 
     #when debug is enabled force all console outputs
@@ -121,7 +121,7 @@ def MUMC():
     #output the starting header
     print_starting_header(cfg)
 
-    #before running the main part of the script, determine if at least one media type is enabled to be monitored
+    #before running the main part of MUMC, determine if at least one media type is enabled to be monitored
     cfg=getIsAnyMediaEnabled(cfg)
 
     #check if at least one media type is enabled ot be monitored
@@ -164,7 +164,7 @@ def MUMC():
     return
 
 
-############# START OF SCRIPT #############
+############# START OF MUMC #############
 
 if (__name__ == "__main__"):
 
@@ -187,4 +187,4 @@ if (__name__ == "__main__"):
 #Exit Gracefully
 sys.exit(0)
 
-############# END OF SCRIPT #############
+############# END OF MUMC #############

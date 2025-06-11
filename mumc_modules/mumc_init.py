@@ -6,11 +6,11 @@ from mumc_modules.mumc_cache import cached_data_handler
 from mumc_modules.mumc_console_attributes import console_text_attributes
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_compare_items import keys_exist_return_value
-from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,compareSemanticVersions,get_script_version,get_min_config_version,get_max_config_version
+from mumc_modules.mumc_versions import get_python_version,get_min_python_version,get_operating_system_info,compareSemanticVersions,get_MUMC_version,get_min_config_version,get_max_config_version
 from mumc_modules.mumc_tagged import get_isFilterStatementTag
 from mumc_modules.mumc_paths_files import getFileName,getFileNameNoExtension
 
-def initialize_mumc(cwd,script_full_path):
+def initialize_mumc(cwd,MUMC_full_path):
 
     the_cfg={}
 
@@ -25,8 +25,8 @@ def initialize_mumc(cwd,script_full_path):
         print('\nPythonVersionError: Python ' + the_cfg['python_version'] + ' is not compatible with this version of MUMC.\n\tPython version must be >= Python ' + get_min_python_version() + '\n')
         sys.exit(0)
     the_cfg['os_info']=get_operating_system_info()
-    the_cfg['version']=get_script_version()
-    the_cfg['script_version']=get_script_version()
+    the_cfg['version']=get_MUMC_version()
+    the_cfg['MUMC_version']=get_MUMC_version()
     the_cfg['min_config_version']=get_min_config_version()
     the_cfg['max_config_version']=get_max_config_version()
     the_cfg['client_name']='mumc.py'
@@ -36,10 +36,10 @@ def initialize_mumc(cwd,script_full_path):
     #update sys.path with debug path info
     add_to_PATH(str(the_cfg['cwd']),0)
 
-    #save script's (e.g. ./mumc.py) file and path info
-    the_cfg['script_file_path']=script_full_path.parent
-    the_cfg['script_file_name_py']=getFileName(script_full_path)
-    the_cfg['script_file_name_no_ext']=getFileNameNoExtension(script_full_path)
+    #save MUMC's (e.g. ./mumc.py) file and path info
+    the_cfg['MUMC_file_path']=MUMC_full_path.parent
+    the_cfg['MUMC_file_name_py']=getFileName(MUMC_full_path)
+    the_cfg['MUMC_file_name_no_ext']=getFileNameNoExtension(MUMC_full_path)
 
     #initialize config's (e.g. mumc_config.yaml) file and path info; we will not know it until after command line arguments are processed
     the_cfg['config_file_path']=None
@@ -48,7 +48,7 @@ def initialize_mumc(cwd,script_full_path):
     the_cfg['config_file_name_no_ext']=None
 
     #save debug's (e.g. log/mumc_DEBUG.log) file and path info
-    the_cfg['debug_file_path']=the_cfg['script_file_path'] / 'logs'
+    the_cfg['debug_file_path']=the_cfg['MUMC_file_path'] / 'logs'
     the_cfg['debug_file_name_log']='mumc_DEBUG.log'
     the_cfg['debug_file_name_no_ext']='mumc_DEBUG'
     #update sys.path with debug path info

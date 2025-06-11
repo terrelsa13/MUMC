@@ -29,7 +29,7 @@ def assignVarTest(cfg):
     try:
         #check if mumc_config.yaml exists but is blank
         if (not (cfg == None)):
-            #removing either 'version:' or 'DEBUG:' from mumc_config.yaml will cause script to attempt rebuilding a new config.yaml
+            #removing either 'version:' or 'DEBUG:' from mumc_config.yaml will cause MUMC to attempt rebuilding a new config.yaml
             #try assigning the below variables from the mumc_config.yaml file
             #if any do not exist go to except and return False
             cfg['version']=cfg['version']
@@ -51,7 +51,7 @@ def get_custom_config_location(cmdopt_dict,the_dict):
         cmdopt_dict['config_file_name_yml']=alternatePathInfo.name
         cmdopt_dict['config_file_name_no_ext']=alternatePathInfo.stem
     else:
-        cmdopt_dict['config_file_path']=the_dict['script_file_path'] / 'config'
+        cmdopt_dict['config_file_path']=the_dict['MUMC_file_path'] / 'config'
         cmdopt_dict['config_file_name_yaml']='mumc_config.yaml'
         cmdopt_dict['config_file_name_yml']='mumc_config.yml'
         cmdopt_dict['config_file_name_no_ext']='mumc_config'

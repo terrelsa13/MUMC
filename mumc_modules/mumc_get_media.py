@@ -22,7 +22,7 @@ from mumc_modules.mumc_string_case import all_uppercase_lowercase_permutations
 
 #Determine if item can be monitored
 def get_isItemMonitored(mediasource,the_dict):
-    #When script is run before a media item is physically available ignore that media item
+    #When MUMC is run before a media item is physically available ignore that media item
     if ('Type' in mediasource) and ('Size' in mediasource):
         if ((mediasource['Type'] == 'Placeholder') and (mediasource['Size'] == 0)):
             #ignore this media item
