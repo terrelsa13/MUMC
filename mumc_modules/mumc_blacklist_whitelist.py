@@ -3,7 +3,7 @@ from mumc_modules.mumc_compare_items import get_isItemMatching
 #from mumc_modules.mumc_server_type import isEmbyServer
 
 
-def get_opposing_listing_type(listing_type):
+def get_unpreferred_listing_type(listing_type):
     if (listing_type == 'blacklist'):
         return 'whitelist'
     else: #(listing_type == 'whitelist'):

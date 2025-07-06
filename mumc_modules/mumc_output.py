@@ -1,7 +1,8 @@
+import sys
 import json
 import yaml
 from pathlib import Path
-from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file
+from mumc_modules.mumc_paths_files import doesFileExist,append_to_file,append_long_string_to_file,doesDirectoryExistCreateIfNot
 
 
 class NoAliasDumper(yaml.SafeDumper):
@@ -9,8 +10,21 @@ class NoAliasDumper(yaml.SafeDumper):
         return True
 
 
+def open_and_return_file(full_file_path):
+    with open(full_file_path, 'r') as opened_file:
+        try:
+            return yaml.safe_load(opened_file)
+        except:
+            print('\nConfigError: Format or Syntax of configuration file is incorrect.\n\tUnable to load ' + str(full_file_path) + '\n')
+            sys.exit(0)
+
+
 def save_yaml_config(dataInput,filePathName):
-    #Save the config file
+    #Check if directory exists; if not create it and it's parent directory structure
+    doesDirectoryExistCreateIfNot(filePathName.parent)
+
+    #if config does NOT exist create it; then write data to it
+    #if config does exist; then write data to it
     with open(filePathName,'w') as file:
         file.write('---\n')
         yaml.dump(dataInput,file,sort_keys=False,Dumper=NoAliasDumper)
@@ -55,7 +69,6 @@ def print_byAttributes(string_to_print,text_attributes,the_dict):
                 str_to_print_list.append(str_to_print)
 
             #string_to_print=''.join(string_to_print_list)
-            #print(string_to_print,end="",flush=True)
             print(''.join(str_to_print_list),end="",flush=True)
     else:
         print(the_dict['text_attrs'].build_ansi_escaped_string(string_to_print,
@@ -90,18 +103,21 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
         except:
             character_limit=128
 
+        #create ../logs/ path if it does not exists
+        doesDirectoryExistCreateIfNot(the_dict['debug_file_path'])
+
         #if debug file does not exist; create blank file
-        if (not(doesFileExist(Path(the_dict['mumc_path']) / the_dict['debug_file_name']))):
-            with open(Path(the_dict['mumc_path']) / the_dict['debug_file_name'],'a') as file:
+        if (not(doesFileExist(Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log']))):
+            with open(Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log'],'a') as file:
                 #create blank file
                 pass
 
         #limit number of characters in a single write to 250
         #loop thru inputs > 250 characters and write in multiple passes
         if (len(string_to_save) > character_limit):
-            append_long_string_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'],character_limit)
+            append_long_string_to_file(str(string_to_save),Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log'],character_limit)
         else:
-            append_to_file(str(string_to_save),Path(the_dict['mumc_path']) / the_dict['debug_file_name'])
+            append_to_file(str(string_to_save),Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log'])
 
 
 #determine if the requested console output line should be shown or hidden

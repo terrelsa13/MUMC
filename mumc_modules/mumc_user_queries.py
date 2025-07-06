@@ -18,9 +18,9 @@ def get_single_user(userId,the_dict):
 
 
 #API call to get all user accounts
-def get_all_users(the_dict):
+def get_all_users_from_media_server(the_dict,isDisabled=''):
 
-    url=the_dict['admin_settings']['server']['url'] + '/Users'
+    url=the_dict['admin_settings']['server']['url'] + '/Users?IsDisabled=' + str(isDisabled)
     
     req=build_emby_jellyfin_request_message(url,the_dict)
 

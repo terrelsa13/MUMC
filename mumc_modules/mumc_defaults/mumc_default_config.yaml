@@ -1,0 +1,571 @@
+---
+version:
+basic_settings:
+  filter_statements:
+    movie:
+      played:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+      created:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+        behavioral_control: True
+    episode:
+      played:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+      created:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+        behavioral_control: True
+    audio:
+      played:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+      created:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+        behavioral_control: True
+    audiobook:
+      played:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+      created:
+        condition_days: -1
+        count_equality: '>='
+        count: 1
+        behavioral_control: True
+  filter_tags:
+    movie:
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
+    episode:
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
+    audio:
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
+    audiobook:
+      whitetags:
+      - null:-1:>=:1
+      blacktags:
+      - null:-1:>=:1
+advanced_settings:
+  filter_statements:
+    movie:
+      query_filter:
+        whitelisted:
+          favorited: false
+          whitetagged: false
+          blacktagged: true
+          played: false
+        blacklisted:
+          favorited: true
+          whitetagged: false
+          blacktagged: true
+          played: true
+    episode:
+      query_filter:
+        whitelisted:
+          favorited: false
+          whitetagged: false
+          blacktagged: true
+          played: false
+        blacklisted:
+          favorited: true
+          whitetagged: false
+          blacktagged: true
+          played: true
+    audio:
+      query_filter:
+        whitelisted:
+          favorited: false
+          whitetagged: false
+          blacktagged: true
+          played: false
+        blacklisted:
+          favorited: true
+          whitetagged: false
+          blacktagged: true
+          played: true
+    audiobook:
+      query_filter:
+        whitelisted:
+          favorited: false
+          whitetagged: false
+          blacktagged: true
+          played: false
+        blacklisted:
+          favorited: true
+          whitetagged: false
+          blacktagged: true
+          played: true
+  behavioral_statements:
+    movie:
+      favorited:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+        extra:
+          genre: 0
+          library_genre: 0
+      whitetagged:
+        action: keep
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+      blacktagged:
+        action: delete
+        user_conditional: all
+        played_conditional: any_played
+        action_control: 0
+        dynamic_behavior: false
+      whitelisted:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+      blacklisted:
+        action: delete
+        user_conditional: any
+        played_conditional: any_played
+        action_control: 3
+        dynamic_behavior: false
+    episode:
+      favorited:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+        extra:
+          genre: 0
+          season_genre: 0
+          series_genre: 0
+          library_genre: 0
+          studio_network: 0
+          studio_network_genre: 0
+      whitetagged:
+        action: keep
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+      blacktagged:
+        action: delete
+        user_conditional: all
+        played_conditional: any_played
+        action_control: 0
+        dynamic_behavior: false
+      whitelisted:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+      blacklisted:
+        action: delete
+        user_conditional: any
+        played_conditional: any_played
+        action_control: 3
+        dynamic_behavior: false
+    audio:
+      favorited:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+        extra:
+          genre: 0
+          album_genre: 0
+          library_genre: 0
+          track_artist: 0
+          album_artist: 0
+      whitetagged:
+        action: keep
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+      blacktagged:
+        action: delete
+        user_conditional: all
+        played_conditional: any_played
+        action_control: 0
+        dynamic_behavior: false
+      whitelisted:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+      blacklisted:
+        action: delete
+        user_conditional: any
+        played_conditional: any_played
+        action_control: 3
+        dynamic_behavior: false
+    audiobook:
+      favorited:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+        extra:
+          genre: 0
+          audiobook_genre: 0
+          library_genre: 0
+          track_author: 0
+          author: 0
+          library_author: 0
+      whitetagged:
+        action: keep
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+      blacktagged:
+        action: delete
+        user_conditional: all
+        played_conditional: any_played
+        action_control: 0
+        dynamic_behavior: false
+      whitelisted:
+        action: keep
+        user_conditional: any
+        played_conditional: ignore
+        action_control: 3
+        dynamic_behavior: false
+      blacklisted:
+        action: delete
+        user_conditional: any
+        played_conditional: any_played
+        action_control: 3
+        dynamic_behavior: false
+  behavioral_tags:
+    movie:
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
+    episode:
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
+    audio:
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
+    audiobook:
+      null:-1:>=:1:
+        action: delete
+        user_conditional: all
+        played_conditional: ignore
+        action_control: 0
+        dynamic_behavior: false
+        high_priority: false
+  whitetags:
+    global:
+    - ''
+    movie:
+    - ''
+    episode:
+    - ''
+    audio:
+    - ''
+    audiobook:
+    - ''
+  blacktags:
+    global:
+    - ''
+    movie:
+    - ''
+    episode:
+    - ''
+    audio:
+    - ''
+    audiobook:
+    - ''
+  delete_empty_folders:
+    episode:
+      season: false
+      series: false
+  episode_control:
+    minimum_episodes: 0
+    minimum_played_episodes: 0
+    minimum_episodes_behavior: 'Max Played Min Unplayed'
+    series_ended:
+      delete_episodes: false
+  radarr:
+    movie:
+    - unmonitor: true
+      remove: false
+  sonarr:
+    series:
+    - unmonitor: true
+      remove: false
+    episode:
+    - unmonitor: true
+  trakt_fix:
+    set_missing_last_played_date:
+      movie: true
+      episode: true
+      audio: true
+      audiobook: true
+  console_controls:
+    headers:
+      script:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      user:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      summary:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    footers:
+      script:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    warnings:
+      script:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    movie:
+      delete:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      keep:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      post_processing:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      summary:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    episode:
+      delete:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      keep:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      post_processing:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      summary:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    audio:
+      delete:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      keep:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      post_processing:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      summary:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+    audiobook:
+      delete:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      keep:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      post_processing:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+      summary:
+        show: true
+        formatting:
+          font:
+            color: ''
+            style: ''
+          background:
+            color: ''
+  UPDATE_CONFIG: false
+  REMOVE_FILES: false
+admin_settings:
+  server:
+    brand: ''
+    url: ''
+    auth_key: ''
+    admin_id: ''
+  behavior:
+    matching: byId
+    list: blacklist
+    users:
+      monitor_disabled: true
+  users:
+  - user_id: ''
+    user_name: ''
+    whitelist:
+    - lib_id: ''
+      collection_type: ''
+      path: ''
+      network_path: ''
+      subfolder_id: ''
+      lib_enabled: false
+    blacklist:
+    - lib_id: ''
+      collection_type: ''
+      path: ''
+      network_path: ''
+      subfolder_id: ''
+      lib_enabled: false
+  media_managers:
+    radarr:
+    - enabled: true
+      url: ''
+      api_key: ''
+    sonarr:
+    - enabled: true
+      url: ''
+      api_key: ''
+  api_controls:
+    attempts: 4
+    item_limit: 25
+  cache:
+    size: 32
+    fallback_behavior: 'LRU'
+    minimum_age: 200
+  output_controls:
+    character_limit:
+      print: 128
+DEBUG: 0
+...

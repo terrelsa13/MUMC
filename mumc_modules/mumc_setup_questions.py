@@ -21,7 +21,7 @@ def get_brand():
 
 
 #ip address, hostname, or FQDN?
-def get_url(defaulturl='http://localhost'):
+def get_server_url(defaulturl='http://localhost'):
     #defaulturl='http://localhost'
     url=input('Enter server ip, hostname, or FQDN (default ' + defaulturl + '): ')
     if (url == ''):
@@ -50,7 +50,7 @@ def proceed_arr_setup(arr):
 #ip address, hostname, or FQDN for *arr?
 def get_arr_url(arr):
     print('\nFor ' + arr + '...')
-    return get_url()
+    return get_server_url()
 
 
 #api key for *arr?
@@ -69,61 +69,6 @@ def get_arr_api(arr):
     return api_key
 
 
-#http or https port?
-def get_port(defaultport='8096'):
-    #defaultport='8096'
-    valid_port=False
-    while (valid_port == False):
-        print('If you have not explicity changed this option, press enter for default.')
-        print('Space for no port.')
-        port=input('Enter port (default ' + defaultport + '): ')
-        if (port == ''):
-            valid_port=True
-            return(defaultport)
-        elif (port == ' '):
-            valid_port=True
-            return('')
-        else:
-            try:
-                port_float=float(port)
-                if ((port_float % 1) == 0):
-                    port_int=int(port_float)
-                    if ((int(port_int) >= 1) and (int(port_int) <= 65535)):
-                        valid_port=True
-                        return(str(port_int))
-                    else:
-                        print('\nInvalid port. Try again.\n')
-                else:
-                    print('\nInvalid port. Try again.\n')
-            except:
-                print('\nInvalid port. Try again.\n')
-
-
-#arr http or https port?
-def get_arr_port(arr,port):
-    print('\nFor ' + arr + '...')
-    return get_port(port)
-
-
-#base url?
-def get_base(brand):
-    defaultbase='emby'
-    if (brand == defaultbase):
-        print('Using "/' + defaultbase + '" as base url')
-        return(defaultbase)
-    else:
-        print('If you have not explicity changed this option in jellyfin, press enter for default.')
-        print('For example: http://example.com/<baseurl>')
-        base=input('Enter base url (default n/a): ')
-        if (base == ''):
-            return(base)
-        else:
-            if (base.find('/',0,1) == 0):
-                return(base[1:len(base)])
-            else:
-                return(base)
-
-
 #admin username?
 def get_admin_username():
     return(input('Enter admin username: '))
@@ -131,7 +76,7 @@ def get_admin_username():
 
 #admin password?
 def get_admin_password():
-    print('Plain text password used to grab authentication key; password is not stored.')
+    print('Plain text password used to grab authentication key. Password is NOT stored.')
     password=input('Enter admin password: ')
     return(password)
 
@@ -141,7 +86,7 @@ def get_library_setup_behavior(library_setup_behavior=None):
     defaultbehavior='blacklist'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Decide how the script will use the libraries chosen for each user.')
+        print('Decide how MUMC will use the libraries chosen for each user.')
         print('0 - blacklist - Chosen libraries will blacklisted.')
         print('                All other libraries will be whitelisted.')
         print('1 - whitelist - Chosen libraries will whitelisted.')
@@ -149,11 +94,11 @@ def get_library_setup_behavior(library_setup_behavior=None):
         if (not (library_setup_behavior == None)):
             if (library_setup_behavior.casefold() == 'blacklist'):
                 print('')
-                print('Script previously setup using \'0 - ' + library_setup_behavior + '\'.')
+                print('MUMC previously setup using \'0 - ' + library_setup_behavior + '\'.')
             elif (library_setup_behavior.casefold() == 'whitelist'):
                 print('')
-                print('Script previously setup using \'1 - ' + library_setup_behavior + '\'.')
-        behavior=input('Choose how the script will use the chosen libraries. (default 0 - ' + defaultbehavior + '): ')
+                print('MUMC previously setup using \'1 - ' + library_setup_behavior + '\'.')
+        behavior=input('Choose how MUMC will use the chosen libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -172,7 +117,7 @@ def get_library_matching_behavior(library_matching_behavior=None):
     defaultbehavior='byId'
     valid_behavior=False
     while (valid_behavior == False):
-        print('Decide how the script will match media items to libraries.')
+        print('Decide how MUMC will match media items to libraries.')
         print('0 - byId - Media items will be matched to libraries using \'LibraryIds\'.')
         print('1 - byPath - Media items will be matched to libraries using \'Paths\'.')
         print('2 - byNetworkPath - Media items will be matched to libraries using \'NetworkPaths\'.')
@@ -185,12 +130,12 @@ def get_library_matching_behavior(library_matching_behavior=None):
                 (library_matching_behavior.casefold() == 'bynetworkpath')):
                 print('')
                 if (library_matching_behavior.casefold() == 'byid'):
-                    print('Script previously setup to match media items to libraries 0 - ' + library_matching_behavior + '.')
+                    print('MUMC previously setup to match media items to libraries using 0 - ' + library_matching_behavior + '.')
                 elif (library_matching_behavior.casefold() == 'bypath'):
-                    print('Script previously setup to match media items to libraries 1 - ' + library_matching_behavior + '.')
+                    print('MUMC previously setup to match media items to libraries using 1 - ' + library_matching_behavior + '.')
                 else: #(library_matching_behavior.casefold() == 'bynetworkpath'):
-                    print('Script previously setup to match media items to libraries 2 - ' + library_matching_behavior + '.')
-        behavior=input('Choose how the script will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
+                    print('MUMC previously setup to match media items to libraries using 2 - ' + library_matching_behavior + '.')
+        behavior=input('Choose how MUMC will match media items to libraries. (default 0 - ' + defaultbehavior + '): ')
         if (behavior == ''):
             valid_behavior=True
             return(defaultbehavior)
@@ -282,27 +227,33 @@ def get_show_disabled_users():
 
 
 def get_user_and_library_selection_type(library_setup_behavior):
-    defaultvalue=0
+    defaultvalue=3
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
         print('0 - Select users and libraries.')
-        print('    Select specific users and the specific libraries to be ' + str(library_setup_behavior) + 'ed for each user.')
+        print('    Select libraries to be ' + str(library_setup_behavior) + 'ed for selected users.')
         print('1 - Select users only.')
         print('    Selected users will have all libraries ' + str(library_setup_behavior) + 'ed according to their access policy.')
         print('2 - Select libraries only.')
         print('    Selected libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
-        selection=input('Enter number (default 0 - Select users and libraries): ')
+        print('3 - Select nothing.')
+        print('    All libraries will be ' + str(library_setup_behavior) + 'ed for all users according to their access policy.')
+        selection=input('Enter number (default ' + str(defaultvalue) + ' - All users and all libraries automatically selected.): ')
         if (selection == ''):
             valid_value = True
         elif (selection == '0'):
             valid_value = True
+            defaultvalue=0
         elif (selection == '1'):
             valid_value = True
             defaultvalue=1
         elif (selection == '2'):
             valid_value = True
             defaultvalue=2
+        elif (selection == '3'):
+            valid_value = True
+            #defaultvalue=3
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)

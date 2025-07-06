@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 #import re
-#import yaml
 import emoji
 from sys import path
 from pathlib import Path
@@ -26,10 +25,17 @@ def change_to_directory(directory):
 
 def doesFileExist(filePathName):
     fileExists=False
-    #check if file exists; script can be run from anywhere; recommend using full paths
+    #check if file exists; MUMC can be run from anywhere; recommend using full paths
     if (Path(filePathName).is_file()):
         fileExists=True
     return fileExists
+
+
+def doesFileExistCreateIfNot(filePathName):
+    if (not (filePathName.exists())):
+        #Create empty file if it does not already exist
+        with open(filePathName,'w') as file:
+            pass
 
 
 def getFullPathName(filePathName):
@@ -53,21 +59,45 @@ def doesDirectoryExist(PathName):
     return pathExists
 
 
+def doesDirectoryExistCreateIfNot(PathName):
+    #create directory and it's parent directory structure
+    Path(PathName).mkdir(parents=True, exist_ok=True)
+
+
 def getFileExtension(path_or_filename):
     if (doesFileExist(path_or_filename)):
         return Path(path_or_filename).suffix
     else:
         return None
 
+def getFileNameNoExtension(path_or_filename):
+    if (doesFileExist(path_or_filename)):
+        return Path(path_or_filename).stem
+    else:
+        return None
 
-def get_current_directory():
-    return Path('.').parent.resolve()
+def getFileName(path_or_filename):
+    if (doesFileExist(path_or_filename)):
+        return Path(path_or_filename).name
+    else:
+        return None
+
+
+#return the default config path
+def get_default_config_path(MUMC_file_path):
+    return Path(MUMC_file_path / 'mumc_modules' / 'mumc_defaults' / 'mumc_default_config.yaml')
 
 
 # Delete existing mumc_DEBUG.log file
 def delete_debug_log(the_dict):
-    Path(the_dict['mumc_path'] / the_dict['debug_file_name']).unlink(missing_ok=True)
-    Path(the_dict['mumc_path_config_dir'] / the_dict['debug_file_name']).unlink(missing_ok=True)
+
+    #for the sake of Docker; do not delete the mumc_DEBUG.log file; instead clear the contents
+    if (doesFileExist(the_dict['debug_file_path'] / the_dict['debug_file_name_log'])):
+        with open(the_dict['debug_file_path'] / the_dict['debug_file_name_log'], 'w'):
+            pass
+
+    #if a mumc_DEBUG.log file exists in the old location (aka the root structure); go ahead and delete it
+    Path(the_dict['MUMC_file_path'] / the_dict['debug_file_name_log']).unlink(missing_ok=True)
 
 
 #Remove emojis before printing to mumc_debug.log
@@ -90,14 +120,14 @@ def remove_emojis(dataInput: str) -> str:
     #return removeEmojis.sub(r'',dataInput)
 
 
-#Save file to the directory this script is running from; even when the cwd is not the same
+#Save file to the directory this MUMC is running from; even when the cwd is not the same
 def append_to_file(dataInput,filePathName):
     fullPathName=getFullPathName(filePathName)
 
     #remove emojis
     dataInput=remove_emojis(dataInput)
 
-    #Save the config file
+    #Append data to the config file
     with open(fullPathName,'a') as file:
         file.write(dataInput)
 

@@ -52,252 +52,277 @@ def userLib_configurationUpdater(the_dict):
     return the_dict['admin_settings']['users']
 
 
-def yaml_configurationUpdater(the_dict,orig_dict={}):
-    config_data={}
+def yaml_configurationUpdater(mem_dict,orig_dict={}):
+    new_dict={}
     
     if (orig_dict=={}):
-        config_data['version']=the_dict['version']
+        new_dict['version']=mem_dict['version']
         try:
-            config_data['basic_settings']=the_dict['basic_settings']
+            new_dict['basic_settings']=mem_dict['basic_settings']
         except:
             pass
         try:
-            config_data['advanced_settings']=the_dict['advanced_settings']
-            if (not ((check:=keys_exist_return_value(the_dict,'advanced_settings','REMOVE_FILES')) == None)):
+            new_dict['advanced_settings']=mem_dict['advanced_settings']
+            if (not ((check:=keys_exist_return_value(mem_dict,'advanced_settings','REMOVE_FILES')) == None)):
                 if (check):
-                    config_data['advanced_settings']['REMOVE_FILES']=False
+                    new_dict['advanced_settings']['REMOVE_FILES']=False
         except:
             pass
-        config_data['admin_settings']=the_dict['admin_settings']
+        new_dict['admin_settings']=mem_dict['admin_settings']
         try:
-            config_data['DEBUG']=the_dict['DEBUG']
+            new_dict['DEBUG']=mem_dict['DEBUG']
         except:
-            config_data['DEBUG']=0
+            new_dict['DEBUG']=0
     else:
-        config_data['version']=orig_dict['version']
+        new_dict['version']=orig_dict['version']
         try:
-            config_data['basic_settings']=orig_dict['basic_settings']
+            new_dict['basic_settings']=orig_dict['basic_settings']
         except:
             pass
         try:
-            config_data['advanced_settings']=orig_dict['advanced_settings']
+            new_dict['advanced_settings']=orig_dict['advanced_settings']
             if (not ((check:=keys_exist_return_value(orig_dict,'advanced_settings','REMOVE_FILES')) == None)):
                 if (check):
-                    config_data['advanced_settings']['REMOVE_FILES']=False
+                    new_dict['advanced_settings']['REMOVE_FILES']=False
         except:
             pass
-        config_data['admin_settings']={}
+        new_dict['admin_settings']={}
         try:
             try:
                 #check if default value was NOT selected during updating
-                if (the_dict['admin_settings']['behavior']['list'] == 'whitelist'):
-                    orig_dict['admin_settings']['behavior']['list']='whitelist'
+                if (mem_dict['admin_settings']['behavior']['list'] == 'whitelist'):
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','list'))):
+                        new_dict['admin_settings']['behavior']['list']=None
+                    new_dict['admin_settings']['behavior']['list']='whitelist'
                 else:
                     #check if keys already exist in 
                     if (keys_exist(orig_dict,'admin_settings','behavior','list')):
-                        orig_dict['admin_settings']['behavior']['list']=the_dict['admin_settings']['behavior']['list']
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','list'))):
+                            new_dict['admin_settings']['behavior']['list']=None
+                        new_dict['admin_settings']['behavior']['list']=mem_dict['admin_settings']['behavior']['list']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['list']=orig_dict['admin_settings']['behavior'].pop('list')
+                new_dict['admin_settings']['behavior']['list']=new_dict['admin_settings']['behavior'].pop('list')
             except:
                 pass
 
             try:
                 #check if default value was NOT selected during updating
-                if (the_dict['admin_settings']['behavior']['matching'] == 'byPath'):
-                    orig_dict['admin_settings']['behavior']['matching']='byPath'
-                elif (the_dict['admin_settings']['behavior']['matching'] == 'byNetworkPath'):
-                    orig_dict['admin_settings']['behavior']['matching']='byNetworkPath'
+                if (mem_dict['admin_settings']['behavior']['matching'] == 'byPath'):
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                        new_dict['admin_settings']['behavior']['matching']=None
+                    new_dict['admin_settings']['behavior']['matching']='byPath'
+                elif (mem_dict['admin_settings']['behavior']['matching'] == 'byNetworkPath'):
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                        new_dict['admin_settings']['behavior']['matching']=None
+                    new_dict['admin_settings']['behavior']['matching']='byNetworkPath'
                 else:
+                    #check if keys already exist in 
                     if (keys_exist(orig_dict,'admin_settings','behavior','matching')):
-                        orig_dict['admin_settings']['behavior']['matching']=the_dict['admin_settings']['behavior']['matching']
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','matching'))):
+                            new_dict['admin_settings']['behavior']['matching']=None
+                        new_dict['admin_settings']['behavior']['matching']=mem_dict['admin_settings']['behavior']['matching']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['matching']=orig_dict['admin_settings']['behavior'].pop('matching')
+                new_dict['admin_settings']['behavior']['matching']=new_dict['admin_settings']['behavior'].pop('matching')
             except:
                 pass
 
             try:
                 #check if default value was NOT selected during updating
-                if (the_dict['admin_settings']['behavior']['users']['monitor_disabled'] == False):
-                    orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=False
+                if (mem_dict['admin_settings']['behavior']['users']['monitor_disabled'] == False):
+                    if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                        new_dict['admin_settings']['behavior']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','users'))):
+                        new_dict['admin_settings']['behavior']['users']={}
+                    if (not (keys_exist(new_dict,'admin_settings','behavior','users','monitor_disabled'))):
+                        new_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
+                    new_dict['admin_settings']['behavior']['users']['monitor_disabled']=False
                 else:
-                    if (keys_exist(orig_dict,'admin_settings','behavior','users')):
-                        orig_dict['admin_settings']['behavior']['users']={}
-                        orig_dict['admin_settings']['behavior']['users']['monitor_disabled']=the_dict['admin_settings']['behavior']['users']['monitor_disabled']
+                    #check if keys already exist in 
+                    if (keys_exist(orig_dict,'admin_settings','behavior','users','monitor_disabled')):
+                        if (not (keys_exist(new_dict,'admin_settings','behavior'))):
+                            new_dict['admin_settings']['behavior']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','users'))):
+                            new_dict['admin_settings']['behavior']['users']={}
+                        if (not (keys_exist(new_dict,'admin_settings','behavior','users','monitor_disabled'))):
+                            new_dict['admin_settings']['behavior']['users']['monitor_disabled']=None
+                        new_dict['admin_settings']['behavior']['users']['monitor_disabled']=mem_dict['admin_settings']['behavior']['users']['monitor_disabled']
 
                 #before saving; reorder some keys for consistency
-                orig_dict['admin_settings']['behavior']['users']=orig_dict['admin_settings']['behavior'].pop('users')
+                new_dict['admin_settings']['behavior']['users']=new_dict['admin_settings']['behavior'].pop('users')
             except:
                 pass
 
-            config_data['admin_settings']['behavior']=orig_dict['admin_settings']['behavior']
+            #new_dict['admin_settings']['behavior']=orig_dict['admin_settings']['behavior']
         except:
             pass
-        config_data['admin_settings']['server']=orig_dict['admin_settings']['server']
+        new_dict['admin_settings']['server']=orig_dict['admin_settings']['server']
 
-        config_data['admin_settings']['users']=userLib_configurationUpdater(the_dict)
+        new_dict['admin_settings']['users']=userLib_configurationUpdater(mem_dict)
 
         try:
-            #check if radarr enabled key existed
-            if (keys_exist(orig_dict,'admin_settings','media_managers','radarr','enabled')):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
-                    config_data['admin_settings']['media_managers']['radarr']={}
-                config_data['admin_settings']['media_managers']['radarr']['enabled']=orig_dict['admin_settings']['media_managers']['radarr']['enabled']
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['radarr']['url'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
-                    config_data['admin_settings']['media_managers']['radarr']={}
-                config_data['admin_settings']['media_managers']['radarr']['url']=the_dict['admin_settings']['media_managers']['radarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['url'] == None):
-                #pass
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','radarr'))):
-                    config_data['admin_settings']['media_managers']['radarr']={}
-                config_data['admin_settings']['media_managers']['radarr']['api_key']=the_dict['admin_settings']['media_managers']['radarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['radarr']['api_key'] == None):
-                #pass
+            arr_in_orig_dict=False
+            arr_in_mem_dict=False
+            #check if media_managers in orig_dict['admin_settings']
+            if ('media_managers' in orig_dict['admin_settings']):
+                #check if radarr in orig_dict['admin_settings']['media_managers']
+                if ('radarr' in orig_dict['admin_settings']['media_managers']):
+                    #check if orig_dict['admin_settings']['media_managers']['radarr'] is an empty list
+                    if (not (orig_dict['admin_settings']['media_managers']['radarr'] == [])):
+                        #set orig_dict has values
+                        arr_in_orig_dict=True
+            #check if media_managers in mem_dict['admin_settings']
+            if ('media_managers' in mem_dict['admin_settings']):
+                #check if radarr in mem_dict['admin_settings']['media_managers']
+                if ('radarr' in mem_dict['admin_settings']['media_managers']):
+                    #check if mem_dict['admin_settings']['media_managers']['radarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['radarr'] == [{'enabled':True,'url':'','api_key':''}])):
+                        #set mem_dict has values
+                        arr_in_mem_dict=True
+
+            #check if orig_dict['admin_settings']['media_managers']['radarr'] or mem_dict['admin_settings']['media_managers']['radarr'] have values
+            if (arr_in_orig_dict or arr_in_mem_dict):
+                #check if media_managers in new_dict['admin_settings']
+                if (not ('media_managers' in new_dict['admin_settings'])):
+                    #add media_managers key
+                    new_dict['admin_settings']['media_managers']={}
+                #check if radarr in new_dict['admin_settings']['media_managers']
+                if (not ('radarr' in new_dict['admin_settings']['media_managers'])):
+                    #add radarr key
+                    new_dict['admin_settings']['media_managers']['radarr']=[]
+                #save mem_dict['admin_settings']['media_managers']['radarr'] values to new_dict['admin_settings']['media_managers']['radarr']
+                new_dict['admin_settings']['media_managers']['radarr']=mem_dict['admin_settings']['media_managers']['radarr']
         except:
             pass
 
         try:
-            #check if sonarr enabled key existed
-            if (keys_exist(orig_dict,'admin_settings','media_managers','sonarr','enabled')):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
-                    config_data['admin_settings']['media_managers']['sonarr']={}
-                config_data['admin_settings']['media_managers']['sonarr']['enabled']=orig_dict['admin_settings']['media_managers']['sonarr']['enabled']
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['sonarr']['url'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
-                    config_data['admin_settings']['media_managers']['sonarr']={}
-                config_data['admin_settings']['media_managers']['sonarr']['url']=the_dict['admin_settings']['media_managers']['sonarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['url'] == None):
-                #pass
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','sonarr'))):
-                    config_data['admin_settings']['media_managers']['sonarr']={}
-                config_data['admin_settings']['media_managers']['sonarr']['api_key']=the_dict['admin_settings']['media_managers']['sonarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['sonarr']['api_key'] == None):
-                #pass
+            arr_in_orig_dict=False
+            arr_in_mem_dict=False
+            #check if media_managers in orig_dict['admin_settings']
+            if ('media_managers' in orig_dict['admin_settings']):
+                #check if sonarr in orig_dict['admin_settings']['media_managers']
+                if ('sonarr' in orig_dict['admin_settings']['media_managers']):
+                    #check if orig_dict['admin_settings']['media_managers']['sonarr'] is an empty list
+                    if (not (orig_dict['admin_settings']['media_managers']['sonarr'] == [])):
+                        #set orig_dict has values
+                        arr_in_orig_dict=True
+            #check if media_managers in mem_dict['admin_settings']
+            if ('media_managers' in mem_dict['admin_settings']):
+                #check if sonarr in mem_dict['admin_settings']['media_managers']
+                if ('sonarr' in mem_dict['admin_settings']['media_managers']):
+                    #check if mem_dict['admin_settings']['media_managers']['sonarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['sonarr'] == [{'enabled':True,'url':'','api_key':''}])):
+                        #set mem_dict has values
+                        arr_in_mem_dict=True
+
+            #check if orig_dict['admin_settings']['media_managers']['sonarr'] or mem_dict['admin_settings']['media_managers']['sonarr'] have values
+            if (arr_in_orig_dict or arr_in_mem_dict):
+                #check if media_managers in new_dict['admin_settings']
+                if (not ('media_managers' in new_dict['admin_settings'])):
+                    #add media_managers key
+                    new_dict['admin_settings']['media_managers']={}
+                #check if sonarr in new_dict['admin_settings']['media_managers']
+                if (not ('sonarr' in new_dict['admin_settings']['media_managers'])):
+                    #add sonarr key
+                    new_dict['admin_settings']['media_managers']['sonarr']=[]
+                #save mem_dict['admin_settings']['media_managers']['sonarr'] values to new_dict['admin_settings']['media_managers']['sonarr']
+                new_dict['admin_settings']['media_managers']['sonarr']=mem_dict['admin_settings']['media_managers']['sonarr']
         except:
             pass
 
         try:
-            #check if lidarr enabled key existed
-            if (keys_exist(orig_dict,'admin_settings','media_managers','lidarr','enabled')):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
-                    config_data['admin_settings']['media_managers']['lidarr']={}
-                config_data['admin_settings']['media_managers']['lidarr']['enabled']=orig_dict['admin_settings']['media_managers']['lidarr']['enabled']
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['lidarr']['url'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
-                    config_data['admin_settings']['media_managers']['lidarr']={}
-                config_data['admin_settings']['media_managers']['lidarr']['url']=the_dict['admin_settings']['media_managers']['lidarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['url'] == None):
-                #pass
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','lidarr'))):
-                    config_data['admin_settings']['media_managers']['lidarr']={}
-                config_data['admin_settings']['media_managers']['lidarr']['api_key']=the_dict['admin_settings']['media_managers']['lidarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['lidarr']['api_key'] == None):
-                #pass
+            arr_in_orig_dict=False
+            arr_in_mem_dict=False
+            #check if media_managers in orig_dict['admin_settings']
+            if ('media_managers' in orig_dict['admin_settings']):
+                #check if lidarr in orig_dict['admin_settings']['media_managers']
+                if ('lidarr' in orig_dict['admin_settings']['media_managers']):
+                    #check if orig_dict['admin_settings']['media_managers']['lidarr'] is an empty list
+                    if (not (orig_dict['admin_settings']['media_managers']['lidarr'] == [])):
+                        #set orig_dict has values
+                        arr_in_orig_dict=True
+            #check if media_managers in mem_dict['admin_settings']
+            if ('media_managers' in mem_dict['admin_settings']):
+                #check if lidarr in mem_dict['admin_settings']['media_managers']
+                if ('lidarr' in mem_dict['admin_settings']['media_managers']):
+                    #check if mem_dict['admin_settings']['media_managers']['lidarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['lidarr'] == [{'enabled':True,'url':'','api_key':''}])):
+                        #set mem_dict has values
+                        arr_in_mem_dict=True
+
+            #check if orig_dict['admin_settings']['media_managers']['lidarr'] or mem_dict['admin_settings']['media_managers']['lidarr'] have values
+            if (arr_in_orig_dict or arr_in_mem_dict):
+                #check if media_managers in new_dict['admin_settings']
+                if (not ('media_managers' in new_dict['admin_settings'])):
+                    #add media_managers key
+                    new_dict['admin_settings']['media_managers']={}
+                #check if lidarr in new_dict['admin_settings']['media_managers']
+                if (not ('lidarr' in new_dict['admin_settings']['media_managers'])):
+                    #add lidarr key
+                    new_dict['admin_settings']['media_managers']['lidarr']=[]
+                #save mem_dict['admin_settings']['media_managers']['lidarr'] values to new_dict['admin_settings']['media_managers']['lidarr']
+                new_dict['admin_settings']['media_managers']['lidarr']=mem_dict['admin_settings']['media_managers']['lidarr']
         except:
             pass
 
         try:
-            #check if readarr enabled key existed
-            if (keys_exist(orig_dict,'admin_settings','media_managers','readarr','enabled')):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
-                    config_data['admin_settings']['media_managers']['readarr']={}
-                config_data['admin_settings']['media_managers']['readarr']['enabled']=orig_dict['admin_settings']['media_managers']['readarr']['enabled']
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['readarr']['url'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
-                    config_data['admin_settings']['media_managers']['readarr']={}
-                config_data['admin_settings']['media_managers']['readarr']['url']=the_dict['admin_settings']['media_managers']['readarr']['url']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['readarr']['url'] == None):
-                #pass
-        except:
-            pass
-        try:
-            #existed and unchanged, existed and unchanged, or non-existant and added
-            if (not (the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None)):
-                if (not (keys_exist(config_data,'admin_settings','media_managers'))):
-                    config_data['admin_settings']['media_managers']={}
-                if (not (keys_exist(config_data,'admin_settings','media_managers','readarr'))):
-                    config_data['admin_settings']['media_managers']['readarr']={}
-                config_data['admin_settings']['media_managers']['readarr']['api_key']=the_dict['admin_settings']['media_managers']['readarr']['api_key']
-            #non-existant unchanged
-            #else: #(the_dict['admin_settings']['media_managers']['readarr']['api_key'] == None):
-                #pass
+            arr_in_orig_dict=False
+            arr_in_mem_dict=False
+            #check if media_managers in orig_dict['admin_settings']
+            if ('media_managers' in orig_dict['admin_settings']):
+                #check if readarr in orig_dict['admin_settings']['media_managers']
+                if ('readarr' in orig_dict['admin_settings']['media_managers']):
+                    #check if orig_dict['admin_settings']['media_managers']['readarr'] is an empty list
+                    if (not (orig_dict['admin_settings']['media_managers']['readarr'] == [])):
+                        #set orig_dict has values
+                        arr_in_orig_dict=True
+            #check if media_managers in mem_dict['admin_settings']
+            if ('media_managers' in mem_dict['admin_settings']):
+                #check if readarr in mem_dict['admin_settings']['media_managers']
+                if ('readarr' in mem_dict['admin_settings']['media_managers']):
+                    #check if mem_dict['admin_settings']['media_managers']['readarr'] is the default value
+                    if (not (mem_dict['admin_settings']['media_managers']['readarr'] == [{'enabled':True,'url':'','api_key':''}])):
+                        #set mem_dict has values
+                        arr_in_mem_dict=True
+
+            #check if orig_dict['admin_settings']['media_managers']['readarr'] or mem_dict['admin_settings']['media_managers']['readarr'] have values
+            if (arr_in_orig_dict or arr_in_mem_dict):
+                #check if media_managers in new_dict['admin_settings']
+                if (not ('media_managers' in new_dict['admin_settings'])):
+                    #add media_managers key
+                    new_dict['admin_settings']['media_managers']={}
+                #check if readarr in new_dict['admin_settings']['media_managers']
+                if (not ('readarr' in new_dict['admin_settings']['media_managers'])):
+                    #add readarr key
+                    new_dict['admin_settings']['media_managers']['readarr']=[]
+                #save mem_dict['admin_settings']['media_managers']['readarr'] values to new_dict['admin_settings']['media_managers']['readarr']
+                new_dict['admin_settings']['media_managers']['readarr']=mem_dict['admin_settings']['media_managers']['readarr']
         except:
             pass
 
         try:
-            config_data['admin_settings']['api_controls']=orig_dict['admin_settings']['api_controls']
+            new_dict['admin_settings']['api_controls']=orig_dict['admin_settings']['api_controls']
         except:
             pass
         try:
-            config_data['admin_settings']['cache']=orig_dict['admin_settings']['cache']
+            new_dict['admin_settings']['cache']=orig_dict['admin_settings']['cache']
         except:
             pass
         try:
-            config_data['DEBUG']=the_dict['DEBUG']
+            new_dict['DEBUG']=mem_dict['DEBUG']
         except:
-            config_data['DEBUG']=0
+            new_dict['DEBUG']=0
 
     #save yaml config file
-    save_yaml_config(config_data,the_dict['mumc_path'] / the_dict['config_file_name_yaml'])
+    save_yaml_config(new_dict,mem_dict['config_file_path'] / mem_dict['config_file_name_yaml'])

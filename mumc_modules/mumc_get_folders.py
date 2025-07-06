@@ -3,7 +3,7 @@ from mumc_modules.mumc_output import appendTo_DEBUG_log
 from mumc_modules.mumc_server_type import isEmbyServer,isJellyfinServer
 from mumc_modules.mumc_library_queries import get_all_library_subfolders
 from mumc_modules.mumc_output import save_yaml_config
-from mumc_modules.mumc_versions import get_script_version,get_semantic_version_parts
+from mumc_modules.mumc_versions import get_MUMC_version,get_semantic_version_parts
 
 
 def init_empty_folder_query(var_dict):
@@ -123,8 +123,8 @@ def populate_config_with_subfolder_ids(cfg,init_dict):
                         else:
                             user_lib_entry_data['subfolder_id']=None
 
-        cfg['version']=get_script_version()
+        cfg['version']=get_MUMC_version()
 
-        save_yaml_config(cfg,init_dict['mumc_path'] / init_dict['config_file_name_yaml'])
+        save_yaml_config(cfg,init_dict['config_file_path'] / init_dict['config_file_name_yaml'])
 
     return cfg

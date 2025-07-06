@@ -1,37 +1,59 @@
 #!/usr/bin/env python3
-import copy
 import sys
+import copy
 from pathlib import Path
 from mumc_modules.mumc_init import initialize_mumc,getIsAnyMediaEnabled,override_consoleOutputs_onDEBUG
-from mumc_modules.mumc_parse_options import parse_command_line_options
+from mumc_modules.mumc_parse_commands import parse_command_line_options
 from mumc_modules.mumc_config_import import importConfig
 from mumc_modules.mumc_config_builder import edit_configuration_file
 from mumc_modules.mumc_post_process import init_postProcessing
-from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml
+from mumc_modules.mumc_console_info import print_informational_header,print_starting_header,print_cache_stats,print_footer_information,print_all_media_disabled,cache_data_to_debug,print_configuration_yaml,override_media_manager_enabled_states
 from mumc_modules.mumc_get_media import init_getMedia
 from mumc_modules.mumc_sort import sortDeleteLists
-from mumc_modules.mumc_paths_files import get_current_directory,delete_debug_log
-from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
+from mumc_modules.mumc_paths_files import delete_debug_log,get_default_config_path
+from mumc_modules.mumc_output import open_and_return_file
 from mumc_modules.mumc_folder_cleanup import season_series_folder_cleanup
-from mumc_modules.mumc_config_default import create_default_config,merge_configuration
+from mumc_modules.mumc_config_merge import merge_configurations
 from mumc_modules.mumc_get_folders import populate_config_with_subfolder_ids
 from mumc_modules.mumc_delete import print_and_delete_items
+from mumc_modules.mumc_data_checks import data_checker,convertLegacyMediaManagers,convertLegacyMediaManagerSettings,convertLegacyMediaManagerLengths
+from mumc_modules.mumc_yaml_check import cfgCheckYAML,pre_cfgCheckYAML
+from mumc_modules.mumc_argenv_check import cfgCheckARGENV
 #from memory_profiler import profile
 
 
 #@profile
 def MUMC():
-    #inital dictionary setup
-    init_dict=initialize_mumc(get_current_directory(),Path(__file__).parent)
+
+    #inital dictionary setup; get cwd; get mumc.py full path and filename if changed
+    init_dict=initialize_mumc(Path('.').parent.resolve(),Path(__file__))
 
     #parse command line options
     cmdopt_dict=parse_command_line_options(init_dict)
 
+    #remove old DEBUG if it exists
+    delete_debug_log(init_dict)
+
+    #fully check argv commandline options (and environmental variables) are what we expect them to be
+    argvCfgChecker=data_checker(cmdopt_dict['argv'])
+    cmdopt_dict['argv']=cfgCheckARGENV(argvCfgChecker)
+
+    #update the argv created during initialization
+    init_dict['argv']=cmdopt_dict['argv']
+
     #import config file
     cfg,init_dict=importConfig(init_dict,cmdopt_dict)
 
-    #after importing the config; remove old DEBUG if it exists
-    delete_debug_log(init_dict)
+    #get and pre-check user defined values are what we expect them to be
+    pre_cfgCheckYAML(cfg,init_dict)
+
+    #must be done in this order
+    #convert legacy admin_settings > media_managers > *arr > {} into admin_settings > media_managers > *arr > []
+    cfg=convertLegacyMediaManagers(cfg)
+
+    #get and fully check user defined config values are what we expect them to be
+    userCfgChecker=data_checker(cfg)
+    cfg=cfgCheckYAML(userCfgChecker)
 
     #look for missing subfolder Ids and add them
     cfg=populate_config_with_subfolder_ids(cfg,init_dict)
@@ -39,25 +61,28 @@ def MUMC():
     #remember original config for when user wants to update existing config file
     cfg_orig=copy.deepcopy(cfg)
 
-    #precheck the config for the minimum needed variables to run
-    pre_cfgCheckYAML(cfg)
+    #convert legacy advanced_settings > *arr > media_type > {} into advanced_settings > *arr > media_type > []
+    cfg=convertLegacyMediaManagerSettings(cfg)
+    #match length of advanced_settings > *arr > media_type > [] to length of admin_settings > media_managers > *arr > []
+    cfg=convertLegacyMediaManagerLengths(cfg)
 
     #create default config file
-    default_config=create_default_config(cfg['admin_settings']['server']['brand'])
+    default_config=open_and_return_file(get_default_config_path(init_dict['MUMC_file_path']))
 
     #copy over path info for use later
-    default_config['mumc_path']=init_dict['mumc_path']
-    default_config['debug_file_name']=init_dict['debug_file_name']
+    default_config['debug_file_path']=init_dict['debug_file_path']
+    default_config['debug_file_name_log']=init_dict['debug_file_name_log']
 
     #merge user config into default config
-    cfg=merge_configuration(default_config,cfg)
+    cfg=merge_configurations(default_config,cfg)
 
     if (cfg['DEBUG']):
         #print config when DEBUG >= 1
         print_configuration_yaml(cfg,init_dict)
 
-    #get and check config values are what we expect them to be
-    cfg,init_dict=cfgCheckYAML(cfg,init_dict)
+    #get and fully check user defined + default config values are what we expect them to be
+    #cfgChecker=data_checker(cfg)
+    #cfg=cfgCheckYAML(cfgChecker)
 
     #merge cfg and init_dict; goal is to preserve cfg's structure
     init_dict.update(copy.deepcopy(cfg))
@@ -67,7 +92,7 @@ def MUMC():
     cfg['cached_data'].updateCacheVariables(cfg)
 
     #check if user wants to update the existing config file
-    if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (cmdopt_dict['configUpdater'])):
+    if ((cfg['advanced_settings']['UPDATE_CONFIG']) or (('-config_updater' in cmdopt_dict['argv']) and (cmdopt_dict['argv']['-config_updater']))):
         #check if user intentionally wants to update the config
         edit_configuration_file(cfg,cfg_orig)
 
@@ -84,7 +109,10 @@ def MUMC():
 
         return
 
-    #output details about script, Emby/Jellyfin, and server
+    #check for media_manager info; override if None or ''
+    cfg=override_media_manager_enabled_states(cfg)
+
+    #output details about MUMC, Emby/Jellyfin, and server
     print_informational_header(cfg)
 
     #when debug is enabled force all console outputs
@@ -93,7 +121,7 @@ def MUMC():
     #output the starting header
     print_starting_header(cfg)
 
-    #before running the main part of the script, determine if at least one media type is enabled to be monitored
+    #before running the main part of MUMC, determine if at least one media type is enabled to be monitored
     cfg=getIsAnyMediaEnabled(cfg)
 
     #check if at least one media type is enabled ot be monitored
@@ -136,13 +164,27 @@ def MUMC():
     return
 
 
-############# START OF SCRIPT #############
+############# START OF MUMC #############
 
 if (__name__ == "__main__"):
 
+    # ::::     :::: :::    ::: ::::    :::::  ::::::::
+    # +:+:+: :+:+:+ :+:    :+: +:+:+: :+:+:+ :+:    :+:
+    # +:+ +:+:+ +:+ +:+    +:+ +:+ +:+:+ +:+ +:+       
+    # +#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       
+    # +#+       +#+ +#+    +#+ +#+       +#+ +#+       
+    # #+#       #+# #+#    #+# #+#       #+# #+#    #+#
+    # ###       ###  ########  ###       ###  ########
     MUMC()
+    # ####     #### ###    ### ####    #####  ########
+    # #+#+#+ +#+#+# #+#    #+# #+#+#+ +#+#+# #+#    #+#
+    # +#+ +#+#+ +#+ +#+    +#+ +#+ +#+#+ +#+ +#+       
+    # +#+  +:+  +#+ +#+    +:+ +#+  +:+  +#+ +#+       
+    # +:+       +:+ +:+    +:+ +:+       +:+ +:+       
+    # :+:       :+: :+:    :+: :+:       :+: :+:    :+:
+    # :::       :::  ::::::::  :::       :::  ::::::::
 
 #Exit Gracefully
 sys.exit(0)
 
-############# END OF SCRIPT #############
+############# END OF MUMC #############
