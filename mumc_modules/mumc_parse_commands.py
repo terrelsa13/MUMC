@@ -211,25 +211,6 @@ def findCMD_getArgument(argv,optionsList,expectedCMD,the_dict):
         return cmdOption
 
 
-def convertCMDOptionsToDict(argv,optionsList):
-    cmd_dict={}
-    for cmd in argv:
-        if ((cmd == '-a') or (cmd == '-attrs') or (cmd == '-attributes') or
-            (cmd == '-u') or (cmd == '-config_updater') or
-            (cmd == '-h') or (cmd == '-help') or (cmd == '-?')):
-
-            if (((argv.index(cmd) + 1) < len(argv)) and
-               (argv[argv.index(cmd) + 1].strip().casefold() == 'false')):
-                #check if next list item is boolean
-                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='false'
-            else:
-                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='true'
-        elif (cmd  in optionsList):
-            cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]=argv[argv.index(cmd) + 1]
-
-    return cmd_dict
-
-
 def convertShortCMDOptionsToLongCMDOptions(cmd):
 
     if (cmd.casefold() == '-c'):
@@ -238,8 +219,6 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
         return '-server_brand'
     elif (cmd.casefold() == '-url'):
         return '-server_url'
-    elif (cmd.casefold() == '-username'):
-        return '-admin_username'
     elif (cmd.casefold() == '-password'):
         return '-admin_password'
     elif (cmd.casefold() == '-authkey'):
@@ -276,6 +255,25 @@ def convertShortCMDOptionsToLongCMDOptions(cmd):
         return cmd.casefold()
 
 
+def convertCMDOptionsToDict(argv,optionsList):
+    cmd_dict={}
+    for cmd in argv:
+        if ((cmd == '-a') or (cmd == '-attrs') or (cmd == '-attributes') or
+            (cmd == '-u') or (cmd == '-config_updater') or
+            (cmd == '-h') or (cmd == '-help') or (cmd == '-?')):
+
+            if (((argv.index(cmd) + 1) < len(argv)) and
+               (argv[argv.index(cmd) + 1].strip().casefold() == 'false')):
+                #check if next list item is boolean
+                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='false'
+            else:
+                cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]='true'
+        elif (cmd  in optionsList):
+            cmd_dict[convertShortCMDOptionsToLongCMDOptions(cmd)]=argv[argv.index(cmd) + 1]
+
+    return cmd_dict
+
+
 #convert container environmental variables into CMD options
 def convertEnvironmentalVariablesToCMDOptions(argv,envar):
 
@@ -297,9 +295,7 @@ def convertEnvironmentalVariablesToCMDOptions(argv,envar):
     if (envar.get('SERVER_URL')):
         argv['-server_url']=envar.get('SERVER_URL')
 
-    #save environmental variable - USERNAME,ADMIN_USERNAME
-    if (envar.get('USERNAME')):
-        argv['-admin_username']=envar.get('USERNAME')
+    #save environmental variable - ADMIN_USERNAME
     if (envar.get('ADMIN_USERNAME')):
         argv['-admin_username']=envar.get('ADMIN_USERNAME')
 
