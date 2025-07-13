@@ -1,8 +1,8 @@
 
 
 #emby or jellyfin?
-def get_brand():
-    defaultbrand='emby'
+def get_brand(defaultbrand='emby'):
+#    defaultbrand='emby'
     valid_brand=False
     selected_brand=defaultbrand
     while (valid_brand == False):
@@ -21,7 +21,7 @@ def get_brand():
 
 
 #ip address, hostname, or FQDN?
-def get_server_url(defaulturl='http://localhost'):
+def get_server_url(defaulturl='http://localhost:8096'):
     #defaulturl='http://localhost'
     url=input('Enter server ip, hostname, or FQDN (default ' + defaulturl + '): ')
     if (url == ''):
@@ -206,8 +206,8 @@ def get_tag_name(tagbehavior,existingtag):
                 print('\nDo not use backslash \'\\\'. Try again.\n')
 
 
-def get_show_disabled_users():
-    defaultvalue=True
+def get_show_disabled_users(defaultvalue=True):
+    #defaultvalue=True
     valid_value=False
     while (valid_value == False):
         print('Decide if users disabled in the GUI should be considered.')
@@ -226,8 +226,8 @@ def get_show_disabled_users():
     return(defaultvalue)
 
 
-def get_user_and_library_selection_type(library_setup_behavior):
-    defaultvalue=3
+def get_user_and_library_selection_type(library_setup_behavior,defaultvalue=3):
+    #defaultvalue=3
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
