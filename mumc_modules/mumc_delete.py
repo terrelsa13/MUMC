@@ -152,7 +152,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                             if (arrInfo['enabled'] and arrMovie['remove'] and (not (item['mumc']['providerIds']['Imdb'] == None))):
                                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
                                                     #remove movie from Radarr using Radarr Id
-                                                    media_item_data=remove_MOVIE_radarr_radarrId(media_item_data[0]['id'],the_dict)
+                                                    media_item_data=remove_MOVIE_radarr_radarrId(media_item_data[0]['id'],arrInfo,the_dict)
                                                 appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now removed from Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n',2,the_dict)
                                         except:
                                             print('RadarrMovieWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be removed from Radarr-' + str(the_dict['admin_settings']['media_managers']['radarr'].index(arrInfo)) + '.\n')
@@ -288,7 +288,7 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                                 media_item_data[0]['id']=media_item_data[0]['id']
                                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
                                                     #remove series from Sonarr
-                                                    media_item_data=remove_SERIES_sonarr(media_item_data['id'],the_dict)
+                                                    media_item_data=remove_SERIES_sonarr(media_item_data['id'],arrInfo,the_dict)
                                             appendTo_DEBUG_log(str(item['Type']) + 'Id: ' + str(item['Id']) + ' - ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is now removed from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
 
                                         except:
