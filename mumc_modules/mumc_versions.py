@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 #Get the current MUMC version
 def get_MUMC_version():
-    return '5.11.30-alpha'
+    return '5.11.31-alpha'
 
 
 #Get the min config version
