@@ -234,7 +234,8 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                         source = response.read()
                         if ((url.method == 'GET') or (url.method == 'PUT') or (url.method == 'POST')):
                             data = json.loads(source)
-                            the_dict['cached_data'].addEntryToCache(url.full_url,data)
+                            if (url.method == 'GET'):
+                                the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         elif (url.method == 'DELETE'):
                             data = response.getcode()
                         getdata = False
