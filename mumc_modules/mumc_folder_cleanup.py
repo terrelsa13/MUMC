@@ -64,10 +64,14 @@ def get_empty_folders(folder_type,the_dict):
             var_dict['QueryItemsRemaining_All']=var_dict['QueriesRemaining_Empty_Folder']
 
             for parentItem in var_dict['data_Empty_Folder']['Items']:
-                try:
+                #try:
+                if ('SeriesId' in parentItem):
                     seriesId=parentItem['SeriesId']
-                except:
+                #except:
+                elif ('ParentId' in parentItem):
                     seriesId=parentItem['ParentId']
+                else:
+                    parentItem = None
                 #When season look for parents with no children; add them to the delete list
                 #When season/series and REMOVE_FILES is True look for parents with no children; add them to the delete list
                 if (the_dict['advanced_settings']['REMOVE_FILES']):
@@ -80,10 +84,10 @@ def get_empty_folders(folder_type,the_dict):
                                 else:
                                     parentItems_Tracker.append(parentItem['Id'])
                                     the_dict['parentDeleteItems'].append(parentItem)
-                                if (seriesId in the_dict['child_remaining']):
-                                    the_dict['child_remaining'][seriesId]+=1
+                                if (seriesId in the_dict['pre_child_remaing']):
+                                    the_dict['pre_child_remaing'][seriesId]+=1
                                 else:
-                                    the_dict['child_remaining'][seriesId]=1
+                                    the_dict['pre_child_remaing'][seriesId]=1
                 #When season/series and REMOVE_FILES is False simulate looking for parents with no children; adding them to the delete list
                 else:
                     if (not (parentItem == None)):
