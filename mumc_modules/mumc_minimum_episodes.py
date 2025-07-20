@@ -579,7 +579,8 @@ class minEpisodesToKeep_data_handler:
                         #make sure an empty list was not returned (i.e. the series still exists on Sonarr)
                         if (not (seriesInfo == [])):
                             #check the "status" value and "ended" value
-                            if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
+                            #if(((seriesInfo[0]['status'] == 'ended') or (seriesInfo[0]['status'] == 'deleted')) and seriesInfo[0]['ended']):
+                            if(seriesInfo[0]['ended']):
                                 while (episodeId in self.episodesToKeepIds):
                                     self.episodesToKeepIds.pop(self.episodesToKeepIds.index(episodeId))
                         break

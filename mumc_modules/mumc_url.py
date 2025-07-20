@@ -232,9 +232,10 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                 if ((response.getcode() == 200) or (response.getcode() == 202)):
                     try:
                         source = response.read()
-                        data = json.loads(source)
-                        if ((url.method == 'GET')):
-                            the_dict['cached_data'].addEntryToCache(url.full_url,data)
+                        if ((url.method == 'GET') or (url.method == 'PUT') or (url.method == 'POST')):
+                            data = json.loads(source)
+                            if (url.method == 'GET'):
+                                the_dict['cached_data'].addEntryToCache(url.full_url,data)
                         elif (url.method == 'DELETE'):
                             data = response.getcode()
                         getdata = False

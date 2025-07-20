@@ -72,7 +72,7 @@ def lookup_MOVIE_radarrInfo_IMdBId(radarrIMdbId,arrInfo,the_dict):
 
     req=build_radarr_request_message(url=url,arrInfo=arrInfo)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'lookup_info_for_movie_with_tmdbId: ' + str(radarrIMdbId), the_dict['admin_settings']['api_controls']['attempts'], False)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'lookup_info_for_movie_with_imdbId: ' + str(radarrIMdbId), the_dict['admin_settings']['api_controls']['attempts'], False)
 
     return itemInfo
 
@@ -132,7 +132,7 @@ def lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,arrInfo,the_dict):
 
     req=build_sonarr_request_message(url=url,arrInfo=arrInfo)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'lookup_info_for_series_with_tmdbid' + str(seriesIMdBId), the_dict['admin_settings']['api_controls']['attempts'],False)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'lookup_info_for_series_with_imdbid' + str(seriesIMdBId), the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo
 
