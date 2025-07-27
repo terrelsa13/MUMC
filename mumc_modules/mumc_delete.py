@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 from mumc_modules.mumc_console_info import build_config_setup_to_delete_media
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,lookup_MOVIE_radarrInfo_IMdBId,get_MOVIE_radarrInfo_TMdBId,put_MOVIE_radarrInfo_radarrId,remove_MOVIE_radarr_radarrId,put_EPISODE_sonarrInfo_sonarrId,lookup_SERIES_sonarrInfo_IMdbId,get_SERIES_sonarrInfo_TVdbId,put_SERIES_sonarrInfo_sonarrId,remove_SERIES_sonarr
+from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,lookup_MOVIE_radarrInfo_IMdBId,get_MOVIE_radarrInfo_TMdBId,put_MOVIE_radarrInfo_radarrId,remove_MOVIE_radarr_radarrId,lookup_EPISODE_sonarrInfo_sonarrId,put_EPISODE_sonarrInfo_sonarrId,lookup_SERIES_sonarrInfo_IMdbId,get_SERIES_sonarrInfo_TVdbId,put_SERIES_sonarrInfo_sonarrId,remove_SERIES_sonarr
 from mumc_modules.mumc_string_case import all_uppercase_lowercase_permutations
 #from memory_profiler import profile
 
@@ -188,6 +188,31 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     #loop thru each sonarr instance
                     for arrInfo,arrEpisode in zip(the_dict['admin_settings']['media_managers']['sonarr'],the_dict['advanced_settings']['sonarr']['episode']):
                         try:
+                            user_info={}
+                            user_info['user_id']=the_dict['admin_settings']['server']['admin_id']
+                            #get series info
+                            series_info=get_ADDITIONAL_itemInfo(user_info,item['SeriesId'],'get_series_info_to_unmonitor_and_or_remove',the_dict)
+                            item['mumc']={}
+                            item['mumc']['providerIds']=series_info['ProviderIds']
+                            ######################################################################
+                            #For episodes; because TVDB sometimes changes the series Ids and then re-adds them with completely new Ids this has to be done in a certain order
+                            #  1. Lookup series in Sonarr using the IMDB Id (the IMDB Id should NEVER change)
+                            #  2. Grab the Sonarr series Id from the lookup in step #1
+                            #  3. Lookup season specific episodes using the Sonarr series Id from step#2
+                            #  4. Loop thru episodes in this season until finding a matching episode number
+                            #  5. Grab the Sonarr episode Id from step #4
+                            #  6. Use the Sonarr episode Id to unmonitor the episode in Sonarr
+                            ######################################################################
+                            #lookup series info from sonarrr using IMdBId
+                            lookup_media_item_data=lookup_SERIES_sonarrInfo_IMdbId(item['mumc']['providerIds']['Imdb'],arrInfo,the_dict)
+                            #lookup episode info from Sonarr using Sonarr SeriesId
+                            lookup_episode_data=lookup_EPISODE_sonarrInfo_sonarrId(lookup_media_item_data[0]['id'],item['ParentIndexNumber'],arrInfo,the_dict)
+                            #find sonarr episode id and episode fileId in list of returned episodes
+                            for episode_data in lookup_episode_data:
+                                if (episode_data['episodeNumber'] == item['IndexNumber']):
+                                    item['mumc']['providerIds']['sonarr']=lookup_episode_data[lookup_episode_data.index(episode_data)]['id']
+                                    #item['mumc']['providerIds']['sonarrFileId']=lookup_episode_data[lookup_episode_data.index(episode_data)]['episodeFileId']
+                                    break
                             #unmonitor media item
                             if ((arrInfo['enabled']) and (arrEpisode['unmonitor'])):
                                 if (the_dict['advanced_settings']['REMOVE_FILES']):
