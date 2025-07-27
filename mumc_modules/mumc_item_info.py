@@ -125,6 +125,17 @@ def remove_MOVIE_radarr_radarrId(radarrId,arrInfo,the_dict):
     return itemInfo
 
 
+#get episode item info from Sonarr series Id
+def lookup_EPISODE_sonarrInfo_sonarrId(sonarrSeriesId,seasonNumber,arrInfo,the_dict):
+    url=arrInfo['url'] + '/api/v3/episode?seriesId=' + str(sonarrSeriesId) + '&seasonNumber=' +str(seasonNumber)
+
+    req=build_sonarr_request_message(url=url,arrInfo=arrInfo)
+
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_epsiode_with_sonarrSeriesid' + str(sonarrSeriesId), the_dict['admin_settings']['api_controls']['attempts'],False)
+
+    return itemInfo
+
+
 #get series item info from IMDB Id
 def lookup_SERIES_sonarrInfo_IMdbId(seriesIMdBId,arrInfo,the_dict):
 
@@ -144,7 +155,7 @@ def get_SERIES_sonarrInfo_TVdbId(seriesTVdBId,arrInfo,the_dict):
 
     req=build_sonarr_request_message(url=url,arrInfo=arrInfo)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_tvdbid' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'],False)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_series_with_tvdbid' + str(seriesTVdBId), the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo
 
@@ -156,7 +167,7 @@ def get_SERIES_sonarrInfo_sonarrId(sonarrId,arrInfo,the_dict):
 
     req=build_sonarr_request_message(url=url,arrInfo=arrInfo)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_movie_with_sonarrid' + str(sonarrId), the_dict['admin_settings']['api_controls']['attempts'],False)
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'get_info_for_series_with_sonarrid' + str(sonarrId), the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo
 
