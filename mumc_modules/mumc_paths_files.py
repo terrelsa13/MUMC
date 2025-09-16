@@ -97,7 +97,8 @@ def delete_debug_log(the_dict):
             pass
 
     #if a mumc_DEBUG.log file exists in the old location (aka the root structure); go ahead and delete it
-    Path(the_dict['MUMC_file_path'] / the_dict['debug_file_name_log']).unlink(missing_ok=True)
+    if (doesFileExist(the_dict['MUMC_file_path'] / the_dict['debug_file_name_log'])):
+        Path(the_dict['MUMC_file_path'] / the_dict['debug_file_name_log']).unlink()
 
 
 #Remove emojis before printing to mumc_debug.log
