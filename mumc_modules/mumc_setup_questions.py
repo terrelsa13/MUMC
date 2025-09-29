@@ -2,7 +2,6 @@
 
 #emby or jellyfin?
 def get_brand(defaultbrand='emby'):
-#    defaultbrand='emby'
     valid_brand=False
     selected_brand=defaultbrand
     while (valid_brand == False):
@@ -22,22 +21,22 @@ def get_brand(defaultbrand='emby'):
 
 #ip address, hostname, or FQDN?
 def get_server_url(defaulturl='http://localhost:8096'):
-    #defaulturl='http://localhost'
     url=input('Enter server ip, hostname, or FQDN (default ' + defaulturl + '): ')
+    #remove any trailing forward slashes "/"
+    url=url.rstrip("/")
+    #check if default url selected
     if (url == ''):
         return(defaulturl)
-    else:
-        if (url.find('://',3,8) >= 0):
-            return(url)
-        else:
-           url='http://' + url
-           print('Assuming server ip, hostname, or FQDN is: ' + url)
-           return(url)
+    #check if custom url entered without leading http:// or https://
+    elif (url.find('://',3,8) < 0):
+            #add if http:// or https:// not found
+            url=f"http://{url}"
+            print(f'Assuming server ip, hostname, or FQDN is: {url}')
+    return url
 
 
 #does user want to setup *arr?
 def proceed_arr_setup(arr):
-    #print('\nPreparing MUMC to use ' + arr + '.')
     print('\nPreparing to add or modify ' + arr + ' API settings...')
     choice=input('Do you want to continue? [y/N]: ').casefold()
     if ((choice == 'y') or (choice == 'yes') or (choice == 'ye')):
@@ -61,7 +60,6 @@ def get_arr_api(arr):
         print('Copy the API key.')
         print('It can be found in ' + arr + ' Settings > General > Security > API Key')
         api_key=str(input('Paste the ' + arr + ' API Key: '))
-        #if(isinstance(api_key,str) and (api_key.isalpha() or api_key.isalnum() or api_key.isnumeric())):
         if(api_key.isalpha() or api_key.isalnum() or api_key.isnumeric() and (len(api_key) == 32)):
             valid_apiKey=True
         else:
@@ -183,7 +181,6 @@ def get_tag_name(tagbehavior,existingtag):
                 inputtagname_return=list(set(inputtagname_return))
                 for inputtag in inputtagname_return:
                     if (not (inputtag == '')):
-                        #existingtag_split=existingtag.split(',')
                         for donetag in existingtag:
                             if (inputtag == donetag):
                                 valid_tag=False
@@ -207,7 +204,6 @@ def get_tag_name(tagbehavior,existingtag):
 
 
 def get_show_disabled_users(defaultvalue=True):
-    #defaultvalue=True
     valid_value=False
     while (valid_value == False):
         print('Decide if users disabled in the GUI should be considered.')
@@ -227,7 +223,6 @@ def get_show_disabled_users(defaultvalue=True):
 
 
 def get_user_and_library_selection_type(library_setup_behavior,defaultvalue=3):
-    #defaultvalue=3
     valid_value=False
     while (valid_value == False):
         print('Decide how to select users and/or libraries.')
@@ -253,7 +248,6 @@ def get_user_and_library_selection_type(library_setup_behavior,defaultvalue=3):
             defaultvalue=2
         elif (selection == '3'):
             valid_value = True
-            #defaultvalue=3
         else:
             print('\nInvalid choice. Try again.\n')
     return(defaultvalue)

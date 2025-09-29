@@ -416,7 +416,7 @@ def get_multiple_user_selection(all_users):
     #loop until finished selecting users
     while (loop_active):
         #show message on console; wait for input
-        user_selection_str = input('Select one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+        user_selection_str = input('Select/Unselect one or more users.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
         #scrub and normalize selection
         selected_user_list=clean_selection_convert_selection_to_list(user_selection_str)

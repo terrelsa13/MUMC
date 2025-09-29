@@ -207,7 +207,7 @@ def get_multiple_library_selection(preferred_listing_type,libraries_to_show,user
     #loop until finished selecting libraries
     while (loop_active):
         #show message on console; wait for input
-        library_selection_str = input('Select one or more libraries to be ' + str(preferred_listing_type) + 'ed.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
+        library_selection_str = input('Select/Unselect one or more libraries to be ' + str(preferred_listing_type) + 'ed.\n*Use a comma or space to separate multiple selections.\nLeave blank when finished: ')
 
         #scrub and normalize selection
         selected_library_list=clean_selection_convert_selection_to_list(library_selection_str)
