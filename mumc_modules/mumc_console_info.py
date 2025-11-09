@@ -61,8 +61,9 @@ def override_media_manager_enabled_states(the_dict):
                 unmonitorSonarrSeries=arrSeries['unmonitor']
                 removeSonarrSeries=arrSeries['remove']
                 unmonitorSonarrEpisode=arrEpisode['unmonitor']
+                removeSonarrEpisode=arrEpisode['remove']
 
-                arrInfo['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode)
+                arrInfo['enabled']=(unmonitorSonarrSeries or removeSonarrSeries or unmonitorSonarrEpisode or removeSonarrEpisode)
             else:
                 arrInfo['enabled']=False
 

@@ -1052,6 +1052,8 @@ def cfgCheckYAML(cfgChecker):
 
                     unmonitor=cfgChecker.checkBoolean('advanced_settings','sonarr','episode',cfgChecker.cfg['advanced_settings']['sonarr']['episode'].index(sonarrConfig),'unmonitor',value=None,instanceType=cfgChecker.bool,errOut=True)
 
+                    remove=cfgChecker.checkBoolean('advanced_settings','sonarr','episode',cfgChecker.cfg['advanced_settings']['sonarr']['episode'].index(sonarrConfig),'remove',value=None,instanceType=cfgChecker.bool,errOut=True)
+
 #######################################################################################################
 
         #if (not ((lidarr_config:=cfgChecker.checkDict('advanced_settings','lidarr',value=None,instanceType=cfgChecker.dict,minLength=None,maxLength=None,errOut=True,comparisonValues=None)) == None)):

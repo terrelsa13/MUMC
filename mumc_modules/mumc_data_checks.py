@@ -834,6 +834,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('radarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['radarr']={}
         if ((not (isinstance(cfg['advanced_settings']['radarr'],dict))) or (not('movie' in cfg['advanced_settings']['radarr']))):
+            cfg['advanced_settings']['radarr']={}
             cfg['advanced_settings']['radarr']['movie']=[]
         if (not (isinstance(cfg['advanced_settings']['radarr']['movie'],list))):
             cfg['advanced_settings']['radarr']['movie']=[]
@@ -849,6 +850,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('sonarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['sonarr']={}
         if ((not (isinstance(cfg['advanced_settings']['sonarr'],dict))) or (not('series' in cfg['advanced_settings']['sonarr']))):
+            cfg['advanced_settings']['sonarr']={}
             cfg['advanced_settings']['sonarr']['series']=[]
         if (not (isinstance(cfg['advanced_settings']['sonarr']['series'],list))):
             cfg['advanced_settings']['sonarr']['series']=[]
@@ -864,6 +866,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('sonarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['sonarr']={}
         if ((not (isinstance(cfg['advanced_settings']['sonarr'],dict))) or (not('episode' in cfg['advanced_settings']['sonarr']))):
+            cfg['advanced_settings']['sonarr']={}
             cfg['advanced_settings']['sonarr']['episode']=[]
         if (not (isinstance(cfg['advanced_settings']['sonarr']['episode'],list))):
             cfg['advanced_settings']['sonarr']['episode']=[]
@@ -879,6 +882,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('lidarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['lidarr']={}
         if ((not (isinstance(cfg['advanced_settings']['lidarr'],dict))) or (not('album' in cfg['advanced_settings']['lidarr']))):
+            cfg['advanced_settings']['lidarr']={}
             cfg['advanced_settings']['lidarr']['album']=[]
         if (not (isinstance(cfg['advanced_settings']['lidarr']['album'],list))):
             cfg['advanced_settings']['lidarr']['album']=[]
@@ -894,6 +898,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('lidarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['lidarr']={}
         if ((not (isinstance(cfg['advanced_settings']['lidarr'],dict))) or (not('track' in cfg['advanced_settings']['lidarr']))):
+            cfg['advanced_settings']['lidarr']={}
             cfg['advanced_settings']['lidarr']['track']=[]
         if (not (isinstance(cfg['advanced_settings']['lidarr']['track'],list))):
             cfg['advanced_settings']['lidarr']['track']=[]
@@ -909,6 +914,7 @@ def convertLegacyMediaManagerLengths(cfg):
         if ((not (isinstance(cfg['advanced_settings'],dict))) or (not('readarr' in cfg['advanced_settings']))):
             cfg['advanced_settings']['readarr']={}
         if ((not (isinstance(cfg['advanced_settings']['readarr'],dict))) or (not('book' in cfg['advanced_settings']['readarr']))):
+            cfg['advanced_settings']['readarr']={}
             cfg['advanced_settings']['readarr']['book']=[]
         if (not (isinstance(cfg['advanced_settings']['readarr']['book'],list))):
             cfg['advanced_settings']['readarr']['book']=[]

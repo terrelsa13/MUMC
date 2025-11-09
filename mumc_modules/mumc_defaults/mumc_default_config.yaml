@@ -336,6 +336,7 @@ advanced_settings:
       remove: false
     episode:
     - unmonitor: true
+      remove: false
   trakt_fix:
     set_missing_last_played_date:
       movie: true

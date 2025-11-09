@@ -1087,33 +1087,256 @@ def merge_configurations(cfg_default,cfg_user):
 
 
     try:
-        cfg_default['advanced_settings']['radarr']['movie']=cfg_user['advanced_settings']['radarr']['movie']
+        cfg_user['advanced_settings']['radarr']=cfg_user['advanced_settings']['radarr']
     except:
-        pass
-            
+        cfg_user['advanced_settings']={'radarr'}
 
     try:
-        cfg_default['advanced_settings']['sonarr']['series']=cfg_user['advanced_settings']['sonarr']['series']
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['radarr']['movie']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                        cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['radarr']['movie'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['radarr']['movie'].append({'unmonitor': cfg_default['advanced_settings']['radarr']['movie'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                        cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['radarr']['movie'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                    cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['radarr']['movie'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['radarr']['movie'].append({'unmonitor': cfg_default['advanced_settings']['radarr']['movie'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                        cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['remove']=cfg_default['advanced_settings']['radarr']['movie'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['radarr']['movie'].append({'remove': cfg_default['advanced_settings']['radarr']['movie'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                        cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['radarr']['movie'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['radarr']['movie']) > arrIndex):
+                    cfg_default['advanced_settings']['radarr']['movie'][arrIndex]['remove']=cfg_default['advanced_settings']['radarr']['movie'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['radarr']['movie'].append({'remove': cfg_default['advanced_settings']['radarr']['movie'][0]['remove']})
+            arrIndex+=1
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['sonarr']['episode']=cfg_user['advanced_settings']['sonarr']['episode']
+        cfg_user['advanced_settings']['sonarr']=cfg_user['advanced_settings']['sonarr']
+    except:
+        cfg_user['advanced_settings']={'sonarr'}
+
+    try:
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['sonarr']['series']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['sonarr']['series'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['series'].append({'unmonitor': cfg_default['advanced_settings']['sonarr']['series'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['series'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                    cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['sonarr']['series'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['sonarr']['series'].append({'unmonitor': cfg_default['advanced_settings']['sonarr']['series'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['remove']=cfg_default['advanced_settings']['sonarr']['series'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['series'].append({'remove': cfg_default['advanced_settings']['sonarr']['series'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['series'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['sonarr']['series']) > arrIndex):
+                    cfg_default['advanced_settings']['sonarr']['series'][arrIndex]['remove']=cfg_default['advanced_settings']['sonarr']['series'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['sonarr']['series'].append({'remove': cfg_default['advanced_settings']['sonarr']['series'][0]['remove']})
+            arrIndex+=1
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['lidarr']['album']=cfg_user['advanced_settings']['lidarr']['album']
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['sonarr']['episode']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['sonarr']['episode'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['episode'].append({'unmonitor': cfg_default['advanced_settings']['sonarr']['episode'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['episode'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                    cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['sonarr']['episode'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['sonarr']['episode'].append({'unmonitor': cfg_default['advanced_settings']['sonarr']['episode'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['remove']=cfg_default['advanced_settings']['sonarr']['episode'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['episode'].append({'remove': cfg_default['advanced_settings']['sonarr']['episode'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                        cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['sonarr']['episode'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['sonarr']['episode']) > arrIndex):
+                    cfg_default['advanced_settings']['sonarr']['episode'][arrIndex]['remove']=cfg_default['advanced_settings']['sonarr']['episode'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['sonarr']['episode'].append({'remove': cfg_default['advanced_settings']['sonarr']['episode'][0]['remove']})
+            arrIndex+=1
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['lidarr']['track']=cfg_user['advanced_settings']['lidarr']['track']
+        cfg_user['advanced_settings']['lidarr']=cfg_user['advanced_settings']['lidarr']
+    except:
+        cfg_user['advanced_settings']={'lidarr'}
+
+    try:
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['lidarr']['album']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['lidarr']['album'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['album'].append({'unmonitor': cfg_default['advanced_settings']['lidarr']['album'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['album'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                    cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['lidarr']['album'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['lidarr']['album'].append({'unmonitor': cfg_default['advanced_settings']['lidarr']['album'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['remove']=cfg_default['advanced_settings']['lidarr']['album'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['album'].append({'remove': cfg_default['advanced_settings']['lidarr']['album'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['album'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['lidarr']['album']) > arrIndex):
+                    cfg_default['advanced_settings']['lidarr']['album'][arrIndex]['remove']=cfg_default['advanced_settings']['lidarr']['album'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['lidarr']['album'].append({'remove': cfg_default['advanced_settings']['lidarr']['album'][0]['remove']})
+            arrIndex+=1
     except:
         pass
 
     try:
-        cfg_default['advanced_settings']['readarr']['book']=cfg_user['advanced_settings']['readarr']['book']
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['lidarr']['track']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['lidarr']['track'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['track'].append({'unmonitor': cfg_default['advanced_settings']['lidarr']['track'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['track'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                    cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['lidarr']['track'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['lidarr']['track'].append({'unmonitor': cfg_default['advanced_settings']['lidarr']['track'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['remove']=cfg_default['advanced_settings']['lidarr']['track'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['track'].append({'remove': cfg_default['advanced_settings']['lidarr']['track'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                        cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['lidarr']['track'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['lidarr']['track']) > arrIndex):
+                    cfg_default['advanced_settings']['lidarr']['track'][arrIndex]['remove']=cfg_default['advanced_settings']['lidarr']['track'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['lidarr']['track'].append({'remove': cfg_default['advanced_settings']['lidarr']['track'][0]['remove']})
+            arrIndex+=1
+    except:
+        pass
+
+    try:
+        cfg_user['advanced_settings']['readarr']=cfg_user['advanced_settings']['readarr']
+    except:
+        cfg_user['advanced_settings']={'readarr'}
+
+    try:
+        arrIndex=0
+        for arrEntry in cfg_user['advanced_settings']['readarr']['book']:
+            try:
+                if ((not (isinstance(arrEntry['unmonitor'],bool)))):
+                    if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                        cfg_default['advanced_settings']['readarr']['book'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['readarr']['book'][0]['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['readarr']['book'].append({'unmonitor': cfg_default['advanced_settings']['readarr']['book'][0]['unmonitor']})
+                else:
+                    if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                        cfg_default['advanced_settings']['readarr']['book'][arrIndex]['unmonitor']=arrEntry['unmonitor']
+                    else:
+                        cfg_default['advanced_settings']['readarr']['book'].append({'unmonitor': arrEntry['unmonitor']})
+            except:
+                if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                    cfg_default['advanced_settings']['readarr']['book'][arrIndex]['unmonitor']=cfg_default['advanced_settings']['readarr']['book'][0]['unmonitor']
+                else:
+                    cfg_default['advanced_settings']['readarr']['book'].append({'unmonitor': cfg_default['advanced_settings']['readarr']['book'][0]['unmonitor']})
+            try:
+                if ((not (isinstance(arrEntry['remove'],bool)))):
+                    if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                        cfg_default['advanced_settings']['readarr']['book'][arrIndex]['remove']=cfg_default['advanced_settings']['readarr']['book'][0]['remove']
+                    else:
+                        cfg_default['advanced_settings']['readarr']['book'].append({'remove': cfg_default['advanced_settings']['readarr']['book'][0]['remove']})
+                else:
+                    if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                        cfg_default['advanced_settings']['readarr']['book'][arrIndex]['remove']=arrEntry['remove']
+                    else:
+                        cfg_default['advanced_settings']['readarr']['book'].append({'remove': arrEntry['remove']})
+            except:
+                if (len(cfg_default['advanced_settings']['readarr']['book']) > arrIndex):
+                    cfg_default['advanced_settings']['readarr']['book'][arrIndex]['remove']=cfg_default['advanced_settings']['readarr']['book'][0]['remove']
+                else:
+                    cfg_default['advanced_settings']['readarr']['book'].append({'remove': cfg_default['advanced_settings']['readarr']['book'][0]['remove']})
+            arrIndex+=1
     except:
         pass
 
