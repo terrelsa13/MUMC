@@ -316,7 +316,7 @@ def clean_selection_convert_selection_to_list(selection_str):
 
 
 #check if all selections are valid
-def are_valid_inputs_selected(selection_list,selection_limit):
+def are_valid_numeric_inputs_selected(selection_list,selection_limit):
     #loop thru all selections
     for thisSelection in selection_list:
         try:
@@ -391,7 +391,7 @@ def get_single_user_selection(all_users):
                 show_users(all_users)
                 print()
         #check if single user was selected; verify selection is valid
-        elif ((len(selected_user_list) == 1) and (are_valid_inputs_selected(selected_user_list,len(all_users) - 1))):
+        elif ((len(selected_user_list) == 1) and (are_valid_numeric_inputs_selected(selected_user_list,len(all_users) - 1))):
             #at least one user selected; ok to exit selection loop
             loop_active=False
         else:
@@ -436,7 +436,7 @@ def get_multiple_user_selection(all_users):
                 show_users(all_users)
                 print()
         #check if single user was selected; verify selection is valid
-        elif (are_valid_inputs_selected(selected_user_list,len(all_users) - 1)):
+        elif (are_valid_numeric_inputs_selected(selected_user_list,len(all_users) - 1)):
             #at least one user selected; ok to exit selection loop
             loop_active=False
         else:
@@ -487,6 +487,8 @@ def toggle_selected_user_libraries(preferred_listing_type,all_users,user_selecti
                     thisUserLib.selected=(not thisUserLib.selected)
                     break
 
+    return all_users
+
 
 #update user libraries select flag all to the same value
 def on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection):
@@ -509,3 +511,5 @@ def on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_sel
                     #toggle selection
                     thisUserLib.selected=(not all_users[usrPos].selected)
                     break
+
+    return all_users

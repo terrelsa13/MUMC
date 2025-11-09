@@ -1,5 +1,5 @@
 from mumc_modules.mumc_library_queries import get_all_libraries_from_media_server,get_all_library_subfolders
-from mumc_modules.mumc_builder_user import clean_selection_convert_selection_to_list,are_valid_inputs_selected
+from mumc_modules.mumc_builder_user import clean_selection_convert_selection_to_list,are_valid_numeric_inputs_selected
 
 
 #user library class for builder
@@ -80,7 +80,7 @@ def get_all_libraries(the_dict):
          #playlists - Emby
          #boxsets - Emby
 
-        #check if CollectionType dos not exist
+        #check if CollectionType does not exist
         if (not ('CollectionType' in virtFolder)):
             #for libraries with a "Mixed Movies And Shows" content type the CollectionType does not exist; add a custom "mixed" CollectionType
             virtFolder['CollectionType']='mixed'
@@ -227,7 +227,7 @@ def get_multiple_library_selection(preferred_listing_type,libraries_to_show,user
                 show_libraries(libraries_to_show)
                 print()
         #check if single library was selected; verify selection is valid
-        elif (are_valid_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
+        elif (are_valid_numeric_inputs_selected(selected_library_list,len(libraries_to_show) - 1)):
             #at least one library selected; ok to exit selection loop
             loop_active=False
         else:
@@ -255,10 +255,14 @@ def select_all_user_libraries(all_users,selected_value=True):
             #unselecte this library
             thisLib.selected=selected_value
 
+    return all_users
+
 
 #set selected for all user libraries to False
 def unselect_all_user_libraries(all_users,selected_value=False):
     select_all_user_libraries(all_users,selected_value)
+
+    return all_users
 
 
 #auto select all libraries

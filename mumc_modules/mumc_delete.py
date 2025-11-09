@@ -4,7 +4,7 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 from mumc_modules.mumc_console_info import build_config_setup_to_delete_media
 from mumc_modules.mumc_server_type import isJellyfinServer
 from mumc_modules.mumc_season_episode import get_season_episode
-from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,lookup_MOVIE_radarrInfo_IMdBId,get_MOVIE_radarrInfo_TMdBId,put_MOVIE_radarrInfo_radarrId,remove_MOVIE_radarr_radarrId,lookup_EPISODE_sonarrInfo_sonarrId,put_EPISODE_sonarrInfo_sonarrId,lookup_SERIES_sonarrInfo_IMdbId,get_SERIES_sonarrInfo_TVdbId,put_SERIES_sonarrInfo_sonarrId,remove_SERIES_sonarr
+from mumc_modules.mumc_item_info import get_ADDITIONAL_itemInfo,lookup_MOVIE_radarrInfo_IMdBId,get_MOVIE_radarrInfo_TMdBId,put_MOVIE_radarrInfo_radarrId,remove_MOVIE_radarr_radarrId,lookup_EPISODE_sonarrInfo_sonarrId,put_EPISODE_sonarrInfo_sonarrId,lookup_SERIES_sonarrInfo_IMdbId,get_SERIES_sonarrInfo_TVdbId,put_SERIES_sonarrInfo_sonarrId,remove_SERIES_sonarr,rescan_SERIES_sonarr
 from mumc_modules.mumc_string_case import all_uppercase_lowercase_permutations
 #from memory_profiler import profile
 
@@ -58,6 +58,8 @@ def delete_media_item(itemID,the_dict):
 #list and delete items past played threshold
 def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
     deleteItems_Tracker=[]
+    sonarrRescan_seriesTracker_set=set()
+    sonarrRescan_seriesTracker_dict={}
 
     print_summary_header=the_dict['advanced_settings']['console_controls']['headers']['summary']['show']
     summary_header_format=the_dict['advanced_settings']['console_controls']['headers']['summary']['formatting']
@@ -213,15 +215,35 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                                     item['mumc']['providerIds']['sonarr']=lookup_episode_data[lookup_episode_data.index(episode_data)]['id']
                                     #item['mumc']['providerIds']['sonarrFileId']=lookup_episode_data[lookup_episode_data.index(episode_data)]['episodeFileId']
                                     break
-                            #unmonitor media item
-                            if ((arrInfo['enabled']) and (arrEpisode['unmonitor'])):
-                                if (the_dict['advanced_settings']['REMOVE_FILES']):
-                                    #unmonitor episode item in Sonarr
-                                    media_item_response=put_EPISODE_sonarrInfo_sonarrId(item['mumc']['providerIds']['sonarr'],arrInfo,the_dict)
-                                appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            try:
+                                #unmonitor media item
+                                if ((arrInfo['enabled']) and (arrEpisode['unmonitor'])):
+                                    if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                        #unmonitor episode item in Sonarr
+                                        media_item_response=put_EPISODE_sonarrInfo_sonarrId(item['mumc']['providerIds']['sonarr'],arrInfo,the_dict)
+                                        appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" monitor status is now unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                    else:
+                                        appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" simulated being unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            except:
+                                print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                                appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            try:
+                                #prepare to remove media item
+                                if ((arrInfo['enabled']) and (arrEpisode['remove'])):
+                                    #if (the_dict['advanced_settings']['REMOVE_FILES']):
+                                    #"remove" episode item in Sonarr later by adding it's series it to this set; series will be rescanned later
+                                    if (not (episode_data['seriesId'] in sonarrRescan_seriesTracker_set)):
+                                        sonarrRescan_seriesTracker_set.add(str(episode_data['seriesId']))
+                                        sonarrRescan_seriesTracker_dict[str(episode_data['seriesId'])]=lookup_media_item_data[0]['title']
+                                    appendTo_DEBUG_log(str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" is added to the episode remove series tracker and will be later rescanned in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                                    
+                            except:
+                                print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be added to the episode remove series tracker and will not be rescanned later in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                                appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be added to the episode remove series tracker and will not be rescanned later in Sonarr' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+
                         except:
-                            print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
-                            appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" cannot be unmonitored in Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+                            print('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" issue getting data from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n')
+                            appendTo_DEBUG_log('SonarrEpisodeWarning: ' + str(serverBrand) + str(item['Type']) + 'Id: ' + str(item['Id']) + ' - SeriesName: ' + str(item['SeriesName']) + ' ' + str(item['Type']) + 'Name: "' + str(item['Name']) + '" issue getting data from Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
 
                     #Delete media item
                     if (delete_media_item(item['Id'],the_dict)):
@@ -349,6 +371,16 @@ def print_and_delete_items(deleteItems,the_dict,delete_item_type='Media'):
                     strings_list_to_print+='Not Able To Delete Unknown Media Type' + '\n'
 
                     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])
+
+        #loop thru each sonarr instance
+        if (len(sonarrRescan_seriesTracker_set) > 0):
+            for arrInfo in the_dict['admin_settings']['media_managers']['sonarr']:
+                #loop thru each series
+                for thisSonarrSeriesId in sonarrRescan_seriesTracker_set:
+                    #API call to rescan the parent series for all sonarr "removed" episodes stored in sonarrRescan_seriesTracker_set; one call per series
+                    media_item_response=rescan_SERIES_sonarr(thisSonarrSeriesId,arrInfo,the_dict)
+                    appendTo_DEBUG_log('SonarrSeriesId: ' + str(thisSonarrSeriesId) + ' - SeriesName: "' + str(sonarrRescan_seriesTracker_dict[thisSonarrSeriesId]) + '" rescan series request sent to Sonarr-' + str(the_dict['admin_settings']['media_managers']['sonarr'].index(arrInfo)) + '.\n',2,the_dict)
+
     else:
         strings_list_to_print=''
         strings_list_to_print+='[NO ITEMS TO DELETE]' + '\n'

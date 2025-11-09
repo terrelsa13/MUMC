@@ -229,7 +229,7 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
             with urlrequest.urlopen(url) as response:
                 if (debugState):
                     appendTo_DEBUG_log("\nResponse code: " + str(response.getcode()),2,the_dict)
-                if ((response.getcode() == 200) or (response.getcode() == 202)):
+                if ((response.getcode() == 200) or (response.getcode() == 201) or (response.getcode() == 202)):
                     try:
                         source = response.read()
                         if ((url.method == 'GET') or (url.method == 'PUT') or (url.method == 'POST')):

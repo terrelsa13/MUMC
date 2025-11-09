@@ -1,6 +1,7 @@
 from mumc_modules.mumc_server_type import isEmbyServer
 from mumc_modules.mumc_builder_library import get_all_libraries,get_list_of_libraries_to_show,enumerate_libraries_to_be_shown,show_libraries,get_multiple_library_selection,select_all_user_libraries,unselect_all_user_libraries,auto_select_libraries_to_show
-from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries,remove_users_without_valid_libraries
+#from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,on_off_all_selected_user_libraries,remove_users_without_valid_libraries
+from mumc_modules.mumc_builder_user import get_all_users,clean_all_users,clean_all_user_libraries,update_all_user_libraries,show_users,show_users,get_single_user_selection,get_multiple_user_selection,auto_select_all_users,toggle_selected_user_libraries,remove_users_without_valid_libraries
 
 
 #build users and libraries
@@ -110,10 +111,10 @@ def build_users_and_libraries(the_dict):
 
             if (user_library_selection == 2):
                 #unselect all user libraries before show_libraries(); this will show all as unselected
-                unselect_all_user_libraries(all_users)
+                all_users=unselect_all_user_libraries(all_users)
             else:
                 #select all user libraries
-                select_all_user_libraries(all_users)
+                all_users=select_all_user_libraries(all_users)
 
         ##########################################################################################################
         ######Library Selection###################################################################################
@@ -131,7 +132,7 @@ def build_users_and_libraries(the_dict):
                     libraries_to_show=get_list_of_libraries_to_show(preferred_listing_type,all_users,user_selection)
 
                     #enumerate each library selection to align with it's position in the list
-                    enumerate_libraries_to_be_shown(libraries_to_show)
+                    libraries_to_show=enumerate_libraries_to_be_shown(libraries_to_show)
 
                     #print library info to console
                     show_libraries(libraries_to_show)
@@ -140,7 +141,7 @@ def build_users_and_libraries(the_dict):
                     library_selection=get_multiple_library_selection(preferred_listing_type,libraries_to_show,user_library_selection)
 
                     #toggle if library is considered selected or unselected
-                    toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
+                    all_users=toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
                     #if no library selected set loop to inactive
                     if (library_selection == []):
@@ -161,7 +162,7 @@ def build_users_and_libraries(the_dict):
 
                     if (user_library_selection == 1):
                         #toggle if library is considered selected or unselected
-                        on_off_all_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
+                        all_users=toggle_selected_user_libraries(preferred_listing_type,all_users,user_selection,libraries_to_show,library_selection)
 
                     #stop loop
                     library_loop_active=False

@@ -184,7 +184,7 @@ def put_SERIES_sonarrInfo_sonarrId(sonarrId,arrInfo,seriesData,the_dict):
     return itemInfo
 
 
-#remove series from sonar
+#remove series from sonarr
 def remove_SERIES_sonarr(sonarrId,arrInfo,the_dict):
 
     url=arrInfo['url'] + '/api/v3/series/' + str(sonarrId) + '?deleteFiles=false&addImportExclusion=false'
@@ -208,5 +208,21 @@ def put_EPISODE_sonarrInfo_sonarrId(sonarrItemId,arrInfo,the_dict,monitored_stat
     req=build_sonarr_request_message(url=url,arrInfo=arrInfo,accept='*/*',data=monitorData_dict,method='PUT')
 
     itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'set_episodeId_' + str(monitorData_dict['episodeIds']) + '_monitor_status_to_' + str(monitorData_dict['monitored']), the_dict['admin_settings']['api_controls']['attempts'])
+
+    return itemInfo
+
+
+#"remove" episodes from sonarr by rescanning the series after episodes deleted in emby/jf
+def rescan_SERIES_sonarr(seriesId,arrInfo,the_dict):
+    
+    rescanData_dict={}
+    rescanData_dict['name']="rescanSeries"
+    rescanData_dict['seriesId']=int(seriesId)
+
+    url=arrInfo['url'] + '/api/v3/command'
+
+    req=build_sonarr_request_message(url=url,arrInfo=arrInfo,accept='',data=rescanData_dict,method='POST')
+
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], 'rescan_series_with_sonarrId: ' + str(seriesId) + ' from_Sonarr', the_dict['admin_settings']['api_controls']['attempts'],False)
 
     return itemInfo

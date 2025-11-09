@@ -112,8 +112,8 @@ def appendTo_DEBUG_log(string_to_save,debugLevel,the_dict):
                 #create blank file
                 pass
 
-        #limit number of characters in a single write to 250
-        #loop thru inputs > 250 characters and write in multiple passes
+        #limit number of characters in a single write to 128
+        #loop thru inputs > 128 characters and write in multiple passes
         if (len(string_to_save) > character_limit):
             append_long_string_to_file(str(string_to_save),Path(the_dict['debug_file_path']) / the_dict['debug_file_name_log'],character_limit)
         else:
