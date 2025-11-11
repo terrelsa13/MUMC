@@ -1089,7 +1089,7 @@ def merge_configurations(cfg_default,cfg_user):
     try:
         cfg_user['advanced_settings']['radarr']=cfg_user['advanced_settings']['radarr']
     except:
-        cfg_user['advanced_settings']={'radarr'}
+        cfg_user['advanced_settings']['radarr']={'movie': {}}
 
     try:
         arrIndex=0
@@ -1133,7 +1133,7 @@ def merge_configurations(cfg_default,cfg_user):
     try:
         cfg_user['advanced_settings']['sonarr']=cfg_user['advanced_settings']['sonarr']
     except:
-        cfg_user['advanced_settings']={'sonarr'}
+        cfg_user['advanced_settings']['sonarr']={'series': {}, 'episode': {}}
 
     try:
         arrIndex=0
@@ -1216,7 +1216,7 @@ def merge_configurations(cfg_default,cfg_user):
     try:
         cfg_user['advanced_settings']['lidarr']=cfg_user['advanced_settings']['lidarr']
     except:
-        cfg_user['advanced_settings']={'lidarr'}
+        cfg_user['advanced_settings']['lidarr']={'album': {}, 'track': {}}
 
     try:
         arrIndex=0
@@ -1299,7 +1299,7 @@ def merge_configurations(cfg_default,cfg_user):
     try:
         cfg_user['advanced_settings']['readarr']=cfg_user['advanced_settings']['readarr']
     except:
-        cfg_user['advanced_settings']={'readarr'}
+        cfg_user['advanced_settings']['readarr']={'book': {}}
 
     try:
         arrIndex=0
