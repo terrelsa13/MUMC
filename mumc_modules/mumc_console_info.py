@@ -423,9 +423,9 @@ def print_containerized_config_missing(the_dict):
     strings_list_to_print=''
     strings_list_to_print+=the_dict['_console_separator'] + '\n'
     strings_list_to_print+='Config file missing or not setup.' + '\n'
-    strings_list_to_print+='Config file should be located at ' + str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + ' of the guest OS.' + '\n'
+    strings_list_to_print+='Config file should be located at ' + str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + ' of the guest OS.' + '\n'
     strings_list_to_print+='\n'
-    strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c '+ str(the_dict['mumc_path_config_dir'] / the_dict['config_file_name_yaml']) + '\n'
+    strings_list_to_print+='To build config run: docker exec -it mumc python ./mumc.py -c '+ str(the_dict['config_file_path'] / the_dict['config_file_name_yaml']) + '\n'
     strings_list_to_print+=the_dict['console_separator'] + '\n'
 
     print_byType(strings_list_to_print,True,the_dict,the_dict['formatting'])

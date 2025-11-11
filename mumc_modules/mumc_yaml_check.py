@@ -2328,5 +2328,5 @@ def pre_cfgCheckYAML(cfg,init_dict):
 
     if (errorFlag):
         #Bring error to attention
-        print('\nConfigError: configuration - ' + str(init_dict['mumc_path_config_dir']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(init_dict['version']) + ' is not compatible with MUMC v' + str(get_MUMC_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']) + '\n')
+        print('\nConfigError: configuration - ' + str(init_dict['config_file_path']) + '/' + str(init_dict['config_file_name_yaml']) + ' v' + str(cfg['version']) + ' is not compatible with MUMC v' + str(get_MUMC_version()) + '\n\tMinimum allowed version is ' + str(init_dict['min_config_version']) + '\n\tMaximum allowed version is ' + str(init_dict['max_config_version']) + '\n')
         sys.exit(0)

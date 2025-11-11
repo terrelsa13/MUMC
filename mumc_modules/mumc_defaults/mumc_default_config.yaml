@@ -1,5 +1,5 @@
 ---
-version:
+version: 0.0.0
 basic_settings:
   filter_statements:
     movie:
