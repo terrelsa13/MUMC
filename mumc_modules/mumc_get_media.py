@@ -828,6 +828,11 @@ def init_getMedia(the_dict):
     the_dict['enabled_user_ids']=[]
     the_dict['disabled_users']=[]
     the_dict['disabled_user_ids']=[]
+
+    #Create userId list of accessible libraries
+    the_dict['byUserId_accessibleLibraries']={}
+    the_dict['byUserId_accessibleLibraryParents']={}
+
     #Get items that could be ready for deletion
     for user_info in the_dict['admin_settings']['users']:
 
@@ -848,13 +853,16 @@ def init_getMedia(the_dict):
             the_dict['enabled_users'].append(user_info)
             the_dict['enabled_user_ids'].append(user_info['user_id'])
 
-    #Create userId list of accessible libraries
-    the_dict['byUserId_accessibleLibraries']={}
-    the_dict['byUserId_accessibleLibraryParents']={}
+    ##Create userId list of accessible libraries
+    #the_dict['byUserId_accessibleLibraries']={}
+    #the_dict['byUserId_accessibleLibraryParents']={}
 
-    for user_info in the_dict['admin_settings']['users']:
+    #for user_info in the_dict['admin_settings']['users']:
         the_dict['byUserId_accessibleLibraries'][user_info['user_id']]=[]
         the_dict['byUserId_accessibleLibraryParents'][user_info['user_id']]=[]
+
+        library_id='lib_id'
+        parent_id='lib_id'
 
         for lib_info in user_info['whitelist']:
             #if (isJellyfinServer(the_dict['admin_settings']['server']['brand'])):
@@ -867,8 +875,8 @@ def init_getMedia(the_dict):
                 #else:
                     #library_id='lib_id'
                     #parent_id='lib_id'
-            library_id='lib_id'
-            parent_id='lib_id'
+            #library_id='lib_id'
+            #parent_id='lib_id'
 
             if (not (lib_info[library_id] == None)):
                 the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])
@@ -886,8 +894,8 @@ def init_getMedia(the_dict):
                 #else:
                     #library_id='lib_id'
                     #parent_id='lib_id'
-            library_id='lib_id'
-            parent_id='lib_id'
+            #library_id='lib_id'
+            #parent_id='lib_id'
 
             if (not (lib_info[library_id] == None)):
                 the_dict['byUserId_accessibleLibraries'][user_info['user_id']].append(lib_info[library_id])

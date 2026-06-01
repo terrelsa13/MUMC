@@ -1,5 +1,6 @@
 **
 !docker/
+!docker/cron/
 !mumc_modules/
 !mumc_modules/mumc_defaults/
 !mumc.py
