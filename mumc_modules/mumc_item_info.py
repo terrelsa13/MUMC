@@ -3,14 +3,16 @@ from mumc_modules.mumc_url import requestURL,build_emby_jellyfin_request_message
 
 
 #get additional item info needed to make a decision about a media item
-def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict):
+def get_ADDITIONAL_itemInfo(user_info,itemId,lookupTopic,the_dict,exitOnError=True):
     #Get additonal item information
 
     url=the_dict['admin_settings']['server']['url'] + '/Users/' + user_info['user_id']  + '/Items/' + str(itemId) + '?enableImages=False&enableUserData=True&Fields=ParentId,Genres,Tags,RecursiveItemCount,ChildCount,Type,ProviderIds'
 
     req=build_emby_jellyfin_request_message(url,the_dict)
 
-    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'])
+    #exitOnError=False allows callers to handle a missing item (i.e. a stale
+    #reference to an itemId the server no longer has) instead of exiting
+    itemInfo=requestURL(the_dict, req, the_dict['DEBUG'], lookupTopic + '_for_' + str(itemId), the_dict['admin_settings']['api_controls']['attempts'], exitOnError)
 
     return itemInfo
 
