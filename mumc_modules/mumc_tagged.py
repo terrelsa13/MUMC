@@ -373,7 +373,8 @@ def get_isEPISODE_Tagged(the_dict,item,user_info,usertags):
 
                 if (('Studios' in series_item_info) and does_index_exist(series_item_info['Studios'],0)):
                     #Get studio network's item info
-                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
+                     #exitOnError=False; the None check below already handles a missing item (Issue #178)
+                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict,exitOnError=False)
                 elif ('SeriesStudio' in series_item_info):
                     #Get series studio network's item info
                     tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict,the_dict)

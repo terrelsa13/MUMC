@@ -160,9 +160,12 @@ def get_isSTUDIONETWORK_Fav(user_info,item,isfav_ITEMstdo_ntwk,favorites_advance
             #Check if bitmask for any or first item genre is enabled
             if (favorites_advanced == 1):
                 #Get studio network's item info
-                studionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,item['Studios'][0]['Id'],'studio_network_info',the_dict)
+                studionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,item['Studios'][0]['Id'],'studio_network_info',the_dict,exitOnError=False)
+                #Studio may reference an itemId the server no longer has; nothing to favorite check (Issue #178)
+                if (studionetwork_item_info == None):
+                    pass
                 #Check if studio-network's favorite value already exists in dictionary
-                if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
+                elif not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
                     if (('UserData' in studionetwork_item_info) and ('IsFavorite' in studionetwork_item_info['UserData'])):
                         #Store if the studio network is marked as a favorite
                         isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
@@ -175,9 +178,12 @@ def get_isSTUDIONETWORK_Fav(user_info,item,isfav_ITEMstdo_ntwk,favorites_advance
             else:
                 for studios in range(len(item['Studios'])):
                     #Get studio network's item info
-                    studionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,item['Studios'][studios]['Id'],'studio_network_info',the_dict)
+                    studionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,item['Studios'][studios]['Id'],'studio_network_info',the_dict,exitOnError=False)
+                    #Studio may reference an itemId the server no longer has; nothing to favorite check (Issue #178)
+                    if (studionetwork_item_info == None):
+                        pass
                     #Check if studio network's favorite value already exists in dictionary
-                    if not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
+                    elif not studionetwork_item_info['Id'] in isfav_ITEMstdo_ntwk:
                         if (('UserData' in studionetwork_item_info) and ('IsFavorite' in studionetwork_item_info['UserData'])):
                             #Store if the studio network is marked as a favorite
                             isfav_ITEMstdo_ntwk[studionetwork_item_info['Id']] = studionetwork_item_info['UserData']['IsFavorite']
@@ -410,7 +416,8 @@ def get_isEPISODE_AdvancedFav(the_dict,item,user_info,var_dict):
 
                 if (('Studios' in series_item_info) and (does_index_exist(series_item_info['Studios'],0))):
                     #Get studio network's item info
-                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict)
+                     #exitOnError=False; the None check below already handles a missing item (Issue #178)
+                    tvstudionetwork_item_info = get_ADDITIONAL_itemInfo(user_info,series_item_info['Studios'][0]['Id'],'studio_network_info',the_dict,exitOnError=False)
                 elif ('SeriesStudio' in series_item_info):
                     #Get series studio network's item info
                     tvstudionetwork_item_info = get_STUDIO_itemInfo(series_item_info['SeriesStudio'],the_dict)

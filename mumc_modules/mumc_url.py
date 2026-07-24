@@ -361,9 +361,13 @@ def requestURL(the_dict, url='', debugState=0, requestDebugMessage='message unde
                     else:
                         return None
         except HTTPError as err:
-            time.sleep(doubling_delay)
-            #doubling_delay value doubles each time the same API request is resent
-            doubling_delay += doubling_delay
+            #404 Not Found is permanent for this request; retrying cannot change the outcome
+            if (err.code == 404):
+                doubling_delay = (2**retryAttempts)
+            else:
+                time.sleep(doubling_delay)
+                #doubling_delay value doubles each time the same API request is resent
+                doubling_delay += doubling_delay
             if (doubling_delay >= (2**retryAttempts)):
                 print('\nHTTPError: Unable to get information from server during processing of: ' + requestDebugMessage)
                 try:
